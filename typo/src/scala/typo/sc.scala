@@ -6,18 +6,16 @@ import typo.sc.syntax.CodeInterpolator
 import java.nio.file.{Files, Path}
 import scala.collection.immutable.SortedSet
 
-/**
- * Simplified model of the scala language.
- * 
- * The generated code is stored in the `Code` data structure.
- * For full flexibility, some parts are stored as text and other parts in trees. 
- * Most notably *all type and term references* which need an import to work should be in a tree. 
- * 
- * You'll mainly use this module with the `code"..."` interpolator.
- * 
- * (It should rather be called `scala`, but let's avoid that name clash)
- */
-object sc { 
+/** Simplified model of the scala language.
+  *
+  * The generated code is stored in the `Code` data structure. For full flexibility, some parts are stored as text and other parts in trees. Most notably *all
+  * type and term references* which need an import to work should be in a tree.
+  *
+  * You'll mainly use this module with the `code"..."` interpolator.
+  *
+  * (It should rather be called `scala`, but let's avoid that name clash)
+  */
+object sc {
   sealed trait Tree
 
   case class Ident(value: String) extends Tree {
@@ -124,21 +122,22 @@ object sc {
   }
 
   def renderTree(tree: Tree): String = {
-    tree match
-      case Ident(value) => value
-      case QIdent(value) => value.map(renderTree).mkString(".")
+    tree match {
+      case Ident(value)     => value
+      case QIdent(value)    => value.map(renderTree).mkString(".")
       case Param(name, tpe) => renderTree(name) + ": " + renderTree(tpe)
-      case StrLit(str) => '"'.toString + str + '"'.toString
+      case StrLit(str)      => '"'.toString + str + '"'.toString
       case tpe: Type =>
-        tpe match
-          case Type.Wildcard => "_"
+        tpe match {
+          case Type.Wildcard                  => "_"
           case Type.TApply(underlying, targs) => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
-          case Type.Qualified(value) => renderTree(value)
+          case Type.Qualified(value)          => renderTree(value)
+        }
       case StringInterpolate(_, prefix, content) =>
         val Quote = '"'.toString
         s"${renderTree(prefix)}${Quote * 3}${content.render}${Quote * 3}"
+    }
   }
-
 
   case class File(tpe: Type.Qualified, contents: Code) {
     def name: Ident = tpe.value.last
@@ -165,40 +164,40 @@ object sc {
     implicit final class CodeInterpolator(private val sc: StringContext) extends AnyVal {
       def code(args: Code*): Code = {
         val fragments = List.newBuilder[Code]
-        sc.parts.zipWithIndex.foreach {
-          case (str, n) =>
-            if (n > 0) fragments += args(n - 1)
-            fragments += Code.Str(StringContext.processEscapes(str))
+        sc.parts.zipWithIndex.foreach { case (str, n) =>
+          if (n > 0) fragments += args(n - 1)
+          fragments += Code.Str(StringContext.processEscapes(str))
         }
         Code.Combined(fragments.result())
       }
     }
   }
 
-  /**
-   * Semi-structured generated code.
-   * We keep all `Tree`s as long as possible so we can write imports based on what is used
-   */
+  /** Semi-structured generated code. We keep all `Tree`s as long as possible so we can write imports based on what is used
+    */
   sealed trait Code {
     override def toString: String = sys.error("stringifying code too early loses structure")
 
     def stripMargin: Code =
-      this match
+      this match {
         case Code.Combined(codes) => Code.Combined(codes.map(_.stripMargin))
-        case Code.Str(value) => Code.Str(value.stripMargin)
-        case tree@Code.Tree(_) => tree
+        case Code.Str(value)      => Code.Str(value.stripMargin)
+        case tree @ Code.Tree(_)  => tree
+      }
 
     def render: String =
-      this match
+      this match {
         case Code.Combined(codes) => codes.map(_.render).mkString
-        case Code.Str(str) => str
-        case Code.Tree(tree) => renderTree(tree)
+        case Code.Str(str)        => str
+        case Code.Tree(tree)      => renderTree(tree)
+      }
 
     def mapTrees(f: Tree => Tree): Code =
-      this match
+      this match {
         case Code.Combined(codes) => Code.Combined(codes.map(_.mapTrees(f)))
-        case str@Code.Str(_) => str
-        case Code.Tree(tree) => Code.Tree(f(tree))
+        case str @ Code.Str(_)    => str
+        case Code.Tree(tree)      => Code.Tree(f(tree))
+      }
 
     def ++(other: Code): Code = Code.Combined(List(this, other))
   }
