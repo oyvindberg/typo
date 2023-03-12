@@ -1,0 +1,33 @@
+$schema: https://raw.githubusercontent.com/oyvindberg/bleep/master/schema.json
+$version: 0.0.1-M26
+jvm:
+  name: graalvm-java17:22.2.0
+projects:
+  tests:
+    dependencies: org.scalatest::scalatest:3.2.13
+    dependsOn: typo
+    extends: template-common
+    isTestProject: true
+  typo:
+    extends: template-common
+    platform:
+      mainClass: com.foo.App
+  typo-scripts:
+    dependsOn: typo
+    dependencies: build.bleep::bleep-core:${BLEEP_VERSION}
+    extends: template-common
+    platform:
+      mainClass: com.foo.App
+  typo-tester:
+    dependencies:
+      - org.playframework.anorm::anorm:2.7.0
+      - com.typesafe.play::play-json:2.10.0-RC7
+    extends: template-common
+templates:
+  template-common:
+    platform:
+      name: jvm
+    scala:
+      options: -encoding utf8 -feature -unchecked
+      strict: true
+      version: 3.2.0
