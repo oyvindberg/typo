@@ -21,30 +21,7 @@ object Gen {
     case class Cached(repoMethods: List[RepoMethod], table: db.Table) extends Repo
   }
 
-  sealed trait RepoMethod {
-    def sig: sc.Code = this match {
-      case RepoMethod.SelectAll(rowType) =>
-        code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
-      case RepoMethod.SelectById(idParam, rowType) =>
-        code"def selectById($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Option(rowType)}"
-      case RepoMethod.SelectAllByIds(idParam, rowType) =>
-        code"def selectByIds($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
-      case RepoMethod.SelectByUnique(params, rowType) =>
-        code"def selectByUnique(${params.map(_.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option(rowType)}"
-      case RepoMethod.SelectByFieldValues(param, rowType) =>
-        code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
-      case RepoMethod.UpdateFieldValues(idParam, param) =>
-        code"def updateFieldValues($idParam, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Int}"
-      case RepoMethod.InsertDbGeneratedKey(param, idType) =>
-        code"def insert($param)(implicit c: ${sc.Type.Connection}): $idType"
-      case RepoMethod.InsertProvidedKey(idParam, unsavedParam) =>
-        code"def insert($idParam, $unsavedParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
-      case RepoMethod.InsertOnlyKey(idParam) =>
-        code"def insert($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
-      case RepoMethod.Delete(idParam) =>
-        code"def delete($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
-    }
-  }
+  sealed trait RepoMethod
 
   object RepoMethod {
     case class SelectAll(rowType: sc.Type) extends RepoMethod
@@ -77,12 +54,12 @@ object Gen {
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
             |  val ByName: ${sc.Type.Map(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
-            |  implicit val column: ${libs.anorm.Column(EnumType)} =
-            |    implicitly[${libs.anorm.Column(sc.Type.String)}].mapResult { str =>
-            |      $ByName.get(str).toRight(${libs.anorm.SqlMappingError}(s"$$str was not among $$Names"))
+            |  implicit val column: ${DbLib.anorm.Column(EnumType)} =
+            |    implicitly[${DbLib.anorm.Column(sc.Type.String)}].mapResult { str =>
+            |      $ByName.get(str).toRight(${DbLib.anorm.SqlMappingError}(s"$$str was not among $$Names"))
             |    }
             |
-            |  implicit val toStatement: ${libs.anorm.ToStatement(EnumType)} = implicitly[${libs.anorm.ToStatement(sc.Type.String)}].contramap(_.value)
+            |  implicit val toStatement: ${DbLib.anorm.ToStatement(EnumType)} = implicitly[${DbLib.anorm.ToStatement(sc.Type.String)}].contramap(_.value)
             |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |}
             |""".stripMargin
@@ -90,7 +67,7 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  case class TableFiles(pkg: sc.QIdent, table: db.Table, jsonLib: JsonLib) {
+  case class TableFiles(pkg: sc.QIdent, table: db.Table, dbLib: DbLib, jsonLib: JsonLib) {
     val scalaFields: Seq[(sc.Ident, sc.Type, db.Col)] = {
       table.cols.map {
         case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
@@ -114,8 +91,8 @@ object Gen {
               |  ${fields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
               |)
               |object $name {
-              |  implicit val rowParser: ${libs.anorm.RowParser(rowType)} = { row =>
-              |    ${libs.anorm.Success}(
+              |  implicit val rowParser: ${DbLib.anorm.RowParser(rowType)} = { row =>
+              |    ${DbLib.anorm.Success}(
               |      $name(
               |        ${fetchValues.mkCode(",\n        ")}
               |      )
@@ -155,8 +132,8 @@ object Gen {
         name -> code"case class $name(override val value: $tpe) extends $fieldValueType(${sc.StrLit(col.name.value)}, value)"
       }
       val str =
-        code"""sealed abstract class $fieldValueName[T: ${libs.anorm.ToStatementName}](val name: String, val value: T) {
-              |  def toNamedParameter: ${libs.anorm.NamedParameter} = ${libs.anorm.NamedParameter}(name, ${libs.anorm.ParameterValue}.toParameterValue(value))
+        code"""sealed abstract class $fieldValueName[T: ${DbLib.anorm.ToStatementName}](val name: String, val value: T) {
+              |  def toNamedParameter: ${DbLib.anorm.NamedParameter} = ${DbLib.anorm.NamedParameter}(name, ${DbLib.anorm.ParameterValue}.toParameterValue(value))
               |}
               |
               |object $fieldValueName {
@@ -175,9 +152,9 @@ object Gen {
         val str =
           code"""case class $name(value: $underlying) extends AnyVal
                 |object $name {
-                |  implicit val column: ${libs.anorm.Column(tpe)} = implicitly[${libs.anorm.Column(underlying)}].map($name.apply)
+                |  implicit val column: ${DbLib.anorm.Column(tpe)} = implicitly[${DbLib.anorm.Column(underlying)}].map($name.apply)
                 |  implicit val ordering: ${sc.Type.Ordering(tpe)} = Ordering.by(_.value)
-                |  implicit val toStatement: ${libs.anorm.ToStatement(tpe)} = implicitly[${libs.anorm.ToStatement(underlying)}].contramap(_.value)
+                |  implicit val toStatement: ${DbLib.anorm.ToStatement(tpe)} = implicitly[${DbLib.anorm.ToStatement(underlying)}].contramap(_.value)
                 |  ${jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}
                 |}
                 |""".stripMargin
@@ -228,7 +205,7 @@ object Gen {
       val tpe = sc.Type.Qualified(pkg / Repo)
       val str =
         code"""trait $Repo {
-              |  ${repoMethods.map(_.sig).mkCode("\n  ")}
+              |  ${repoMethods.map(dbLib.sig).mkCode("\n  ")}
               |}
               |""".stripMargin
 
@@ -244,13 +221,13 @@ object Gen {
           val joinedColNames = table.cols.map(_.name.value).mkString(", ")
           val impl: sc.Code = repoMethod match {
             case RepoMethod.SelectAll(_) =>
-              val sql = libs.anorm.sql(code"""select $joinedColNames from ${table.name.value}""")
+              val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.name.value}""")
               code"""$sql.as(${RowFile.tpe}.rowParser.*)"""
             case RepoMethod.SelectById(idParam, _) =>
-              val sql = libs.anorm.sql(code"""select $joinedColNames from ${table.name.value} where ${table.idCol.get.name.value} = $$${idParam.name}""")
+              val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.name.value} where ${table.idCol.get.name.value} = $$${idParam.name}""")
               code"""$sql.as(${RowFile.tpe}.rowParser.singleOpt)"""
             case RepoMethod.SelectAllByIds(idsParam, _) =>
-              val sql = libs.anorm.sql(code"""select $joinedColNames from ${table.name.value} where ${table.idCol.get.name.value} in $$${idsParam.name}""")
+              val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.name.value} where ${table.idCol.get.name.value} in $$${idsParam.name}""")
               code"""$sql.as(${RowFile.tpe}.rowParser.*)"""
             case RepoMethod.SelectByUnique(_, _) => "???"
             case RepoMethod.SelectByFieldValues(param, _) =>
@@ -278,7 +255,7 @@ object Gen {
             case RepoMethod.InsertOnlyKey(_)           => code"???"
             case RepoMethod.Delete(_)                  => code"???"
           }
-          code"override ${repoMethod.sig} = \n    $impl"
+          code"override ${dbLib.sig(repoMethod)} = \n    $impl"
         }
 
         val str =
@@ -307,7 +284,7 @@ object Gen {
     val enumFiles: List[sc.File] =
       enums.map(stringEnumClass(pkg, _, jsonLib))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(pkg, table, jsonLib).all)
+      tables.flatMap(table => TableFiles(pkg, table, DbLib.anorm, jsonLib).all)
     val allFiles: List[sc.File] =
       enumFiles ++ tableFiles
     val knownNames = allFiles.map { f => (f.name, f.tpe.value) }.toMap
