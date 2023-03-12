@@ -1,130 +1,24 @@
 package typo
 
 import typo.Show.*
-import typo.db.*
 
 import java.nio.file.{Files, Path}
 
 object Gen {
-
-  case class ScalaIdent(value: String) extends AnyVal {
-    def appended(suffix: String) = new ScalaIdent(value + suffix)
-  }
-
-  object ScalaIdent {
-    implicit val shows: Show[ScalaIdent] = _.value
-    private def camelCase(name: ColName): ScalaIdent =
-      ScalaIdent(
-        name.value
-          .split('_')
-          .zipWithIndex
-          .map {
-            case (s, 0) => s
-            case (s, _) => s.capitalize
-          }
-          .mkString("")
-      )
-    def titleCase(name: String): ScalaIdent =
-      ScalaIdent(name.split('_').map(_.capitalize).mkString(""))
-    def field(name: ColName): ScalaIdent =
-      camelCase(name)
-    def id(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("Id")
-    def repo(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("Repo")
-    def repoImpl(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("RepoImpl")
-    def repoMock(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("RepoMock")
-    def row(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("Row")
-    def rowUnsaved(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("RowUnsaved")
-    def fieldValue(name: TableName): ScalaIdent =
-      titleCase(name.value).appended("FieldValue")
-    def `enum`(name: EnumName): ScalaIdent =
-      titleCase(name.value).appended("Enum")
-    def enumValue(name: String): ScalaIdent = ScalaIdent(name)
-  }
-
-  case class ScalaQIdent(value: List[ScalaIdent]) extends AnyVal {
-    def /(ident: ScalaIdent): ScalaQIdent = ScalaQIdent(value :+ ident)
-  }
-
-  object ScalaQIdent {
-    implicit val shows: Show[ScalaQIdent] = _.value.map(_.show).mkString(".")
-  }
-
-  case class ScalaParam(name: ScalaIdent, tpe: ScalaType)
-  object ScalaParam {
-    implicit val shows: Show[ScalaParam] = { case ScalaParam(name, tpe) =>
-      show"$name: $tpe"
-    }
-  }
-
-  case class StringLiteral(str: String)
-  object StringLiteral {
-    implicit val shows: Show[StringLiteral] = { case StringLiteral(str) =>
-      '"' + str + '"'
-    }
-  }
-  sealed trait ScalaType
-
-  object ScalaType {
-    case object Wildcard extends ScalaType
-    case object Int extends ScalaType
-    case object Long extends ScalaType
-    case object String extends ScalaType
-    case object Boolean extends ScalaType
-    case class Option(underlying: ScalaType) extends ScalaType
-    case class List(underlying: ScalaType) extends ScalaType
-    case class TApply(underlying: ScalaType, targs: scala.List[ScalaType]) extends ScalaType
-    case class Qualified(value: ScalaQIdent) extends ScalaType
-
-    object Qualified {
-      def apply(value: ScalaIdent): Qualified =
-        Qualified(ScalaQIdent(scala.List(value)))
-    }
-
-    implicit val shows: Show[ScalaType] = {
-      case Wildcard                  => "_"
-      case Int                       => "Int"
-      case Long                      => "Long"
-      case String                    => "String"
-      case Boolean                   => "Boolean"
-      case Option(underlying)        => show"Option[$underlying]"
-      case List(underlying)          => show"List[$underlying]"
-      case Qualified(qname)          => qname.show
-      case TApply(underlying, targs) => show"$underlying[${targs.map(shows.show).mkString(", ")}]"
-    }
-  }
-
-  def scalaType(pkg: ScalaQIdent, col: Col): ScalaType = {
+  def scalaType(pkg: s.QIdent, col: db.Col): s.Type = {
     val baseTpe = col.tpe match {
-      case DbType.BigInt              => ScalaType.Long
-      case DbType.VarChar(_)          => ScalaType.String
-      case DbType.Boolean             => ScalaType.Boolean
-      case DbType.StringEnum(name, _) => ScalaType.Qualified(pkg / ScalaIdent.`enum`(name))
+      case db.Type.BigInt              => s.Type.Long
+      case db.Type.VarChar(_)          => s.Type.String
+      case db.Type.Boolean             => s.Type.Boolean
+      case db.Type.StringEnum(name, _) => s.Type.Qualified(pkg / s.Ident.`enum`(name))
     }
-    if (col.isNotNull) baseTpe else ScalaType.Option(baseTpe)
+    if (col.isNotNull) baseTpe else s.Type.Option(baseTpe)
   }
 
-  def scalaFields(pkg: ScalaQIdent, table: Table): Seq[(ScalaIdent, ScalaType, Col)] = {
-    table.cols.map {
-      case col @ Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
-        if (!isNotNull) {
-          sys.error(s"assumption: id column in ${table.name.value} should be not null")
-        }
-        (ScalaIdent.field(colName), ScalaType.Qualified(pkg / ScalaIdent.id(table.name)), col)
-      case col =>
-        val finalType: ScalaType = scalaType(pkg, col)
-        (ScalaIdent.field(col.name), finalType, col)
-    }
-  }
   sealed trait Repo
   object Repo {
-    case class Direct(repoMethods: List[RepoMethod], table: Table) extends Repo
-    case class Cached(repoMethods: List[RepoMethod], table: Table) extends Repo
+    case class Direct(repoMethods: List[RepoMethod], table: db.Table) extends Repo
+    case class Cached(repoMethods: List[RepoMethod], table: db.Table) extends Repo
   }
 
   sealed trait RepoMethod {
@@ -153,26 +47,26 @@ object Gen {
   }
 
   object RepoMethod {
-    case class SelectAll(rowType: ScalaType) extends RepoMethod
-    case class SelectById(idParam: ScalaParam, rowType: ScalaType) extends RepoMethod
-    case class SelectAllByIds(idsParam: ScalaParam, rowType: ScalaType) extends RepoMethod
-    case class SelectByUnique(params: List[ScalaParam], rowType: ScalaType) extends RepoMethod
-    case class SelectByFieldValues(param: ScalaParam, rowType: ScalaType) extends RepoMethod
-    case class UpdateFieldValues(idParam: ScalaParam, param: ScalaParam) extends RepoMethod
-    case class InsertDbGeneratedKey(unsavedParam: ScalaParam, idType: ScalaType) extends RepoMethod
-    case class InsertProvidedKey(idParam: ScalaParam, unsavedParam: ScalaParam) extends RepoMethod
-    case class InsertOnlyKey(idParam: ScalaParam) extends RepoMethod
-    case class Delete(idParam: ScalaParam) extends RepoMethod
+    case class SelectAll(rowType: s.Type) extends RepoMethod
+    case class SelectById(idParam: s.Param, rowType: s.Type) extends RepoMethod
+    case class SelectAllByIds(idsParam: s.Param, rowType: s.Type) extends RepoMethod
+    case class SelectByUnique(params: List[s.Param], rowType: s.Type) extends RepoMethod
+    case class SelectByFieldValues(param: s.Param, rowType: s.Type) extends RepoMethod
+    case class UpdateFieldValues(idParam: s.Param, param: s.Param) extends RepoMethod
+    case class InsertDbGeneratedKey(unsavedParam: s.Param, idType: s.Type) extends RepoMethod
+    case class InsertProvidedKey(idParam: s.Param, unsavedParam: s.Param) extends RepoMethod
+    case class InsertOnlyKey(idParam: s.Param) extends RepoMethod
+    case class Delete(idParam: s.Param) extends RepoMethod
   }
 
-  case class File(name: ScalaIdent, contents: String)
+  case class File(name: s.Ident, contents: String)
 
-  def stringEnumClass(pkg: ScalaQIdent, `enum`: DbType.StringEnum): File = {
-    val EnumName = ScalaIdent.`enum`(`enum`.name)
+  def stringEnumClass(pkg: s.QIdent, `enum`: db.Type.StringEnum): File = {
+    val EnumName = s.Ident.`enum`(`enum`.name)
 
     val members = `enum`.values.map { value =>
-      val name = ScalaIdent.enumValue(value)
-      name -> show"case object $name extends $EnumName(${StringLiteral(value)})"
+      val name = s.Ident.enumValue(value)
+      name -> show"case object $name extends $EnumName(${s.StrLit(value)})"
     }
     val str =
       show"""package $pkg
@@ -208,11 +102,24 @@ object Gen {
     File(EnumName, str)
   }
 
-  case class TableFiles(pkg: ScalaQIdent, table: Table) {
+  case class TableFiles(pkg: s.QIdent, table: db.Table) {
+    val scalaFields: Seq[(s.Ident, s.Type, db.Col)] = {
+      table.cols.map {
+        case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
+          if (!isNotNull) {
+            sys.error(s"assumption: id column in ${table.name.value} should be not null")
+          }
+          (s.Ident.field(colName), s.Type.Qualified(pkg / s.Ident.id(table.name)), col)
+        case col =>
+          val finalType: s.Type = scalaType(pkg, col)
+          (s.Ident.field(col.name), finalType, col)
+      }
+    }
+
     val caseClass: File = {
-      val name = ScalaIdent.row(table.name)
-      val fields = scalaFields(pkg, table)
-      val fetchValues = fields.map { case (name, tpe, col) => show"$name = row[$tpe](${StringLiteral(col.name.value)})" }
+      val name = s.Ident.row(table.name)
+      val fields = scalaFields
+      val fetchValues = fields.map { case (name, tpe, col) => show"$name = row[$tpe](${s.StrLit(col.name.value)})" }
       val str =
         show"""package $pkg
               |
@@ -239,8 +146,8 @@ object Gen {
     }
 
     val caseClassUnsaved: Option[File] = {
-      val Unsaved = ScalaIdent.rowUnsaved(table.name)
-      scalaFields(pkg, table).filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) } match {
+      val Unsaved = s.Ident.rowUnsaved(table.name)
+      scalaFields.filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) } match {
         case Nil => None
         case fields =>
           val str =
@@ -261,10 +168,10 @@ object Gen {
     }
 
     val fieldValue: File = {
-      val FieldValue = ScalaIdent.fieldValue(table.name)
+      val FieldValue = s.Ident.fieldValue(table.name)
 
-      val members = scalaFields(pkg, table).map { case (name, tpe, col) =>
-        name -> show"case class $name(override val value: $tpe) extends $FieldValue(${StringLiteral(col.name.value)}, value)"
+      val members = scalaFields.map { case (name, tpe, col) =>
+        name -> show"case class $name(override val value: $tpe) extends $FieldValue(${s.StrLit(col.name.value)}, value)"
       }
       val str =
         show"""package $pkg
@@ -285,7 +192,7 @@ object Gen {
 
     val idFile: Option[File] = {
       table.idCol.map { idCol =>
-        val Id = ScalaIdent.id(table.name)
+        val Id = s.Ident.id(table.name)
         val underlying = scalaType(pkg, idCol)
         val str =
           show"""package $pkg
@@ -309,32 +216,32 @@ object Gen {
     }
 
     val repoMethods: Option[List[RepoMethod]] = Some {
-      val rowType = ScalaType.Qualified(caseClass.name)
+      val rowType = s.Type.Qualified(caseClass.name)
 
       List(
         table.idCol.zip(idFile) match {
           case Some((idCol, idFile)) =>
-            val idType = ScalaType.Qualified(ScalaQIdent(List(idFile.name)))
-            val idParam = ScalaParam(ScalaIdent.field(idCol.name), idType)
+            val idType = s.Type.Qualified(s.QIdent(List(idFile.name)))
+            val idParam = s.Param(s.Ident.field(idCol.name), idType)
 
             val updateMethod = caseClassUnsaved.map { unsavedRowFile =>
-              val unsavedRow = ScalaType.Qualified(unsavedRowFile.name)
-              val unsavedParam = ScalaParam(ScalaIdent("unsaved"), unsavedRow)
+              val unsavedRow = s.Type.Qualified(unsavedRowFile.name)
+              val unsavedParam = s.Param(s.Ident("unsaved"), unsavedRow)
 
               if (idCol.hasDefault) RepoMethod.InsertDbGeneratedKey(unsavedParam, idType)
               else RepoMethod.InsertProvidedKey(idParam, unsavedParam)
 
             }
 
-            val fieldValuesParam = ScalaParam(
-              ScalaIdent("fieldValues"),
-              ScalaType.List(ScalaType.TApply(ScalaType.Qualified(pkg / ScalaIdent.fieldValue(table.name)), List(ScalaType.Wildcard)))
+            val fieldValuesParam = s.Param(
+              s.Ident("fieldValues"),
+              s.Type.List(s.Type.TApply(s.Type.Qualified(pkg / s.Ident.fieldValue(table.name)), List(s.Type.Wildcard)))
             )
 
             List(
               Some(RepoMethod.SelectAll(rowType)),
               Some(RepoMethod.SelectById(idParam, rowType)),
-              Some(RepoMethod.SelectAllByIds(ScalaParam(ScalaIdent.field(idCol.name).appended("s"), ScalaType.List(idType)), rowType)),
+              Some(RepoMethod.SelectAllByIds(s.Param(s.Ident.field(idCol.name).appended("s"), s.Type.List(idType)), rowType)),
               Some(RepoMethod.SelectByFieldValues(fieldValuesParam, rowType)),
               Some(RepoMethod.UpdateFieldValues(idParam, fieldValuesParam)),
               updateMethod,
@@ -343,14 +250,14 @@ object Gen {
           case None => Nil
         },
         table.uniqueKeys.map { uk =>
-          val params = uk.cols.map(colName => ScalaParam(ScalaIdent.field(colName), scalaType(pkg, table.colsByName(colName))))
+          val params = uk.cols.map(colName => s.Param(s.Ident.field(colName), scalaType(pkg, table.colsByName(colName))))
           RepoMethod.SelectByUnique(params, rowType)
         }
       ).flatten
     }.filter(_.nonEmpty)
 
     val repoTrait: Option[File] = repoMethods.map { repoMethods =>
-      val Repo = ScalaIdent.repo(table.name)
+      val Repo = s.Ident.repo(table.name)
 
       val str =
         show"""package $pkg
@@ -366,7 +273,7 @@ object Gen {
     }
 
     val repoImplTrait: Option[File] = repoTrait.zip(repoMethods).map { case (repoTrait, repoMethods) =>
-      val Repo = ScalaIdent.repoImpl(table.name)
+      val Repo = s.Ident.repoImpl(table.name)
 
       val tripleQuote = "\"" * 3
       val renderedMethods = repoMethods.map { repoMethod =>
@@ -458,9 +365,9 @@ object Gen {
     ).flatten
   }
 
-  def all(pkg: ScalaQIdent, tables: List[Table]): List[File] = {
-    val enums: List[DbType.StringEnum] =
-      tables.flatMap(_.cols.map(_.tpe)).collect { case x: DbType.StringEnum => x }.distinct
+  def all(pkg: s.QIdent, tables: List[db.Table]): List[File] = {
+    val enums: List[db.Type.StringEnum] =
+      tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
 
     val enumFiles = enums.map(stringEnumClass(pkg, _))
     val tableFiles: List[File] = tables.flatMap(table => TableFiles(pkg, table).all)
