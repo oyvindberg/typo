@@ -1,5 +1,7 @@
 package typo
 
+/** Describes what tables look like in postgres
+  */
 object db {
   case class EnumName(value: String) extends AnyVal
   sealed trait Type
