@@ -17,16 +17,4 @@ object libs {
     def sql(content: sc.Code) =
       sc.StringInterpolate(libs.anorm.SqlStringInterpolation, sc.Ident("SQL"), content)
   }
-
-  object playJson {
-    def Format(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.Format"), List(t))
-    def Reads(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.Reads"), List(t))
-    def Writes(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.Writes"), List(t))
-    val Json = sc.Type.Qualified("play.api.libs.json.Json")
-    def OFormat(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.OFormat"), List(t))
-    val JsString = sc.Type.Qualified("play.api.libs.json.JsString")
-    val JsError = sc.Type.Qualified("play.api.libs.json.JsError")
-    val JsSuccess = sc.Type.Qualified("play.api.libs.json.JsSuccess")
-    val JsValue = sc.Type.Qualified("play.api.libs.json.JsValue")
-  }
 }

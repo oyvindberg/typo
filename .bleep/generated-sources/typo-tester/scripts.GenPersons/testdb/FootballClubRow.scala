@@ -19,5 +19,4 @@ object FootballClubRow {
     )
   }
   implicit val oFormat: OFormat[FootballClubRow] = Json.format
-
 }

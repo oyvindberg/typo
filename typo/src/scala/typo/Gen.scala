@@ -59,7 +59,7 @@ object Gen {
     case class Delete(idParam: sc.Param) extends RepoMethod
   }
 
-  def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum): sc.File = {
+  def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum, jsonLib: JsonLib): sc.File = {
     val EnumName = sc.Ident.`enum`(`enum`.name)
     val EnumType = sc.Type.Qualified(pkg / EnumName)
 
@@ -67,7 +67,7 @@ object Gen {
       val name = sc.Ident.enumValue(value)
       name -> code"case object $name extends $EnumName(${sc.StrLit(value)})"
     }
-
+    val ByName = sc.Ident("ByName")
     val str =
       code"""sealed abstract class $EnumName(val value: ${sc.Type.String})
             |object $EnumName {
@@ -79,25 +79,18 @@ object Gen {
             |
             |  implicit val column: ${libs.anorm.Column(EnumType)} =
             |    implicitly[${libs.anorm.Column(sc.Type.String)}].mapResult { str =>
-            |      ByName.get(str).toRight(${libs.anorm.SqlMappingError}(s"$$str was not among $$Names"))
+            |      $ByName.get(str).toRight(${libs.anorm.SqlMappingError}(s"$$str was not among $$Names"))
             |    }
             |
-            |  implicit val reads: ${libs.playJson.Reads(EnumType)} = (value: ${libs.playJson.JsValue}) =>
-            |    value.validate[${sc.Type.String}].flatMap { str =>
-            |      ByName.get(str) match {
-            |        case Some(value) => ${libs.playJson.JsSuccess}(value)
-            |        case None => ${libs.playJson.JsError}(s"'$$str' does not match any of the following legal values: $$Names")
-            |      }
-            |    }
             |  implicit val toStatement: ${libs.anorm.ToStatement(EnumType)} = implicitly[${libs.anorm.ToStatement(sc.Type.String)}].contramap(_.value)
-            |  implicit val writes: ${libs.playJson.Writes(EnumType)} = enumValue => ${libs.playJson.JsString}(enumValue.value)
+            |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |}
             |""".stripMargin
 
     sc.File(EnumType, str)
   }
 
-  case class TableFiles(pkg: sc.QIdent, table: db.Table) {
+  case class TableFiles(pkg: sc.QIdent, table: db.Table, jsonLib: JsonLib) {
     val scalaFields: Seq[(sc.Ident, sc.Type, db.Col)] = {
       table.cols.map {
         case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
@@ -128,8 +121,7 @@ object Gen {
               |      )
               |    )
               |  }
-              |  implicit val oFormat: ${libs.playJson.OFormat(rowType)} = ${libs.playJson.Json}.format
-              |
+              |  ${jsonLib.instances(rowType).mkCode("\n  ")}
               |}
               |""".stripMargin
 
@@ -148,7 +140,7 @@ object Gen {
                   |  ${fields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
                   |)
                   |object $name {
-                  |  implicit val oFormat: ${libs.playJson.OFormat(rowType)} = ${libs.playJson.Json}.format
+                  |  ${jsonLib.instances(rowType).mkCode("\n  ")}
                   |}
                   |""".stripMargin
           Some(sc.File(rowType, str))
@@ -184,11 +176,9 @@ object Gen {
           code"""case class $name(value: $underlying) extends AnyVal
                 |object $name {
                 |  implicit val column: ${libs.anorm.Column(tpe)} = implicitly[${libs.anorm.Column(underlying)}].map($name.apply)
-                |  implicit val format: ${libs.playJson.Format(tpe)} = implicitly[${libs.playJson.Format(underlying)}].bimap($name.apply, _.value)
                 |  implicit val ordering: ${sc.Type.Ordering(tpe)} = Ordering.by(_.value)
-                |  implicit val reads: ${libs.playJson.Reads(tpe)} = implicitly[${libs.playJson.Reads(underlying)}].map($name.apply)
                 |  implicit val toStatement: ${libs.anorm.ToStatement(tpe)} = implicitly[${libs.anorm.ToStatement(underlying)}].contramap(_.value)
-                |  implicit val writes: ${libs.playJson.Writes(tpe)} = implicitly[${libs.playJson.Writes(underlying)}].contramap(_.value)
+                |  ${jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}
                 |}
                 |""".stripMargin
 
@@ -310,14 +300,14 @@ object Gen {
     ).flatten
   }
 
-  def allTables(pkg: sc.QIdent, tables: List[db.Table]): List[sc.File] = {
+  def allTables(pkg: sc.QIdent, tables: List[db.Table], jsonLib: JsonLib): List[sc.File] = {
     val enums: List[db.Type.StringEnum] =
       tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
 
     val enumFiles: List[sc.File] =
-      enums.map(stringEnumClass(pkg, _))
+      enums.map(stringEnumClass(pkg, _, jsonLib))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(pkg, table).all)
+      tables.flatMap(table => TableFiles(pkg, table, jsonLib).all)
     val allFiles: List[sc.File] =
       enumFiles ++ tableFiles
     val knownNames = allFiles.map { f => (f.name, f.tpe.value) }.toMap

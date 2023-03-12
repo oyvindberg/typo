@@ -37,5 +37,4 @@ object PersonRow {
     )
   }
   implicit val oFormat: OFormat[PersonRow] = Json.format
-
 }

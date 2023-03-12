@@ -4,7 +4,6 @@ import anorm.Column
 import anorm.SqlMappingError
 import anorm.ToStatement
 import play.api.libs.json.JsError
-import play.api.libs.json.JsString
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Reads
@@ -25,6 +24,7 @@ object SectorEnum {
       ByName.get(str).toRight(SqlMappingError(s"$str was not among $Names"))
     }
 
+  implicit val toStatement: ToStatement[SectorEnum] = implicitly[ToStatement[String]].contramap(_.value)
   implicit val reads: Reads[SectorEnum] = (value: JsValue) =>
     value.validate[String].flatMap { str =>
       ByName.get(str) match {
@@ -32,6 +32,6 @@ object SectorEnum {
         case None => JsError(s"'$str' does not match any of the following legal values: $Names")
       }
     }
-  implicit val toStatement: ToStatement[SectorEnum] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[SectorEnum] = enumValue => JsString(enumValue.value)
+
+  implicit val writes: Writes[SectorEnum] = value => implicitly[Writes[String]].writes(value.value)
 }
