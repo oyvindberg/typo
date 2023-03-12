@@ -23,6 +23,7 @@ projects:
       - org.playframework.anorm::anorm:2.7.0
       - com.typesafe.play::play-json:2.10.0-RC7
     extends: template-common
+    sourcegen: typo-scripts/scripts.GenPersons
 templates:
   template-common:
     platform:
