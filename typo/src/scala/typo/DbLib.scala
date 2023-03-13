@@ -51,15 +51,19 @@ object DbLib {
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
           val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value}""")
           code"""$sql.as(${table.RowName}.rowParser.*)"""
+
         case RepoMethod.SelectById(idParam, _) =>
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get._1.name.value} = $$${idParam.name}""")
+          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $$${idParam.name}""")
           code"""$sql.as(${table.RowName}.rowParser.singleOpt)"""
+
         case RepoMethod.SelectAllByIds(idsParam, _) =>
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get._1.name.value} in $$${idsParam.name}""")
+          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} in $$${idsParam.name}""")
           code"""$sql.as(${table.RowName}.rowParser.*)"""
+
         case RepoMethod.SelectByUnique(_, _) => "???"
+
         case RepoMethod.SelectByFieldValues(param, _) =>
           val cases: Seq[sc.Code] =
             table.scalaFields.map { case (name, _, col) =>
@@ -87,7 +91,9 @@ object DbLib {
             }
 
           val sql = DbLib.anorm.sql(
-            code"""update ${table.table.name.value} set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")} where ${table.maybeId.get._1.name.value} = $${${idParam.name}}}"""
+            code"""update ${table.table.name.value}
+                   |          set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
+                   |          where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}""".stripMargin
           )
           code"""${param.name} match {
               |      case Nil => 0
@@ -104,7 +110,11 @@ object DbLib {
         case RepoMethod.InsertDbGeneratedKey(_, _) => code"???"
         case RepoMethod.InsertProvidedKey(_, _)    => code"???"
         case RepoMethod.InsertOnlyKey(_)           => code"???"
-        case RepoMethod.Delete(_)                  => code"???"
+        case RepoMethod.Delete(idParam)                  =>
+          val sql = DbLib.anorm.sql(
+            code"""delete from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}"""
+          )
+          code"$sql.executeUpdate() > 0"
       }
   }
 }

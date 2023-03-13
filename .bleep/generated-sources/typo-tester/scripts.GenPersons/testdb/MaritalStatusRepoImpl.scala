@@ -31,11 +31,13 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        SQL"""update marital_status set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+        SQL"""update marital_status
+          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+          where id = ${id}}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = 
-    ???
+    SQL"""delete from marital_status where id = ${id}}""".executeUpdate() > 0
 }

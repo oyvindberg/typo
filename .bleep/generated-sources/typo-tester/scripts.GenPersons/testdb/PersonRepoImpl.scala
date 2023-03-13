@@ -51,7 +51,9 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        SQL"""update person set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+        SQL"""update person
+          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+          where id = ${id}}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
@@ -59,5 +61,5 @@ trait PersonRepoImpl extends PersonRepo {
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = 
     ???
   override def delete(id: PersonId)(implicit c: Connection): Boolean = 
-    ???
+    SQL"""delete from person where id = ${id}}""".executeUpdate() > 0
 }

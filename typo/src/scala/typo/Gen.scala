@@ -24,9 +24,7 @@ object Gen {
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
             |  val ByName: ${sc.Type.Map(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
-            |  implicit val column: ${DbLib.anorm.Column(EnumType)} = implicitly[${DbLib.anorm.Column(
-             sc.Type.String
-           )}].mapResult { str => $ByName.get(str).toRight(${DbLib.anorm.SqlMappingError}(s"$$str was not among $$Names")) }
+            |  implicit val column: ${DbLib.anorm.Column(EnumType)} = implicitly[${DbLib.anorm.Column(sc.Type.String)}].mapResult { str => $ByName.get(str).toRight(${DbLib.anorm.SqlMappingError}(s"$$str was not among $$Names")) }
             |  implicit val toStatement: ${DbLib.anorm.ToStatement(EnumType)} = implicitly[${DbLib.anorm.ToStatement(sc.Type.String)}].contramap(_.value)
             |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |}

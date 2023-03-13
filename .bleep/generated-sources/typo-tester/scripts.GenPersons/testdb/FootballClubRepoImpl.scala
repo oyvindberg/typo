@@ -33,7 +33,9 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""update football_club set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+        SQL"""update football_club
+          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+          where id = ${id}}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
@@ -41,5 +43,5 @@ trait FootballClubRepoImpl extends FootballClubRepo {
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit = 
     ???
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = 
-    ???
+    SQL"""delete from football_club where id = ${id}}""".executeUpdate() > 0
 }
