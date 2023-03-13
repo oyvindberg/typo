@@ -1,6 +1,6 @@
 package typo
 
-case class TableComputed(pkg: sc.QIdent, table: db.Table) {
+case class TableComputed(pkg: sc.QIdent, defaultFile: sc.File, table: db.Table) {
   val allKeyNames: Set[db.ColName] =
     (table.primaryKey.map(_.colName) ++ table.uniqueKeys.flatMap(_.cols) ++ table.foreignKeys.map(_.col)).toSet
 
@@ -39,13 +39,17 @@ case class TableComputed(pkg: sc.QIdent, table: db.Table) {
     }
   }
 
-  val scalaFieldsNotId: Seq[(sc.Ident, sc.Type, db.Col)] =
+  val scalaFieldsUnsaved: Seq[(sc.Ident, sc.Type, db.Col)] =
     scalaFields.filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) }
+      .map{case (name, tpe, col) =>
+        val newType = if (col.hasDefault) sc.Type.TApply(defaultFile.tpe, List(tpe)) else tpe
+        (name, newType, col)
+      }
 
   val RepoName: sc.QIdent = names.titleCase(pkg, table.name.value, "Repo")
   val RepoImplName: sc.QIdent = names.titleCase(pkg, table.name.value, "RepoImpl")
   val RowName: sc.QIdent = names.titleCase(pkg, table.name.value, "Row")
-  val RowUnsavedName: Option[sc.QIdent] = if (scalaFieldsNotId.nonEmpty) Some(names.titleCase(pkg, table.name.value, "RowUnsaved")) else None
+  val RowUnsavedName: Option[sc.QIdent] = if (scalaFieldsUnsaved.nonEmpty) Some(names.titleCase(pkg, table.name.value, "RowUnsaved")) else None
   val FieldValueName: sc.QIdent = names.titleCase(pkg, table.name.value, "FieldValue")
 
   val repoMethods: Option[List[RepoMethod]] = {

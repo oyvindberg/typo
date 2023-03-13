@@ -11,9 +11,9 @@ case class PersonRowUnsaved(
   email: String,
   phone: String,
   likesPizza: Boolean,
-  maritalStatusId: String,
+  maritalStatusId: Defaulted[String],
   workEmail: Option[String],
-  sector: SectorEnum
+  sector: Defaulted[SectorEnum]
 )
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = Json.format

@@ -45,6 +45,7 @@ object sc {
     case object Wildcard extends Type
     case class TApply(underlying: Type, targs: List[Type]) extends Type
     case class Qualified(value: QIdent) extends Type
+    case class Abstract(value: Ident) extends Type
 
     object Qualified {
       def apply(value: String): Qualified =
@@ -85,6 +86,7 @@ object sc {
       case StrLit(str)      => '"'.toString + str + '"'.toString
       case tpe: Type =>
         tpe match {
+          case Type.Abstract(value)           => renderTree(value)
           case Type.Wildcard                  => "_"
           case Type.TApply(underlying, targs) => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
           case Type.Qualified(value)          => renderTree(value)

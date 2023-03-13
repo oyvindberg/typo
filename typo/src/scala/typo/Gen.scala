@@ -33,7 +33,28 @@ object Gen {
     sc.File(EnumType, str)
   }
 
+  def genDefaultFile(jsonLib: JsonLib, pkg: sc.QIdent): sc.File = {
+    val Defaulted = pkg / sc.Ident("Defaulted")
+    val Provided = Defaulted / sc.Ident("Provided")
+    val UseDefault = Defaulted / sc.Ident("UseDefault")
+    val contents =
+      code"""
+/**
+ * This signals a value where if you don't provide it, postgres will generate it for you
+ */
+sealed trait ${Defaulted.last}[+T]
+
+object ${Defaulted.last} {
+  case class ${Provided.last}[T](value: T) extends $Defaulted[T]
+  case object ${UseDefault.last} extends $Defaulted[Nothing]
+  ${jsonLib.defaultedInstance(Defaulted, Provided, UseDefault).mkCode("\n  ")}
+}
+"""
+    sc.File(sc.Type.Qualified(Defaulted), contents)
+  }
+
   case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
+
     val RowFile: sc.File = {
       val rowType = sc.Type.Qualified(table.RowName)
       val mappedValues = table.scalaFields.map { case (name, tpe, col) => code"$name = row[$tpe](${sc.StrLit(col.name.value)})" }
@@ -61,7 +82,7 @@ object Gen {
 
       val str =
         code"""case class ${qident.last}(
-              |  ${table.scalaFieldsNotId.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
+              |  ${table.scalaFieldsUnsaved.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
               |)
               |object ${qident.last} {
               |  ${jsonLib.instances(rowType).mkCode("\n  ")}
@@ -145,13 +166,16 @@ object Gen {
     val enums: List[db.Type.StringEnum] =
       tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
 
+    val defaultFile = genDefaultFile(jsonLib, pkg)
     val enumFiles: List[sc.File] =
       enums.map(stringEnumClass(pkg, _, jsonLib))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(pkg, table), DbLib.anorm, jsonLib).all)
+      tables.flatMap(table => TableFiles(TableComputed(pkg, defaultFile, table), DbLib.anorm, jsonLib).all)
     val allFiles: List[sc.File] =
-      enumFiles ++ tableFiles
+      List(defaultFile) ++ enumFiles ++ tableFiles
+
     val knownNames = allFiles.map { f => (f.name, f.tpe.value) }.toMap
+
     allFiles.map(file => addPackageAndImports(pkg, knownNames, file))
   }
 }
