@@ -1,5 +1,7 @@
 package testdb
 
+import anorm.NamedParameter
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -14,8 +16,21 @@ trait PersonRepoImpl extends PersonRepo {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
-        SQL"""select * from person where ${nonEmpty.map(x => s"{${x.name}}")}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case PersonFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
+          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
+          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
+          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
+          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
+          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
+          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
+          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
+        }
+        SQL"""select * from person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+          .on(namedParams: _*)
           .as(PersonRow.rowParser.*)
     }
 
@@ -23,8 +38,21 @@ trait PersonRepoImpl extends PersonRepo {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
-        SQL"""update person set ${nonEmpty.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case PersonFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
+          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
+          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
+          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
+          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
+          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
+          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
+          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
+        }
+        SQL"""update person set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+          .on(namedParams: _*)
           .executeUpdate()
     }
 

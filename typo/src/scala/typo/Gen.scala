@@ -155,7 +155,7 @@ object Gen {
                 |  implicit val column: ${DbLib.anorm.Column(tpe)} = implicitly[${DbLib.anorm.Column(underlying)}].map($name.apply)
                 |  implicit val ordering: ${sc.Type.Ordering(tpe)} = Ordering.by(_.value)
                 |  implicit val toStatement: ${DbLib.anorm.ToStatement(tpe)} = implicitly[${DbLib.anorm.ToStatement(underlying)}].contramap(_.value)
-                |  ${jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}
+                |  ${jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n  ")}
                 |}
                 |""".stripMargin
 
@@ -229,25 +229,42 @@ object Gen {
               code"""$sql.as(${RowFile.tpe}.rowParser.*)"""
             case RepoMethod.SelectByUnique(_, _) => "???"
             case RepoMethod.SelectByFieldValues(param, _) =>
-              val sql = DbLib.anorm.sql(code"""select * from ${table.name.value} where $${nonEmpty.map(x => s"{$${x.name}}")}""")
+              val cases: Seq[sc.Code] =
+                scalaFields.map { case (name, _, col) =>
+                  code"case ${FieldValueFile.tpe}.$name(value) => ${DbLib.anorm.NamedParameter}(${sc.StrLit(col.name.value)}, ${DbLib.anorm.ParameterValue}.from(value))"
+                }
+
+              code""""""
+              val sql = DbLib.anorm.sql(code"""select * from ${table.name.value} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}""")
               code"""${param.name} match {
                   |      case Nil => selectAll
                   |      case nonEmpty =>
+                  |        val namedParams = nonEmpty.map{
+                  |          ${cases.mkCode("\n          ")}
+                  |        }
                   |        $sql
-                  |          .on(nonEmpty.map(_.toNamedParameter): _*)
+                  |          .on(namedParams: _*)
                   |          .as(${RowFile.tpe}.rowParser.*)
                   |    }
                   |""".stripMargin
 
             case RepoMethod.UpdateFieldValues(idParam, param) =>
+              val cases: Seq[sc.Code] =
+                scalaFields.map { case (name, _, col) =>
+                  code"case ${FieldValueFile.tpe}.$name(value) => ${DbLib.anorm.NamedParameter}(${sc.StrLit(col.name.value)}, ${DbLib.anorm.ParameterValue}.from(value))"
+                }
+
               val sql = DbLib.anorm.sql(
-                code"""update ${table.name.value} set $${nonEmpty.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")} where ${table.idCol.get.name.value} = $${${idParam.name}}}"""
+                code"""update ${table.name.value} set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")} where ${table.idCol.get.name.value} = $${${idParam.name}}}"""
               )
               code"""${param.name} match {
                   |      case Nil => 0
                   |      case nonEmpty =>
+                  |        val namedParams = nonEmpty.map{
+                  |          ${cases.mkCode("\n          ")}
+                  |        }
                   |        $sql
-                  |          .on(nonEmpty.map(_.toNamedParameter): _*)
+                  |          .on(namedParams: _*)
                   |          .executeUpdate()
                   |    }
                   |""".stripMargin

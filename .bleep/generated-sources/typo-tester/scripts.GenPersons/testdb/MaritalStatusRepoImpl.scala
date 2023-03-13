@@ -1,5 +1,7 @@
 package testdb
 
+import anorm.NamedParameter
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -14,8 +16,11 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
-        SQL"""select * from marital_status where ${nonEmpty.map(x => s"{${x.name}}")}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+        }
+        SQL"""select * from marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+          .on(namedParams: _*)
           .as(MaritalStatusRow.rowParser.*)
     }
 
@@ -23,8 +28,11 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
-        SQL"""update marital_status set ${nonEmpty.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+        }
+        SQL"""update marital_status set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+          .on(namedParams: _*)
           .executeUpdate()
     }
 

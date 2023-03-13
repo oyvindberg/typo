@@ -1,12 +1,8 @@
 package testdb
 
-import anorm.NamedParameter
-import anorm.ParameterValue
-import anorm.ToStatement
 
-sealed abstract class PersonFieldValue[T: ToStatement](val name: String, val value: T) {
-  def toNamedParameter: NamedParameter = NamedParameter(name, ParameterValue.toParameterValue(value))
-}
+
+sealed abstract class PersonFieldValue[T](val name: String, val value: T) 
 
 object PersonFieldValue {
   case class id(override val value: PersonId) extends PersonFieldValue("id", value)

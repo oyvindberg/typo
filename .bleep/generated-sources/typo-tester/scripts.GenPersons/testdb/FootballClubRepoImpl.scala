@@ -1,5 +1,7 @@
 package testdb
 
+import anorm.NamedParameter
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -14,8 +16,12 @@ trait FootballClubRepoImpl extends FootballClubRepo {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
-        SQL"""select * from football_club where ${nonEmpty.map(x => s"{${x.name}}")}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+        }
+        SQL"""select * from football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+          .on(namedParams: _*)
           .as(FootballClubRow.rowParser.*)
     }
 
@@ -23,8 +29,12 @@ trait FootballClubRepoImpl extends FootballClubRepo {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
-        SQL"""update football_club set ${nonEmpty.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
-          .on(nonEmpty.map(_.toNamedParameter): _*)
+        val namedParams = nonEmpty.map{
+          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+        }
+        SQL"""update football_club set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")} where id = ${id}}"""
+          .on(namedParams: _*)
           .executeUpdate()
     }
 
