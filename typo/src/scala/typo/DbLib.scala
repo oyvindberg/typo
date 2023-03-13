@@ -19,8 +19,8 @@ object DbLib {
     val SqlMappingError = sc.Type.Qualified("anorm.SqlMappingError")
     val SqlStringInterpolation = sc.Type.Qualified("anorm.SqlStringInterpolation")
 
-    def sql(content: sc.Code) =
-      sc.StringInterpolate(DbLib.anorm.SqlStringInterpolation, sc.Ident("SQL"), content)
+    def interpolate(content: sc.Code) =
+      sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
     override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
       case RepoMethod.SelectAll(rowType) =>
@@ -49,17 +49,17 @@ object DbLib {
       repoMethod match {
         case RepoMethod.SelectAll(_) =>
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value}""")
+          val sql = interpolate(code"""select $joinedColNames from ${table.table.name.value}""")
           code"""$sql.as(${table.RowName}.rowParser.*)"""
 
         case RepoMethod.SelectById(idParam, _) =>
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $$${idParam.name}""")
+          val sql = interpolate(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $$${idParam.name}""")
           code"""$sql.as(${table.RowName}.rowParser.singleOpt)"""
 
         case RepoMethod.SelectAllByIds(idsParam, _) =>
           val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-          val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} in $$${idsParam.name}""")
+          val sql = interpolate(code"""select $joinedColNames from ${table.table.name.value} where ${table.maybeId.get.col.name.value} in $$${idsParam.name}""")
           code"""$sql.as(${table.RowName}.rowParser.*)"""
 
         case RepoMethod.SelectByUnique(_, _) => "???"
@@ -71,7 +71,7 @@ object DbLib {
             }
 
           code""""""
-          val sql = DbLib.anorm.sql(code"""select * from ${table.table.name.value} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}""")
+          val sql = interpolate(code"""select * from ${table.table.name.value} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}""")
           code"""${param.name} match {
               |      case Nil => selectAll
               |      case nonEmpty =>
@@ -90,7 +90,7 @@ object DbLib {
               code"case ${table.FieldValueName}.$name(value) => $NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(value))"
             }
 
-          val sql = DbLib.anorm.sql(
+          val sql = interpolate(
             code"""update ${table.table.name.value}
                    |          set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
                    |          where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}""".stripMargin
@@ -111,7 +111,7 @@ object DbLib {
         case RepoMethod.InsertProvidedKey(_, _)    => code"???"
         case RepoMethod.InsertOnlyKey(_)           => code"???"
         case RepoMethod.Delete(idParam)                  =>
-          val sql = DbLib.anorm.sql(
+          val sql = interpolate(
             code"""delete from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}"""
           )
           code"$sql.executeUpdate() > 0"
