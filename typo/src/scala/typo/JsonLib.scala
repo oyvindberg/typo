@@ -6,7 +6,7 @@ trait JsonLib {
   def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code]
   def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code]
   def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code]
-  def instances(tpe: sc.Type): List[sc.Code]
+  def instances(tpe: sc.Type, scalaFields: Seq[(sc.Ident, sc.Type, db.Col)]): List[sc.Code]
 }
 
 object JsonLib {
@@ -61,7 +61,7 @@ object JsonLib {
       List(reader, writer)
     }
 
-    override def instances(tpe: sc.Type): List[sc.Code] =
+    override def instances(tpe: sc.Type, scalaFields: Seq[(sc.Ident, sc.Type, db.Col)]): List[sc.Code] =
       List(
         code"""implicit val oFormat: ${OFormat(tpe)} = $Json.format"""
       )

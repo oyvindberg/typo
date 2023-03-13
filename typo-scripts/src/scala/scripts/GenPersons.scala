@@ -59,7 +59,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   override def run(started: Started, commands: Commands, targets: List[Target], args: List[String]): Unit = {
     val filesByRelPath: Map[RelPath, String] =
       Gen
-        .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, JsonLib.PlayJson)
+        .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, JsonLib.PlayJson, DbLib.anorm)
         .map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render

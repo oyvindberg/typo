@@ -5,6 +5,9 @@ import typo.sc.syntax.*
 trait DbLib {
   def repoSig(repoMethod: RepoMethod): sc.Code
   def repoImpl(table: TableComputed, repoMethod: RepoMethod): sc.Code
+  def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code]
+  def instances(tpe: sc.Type, scalaFields: Seq[(sc.Ident, sc.Type, db.Col)]): List[sc.Code]
+  def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code]
 }
 
 object DbLib {
@@ -21,6 +24,36 @@ object DbLib {
 
     def interpolate(content: sc.Code) =
       sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
+
+    override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
+      val column =
+        code"""|implicit val column: ${Column(wrapperType)} =
+               |    implicitly[${Column(underlying)}]
+               |      .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin
+      val toStatement =
+        code"""|implicit val toStatement: ${ToStatement(wrapperType)} =
+               |    implicitly[${ToStatement(underlying)}].contramap(_.value)""".stripMargin
+      List(column, toStatement)
+    }
+
+    override def instances(tpe: sc.Type, scalaFields: Seq[(sc.Ident, sc.Type, db.Col)]): List[sc.Code] = {
+      val mappedValues = scalaFields.map { case (name, tpe, col) => code"$name = row[$tpe](${sc.StrLit(col.name.value)})" }
+      val rowParser = code"""implicit val rowParser: ${RowParser(tpe)} = { row =>
+            |    $Success(
+            |      $tpe(
+            |        ${mappedValues.mkCode(",\n        ")}
+            |      )
+            |    )
+            |  }
+            |""".stripMargin
+
+      List(rowParser)
+    }
+    override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
+      val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
+      val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
+      List(toStatement, column)
+    }
 
     override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
       case RepoMethod.SelectAll(rowType) =>
@@ -71,7 +104,9 @@ object DbLib {
             }
 
           code""""""
-          val sql = interpolate(code"""select * from ${table.table.name.value} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}""")
+          val sql = interpolate(
+            code"""select * from ${table.table.name.value} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
+          )
           code"""${param.name} match {
               |      case Nil => selectAll
               |      case nonEmpty =>
@@ -110,7 +145,7 @@ object DbLib {
         case RepoMethod.InsertDbGeneratedKey(_, _) => code"???"
         case RepoMethod.InsertProvidedKey(_, _)    => code"???"
         case RepoMethod.InsertOnlyKey(_)           => code"???"
-        case RepoMethod.Delete(idParam)                  =>
+        case RepoMethod.Delete(idParam) =>
           val sql = interpolate(
             code"""delete from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}"""
           )

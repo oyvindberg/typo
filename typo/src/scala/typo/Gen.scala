@@ -6,7 +6,7 @@ import java.nio.file.{Files, Path}
 
 object Gen {
 
-  def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum, jsonLib: JsonLib): sc.File = {
+  def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum, dbLib: DbLib, jsonLib: JsonLib): sc.File = {
     val qident = names.EnumName(pkg, `enum`.name)
     val EnumType = sc.Type.Qualified(qident)
 
@@ -24,8 +24,7 @@ object Gen {
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
             |  val ByName: ${sc.Type.Map(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
-            |  implicit val column: ${DbLib.anorm.Column(EnumType)} = implicitly[${DbLib.anorm.Column(sc.Type.String)}].mapResult { str => $ByName.get(str).toRight(${DbLib.anorm.SqlMappingError}(s"$$str was not among $$Names")) }
-            |  implicit val toStatement: ${DbLib.anorm.ToStatement(EnumType)} = implicitly[${DbLib.anorm.ToStatement(sc.Type.String)}].contramap(_.value)
+            |  ${dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |}
             |""".stripMargin
@@ -57,20 +56,13 @@ object ${Defaulted.last} {
 
     val RowFile: sc.File = {
       val rowType = sc.Type.Qualified(table.RowName)
-      val mappedValues = table.scalaFields.map { case (name, tpe, col) => code"$name = row[$tpe](${sc.StrLit(col.name.value)})" }
       val str =
         code"""case class ${table.RowName.last}(
               |  ${table.scalaFields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
               |)
               |object ${table.RowName.last} {
-              |  implicit val rowParser: ${DbLib.anorm.RowParser(rowType)} = { row =>
-              |    ${DbLib.anorm.Success}(
-              |      ${table.RowName.last}(
-              |        ${mappedValues.mkCode(",\n        ")}
-              |      )
-              |    )
-              |  }
-              |  ${jsonLib.instances(rowType).mkCode("\n  ")}
+              |  ${dbLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
+              |  ${jsonLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
               |}
               |""".stripMargin
 
@@ -85,7 +77,7 @@ object ${Defaulted.last} {
               |  ${table.scalaFieldsUnsaved.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
               |)
               |object ${qident.last} {
-              |  ${jsonLib.instances(rowType).mkCode("\n  ")}
+              |  ${jsonLib.instances(rowType, table.scalaFieldsUnsaved).mkCode("\n  ")}
               |}
               |""".stripMargin
 
@@ -114,10 +106,9 @@ object ${Defaulted.last} {
         val str =
           code"""case class ${id.name}(value: ${id.underlying}) extends AnyVal
                  |object ${id.name} {
-                 |  implicit val column: ${DbLib.anorm.Column(id.tpe)} = implicitly[${DbLib.anorm.Column(id.underlying)}].map(${id.name}.apply)
                  |  implicit val ordering: ${sc.Type.Ordering(id.tpe)} = Ordering.by(_.value)
-                 |  implicit val toStatement: ${DbLib.anorm.ToStatement(id.tpe)} = implicitly[${DbLib.anorm.ToStatement(id.underlying)}].contramap(_.value)
                  |  ${jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
+                 |  ${dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
                  |}
  """.stripMargin
 
@@ -162,15 +153,15 @@ object ${Defaulted.last} {
     ).flatten
   }
 
-  def allTables(pkg: sc.QIdent, tables: List[db.Table], jsonLib: JsonLib): List[sc.File] = {
+  def allTables(pkg: sc.QIdent, tables: List[db.Table], jsonLib: JsonLib, dbLib: DbLib): List[sc.File] = {
     val enums: List[db.Type.StringEnum] =
       tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
 
     val defaultFile = genDefaultFile(jsonLib, pkg)
     val enumFiles: List[sc.File] =
-      enums.map(stringEnumClass(pkg, _, jsonLib))
+      enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(pkg, defaultFile, table), DbLib.anorm, jsonLib).all)
+      tables.flatMap(table => TableFiles(TableComputed(pkg, defaultFile, table), dbLib, jsonLib).all)
     val allFiles: List[sc.File] =
       List(defaultFile) ++ enumFiles ++ tableFiles
 

@@ -16,5 +16,6 @@ object MaritalStatusRow {
       )
     )
   }
+
   implicit val oFormat: OFormat[MaritalStatusRow] = Json.format
 }
