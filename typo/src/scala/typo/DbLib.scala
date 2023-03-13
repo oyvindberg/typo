@@ -1,6 +1,5 @@
 package typo
 
-import typo.Gen.RepoMethod
 import typo.sc.syntax.*
 
 trait DbLib {

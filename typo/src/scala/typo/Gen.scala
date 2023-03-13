@@ -15,27 +15,6 @@ object Gen {
     if (col.isNotNull) baseTpe else sc.Type.Option(baseTpe)
   }
 
-  sealed trait Repo
-  object Repo {
-    case class Direct(repoMethods: List[RepoMethod], table: db.Table) extends Repo
-    case class Cached(repoMethods: List[RepoMethod], table: db.Table) extends Repo
-  }
-
-  sealed trait RepoMethod
-
-  object RepoMethod {
-    case class SelectAll(rowType: sc.Type) extends RepoMethod
-    case class SelectById(idParam: sc.Param, rowType: sc.Type) extends RepoMethod
-    case class SelectAllByIds(idsParam: sc.Param, rowType: sc.Type) extends RepoMethod
-    case class SelectByUnique(params: List[sc.Param], rowType: sc.Type) extends RepoMethod
-    case class SelectByFieldValues(param: sc.Param, rowType: sc.Type) extends RepoMethod
-    case class UpdateFieldValues(idParam: sc.Param, param: sc.Param) extends RepoMethod
-    case class InsertDbGeneratedKey(unsavedParam: sc.Param, idType: sc.Type) extends RepoMethod
-    case class InsertProvidedKey(idParam: sc.Param, unsavedParam: sc.Param) extends RepoMethod
-    case class InsertOnlyKey(idParam: sc.Param) extends RepoMethod
-    case class Delete(idParam: sc.Param) extends RepoMethod
-  }
-
   def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum, jsonLib: JsonLib): sc.File = {
     val EnumName = sc.Ident.`enum`(`enum`.name)
     val EnumType = sc.Type.Qualified(pkg / EnumName)
@@ -132,9 +111,7 @@ object Gen {
         name -> code"case class $name(override val value: $tpe) extends $fieldValueType(${sc.StrLit(col.name.value)}, value)"
       }
       val str =
-        code"""sealed abstract class $fieldValueName[T: ${DbLib.anorm.ToStatementName}](val name: String, val value: T) {
-              |  def toNamedParameter: ${DbLib.anorm.NamedParameter} = ${DbLib.anorm.NamedParameter}(name, ${DbLib.anorm.ParameterValue}.toParameterValue(value))
-              |}
+        code"""sealed abstract class $fieldValueName[T](val name: String, val value: T) 
               |
               |object $fieldValueName {
               |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
@@ -179,7 +156,7 @@ object Gen {
 
             val fieldValuesParam = sc.Param(
               sc.Ident("fieldValues"),
-              sc.Type.List(sc.Type.TApply(sc.Type.Qualified(pkg / sc.Ident.fieldValue(table.name)), List(sc.Type.Wildcard)))
+              sc.Type.List(sc.Type.TApply(FieldValueFile.tpe, List(sc.Type.Wildcard)))
             )
 
             List(
