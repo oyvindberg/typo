@@ -85,7 +85,7 @@ object Gen {
       val name = sc.Ident.row(table.name)
       val rowType = sc.Type.Qualified(pkg / name)
       val fields = scalaFields
-      val fetchValues = fields.map { case (name, tpe, col) => code"$name = row[$tpe](${sc.StrLit(col.name.value)})" }
+      val mappedValues = fields.map { case (name, tpe, col) => code"$name = row[$tpe](${sc.StrLit(col.name.value)})" }
       val str =
         code"""case class $name(
               |  ${fields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
@@ -94,7 +94,7 @@ object Gen {
               |  implicit val rowParser: ${DbLib.anorm.RowParser(rowType)} = { row =>
               |    ${DbLib.anorm.Success}(
               |      $name(
-              |        ${fetchValues.mkCode(",\n        ")}
+              |        ${mappedValues.mkCode(",\n        ")}
               |      )
               |    )
               |  }
@@ -212,13 +212,11 @@ object Gen {
       sc.File(tpe, str)
     }
 
-    val TripleQuote = "\"" * 3
-
     val RepoImplTraitFile: Option[sc.File] =
       RepoTraitFile.zip(repoMethods).map { case (repoTrait, repoMethods) =>
         val name = sc.Ident.repoImpl(table.name)
+        val joinedColNames = table.cols.map(_.name.value).mkString(", ")
         val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
-          val joinedColNames = table.cols.map(_.name.value).mkString(", ")
           val impl: sc.Code = repoMethod match {
             case RepoMethod.SelectAll(_) =>
               val sql = DbLib.anorm.sql(code"""select $joinedColNames from ${table.name.value}""")
@@ -231,20 +229,24 @@ object Gen {
               code"""$sql.as(${RowFile.tpe}.rowParser.*)"""
             case RepoMethod.SelectByUnique(_, _) => "???"
             case RepoMethod.SelectByFieldValues(param, _) =>
+              val sql = DbLib.anorm.sql(code"""select * from ${table.name.value} where $${nonEmpty.map(x => s"{$${x.name}}")}""")
               code"""${param.name} match {
                   |      case Nil => selectAll
                   |      case nonEmpty =>
-                  |        SQL"select * from ${table.name.value} where $${nonEmpty.map(x => s"{$${x.name}}")}"
+                  |        $sql
                   |          .on(nonEmpty.map(_.toNamedParameter): _*)
                   |          .as(${RowFile.tpe}.rowParser.*)
                   |    }
                   |""".stripMargin
 
             case RepoMethod.UpdateFieldValues(idParam, param) =>
+              val sql = DbLib.anorm.sql(
+                code"""update ${table.name.value} set $${nonEmpty.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")} where ${table.idCol.get.name.value} = $${${idParam.name}}}"""
+              )
               code"""${param.name} match {
                   |      case Nil => 0
                   |      case nonEmpty =>
-                  |        SQL${TripleQuote}update ${table.name.value} set $${nonEmpty.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")} where ${table.idCol.get.name.value} = $${${idParam.name}}}$TripleQuote
+                  |        $sql
                   |          .on(nonEmpty.map(_.toNamedParameter): _*)
                   |          .executeUpdate()
                   |    }

@@ -14,7 +14,7 @@ trait FootballClubRepoImpl extends FootballClubRepo {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
-        SQL"select * from football_club where ${nonEmpty.map(x => s"{${x.name}}")}"
+        SQL"""select * from football_club where ${nonEmpty.map(x => s"{${x.name}}")}"""
           .on(nonEmpty.map(_.toNamedParameter): _*)
           .as(FootballClubRow.rowParser.*)
     }

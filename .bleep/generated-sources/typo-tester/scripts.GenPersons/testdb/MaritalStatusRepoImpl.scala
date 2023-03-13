@@ -14,7 +14,7 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
-        SQL"select * from marital_status where ${nonEmpty.map(x => s"{${x.name}}")}"
+        SQL"""select * from marital_status where ${nonEmpty.map(x => s"{${x.name}}")}"""
           .on(nonEmpty.map(_.toNamedParameter): _*)
           .as(MaritalStatusRow.rowParser.*)
     }
