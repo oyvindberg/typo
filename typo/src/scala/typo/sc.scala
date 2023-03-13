@@ -24,50 +24,6 @@ object sc {
 
   object Ident {
     implicit val ordering: Ordering[Ident] = Ordering.by(_.value)
-
-    private def camelCase(name: ColName): Ident =
-      Ident(
-        name.value
-          .split('_')
-          .zipWithIndex
-          .map {
-            case (s, 0) => s
-            case (s, _) => s.capitalize
-          }
-          .mkString("")
-      )
-
-    def titleCase(name: String): Ident =
-      Ident(name.split('_').map(_.capitalize).mkString(""))
-
-    def field(name: ColName): Ident =
-      camelCase(name)
-
-    def id(name: TableName): Ident =
-      titleCase(name.value).appended("Id")
-
-    def repo(name: TableName): Ident =
-      titleCase(name.value).appended("Repo")
-
-    def repoImpl(name: TableName): Ident =
-      titleCase(name.value).appended("RepoImpl")
-
-    def repoMock(name: TableName): Ident =
-      titleCase(name.value).appended("RepoMock")
-
-    def row(name: TableName): Ident =
-      titleCase(name.value).appended("Row")
-
-    def rowUnsaved(name: TableName): Ident =
-      titleCase(name.value).appended("RowUnsaved")
-
-    def fieldValue(name: TableName): Ident =
-      titleCase(name.value).appended("FieldValue")
-
-    def `enum`(name: EnumName): Ident =
-      titleCase(name.value).appended("Enum")
-
-    def enumValue(name: String): Ident = Ident(name)
   }
 
   case class QIdent(idents: List[Ident]) extends Tree {

@@ -24,13 +24,5 @@ object db {
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],
       foreignKeys: List[ForeignKey]
-  ) {
-    val allKeyNames: Set[ColName] =
-      (primaryKey.map(_.colName) ++ uniqueKeys.flatMap(_.cols) ++ foreignKeys.map(_.col)).toSet
-
-    val colsByName: Map[ColName, Col] =
-      cols.map(col => (col.name, col)).toMap
-    val idCol: Option[Col] =
-      primaryKey.map(pk => colsByName(pk.colName))
-  }
+  )
 }

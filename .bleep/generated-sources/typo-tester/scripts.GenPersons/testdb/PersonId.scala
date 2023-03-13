@@ -11,3 +11,4 @@ object PersonId {
   implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val format: Format[PersonId] = implicitly[Format[Long]].bimap(PersonId.apply, _.value)
 }
+ 

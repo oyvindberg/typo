@@ -2,7 +2,7 @@ package testdb
 
 
 
-sealed abstract class PersonFieldValue[T](val name: String, val value: T) 
+sealed abstract class PersonFieldValue[T](val name: String, val value: T)
 
 object PersonFieldValue {
   case class id(override val value: PersonId) extends PersonFieldValue("id", value)

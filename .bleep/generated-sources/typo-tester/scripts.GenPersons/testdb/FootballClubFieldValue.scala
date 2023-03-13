@@ -2,7 +2,7 @@ package testdb
 
 
 
-sealed abstract class FootballClubFieldValue[T](val name: String, val value: T) 
+sealed abstract class FootballClubFieldValue[T](val name: String, val value: T)
 
 object FootballClubFieldValue {
   case class id(override val value: FootballClubId) extends FootballClubFieldValue("id", value)

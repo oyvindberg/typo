@@ -19,11 +19,7 @@ object SectorEnum {
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, SectorEnum] = All.map(x => (x.value, x)).toMap
 
-  implicit val column: Column[SectorEnum] =
-    implicitly[Column[String]].mapResult { str =>
-      ByName.get(str).toRight(SqlMappingError(s"$str was not among $Names"))
-    }
-
+  implicit val column: Column[SectorEnum] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among $Names")) }
   implicit val toStatement: ToStatement[SectorEnum] = implicitly[ToStatement[String]].contramap(_.value)
   implicit val reads: Reads[SectorEnum] = (value: JsValue) =>
     value.validate[String].flatMap { str =>
