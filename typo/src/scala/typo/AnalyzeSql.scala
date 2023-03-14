@@ -12,14 +12,14 @@ object AnalyzeSql {
       columnDisplaySize: Int,
       columnLabel: String,
       columnName: String,
-      columnType: Int,
+      columnType: doobie.JdbcType,
       columnTypeName: String,
       format: Int,
       isAutoIncrement: Boolean,
       isCaseSensitive: Boolean,
       isCurrency: Boolean,
       isDefinitelyWritable: Boolean,
-      isNullable: Int,
+      isNullable: Option[doobie.ColumnNullable],
       isReadOnly: Boolean,
       isSearchable: Boolean,
       isSigned: Boolean,
@@ -31,10 +31,10 @@ object AnalyzeSql {
   )
 
   case class ParameterColumn(
-      isNullable: Int,
+      isNullable: Option[doobie.ParameterNullable],
       isSigned: Boolean,
-      parameterMode: Int,
-      parameterType: Int,
+      parameterMode: Option[doobie.ParameterMode],
+      parameterType: doobie.JdbcType,
       parameterTypeName: String,
       precision: Int,
       scale: Int
@@ -47,10 +47,10 @@ object AnalyzeSql {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
           ParameterColumn(
-            isNullable = metadata.isNullable(n),
+            isNullable = doobie.ParameterNullable.fromInt(metadata.isNullable(n)),
             isSigned = metadata.isSigned(n),
-            parameterMode = metadata.getParameterMode(n),
-            parameterType = metadata.getParameterType(n),
+            parameterMode = doobie.ParameterMode.fromInt(metadata.getParameterMode(n)),
+            parameterType = doobie.JdbcType.fromInt(metadata.getParameterType(n)),
             parameterTypeName = metadata.getParameterTypeName(n),
             precision = metadata.getPrecision(n),
             scale = metadata.getScale(n)
@@ -71,14 +71,14 @@ object AnalyzeSql {
             columnDisplaySize = metadata.getColumnDisplaySize(n),
             columnLabel = metadata.getColumnLabel(n),
             columnName = metadata.getColumnName(n),
-            columnType = metadata.getColumnType(n),
+            columnType = doobie.JdbcType.fromInt(metadata.getColumnType(n)),
             columnTypeName = metadata.getColumnTypeName(n),
             format = metadata.getFormat(n),
             isAutoIncrement = metadata.isAutoIncrement(n),
             isCaseSensitive = metadata.isCaseSensitive(n),
             isCurrency = metadata.isCurrency(n),
             isDefinitelyWritable = metadata.isDefinitelyWritable(n),
-            isNullable = metadata.isNullable(n),
+            isNullable = doobie.ColumnNullable.fromInt(metadata.isNullable(n)),
             isReadOnly = metadata.isReadOnly(n),
             isSearchable = metadata.isSearchable(n),
             isSigned = metadata.isSigned(n),
