@@ -10,6 +10,7 @@ projects:
     isTestProject: true
   typo:
     extends: template-common
+    dependencies: org.postgresql:postgresql:42.5.1
     platform:
       mainClass: com.foo.App
   typo-scripts:
