@@ -1,6 +1,6 @@
 package typo
 
-case class TableComputed(pkg: sc.QIdent, defaultFile: sc.File, table: db.Table) {
+case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Table) {
   val allKeyNames: Set[db.ColName] =
     (table.primaryKey.map(_.colName) ++ table.uniqueKeys.flatMap(_.cols) ++ table.foreignKeys.map(_.col)).toSet
 
@@ -40,9 +40,10 @@ case class TableComputed(pkg: sc.QIdent, defaultFile: sc.File, table: db.Table) 
   }
 
   val scalaFieldsUnsaved: Seq[(sc.Ident, sc.Type, db.Col)] =
-    scalaFields.filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) }
-      .map{case (name, tpe, col) =>
-        val newType = if (col.hasDefault) sc.Type.TApply(defaultFile.tpe, List(tpe)) else tpe
+    scalaFields
+      .filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) }
+      .map { case (name, tpe, col) =>
+        val newType = if (col.hasDefault) sc.Type.TApply(default.DefaultedType, List(tpe)) else tpe
         (name, newType, col)
       }
 

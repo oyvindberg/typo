@@ -82,8 +82,10 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val RepoImplTraitFile: Option[sc.File] =
     RepoTraitFile.zip(table.repoMethods).map { case (repoTrait, repoMethods) =>
       val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
-        val impl: sc.Code = dbLib.repoImpl(table, repoMethod)
-        code"override ${dbLib.repoSig(repoMethod)} = \n    $impl"
+        val impl: sc.Code = dbLib.repoImpl(table, table.default, repoMethod)
+        code"""|override ${dbLib.repoSig(repoMethod)} = {
+               |    $impl
+               |  }""".stripMargin
       }
 
       val str =

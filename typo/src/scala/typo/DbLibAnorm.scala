@@ -12,6 +12,7 @@ object DbLibAnorm extends DbLib {
   val Success = sc.Type.Qualified("anorm.Success")
   val SqlMappingError = sc.Type.Qualified("anorm.SqlMappingError")
   val SqlStringInterpolation = sc.Type.Qualified("anorm.SqlStringInterpolation")
+  val SqlParser = sc.Type.Qualified("anorm.SqlParser")
 
   def interpolate(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
@@ -69,7 +70,7 @@ object DbLibAnorm extends DbLib {
       code"def delete($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
   }
 
-  override def repoImpl(table: TableComputed, repoMethod: RepoMethod): sc.Code =
+  override def repoImpl(table: TableComputed, default: DefaultComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectAll(_) =>
         val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
@@ -133,9 +134,34 @@ object DbLibAnorm extends DbLib {
               |    }
               |""".stripMargin
 
-      case RepoMethod.InsertDbGeneratedKey(_, _) => code"???"
-      case RepoMethod.InsertProvidedKey(_, _)    => code"???"
-      case RepoMethod.InsertOnlyKey(_)           => code"???"
+      case RepoMethod.InsertDbGeneratedKey(unsavedParam, idType) =>
+        val maybeNamedParameters = table.scalaFieldsUnsaved.map {
+          case (ident, sc.Type.TApply(default.DefaultedType, List(tpe)), col) =>
+            code"""|${unsavedParam.name}.$ident match {
+                   |        case ${default.UseDefault} => None
+                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from[$tpe](value)))
+                   |      }"""
+          case (ident, _, col) =>
+            code"""Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(${unsavedParam.name}.$ident)))"""
+        }
+
+        val sql = interpolate(
+          code"""|insert into ${table.table.name.value}($${namedParameters.map(_.name).mkString(", ")})
+                 |      values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+                 |      returning ${table.maybeId.get.col.name.value}
+                 |      """.stripMargin
+        )
+
+        code"""|val namedParameters = List(
+               |      ${maybeNamedParameters.mkCode(",\n      ")}
+               |    ).flatten
+               |
+               |    $sql
+               |      .on(namedParameters :_*)
+               |      .executeInsert($SqlParser.get[$idType](${sc.StrLit({ table.maybeId.get.col.name.value })}).single)
+               |"""
+      case RepoMethod.InsertProvidedKey(_, _) => code"???"
+      case RepoMethod.InsertOnlyKey(_)        => code"???"
       case RepoMethod.Delete(idParam) =>
         val sql = interpolate(
           code"""delete from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}"""

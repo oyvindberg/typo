@@ -32,38 +32,17 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  def genDefaultFile(jsonLib: JsonLib, pkg: sc.QIdent): sc.File = {
-    val Defaulted = pkg / sc.Ident("Defaulted")
-    val Provided = Defaulted / sc.Ident("Provided")
-    val UseDefault = Defaulted / sc.Ident("UseDefault")
-    val contents =
-      code"""
-/**
- * This signals a value where if you don't provide it, postgres will generate it for you
- */
-sealed trait ${Defaulted.last}[+T]
-
-object ${Defaulted.last} {
-  case class ${Provided.last}[T](value: T) extends $Defaulted[T]
-  case object ${UseDefault.last} extends $Defaulted[Nothing]
-  ${jsonLib.defaultedInstance(Defaulted, Provided, UseDefault).mkCode("\n  ")}
-}
-"""
-    sc.File(sc.Type.Qualified(Defaulted), contents)
-  }
-
-
   def allTables(pkg: sc.QIdent, tables: List[db.Table], jsonLib: JsonLib, dbLib: DbLib): List[sc.File] = {
     val enums: List[db.Type.StringEnum] =
       tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
 
-    val defaultFile = genDefaultFile(jsonLib, pkg)
+    val default = DefaultComputed(pkg)
     val enumFiles: List[sc.File] =
       enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(pkg, defaultFile, table), dbLib, jsonLib).all)
+      tables.flatMap(table => TableFiles(TableComputed(pkg, default, table), dbLib, jsonLib).all)
     val allFiles: List[sc.File] =
-      List(defaultFile) ++ enumFiles ++ tableFiles
+      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles
 
     val knownNames = allFiles.map { f => (f.name, f.tpe.value) }.toMap
 

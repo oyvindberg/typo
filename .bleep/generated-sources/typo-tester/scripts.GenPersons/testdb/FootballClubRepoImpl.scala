@@ -6,13 +6,16 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 trait FootballClubRepoImpl extends FootballClubRepo {
-  override def selectAll(implicit c: Connection): List[FootballClubRow] = 
+  override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select id, name from football_club""".as(FootballClubRow.rowParser.*)
-  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = 
+  }
+  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     SQL"""select id, name from football_club where id = $id""".as(FootballClubRow.rowParser.singleOpt)
-  override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = 
+  }
+  override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select id, name from football_club where id in $ids""".as(FootballClubRow.rowParser.*)
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): List[FootballClubRow] = 
+  }
+  override def selectByFieldValues(fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -25,7 +28,8 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           .as(FootballClubRow.rowParser.*)
     }
 
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Int = 
+  }
+  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -40,8 +44,11 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           .executeUpdate()
     }
 
-  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit = 
+  }
+  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit = {
     ???
-  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = 
+  }
+  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from football_club where id = ${id}}""".executeUpdate() > 0
+  }
 }
