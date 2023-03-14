@@ -46,7 +46,16 @@ trait FootballClubRepoImpl extends FootballClubRepo {
 
   }
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit = {
-    ???
+    val namedParameters = List(
+      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
+    ).flatten
+
+    SQL"""insert into football_club(id, ${namedParameters.map(_.name).mkString(", ")})
+      values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      """
+      .on(namedParameters :_*)
+      .execute()
+
   }
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from football_club where id = ${id}}""".executeUpdate() > 0

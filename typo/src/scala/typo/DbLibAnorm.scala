@@ -160,8 +160,33 @@ object DbLibAnorm extends DbLib {
                |      .on(namedParameters :_*)
                |      .executeInsert($SqlParser.get[$idType](${sc.StrLit({ table.maybeId.get.col.name.value })}).single)
                |"""
-      case RepoMethod.InsertProvidedKey(_, _) => code"???"
-      case RepoMethod.InsertOnlyKey(_)        => code"???"
+      case RepoMethod.InsertProvidedKey(idParam, unsavedParam) =>
+        val maybeNamedParameters = table.scalaFieldsUnsaved.map {
+          case (ident, sc.Type.TApply(default.DefaultedType, List(tpe)), col) =>
+            code"""|${unsavedParam.name}.$ident match {
+                   |        case ${default.UseDefault} => None
+                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from[$tpe](value)))
+                   |      }"""
+          case (ident, _, col) =>
+            code"""Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(${unsavedParam.name}.$ident)))"""
+        }
+
+        val sql = interpolate(
+          code"""|insert into ${table.table.name.value}(${table.maybeId.get.col.name.value}, $${namedParameters.map(_.name).mkString(", ")})
+                 |      values ($${${idParam.name}}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+                 |      """.stripMargin
+        )
+
+        code"""|val namedParameters = List(
+               |      ${maybeNamedParameters.mkCode(",\n      ")}
+               |    ).flatten
+               |
+               |    $sql
+               |      .on(namedParameters :_*)
+               |      .execute()
+               |"""
+
+      case RepoMethod.InsertOnlyKey(_) => code"???"
       case RepoMethod.Delete(idParam) =>
         val sql = interpolate(
           code"""delete from ${table.table.name.value} where ${table.maybeId.get.col.name.value} = $${${idParam.name}}}"""
