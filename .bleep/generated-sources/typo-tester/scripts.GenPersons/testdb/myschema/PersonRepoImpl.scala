@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -10,13 +10,13 @@ import testdb.Defaulted.UseDefault
 
 trait PersonRepoImpl extends PersonRepo {
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from person""".as(PersonRow.rowParser.*)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".as(PersonRow.rowParser.*)
   }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from person where id = $id""".as(PersonRow.rowParser.singleOpt)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id""".as(PersonRow.rowParser.singleOpt)
   }
   override def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from person where id in $ids""".as(PersonRow.rowParser.*)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(PersonRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        SQL"""select * from person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL"""select * from myschema.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
           .on(namedParams: _*)
           .as(PersonRow.rowParser.*)
     }
@@ -58,7 +58,7 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        SQL"""update person
+        SQL"""update myschema.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = ${id}}"""
           .on(namedParams: _*)
@@ -86,7 +86,7 @@ trait PersonRepoImpl extends PersonRepo {
       }
     ).flatten
 
-    SQL"""insert into person(${namedParameters.map(_.name).mkString(", ")})
+    SQL"""insert into myschema.person(${namedParameters.map(_.name).mkString(", ")})
       values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       returning id
       """
@@ -95,6 +95,6 @@ trait PersonRepoImpl extends PersonRepo {
 
   }
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.person where id = ${id}}""".executeUpdate() > 0
   }
 }

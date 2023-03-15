@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import java.sql.Connection
 

@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -7,13 +7,13 @@ import java.sql.Connection
 
 trait FootballClubRepoImpl extends FootballClubRepo {
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from football_club""".as(FootballClubRow.rowParser.*)
+    SQL"""select id, name from myschema.football_club""".as(FootballClubRow.rowParser.*)
   }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
-    SQL"""select id, name from football_club where id = $id""".as(FootballClubRow.rowParser.singleOpt)
+    SQL"""select id, name from myschema.football_club where id = $id""".as(FootballClubRow.rowParser.singleOpt)
   }
   override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from football_club where id in $ids""".as(FootballClubRow.rowParser.*)
+    SQL"""select id, name from myschema.football_club where id in $ids""".as(FootballClubRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
@@ -23,7 +23,7 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""select * from football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL"""select * from myschema.football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
           .on(namedParams: _*)
           .as(FootballClubRow.rowParser.*)
     }
@@ -37,7 +37,7 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""update football_club
+        SQL"""update myschema.football_club
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = ${id}}"""
           .on(namedParams: _*)
@@ -50,7 +50,7 @@ trait FootballClubRepoImpl extends FootballClubRepo {
       Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
     ).flatten
 
-    SQL"""insert into football_club(id, ${namedParameters.map(_.name).mkString(", ")})
+    SQL"""insert into myschema.football_club(id, ${namedParameters.map(_.name).mkString(", ")})
       values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
@@ -58,6 +58,6 @@ trait FootballClubRepoImpl extends FootballClubRepo {
 
   }
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
-    SQL"""delete from football_club where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.football_club where id = ${id}}""".executeUpdate() > 0
   }
 }

@@ -5,10 +5,12 @@ import bleep.logging.Logger
 import typo.*
 
 import java.nio.file.{Files, Path}
+import java.sql.DriverManager
+import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
   val person = db.Table(
-    name = db.TableName("person"),
+    name = db.TableName("myschema", "person"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true),
       db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(50), isNotNull = true, hasDefault = false),
@@ -22,7 +24,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
       db.Col(db.ColName("work_email"), db.Type.VarChar(254), isNotNull = false, hasDefault = false),
       db.Col(
         db.ColName("sector"),
-        db.Type.StringEnum(db.EnumName("sector"), List("PUBLIC", "PRIVATE", "OTHER")),
+        db.Type.StringEnum(db.EnumName("myschema", "sector"), List("PUBLIC", "PRIVATE", "OTHER")),
         isNotNull = true,
         hasDefault = true
       )
@@ -30,12 +32,12 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Some(db.PrimaryKey(db.ColName("id"))),
     Nil,
     List(
-      db.ForeignKey(db.ColName("favourite_football_club_id"), db.TableName("football_club"), db.ColName("id")),
-      db.ForeignKey(db.ColName("marital_status_id"), db.TableName("marital_status"), db.ColName("id"))
+      db.ForeignKey(db.ColName("favourite_football_club_id"), db.TableName("myschema", "football_club"), db.ColName("id")),
+      db.ForeignKey(db.ColName("marital_status_id"), db.TableName("myschema", "marital_status"), db.ColName("id"))
     )
   )
   val football_club = db.Table(
-    name = db.TableName("football_club"),
+    name = db.TableName("myschema", "football_club"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false),
       db.Col(db.ColName("name"), db.Type.VarChar(100), isNotNull = true, hasDefault = false)
@@ -45,7 +47,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Nil
   )
   val marital_status = db.Table(
-    name = db.TableName("marital_status"),
+    name = db.TableName("myschema", "marital_status"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false)
     ),

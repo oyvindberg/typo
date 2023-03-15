@@ -9,10 +9,10 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val RowFile: sc.File = {
     val rowType = sc.Type.Qualified(table.RowName)
     val str =
-      code"""case class ${table.RowName.last}(
+      code"""case class ${table.RowName.name}(
             |  ${table.scalaFields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
             |)
-            |object ${table.RowName.last} {
+            |object ${table.RowName.name} {
             |  ${dbLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
             |  ${jsonLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
             |}
@@ -25,10 +25,10 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
     val rowType = sc.Type.Qualified(qident)
 
     val str =
-      code"""case class ${qident.last}(
+      code"""case class ${qident.name}(
             |  ${table.scalaFieldsUnsaved.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
             |)
-            |object ${qident.last} {
+            |object ${qident.name} {
             |  ${jsonLib.instances(rowType, table.scalaFieldsUnsaved).mkCode("\n  ")}
             |}
             |""".stripMargin
@@ -43,7 +43,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
       name -> code"case class $name(override val value: $tpe) extends $fieldValueType(${sc.StrLit(col.name.value)}, value)"
     }
     val str =
-      code"""sealed abstract class ${table.FieldValueName.last}[T](val name: String, val value: T)
+      code"""sealed abstract class ${table.FieldValueName.name}[T](val name: String, val value: T)
             |
             |object ${table.FieldValueName} {
             |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
@@ -71,7 +71,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val RepoTraitFile: Option[sc.File] = table.repoMethods.map { repoMethods =>
     val tpe = sc.Type.Qualified(table.RepoName)
     val str =
-      code"""trait ${table.RepoName.last} {
+      code"""trait ${table.RepoName.name} {
             |  ${repoMethods.map(dbLib.repoSig).mkCode("\n  ")}
             |}
             |""".stripMargin
@@ -89,7 +89,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
       }
 
       val str =
-        code"""trait ${table.RepoImplName.last} extends ${repoTrait.tpe} {
+        code"""trait ${table.RepoImplName.name} extends ${repoTrait.tpe} {
               |  ${renderedMethods.mkCode("\n  ")}
               |}
               |""".stripMargin

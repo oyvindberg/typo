@@ -29,7 +29,7 @@ object sc {
   case class QIdent(idents: List[Ident]) extends Tree {
     require(idents.nonEmpty)
     def /(ident: Ident): QIdent = QIdent(idents :+ ident)
-    def last = idents.last
+    def name = idents.last
   }
   object QIdent {
     implicit val ordering: Ordering[QIdent] = Ordering.by(renderTree)
@@ -70,7 +70,7 @@ object sc {
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
       Set(AnyVal, OrderingName, Unit, Int, Long, String, Boolean, OptionName, ListName, MapName)
-        .map(x => (x.value.last, x.value))
+        .map(x => (x.value.name, x.value))
         .toMap
 
     def Option(underlying: Type): Type = TApply(OptionName, scala.List(underlying))
@@ -98,7 +98,8 @@ object sc {
   }
 
   case class File(tpe: Type.Qualified, contents: Code) {
-    def name: Ident = tpe.value.last
+    val name: Ident = tpe.value.name
+    val pkg = QIdent(tpe.value.idents.dropRight(1))
   }
 
   @FunctionalInterface
@@ -112,6 +113,7 @@ object sc {
     implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
     implicit val str: ToCode[String] = Code.Str.apply
     implicit val code: ToCode[Code] = identity
+    implicit val tableName: ToCode[TableName] = x => s"${x.schema}.${x.name}"
   }
 
   object syntax {

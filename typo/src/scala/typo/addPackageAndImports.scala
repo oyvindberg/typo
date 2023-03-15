@@ -8,14 +8,14 @@ import scala.collection.mutable
 /** imports are automatically written based on the qualified idents found in the code
   */
 object addPackageAndImports {
-  def apply(pkg: sc.QIdent, knownNames: Map[sc.Ident, sc.QIdent], file: sc.File): sc.File = {
+  def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.QIdent]
 
     val withShortenedNames = file.contents.mapTrees { tree =>
       shortenNames(tree) { currentQName =>
-        val currentName = currentQName.last
+        val currentName = currentQName.name
         val shortenedQName = sc.QIdent(List(currentName))
-        knownNames.get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+        knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
           case Some(alreadyAvailable) =>
             if (alreadyAvailable == currentQName) shortenedQName else currentQName
           case None =>
@@ -26,7 +26,7 @@ object addPackageAndImports {
     }
 
     val withPrefix =
-      code"""package $pkg
+      code"""package ${file.pkg}
             |
             |${newImports.values.toList.sorted.map { i => code"import $i" }.mkCode("\n")}
             |

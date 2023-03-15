@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat

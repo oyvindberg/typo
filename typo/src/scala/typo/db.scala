@@ -3,7 +3,7 @@ package typo
 /** Describes what tables look like in postgres
   */
 object db {
-  case class EnumName(value: String) extends AnyVal
+  case class EnumName(schema: String, name: String)
   sealed trait Type
   object Type {
     case object BigInt extends Type
@@ -14,7 +14,7 @@ object db {
 
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
-  case class TableName(value: String) extends AnyVal
+  case class TableName(schema: String, name: String)
   case class PrimaryKey(colName: ColName)
   case class ForeignKey(col: ColName, otherTable: TableName, otherColumn: ColName)
   case class UniqueKey(cols: List[ColName])

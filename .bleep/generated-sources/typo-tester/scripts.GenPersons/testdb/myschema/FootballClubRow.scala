@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import anorm.RowParser
 import anorm.Success

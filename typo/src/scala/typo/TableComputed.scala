@@ -20,7 +20,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
   val maybeId: Option[TableComputed.Id] =
     table.primaryKey.map { pk =>
       val col = colsByName(pk.colName)
-      val qident = names.titleCase(pkg, table.name.value, "Id")
+      val qident = names.titleCase(pkg, table.name, "Id")
       val underlying = scalaType(pkg, col)
       val paramName = names.field(col.name)
       TableComputed.Id(col, qident, underlying, paramName)
@@ -30,7 +30,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
     table.cols.map {
       case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
         if (!isNotNull) {
-          sys.error(s"assumption: id column in ${table.name.value} should be not null")
+          sys.error(s"assumption: id column in ${table.name} should be not null")
         }
         (names.field(colName), maybeId.get.tpe, col)
       case col =>
@@ -47,11 +47,11 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
         (name, newType, col)
       }
 
-  val RepoName: sc.QIdent = names.titleCase(pkg, table.name.value, "Repo")
-  val RepoImplName: sc.QIdent = names.titleCase(pkg, table.name.value, "RepoImpl")
-  val RowName: sc.QIdent = names.titleCase(pkg, table.name.value, "Row")
-  val RowUnsavedName: Option[sc.QIdent] = if (scalaFieldsUnsaved.nonEmpty) Some(names.titleCase(pkg, table.name.value, "RowUnsaved")) else None
-  val FieldValueName: sc.QIdent = names.titleCase(pkg, table.name.value, "FieldValue")
+  val RepoName: sc.QIdent = names.titleCase(pkg, table.name, "Repo")
+  val RepoImplName: sc.QIdent = names.titleCase(pkg, table.name, "RepoImpl")
+  val RowName: sc.QIdent = names.titleCase(pkg, table.name, "Row")
+  val RowUnsavedName: Option[sc.QIdent] = if (scalaFieldsUnsaved.nonEmpty) Some(names.titleCase(pkg, table.name, "RowUnsaved")) else None
+  val FieldValueName: sc.QIdent = names.titleCase(pkg, table.name, "FieldValue")
 
   val repoMethods: Option[List[RepoMethod]] = {
     val RowType = sc.Type.Qualified(RowName)
@@ -95,7 +95,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
 
 object TableComputed {
   case class Id(col: db.Col, qident: sc.QIdent, underlying: sc.Type, paramName: sc.Ident) {
-    def name = qident.last
+    def name = qident.name
     def tpe = sc.Type.Qualified(qident)
   }
 }

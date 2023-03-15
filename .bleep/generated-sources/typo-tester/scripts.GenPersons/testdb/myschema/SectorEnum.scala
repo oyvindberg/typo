@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import anorm.Column
 import anorm.SqlMappingError

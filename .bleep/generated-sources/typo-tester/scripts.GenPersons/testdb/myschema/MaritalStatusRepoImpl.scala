@@ -1,4 +1,4 @@
-package testdb
+package testdb.myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -7,13 +7,13 @@ import java.sql.Connection
 
 trait MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from marital_status""".as(MaritalStatusRow.rowParser.*)
+    SQL"""select id from myschema.marital_status""".as(MaritalStatusRow.rowParser.*)
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
-    SQL"""select id from marital_status where id = $id""".as(MaritalStatusRow.rowParser.singleOpt)
+    SQL"""select id from myschema.marital_status where id = $id""".as(MaritalStatusRow.rowParser.singleOpt)
   }
   override def selectByIds(ids: List[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from marital_status where id in $ids""".as(MaritalStatusRow.rowParser.*)
+    SQL"""select id from myschema.marital_status where id in $ids""".as(MaritalStatusRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -22,7 +22,7 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        SQL"""select * from marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL"""select * from myschema.marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
           .on(namedParams: _*)
           .as(MaritalStatusRow.rowParser.*)
     }
@@ -35,7 +35,7 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        SQL"""update marital_status
+        SQL"""update myschema.marital_status
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = ${id}}"""
           .on(namedParams: _*)
@@ -44,6 +44,6 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
 
   }
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"""delete from marital_status where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.marital_status where id = ${id}}""".executeUpdate() > 0
   }
 }
