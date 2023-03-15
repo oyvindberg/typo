@@ -4,10 +4,10 @@ import java.sql.PreparedStatement
 
 object AnalyzeSql {
   case class Column(
-      baseColumnName: String,
-      baseSchemaName: String,
-      baseTableName: String,
-      catalogName: String,
+      baseColumnName: Option[String],
+      baseSchemaName: Option[String],
+      baseTableName: Option[String],
+      catalogName: Option[String],
       columnClassName: String,
       columnDisplaySize: Int,
       columnLabel: String,
@@ -26,8 +26,8 @@ object AnalyzeSql {
       isWritable: Boolean,
       precision: Int,
       scale: Int,
-      schemaName: String,
-      tableName: String
+      schemaName: Option[String],
+      tableName: Option[String]
   )
 
   case class ParameterColumn(
@@ -58,15 +58,17 @@ object AnalyzeSql {
         }
       case other => sys.error(s"Expected `org.postgresql.jdbc.PgParameterMetaData`, ot ${other.getClass.getName}")
     }
+    def nonEmpty(str: String): Option[String] = if (str.isEmpty) None else Some(str)
 
     val columns = ps.getMetaData match {
+
       case metadata: org.postgresql.jdbc.PgResultSetMetaData =>
         0.until(metadata.getColumnCount).map(_ + 1).map { n =>
           Column(
-            baseColumnName = metadata.getBaseColumnName(n),
-            baseSchemaName = metadata.getBaseSchemaName(n),
-            baseTableName = metadata.getBaseTableName(n),
-            catalogName = metadata.getCatalogName(n),
+            baseColumnName = nonEmpty(metadata.getBaseColumnName(n)),
+            baseSchemaName = nonEmpty(metadata.getBaseSchemaName(n)),
+            baseTableName = nonEmpty(metadata.getBaseTableName(n)),
+            catalogName = nonEmpty(metadata.getCatalogName(n)),
             columnClassName = metadata.getColumnClassName(n),
             columnDisplaySize = metadata.getColumnDisplaySize(n),
             columnLabel = metadata.getColumnLabel(n),
@@ -85,8 +87,8 @@ object AnalyzeSql {
             isWritable = metadata.isWritable(n),
             precision = metadata.getPrecision(n),
             scale = metadata.getScale(n),
-            schemaName = metadata.getSchemaName(n),
-            tableName = metadata.getTableName(n)
+            schemaName = nonEmpty(metadata.getSchemaName(n)),
+            tableName = nonEmpty(metadata.getTableName(n))
           )
         }
 

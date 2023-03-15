@@ -3,9 +3,10 @@ package scripts
 import bleep.*
 import bleep.logging.Logger
 import typo.*
+import typo.information_schema.{ViewRow, ViewsRepo}
 
 import java.nio.file.{Files, Path}
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager}
 import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
@@ -59,6 +60,22 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val all = List(person, football_club, marital_status)
 
   override def run(started: Started, commands: Commands, targets: List[Target], args: List[String]): Unit = {
+    val c = {
+      val url = "jdbc:postgresql://localhost/postgres"
+      val props = new util.Properties
+      props.setProperty("user", "postgres")
+      props.setProperty("password", "postgres")
+      DriverManager.getConnection(url, props)
+    }
+
+    val allViews = ViewsRepo.fetch(c).map { view =>
+      val ps = c.prepareStatement(view.view_definition)
+      val analyzed =
+        try AnalyzeSql.from(ps)
+        finally ps.close()
+      (view, analyzed)
+    }
+
     val filesByRelPath: Map[RelPath, String] =
       Gen
         .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, JsonLibPlay, DbLibAnorm)
