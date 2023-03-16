@@ -14,7 +14,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   )
 
   val person = db.Table(
-    name = db.TableName("myschema", "person"),
+    name = db.RelationName("myschema", "person"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true),
       db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(50), isNotNull = true, hasDefault = false),
@@ -36,12 +36,12 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
     List(
-      db.ForeignKey(db.ColName("favourite_football_club_id"), db.TableName("myschema", "football_club"), db.ColName("id")),
-      db.ForeignKey(db.ColName("marital_status_id"), db.TableName("myschema", "marital_status"), db.ColName("id"))
+      db.ForeignKey(db.ColName("favourite_football_club_id"), db.RelationName("myschema", "football_club"), db.ColName("id")),
+      db.ForeignKey(db.ColName("marital_status_id"), db.RelationName("myschema", "marital_status"), db.ColName("id"))
     )
   )
   val football_club = db.Table(
-    name = db.TableName("myschema", "football_club"),
+    name = db.RelationName("myschema", "football_club"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false),
       db.Col(db.ColName("name"), db.Type.VarChar(100), isNotNull = true, hasDefault = false)
@@ -51,7 +51,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Nil
   )
   val marital_status = db.Table(
-    name = db.TableName("myschema", "marital_status"),
+    name = db.RelationName("myschema", "marital_status"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false)
     ),
@@ -61,7 +61,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   )
 
   val cpk_person = db.Table(
-    name = db.TableName("compositepk", "person"), // name clash to ensure we handle it
+    name = db.RelationName("compositepk", "person"), // name clash to ensure we handle it
     cols = List(
       db.Col(db.ColName("one"), db.Type.BigInt, isNotNull = true, hasDefault = true),
       db.Col(db.ColName("two"), db.Type.Text, isNotNull = false, hasDefault = true),
@@ -72,7 +72,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Nil
   )
   val cpk_bike = db.Table(
-    name = db.TableName("compositepk", "bike"),
+    name = db.RelationName("compositepk", "bike"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true),
       db.Col(db.ColName("owner_one"), db.Type.BigInt, isNotNull = true, hasDefault = false),

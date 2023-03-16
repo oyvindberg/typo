@@ -16,12 +16,12 @@ object db {
   case class StringEnum(name: EnumName, values: List[String])
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
-  case class TableName(schema: String, name: String)
+  case class RelationName(schema: String, name: String)
   case class PrimaryKey(colNames: List[ColName])
-  case class ForeignKey(col: ColName, otherTable: TableName, otherColumn: ColName)
+  case class ForeignKey(col: ColName, otherTable: RelationName, otherColumn: ColName)
   case class UniqueKey(cols: List[ColName])
   case class Table(
-      name: TableName,
+      name: RelationName,
       cols: Seq[Col],
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],

@@ -1,7 +1,5 @@
 package typo
 
-import typo.db._
-
 /** Simplified model of the scala language.
   *
   * The generated code is stored in the `Code` data structure. For full flexibility, some parts are stored as text and other parts in trees. Most notably *all
@@ -109,7 +107,7 @@ object sc {
     implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
     implicit val str: ToCode[String] = Code.Str.apply
     implicit val code: ToCode[Code] = identity
-    implicit val tableName: ToCode[TableName] = x => s"${x.schema}.${x.name}"
+    implicit val tableName: ToCode[db.RelationName] = x => s"${x.schema}.${x.name}"
   }
 
   object syntax {
