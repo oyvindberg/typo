@@ -1,37 +1,169 @@
 package com.foo
 
-import anorm._
+import anorm.*
+import com.foo.Q.PgType
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.sql.{Connection, DriverManager}
 
 class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  val url = "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
-  implicit val conn: Connection = DriverManager.getConnection(url)
-
   test("works") {
-    val schematas = Q.Schemata.all
-//    println(schematas)
+    val url = "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
+    implicit val conn: Connection = DriverManager.getConnection(url)
 
-    val tables = Q.Tables.all
-//    println(tables)
+    try {
+      val tables = Q.Tables.all
+      val columns = Q.Columns.all
+      val tableConstraints = Q.TableConstraints.all
+      val referentialConstraints = Q.ReferentialConstraints.all
+      val constraintColumnUsage = Q.ConstraintColumnUsage.all
+      val pgTypes = PgType.all
 
-    val columns = Q.Columns.all
-//    println(columns)
+      val filteredTables =
+        tables
+          .filter(t =>
+            t.table_schema == "institusjoner"
+              && t.table_name == "institution"
+          )
 
-    val tableConstraints = Q.TableConstraints.all
-//    println(tableConstraints)
+      def processed =
+        filteredTables
+          .map {
+            table =>
+              val cols =
+                columns
+                  .filter(c =>
+                    c.table_catalog == table.table_catalog
+                      && c.table_schema == table.table_schema
+                      && c.table_name == table.table_name
+                  )
+                  .sortBy(_.ordinal_position)
+                  .map { c =>
+                    Column(
+                      name = ColumnName(c.column_name),
+                      default = c.column_default,
+                      nullable = c.is_nullable == "YES",
+                      tpe = Type.fromUdtName(c.udt_name, c.character_maximum_length, pgTypes)
+                    )
+                  }
 
-    val referentialConstraints = Q.ReferentialConstraints.all
-    //    println(referentialConstraints)
+              Table(
+                name = TableName(
+                  catalog = table.table_catalog,
+                  schema = table.table_schema,
+                  tableName = table.table_name,
+                ),
+                columns = cols,
+              )
+          }
 
-    val constraintColumnUsage = Q.ConstraintColumnUsage.all
-    println(constraintColumnUsage)
+      //      println(processed)
+      val foo = columns
+        .filter(t =>
+          List(
+            "audit",
+            "common",
+            "institusjoner",
+            "opptak",
+            "posten",
+            "public",
+            "regelverk",
+            "saksbehandling",
+            "sokerportal",
+            "statistikk",
+            "studier",
+            "systemkonfigurasjon",
+            "tilgangskontroll"
+          ).contains(t.table_schema)
+        )
+        .map(c =>
+          Column(
+            name = ColumnName(c.column_name),
+            default = c.column_default,
+            nullable = c.is_nullable == "YES",
+            tpe = Type.fromUdtName(c.udt_name, c.character_maximum_length, pgTypes),
+          )
+        )
 
+      println(foo.mkString("\n"))
+
+    } finally {
+      conn.close()
+    }
     assert(true)
   }
 }
+
+case class TableName(catalog: String, schema: String, tableName: String)
+
+case class Table(name: TableName, columns: List[Column])
+
+sealed trait Type
+
+object Type {
+  def fromUdtName(udtName: String, characterMaximumLength: Option[Int], pgTypes: List[PgType.Row]): Type = {
+    udtName match {
+      case "bool" => Boolean
+      case "float4" => Float4
+      case "float8" => Float8
+      case "hstore" => Hstore
+      case "inet" => Inet
+      case "int4" => Int4
+      case "int8" => Int8
+      case "json" => Json
+      case "numeric" => Numeric
+      case "oid" => Oid
+      case "text" => Text
+      case "timestamp" => Timestamp
+      case "timestamptz" => TimestampTz
+      case "varchar" => Varchar(characterMaximumLength)
+
+      case typeName =>
+        pgTypes.find(_.typname == typeName) match {
+          case Some(pgType) if pgType.typcategory == 'E' => Type.Enum(typeName)
+          case None =>
+            throw new NotImplementedError(s"$typeName not implemend")
+        }
+
+    }
+  }
+
+  case class Enum(name: String) extends Type
+
+  case object Hstore extends Type
+
+  case object Inet extends Type
+
+  case object Oid extends Type
+
+  case class Varchar(maxLength: Option[Int]) extends Type
+
+  case object Boolean extends Type
+
+  case object Float4 extends Type
+
+  case object Float8 extends Type
+
+  case object Int4 extends Type
+
+  case object Int8 extends Type
+
+  case object Json extends Type
+
+  case object Numeric extends Type
+
+  case object Text extends Type
+
+  case object Timestamp extends Type
+
+  case object TimestampTz extends Type
+}
+
+
+case class ColumnName(value: String) extends AnyVal
+
+case class Column(name: ColumnName, default: Option[String], nullable: Boolean, tpe: Type)
 
 object Q {
   object Schemata {
@@ -221,6 +353,29 @@ object Q {
       """
         .as(ConstraintColumnUsage.Row.parser.*)
 
+  }
+
+  object PgType {
+    case class Row(oid: Int, typname: String, typtype: Char, typcategory: Char)
+
+    object Row {
+      val parser: RowParser[PgType.Row] = row =>
+        anorm.Success {
+          PgType.Row(
+            oid = row[Int]("oid"),
+            typname = row[String]("typname"),
+            typtype = row[Char]("typtype"),
+            typcategory = row[Char]("typcategory"),
+          )
+        }
+    }
+
+    def all(implicit c: Connection): List[PgType.Row] =
+      SQL"""
+         select *
+         from pg_catalog.pg_type
+       """
+        .as(PgType.Row.parser.*)
   }
 
 }
