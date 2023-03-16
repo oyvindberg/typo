@@ -9,11 +9,11 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
 
   def scalaType(pkg: sc.QIdent, col: db.Col): sc.Type = {
     val baseTpe = col.tpe match {
-      case db.Type.BigInt              => sc.Type.Long
-      case db.Type.VarChar(_)          => sc.Type.String
-      case db.Type.Boolean             => sc.Type.Boolean
-      case db.Type.Text                => sc.Type.String
-      case db.Type.StringEnum(name, _) => sc.Type.Qualified(names.EnumName(pkg, name))
+      case db.Type.BigInt           => sc.Type.Long
+      case db.Type.VarChar(_)       => sc.Type.String
+      case db.Type.Boolean          => sc.Type.Boolean
+      case db.Type.Text             => sc.Type.String
+      case db.Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
     }
     if (col.isNotNull) baseTpe else sc.Type.Option(baseTpe)
   }

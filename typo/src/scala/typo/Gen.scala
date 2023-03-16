@@ -4,7 +4,7 @@ import typo.sc.syntax._
 
 object Gen {
 
-  def stringEnumClass(pkg: sc.QIdent, `enum`: db.Type.StringEnum, dbLib: DbLib, jsonLib: JsonLib): sc.File = {
+  def stringEnumClass(pkg: sc.QIdent, `enum`: db.StringEnum, dbLib: DbLib, jsonLib: JsonLib): sc.File = {
     val qident = names.EnumName(pkg, `enum`.name)
     val EnumType = sc.Type.Qualified(qident)
 
@@ -30,10 +30,7 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  def allTables(pkg: sc.QIdent, tables: List[db.Table], jsonLib: JsonLib, dbLib: DbLib): List[sc.File] = {
-    val enums: List[db.Type.StringEnum] =
-      tables.flatMap(_.cols.map(_.tpe)).collect { case x: db.Type.StringEnum => x }.distinct
-
+  def allTables(pkg: sc.QIdent, tables: List[db.Table], enums: List[db.StringEnum], jsonLib: JsonLib, dbLib: DbLib): List[sc.File] = {
     val default = DefaultComputed(pkg)
     val enumFiles: List[sc.File] =
       enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))

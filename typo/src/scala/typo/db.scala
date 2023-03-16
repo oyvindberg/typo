@@ -10,9 +10,10 @@ object db {
     case class VarChar(n: Int) extends Type
     case object Text extends Type
     case object Boolean extends Type
-    case class StringEnum(name: EnumName, values: List[String]) extends Type
+    case class StringEnum(name: EnumName) extends Type
   }
 
+  case class StringEnum(name: EnumName, values: List[String])
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
   case class TableName(schema: String, name: String)

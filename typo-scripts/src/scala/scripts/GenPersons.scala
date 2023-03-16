@@ -9,6 +9,10 @@ import java.sql.DriverManager
 import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
+  val enums = List(
+    db.StringEnum(db.EnumName("myschema", "sector"), List("PUBLIC", "PRIVATE", "OTHER"))
+  )
+
   val person = db.Table(
     name = db.TableName("myschema", "person"),
     cols = List(
@@ -24,7 +28,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
       db.Col(db.ColName("work_email"), db.Type.VarChar(254), isNotNull = false, hasDefault = false),
       db.Col(
         db.ColName("sector"),
-        db.Type.StringEnum(db.EnumName("myschema", "sector"), List("PUBLIC", "PRIVATE", "OTHER")),
+        db.Type.StringEnum(db.EnumName("myschema", "sector")),
         isNotNull = true,
         hasDefault = true
       )
@@ -101,7 +105,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val filesByRelPath: Map[RelPath, String] =
       Gen
-        .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, JsonLibPlay, DbLibAnorm)
+        .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, enums, JsonLibPlay, DbLibAnorm)
         .map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render
