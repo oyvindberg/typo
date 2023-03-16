@@ -19,7 +19,7 @@ object AnalyzeSql {
       isCaseSensitive: Boolean,
       isCurrency: Boolean,
       isDefinitelyWritable: Boolean,
-      isNullable: Option[doobie.ColumnNullable],
+      isNullable: doobie.ColumnNullable,
       isReadOnly: Boolean,
       isSearchable: Boolean,
       isSigned: Boolean,
@@ -31,9 +31,9 @@ object AnalyzeSql {
   )
 
   case class ParameterColumn(
-      isNullable: Option[doobie.ParameterNullable],
+      isNullable: doobie.ParameterNullable,
       isSigned: Boolean,
-      parameterMode: Option[doobie.ParameterMode],
+      parameterMode: doobie.ParameterMode,
       parameterType: doobie.JdbcType,
       parameterTypeName: String,
       precision: Int,
@@ -47,9 +47,13 @@ object AnalyzeSql {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
           ParameterColumn(
-            isNullable = doobie.ParameterNullable.fromInt(metadata.isNullable(n)),
+            isNullable = doobie.ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
+              sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
+            },
             isSigned = metadata.isSigned(n),
-            parameterMode = doobie.ParameterMode.fromInt(metadata.getParameterMode(n)),
+            parameterMode = doobie.ParameterMode.fromInt(metadata.getParameterMode(n)).getOrElse {
+              sys.error(s"Couldn't understand metadata.getParameterMode($n) = ${metadata.getParameterMode(n)}")
+            },
             parameterType = doobie.JdbcType.fromInt(metadata.getParameterType(n)),
             parameterTypeName = metadata.getParameterTypeName(n),
             precision = metadata.getPrecision(n),
@@ -80,7 +84,9 @@ object AnalyzeSql {
             isCaseSensitive = metadata.isCaseSensitive(n),
             isCurrency = metadata.isCurrency(n),
             isDefinitelyWritable = metadata.isDefinitelyWritable(n),
-            isNullable = doobie.ColumnNullable.fromInt(metadata.isNullable(n)),
+            isNullable = doobie.ColumnNullable.fromInt(metadata.isNullable(n)).getOrElse {
+              sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
+            },
             isReadOnly = metadata.isReadOnly(n),
             isSearchable = metadata.isSearchable(n),
             isSigned = metadata.isSigned(n),
