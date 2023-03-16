@@ -1,7 +1,6 @@
 package com.foo
 
 import anorm.*
-import com.foo.Q.PgType
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -18,7 +17,8 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val tableConstraints = Q.TableConstraints.all
       val referentialConstraints = Q.ReferentialConstraints.all
       val constraintColumnUsage = Q.ConstraintColumnUsage.all
-      val pgTypes = PgType.all
+
+      val typeLookup = TypeLookup(pgTypes = Q.PgType.all, pgEnums = Q.PgEnum.all)
 
       val filteredTables =
         tables
@@ -44,7 +44,7 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
                       name = ColumnName(c.column_name),
                       default = c.column_default,
                       nullable = c.is_nullable == "YES",
-                      tpe = Type.fromUdtName(c.udt_name, c.character_maximum_length, pgTypes)
+                      tpe = typeLookup.fromUdtName(c.udt_name, c.character_maximum_length)
                     )
                   }
 
@@ -58,7 +58,7 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
               )
           }
 
-      //      println(processed)
+      println(processed)
       val foo = columns
         .filter(t =>
           List(
@@ -82,17 +82,53 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
             name = ColumnName(c.column_name),
             default = c.column_default,
             nullable = c.is_nullable == "YES",
-            tpe = Type.fromUdtName(c.udt_name, c.character_maximum_length, pgTypes),
+            tpe = typeLookup.fromUdtName(c.udt_name, c.character_maximum_length),
           )
         )
 
-      println(foo.mkString("\n"))
+//      val filteredFoo = foo.filter(_.tpe.isInstanceOf[Type.Enum])
+//      println(filteredFoo.mkString("\n"))
 
     } finally {
       conn.close()
     }
     assert(true)
   }
+}
+
+case class TypeLookup(pgTypes: List[Q.PgType.Row], pgEnums: List[Q.PgEnum.Row]) {
+  def fromUdtName(udtName: String, characterMaximumLength: Option[Int]): Type = {
+    udtName match {
+      case "bool" => Type.Boolean
+      case "float4" => Type.Float4
+      case "float8" => Type.Float8
+      case "hstore" => Type.Hstore
+      case "inet" => Type.Inet
+      case "int4" => Type.Int4
+      case "int8" => Type.Int8
+      case "json" => Type.Json
+      case "numeric" => Type.Numeric
+      case "oid" => Type.Oid
+      case "text" => Type.Text
+      case "timestamp" => Type.Timestamp
+      case "timestamptz" => Type.TimestampTz
+      case "varchar" => Type.Varchar(characterMaximumLength)
+
+      case typeName =>
+        pgTypes.find(_.typname == typeName) match {
+          case Some(pgType) if pgType.typcategory == 'E' =>
+            val enumValues =
+              pgEnums
+                .filter(_.enumtypid == pgType.oid)
+                .map(_.enumlabel)
+            Type.Enum(typeName, enumValues)
+          case None =>
+            throw new NotImplementedError(s"$typeName not implemend")
+        }
+
+    }
+  }
+
 }
 
 case class TableName(catalog: String, schema: String, tableName: String)
@@ -102,34 +138,7 @@ case class Table(name: TableName, columns: List[Column])
 sealed trait Type
 
 object Type {
-  def fromUdtName(udtName: String, characterMaximumLength: Option[Int], pgTypes: List[PgType.Row]): Type = {
-    udtName match {
-      case "bool" => Boolean
-      case "float4" => Float4
-      case "float8" => Float8
-      case "hstore" => Hstore
-      case "inet" => Inet
-      case "int4" => Int4
-      case "int8" => Int8
-      case "json" => Json
-      case "numeric" => Numeric
-      case "oid" => Oid
-      case "text" => Text
-      case "timestamp" => Timestamp
-      case "timestamptz" => TimestampTz
-      case "varchar" => Varchar(characterMaximumLength)
-
-      case typeName =>
-        pgTypes.find(_.typname == typeName) match {
-          case Some(pgType) if pgType.typcategory == 'E' => Type.Enum(typeName)
-          case None =>
-            throw new NotImplementedError(s"$typeName not implemend")
-        }
-
-    }
-  }
-
-  case class Enum(name: String) extends Type
+  case class Enum(name: String, values: List[String]) extends Type
 
   case object Hstore extends Type
 
@@ -378,4 +387,31 @@ object Q {
         .as(PgType.Row.parser.*)
   }
 
+  object PgEnum {
+    case class Row(
+                    oid: Int,
+                    enumtypid: Int,
+                    enumsortorder: Float,
+                    enumlabel: String
+                  )
+
+    object Row {
+      val parser: RowParser[PgEnum.Row] =
+        row => anorm.Success {
+          PgEnum.Row(
+            oid = row[Int]("oid"),
+            enumtypid = row[Int]("enumtypid"),
+            enumsortorder = row[Float]("enumsortorder"),
+            enumlabel = row[String]("enumlabel"),
+          )
+        }
+    }
+
+    def all(implicit c: Connection): List[PgEnum.Row] =
+      SQL"""
+        select *
+        from pg_catalog.pg_enum
+      """
+        .as(PgEnum.Row.parser.*)
+  }
 }
