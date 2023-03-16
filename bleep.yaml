@@ -34,4 +34,4 @@ templates:
     scala:
       options: -encoding utf8 -feature -unchecked
       strict: true
-      version: 3.2.0
+      version: 2.13.10
