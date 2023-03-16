@@ -1,12 +1,11 @@
 package scripts
 
-import bleep.*
+import bleep._
 import bleep.logging.Logger
-import typo.*
-import typo.information_schema.{ViewRow, ViewsRepo}
+import typo._
+import typo.information_schema.ViewsRepo
 
-import java.nio.file.{Files, Path}
-import java.sql.{Connection, DriverManager}
+import java.sql.DriverManager
 import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
@@ -30,7 +29,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
         hasDefault = true
       )
     ),
-    Some(db.PrimaryKey(db.ColName("id"))),
+    Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
     List(
       db.ForeignKey(db.ColName("favourite_football_club_id"), db.TableName("myschema", "football_club"), db.ColName("id")),
@@ -43,7 +42,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false),
       db.Col(db.ColName("name"), db.Type.VarChar(100), isNotNull = true, hasDefault = false)
     ),
-    Some(db.PrimaryKey(db.ColName("id"))),
+    Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
     Nil
   )
@@ -52,12 +51,36 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false)
     ),
-    Some(db.PrimaryKey(db.ColName("id"))),
+    Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
     Nil
   )
 
-  val all = List(person, football_club, marital_status)
+  val cpk_person = db.Table(
+    name = db.TableName("compositepk", "person"), // name clash to ensure we handle it
+    cols = List(
+      db.Col(db.ColName("one"), db.Type.BigInt, isNotNull = true, hasDefault = true),
+      db.Col(db.ColName("two"), db.Type.Text, isNotNull = false, hasDefault = true),
+      db.Col(db.ColName("name"), db.Type.Text, isNotNull = false, hasDefault = false)
+    ),
+    Some(db.PrimaryKey(List(db.ColName("one"), db.ColName("two")))),
+    Nil,
+    Nil
+  )
+  val cpk_bike = db.Table(
+    name = db.TableName("compositepk", "bike"),
+    cols = List(
+      db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true),
+      db.Col(db.ColName("owner_one"), db.Type.BigInt, isNotNull = true, hasDefault = false),
+      db.Col(db.ColName("owner_two"), db.Type.Text, isNotNull = false, hasDefault = false),
+      db.Col(db.ColName("bike_name"), db.Type.Text, isNotNull = true, hasDefault = false)
+    ),
+    Some(db.PrimaryKey(List(db.ColName("id")))),
+    Nil,
+    Nil
+  )
+
+  val all = List(person, football_club, marital_status, cpk_person)
 
   override def run(started: Started, commands: Commands, targets: List[Target], args: List[String]): Unit = {
     val c = {

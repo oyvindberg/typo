@@ -4,7 +4,7 @@
 
 package typo.doobie
 
-import java.sql.Types.*
+import java.sql.Types._
 
 /** @group Types */
 sealed abstract class JdbcType(val toInt: Int) extends Product with Serializable

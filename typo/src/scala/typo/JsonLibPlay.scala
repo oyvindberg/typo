@@ -53,7 +53,7 @@ object JsonLibPlay extends JsonLib {
     List(reader, writer)
   }
 
-  override def instances(tpe: sc.Type, scalaFields: Seq[(sc.Ident, sc.Type, db.Col)]): List[sc.Code] =
+  override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] =
     List(
       code"""implicit val oFormat: ${OFormat(tpe)} = $Json.format"""
     )

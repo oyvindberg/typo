@@ -1,8 +1,7 @@
 package typo
 
-import typo.sc.syntax.*
+import typo.sc.syntax._
 
-import scala.collection.immutable.{SortedMap, SortedSet}
 import scala.collection.mutable
 
 /** imports are automatically written based on the qualified idents found in the code

@@ -8,6 +8,7 @@ import play.api.libs.json.OFormat
 case class MaritalStatusRow(
   id: MaritalStatusId
 )
+
 object MaritalStatusRow {
   implicit val rowParser: RowParser[MaritalStatusRow] = { row =>
     Success(

@@ -1,10 +1,6 @@
 package typo
 
-import typo.db.*
-import typo.sc.syntax.CodeInterpolator
-
-import java.nio.file.{Files, Path}
-import scala.collection.immutable.SortedSet
+import typo.db._
 
 /** Simplified model of the scala language.
   *

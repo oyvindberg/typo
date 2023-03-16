@@ -1,6 +1,8 @@
 package testdb.myschema
 
 import anorm.Column
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -10,4 +12,5 @@ object MaritalStatusId {
   implicit val format: Format[MaritalStatusId] = implicitly[Format[Long]].bimap(MaritalStatusId.apply, _.value)
   implicit val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)
+  implicit val rowParser: RowParser[MaritalStatusId] = SqlParser.get[MaritalStatusId]("id")
 }

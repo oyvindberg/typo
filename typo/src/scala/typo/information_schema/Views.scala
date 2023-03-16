@@ -1,7 +1,5 @@
 package typo.information_schema
 
-import java.sql.Connection
-
 case class ViewRow(
     table_schema: String,
     table_name: String,

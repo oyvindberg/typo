@@ -2,7 +2,6 @@ package testdb.myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.Defaulted.Provided
@@ -60,7 +59,7 @@ trait PersonRepoImpl extends PersonRepo {
         }
         SQL"""update myschema.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = ${id}}"""
+          where id = $id"""
           .on(namedParams: _*)
           .executeUpdate()
     }
@@ -91,10 +90,10 @@ trait PersonRepoImpl extends PersonRepo {
       returning id
       """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[PersonId]("id").single)
+      .executeInsert(PersonId.rowParser.single)
 
   }
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.person where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.person where id = $id""".executeUpdate() > 0
   }
 }

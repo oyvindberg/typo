@@ -4,7 +4,7 @@
 
 package typo.doobie
 
-import java.sql.ParameterMetaData.*
+import java.sql.ParameterMetaData._
 
 /** @group Types */
 sealed abstract class ParameterNullable(val toInt: Int) extends Product with Serializable {

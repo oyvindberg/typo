@@ -5,7 +5,7 @@ sealed trait RepoMethod
 object RepoMethod {
   case class SelectAll(rowType: sc.Type) extends RepoMethod
   case class SelectById(idParam: sc.Param, rowType: sc.Type) extends RepoMethod
-  case class SelectAllByIds(idsParam: sc.Param, rowType: sc.Type) extends RepoMethod
+  case class SelectAllByIds(unaryId: IdComputed.Unary, idsParam: sc.Param, rowType: sc.Type) extends RepoMethod
   case class SelectByUnique(params: List[sc.Param], rowType: sc.Type) extends RepoMethod
   case class SelectByFieldValues(param: sc.Param, rowType: sc.Type) extends RepoMethod
   case class UpdateFieldValues(idParam: sc.Param, param: sc.Param) extends RepoMethod

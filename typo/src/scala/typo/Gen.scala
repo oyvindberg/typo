@@ -1,8 +1,6 @@
 package typo
 
-import typo.sc.syntax.*
-
-import java.nio.file.{Files, Path}
+import typo.sc.syntax._
 
 object Gen {
 

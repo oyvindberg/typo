@@ -9,6 +9,7 @@ case class FootballClubRow(
   id: FootballClubId,
   name: String
 )
+
 object FootballClubRow {
   implicit val rowParser: RowParser[FootballClubRow] = { row =>
     Success(

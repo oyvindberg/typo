@@ -37,13 +37,13 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         }
         SQL"""update myschema.marital_status
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = ${id}}"""
+          where id = $id"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.marital_status where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.marital_status where id = $id""".executeUpdate() > 0
   }
 }

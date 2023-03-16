@@ -18,6 +18,7 @@ case class PersonRow(
   workEmail: Option[String],
   sector: SectorEnum
 )
+
 object PersonRow {
   implicit val rowParser: RowParser[PersonRow] = { row =>
     Success(

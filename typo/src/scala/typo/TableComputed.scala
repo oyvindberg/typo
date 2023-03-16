@@ -2,7 +2,7 @@ package typo
 
 case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Table) {
   val allKeyNames: Set[db.ColName] =
-    (table.primaryKey.map(_.colName) ++ table.uniqueKeys.flatMap(_.cols) ++ table.foreignKeys.map(_.col)).toSet
+    (table.primaryKey.toList.flatMap(_.colNames) ++ table.uniqueKeys.flatMap(_.cols) ++ table.foreignKeys.map(_.col)).toSet
 
   val colsByName: Map[db.ColName, db.Col] =
     table.cols.map(col => (col.name, col)).toMap
@@ -12,45 +12,59 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
       case db.Type.BigInt              => sc.Type.Long
       case db.Type.VarChar(_)          => sc.Type.String
       case db.Type.Boolean             => sc.Type.Boolean
+      case db.Type.Text                => sc.Type.String
       case db.Type.StringEnum(name, _) => sc.Type.Qualified(names.EnumName(pkg, name))
     }
     if (col.isNotNull) baseTpe else sc.Type.Option(baseTpe)
   }
 
-  val maybeId: Option[TableComputed.Id] =
-    table.primaryKey.map { pk =>
-      val col = colsByName(pk.colName)
+  val maybeId: Option[IdComputed] =
+    table.primaryKey.flatMap { pk =>
       val qident = names.titleCase(pkg, table.name, "Id")
-      val underlying = scalaType(pkg, col)
-      val paramName = names.field(col.name)
-      TableComputed.Id(col, qident, underlying, paramName)
+      pk.colNames match {
+        case Nil => None
+        case colName :: Nil =>
+          val dbCol = colsByName(colName)
+          val col = ColumnComputed(names.field(dbCol.name), scalaType(pkg, dbCol), dbCol)
+          Some(IdComputed.Unary(col, qident))
+
+        case colNames =>
+          val cols: List[ColumnComputed] = colNames.map { colName =>
+            val fieldName = names.field(colName)
+            val col = colsByName(colName)
+            val underlying = scalaType(pkg, col)
+            ColumnComputed(fieldName, underlying, col)
+          }
+          val paramName = names.field(db.ColName(colNames.map(_.value).mkString("_and_")))
+          Some(IdComputed.Composite(cols, qident, paramName))
+      }
     }
 
-  val scalaFields: Seq[(sc.Ident, sc.Type, db.Col)] = {
+  val cols: Seq[ColumnComputed] = {
     table.cols.map {
-      case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colName == colName) =>
+      case col @ db.Col(colName, _, isNotNull, _) if table.primaryKey.exists(_.colNames == List(colName)) =>
         if (!isNotNull) {
           sys.error(s"assumption: id column in ${table.name} should be not null")
         }
-        (names.field(colName), maybeId.get.tpe, col)
+        ColumnComputed(names.field(colName), maybeId.get.tpe, col)
       case col =>
         val finalType: sc.Type = scalaType(pkg, col)
-        (names.field(col.name), finalType, col)
+        ColumnComputed(names.field(col.name), finalType, col)
     }
   }
 
-  val scalaFieldsUnsaved: Seq[(sc.Ident, sc.Type, db.Col)] =
-    scalaFields
-      .filterNot { case (_, _, col) => table.primaryKey.exists(_.colName == col.name) }
-      .map { case (name, tpe, col) =>
+  val colsUnsaved: Seq[ColumnComputed] =
+    cols
+      .filterNot { case ColumnComputed(_, _, col) => table.primaryKey.exists(_.colNames.contains(col.name)) }
+      .map { case ColumnComputed(name, tpe, col) =>
         val newType = if (col.hasDefault) sc.Type.TApply(default.DefaultedType, List(tpe)) else tpe
-        (name, newType, col)
+        ColumnComputed(name, newType, col)
       }
 
   val RepoName: sc.QIdent = names.titleCase(pkg, table.name, "Repo")
   val RepoImplName: sc.QIdent = names.titleCase(pkg, table.name, "RepoImpl")
   val RowName: sc.QIdent = names.titleCase(pkg, table.name, "Row")
-  val RowUnsavedName: Option[sc.QIdent] = if (scalaFieldsUnsaved.nonEmpty) Some(names.titleCase(pkg, table.name, "RowUnsaved")) else None
+  val RowUnsavedName: Option[sc.QIdent] = if (colsUnsaved.nonEmpty) Some(names.titleCase(pkg, table.name, "RowUnsaved")) else None
   val FieldValueName: sc.QIdent = names.titleCase(pkg, table.name, "FieldValue")
 
   val repoMethods: Option[List[RepoMethod]] = {
@@ -64,8 +78,10 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
           val updateMethod = RowUnsavedName.map { unsaved =>
             val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
 
-            if (id.col.hasDefault) RepoMethod.InsertDbGeneratedKey(unsavedParam, id.tpe)
-            else RepoMethod.InsertProvidedKey(idParam, unsavedParam)
+            if (id.cols.forall(_.dbCol.hasDefault))
+              RepoMethod.InsertDbGeneratedKey(unsavedParam, id.tpe)
+            else
+              RepoMethod.InsertProvidedKey(idParam, unsavedParam)
           }
 
           val fieldValuesParam = sc.Param(
@@ -76,7 +92,12 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
           List(
             Some(RepoMethod.SelectAll(RowType)),
             Some(RepoMethod.SelectById(idParam, RowType)),
-            Some(RepoMethod.SelectAllByIds(sc.Param(id.paramName.appended("s"), sc.Type.List(id.tpe)), RowType)),
+            id match {
+              case unary: IdComputed.Unary =>
+                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.List(id.tpe)), RowType))
+              case IdComputed.Composite(_, _, _) =>
+                None
+            },
             Some(RepoMethod.SelectByFieldValues(fieldValuesParam, RowType)),
             Some(RepoMethod.UpdateFieldValues(idParam, fieldValuesParam)),
             updateMethod,
@@ -90,12 +111,5 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, table: db.Tab
       }
     )
     Some(foo.flatten).filter(_.nonEmpty)
-  }
-}
-
-object TableComputed {
-  case class Id(col: db.Col, qident: sc.QIdent, underlying: sc.Type, paramName: sc.Ident) {
-    def name = qident.name
-    def tpe = sc.Type.Qualified(qident)
   }
 }

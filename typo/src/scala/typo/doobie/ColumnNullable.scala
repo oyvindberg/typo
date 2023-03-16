@@ -4,7 +4,7 @@
 
 package typo.doobie
 
-import java.sql.ResultSetMetaData.*
+import java.sql.ResultSetMetaData._
 
 /** @group Types */
 sealed abstract class ColumnNullable(val toInt: Int) extends Product with Serializable {

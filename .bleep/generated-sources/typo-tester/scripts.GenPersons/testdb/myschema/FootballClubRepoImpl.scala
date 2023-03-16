@@ -39,7 +39,7 @@ trait FootballClubRepoImpl extends FootballClubRepo {
         }
         SQL"""update myschema.football_club
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = ${id}}"""
+          where id = $id"""
           .on(namedParams: _*)
           .executeUpdate()
     }
@@ -58,6 +58,6 @@ trait FootballClubRepoImpl extends FootballClubRepo {
 
   }
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.football_club where id = ${id}}""".executeUpdate() > 0
+    SQL"""delete from myschema.football_club where id = $id""".executeUpdate() > 0
   }
 }

@@ -1,20 +1,28 @@
 package typo
 
-import typo.sc.syntax.*
-
-import java.nio.file.{Files, Path}
+import typo.sc.syntax._
 
 case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
 
   val RowFile: sc.File = {
     val rowType = sc.Type.Qualified(table.RowName)
+
+    val compositeId = table.maybeId match {
+      case Some(x: IdComputed.Composite) =>
+        code"""|{
+               |  val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})
+               |}""".stripMargin
+      case _ => code""
+    }
+
     val str =
       code"""case class ${table.RowName.name}(
-            |  ${table.scalaFields.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
-            |)
+            |  ${table.cols.map { case ColumnComputed(name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
+            |)$compositeId
+            |
             |object ${table.RowName.name} {
-            |  ${dbLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
-            |  ${jsonLib.instances(rowType, table.scalaFields).mkCode("\n  ")}
+            |  ${dbLib.instances(rowType, table.cols).mkCode("\n  ")}
+            |  ${jsonLib.instances(rowType, table.cols).mkCode("\n  ")}
             |}
             |""".stripMargin
 
@@ -26,10 +34,10 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
 
     val str =
       code"""case class ${qident.name}(
-            |  ${table.scalaFieldsUnsaved.map { case (name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
+            |  ${table.colsUnsaved.map { case ColumnComputed(name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
             |)
             |object ${qident.name} {
-            |  ${jsonLib.instances(rowType, table.scalaFieldsUnsaved).mkCode("\n  ")}
+            |  ${jsonLib.instances(rowType, table.colsUnsaved).mkCode("\n  ")}
             |}
             |""".stripMargin
 
@@ -39,7 +47,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val FieldValueFile: sc.File = {
     val fieldValueType = sc.Type.Qualified(table.FieldValueName)
 
-    val members = table.scalaFields.map { case (name, tpe, col) =>
+    val members = table.cols.map { case ColumnComputed(name, tpe, col) =>
       name -> code"case class $name(override val value: $tpe) extends $fieldValueType(${sc.StrLit(col.name.value)}, value)"
     }
     val str =
@@ -54,17 +62,29 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   }
 
   val IdFile: Option[sc.File] = {
-    table.maybeId.map { id =>
-      val str =
-        code"""case class ${id.name}(value: ${id.underlying}) extends AnyVal
+    table.maybeId.map {
+      case id: IdComputed.Unary =>
+        val str =
+          code"""case class ${id.name}(value: ${id.underlying}) extends AnyVal
               |object ${id.name} {
-              |  implicit val ordering: ${sc.Type.Ordering(id.tpe)} = Ordering.by(_.value)
+              |  implicit val ordering: ${sc.Type.Ordering(id.tpe)} = ${sc.Type.OrderingName}.by(_.value)
               |  ${jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
-              |  ${dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
+              |  ${dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbCol.name).mkCode("\n  ")}
               |}
 """.stripMargin
 
-      sc.File(id.tpe, str)
+        sc.File(id.tpe, str)
+
+      case id @ IdComputed.Composite(cols, qident, _) =>
+        val str = code"""case class ${qident.name}(${cols.map { case ColumnComputed(i, tpe, _) => code"$i: $tpe" }.mkCode(", ")})
+              |object ${qident.name} {
+              |  implicit val ordering: ${sc.Type
+                         .Ordering(id.tpe)} = ${sc.Type.OrderingName}.by(x => (${cols.map { case ColumnComputed(i, _, _) => code"x.${i.code}" }.mkCode(", ")}))
+              |  ${jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
+              |  ${dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
+              |}
+""".stripMargin
+        sc.File(id.tpe, str)
     }
   }
 
