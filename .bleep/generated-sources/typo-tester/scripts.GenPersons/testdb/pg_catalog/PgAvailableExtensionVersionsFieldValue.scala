@@ -13,6 +13,6 @@ object PgAvailableExtensionVersionsFieldValue {
   case class trusted(override val value: /* unknown nullability */ Option[Boolean]) extends PgAvailableExtensionVersionsFieldValue("trusted", value)
   case class relocatable(override val value: /* unknown nullability */ Option[Boolean]) extends PgAvailableExtensionVersionsFieldValue("relocatable", value)
   case class schema(override val value: /* unknown nullability */ Option[String]) extends PgAvailableExtensionVersionsFieldValue("schema", value)
-  case class requires(override val value: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any) extends PgAvailableExtensionVersionsFieldValue("requires", value)
+  case class requires(override val value: /* unknown nullability */ Option[Array[String]]) extends PgAvailableExtensionVersionsFieldValue("requires", value)
   case class comment(override val value: /* unknown nullability */ Option[String]) extends PgAvailableExtensionVersionsFieldValue("comment", value)
 }

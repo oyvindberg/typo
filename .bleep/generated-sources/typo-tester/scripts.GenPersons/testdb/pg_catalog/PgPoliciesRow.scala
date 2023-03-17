@@ -18,7 +18,7 @@ case class PgPoliciesRow(
   /** Points to [[testdb.pg_catalog.PgPolicyRow.polname]] */
   policyname: String,
   permissive: /* unknown nullability */ Option[String],
-  roles: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any,
+  roles: /* unknown nullability */ Option[Array[String]],
   cmd: /* unknown nullability */ Option[String],
   qual: /* unknown nullability */ Option[String],
   withCheck: /* unknown nullability */ Option[String]
@@ -32,7 +32,7 @@ object PgPoliciesRow {
         tablename = row[String]("tablename"),
         policyname = row[String]("policyname"),
         permissive = row[/* unknown nullability */ Option[String]]("permissive"),
-        roles = row[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any]("roles"),
+        roles = row[/* unknown nullability */ Option[Array[String]]]("roles"),
         cmd = row[/* unknown nullability */ Option[String]]("cmd"),
         qual = row[/* unknown nullability */ Option[String]]("qual"),
         withCheck = row[/* unknown nullability */ Option[String]]("with_check")
@@ -61,7 +61,7 @@ object PgPoliciesRow {
             tablename = json.\("tablename").as[String],
             policyname = json.\("policyname").as[String],
             permissive = json.\("permissive").toOption.map(_.as[String]),
-            roles = json.\("roles").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any],
+            roles = json.\("roles").toOption.map(_.as[Array[String]]),
             cmd = json.\("cmd").toOption.map(_.as[String]),
             qual = json.\("qual").toOption.map(_.as[String]),
             withCheck = json.\("with_check").toOption.map(_.as[String])

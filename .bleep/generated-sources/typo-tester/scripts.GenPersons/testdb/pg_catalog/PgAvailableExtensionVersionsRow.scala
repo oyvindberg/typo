@@ -18,7 +18,7 @@ case class PgAvailableExtensionVersionsRow(
   trusted: /* unknown nullability */ Option[Boolean],
   relocatable: /* unknown nullability */ Option[Boolean],
   schema: /* unknown nullability */ Option[String],
-  requires: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any,
+  requires: /* unknown nullability */ Option[Array[String]],
   comment: /* unknown nullability */ Option[String]
 )
 
@@ -33,7 +33,7 @@ object PgAvailableExtensionVersionsRow {
         trusted = row[/* unknown nullability */ Option[Boolean]]("trusted"),
         relocatable = row[/* unknown nullability */ Option[Boolean]]("relocatable"),
         schema = row[/* unknown nullability */ Option[String]]("schema"),
-        requires = row[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any]("requires"),
+        requires = row[/* unknown nullability */ Option[Array[String]]]("requires"),
         comment = row[/* unknown nullability */ Option[String]]("comment")
       )
     )
@@ -64,7 +64,7 @@ object PgAvailableExtensionVersionsRow {
             trusted = json.\("trusted").toOption.map(_.as[Boolean]),
             relocatable = json.\("relocatable").toOption.map(_.as[Boolean]),
             schema = json.\("schema").toOption.map(_.as[String]),
-            requires = json.\("requires").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any],
+            requires = json.\("requires").toOption.map(_.as[Array[String]]),
             comment = json.\("comment").toOption.map(_.as[String])
           )
         )

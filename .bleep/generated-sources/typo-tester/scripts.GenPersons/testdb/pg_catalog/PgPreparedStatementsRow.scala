@@ -15,7 +15,7 @@ case class PgPreparedStatementsRow(
   name: /* unknown nullability */ Option[String],
   statement: /* unknown nullability */ Option[String],
   prepareTime: /* unknown nullability */ Option[LocalDateTime],
-  parameterTypes: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _regtype, columnClassName: java.sql.Array */ Any,
+  parameterTypes: /* unknown nullability */ Option[Array[String]],
   fromSql: /* unknown nullability */ Option[Boolean],
   genericPlans: /* unknown nullability */ Option[Long],
   customPlans: /* unknown nullability */ Option[Long]
@@ -28,7 +28,7 @@ object PgPreparedStatementsRow {
         name = row[/* unknown nullability */ Option[String]]("name"),
         statement = row[/* unknown nullability */ Option[String]]("statement"),
         prepareTime = row[/* unknown nullability */ Option[LocalDateTime]]("prepare_time"),
-        parameterTypes = row[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _regtype, columnClassName: java.sql.Array */ Any]("parameter_types"),
+        parameterTypes = row[/* unknown nullability */ Option[Array[String]]]("parameter_types"),
         fromSql = row[/* unknown nullability */ Option[Boolean]]("from_sql"),
         genericPlans = row[/* unknown nullability */ Option[Long]]("generic_plans"),
         customPlans = row[/* unknown nullability */ Option[Long]]("custom_plans")
@@ -55,7 +55,7 @@ object PgPreparedStatementsRow {
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
             prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
-            parameterTypes = json.\("parameter_types").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _regtype, columnClassName: java.sql.Array */ Any],
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[String]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
             customPlans = json.\("custom_plans").toOption.map(_.as[Long])

@@ -15,7 +15,7 @@ case class PgGroupRow(
   groname: String,
   /** Points to [[testdb.pg_catalog.PgAuthidRow.oid]] */
   grosysid: Long,
-  grolist: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _oid, columnClassName: java.sql.Array */ Any
+  grolist: /* unknown nullability */ Option[Array[Long]]
 )
 
 object PgGroupRow {
@@ -24,7 +24,7 @@ object PgGroupRow {
       PgGroupRow(
         groname = row[String]("groname"),
         grosysid = row[Long]("grosysid"),
-        grolist = row[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _oid, columnClassName: java.sql.Array */ Any]("grolist")
+        grolist = row[/* unknown nullability */ Option[Array[Long]]]("grolist")
       )
     )
   }
@@ -43,7 +43,7 @@ object PgGroupRow {
           PgGroupRow(
             groname = json.\("groname").as[String],
             grosysid = json.\("grosysid").as[Long],
-            grolist = json.\("grolist").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _oid, columnClassName: java.sql.Array */ Any]
+            grolist = json.\("grolist").toOption.map(_.as[Array[Long]])
           )
         )
       )

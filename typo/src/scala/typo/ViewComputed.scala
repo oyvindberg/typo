@@ -49,24 +49,29 @@ object ViewComputed {
   def scalaType(col: AnalyzeSql.Column): Option[sc.Type] = {
     def other = {
       col.columnClassName match {
-        case "java.util.Map" => sc.Type.Map.of(sc.Type.Wildcard, sc.Type.Wildcard).withComment(col.columnTypeName)
-        case other           => sc.Type.Qualified(other).withComment(col.columnTypeName)
+        case "java.util.Map" =>
+          sc.Type.Map.of(sc.Type.String, sc.Type.String).withComment(col.columnTypeName)
+        case other =>
+          sc.Type.Qualified(other).withComment(col.columnTypeName)
       }
     }
 
     val baseType: Option[sc.Type] =
       col.columnType match {
         case JdbcType.Array =>
+          // adding to this list? check if you should also generate instances for it
           col.columnTypeName match {
-            case "_bit"                                     => Some(sc.Type.Array.of(sc.Type.Boolean))
-            case "_int4"                                    => Some(sc.Type.Array.of(sc.Type.Int))
-            case "_int8"                                    => Some(sc.Type.Array.of(sc.Type.Long))
-            case "_float4"                                  => Some(sc.Type.Array.of(sc.Type.Float))
-            case "_float8"                                  => Some(sc.Type.Array.of(sc.Type.Double))
-            case "_varchar" | "_char" | "_text" | "_bpchar" => Some(sc.Type.Array.of(sc.Type.String))
-            case "_uuid"                                    => Some(sc.Type.Array.of(sc.Type.UUID))
-            case "_decimal" | "_numeric"                    => Some(sc.Type.Array.of(sc.Type.BigDecimal))
-            case _                                          => None
+            case "_bit" | "_bool"        => Some(sc.Type.Array.of(sc.Type.Boolean))
+            case "_int4"                 => Some(sc.Type.Array.of(sc.Type.Int))
+            case "_int8"                 => Some(sc.Type.Array.of(sc.Type.Long))
+            case "_oid"                  => Some(sc.Type.Array.of(sc.Type.Long)) // true enough, really unsigned int
+            case "_float4"               => Some(sc.Type.Array.of(sc.Type.Float))
+            case "_float8"               => Some(sc.Type.Array.of(sc.Type.Double))
+            case "_uuid"                 => Some(sc.Type.Array.of(sc.Type.UUID))
+            case "_decimal" | "_numeric" => Some(sc.Type.Array.of(sc.Type.BigDecimal))
+            case "_varchar" | "_char" | "_text" | "_bpchar" | "_name" | "_regtype" =>
+              Some(sc.Type.Array.of(sc.Type.String))
+            case _ => None
           }
         case JdbcType.BigInt                => Some(sc.Type.Long)
         case JdbcType.Binary                => Some(sc.Type.Array.of(sc.Type.Byte))
