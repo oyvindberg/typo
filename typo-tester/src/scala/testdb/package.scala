@@ -45,6 +45,8 @@ package object testdb {
   implicit val moneyDb: ToDb[PGmoney] with Column[PGmoney] = castOther[PGmoney]("money")
   implicit val intervalDb: ToDb[PGInterval] with Column[PGInterval] = castOther[PGInterval]("interval")
 
+  implicit val hstoreDb = castOther[java.util.Map[String, String]]("hstore")
+
   def pgObjectFormat[T <: PGobject](f: String => T): Format[T] =
     implicitly[Format[String]].bimap[T](f, _.getValue)
 
@@ -57,4 +59,7 @@ package object testdb {
   implicit val polygonCodec: Format[PGpolygon] = pgObjectFormat(new PGpolygon(_))
   implicit val moneyCodec: Format[PGmoney] = pgObjectFormat(new PGmoney(_))
   implicit val intervalCodec: Format[PGInterval] = pgObjectFormat(new PGInterval(_))
+
+  import scala.jdk.CollectionConverters._
+  implicit val hstoreCodec: Format[java.util.Map[String, String]] = implicitly[Format[Map[String, String]]].bimap(_.asJava, _.asScala.toMap)
 }

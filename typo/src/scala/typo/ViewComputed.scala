@@ -48,11 +48,11 @@ object ViewComputed {
   // todo: provide missing instances somehow
   def scalaType(col: AnalyzeSql.Column): Option[sc.Type] = {
     def other = {
-      col.columnClassName match {
-        case "java.util.Map" =>
-          sc.Type.Map.of(sc.Type.String, sc.Type.String).withComment(col.columnTypeName)
+      col.columnTypeName match {
+        case "hstore" =>
+          sc.Type.JavaMap.of(sc.Type.String, sc.Type.String).withComment(col.columnTypeName)
         case other =>
-          sc.Type.Qualified(other).withComment(col.columnTypeName)
+          sc.Type.Qualified(col.columnClassName).withComment(other)
       }
     }
 

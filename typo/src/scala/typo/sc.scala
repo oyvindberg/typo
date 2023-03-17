@@ -77,7 +77,7 @@ object sc {
     val List = Qualified("scala.List")
     val Map = Qualified("scala.Map")
     val Try = Qualified("scala.util.Try")
-
+    val JavaMap = Qualified("java.util.Map")
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
       Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map)
