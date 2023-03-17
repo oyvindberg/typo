@@ -6,6 +6,6 @@ case class ViewFiles(view: ViewComputed, dbLib: DbLib, jsonLib: JsonLib) {
     relation.RowFile,
     relation.RepoTraitFile(view.repoMethods),
     relation.RepoImplTraitFile(view.repoMethods),
-    relation.FieldValueFile,
+    relation.FieldValueFile
   )
 }

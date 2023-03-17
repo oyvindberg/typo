@@ -58,7 +58,7 @@ object JsonLibPlay extends JsonLib {
     def as(col: ColumnComputed): sc.Code =
       col.tpe match {
         case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(col.dbName.value)}).toOption.map(_.as[$of])"""
-        case _ => code"""json.\\(${sc.StrLit(col.dbName.value)}).as[${col.tpe}]"""
+        case _                    => code"""json.\\(${sc.StrLit(col.dbName.value)}).as[${col.tpe}]"""
       }
 
     List(
