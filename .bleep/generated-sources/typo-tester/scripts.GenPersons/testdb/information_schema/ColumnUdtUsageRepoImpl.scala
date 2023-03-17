@@ -1,4 +1,5 @@
-package testdb.information_schema
+package testdb
+package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue

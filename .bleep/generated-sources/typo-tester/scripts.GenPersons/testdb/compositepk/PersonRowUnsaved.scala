@@ -1,4 +1,5 @@
-package testdb.compositepk
+package testdb
+package compositepk
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

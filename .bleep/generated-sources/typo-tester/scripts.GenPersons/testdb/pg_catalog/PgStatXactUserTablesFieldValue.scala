@@ -1,4 +1,5 @@
-package testdb.pg_catalog
+package testdb
+package pg_catalog
 
 
 

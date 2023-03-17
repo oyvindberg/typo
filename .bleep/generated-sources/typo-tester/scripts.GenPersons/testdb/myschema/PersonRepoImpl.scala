@@ -1,4 +1,5 @@
-package testdb.myschema
+package testdb
+package myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue

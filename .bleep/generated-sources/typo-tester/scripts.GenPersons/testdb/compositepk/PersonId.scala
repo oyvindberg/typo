@@ -1,4 +1,5 @@
-package testdb.compositepk
+package testdb
+package compositepk
 
 import anorm.RowParser
 import anorm.Success

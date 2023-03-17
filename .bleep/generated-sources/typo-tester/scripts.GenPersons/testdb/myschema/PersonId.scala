@@ -1,4 +1,5 @@
-package testdb.myschema
+package testdb
+package myschema
 
 import anorm.Column
 import anorm.RowParser

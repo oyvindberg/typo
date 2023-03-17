@@ -1,4 +1,5 @@
-package testdb.myschema
+package testdb
+package myschema
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
