@@ -3,7 +3,6 @@ package scripts
 import bleep._
 import bleep.logging.Logger
 import typo._
-import typo.information_schema.ViewsRepo
 
 import java.sql.DriverManager
 import java.util
@@ -95,22 +94,13 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
       DriverManager.getConnection(url, props)
     }
 
-    val allViews = ViewsRepo.fetch(c).map { view =>
-      val ps = c.prepareStatement(view.view_definition)
-      val analyzed =
-        try AnalyzeSql.from(ps)
-        finally ps.close()
-      (view, analyzed)
-    }
-
+    val views: List[View] = View.from(c)
     val filesByRelPath: Map[RelPath, String] =
-      Gen
-        .allTables(sc.QIdent(List(sc.Ident("testdb"))), all, enums, JsonLibPlay, DbLibAnorm)
-        .map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen(sc.QIdent(List(sc.Ident("testdb"))), all, enums, views, JsonLibPlay, DbLibAnorm).map {
+        case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render
-        }
-        .toMap
+      }.toMap
 
     targets.foreach { target =>
       FileSync

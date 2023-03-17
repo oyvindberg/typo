@@ -17,7 +17,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
 
     val str =
       code"""case class ${table.RowName.name}(
-            |  ${table.cols.map { case ColumnComputed(name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
+            |  ${table.cols.map(_.param.code).mkCode(",\n  ")}
             |)$compositeId
             |
             |object ${table.RowName.name} {
@@ -34,7 +34,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
 
     val str =
       code"""case class ${qident.name}(
-            |  ${table.colsUnsaved.map { case ColumnComputed(name, tpe, _) => code"$name: $tpe" }.mkCode(",\n  ")}
+            |  ${table.colsUnsaved.map(_.param.code).mkCode(",\n  ")}
             |)
             |object ${qident.name} {
             |  ${jsonLib.instances(rowType, table.colsUnsaved).mkCode("\n  ")}
@@ -47,8 +47,8 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val FieldValueFile: sc.File = {
     val fieldValueType = sc.Type.Qualified(table.FieldValueName)
 
-    val members = table.cols.map { case ColumnComputed(name, tpe, col) =>
-      name -> code"case class $name(override val value: $tpe) extends $fieldValueType(${sc.StrLit(col.name.value)}, value)"
+    val members = table.cols.map { col =>
+      col.name -> code"case class ${col.name}(override val value: ${col.tpe}) extends $fieldValueType(${sc.StrLit(col.dbName.value)}, value)"
     }
     val str =
       code"""sealed abstract class ${table.FieldValueName.name}[T](val name: String, val value: T)
@@ -69,17 +69,17 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
               |object ${id.name} {
               |  implicit val ordering: ${sc.Type.Ordering(id.tpe)} = ${sc.Type.OrderingName}.by(_.value)
               |  ${jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
-              |  ${dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbCol.name).mkCode("\n  ")}
+              |  ${dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbName).mkCode("\n  ")}
               |}
 """.stripMargin
 
         sc.File(id.tpe, str)
 
       case id @ IdComputed.Composite(cols, qident, _) =>
-        val str = code"""case class ${qident.name}(${cols.map { case ColumnComputed(i, tpe, _) => code"$i: $tpe" }.mkCode(", ")})
+        val ordering = sc.Type.Ordering(id.tpe)
+        val str = code"""case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
               |object ${qident.name} {
-              |  implicit val ordering: ${sc.Type
-                         .Ordering(id.tpe)} = ${sc.Type.OrderingName}.by(x => (${cols.map { case ColumnComputed(i, _, _) => code"x.${i.code}" }.mkCode(", ")}))
+              |  implicit val ordering: $ordering = ${sc.Type.OrderingName}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
               |  ${jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
               |  ${dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
               |}

@@ -1,12 +1,11 @@
 package typo
 
-import java.sql.PreparedStatement
+import java.sql.{Connection, PreparedStatement}
 
 object AnalyzeSql {
   case class Column(
       baseColumnName: Option[String],
-      baseSchemaName: Option[String],
-      baseTableName: Option[String],
+      baseRelationName: Option[db.RelationName],
       catalogName: Option[String],
       columnClassName: String,
       columnDisplaySize: Int,
@@ -28,7 +27,9 @@ object AnalyzeSql {
       scale: Int,
       schemaName: Option[String],
       tableName: Option[String]
-  )
+  ) {
+    def name = db.ColName(columnLabel)
+  }
 
   case class ParameterColumn(
       isNullable: doobie.ParameterNullable,
@@ -41,6 +42,12 @@ object AnalyzeSql {
   )
 
   case class Analyzed(params: Seq[ParameterColumn], columns: Seq[Column])
+
+  def from(c: Connection, sql: String): Analyzed = {
+    val ps = c.prepareStatement(sql)
+    try from(ps)
+    finally ps.close()
+  }
 
   def from(ps: PreparedStatement): Analyzed = {
     val params = ps.getParameterMetaData match {
@@ -65,13 +72,11 @@ object AnalyzeSql {
     def nonEmpty(str: String): Option[String] = if (str.isEmpty) None else Some(str)
 
     val columns = ps.getMetaData match {
-
       case metadata: org.postgresql.jdbc.PgResultSetMetaData =>
         0.until(metadata.getColumnCount).map(_ + 1).map { n =>
           Column(
             baseColumnName = nonEmpty(metadata.getBaseColumnName(n)),
-            baseSchemaName = nonEmpty(metadata.getBaseSchemaName(n)),
-            baseTableName = nonEmpty(metadata.getBaseTableName(n)),
+            baseRelationName = nonEmpty(metadata.getBaseSchemaName(n)).zip(nonEmpty(metadata.getBaseTableName(n))).map(db.RelationName.tupled),
             catalogName = nonEmpty(metadata.getCatalogName(n)),
             columnClassName = metadata.getColumnClassName(n),
             columnDisplaySize = metadata.getColumnDisplaySize(n),

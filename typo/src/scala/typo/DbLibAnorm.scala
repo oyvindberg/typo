@@ -30,7 +30,7 @@ object DbLibAnorm extends DbLib {
   }
 
   override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
-    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbCol.name.value)})" }
+    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbName.value)})" }
     val rowParser = code"""implicit val $rowParserIdent: ${RowParser(tpe)} = { row =>
             |    $Success(
             |      $tpe(
@@ -75,13 +75,13 @@ object DbLibAnorm extends DbLib {
   def matchId(table: TableComputed, idParam: sc.Param): sc.Code =
     table.maybeId.get match {
       case x: IdComputed.Unary =>
-        code"${x.col.dbCol.name.value} = $$${idParam.name}"
+        code"${x.col.dbName.value} = $$${idParam.name}"
       case x: IdComputed.Composite =>
-        code"${x.cols.map(cc => code"${cc.dbCol.name.value} = $${${idParam.name}.${cc.name}}").mkCode(", ")}"
+        code"${x.cols.map(cc => code"${cc.dbName.value} = $${${idParam.name}.${cc.name}}").mkCode(", ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${x.col.dbCol.name.value} in $$${idsParam.name}"
+    code"${x.col.dbName.value} in $$${idsParam.name}"
 
   override def repoImpl(table: TableComputed, default: DefaultComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
@@ -104,8 +104,8 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.SelectByFieldValues(param, _) =>
         val cases: Seq[sc.Code] =
-          table.cols.map { case ColumnComputed(name, _, col) =>
-            code"case ${table.FieldValueName}.$name(value) => $NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(value))"
+          table.cols.map { case col =>
+            code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
         code""""""
@@ -126,8 +126,8 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.UpdateFieldValues(idParam, param) =>
         val cases: Seq[sc.Code] =
-          table.cols.map { case ColumnComputed(name, _, col) =>
-            code"case ${table.FieldValueName}.$name(value) => $NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(value))"
+          table.cols.map { case col =>
+            code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
         val sql = interpolate(
@@ -149,13 +149,13 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(unsavedParam, idType) =>
         val maybeNamedParameters = table.colsUnsaved.map {
-          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), col) =>
+          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
-                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from[$tpe](value)))
+                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
                    |      }"""
-          case ColumnComputed(ident, _, col) =>
-            code"""Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(${unsavedParam.name}.$ident)))"""
+          case col =>
+            code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
 
         val sql = interpolate(
@@ -176,19 +176,18 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertProvidedKey(idParam, unsavedParam) =>
         val maybeNamedParameters = table.colsUnsaved.map {
-          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), col) =>
+          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
-                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from[$tpe](value)))
+                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
                    |      }"""
-          case ColumnComputed(ident, _, col) =>
-            code"""Some($NamedParameter(${sc.StrLit(col.name.value)}, $ParameterValue.from(${unsavedParam.name}.$ident)))"""
+          case col =>
+            code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
 
+        val joinedColNames = table.maybeId.get.cols.map(_.dbName.value).mkString(", ")
         val sql = interpolate(
-          code"""|insert into ${table.table.name}(${table.maybeId.get.cols
-                  .map(_.dbCol.name.value)
-                  .mkString(", ")}, $${namedParameters.map(_.name).mkString(", ")})
+          code"""|insert into ${table.table.name}($joinedColNames, $${namedParameters.map(_.name).mkString(", ")})
                  |      values ($${${idParam.name}}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |      """.stripMargin
         )

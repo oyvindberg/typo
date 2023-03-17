@@ -30,7 +30,14 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  def allTables(pkg: sc.QIdent, tables: List[db.Table], enums: List[db.StringEnum], jsonLib: JsonLib, dbLib: DbLib): List[sc.File] = {
+  def apply(
+      pkg: sc.QIdent,
+      tables: List[db.Table],
+      enums: List[db.StringEnum],
+      views: List[View],
+      jsonLib: JsonLib,
+      dbLib: DbLib
+  ): List[sc.File] = {
     val default = DefaultComputed(pkg)
     val enumFiles: List[sc.File] =
       enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
