@@ -17,7 +17,7 @@ case class ViewComputed(pkg: sc.QIdent, view: View) {
 
       val pointsTo = (col.baseColumnName, col.baseRelationName) match {
         case (Some(colName), Some(relationName)) if relationName != view.name =>
-          Some(relationName, colName)
+          Some((relationName, colName))
         case _ =>
           None
       }
