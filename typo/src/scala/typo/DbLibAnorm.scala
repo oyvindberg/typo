@@ -51,66 +51,66 @@ object DbLibAnorm extends DbLib {
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectAll(rowType) =>
-      code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
-    case RepoMethod.SelectById(idParam, rowType) =>
-      code"def selectById($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Option(rowType)}"
+      code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+    case RepoMethod.SelectById(id, rowType) =>
+      code"def selectById(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectAllByIds(_, idsParam, rowType) =>
-      code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
+      code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectByUnique(params, rowType) =>
-      code"def selectByUnique(${params.map(_.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option(rowType)}"
+      code"def selectByUnique(${params.map(_.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(param, rowType) =>
-      code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List(rowType)}"
-    case RepoMethod.UpdateFieldValues(idParam, param) =>
-      code"def updateFieldValues($idParam, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Int}"
-    case RepoMethod.InsertDbGeneratedKey(unsavedParam, idType) =>
-      code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $idType"
-    case RepoMethod.InsertProvidedKey(idParam, unsavedParam) =>
-      code"def insert($idParam, $unsavedParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
-    case RepoMethod.InsertOnlyKey(idParam) =>
-      code"def insert($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
-    case RepoMethod.Delete(idParam) =>
-      code"def delete($idParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
+      code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+    case RepoMethod.UpdateFieldValues(id, param) =>
+      code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Int}"
+    case RepoMethod.InsertDbGeneratedKey(id, _, unsavedParam, _) =>
+      code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): ${id.tpe}"
+    case RepoMethod.InsertProvidedKey(id, _, unsavedParam, _) =>
+      code"def insert(${id.param}, $unsavedParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
+    case RepoMethod.InsertOnlyKey(id) =>
+      code"def insert(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
+    case RepoMethod.Delete(id) =>
+      code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
   }
 
-  def matchId(table: TableComputed, idParam: sc.Param): sc.Code =
-    table.maybeId.get match {
-      case x: IdComputed.Unary =>
-        code"${x.col.dbName.value} = $$${idParam.name}"
-      case x: IdComputed.Composite =>
-        code"${x.cols.map(cc => code"${cc.dbName.value} = $${${idParam.name}.${cc.name}}").mkCode(", ")}"
+  def matchId(id: IdComputed): sc.Code =
+    id match {
+      case id: IdComputed.Unary =>
+        code"${id.col.dbName.value} = $$${id.paramName}"
+      case compositive: IdComputed.Composite =>
+        code"${compositive.cols.map(cc => code"${cc.dbName.value} = $${${compositive.paramName}.${cc.name}}").mkCode(", ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
     code"${x.col.dbName.value} in $$${idsParam.name}"
 
-  override def repoImpl(table: TableComputed, default: DefaultComputed, repoMethod: RepoMethod): sc.Code =
+  override def repoImpl(table: RelationComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectAll(_) =>
-        val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.table.name}""")
+        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val sql = interpolate(code"""select $joinedColNames from ${table.relationName}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent.*)"""
 
-      case RepoMethod.SelectById(idParam, _) =>
-        val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.table.name} where ${matchId(table, idParam)}""")
+      case RepoMethod.SelectById(id, _) =>
+        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchId(id)}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent.singleOpt)"""
 
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
-        val joinedColNames = table.table.cols.map(_.name.value).mkString(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.table.name} where ${matchAnyId(unaryId, idsParam)}""")
+        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent.*)"""
 
       case RepoMethod.SelectByUnique(_, _) => "???"
 
       case RepoMethod.SelectByFieldValues(param, _) =>
         val cases: Seq[sc.Code] =
-          table.cols.map { case col =>
+          table.cols.map(col =>
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
-          }
+          )
 
         code""""""
         val sql = interpolate(
-          code"""select * from ${table.table.name} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
+          code"""select * from ${table.relationName} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
         )
         code"""${param.name} match {
               |      case Nil => selectAll
@@ -124,16 +124,16 @@ object DbLibAnorm extends DbLib {
               |    }
               |""".stripMargin
 
-      case RepoMethod.UpdateFieldValues(idParam, param) =>
+      case RepoMethod.UpdateFieldValues(id, param) =>
         val cases: Seq[sc.Code] =
-          table.cols.map { case col =>
+          table.cols.map { col =>
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
         val sql = interpolate(
-          code"""update ${table.table.name}
+          code"""update ${table.relationName}
                 |          set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
-                |          where ${matchId(table, idParam)}""".stripMargin
+                |          where ${matchId(id)}""".stripMargin
         )
         code"""${param.name} match {
               |      case Nil => 0
@@ -147,8 +147,8 @@ object DbLibAnorm extends DbLib {
               |    }
               |""".stripMargin
 
-      case RepoMethod.InsertDbGeneratedKey(unsavedParam, idType) =>
-        val maybeNamedParameters = table.colsUnsaved.map {
+      case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
+        val maybeNamedParameters = colsUnsaved.map {
           case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
@@ -159,7 +159,7 @@ object DbLibAnorm extends DbLib {
         }
 
         val sql = interpolate(
-          code"""|insert into ${table.table.name}($${namedParameters.map(_.name).mkString(", ")})
+          code"""|insert into ${table.relationName}($${namedParameters.map(_.name).mkString(", ")})
                  |      values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |      returning ${table.maybeId.get.cols.map(_.name.value.code).mkCode(", ")}
                  |      """.stripMargin
@@ -171,11 +171,11 @@ object DbLibAnorm extends DbLib {
                |
                |    $sql
                |      .on(namedParameters :_*)
-               |      .executeInsert($idType.$rowParserIdent.single)
+               |      .executeInsert(${id.tpe}.$rowParserIdent.single)
                |"""
 
-      case RepoMethod.InsertProvidedKey(idParam, unsavedParam) =>
-        val maybeNamedParameters = table.colsUnsaved.map {
+      case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
+        val maybeNamedParameters = colsUnsaved.map {
           case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
@@ -185,10 +185,15 @@ object DbLibAnorm extends DbLib {
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
 
-        val joinedColNames = table.maybeId.get.cols.map(_.dbName.value).mkString(", ")
+        val joinedIdColNames = id.cols.map(_.dbName.value).mkString(", ")
+        val idValues: List[sc.Code] = id match {
+          case id: IdComputed.Unary     => List(code"$${${id.paramName}}")
+          case id: IdComputed.Composite => id.cols.map(cc => code"$${${id.paramName}.${cc.name}}")
+        }
+
         val sql = interpolate(
-          code"""|insert into ${table.table.name}($joinedColNames, $${namedParameters.map(_.name).mkString(", ")})
-                 |      values ($${${idParam.name}}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+          code"""|insert into ${table.relationName}($joinedIdColNames, $${namedParameters.map(_.name).mkString(", ")})
+                 |      values (${idValues.mkCode(", ")}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |      """.stripMargin
         )
 
@@ -202,10 +207,8 @@ object DbLibAnorm extends DbLib {
                |"""
 
       case RepoMethod.InsertOnlyKey(_) => code"???"
-      case RepoMethod.Delete(idParam) =>
-        val sql = interpolate(
-          code"""delete from ${table.table.name} where ${matchId(table, idParam)}"""
-        )
+      case RepoMethod.Delete(id) =>
+        val sql = interpolate(code"""delete from ${table.relationName} where ${matchId(id)}""")
         code"$sql.executeUpdate() > 0"
     }
 }

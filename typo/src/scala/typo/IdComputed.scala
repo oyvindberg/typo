@@ -7,6 +7,7 @@ sealed trait IdComputed {
 
   final def name: sc.Ident = qident.name
   final def tpe: sc.Type.Qualified = sc.Type.Qualified(qident)
+  final def param: sc.Param = sc.Param(paramName, tpe)
 }
 
 object IdComputed {

@@ -33,13 +33,17 @@ object sc {
   case class StrLit(str: String) extends Tree
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
 
-  sealed trait Type extends Tree
+  sealed trait Type extends Tree {
+    def of(targs: Type*): Type = Type.TApply(this, targs.toList)
+    def withComment(str: String): Type = Type.Commented(this, s"/* $str */")
+  }
 
   object Type {
     case object Wildcard extends Type
     case class TApply(underlying: Type, targs: List[Type]) extends Type
     case class Qualified(value: QIdent) extends Type
     case class Abstract(value: Ident) extends Type
+    case class Commented(underlying: Type, comment: String) extends Type
 
     object Qualified {
       def apply(value: String): Qualified =
@@ -48,42 +52,55 @@ object sc {
         Qualified(QIdent(scala.List(value)))
     }
 
+    val ZonedDateTime = sc.Type.Qualified("java.time.ZonedDateTime")
+    val Instant = sc.Type.Qualified("java.time.Instant")
+    val LocalDate = sc.Type.Qualified("java.time.LocalDate")
+    val LocalDateTime = sc.Type.Qualified("java.time.LocalDateTime")
+    val LocalTime = sc.Type.Qualified("java.time.LocalTime")
     val AnyVal = sc.Type.Qualified("scala.AnyVal")
-    val OrderingName = sc.Type.Qualified("scala.math.Ordering")
-    def Ordering(t: sc.Type) = sc.Type.TApply(OrderingName, scala.List(t))
+    val Any = sc.Type.Qualified("scala.Any")
+    val BigDecimal = sc.Type.Qualified("scala.math.BigDecimal")
+    val Byte = sc.Type.Qualified("scala.Byte")
+    val Short = sc.Type.Qualified("scala.Short")
+    val Array = sc.Type.Qualified("scala.Array")
+    val Ordering = sc.Type.Qualified("scala.math.Ordering")
     val Connection = sc.Type.Qualified("java.sql.Connection")
     val Unit = Qualified("scala.Unit")
     val Int = Qualified("scala.Int")
+    val Double = Qualified("scala.Double")
+    val UUID = Qualified("java.util.UUID")
     val Long = Qualified("scala.Long")
     val String = Qualified("java.lang.String")
+    val Float = Qualified("scala.Float")
     val Boolean = Qualified("scala.Boolean")
-    val OptionName = Qualified("scala.Option")
-    val ListName = Qualified("scala.List")
-    val MapName = Qualified("scala.Map")
+    val Option = Qualified("scala.Option")
+    val List = Qualified("scala.List")
+    val Map = Qualified("scala.Map")
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
-      Set(AnyVal, OrderingName, Unit, Int, Long, String, Boolean, OptionName, ListName, MapName)
+      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map)
         .map(x => (x.value.name, x.value))
         .toMap
-
-    def Option(underlying: Type): Type = TApply(OptionName, scala.List(underlying))
-    def List(underlying: Type): Type = TApply(ListName, scala.List(underlying))
-    def Map(key: Type, value: Type): Type = TApply(MapName, scala.List(key, value))
   }
 
   def renderTree(tree: Tree): String = {
     tree match {
-      case Ident(value)     => value
+      case Ident(value) =>
+        value match {
+          case "type" => "`type`"
+          case other  => other
+        }
       case QIdent(value)    => value.map(renderTree).mkString(".")
       case Param(name, tpe) => renderTree(name) + ": " + renderTree(tpe)
       case StrLit(str)      => '"'.toString + str + '"'.toString
       case tpe: Type =>
         tpe match {
-          case Type.Abstract(value)           => renderTree(value)
-          case Type.Wildcard                  => "_"
-          case Type.TApply(underlying, targs) => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
-          case Type.Qualified(value)          => renderTree(value)
+          case Type.Abstract(value)                => renderTree(value)
+          case Type.Wildcard                       => "_"
+          case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
+          case Type.Qualified(value)               => renderTree(value)
+          case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
         val Quote = '"'.toString

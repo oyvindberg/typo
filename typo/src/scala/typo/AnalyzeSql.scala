@@ -41,7 +41,7 @@ object AnalyzeSql {
       scale: Int
   )
 
-  case class Analyzed(params: Seq[ParameterColumn], columns: Seq[Column])
+  case class Analyzed(params: List[ParameterColumn], columns: List[Column])
 
   def from(c: Connection, sql: String): Analyzed = {
     val ps = c.prepareStatement(sql)
@@ -106,6 +106,6 @@ object AnalyzeSql {
       case other => sys.error(s"Expected `org.postgresql.jdbc.PgResultSetMetaData`, ot ${other.getClass.getName}")
     }
 
-    Analyzed(params, columns)
+    Analyzed(params.toList, columns.toList)
   }
 }

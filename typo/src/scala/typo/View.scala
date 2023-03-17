@@ -6,7 +6,7 @@ case class View(
     name: db.RelationName,
     sql: String,
     isMaterialized: Boolean,
-    cols: Seq[AnalyzeSql.Column]
+    cols: List[AnalyzeSql.Column]
 )
 
 object View {

@@ -22,7 +22,7 @@ object db {
   case class UniqueKey(cols: List[ColName])
   case class Table(
       name: RelationName,
-      cols: Seq[Col],
+      cols: List[Col],
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],
       foreignKeys: List[ForeignKey]

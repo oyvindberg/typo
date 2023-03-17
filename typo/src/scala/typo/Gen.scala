@@ -18,9 +18,9 @@ object Gen {
             |object ${qident.name} {
             |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
             |
-            |  val All: ${sc.Type.List(EnumType)} = ${sc.Type.ListName}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
+            |  val All: ${sc.Type.List.of(EnumType)} = ${sc.Type.List}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
-            |  val ByName: ${sc.Type.Map(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
+            |  val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
             |  ${dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
@@ -43,8 +43,9 @@ object Gen {
       enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
     val tableFiles: List[sc.File] =
       tables.flatMap(table => TableFiles(TableComputed(pkg, default, table), dbLib, jsonLib).all)
+    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(pkg, view), dbLib, jsonLib).all)
     val allFiles: List[sc.File] =
-      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles
+      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
       allFiles.groupBy { _.pkg }.map { case (pkg, files) =>
