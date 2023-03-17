@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatioUserTablesRow(
   /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.relid]] */
@@ -49,5 +53,40 @@ object PgStatioUserTablesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatioUserTablesRow] = Json.format
+  implicit val oFormat: OFormat[PgStatioUserTablesRow] = new OFormat[PgStatioUserTablesRow]{
+    override def writes(o: PgStatioUserTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "heap_blks_read" -> o.heapBlksRead,
+      "heap_blks_hit" -> o.heapBlksHit,
+      "idx_blks_read" -> o.idxBlksRead,
+      "idx_blks_hit" -> o.idxBlksHit,
+      "toast_blks_read" -> o.toastBlksRead,
+      "toast_blks_hit" -> o.toastBlksHit,
+      "tidx_blks_read" -> o.tidxBlksRead,
+      "tidx_blks_hit" -> o.tidxBlksHit
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatioUserTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatioUserTablesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            heapBlksRead = json.\("heap_blks_read").toOption.map(_.as[Long]),
+            heapBlksHit = json.\("heap_blks_hit").toOption.map(_.as[Long]),
+            idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
+            idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long]),
+            toastBlksRead = json.\("toast_blks_read").toOption.map(_.as[Long]),
+            toastBlksHit = json.\("toast_blks_hit").toOption.map(_.as[Long]),
+            tidxBlksRead = json.\("tidx_blks_read").toOption.map(_.as[Long]),
+            tidxBlksHit = json.\("tidx_blks_hit").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

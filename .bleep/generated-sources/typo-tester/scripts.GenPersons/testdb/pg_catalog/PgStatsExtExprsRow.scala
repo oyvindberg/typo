@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatsExtExprsRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -52,5 +56,50 @@ object PgStatsExtExprsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatsExtExprsRow] = Json.format
+  implicit val oFormat: OFormat[PgStatsExtExprsRow] = new OFormat[PgStatsExtExprsRow]{
+    override def writes(o: PgStatsExtExprsRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "statistics_schemaname" -> o.statisticsSchemaname,
+      "statistics_name" -> o.statisticsName,
+      "statistics_owner" -> o.statisticsOwner,
+      "expr" -> o.expr,
+      "null_frac" -> o.nullFrac,
+      "avg_width" -> o.avgWidth,
+      "n_distinct" -> o.nDistinct,
+      "most_common_vals" -> o.mostCommonVals,
+      "most_common_freqs" -> o.mostCommonFreqs,
+      "histogram_bounds" -> o.histogramBounds,
+      "correlation" -> o.correlation,
+      "most_common_elems" -> o.mostCommonElems,
+      "most_common_elem_freqs" -> o.mostCommonElemFreqs,
+      "elem_count_histogram" -> o.elemCountHistogram
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatsExtExprsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatsExtExprsRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            statisticsSchemaname = json.\("statistics_schemaname").as[String],
+            statisticsName = json.\("statistics_name").as[String],
+            statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
+            expr = json.\("expr").toOption.map(_.as[String]),
+            nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
+            avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
+            nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ String]),
+            mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
+            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ String]),
+            correlation = json.\("correlation").toOption.map(_.as[Float]),
+            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ String]),
+            mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
+            elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
+          )
+        )
+      )
+    }
+  }
 }

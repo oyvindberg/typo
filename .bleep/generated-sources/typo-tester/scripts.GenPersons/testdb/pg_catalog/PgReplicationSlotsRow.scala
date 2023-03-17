@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgReplicationSlotsRow(
   slotName: /* unknown nullability */ Option[String],
@@ -47,5 +51,48 @@ object PgReplicationSlotsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgReplicationSlotsRow] = Json.format
+  implicit val oFormat: OFormat[PgReplicationSlotsRow] = new OFormat[PgReplicationSlotsRow]{
+    override def writes(o: PgReplicationSlotsRow): JsObject =
+      Json.obj(
+        "slot_name" -> o.slotName,
+      "plugin" -> o.plugin,
+      "slot_type" -> o.slotType,
+      "datoid" -> o.datoid,
+      "database" -> o.database,
+      "temporary" -> o.temporary,
+      "active" -> o.active,
+      "active_pid" -> o.activePid,
+      "xmin" -> o.xmin,
+      "catalog_xmin" -> o.catalogXmin,
+      "restart_lsn" -> o.restartLsn,
+      "confirmed_flush_lsn" -> o.confirmedFlushLsn,
+      "wal_status" -> o.walStatus,
+      "safe_wal_size" -> o.safeWalSize,
+      "two_phase" -> o.twoPhase
+      )
+
+    override def reads(json: JsValue): JsResult[PgReplicationSlotsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgReplicationSlotsRow(
+            slotName = json.\("slot_name").toOption.map(_.as[String]),
+            plugin = json.\("plugin").toOption.map(_.as[String]),
+            slotType = json.\("slot_type").toOption.map(_.as[String]),
+            datoid = json.\("datoid").toOption.map(_.as[Long]),
+            database = json.\("database").as[String],
+            temporary = json.\("temporary").toOption.map(_.as[Boolean]),
+            active = json.\("active").toOption.map(_.as[Boolean]),
+            activePid = json.\("active_pid").toOption.map(_.as[Int]),
+            xmin = json.\("xmin").toOption.map(_.as[/* xid */ String]),
+            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[/* xid */ String]),
+            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            walStatus = json.\("wal_status").toOption.map(_.as[String]),
+            safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
+            twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

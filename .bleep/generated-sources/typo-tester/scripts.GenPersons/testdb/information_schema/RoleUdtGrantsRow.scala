@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoleUdtGrantsRow(
   /** Points to [[testdb.information_schema.UdtPrivilegesRow.grantor]] */
@@ -37,5 +41,32 @@ object RoleUdtGrantsRow {
     )
   }
 
-  implicit val oFormat: OFormat[RoleUdtGrantsRow] = Json.format
+  implicit val oFormat: OFormat[RoleUdtGrantsRow] = new OFormat[RoleUdtGrantsRow]{
+    override def writes(o: RoleUdtGrantsRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "udt_catalog" -> o.udtCatalog,
+      "udt_schema" -> o.udtSchema,
+      "udt_name" -> o.udtName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[RoleUdtGrantsRow] = {
+      JsResult.fromTry(
+        Try(
+          RoleUdtGrantsRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            udtCatalog = json.\("udt_catalog").toOption.map(_.as[String]),
+            udtSchema = json.\("udt_schema").toOption.map(_.as[String]),
+            udtName = json.\("udt_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

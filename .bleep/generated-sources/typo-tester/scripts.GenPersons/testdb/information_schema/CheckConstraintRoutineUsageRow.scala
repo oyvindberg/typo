@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CheckConstraintRoutineUsageRow(
   constraintCatalog: /* unknown nullability */ Option[String],
@@ -28,5 +32,30 @@ object CheckConstraintRoutineUsageRow {
     )
   }
 
-  implicit val oFormat: OFormat[CheckConstraintRoutineUsageRow] = Json.format
+  implicit val oFormat: OFormat[CheckConstraintRoutineUsageRow] = new OFormat[CheckConstraintRoutineUsageRow]{
+    override def writes(o: CheckConstraintRoutineUsageRow): JsObject =
+      Json.obj(
+        "constraint_catalog" -> o.constraintCatalog,
+      "constraint_schema" -> o.constraintSchema,
+      "constraint_name" -> o.constraintName,
+      "specific_catalog" -> o.specificCatalog,
+      "specific_schema" -> o.specificSchema,
+      "specific_name" -> o.specificName
+      )
+
+    override def reads(json: JsValue): JsResult[CheckConstraintRoutineUsageRow] = {
+      JsResult.fromTry(
+        Try(
+          CheckConstraintRoutineUsageRow(
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[String]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[String]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[String]),
+            specificCatalog = json.\("specific_catalog").toOption.map(_.as[String]),
+            specificSchema = json.\("specific_schema").toOption.map(_.as[String]),
+            specificName = json.\("specific_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

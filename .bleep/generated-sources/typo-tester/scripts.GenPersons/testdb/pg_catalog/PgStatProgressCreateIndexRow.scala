@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressCreateIndexRow(
   pid: /* unknown nullability */ Option[Int],
@@ -49,5 +53,50 @@ object PgStatProgressCreateIndexRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatProgressCreateIndexRow] = Json.format
+  implicit val oFormat: OFormat[PgStatProgressCreateIndexRow] = new OFormat[PgStatProgressCreateIndexRow]{
+    override def writes(o: PgStatProgressCreateIndexRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "index_relid" -> o.indexRelid,
+      "command" -> o.command,
+      "phase" -> o.phase,
+      "lockers_total" -> o.lockersTotal,
+      "lockers_done" -> o.lockersDone,
+      "current_locker_pid" -> o.currentLockerPid,
+      "blocks_total" -> o.blocksTotal,
+      "blocks_done" -> o.blocksDone,
+      "tuples_total" -> o.tuplesTotal,
+      "tuples_done" -> o.tuplesDone,
+      "partitions_total" -> o.partitionsTotal,
+      "partitions_done" -> o.partitionsDone
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressCreateIndexRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressCreateIndexRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            indexRelid = json.\("index_relid").toOption.map(_.as[Long]),
+            command = json.\("command").toOption.map(_.as[String]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            lockersTotal = json.\("lockers_total").toOption.map(_.as[Long]),
+            lockersDone = json.\("lockers_done").toOption.map(_.as[Long]),
+            currentLockerPid = json.\("current_locker_pid").toOption.map(_.as[Long]),
+            blocksTotal = json.\("blocks_total").toOption.map(_.as[Long]),
+            blocksDone = json.\("blocks_done").toOption.map(_.as[Long]),
+            tuplesTotal = json.\("tuples_total").toOption.map(_.as[Long]),
+            tuplesDone = json.\("tuples_done").toOption.map(_.as[Long]),
+            partitionsTotal = json.\("partitions_total").toOption.map(_.as[Long]),
+            partitionsDone = json.\("partitions_done").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

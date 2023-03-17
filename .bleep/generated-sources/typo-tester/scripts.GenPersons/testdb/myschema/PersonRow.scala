@@ -2,8 +2,12 @@ package testdb.myschema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PersonRow(
   id: PersonId,
@@ -38,5 +42,40 @@ object PersonRow {
     )
   }
 
-  implicit val oFormat: OFormat[PersonRow] = Json.format
+  implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
+    override def writes(o: PersonRow): JsObject =
+      Json.obj(
+        "id" -> o.id,
+      "favourite_football_club_id" -> o.favouriteFootballClubId,
+      "name" -> o.name,
+      "nick_name" -> o.nickName,
+      "blog_url" -> o.blogUrl,
+      "email" -> o.email,
+      "phone" -> o.phone,
+      "likes_pizza" -> o.likesPizza,
+      "marital_status_id" -> o.maritalStatusId,
+      "work_email" -> o.workEmail,
+      "sector" -> o.sector
+      )
+
+    override def reads(json: JsValue): JsResult[PersonRow] = {
+      JsResult.fromTry(
+        Try(
+          PersonRow(
+            id = json.\("id").as[PersonId],
+            favouriteFootballClubId = json.\("favourite_football_club_id").as[String],
+            name = json.\("name").as[String],
+            nickName = json.\("nick_name").toOption.map(_.as[String]),
+            blogUrl = json.\("blog_url").toOption.map(_.as[String]),
+            email = json.\("email").as[String],
+            phone = json.\("phone").as[String],
+            likesPizza = json.\("likes_pizza").as[Boolean],
+            maritalStatusId = json.\("marital_status_id").as[String],
+            workEmail = json.\("work_email").toOption.map(_.as[String]),
+            sector = json.\("sector").as[SectorEnum]
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ForeignDataWrapperOptionsRow(
   /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
@@ -26,5 +30,26 @@ object ForeignDataWrapperOptionsRow {
     )
   }
 
-  implicit val oFormat: OFormat[ForeignDataWrapperOptionsRow] = Json.format
+  implicit val oFormat: OFormat[ForeignDataWrapperOptionsRow] = new OFormat[ForeignDataWrapperOptionsRow]{
+    override def writes(o: ForeignDataWrapperOptionsRow): JsObject =
+      Json.obj(
+        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
+      "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
+      "option_name" -> o.optionName,
+      "option_value" -> o.optionValue
+      )
+
+    override def reads(json: JsValue): JsResult[ForeignDataWrapperOptionsRow] = {
+      JsResult.fromTry(
+        Try(
+          ForeignDataWrapperOptionsRow(
+            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
+            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),
+            optionName = json.\("option_name").toOption.map(_.as[String]),
+            optionValue = json.\("option_value").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

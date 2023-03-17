@@ -2,8 +2,12 @@ package testdb.compositepk
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PersonRow(
   one: Long,
@@ -24,5 +28,24 @@ object PersonRow {
     )
   }
 
-  implicit val oFormat: OFormat[PersonRow] = Json.format
+  implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
+    override def writes(o: PersonRow): JsObject =
+      Json.obj(
+        "one" -> o.one,
+      "two" -> o.two,
+      "name" -> o.name
+      )
+
+    override def reads(json: JsValue): JsResult[PersonRow] = {
+      JsResult.fromTry(
+        Try(
+          PersonRow(
+            one = json.\("one").as[Long],
+            two = json.\("two").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSettingsRow(
   name: /* unknown nullability */ Option[String],
@@ -50,5 +54,52 @@ object PgSettingsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgSettingsRow] = Json.format
+  implicit val oFormat: OFormat[PgSettingsRow] = new OFormat[PgSettingsRow]{
+    override def writes(o: PgSettingsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "setting" -> o.setting,
+      "unit" -> o.unit,
+      "category" -> o.category,
+      "short_desc" -> o.shortDesc,
+      "extra_desc" -> o.extraDesc,
+      "context" -> o.context,
+      "vartype" -> o.vartype,
+      "source" -> o.source,
+      "min_val" -> o.minVal,
+      "max_val" -> o.maxVal,
+      "enumvals" -> o.enumvals,
+      "boot_val" -> o.bootVal,
+      "reset_val" -> o.resetVal,
+      "sourcefile" -> o.sourcefile,
+      "sourceline" -> o.sourceline,
+      "pending_restart" -> o.pendingRestart
+      )
+
+    override def reads(json: JsValue): JsResult[PgSettingsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSettingsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            setting = json.\("setting").toOption.map(_.as[String]),
+            unit = json.\("unit").toOption.map(_.as[String]),
+            category = json.\("category").toOption.map(_.as[String]),
+            shortDesc = json.\("short_desc").toOption.map(_.as[String]),
+            extraDesc = json.\("extra_desc").toOption.map(_.as[String]),
+            context = json.\("context").toOption.map(_.as[String]),
+            vartype = json.\("vartype").toOption.map(_.as[String]),
+            source = json.\("source").toOption.map(_.as[String]),
+            minVal = json.\("min_val").toOption.map(_.as[String]),
+            maxVal = json.\("max_val").toOption.map(_.as[String]),
+            enumvals = json.\("enumvals").toOption.map(_.as[Array[String]]),
+            bootVal = json.\("boot_val").toOption.map(_.as[String]),
+            resetVal = json.\("reset_val").toOption.map(_.as[String]),
+            sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
+            sourceline = json.\("sourceline").toOption.map(_.as[Int]),
+            pendingRestart = json.\("pending_restart").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

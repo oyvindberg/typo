@@ -76,12 +76,24 @@ object sc {
     val Option = Qualified("scala.Option")
     val List = Qualified("scala.List")
     val Map = Qualified("scala.Map")
+    val Try = Qualified("scala.util.Try")
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
       Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map)
         .map(x => (x.value.name, x.value))
         .toMap
+
+    object Optional {
+      def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
+        case Wildcard                        => None
+        case TApply(Option, scala.List(one)) => Some(one)
+        case TApply(underlying, _)           => unapply(underlying)
+        case Qualified(_)                    => None
+        case Abstract(_)                     => None
+        case Commented(underlying, _)        => unapply(underlying)
+      }
+    }
   }
 
   def renderTree(tree: Tree): String = {

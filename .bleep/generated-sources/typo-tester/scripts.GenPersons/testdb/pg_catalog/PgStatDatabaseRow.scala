@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatDatabaseRow(
   datid: /* unknown nullability */ Option[Long],
@@ -73,5 +77,74 @@ object PgStatDatabaseRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatDatabaseRow] = Json.format
+  implicit val oFormat: OFormat[PgStatDatabaseRow] = new OFormat[PgStatDatabaseRow]{
+    override def writes(o: PgStatDatabaseRow): JsObject =
+      Json.obj(
+        "datid" -> o.datid,
+      "datname" -> o.datname,
+      "numbackends" -> o.numbackends,
+      "xact_commit" -> o.xactCommit,
+      "xact_rollback" -> o.xactRollback,
+      "blks_read" -> o.blksRead,
+      "blks_hit" -> o.blksHit,
+      "tup_returned" -> o.tupReturned,
+      "tup_fetched" -> o.tupFetched,
+      "tup_inserted" -> o.tupInserted,
+      "tup_updated" -> o.tupUpdated,
+      "tup_deleted" -> o.tupDeleted,
+      "conflicts" -> o.conflicts,
+      "temp_files" -> o.tempFiles,
+      "temp_bytes" -> o.tempBytes,
+      "deadlocks" -> o.deadlocks,
+      "checksum_failures" -> o.checksumFailures,
+      "checksum_last_failure" -> o.checksumLastFailure,
+      "blk_read_time" -> o.blkReadTime,
+      "blk_write_time" -> o.blkWriteTime,
+      "session_time" -> o.sessionTime,
+      "active_time" -> o.activeTime,
+      "idle_in_transaction_time" -> o.idleInTransactionTime,
+      "sessions" -> o.sessions,
+      "sessions_abandoned" -> o.sessionsAbandoned,
+      "sessions_fatal" -> o.sessionsFatal,
+      "sessions_killed" -> o.sessionsKilled,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatDatabaseRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatDatabaseRow(
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").toOption.map(_.as[String]),
+            numbackends = json.\("numbackends").toOption.map(_.as[Int]),
+            xactCommit = json.\("xact_commit").toOption.map(_.as[Long]),
+            xactRollback = json.\("xact_rollback").toOption.map(_.as[Long]),
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
+            tupReturned = json.\("tup_returned").toOption.map(_.as[Long]),
+            tupFetched = json.\("tup_fetched").toOption.map(_.as[Long]),
+            tupInserted = json.\("tup_inserted").toOption.map(_.as[Long]),
+            tupUpdated = json.\("tup_updated").toOption.map(_.as[Long]),
+            tupDeleted = json.\("tup_deleted").toOption.map(_.as[Long]),
+            conflicts = json.\("conflicts").toOption.map(_.as[Long]),
+            tempFiles = json.\("temp_files").toOption.map(_.as[Long]),
+            tempBytes = json.\("temp_bytes").toOption.map(_.as[Long]),
+            deadlocks = json.\("deadlocks").toOption.map(_.as[Long]),
+            checksumFailures = json.\("checksum_failures").toOption.map(_.as[Long]),
+            checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as[LocalDateTime]),
+            blkReadTime = json.\("blk_read_time").toOption.map(_.as[Double]),
+            blkWriteTime = json.\("blk_write_time").toOption.map(_.as[Double]),
+            sessionTime = json.\("session_time").toOption.map(_.as[Double]),
+            activeTime = json.\("active_time").toOption.map(_.as[Double]),
+            idleInTransactionTime = json.\("idle_in_transaction_time").toOption.map(_.as[Double]),
+            sessions = json.\("sessions").toOption.map(_.as[Long]),
+            sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as[Long]),
+            sessionsFatal = json.\("sessions_fatal").toOption.map(_.as[Long]),
+            sessionsKilled = json.\("sessions_killed").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressCopyRow(
   pid: /* unknown nullability */ Option[Int],
@@ -37,5 +41,38 @@ object PgStatProgressCopyRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatProgressCopyRow] = Json.format
+  implicit val oFormat: OFormat[PgStatProgressCopyRow] = new OFormat[PgStatProgressCopyRow]{
+    override def writes(o: PgStatProgressCopyRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "command" -> o.command,
+      "type" -> o.`type`,
+      "bytes_processed" -> o.bytesProcessed,
+      "bytes_total" -> o.bytesTotal,
+      "tuples_processed" -> o.tuplesProcessed,
+      "tuples_excluded" -> o.tuplesExcluded
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressCopyRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressCopyRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            command = json.\("command").toOption.map(_.as[String]),
+            `type` = json.\("type").toOption.map(_.as[String]),
+            bytesProcessed = json.\("bytes_processed").toOption.map(_.as[Long]),
+            bytesTotal = json.\("bytes_total").toOption.map(_.as[Long]),
+            tuplesProcessed = json.\("tuples_processed").toOption.map(_.as[Long]),
+            tuplesExcluded = json.\("tuples_excluded").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

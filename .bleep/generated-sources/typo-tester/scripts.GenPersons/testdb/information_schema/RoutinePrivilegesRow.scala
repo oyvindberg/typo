@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoutinePrivilegesRow(
   grantor: /* unknown nullability */ Option[String],
@@ -36,5 +40,38 @@ object RoutinePrivilegesRow {
     )
   }
 
-  implicit val oFormat: OFormat[RoutinePrivilegesRow] = Json.format
+  implicit val oFormat: OFormat[RoutinePrivilegesRow] = new OFormat[RoutinePrivilegesRow]{
+    override def writes(o: RoutinePrivilegesRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "specific_catalog" -> o.specificCatalog,
+      "specific_schema" -> o.specificSchema,
+      "specific_name" -> o.specificName,
+      "routine_catalog" -> o.routineCatalog,
+      "routine_schema" -> o.routineSchema,
+      "routine_name" -> o.routineName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[RoutinePrivilegesRow] = {
+      JsResult.fromTry(
+        Try(
+          RoutinePrivilegesRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            specificCatalog = json.\("specific_catalog").toOption.map(_.as[String]),
+            specificSchema = json.\("specific_schema").toOption.map(_.as[String]),
+            specificName = json.\("specific_name").toOption.map(_.as[String]),
+            routineCatalog = json.\("routine_catalog").toOption.map(_.as[String]),
+            routineSchema = json.\("routine_schema").toOption.map(_.as[String]),
+            routineName = json.\("routine_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

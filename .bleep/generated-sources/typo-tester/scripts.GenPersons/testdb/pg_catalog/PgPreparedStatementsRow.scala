@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPreparedStatementsRow(
   name: /* unknown nullability */ Option[String],
@@ -31,5 +35,32 @@ object PgPreparedStatementsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgPreparedStatementsRow] = Json.format
+  implicit val oFormat: OFormat[PgPreparedStatementsRow] = new OFormat[PgPreparedStatementsRow]{
+    override def writes(o: PgPreparedStatementsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "statement" -> o.statement,
+      "prepare_time" -> o.prepareTime,
+      "parameter_types" -> o.parameterTypes,
+      "from_sql" -> o.fromSql,
+      "generic_plans" -> o.genericPlans,
+      "custom_plans" -> o.customPlans
+      )
+
+    override def reads(json: JsValue): JsResult[PgPreparedStatementsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPreparedStatementsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            statement = json.\("statement").toOption.map(_.as[String]),
+            prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
+            parameterTypes = json.\("parameter_types").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _regtype, columnClassName: java.sql.Array */ Any],
+            fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
+            genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
+            customPlans = json.\("custom_plans").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

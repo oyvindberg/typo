@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgGroupRow(
   /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
@@ -24,5 +28,24 @@ object PgGroupRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgGroupRow] = Json.format
+  implicit val oFormat: OFormat[PgGroupRow] = new OFormat[PgGroupRow]{
+    override def writes(o: PgGroupRow): JsObject =
+      Json.obj(
+        "groname" -> o.groname,
+      "grosysid" -> o.grosysid,
+      "grolist" -> o.grolist
+      )
+
+    override def reads(json: JsValue): JsResult[PgGroupRow] = {
+      JsResult.fromTry(
+        Try(
+          PgGroupRow(
+            groname = json.\("groname").as[String],
+            grosysid = json.\("grosysid").as[Long],
+            grolist = json.\("grolist").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _oid, columnClassName: java.sql.Array */ Any]
+          )
+        )
+      )
+    }
+  }
 }

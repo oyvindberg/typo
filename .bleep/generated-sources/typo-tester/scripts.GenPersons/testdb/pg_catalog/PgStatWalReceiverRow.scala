@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatWalReceiverRow(
   pid: /* unknown nullability */ Option[Int],
@@ -47,5 +51,48 @@ object PgStatWalReceiverRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatWalReceiverRow] = Json.format
+  implicit val oFormat: OFormat[PgStatWalReceiverRow] = new OFormat[PgStatWalReceiverRow]{
+    override def writes(o: PgStatWalReceiverRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "status" -> o.status,
+      "receive_start_lsn" -> o.receiveStartLsn,
+      "receive_start_tli" -> o.receiveStartTli,
+      "written_lsn" -> o.writtenLsn,
+      "flushed_lsn" -> o.flushedLsn,
+      "received_tli" -> o.receivedTli,
+      "last_msg_send_time" -> o.lastMsgSendTime,
+      "last_msg_receipt_time" -> o.lastMsgReceiptTime,
+      "latest_end_lsn" -> o.latestEndLsn,
+      "latest_end_time" -> o.latestEndTime,
+      "slot_name" -> o.slotName,
+      "sender_host" -> o.senderHost,
+      "sender_port" -> o.senderPort,
+      "conninfo" -> o.conninfo
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatWalReceiverRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatWalReceiverRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            status = json.\("status").toOption.map(_.as[String]),
+            receiveStartLsn = json.\("receive_start_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            receiveStartTli = json.\("receive_start_tli").toOption.map(_.as[Int]),
+            writtenLsn = json.\("written_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            flushedLsn = json.\("flushed_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            receivedTli = json.\("received_tli").toOption.map(_.as[Int]),
+            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[LocalDateTime]),
+            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[LocalDateTime]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            latestEndTime = json.\("latest_end_time").toOption.map(_.as[LocalDateTime]),
+            slotName = json.\("slot_name").toOption.map(_.as[String]),
+            senderHost = json.\("sender_host").toOption.map(_.as[String]),
+            senderPort = json.\("sender_port").toOption.map(_.as[Int]),
+            conninfo = json.\("conninfo").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

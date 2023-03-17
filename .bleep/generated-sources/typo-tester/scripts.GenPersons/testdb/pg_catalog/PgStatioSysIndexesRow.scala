@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatioSysIndexesRow(
   /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.relid]] */
@@ -37,5 +41,32 @@ object PgStatioSysIndexesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatioSysIndexesRow] = Json.format
+  implicit val oFormat: OFormat[PgStatioSysIndexesRow] = new OFormat[PgStatioSysIndexesRow]{
+    override def writes(o: PgStatioSysIndexesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "indexrelid" -> o.indexrelid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "indexrelname" -> o.indexrelname,
+      "idx_blks_read" -> o.idxBlksRead,
+      "idx_blks_hit" -> o.idxBlksHit
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatioSysIndexesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatioSysIndexesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            indexrelid = json.\("indexrelid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
+            idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
+            idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

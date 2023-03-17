@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPreparedXactsRow(
   transaction: /* unknown nullability */ Option[/* xid */ String],
@@ -29,5 +33,28 @@ object PgPreparedXactsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgPreparedXactsRow] = Json.format
+  implicit val oFormat: OFormat[PgPreparedXactsRow] = new OFormat[PgPreparedXactsRow]{
+    override def writes(o: PgPreparedXactsRow): JsObject =
+      Json.obj(
+        "transaction" -> o.transaction,
+      "gid" -> o.gid,
+      "prepared" -> o.prepared,
+      "owner" -> o.owner,
+      "database" -> o.database
+      )
+
+    override def reads(json: JsValue): JsResult[PgPreparedXactsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPreparedXactsRow(
+            transaction = json.\("transaction").toOption.map(_.as[/* xid */ String]),
+            gid = json.\("gid").toOption.map(_.as[String]),
+            prepared = json.\("prepared").toOption.map(_.as[LocalDateTime]),
+            owner = json.\("owner").as[String],
+            database = json.\("database").as[String]
+          )
+        )
+      )
+    }
+  }
 }

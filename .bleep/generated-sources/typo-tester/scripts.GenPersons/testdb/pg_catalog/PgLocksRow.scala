@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgLocksRow(
   locktype: /* unknown nullability */ Option[String],
@@ -49,5 +53,50 @@ object PgLocksRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgLocksRow] = Json.format
+  implicit val oFormat: OFormat[PgLocksRow] = new OFormat[PgLocksRow]{
+    override def writes(o: PgLocksRow): JsObject =
+      Json.obj(
+        "locktype" -> o.locktype,
+      "database" -> o.database,
+      "relation" -> o.relation,
+      "page" -> o.page,
+      "tuple" -> o.tuple,
+      "virtualxid" -> o.virtualxid,
+      "transactionid" -> o.transactionid,
+      "classid" -> o.classid,
+      "objid" -> o.objid,
+      "objsubid" -> o.objsubid,
+      "virtualtransaction" -> o.virtualtransaction,
+      "pid" -> o.pid,
+      "mode" -> o.mode,
+      "granted" -> o.granted,
+      "fastpath" -> o.fastpath,
+      "waitstart" -> o.waitstart
+      )
+
+    override def reads(json: JsValue): JsResult[PgLocksRow] = {
+      JsResult.fromTry(
+        Try(
+          PgLocksRow(
+            locktype = json.\("locktype").toOption.map(_.as[String]),
+            database = json.\("database").toOption.map(_.as[Long]),
+            relation = json.\("relation").toOption.map(_.as[Long]),
+            page = json.\("page").toOption.map(_.as[Int]),
+            tuple = json.\("tuple").toOption.map(_.as[Short]),
+            virtualxid = json.\("virtualxid").toOption.map(_.as[String]),
+            transactionid = json.\("transactionid").toOption.map(_.as[/* xid */ String]),
+            classid = json.\("classid").toOption.map(_.as[Long]),
+            objid = json.\("objid").toOption.map(_.as[Long]),
+            objsubid = json.\("objsubid").toOption.map(_.as[Short]),
+            virtualtransaction = json.\("virtualtransaction").toOption.map(_.as[String]),
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            mode = json.\("mode").toOption.map(_.as[String]),
+            granted = json.\("granted").toOption.map(_.as[Boolean]),
+            fastpath = json.\("fastpath").toOption.map(_.as[Boolean]),
+            waitstart = json.\("waitstart").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

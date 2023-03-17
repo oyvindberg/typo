@@ -3,9 +3,13 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.math.BigDecimal
+import scala.util.Try
 
 case class PgStatWalRow(
   walRecords: /* unknown nullability */ Option[Long],
@@ -36,5 +40,36 @@ object PgStatWalRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatWalRow] = Json.format
+  implicit val oFormat: OFormat[PgStatWalRow] = new OFormat[PgStatWalRow]{
+    override def writes(o: PgStatWalRow): JsObject =
+      Json.obj(
+        "wal_records" -> o.walRecords,
+      "wal_fpi" -> o.walFpi,
+      "wal_bytes" -> o.walBytes,
+      "wal_buffers_full" -> o.walBuffersFull,
+      "wal_write" -> o.walWrite,
+      "wal_sync" -> o.walSync,
+      "wal_write_time" -> o.walWriteTime,
+      "wal_sync_time" -> o.walSyncTime,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatWalRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatWalRow(
+            walRecords = json.\("wal_records").toOption.map(_.as[Long]),
+            walFpi = json.\("wal_fpi").toOption.map(_.as[Long]),
+            walBytes = json.\("wal_bytes").toOption.map(_.as[BigDecimal]),
+            walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as[Long]),
+            walWrite = json.\("wal_write").toOption.map(_.as[Long]),
+            walSync = json.\("wal_sync").toOption.map(_.as[Long]),
+            walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
+            walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

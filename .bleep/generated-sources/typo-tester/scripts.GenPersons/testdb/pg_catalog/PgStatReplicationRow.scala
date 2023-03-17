@@ -4,8 +4,12 @@ import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
 import org.postgresql.util.PGInterval
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatReplicationRow(
   pid: /* unknown nullability */ Option[Int],
@@ -59,5 +63,58 @@ object PgStatReplicationRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatReplicationRow] = Json.format
+  implicit val oFormat: OFormat[PgStatReplicationRow] = new OFormat[PgStatReplicationRow]{
+    override def writes(o: PgStatReplicationRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "usesysid" -> o.usesysid,
+      "usename" -> o.usename,
+      "application_name" -> o.applicationName,
+      "client_addr" -> o.clientAddr,
+      "client_hostname" -> o.clientHostname,
+      "client_port" -> o.clientPort,
+      "backend_start" -> o.backendStart,
+      "backend_xmin" -> o.backendXmin,
+      "state" -> o.state,
+      "sent_lsn" -> o.sentLsn,
+      "write_lsn" -> o.writeLsn,
+      "flush_lsn" -> o.flushLsn,
+      "replay_lsn" -> o.replayLsn,
+      "write_lag" -> o.writeLag,
+      "flush_lag" -> o.flushLag,
+      "replay_lag" -> o.replayLag,
+      "sync_priority" -> o.syncPriority,
+      "sync_state" -> o.syncState,
+      "reply_time" -> o.replyTime
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatReplicationRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatReplicationRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usename = json.\("usename").as[String],
+            applicationName = json.\("application_name").toOption.map(_.as[String]),
+            clientAddr = json.\("client_addr").toOption.map(_.as[/* inet */ String]),
+            clientHostname = json.\("client_hostname").toOption.map(_.as[String]),
+            clientPort = json.\("client_port").toOption.map(_.as[Int]),
+            backendStart = json.\("backend_start").toOption.map(_.as[LocalDateTime]),
+            backendXmin = json.\("backend_xmin").toOption.map(_.as[/* xid */ String]),
+            state = json.\("state").toOption.map(_.as[String]),
+            sentLsn = json.\("sent_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            writeLsn = json.\("write_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            flushLsn = json.\("flush_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            replayLsn = json.\("replay_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            writeLag = json.\("write_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            flushLag = json.\("flush_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            replayLag = json.\("replay_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            syncPriority = json.\("sync_priority").toOption.map(_.as[Int]),
+            syncState = json.\("sync_state").toOption.map(_.as[String]),
+            replyTime = json.\("reply_time").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

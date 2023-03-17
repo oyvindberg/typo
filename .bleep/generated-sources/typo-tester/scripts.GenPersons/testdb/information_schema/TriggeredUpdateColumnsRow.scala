@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TriggeredUpdateColumnsRow(
   triggerCatalog: /* unknown nullability */ Option[String],
@@ -30,5 +34,32 @@ object TriggeredUpdateColumnsRow {
     )
   }
 
-  implicit val oFormat: OFormat[TriggeredUpdateColumnsRow] = Json.format
+  implicit val oFormat: OFormat[TriggeredUpdateColumnsRow] = new OFormat[TriggeredUpdateColumnsRow]{
+    override def writes(o: TriggeredUpdateColumnsRow): JsObject =
+      Json.obj(
+        "trigger_catalog" -> o.triggerCatalog,
+      "trigger_schema" -> o.triggerSchema,
+      "trigger_name" -> o.triggerName,
+      "event_object_catalog" -> o.eventObjectCatalog,
+      "event_object_schema" -> o.eventObjectSchema,
+      "event_object_table" -> o.eventObjectTable,
+      "event_object_column" -> o.eventObjectColumn
+      )
+
+    override def reads(json: JsValue): JsResult[TriggeredUpdateColumnsRow] = {
+      JsResult.fromTry(
+        Try(
+          TriggeredUpdateColumnsRow(
+            triggerCatalog = json.\("trigger_catalog").toOption.map(_.as[String]),
+            triggerSchema = json.\("trigger_schema").toOption.map(_.as[String]),
+            triggerName = json.\("trigger_name").toOption.map(_.as[String]),
+            eventObjectCatalog = json.\("event_object_catalog").toOption.map(_.as[String]),
+            eventObjectSchema = json.\("event_object_schema").toOption.map(_.as[String]),
+            eventObjectTable = json.\("event_object_table").toOption.map(_.as[String]),
+            eventObjectColumn = json.\("event_object_column").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

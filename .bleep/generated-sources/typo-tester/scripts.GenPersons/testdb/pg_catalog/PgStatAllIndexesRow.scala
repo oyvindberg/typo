@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatAllIndexesRow(
   /** Points to [[testdb.pg_catalog.PgClassRow.oid]] */
@@ -37,5 +41,34 @@ object PgStatAllIndexesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatAllIndexesRow] = Json.format
+  implicit val oFormat: OFormat[PgStatAllIndexesRow] = new OFormat[PgStatAllIndexesRow]{
+    override def writes(o: PgStatAllIndexesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "indexrelid" -> o.indexrelid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "indexrelname" -> o.indexrelname,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_read" -> o.idxTupRead,
+      "idx_tup_fetch" -> o.idxTupFetch
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatAllIndexesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatAllIndexesRow(
+            relid = json.\("relid").as[Long],
+            indexrelid = json.\("indexrelid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            indexrelname = json.\("indexrelname").as[String],
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupRead = json.\("idx_tup_read").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

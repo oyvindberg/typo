@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgViewsRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -26,5 +30,26 @@ object PgViewsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgViewsRow] = Json.format
+  implicit val oFormat: OFormat[PgViewsRow] = new OFormat[PgViewsRow]{
+    override def writes(o: PgViewsRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "viewname" -> o.viewname,
+      "viewowner" -> o.viewowner,
+      "definition" -> o.definition
+      )
+
+    override def reads(json: JsValue): JsResult[PgViewsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgViewsRow(
+            schemaname = json.\("schemaname").as[String],
+            viewname = json.\("viewname").as[String],
+            viewowner = json.\("viewowner").toOption.map(_.as[String]),
+            definition = json.\("definition").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ColumnOptionsRow(
   tableCatalog: /* unknown nullability */ Option[String],
@@ -28,5 +32,30 @@ object ColumnOptionsRow {
     )
   }
 
-  implicit val oFormat: OFormat[ColumnOptionsRow] = Json.format
+  implicit val oFormat: OFormat[ColumnOptionsRow] = new OFormat[ColumnOptionsRow]{
+    override def writes(o: ColumnOptionsRow): JsObject =
+      Json.obj(
+        "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "column_name" -> o.columnName,
+      "option_name" -> o.optionName,
+      "option_value" -> o.optionValue
+      )
+
+    override def reads(json: JsValue): JsResult[ColumnOptionsRow] = {
+      JsResult.fromTry(
+        Try(
+          ColumnOptionsRow(
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            columnName = json.\("column_name").toOption.map(_.as[String]),
+            optionName = json.\("option_name").toOption.map(_.as[String]),
+            optionValue = json.\("option_value").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

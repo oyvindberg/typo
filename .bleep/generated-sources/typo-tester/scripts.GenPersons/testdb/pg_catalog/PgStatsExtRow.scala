@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatsExtRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -51,5 +55,46 @@ object PgStatsExtRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatsExtRow] = Json.format
+  implicit val oFormat: OFormat[PgStatsExtRow] = new OFormat[PgStatsExtRow]{
+    override def writes(o: PgStatsExtRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "statistics_schemaname" -> o.statisticsSchemaname,
+      "statistics_name" -> o.statisticsName,
+      "statistics_owner" -> o.statisticsOwner,
+      "attnames" -> o.attnames,
+      "exprs" -> o.exprs,
+      "kinds" -> o.kinds,
+      "n_distinct" -> o.nDistinct,
+      "dependencies" -> o.dependencies,
+      "most_common_vals" -> o.mostCommonVals,
+      "most_common_val_nulls" -> o.mostCommonValNulls,
+      "most_common_freqs" -> o.mostCommonFreqs,
+      "most_common_base_freqs" -> o.mostCommonBaseFreqs
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatsExtRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatsExtRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            statisticsSchemaname = json.\("statistics_schemaname").as[String],
+            statisticsName = json.\("statistics_name").as[String],
+            statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
+            attnames = json.\("attnames").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any],
+            exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
+            kinds = json.\("kinds").as[Array[String]],
+            nDistinct = json.\("n_distinct").toOption.map(_.as[/* pg_ndistinct */ String]),
+            dependencies = json.\("dependencies").toOption.map(_.as[/* pg_dependencies */ String]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
+            mostCommonValNulls = json.\("most_common_val_nulls").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _bool, columnClassName: java.sql.Array */ Any],
+            mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),
+            mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as[Array[Double]])
+          )
+        )
+      )
+    }
+  }
 }

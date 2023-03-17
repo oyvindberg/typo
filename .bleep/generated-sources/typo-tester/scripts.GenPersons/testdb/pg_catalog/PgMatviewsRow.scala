@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgMatviewsRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -35,5 +39,32 @@ object PgMatviewsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgMatviewsRow] = Json.format
+  implicit val oFormat: OFormat[PgMatviewsRow] = new OFormat[PgMatviewsRow]{
+    override def writes(o: PgMatviewsRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "matviewname" -> o.matviewname,
+      "matviewowner" -> o.matviewowner,
+      "tablespace" -> o.tablespace,
+      "hasindexes" -> o.hasindexes,
+      "ispopulated" -> o.ispopulated,
+      "definition" -> o.definition
+      )
+
+    override def reads(json: JsValue): JsResult[PgMatviewsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgMatviewsRow(
+            schemaname = json.\("schemaname").as[String],
+            matviewname = json.\("matviewname").as[String],
+            matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
+            tablespace = json.\("tablespace").as[String],
+            hasindexes = json.\("hasindexes").as[Boolean],
+            ispopulated = json.\("ispopulated").as[Boolean],
+            definition = json.\("definition").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

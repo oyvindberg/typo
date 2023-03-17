@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatXactAllTablesRow(
   /** Points to [[testdb.pg_catalog.PgClassRow.oid]] */
@@ -41,5 +45,40 @@ object PgStatXactAllTablesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatXactAllTablesRow] = Json.format
+  implicit val oFormat: OFormat[PgStatXactAllTablesRow] = new OFormat[PgStatXactAllTablesRow]{
+    override def writes(o: PgStatXactAllTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "seq_scan" -> o.seqScan,
+      "seq_tup_read" -> o.seqTupRead,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_fetch" -> o.idxTupFetch,
+      "n_tup_ins" -> o.nTupIns,
+      "n_tup_upd" -> o.nTupUpd,
+      "n_tup_del" -> o.nTupDel,
+      "n_tup_hot_upd" -> o.nTupHotUpd
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatXactAllTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatXactAllTablesRow(
+            relid = json.\("relid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

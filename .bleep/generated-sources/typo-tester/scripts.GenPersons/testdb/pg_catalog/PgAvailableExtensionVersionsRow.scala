@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAvailableExtensionVersionsRow(
   name: /* unknown nullability */ Option[String],
@@ -34,5 +38,36 @@ object PgAvailableExtensionVersionsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgAvailableExtensionVersionsRow] = Json.format
+  implicit val oFormat: OFormat[PgAvailableExtensionVersionsRow] = new OFormat[PgAvailableExtensionVersionsRow]{
+    override def writes(o: PgAvailableExtensionVersionsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "version" -> o.version,
+      "installed" -> o.installed,
+      "superuser" -> o.superuser,
+      "trusted" -> o.trusted,
+      "relocatable" -> o.relocatable,
+      "schema" -> o.schema,
+      "requires" -> o.requires,
+      "comment" -> o.comment
+      )
+
+    override def reads(json: JsValue): JsResult[PgAvailableExtensionVersionsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgAvailableExtensionVersionsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            version = json.\("version").toOption.map(_.as[String]),
+            installed = json.\("installed").toOption.map(_.as[Boolean]),
+            superuser = json.\("superuser").toOption.map(_.as[Boolean]),
+            trusted = json.\("trusted").toOption.map(_.as[Boolean]),
+            relocatable = json.\("relocatable").toOption.map(_.as[Boolean]),
+            schema = json.\("schema").toOption.map(_.as[String]),
+            requires = json.\("requires").as[/* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any],
+            comment = json.\("comment").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

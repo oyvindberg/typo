@@ -23,6 +23,7 @@ projects:
       mainClass: com.foo.App
   typo-tester:
     dependencies:
+      - org.postgresql:postgresql:42.5.4
       - org.playframework.anorm::anorm:2.7.0
       - com.typesafe.play::play-json:2.10.0-RC7
     extends: template-common

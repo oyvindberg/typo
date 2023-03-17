@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgShmemAllocationsRow(
   name: /* unknown nullability */ Option[String],
@@ -24,5 +28,26 @@ object PgShmemAllocationsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgShmemAllocationsRow] = Json.format
+  implicit val oFormat: OFormat[PgShmemAllocationsRow] = new OFormat[PgShmemAllocationsRow]{
+    override def writes(o: PgShmemAllocationsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "off" -> o.off,
+      "size" -> o.size,
+      "allocated_size" -> o.allocatedSize
+      )
+
+    override def reads(json: JsValue): JsResult[PgShmemAllocationsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgShmemAllocationsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            off = json.\("off").toOption.map(_.as[Long]),
+            size = json.\("size").toOption.map(_.as[Long]),
+            allocatedSize = json.\("allocated_size").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

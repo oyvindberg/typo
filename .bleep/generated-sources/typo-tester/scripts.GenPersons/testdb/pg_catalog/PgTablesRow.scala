@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTablesRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -39,5 +43,34 @@ object PgTablesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgTablesRow] = Json.format
+  implicit val oFormat: OFormat[PgTablesRow] = new OFormat[PgTablesRow]{
+    override def writes(o: PgTablesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "tableowner" -> o.tableowner,
+      "tablespace" -> o.tablespace,
+      "hasindexes" -> o.hasindexes,
+      "hasrules" -> o.hasrules,
+      "hastriggers" -> o.hastriggers,
+      "rowsecurity" -> o.rowsecurity
+      )
+
+    override def reads(json: JsValue): JsResult[PgTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTablesRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            tableowner = json.\("tableowner").toOption.map(_.as[String]),
+            tablespace = json.\("tablespace").as[String],
+            hasindexes = json.\("hasindexes").as[Boolean],
+            hasrules = json.\("hasrules").as[Boolean],
+            hastriggers = json.\("hastriggers").as[Boolean],
+            rowsecurity = json.\("rowsecurity").as[Boolean]
+          )
+        )
+      )
+    }
+  }
 }

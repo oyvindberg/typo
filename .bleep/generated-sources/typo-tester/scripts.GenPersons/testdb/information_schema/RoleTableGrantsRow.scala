@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoleTableGrantsRow(
   /** Points to [[testdb.information_schema.TablePrivilegesRow.grantor]] */
@@ -40,5 +44,34 @@ object RoleTableGrantsRow {
     )
   }
 
-  implicit val oFormat: OFormat[RoleTableGrantsRow] = Json.format
+  implicit val oFormat: OFormat[RoleTableGrantsRow] = new OFormat[RoleTableGrantsRow]{
+    override def writes(o: RoleTableGrantsRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable,
+      "with_hierarchy" -> o.withHierarchy
+      )
+
+    override def reads(json: JsValue): JsResult[RoleTableGrantsRow] = {
+      JsResult.fromTry(
+        Try(
+          RoleTableGrantsRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String]),
+            withHierarchy = json.\("with_hierarchy").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatSlruRow(
   name: /* unknown nullability */ Option[String],
@@ -35,5 +39,36 @@ object PgStatSlruRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatSlruRow] = Json.format
+  implicit val oFormat: OFormat[PgStatSlruRow] = new OFormat[PgStatSlruRow]{
+    override def writes(o: PgStatSlruRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "blks_zeroed" -> o.blksZeroed,
+      "blks_hit" -> o.blksHit,
+      "blks_read" -> o.blksRead,
+      "blks_written" -> o.blksWritten,
+      "blks_exists" -> o.blksExists,
+      "flushes" -> o.flushes,
+      "truncates" -> o.truncates,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatSlruRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatSlruRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            blksZeroed = json.\("blks_zeroed").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksWritten = json.\("blks_written").toOption.map(_.as[Long]),
+            blksExists = json.\("blks_exists").toOption.map(_.as[Long]),
+            flushes = json.\("flushes").toOption.map(_.as[Long]),
+            truncates = json.\("truncates").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgForeignTableColumnsRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -28,5 +32,26 @@ object PgForeignTableColumnsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgForeignTableColumnsRow] = Json.format
+  implicit val oFormat: OFormat[PgForeignTableColumnsRow] = new OFormat[PgForeignTableColumnsRow]{
+    override def writes(o: PgForeignTableColumnsRow): JsObject =
+      Json.obj(
+        "nspname" -> o.nspname,
+      "relname" -> o.relname,
+      "attname" -> o.attname,
+      "attfdwoptions" -> o.attfdwoptions
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignTableColumnsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignTableColumnsRow(
+            nspname = json.\("nspname").as[String],
+            relname = json.\("relname").as[String],
+            attname = json.\("attname").as[String],
+            attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

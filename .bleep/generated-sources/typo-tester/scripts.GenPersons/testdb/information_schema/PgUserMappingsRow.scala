@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgUserMappingsRow(
   /** Points to [[testdb.pg_catalog.PgUserMappingRow.oid]] */
@@ -36,5 +40,32 @@ object PgUserMappingsRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgUserMappingsRow] = Json.format
+  implicit val oFormat: OFormat[PgUserMappingsRow] = new OFormat[PgUserMappingsRow]{
+    override def writes(o: PgUserMappingsRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "umoptions" -> o.umoptions,
+      "umuser" -> o.umuser,
+      "authorization_identifier" -> o.authorizationIdentifier,
+      "foreign_server_catalog" -> o.foreignServerCatalog,
+      "foreign_server_name" -> o.foreignServerName,
+      "srvowner" -> o.srvowner
+      )
+
+    override def reads(json: JsValue): JsResult[PgUserMappingsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgUserMappingsRow(
+            oid = json.\("oid").as[Long],
+            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
+            umuser = json.\("umuser").as[Long],
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
+            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
+            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),
+            srvowner = json.\("srvowner").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

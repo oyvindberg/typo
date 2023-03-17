@@ -15,6 +15,7 @@ object JsonLibPlay extends JsonLib {
   val JsSuccess = sc.Type.Qualified("play.api.libs.json.JsSuccess")
   val JsValue = sc.Type.Qualified("play.api.libs.json.JsValue")
   val JsObject = sc.Type.Qualified("play.api.libs.json.JsObject")
+  val JsResult = sc.Type.Qualified("play.api.libs.json.JsResult")
 
   override def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code] = {
     val T = sc.Type.Abstract(sc.Ident("T"))
@@ -53,10 +54,32 @@ object JsonLibPlay extends JsonLib {
     List(reader, writer)
   }
 
-  override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] =
+  override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
+    def as(col: ColumnComputed): sc.Code =
+      col.tpe match {
+        case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(col.dbName.value)}).toOption.map(_.as[$of])"""
+        case _ => code"""json.\\(${sc.StrLit(col.dbName.value)}).as[${col.tpe}]"""
+      }
+
     List(
-      code"""implicit val oFormat: ${OFormat(tpe)} = $Json.format"""
+      code"""|implicit val oFormat: ${OFormat(tpe)} = new ${OFormat(tpe)}{
+             |    override def writes(o: $tpe): $JsObject =
+             |      $Json.obj(
+             |        ${cols.map(col => code"""${sc.StrLit(col.dbName.value)} -> o.${col.name}""").mkCode(",\n      ")}
+             |      )
+             |
+             |    override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
+             |      $JsResult.fromTry(
+             |        ${sc.Type.Try}(
+             |          $tpe(
+             |            ${cols.map(col => code"""${col.name} = ${as(col)}""").mkCode(",\n            ")}
+             |          )
+             |        )
+             |      )
+             |    }
+             |  }"""
     )
+  }
 
   def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] =
     List(

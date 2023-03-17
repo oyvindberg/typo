@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressClusterRow(
   pid: /* unknown nullability */ Option[Int],
@@ -41,5 +45,42 @@ object PgStatProgressClusterRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatProgressClusterRow] = Json.format
+  implicit val oFormat: OFormat[PgStatProgressClusterRow] = new OFormat[PgStatProgressClusterRow]{
+    override def writes(o: PgStatProgressClusterRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "command" -> o.command,
+      "phase" -> o.phase,
+      "cluster_index_relid" -> o.clusterIndexRelid,
+      "heap_tuples_scanned" -> o.heapTuplesScanned,
+      "heap_tuples_written" -> o.heapTuplesWritten,
+      "heap_blks_total" -> o.heapBlksTotal,
+      "heap_blks_scanned" -> o.heapBlksScanned,
+      "index_rebuild_count" -> o.indexRebuildCount
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressClusterRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressClusterRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            command = json.\("command").toOption.map(_.as[String]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as[Long]),
+            heapTuplesScanned = json.\("heap_tuples_scanned").toOption.map(_.as[Long]),
+            heapTuplesWritten = json.\("heap_tuples_written").toOption.map(_.as[Long]),
+            heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
+            heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),
+            indexRebuildCount = json.\("index_rebuild_count").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

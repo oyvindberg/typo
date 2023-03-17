@@ -3,8 +3,12 @@ package testdb.pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgShadowRow(
   /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
@@ -44,5 +48,36 @@ object PgShadowRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgShadowRow] = Json.format
+  implicit val oFormat: OFormat[PgShadowRow] = new OFormat[PgShadowRow]{
+    override def writes(o: PgShadowRow): JsObject =
+      Json.obj(
+        "usename" -> o.usename,
+      "usesysid" -> o.usesysid,
+      "usecreatedb" -> o.usecreatedb,
+      "usesuper" -> o.usesuper,
+      "userepl" -> o.userepl,
+      "usebypassrls" -> o.usebypassrls,
+      "passwd" -> o.passwd,
+      "valuntil" -> o.valuntil,
+      "useconfig" -> o.useconfig
+      )
+
+    override def reads(json: JsValue): JsResult[PgShadowRow] = {
+      JsResult.fromTry(
+        Try(
+          PgShadowRow(
+            usename = json.\("usename").as[String],
+            usesysid = json.\("usesysid").as[Long],
+            usecreatedb = json.\("usecreatedb").as[Boolean],
+            usesuper = json.\("usesuper").as[Boolean],
+            userepl = json.\("userepl").as[Boolean],
+            usebypassrls = json.\("usebypassrls").as[Boolean],
+            passwd = json.\("passwd").toOption.map(_.as[String]),
+            valuntil = json.\("valuntil").toOption.map(_.as[LocalDateTime]),
+            useconfig = json.\("useconfig").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

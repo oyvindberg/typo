@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CollationCharacterSetApplicabilityRow(
   collationCatalog: /* unknown nullability */ Option[String],
@@ -28,5 +32,30 @@ object CollationCharacterSetApplicabilityRow {
     )
   }
 
-  implicit val oFormat: OFormat[CollationCharacterSetApplicabilityRow] = Json.format
+  implicit val oFormat: OFormat[CollationCharacterSetApplicabilityRow] = new OFormat[CollationCharacterSetApplicabilityRow]{
+    override def writes(o: CollationCharacterSetApplicabilityRow): JsObject =
+      Json.obj(
+        "collation_catalog" -> o.collationCatalog,
+      "collation_schema" -> o.collationSchema,
+      "collation_name" -> o.collationName,
+      "character_set_catalog" -> o.characterSetCatalog,
+      "character_set_schema" -> o.characterSetSchema,
+      "character_set_name" -> o.characterSetName
+      )
+
+    override def reads(json: JsValue): JsResult[CollationCharacterSetApplicabilityRow] = {
+      JsResult.fromTry(
+        Try(
+          CollationCharacterSetApplicabilityRow(
+            collationCatalog = json.\("collation_catalog").toOption.map(_.as[String]),
+            collationSchema = json.\("collation_schema").toOption.map(_.as[String]),
+            collationName = json.\("collation_name").toOption.map(_.as[String]),
+            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[String]),
+            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[String]),
+            characterSetName = json.\("character_set_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

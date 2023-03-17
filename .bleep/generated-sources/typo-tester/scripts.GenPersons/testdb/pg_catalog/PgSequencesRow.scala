@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSequencesRow(
   /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
@@ -46,5 +50,40 @@ object PgSequencesRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgSequencesRow] = Json.format
+  implicit val oFormat: OFormat[PgSequencesRow] = new OFormat[PgSequencesRow]{
+    override def writes(o: PgSequencesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "sequencename" -> o.sequencename,
+      "sequenceowner" -> o.sequenceowner,
+      "data_type" -> o.dataType,
+      "start_value" -> o.startValue,
+      "min_value" -> o.minValue,
+      "max_value" -> o.maxValue,
+      "increment_by" -> o.incrementBy,
+      "cycle" -> o.cycle,
+      "cache_size" -> o.cacheSize,
+      "last_value" -> o.lastValue
+      )
+
+    override def reads(json: JsValue): JsResult[PgSequencesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSequencesRow(
+            schemaname = json.\("schemaname").as[String],
+            sequencename = json.\("sequencename").as[String],
+            sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
+            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ String]),
+            startValue = json.\("start_value").as[Long],
+            minValue = json.\("min_value").as[Long],
+            maxValue = json.\("max_value").as[Long],
+            incrementBy = json.\("increment_by").as[Long],
+            cycle = json.\("cycle").as[Boolean],
+            cacheSize = json.\("cache_size").as[Long],
+            lastValue = json.\("last_value").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.myschema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class FootballClubRow(
   id: FootballClubId,
@@ -20,5 +24,22 @@ object FootballClubRow {
     )
   }
 
-  implicit val oFormat: OFormat[FootballClubRow] = Json.format
+  implicit val oFormat: OFormat[FootballClubRow] = new OFormat[FootballClubRow]{
+    override def writes(o: FootballClubRow): JsObject =
+      Json.obj(
+        "id" -> o.id,
+      "name" -> o.name
+      )
+
+    override def reads(json: JsValue): JsResult[FootballClubRow] = {
+      JsResult.fromTry(
+        Try(
+          FootballClubRow(
+            id = json.\("id").as[FootballClubId],
+            name = json.\("name").as[String]
+          )
+        )
+      )
+    }
+  }
 }

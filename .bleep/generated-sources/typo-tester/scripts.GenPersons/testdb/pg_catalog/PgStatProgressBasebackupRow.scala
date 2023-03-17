@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressBasebackupRow(
   pid: /* unknown nullability */ Option[Int],
@@ -28,5 +32,30 @@ object PgStatProgressBasebackupRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatProgressBasebackupRow] = Json.format
+  implicit val oFormat: OFormat[PgStatProgressBasebackupRow] = new OFormat[PgStatProgressBasebackupRow]{
+    override def writes(o: PgStatProgressBasebackupRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "phase" -> o.phase,
+      "backup_total" -> o.backupTotal,
+      "backup_streamed" -> o.backupStreamed,
+      "tablespaces_total" -> o.tablespacesTotal,
+      "tablespaces_streamed" -> o.tablespacesStreamed
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressBasebackupRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressBasebackupRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            backupTotal = json.\("backup_total").toOption.map(_.as[Long]),
+            backupStreamed = json.\("backup_streamed").toOption.map(_.as[Long]),
+            tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as[Long]),
+            tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class DomainUdtUsageRow(
   udtCatalog: /* unknown nullability */ Option[String],
@@ -28,5 +32,30 @@ object DomainUdtUsageRow {
     )
   }
 
-  implicit val oFormat: OFormat[DomainUdtUsageRow] = Json.format
+  implicit val oFormat: OFormat[DomainUdtUsageRow] = new OFormat[DomainUdtUsageRow]{
+    override def writes(o: DomainUdtUsageRow): JsObject =
+      Json.obj(
+        "udt_catalog" -> o.udtCatalog,
+      "udt_schema" -> o.udtSchema,
+      "udt_name" -> o.udtName,
+      "domain_catalog" -> o.domainCatalog,
+      "domain_schema" -> o.domainSchema,
+      "domain_name" -> o.domainName
+      )
+
+    override def reads(json: JsValue): JsResult[DomainUdtUsageRow] = {
+      JsResult.fromTry(
+        Try(
+          DomainUdtUsageRow(
+            udtCatalog = json.\("udt_catalog").toOption.map(_.as[String]),
+            udtSchema = json.\("udt_schema").toOption.map(_.as[String]),
+            udtName = json.\("udt_name").toOption.map(_.as[String]),
+            domainCatalog = json.\("domain_catalog").toOption.map(_.as[String]),
+            domainSchema = json.\("domain_schema").toOption.map(_.as[String]),
+            domainName = json.\("domain_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -2,8 +2,12 @@ package testdb.pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressAnalyzeRow(
   pid: /* unknown nullability */ Option[Int],
@@ -41,5 +45,42 @@ object PgStatProgressAnalyzeRow {
     )
   }
 
-  implicit val oFormat: OFormat[PgStatProgressAnalyzeRow] = Json.format
+  implicit val oFormat: OFormat[PgStatProgressAnalyzeRow] = new OFormat[PgStatProgressAnalyzeRow]{
+    override def writes(o: PgStatProgressAnalyzeRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "phase" -> o.phase,
+      "sample_blks_total" -> o.sampleBlksTotal,
+      "sample_blks_scanned" -> o.sampleBlksScanned,
+      "ext_stats_total" -> o.extStatsTotal,
+      "ext_stats_computed" -> o.extStatsComputed,
+      "child_tables_total" -> o.childTablesTotal,
+      "child_tables_done" -> o.childTablesDone,
+      "current_child_table_relid" -> o.currentChildTableRelid
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressAnalyzeRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressAnalyzeRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as[Long]),
+            sampleBlksScanned = json.\("sample_blks_scanned").toOption.map(_.as[Long]),
+            extStatsTotal = json.\("ext_stats_total").toOption.map(_.as[Long]),
+            extStatsComputed = json.\("ext_stats_computed").toOption.map(_.as[Long]),
+            childTablesTotal = json.\("child_tables_total").toOption.map(_.as[Long]),
+            childTablesDone = json.\("child_tables_done").toOption.map(_.as[Long]),
+            currentChildTableRelid = json.\("current_child_table_relid").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

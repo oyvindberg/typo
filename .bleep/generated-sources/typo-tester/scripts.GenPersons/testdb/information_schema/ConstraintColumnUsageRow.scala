@@ -2,8 +2,12 @@ package testdb.information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ConstraintColumnUsageRow(
   tableCatalog: /* unknown nullability */ Option[String],
@@ -30,5 +34,32 @@ object ConstraintColumnUsageRow {
     )
   }
 
-  implicit val oFormat: OFormat[ConstraintColumnUsageRow] = Json.format
+  implicit val oFormat: OFormat[ConstraintColumnUsageRow] = new OFormat[ConstraintColumnUsageRow]{
+    override def writes(o: ConstraintColumnUsageRow): JsObject =
+      Json.obj(
+        "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "column_name" -> o.columnName,
+      "constraint_catalog" -> o.constraintCatalog,
+      "constraint_schema" -> o.constraintSchema,
+      "constraint_name" -> o.constraintName
+      )
+
+    override def reads(json: JsValue): JsResult[ConstraintColumnUsageRow] = {
+      JsResult.fromTry(
+        Try(
+          ConstraintColumnUsageRow(
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            columnName = json.\("column_name").toOption.map(_.as[String]),
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[String]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[String]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }
