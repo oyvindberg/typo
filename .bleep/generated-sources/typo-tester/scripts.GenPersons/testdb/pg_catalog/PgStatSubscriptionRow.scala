@@ -7,7 +7,9 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatSubscriptionRow(
+  /** Points to [[testdb.pg_catalog.PgSubscriptionRow.oid]] */
   subid: Long,
+  /** Points to [[testdb.pg_catalog.PgSubscriptionRow.subname]] */
   subname: String,
   pid: /* unknown nullability */ Option[Int],
   relid: /* unknown nullability */ Option[Long],

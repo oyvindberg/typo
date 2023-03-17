@@ -6,9 +6,13 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatsExtExprsRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   statisticsSchemaname: String,
+  /** Points to [[testdb.pg_catalog.PgStatisticExtRow.stxname]] */
   statisticsName: String,
   statisticsOwner: /* unknown nullability */ Option[String],
   expr: /* unknown nullability */ Option[String],

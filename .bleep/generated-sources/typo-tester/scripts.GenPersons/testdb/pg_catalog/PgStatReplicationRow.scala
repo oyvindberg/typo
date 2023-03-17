@@ -10,6 +10,7 @@ import play.api.libs.json.OFormat
 case class PgStatReplicationRow(
   pid: /* unknown nullability */ Option[Int],
   usesysid: /* unknown nullability */ Option[Long],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
   usename: String,
   applicationName: /* unknown nullability */ Option[String],
   clientAddr: /* unknown nullability */ Option[/* inet */ String],

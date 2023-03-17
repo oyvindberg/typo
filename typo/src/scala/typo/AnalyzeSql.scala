@@ -4,13 +4,13 @@ import java.sql.{Connection, PreparedStatement}
 
 object AnalyzeSql {
   case class Column(
-      baseColumnName: Option[String],
+      baseColumnName: Option[db.ColName],
       baseRelationName: Option[db.RelationName],
       catalogName: Option[String],
       columnClassName: String,
       columnDisplaySize: Int,
-      columnLabel: String,
-      columnName: String,
+      columnLabel: db.ColName,
+      columnName: db.ColName,
       columnType: doobie.JdbcType,
       columnTypeName: String,
       format: Int,
@@ -28,7 +28,7 @@ object AnalyzeSql {
       schemaName: Option[String],
       tableName: Option[String]
   ) {
-    def name = db.ColName(columnLabel)
+    def name = columnLabel
   }
 
   case class ParameterColumn(
@@ -75,13 +75,13 @@ object AnalyzeSql {
       case metadata: org.postgresql.jdbc.PgResultSetMetaData =>
         0.until(metadata.getColumnCount).map(_ + 1).map { n =>
           Column(
-            baseColumnName = nonEmpty(metadata.getBaseColumnName(n)),
+            baseColumnName = nonEmpty(metadata.getBaseColumnName(n)).map(db.ColName.apply),
             baseRelationName = nonEmpty(metadata.getBaseSchemaName(n)).zip(nonEmpty(metadata.getBaseTableName(n))).map(db.RelationName.tupled),
             catalogName = nonEmpty(metadata.getCatalogName(n)),
             columnClassName = metadata.getColumnClassName(n),
             columnDisplaySize = metadata.getColumnDisplaySize(n),
-            columnLabel = metadata.getColumnLabel(n),
-            columnName = metadata.getColumnName(n),
+            columnLabel = db.ColName(metadata.getColumnLabel(n)),
+            columnName = db.ColName(metadata.getColumnName(n)),
             columnType = doobie.JdbcType.fromInt(metadata.getColumnType(n)),
             columnTypeName = metadata.getColumnTypeName(n),
             format = metadata.getFormat(n),

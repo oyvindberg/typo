@@ -6,12 +6,18 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgUserMappingsRow(
+  /** Points to [[testdb.pg_catalog.PgUserMappingRow.oid]] */
   oid: Long,
+  /** Points to [[testdb.pg_catalog.PgUserMappingRow.umoptions]] */
   umoptions: Option[Array[String]],
+  /** Points to [[testdb.pg_catalog.PgUserMappingRow.umuser]] */
   umuser: Long,
   authorizationIdentifier: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.authorizationIdentifier]] */
   srvowner: Option[String]
 )
 

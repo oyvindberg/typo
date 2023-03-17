@@ -8,6 +8,7 @@ import play.api.libs.json.OFormat
 case class PgAvailableExtensionsRow(
   name: /* unknown nullability */ Option[String],
   defaultVersion: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgExtensionRow.extversion]] */
   installedVersion: String,
   comment: /* unknown nullability */ Option[String]
 )

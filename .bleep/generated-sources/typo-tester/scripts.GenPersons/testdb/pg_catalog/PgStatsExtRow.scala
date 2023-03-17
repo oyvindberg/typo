@@ -6,15 +6,22 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatsExtRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   statisticsSchemaname: String,
+  /** Points to [[testdb.pg_catalog.PgStatisticExtRow.stxname]] */
   statisticsName: String,
   statisticsOwner: /* unknown nullability */ Option[String],
   attnames: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _name, columnClassName: java.sql.Array */ Any,
   exprs: /* unknown nullability */ Option[Array[String]],
+  /** Points to [[testdb.pg_catalog.PgStatisticExtRow.stxkind]] */
   kinds: Array[String],
+  /** Points to [[testdb.pg_catalog.PgStatisticExtDataRow.stxdndistinct]] */
   nDistinct: Option[/* pg_ndistinct */ String],
+  /** Points to [[testdb.pg_catalog.PgStatisticExtDataRow.stxddependencies]] */
   dependencies: Option[/* pg_dependencies */ String],
   mostCommonVals: /* unknown nullability */ Option[Array[String]],
   mostCommonValNulls: /* typo doesn't know how to translate: columnType: Array, columnTypeName: _bool, columnClassName: java.sql.Array */ Any,

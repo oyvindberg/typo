@@ -6,12 +6,19 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignServersRow(
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerType]] */
   foreignServerType: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerVersion]] */
   foreignServerVersion: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String]
 )
 

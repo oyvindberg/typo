@@ -6,9 +6,13 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgUserMappingsRow(
+  /** Points to [[testdb.pg_catalog.PgUserMappingRow.oid]] */
   umid: Long,
+  /** Points to [[testdb.pg_catalog.PgForeignServerRow.oid]] */
   srvid: Long,
+  /** Points to [[testdb.pg_catalog.PgForeignServerRow.srvname]] */
   srvname: String,
+  /** Points to [[testdb.pg_catalog.PgUserMappingRow.umuser]] */
   umuser: Long,
   usename: /* unknown nullability */ Option[String],
   umoptions: /* unknown nullability */ Option[Array[String]]

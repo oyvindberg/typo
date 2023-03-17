@@ -6,7 +6,9 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignServerOptionsRow(
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
   optionName: /* unknown nullability */ Option[String],
   optionValue: /* unknown nullability */ Option[String]

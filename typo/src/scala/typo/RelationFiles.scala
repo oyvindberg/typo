@@ -14,9 +14,20 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
       case _ => code""
     }
 
+    val formattedCols = relation.cols.map { col =>
+      col.pointsTo match {
+        case Some((relationName, columnName)) =>
+          val row = names.titleCase(relation.pkg, relationName, "Row")
+          // todo: until we have tables in the structure just explode these fields so we don't generate bogus imports
+          val renderedRow = sc.renderTree(row)
+          code"""/** Points to [[$renderedRow.${names.field(columnName)}]] */
+                |  ${col.param}""".stripMargin
+        case None => col.param.code
+      }
+    }
     val str =
       code"""case class ${relation.RowName.name}(
-            |  ${relation.cols.map(_.param.code).mkCode(",\n  ")}
+            |  ${formattedCols.mkCode(",\n  ")}
             |)$compositeId
             |
             |object ${relation.RowName.name} {

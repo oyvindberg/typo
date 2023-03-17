@@ -6,13 +6,20 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgTablesRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
   tableowner: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgTablespaceRow.spcname]] */
   tablespace: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relhasindex]] */
   hasindexes: Boolean,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relhasrules]] */
   hasrules: Boolean,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relhastriggers]] */
   hastriggers: Boolean,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relrowsecurity]] */
   rowsecurity: Boolean
 )
 

@@ -10,7 +10,9 @@ case class PgPreparedXactsRow(
   transaction: /* unknown nullability */ Option[/* xid */ String],
   gid: /* unknown nullability */ Option[String],
   prepared: /* unknown nullability */ Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
   owner: String,
+  /** Points to [[testdb.pg_catalog.PgDatabaseRow.datname]] */
   database: String
 )
 

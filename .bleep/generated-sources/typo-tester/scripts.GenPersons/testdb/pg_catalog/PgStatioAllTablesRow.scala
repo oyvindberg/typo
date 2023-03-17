@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatioAllTablesRow(
+  /** Points to [[testdb.pg_catalog.PgClassRow.oid]] */
   relid: Long,
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   relname: String,
   heapBlksRead: /* unknown nullability */ Option[Long],
   heapBlksHit: /* unknown nullability */ Option[Long],

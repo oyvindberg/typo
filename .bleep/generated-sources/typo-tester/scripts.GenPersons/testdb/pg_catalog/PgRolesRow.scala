@@ -7,18 +7,30 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgRolesRow(
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
   rolname: String,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolsuper]] */
   rolsuper: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolinherit]] */
   rolinherit: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolcreaterole]] */
   rolcreaterole: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolcreatedb]] */
   rolcreatedb: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolcanlogin]] */
   rolcanlogin: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolreplication]] */
   rolreplication: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolconnlimit]] */
   rolconnlimit: Int,
   rolpassword: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolvaliduntil]] */
   rolvaliduntil: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolbypassrls]] */
   rolbypassrls: Boolean,
+  /** Points to [[testdb.pg_catalog.PgDbRoleSettingRow.setconfig]] */
   rolconfig: Option[Array[String]],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.oid]] */
   oid: Long
 )
 

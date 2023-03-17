@@ -6,13 +6,21 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class RoleTableGrantsRow(
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.grantor]] */
   grantor: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.grantee]] */
   grantee: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.tableCatalog]] */
   tableCatalog: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.tableSchema]] */
   tableSchema: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.tableName]] */
   tableName: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.privilegeType]] */
   privilegeType: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.isGrantable]] */
   isGrantable: Option[String],
+  /** Points to [[testdb.information_schema.TablePrivilegesRow.withHierarchy]] */
   withHierarchy: Option[String]
 )
 

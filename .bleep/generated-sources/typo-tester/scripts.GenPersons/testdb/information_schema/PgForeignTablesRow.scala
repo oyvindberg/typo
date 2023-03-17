@@ -9,6 +9,7 @@ case class PgForeignTablesRow(
   foreignTableCatalog: /* unknown nullability */ Option[String],
   foreignTableSchema: /* unknown nullability */ Option[String],
   foreignTableName: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgForeignTableRow.ftoptions]] */
   ftoptions: Option[Array[String]],
   foreignServerCatalog: /* unknown nullability */ Option[String],
   foreignServerName: /* unknown nullability */ Option[String],

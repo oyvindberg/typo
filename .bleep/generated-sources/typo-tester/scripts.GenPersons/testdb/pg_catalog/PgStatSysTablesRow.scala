@@ -7,28 +7,51 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatSysTablesRow(
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.relid]] */
   relid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.seqScan]] */
   seqScan: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.idxScan]] */
   idxScan: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nTupIns]] */
   nTupIns: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nTupDel]] */
   nTupDel: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nLiveTup]] */
   nLiveTup: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nDeadTup]] */
   nDeadTup: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nModSinceAnalyze]] */
   nModSinceAnalyze: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.lastVacuum]] */
   lastVacuum: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.lastAutovacuum]] */
   lastAutovacuum: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.lastAnalyze]] */
   lastAnalyze: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.lastAutoanalyze]] */
   lastAutoanalyze: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.vacuumCount]] */
   vacuumCount: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.autovacuumCount]] */
   autovacuumCount: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.analyzeCount]] */
   analyzeCount: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatAllTablesRow.autoanalyzeCount]] */
   autoanalyzeCount: Option[Long]
 )
 

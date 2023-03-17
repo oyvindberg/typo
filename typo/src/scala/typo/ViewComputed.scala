@@ -8,13 +8,20 @@ case class ViewComputed(pkg: sc.QIdent, view: View) {
 
   val cols: List[ColumnComputed] = {
     view.cols.map { col =>
-      val finalType: sc.Type = ViewComputed.scalaType(col).getOrElse {
+      val tpe: sc.Type = ViewComputed.scalaType(col).getOrElse {
         val msg =
           s"typo doesn't know how to translate: columnType: ${col.columnType}, columnTypeName: ${col.columnTypeName}, columnClassName: ${col.columnClassName}"
         System.err.println(msg)
         sc.Type.Any.withComment(msg)
       }
-      ColumnComputed(names.field(col.name), finalType, col.name, hasDefault = false)
+
+      val pointsTo = (col.baseColumnName, col.baseRelationName) match {
+        case (Some(colName), Some(relationName)) if relationName != view.name =>
+          Some(relationName, colName)
+        case _ =>
+          None
+      }
+      ColumnComputed(pointsTo, names.field(col.name), tpe, col.name, hasDefault = false)
     }
   }
   val relation = RelationComputed(pkg, view.name, cols, maybeId = None)

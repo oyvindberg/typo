@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgForeignDataWrappersRow(
+  /** Points to [[testdb.pg_catalog.PgForeignDataWrapperRow.oid]] */
   oid: Long,
+  /** Points to [[testdb.pg_catalog.PgForeignDataWrapperRow.fdwowner]] */
   fdwowner: Long,
+  /** Points to [[testdb.pg_catalog.PgForeignDataWrapperRow.fdwoptions]] */
   fdwoptions: Option[Array[String]],
   foreignDataWrapperCatalog: /* unknown nullability */ Option[String],
   foreignDataWrapperName: /* unknown nullability */ Option[String],

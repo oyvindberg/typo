@@ -6,9 +6,13 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgForeignTableColumnsRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   nspname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   relname: String,
+  /** Points to [[testdb.pg_catalog.PgAttributeRow.attname]] */
   attname: String,
+  /** Points to [[testdb.pg_catalog.PgAttributeRow.attfdwoptions]] */
   attfdwoptions: Option[Array[String]]
 )
 

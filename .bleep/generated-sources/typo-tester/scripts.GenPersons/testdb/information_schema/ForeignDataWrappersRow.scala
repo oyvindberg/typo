@@ -6,10 +6,14 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignDataWrappersRow(
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String],
   libraryName: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperLanguage]] */
   foreignDataWrapperLanguage: Option[String]
 )
 

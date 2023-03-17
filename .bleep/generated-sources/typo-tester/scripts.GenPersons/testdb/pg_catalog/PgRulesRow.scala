@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgRulesRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[testdb.pg_catalog.PgRewriteRow.rulename]] */
   rulename: String,
   definition: /* unknown nullability */ Option[String]
 )

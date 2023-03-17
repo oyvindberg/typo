@@ -25,7 +25,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
         case Nil => None
         case colName :: Nil =>
           val dbCol = dbColsByName(colName)
-          val col = ColumnComputed(names.field(dbCol.name), scalaType(pkg, dbCol), dbCol.name, dbCol.hasDefault)
+          val col = ColumnComputed(None, names.field(dbCol.name), scalaType(pkg, dbCol), dbCol.name, dbCol.hasDefault)
           Some(IdComputed.Unary(col, qident))
 
         case colNames =>
@@ -33,7 +33,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
             val fieldName = names.field(colName)
             val dbCol = dbColsByName(colName)
             val underlying = scalaType(pkg, dbCol)
-            ColumnComputed(fieldName, underlying, dbCol.name, dbCol.hasDefault)
+            ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault)
           }
           val paramName = names.field(db.ColName(colNames.map(_.value).mkString("_and_")))
           Some(IdComputed.Composite(cols, qident, paramName))
@@ -46,10 +46,10 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
         if (!isNotNull) {
           sys.error(s"assumption: id column in ${dbTable.name} should be not null")
         }
-        dbCol -> ColumnComputed(names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
+        dbCol -> ColumnComputed(None, names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
       case dbCol =>
         val finalType: sc.Type = scalaType(pkg, dbCol)
-        dbCol -> ColumnComputed(names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
+        dbCol -> ColumnComputed(None, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
     }
   }
 

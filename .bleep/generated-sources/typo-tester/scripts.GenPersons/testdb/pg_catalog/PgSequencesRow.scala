@@ -6,15 +6,23 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgSequencesRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   sequencename: String,
   sequenceowner: /* unknown nullability */ Option[String],
   dataType: /* unknown nullability */ Option[/* regtype */ String],
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqstart]] */
   startValue: Long,
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqmin]] */
   minValue: Long,
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqmax]] */
   maxValue: Long,
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqincrement]] */
   incrementBy: Long,
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqcycle]] */
   cycle: Boolean,
+  /** Points to [[testdb.pg_catalog.PgSequenceRow.seqcache]] */
   cacheSize: Long,
   lastValue: /* unknown nullability */ Option[Long]
 )

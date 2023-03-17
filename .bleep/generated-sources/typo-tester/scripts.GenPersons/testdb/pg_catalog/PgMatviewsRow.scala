@@ -6,11 +6,16 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgMatviewsRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   matviewname: String,
   matviewowner: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgTablespaceRow.spcname]] */
   tablespace: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relhasindex]] */
   hasindexes: Boolean,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relispopulated]] */
   ispopulated: Boolean,
   definition: /* unknown nullability */ Option[String]
 )

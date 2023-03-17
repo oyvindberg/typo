@@ -8,6 +8,7 @@ import play.api.libs.json.OFormat
 case class PgStatProgressCreateIndexRow(
   pid: /* unknown nullability */ Option[Int],
   datid: /* unknown nullability */ Option[Long],
+  /** Points to [[testdb.pg_catalog.PgDatabaseRow.datname]] */
   datname: String,
   relid: /* unknown nullability */ Option[Long],
   indexRelid: /* unknown nullability */ Option[Long],

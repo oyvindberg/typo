@@ -149,7 +149,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
                    |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
@@ -161,7 +161,7 @@ object DbLibAnorm extends DbLib {
         val sql = interpolate(
           code"""|insert into ${table.relationName}($${namedParameters.map(_.name).mkString(", ")})
                  |      values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
-                 |      returning ${table.maybeId.get.cols.map(_.name.value.code).mkCode(", ")}
+                 |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
                  |      """.stripMargin
         )
 
@@ -176,7 +176,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
                    |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))

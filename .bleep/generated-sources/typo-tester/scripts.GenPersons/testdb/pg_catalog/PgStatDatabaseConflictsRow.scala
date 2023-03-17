@@ -6,7 +6,9 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatDatabaseConflictsRow(
+  /** Points to [[testdb.pg_catalog.PgDatabaseRow.oid]] */
   datid: Long,
+  /** Points to [[testdb.pg_catalog.PgDatabaseRow.datname]] */
   datname: String,
   conflTablespace: /* unknown nullability */ Option[Long],
   conflLock: /* unknown nullability */ Option[Long],

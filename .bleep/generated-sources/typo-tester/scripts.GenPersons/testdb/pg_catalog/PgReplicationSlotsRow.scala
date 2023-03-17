@@ -10,6 +10,7 @@ case class PgReplicationSlotsRow(
   plugin: /* unknown nullability */ Option[String],
   slotType: /* unknown nullability */ Option[String],
   datoid: /* unknown nullability */ Option[Long],
+  /** Points to [[testdb.pg_catalog.PgDatabaseRow.datname]] */
   database: String,
   temporary: /* unknown nullability */ Option[Boolean],
   active: /* unknown nullability */ Option[Boolean],

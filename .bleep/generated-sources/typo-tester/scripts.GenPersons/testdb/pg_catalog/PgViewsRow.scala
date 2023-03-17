@@ -6,7 +6,9 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgViewsRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   viewname: String,
   viewowner: /* unknown nullability */ Option[String],
   definition: /* unknown nullability */ Option[String]

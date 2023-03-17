@@ -6,16 +6,27 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatXactSysTablesRow(
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.relid]] */
   relid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.seqScan]] */
   seqScan: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.idxScan]] */
   idxScan: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.nTupIns]] */
   nTupIns: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.nTupDel]] */
   nTupDel: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatXactAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long]
 )
 

@@ -6,10 +6,15 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignTablesRow(
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignServerName]] */
   foreignServerName: Option[String]
 )
 

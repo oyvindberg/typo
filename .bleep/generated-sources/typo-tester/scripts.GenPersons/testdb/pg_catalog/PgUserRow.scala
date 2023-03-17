@@ -7,14 +7,22 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgUserRow(
+  /** Points to [[testdb.pg_catalog.PgShadowRow.usename]] */
   usename: Option[String],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.usesysid]] */
   usesysid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.usecreatedb]] */
   usecreatedb: Option[Boolean],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.usesuper]] */
   usesuper: Option[Boolean],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.userepl]] */
   userepl: Option[Boolean],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.usebypassrls]] */
   usebypassrls: Option[Boolean],
   passwd: /* unknown nullability */ Option[String],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.valuntil]] */
   valuntil: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgShadowRow.useconfig]] */
   useconfig: Option[Array[String]]
 )
 

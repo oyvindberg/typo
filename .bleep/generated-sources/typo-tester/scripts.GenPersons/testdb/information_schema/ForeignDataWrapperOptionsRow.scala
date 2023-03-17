@@ -6,7 +6,9 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignDataWrapperOptionsRow(
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignDataWrappersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
   optionName: /* unknown nullability */ Option[String],
   optionValue: /* unknown nullability */ Option[String]

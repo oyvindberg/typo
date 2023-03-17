@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class UserMappingOptionsRow(
+  /** Points to [[testdb.information_schema.PgUserMappingsRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String],
+  /** Points to [[testdb.information_schema.PgUserMappingsRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgUserMappingsRow.foreignServerName]] */
   foreignServerName: Option[String],
   optionName: /* unknown nullability */ Option[String],
   optionValue: /* unknown nullability */ Option[String]

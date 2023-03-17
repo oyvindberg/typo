@@ -6,16 +6,27 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatioUserTablesRow(
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.relid]] */
   relid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.heapBlksRead]] */
   heapBlksRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.heapBlksHit]] */
   heapBlksHit: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.idxBlksRead]] */
   idxBlksRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.idxBlksHit]] */
   idxBlksHit: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.toastBlksRead]] */
   toastBlksRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.toastBlksHit]] */
   toastBlksHit: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.tidxBlksRead]] */
   tidxBlksRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllTablesRow.tidxBlksHit]] */
   tidxBlksHit: Option[Long]
 )
 

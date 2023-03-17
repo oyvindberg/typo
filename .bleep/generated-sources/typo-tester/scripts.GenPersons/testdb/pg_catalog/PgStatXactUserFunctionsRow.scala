@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatXactUserFunctionsRow(
+  /** Points to [[testdb.pg_catalog.PgProcRow.oid]] */
   funcid: Long,
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgProcRow.proname]] */
   funcname: String,
   calls: /* unknown nullability */ Option[Long],
   totalTime: /* unknown nullability */ Option[Double],

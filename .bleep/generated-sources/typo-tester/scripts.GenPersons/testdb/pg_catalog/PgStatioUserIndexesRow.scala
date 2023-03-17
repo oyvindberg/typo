@@ -6,12 +6,19 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatioUserIndexesRow(
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.relid]] */
   relid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.indexrelid]] */
   indexrelid: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.relname]] */
   relname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.indexrelname]] */
   indexrelname: Option[String],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.idxBlksRead]] */
   idxBlksRead: Option[Long],
+  /** Points to [[testdb.pg_catalog.PgStatioAllIndexesRow.idxBlksHit]] */
   idxBlksHit: Option[Long]
 )
 

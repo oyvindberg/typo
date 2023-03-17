@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class AdministrableRoleAuthorizationsRow(
+  /** Points to [[testdb.information_schema.ApplicableRolesRow.grantee]] */
   grantee: Option[String],
+  /** Points to [[testdb.information_schema.ApplicableRolesRow.roleName]] */
   roleName: Option[String],
+  /** Points to [[testdb.information_schema.ApplicableRolesRow.isGrantable]] */
   isGrantable: Option[String]
 )
 

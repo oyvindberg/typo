@@ -6,9 +6,13 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgIndexesRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   indexname: String,
+  /** Points to [[testdb.pg_catalog.PgTablespaceRow.spcname]] */
   tablespace: String,
   indexdef: /* unknown nullability */ Option[String]
 )

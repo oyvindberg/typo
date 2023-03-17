@@ -6,12 +6,19 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatsRow(
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[testdb.pg_catalog.PgAttributeRow.attname]] */
   attname: String,
+  /** Points to [[testdb.pg_catalog.PgStatisticRow.stainherit]] */
   inherited: Boolean,
+  /** Points to [[testdb.pg_catalog.PgStatisticRow.stanullfrac]] */
   nullFrac: Float,
+  /** Points to [[testdb.pg_catalog.PgStatisticRow.stawidth]] */
   avgWidth: Int,
+  /** Points to [[testdb.pg_catalog.PgStatisticRow.stadistinct]] */
   nDistinct: Float,
   mostCommonVals: /* unknown nullability */ Option[/* anyarray */ String],
   mostCommonFreqs: /* unknown nullability */ Option[Array[Float]],

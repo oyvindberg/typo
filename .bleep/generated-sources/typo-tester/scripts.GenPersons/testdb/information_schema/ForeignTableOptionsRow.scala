@@ -6,8 +6,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class ForeignTableOptionsRow(
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String],
+  /** Points to [[testdb.information_schema.PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String],
   optionName: /* unknown nullability */ Option[String],
   optionValue: /* unknown nullability */ Option[String]

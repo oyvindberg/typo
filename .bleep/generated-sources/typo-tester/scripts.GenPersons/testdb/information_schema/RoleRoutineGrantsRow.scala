@@ -6,15 +6,25 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class RoleRoutineGrantsRow(
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.grantor]] */
   grantor: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.grantee]] */
   grantee: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.specificCatalog]] */
   specificCatalog: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.specificSchema]] */
   specificSchema: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.specificName]] */
   specificName: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.routineCatalog]] */
   routineCatalog: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.routineSchema]] */
   routineSchema: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.routineName]] */
   routineName: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.privilegeType]] */
   privilegeType: Option[String],
+  /** Points to [[testdb.information_schema.RoutinePrivilegesRow.isGrantable]] */
   isGrantable: Option[String]
 )
 

@@ -6,10 +6,15 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgStatAllIndexesRow(
+  /** Points to [[testdb.pg_catalog.PgClassRow.oid]] */
   relid: Long,
+  /** Points to [[testdb.pg_catalog.PgClassRow.oid]] */
   indexrelid: Long,
+  /** Points to [[testdb.pg_catalog.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   relname: String,
+  /** Points to [[testdb.pg_catalog.PgClassRow.relname]] */
   indexrelname: String,
   idxScan: /* unknown nullability */ Option[Long],
   idxTupRead: /* unknown nullability */ Option[Long],

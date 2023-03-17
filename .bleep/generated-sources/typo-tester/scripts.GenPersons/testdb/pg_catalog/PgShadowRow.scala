@@ -7,14 +7,23 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
 case class PgShadowRow(
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolname]] */
   usename: String,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.oid]] */
   usesysid: Long,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolcreatedb]] */
   usecreatedb: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolsuper]] */
   usesuper: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolreplication]] */
   userepl: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolbypassrls]] */
   usebypassrls: Boolean,
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolpassword]] */
   passwd: Option[String],
+  /** Points to [[testdb.pg_catalog.PgAuthidRow.rolvaliduntil]] */
   valuntil: Option[LocalDateTime],
+  /** Points to [[testdb.pg_catalog.PgDbRoleSettingRow.setconfig]] */
   useconfig: Option[Array[String]]
 )
 
