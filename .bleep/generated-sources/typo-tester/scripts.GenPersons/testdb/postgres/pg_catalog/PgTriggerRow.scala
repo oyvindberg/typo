@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTriggerRow(
-  oid: Long,
+  oid: PgTriggerId,
   tgrelid: Long,
   tgparentid: Long,
   tgname: String,
@@ -37,7 +37,7 @@ object PgTriggerRow {
   implicit val rowParser: RowParser[PgTriggerRow] = { row =>
     Success(
       PgTriggerRow(
-        oid = row[Long]("oid"),
+        oid = row[PgTriggerId]("oid"),
         tgrelid = row[Long]("tgrelid"),
         tgparentid = row[Long]("tgparentid"),
         tgname = row[String]("tgname"),
@@ -88,7 +88,7 @@ object PgTriggerRow {
       JsResult.fromTry(
         Try(
           PgTriggerRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgTriggerId],
             tgrelid = json.\("tgrelid").as[Long],
             tgparentid = json.\("tgparentid").as[Long],
             tgname = json.\("tgname").as[String],

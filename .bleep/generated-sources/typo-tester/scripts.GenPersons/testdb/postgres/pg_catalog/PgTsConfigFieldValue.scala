@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgTsConfigFieldValue[T](val name: String, val value: T)
 
 object PgTsConfigFieldValue {
-  case class oid(override val value: Long) extends PgTsConfigFieldValue("oid", value)
+  case class oid(override val value: PgTsConfigId) extends PgTsConfigFieldValue("oid", value)
   case class cfgname(override val value: String) extends PgTsConfigFieldValue("cfgname", value)
   case class cfgnamespace(override val value: Long) extends PgTsConfigFieldValue("cfgnamespace", value)
   case class cfgowner(override val value: Long) extends PgTsConfigFieldValue("cfgowner", value)

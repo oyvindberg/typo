@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgTypeFieldValue[T](val name: String, val value: T)
 
 object PgTypeFieldValue {
-  case class oid(override val value: Long) extends PgTypeFieldValue("oid", value)
+  case class oid(override val value: PgTypeId) extends PgTypeFieldValue("oid", value)
   case class typname(override val value: String) extends PgTypeFieldValue("typname", value)
   case class typnamespace(override val value: Long) extends PgTypeFieldValue("typnamespace", value)
   case class typowner(override val value: Long) extends PgTypeFieldValue("typowner", value)

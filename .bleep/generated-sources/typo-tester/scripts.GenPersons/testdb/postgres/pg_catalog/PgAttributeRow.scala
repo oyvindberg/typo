@@ -38,7 +38,9 @@ case class PgAttributeRow(
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
   attmissingval: Option[String]
-)
+){
+  val attrelidAndAttnum: PgAttributeId = PgAttributeId(attrelid, attnum)
+}
 
 object PgAttributeRow {
   implicit val rowParser: RowParser[PgAttributeRow] = { row =>

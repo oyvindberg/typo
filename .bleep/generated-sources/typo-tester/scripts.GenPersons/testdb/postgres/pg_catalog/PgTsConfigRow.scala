@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTsConfigRow(
-  oid: Long,
+  oid: PgTsConfigId,
   cfgname: String,
   cfgnamespace: Long,
   cfgowner: Long,
@@ -23,7 +23,7 @@ object PgTsConfigRow {
   implicit val rowParser: RowParser[PgTsConfigRow] = { row =>
     Success(
       PgTsConfigRow(
-        oid = row[Long]("oid"),
+        oid = row[PgTsConfigId]("oid"),
         cfgname = row[String]("cfgname"),
         cfgnamespace = row[Long]("cfgnamespace"),
         cfgowner = row[Long]("cfgowner"),
@@ -46,7 +46,7 @@ object PgTsConfigRow {
       JsResult.fromTry(
         Try(
           PgTsConfigRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgTsConfigId],
             cfgname = json.\("cfgname").as[String],
             cfgnamespace = json.\("cfgnamespace").as[Long],
             cfgowner = json.\("cfgowner").as[Long],

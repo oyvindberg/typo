@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSequenceRow(
-  seqrelid: Long,
+  seqrelid: PgSequenceId,
   seqtypid: Long,
   seqstart: Long,
   seqincrement: Long,
@@ -26,7 +26,7 @@ object PgSequenceRow {
   implicit val rowParser: RowParser[PgSequenceRow] = { row =>
     Success(
       PgSequenceRow(
-        seqrelid = row[Long]("seqrelid"),
+        seqrelid = row[PgSequenceId]("seqrelid"),
         seqtypid = row[Long]("seqtypid"),
         seqstart = row[Long]("seqstart"),
         seqincrement = row[Long]("seqincrement"),
@@ -55,7 +55,7 @@ object PgSequenceRow {
       JsResult.fromTry(
         Try(
           PgSequenceRow(
-            seqrelid = json.\("seqrelid").as[Long],
+            seqrelid = json.\("seqrelid").as[PgSequenceId],
             seqtypid = json.\("seqtypid").as[Long],
             seqstart = json.\("seqstart").as[Long],
             seqincrement = json.\("seqincrement").as[Long],

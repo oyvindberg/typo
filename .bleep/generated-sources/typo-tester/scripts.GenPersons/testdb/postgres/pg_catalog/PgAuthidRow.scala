@@ -13,7 +13,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAuthidRow(
-  oid: Long,
+  oid: PgAuthidId,
   rolname: String,
   rolsuper: Boolean,
   rolinherit: Boolean,
@@ -31,7 +31,7 @@ object PgAuthidRow {
   implicit val rowParser: RowParser[PgAuthidRow] = { row =>
     Success(
       PgAuthidRow(
-        oid = row[Long]("oid"),
+        oid = row[PgAuthidId]("oid"),
         rolname = row[String]("rolname"),
         rolsuper = row[Boolean]("rolsuper"),
         rolinherit = row[Boolean]("rolinherit"),
@@ -68,7 +68,7 @@ object PgAuthidRow {
       JsResult.fromTry(
         Try(
           PgAuthidRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgAuthidId],
             rolname = json.\("rolname").as[String],
             rolsuper = json.\("rolsuper").as[Boolean],
             rolinherit = json.\("rolinherit").as[Boolean],

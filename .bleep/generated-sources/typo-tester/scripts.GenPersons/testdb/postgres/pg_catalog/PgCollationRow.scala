@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgCollationRow(
-  oid: Long,
+  oid: PgCollationId,
   collname: String,
   collnamespace: Long,
   collowner: Long,
@@ -28,7 +28,7 @@ object PgCollationRow {
   implicit val rowParser: RowParser[PgCollationRow] = { row =>
     Success(
       PgCollationRow(
-        oid = row[Long]("oid"),
+        oid = row[PgCollationId]("oid"),
         collname = row[String]("collname"),
         collnamespace = row[Long]("collnamespace"),
         collowner = row[Long]("collowner"),
@@ -61,7 +61,7 @@ object PgCollationRow {
       JsResult.fromTry(
         Try(
           PgCollationRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgCollationId],
             collname = json.\("collname").as[String],
             collnamespace = json.\("collnamespace").as[Long],
             collowner = json.\("collowner").as[Long],

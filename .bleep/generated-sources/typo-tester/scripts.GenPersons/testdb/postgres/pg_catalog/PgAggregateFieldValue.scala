@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgAggregateFieldValue[T](val name: String, val value: T)
 
 object PgAggregateFieldValue {
-  case class aggfnoid(override val value: String) extends PgAggregateFieldValue("aggfnoid", value)
+  case class aggfnoid(override val value: PgAggregateId) extends PgAggregateFieldValue("aggfnoid", value)
   case class aggkind(override val value: String) extends PgAggregateFieldValue("aggkind", value)
   case class aggnumdirectargs(override val value: Short) extends PgAggregateFieldValue("aggnumdirectargs", value)
   case class aggtransfn(override val value: String) extends PgAggregateFieldValue("aggtransfn", value)

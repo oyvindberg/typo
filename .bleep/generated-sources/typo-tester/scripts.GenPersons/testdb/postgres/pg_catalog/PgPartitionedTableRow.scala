@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPartitionedTableRow(
-  partrelid: Long,
+  partrelid: PgPartitionedTableId,
   partstrat: String,
   partnatts: Short,
   partdefid: Long,
@@ -26,7 +26,7 @@ object PgPartitionedTableRow {
   implicit val rowParser: RowParser[PgPartitionedTableRow] = { row =>
     Success(
       PgPartitionedTableRow(
-        partrelid = row[Long]("partrelid"),
+        partrelid = row[PgPartitionedTableId]("partrelid"),
         partstrat = row[String]("partstrat"),
         partnatts = row[Short]("partnatts"),
         partdefid = row[Long]("partdefid"),
@@ -55,7 +55,7 @@ object PgPartitionedTableRow {
       JsResult.fromTry(
         Try(
           PgPartitionedTableRow(
-            partrelid = json.\("partrelid").as[Long],
+            partrelid = json.\("partrelid").as[PgPartitionedTableId],
             partstrat = json.\("partstrat").as[String],
             partnatts = json.\("partnatts").as[Short],
             partdefid = json.\("partdefid").as[Long],

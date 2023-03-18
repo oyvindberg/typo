@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgExtensionFieldValue[T](val name: String, val value: T)
 
 object PgExtensionFieldValue {
-  case class oid(override val value: Long) extends PgExtensionFieldValue("oid", value)
+  case class oid(override val value: PgExtensionId) extends PgExtensionFieldValue("oid", value)
   case class extname(override val value: String) extends PgExtensionFieldValue("extname", value)
   case class extowner(override val value: Long) extends PgExtensionFieldValue("extowner", value)
   case class extnamespace(override val value: Long) extends PgExtensionFieldValue("extnamespace", value)

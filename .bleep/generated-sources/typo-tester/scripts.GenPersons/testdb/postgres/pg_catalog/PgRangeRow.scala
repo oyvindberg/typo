@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRangeRow(
-  rngtypid: Long,
+  rngtypid: PgRangeId,
   rngsubtype: Long,
   rngmultitypid: Long,
   rngcollation: Long,
@@ -25,7 +25,7 @@ object PgRangeRow {
   implicit val rowParser: RowParser[PgRangeRow] = { row =>
     Success(
       PgRangeRow(
-        rngtypid = row[Long]("rngtypid"),
+        rngtypid = row[PgRangeId]("rngtypid"),
         rngsubtype = row[Long]("rngsubtype"),
         rngmultitypid = row[Long]("rngmultitypid"),
         rngcollation = row[Long]("rngcollation"),
@@ -52,7 +52,7 @@ object PgRangeRow {
       JsResult.fromTry(
         Try(
           PgRangeRow(
-            rngtypid = json.\("rngtypid").as[Long],
+            rngtypid = json.\("rngtypid").as[PgRangeId],
             rngsubtype = json.\("rngsubtype").as[Long],
             rngmultitypid = json.\("rngmultitypid").as[Long],
             rngcollation = json.\("rngcollation").as[Long],

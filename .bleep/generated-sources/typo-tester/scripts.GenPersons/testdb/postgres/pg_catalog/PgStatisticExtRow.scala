@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatisticExtRow(
-  oid: Long,
+  oid: PgStatisticExtId,
   stxrelid: Long,
   stxname: String,
   stxnamespace: Long,
@@ -27,7 +27,7 @@ object PgStatisticExtRow {
   implicit val rowParser: RowParser[PgStatisticExtRow] = { row =>
     Success(
       PgStatisticExtRow(
-        oid = row[Long]("oid"),
+        oid = row[PgStatisticExtId]("oid"),
         stxrelid = row[Long]("stxrelid"),
         stxname = row[String]("stxname"),
         stxnamespace = row[Long]("stxnamespace"),
@@ -58,7 +58,7 @@ object PgStatisticExtRow {
       JsResult.fromTry(
         Try(
           PgStatisticExtRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgStatisticExtId],
             stxrelid = json.\("stxrelid").as[Long],
             stxname = json.\("stxname").as[String],
             stxnamespace = json.\("stxnamespace").as[Long],

@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSubscriptionRow(
-  oid: Long,
+  oid: PgSubscriptionId,
   subdbid: Long,
   subname: String,
   subowner: Long,
@@ -29,7 +29,7 @@ object PgSubscriptionRow {
   implicit val rowParser: RowParser[PgSubscriptionRow] = { row =>
     Success(
       PgSubscriptionRow(
-        oid = row[Long]("oid"),
+        oid = row[PgSubscriptionId]("oid"),
         subdbid = row[Long]("subdbid"),
         subname = row[String]("subname"),
         subowner = row[Long]("subowner"),
@@ -64,7 +64,7 @@ object PgSubscriptionRow {
       JsResult.fromTry(
         Try(
           PgSubscriptionRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgSubscriptionId],
             subdbid = json.\("subdbid").as[Long],
             subname = json.\("subname").as[String],
             subowner = json.\("subowner").as[Long],

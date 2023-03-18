@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgConstraintFieldValue[T](val name: String, val value: T)
 
 object PgConstraintFieldValue {
-  case class oid(override val value: Long) extends PgConstraintFieldValue("oid", value)
+  case class oid(override val value: PgConstraintId) extends PgConstraintFieldValue("oid", value)
   case class conname(override val value: String) extends PgConstraintFieldValue("conname", value)
   case class connamespace(override val value: Long) extends PgConstraintFieldValue("connamespace", value)
   case class contype(override val value: String) extends PgConstraintFieldValue("contype", value)

@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgTriggerFieldValue[T](val name: String, val value: T)
 
 object PgTriggerFieldValue {
-  case class oid(override val value: Long) extends PgTriggerFieldValue("oid", value)
+  case class oid(override val value: PgTriggerId) extends PgTriggerFieldValue("oid", value)
   case class tgrelid(override val value: Long) extends PgTriggerFieldValue("tgrelid", value)
   case class tgparentid(override val value: Long) extends PgTriggerFieldValue("tgparentid", value)
   case class tgname(override val value: String) extends PgTriggerFieldValue("tgname", value)

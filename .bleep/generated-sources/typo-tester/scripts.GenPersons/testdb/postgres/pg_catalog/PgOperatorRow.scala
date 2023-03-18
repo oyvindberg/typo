@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgOperatorRow(
-  oid: Long,
+  oid: PgOperatorId,
   oprname: String,
   oprnamespace: Long,
   oprowner: Long,
@@ -33,7 +33,7 @@ object PgOperatorRow {
   implicit val rowParser: RowParser[PgOperatorRow] = { row =>
     Success(
       PgOperatorRow(
-        oid = row[Long]("oid"),
+        oid = row[PgOperatorId]("oid"),
         oprname = row[String]("oprname"),
         oprnamespace = row[Long]("oprnamespace"),
         oprowner = row[Long]("oprowner"),
@@ -76,7 +76,7 @@ object PgOperatorRow {
       JsResult.fromTry(
         Try(
           PgOperatorRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgOperatorId],
             oprname = json.\("oprname").as[String],
             oprnamespace = json.\("oprnamespace").as[Long],
             oprowner = json.\("oprowner").as[Long],

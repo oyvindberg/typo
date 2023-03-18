@@ -16,7 +16,9 @@ case class PgAuthMembersRow(
   member: Long,
   grantor: Long,
   adminOption: Boolean
-)
+){
+  val roleidAndMember: PgAuthMembersId = PgAuthMembersId(roleid, member)
+}
 
 object PgAuthMembersRow {
   implicit val rowParser: RowParser[PgAuthMembersRow] = { row =>

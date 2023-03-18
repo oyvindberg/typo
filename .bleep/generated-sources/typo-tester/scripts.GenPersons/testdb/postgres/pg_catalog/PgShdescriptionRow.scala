@@ -15,7 +15,9 @@ case class PgShdescriptionRow(
   objoid: Long,
   classoid: Long,
   description: String
-)
+){
+  val objoidAndClassoid: PgShdescriptionId = PgShdescriptionId(objoid, classoid)
+}
 
 object PgShdescriptionRow {
   implicit val rowParser: RowParser[PgShdescriptionRow] = { row =>

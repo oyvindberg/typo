@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgTsParserFieldValue[T](val name: String, val value: T)
 
 object PgTsParserFieldValue {
-  case class oid(override val value: Long) extends PgTsParserFieldValue("oid", value)
+  case class oid(override val value: PgTsParserId) extends PgTsParserFieldValue("oid", value)
   case class prsname(override val value: String) extends PgTsParserFieldValue("prsname", value)
   case class prsnamespace(override val value: Long) extends PgTsParserFieldValue("prsnamespace", value)
   case class prsstart(override val value: String) extends PgTsParserFieldValue("prsstart", value)

@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgTsDictFieldValue[T](val name: String, val value: T)
 
 object PgTsDictFieldValue {
-  case class oid(override val value: Long) extends PgTsDictFieldValue("oid", value)
+  case class oid(override val value: PgTsDictId) extends PgTsDictFieldValue("oid", value)
   case class dictname(override val value: String) extends PgTsDictFieldValue("dictname", value)
   case class dictnamespace(override val value: Long) extends PgTsDictFieldValue("dictnamespace", value)
   case class dictowner(override val value: Long) extends PgTsDictFieldValue("dictowner", value)

@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLargeobjectMetadataRow(
-  oid: Long,
+  oid: PgLargeobjectMetadataId,
   lomowner: Long,
   lomacl: Option[Array[String]]
 )
@@ -21,7 +21,7 @@ object PgLargeobjectMetadataRow {
   implicit val rowParser: RowParser[PgLargeobjectMetadataRow] = { row =>
     Success(
       PgLargeobjectMetadataRow(
-        oid = row[Long]("oid"),
+        oid = row[PgLargeobjectMetadataId]("oid"),
         lomowner = row[Long]("lomowner"),
         lomacl = row[Option[Array[String]]]("lomacl")
       )
@@ -40,7 +40,7 @@ object PgLargeobjectMetadataRow {
       JsResult.fromTry(
         Try(
           PgLargeobjectMetadataRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgLargeobjectMetadataId],
             lomowner = json.\("lomowner").as[Long],
             lomacl = json.\("lomacl").toOption.map(_.as[Array[String]])
           )

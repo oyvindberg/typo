@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgProcRow(
-  oid: Long,
+  oid: PgProcId,
   proname: String,
   pronamespace: Long,
   proowner: Long,
@@ -48,7 +48,7 @@ object PgProcRow {
   implicit val rowParser: RowParser[PgProcRow] = { row =>
     Success(
       PgProcRow(
-        oid = row[Long]("oid"),
+        oid = row[PgProcId]("oid"),
         proname = row[String]("proname"),
         pronamespace = row[Long]("pronamespace"),
         proowner = row[Long]("proowner"),
@@ -121,7 +121,7 @@ object PgProcRow {
       JsResult.fromTry(
         Try(
           PgProcRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgProcId],
             proname = json.\("proname").as[String],
             pronamespace = json.\("pronamespace").as[Long],
             proowner = json.\("proowner").as[Long],

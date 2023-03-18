@@ -16,7 +16,9 @@ case class PgTsConfigMapRow(
   maptokentype: Int,
   mapseqno: Int,
   mapdict: Long
-)
+){
+  val mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId = PgTsConfigMapId(mapcfg, maptokentype, mapseqno)
+}
 
 object PgTsConfigMapRow {
   implicit val rowParser: RowParser[PgTsConfigMapRow] = { row =>

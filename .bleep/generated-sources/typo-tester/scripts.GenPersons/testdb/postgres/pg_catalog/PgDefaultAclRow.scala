@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgDefaultAclRow(
-  oid: Long,
+  oid: PgDefaultAclId,
   defaclrole: Long,
   defaclnamespace: Long,
   defaclobjtype: String,
@@ -23,7 +23,7 @@ object PgDefaultAclRow {
   implicit val rowParser: RowParser[PgDefaultAclRow] = { row =>
     Success(
       PgDefaultAclRow(
-        oid = row[Long]("oid"),
+        oid = row[PgDefaultAclId]("oid"),
         defaclrole = row[Long]("defaclrole"),
         defaclnamespace = row[Long]("defaclnamespace"),
         defaclobjtype = row[String]("defaclobjtype"),
@@ -46,7 +46,7 @@ object PgDefaultAclRow {
       JsResult.fromTry(
         Try(
           PgDefaultAclRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgDefaultAclId],
             defaclrole = json.\("defaclrole").as[Long],
             defaclnamespace = json.\("defaclnamespace").as[Long],
             defaclobjtype = json.\("defaclobjtype").as[String],

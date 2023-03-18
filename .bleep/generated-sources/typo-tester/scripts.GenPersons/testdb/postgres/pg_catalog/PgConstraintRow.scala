@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgConstraintRow(
-  oid: Long,
+  oid: PgConstraintId,
   conname: String,
   connamespace: Long,
   contype: String,
@@ -43,7 +43,7 @@ object PgConstraintRow {
   implicit val rowParser: RowParser[PgConstraintRow] = { row =>
     Success(
       PgConstraintRow(
-        oid = row[Long]("oid"),
+        oid = row[PgConstraintId]("oid"),
         conname = row[String]("conname"),
         connamespace = row[Long]("connamespace"),
         contype = row[String]("contype"),
@@ -106,7 +106,7 @@ object PgConstraintRow {
       JsResult.fromTry(
         Try(
           PgConstraintRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgConstraintId],
             conname = json.\("conname").as[String],
             connamespace = json.\("connamespace").as[Long],
             contype = json.\("contype").as[String],

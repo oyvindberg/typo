@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgOperatorFieldValue[T](val name: String, val value: T)
 
 object PgOperatorFieldValue {
-  case class oid(override val value: Long) extends PgOperatorFieldValue("oid", value)
+  case class oid(override val value: PgOperatorId) extends PgOperatorFieldValue("oid", value)
   case class oprname(override val value: String) extends PgOperatorFieldValue("oprname", value)
   case class oprnamespace(override val value: Long) extends PgOperatorFieldValue("oprnamespace", value)
   case class oprowner(override val value: Long) extends PgOperatorFieldValue("oprowner", value)

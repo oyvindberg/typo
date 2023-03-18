@@ -7,7 +7,7 @@ import java.time.ZonedDateTime
 sealed abstract class PgAuthidFieldValue[T](val name: String, val value: T)
 
 object PgAuthidFieldValue {
-  case class oid(override val value: Long) extends PgAuthidFieldValue("oid", value)
+  case class oid(override val value: PgAuthidId) extends PgAuthidFieldValue("oid", value)
   case class rolname(override val value: String) extends PgAuthidFieldValue("rolname", value)
   case class rolsuper(override val value: Boolean) extends PgAuthidFieldValue("rolsuper", value)
   case class rolinherit(override val value: Boolean) extends PgAuthidFieldValue("rolinherit", value)

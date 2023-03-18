@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignTableRow(
-  ftrelid: Long,
+  ftrelid: PgForeignTableId,
   ftserver: Long,
   ftoptions: Option[Array[String]]
 )
@@ -21,7 +21,7 @@ object PgForeignTableRow {
   implicit val rowParser: RowParser[PgForeignTableRow] = { row =>
     Success(
       PgForeignTableRow(
-        ftrelid = row[Long]("ftrelid"),
+        ftrelid = row[PgForeignTableId]("ftrelid"),
         ftserver = row[Long]("ftserver"),
         ftoptions = row[Option[Array[String]]]("ftoptions")
       )
@@ -40,7 +40,7 @@ object PgForeignTableRow {
       JsResult.fromTry(
         Try(
           PgForeignTableRow(
-            ftrelid = json.\("ftrelid").as[Long],
+            ftrelid = json.\("ftrelid").as[PgForeignTableId],
             ftserver = json.\("ftserver").as[Long],
             ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]])
           )

@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTransformRow(
-  oid: Long,
+  oid: PgTransformId,
   trftype: Long,
   trflang: Long,
   trffromsql: String,
@@ -23,7 +23,7 @@ object PgTransformRow {
   implicit val rowParser: RowParser[PgTransformRow] = { row =>
     Success(
       PgTransformRow(
-        oid = row[Long]("oid"),
+        oid = row[PgTransformId]("oid"),
         trftype = row[Long]("trftype"),
         trflang = row[Long]("trflang"),
         trffromsql = row[String]("trffromsql"),
@@ -46,7 +46,7 @@ object PgTransformRow {
       JsResult.fromTry(
         Try(
           PgTransformRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgTransformId],
             trftype = json.\("trftype").as[Long],
             trflang = json.\("trflang").as[Long],
             trffromsql = json.\("trffromsql").as[String],

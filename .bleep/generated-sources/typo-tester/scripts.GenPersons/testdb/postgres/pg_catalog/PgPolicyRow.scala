@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPolicyRow(
-  oid: Long,
+  oid: PgPolicyId,
   polname: String,
   polrelid: Long,
   polcmd: String,
@@ -26,7 +26,7 @@ object PgPolicyRow {
   implicit val rowParser: RowParser[PgPolicyRow] = { row =>
     Success(
       PgPolicyRow(
-        oid = row[Long]("oid"),
+        oid = row[PgPolicyId]("oid"),
         polname = row[String]("polname"),
         polrelid = row[Long]("polrelid"),
         polcmd = row[String]("polcmd"),
@@ -55,7 +55,7 @@ object PgPolicyRow {
       JsResult.fromTry(
         Try(
           PgPolicyRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgPolicyId],
             polname = json.\("polname").as[String],
             polrelid = json.\("polrelid").as[Long],
             polcmd = json.\("polcmd").as[String],

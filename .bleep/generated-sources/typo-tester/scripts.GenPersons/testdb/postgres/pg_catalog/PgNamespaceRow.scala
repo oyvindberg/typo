@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgNamespaceRow(
-  oid: Long,
+  oid: PgNamespaceId,
   nspname: String,
   nspowner: Long,
   nspacl: Option[Array[String]]
@@ -22,7 +22,7 @@ object PgNamespaceRow {
   implicit val rowParser: RowParser[PgNamespaceRow] = { row =>
     Success(
       PgNamespaceRow(
-        oid = row[Long]("oid"),
+        oid = row[PgNamespaceId]("oid"),
         nspname = row[String]("nspname"),
         nspowner = row[Long]("nspowner"),
         nspacl = row[Option[Array[String]]]("nspacl")
@@ -43,7 +43,7 @@ object PgNamespaceRow {
       JsResult.fromTry(
         Try(
           PgNamespaceRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgNamespaceId],
             nspname = json.\("nspname").as[String],
             nspowner = json.\("nspowner").as[Long],
             nspacl = json.\("nspacl").toOption.map(_.as[Array[String]])

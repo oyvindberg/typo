@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRewriteRow(
-  oid: Long,
+  oid: PgRewriteId,
   rulename: String,
   evClass: Long,
   evType: String,
@@ -26,7 +26,7 @@ object PgRewriteRow {
   implicit val rowParser: RowParser[PgRewriteRow] = { row =>
     Success(
       PgRewriteRow(
-        oid = row[Long]("oid"),
+        oid = row[PgRewriteId]("oid"),
         rulename = row[String]("rulename"),
         evClass = row[Long]("ev_class"),
         evType = row[String]("ev_type"),
@@ -55,7 +55,7 @@ object PgRewriteRow {
       JsResult.fromTry(
         Try(
           PgRewriteRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgRewriteId],
             rulename = json.\("rulename").as[String],
             evClass = json.\("ev_class").as[Long],
             evType = json.\("ev_type").as[String],

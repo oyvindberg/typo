@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAggregateRow(
-  aggfnoid: String,
+  aggfnoid: PgAggregateId,
   aggkind: String,
   aggnumdirectargs: Short,
   aggtransfn: String,
@@ -40,7 +40,7 @@ object PgAggregateRow {
   implicit val rowParser: RowParser[PgAggregateRow] = { row =>
     Success(
       PgAggregateRow(
-        aggfnoid = row[String]("aggfnoid"),
+        aggfnoid = row[PgAggregateId]("aggfnoid"),
         aggkind = row[String]("aggkind"),
         aggnumdirectargs = row[Short]("aggnumdirectargs"),
         aggtransfn = row[String]("aggtransfn"),
@@ -97,7 +97,7 @@ object PgAggregateRow {
       JsResult.fromTry(
         Try(
           PgAggregateRow(
-            aggfnoid = json.\("aggfnoid").as[String],
+            aggfnoid = json.\("aggfnoid").as[PgAggregateId],
             aggkind = json.\("aggkind").as[String],
             aggnumdirectargs = json.\("aggnumdirectargs").as[Short],
             aggtransfn = json.\("aggtransfn").as[String],

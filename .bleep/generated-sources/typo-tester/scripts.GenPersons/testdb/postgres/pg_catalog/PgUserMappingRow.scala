@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingRow(
-  oid: Long,
+  oid: PgUserMappingId,
   umuser: Long,
   umserver: Long,
   umoptions: Option[Array[String]]
@@ -22,7 +22,7 @@ object PgUserMappingRow {
   implicit val rowParser: RowParser[PgUserMappingRow] = { row =>
     Success(
       PgUserMappingRow(
-        oid = row[Long]("oid"),
+        oid = row[PgUserMappingId]("oid"),
         umuser = row[Long]("umuser"),
         umserver = row[Long]("umserver"),
         umoptions = row[Option[Array[String]]]("umoptions")
@@ -43,7 +43,7 @@ object PgUserMappingRow {
       JsResult.fromTry(
         Try(
           PgUserMappingRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgUserMappingId],
             umuser = json.\("umuser").as[Long],
             umserver = json.\("umserver").as[Long],
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])

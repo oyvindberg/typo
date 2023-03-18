@@ -16,7 +16,9 @@ case class PgInheritsRow(
   inhparent: Long,
   inhseqno: Int,
   inhdetachpending: Boolean
-)
+){
+  val inhrelidAndInhseqno: PgInheritsId = PgInheritsId(inhrelid, inhseqno)
+}
 
 object PgInheritsRow {
   implicit val rowParser: RowParser[PgInheritsRow] = { row =>

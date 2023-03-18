@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLanguageRow(
-  oid: Long,
+  oid: PgLanguageId,
   lanname: String,
   lanowner: Long,
   lanispl: Boolean,
@@ -27,7 +27,7 @@ object PgLanguageRow {
   implicit val rowParser: RowParser[PgLanguageRow] = { row =>
     Success(
       PgLanguageRow(
-        oid = row[Long]("oid"),
+        oid = row[PgLanguageId]("oid"),
         lanname = row[String]("lanname"),
         lanowner = row[Long]("lanowner"),
         lanispl = row[Boolean]("lanispl"),
@@ -58,7 +58,7 @@ object PgLanguageRow {
       JsResult.fromTry(
         Try(
           PgLanguageRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgLanguageId],
             lanname = json.\("lanname").as[String],
             lanowner = json.\("lanowner").as[Long],
             lanispl = json.\("lanispl").as[Boolean],

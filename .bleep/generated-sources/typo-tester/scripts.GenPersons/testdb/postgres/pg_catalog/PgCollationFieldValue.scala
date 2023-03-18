@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgCollationFieldValue[T](val name: String, val value: T)
 
 object PgCollationFieldValue {
-  case class oid(override val value: Long) extends PgCollationFieldValue("oid", value)
+  case class oid(override val value: PgCollationId) extends PgCollationFieldValue("oid", value)
   case class collname(override val value: String) extends PgCollationFieldValue("collname", value)
   case class collnamespace(override val value: Long) extends PgCollationFieldValue("collnamespace", value)
   case class collowner(override val value: Long) extends PgCollationFieldValue("collowner", value)

@@ -17,7 +17,9 @@ case class PgInitPrivsRow(
   objsubid: Int,
   privtype: String,
   initprivs: Array[String]
-)
+){
+  val objoidAndClassoidAndObjsubid: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
+}
 
 object PgInitPrivsRow {
   implicit val rowParser: RowParser[PgInitPrivsRow] = { row =>

@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgEventTriggerRow(
-  oid: Long,
+  oid: PgEventTriggerId,
   evtname: String,
   evtevent: String,
   evtowner: Long,
@@ -25,7 +25,7 @@ object PgEventTriggerRow {
   implicit val rowParser: RowParser[PgEventTriggerRow] = { row =>
     Success(
       PgEventTriggerRow(
-        oid = row[Long]("oid"),
+        oid = row[PgEventTriggerId]("oid"),
         evtname = row[String]("evtname"),
         evtevent = row[String]("evtevent"),
         evtowner = row[Long]("evtowner"),
@@ -52,7 +52,7 @@ object PgEventTriggerRow {
       JsResult.fromTry(
         Try(
           PgEventTriggerRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgEventTriggerId],
             evtname = json.\("evtname").as[String],
             evtevent = json.\("evtevent").as[String],
             evtowner = json.\("evtowner").as[Long],

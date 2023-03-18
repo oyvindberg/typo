@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgIndexFieldValue[T](val name: String, val value: T)
 
 object PgIndexFieldValue {
-  case class indexrelid(override val value: Long) extends PgIndexFieldValue("indexrelid", value)
+  case class indexrelid(override val value: PgIndexId) extends PgIndexFieldValue("indexrelid", value)
   case class indrelid(override val value: Long) extends PgIndexFieldValue("indrelid", value)
   case class indnatts(override val value: Short) extends PgIndexFieldValue("indnatts", value)
   case class indnkeyatts(override val value: Short) extends PgIndexFieldValue("indnkeyatts", value)

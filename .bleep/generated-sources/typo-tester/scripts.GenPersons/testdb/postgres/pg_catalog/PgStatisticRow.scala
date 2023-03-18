@@ -43,7 +43,9 @@ case class PgStatisticRow(
   stavalues3: Option[String],
   stavalues4: Option[String],
   stavalues5: Option[String]
-)
+){
+  val starelidAndStaattnumAndStainherit: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
+}
 
 object PgStatisticRow {
   implicit val rowParser: RowParser[PgStatisticRow] = { row =>

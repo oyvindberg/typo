@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignDataWrapperRow(
-  oid: Long,
+  oid: PgForeignDataWrapperId,
   fdwname: String,
   fdwowner: Long,
   fdwhandler: Long,
@@ -25,7 +25,7 @@ object PgForeignDataWrapperRow {
   implicit val rowParser: RowParser[PgForeignDataWrapperRow] = { row =>
     Success(
       PgForeignDataWrapperRow(
-        oid = row[Long]("oid"),
+        oid = row[PgForeignDataWrapperId]("oid"),
         fdwname = row[String]("fdwname"),
         fdwowner = row[Long]("fdwowner"),
         fdwhandler = row[Long]("fdwhandler"),
@@ -52,7 +52,7 @@ object PgForeignDataWrapperRow {
       JsResult.fromTry(
         Try(
           PgForeignDataWrapperRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgForeignDataWrapperId],
             fdwname = json.\("fdwname").as[String],
             fdwowner = json.\("fdwowner").as[Long],
             fdwhandler = json.\("fdwhandler").as[Long],

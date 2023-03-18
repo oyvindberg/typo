@@ -17,7 +17,9 @@ case class PgSeclabelRow(
   objsubid: Int,
   provider: String,
   label: String
-)
+){
+  val objoidAndClassoidAndObjsubidAndProvider: PgSeclabelId = PgSeclabelId(objoid, classoid, objsubid, provider)
+}
 
 object PgSeclabelRow {
   implicit val rowParser: RowParser[PgSeclabelRow] = { row =>

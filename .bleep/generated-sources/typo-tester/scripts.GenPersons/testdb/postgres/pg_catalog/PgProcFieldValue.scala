@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgProcFieldValue[T](val name: String, val value: T)
 
 object PgProcFieldValue {
-  case class oid(override val value: Long) extends PgProcFieldValue("oid", value)
+  case class oid(override val value: PgProcId) extends PgProcFieldValue("oid", value)
   case class proname(override val value: String) extends PgProcFieldValue("proname", value)
   case class pronamespace(override val value: Long) extends PgProcFieldValue("pronamespace", value)
   case class proowner(override val value: Long) extends PgProcFieldValue("proowner", value)

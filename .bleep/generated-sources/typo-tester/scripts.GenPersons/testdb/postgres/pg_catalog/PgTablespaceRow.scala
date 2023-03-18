@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTablespaceRow(
-  oid: Long,
+  oid: PgTablespaceId,
   spcname: String,
   spcowner: Long,
   spcacl: Option[Array[String]],
@@ -23,7 +23,7 @@ object PgTablespaceRow {
   implicit val rowParser: RowParser[PgTablespaceRow] = { row =>
     Success(
       PgTablespaceRow(
-        oid = row[Long]("oid"),
+        oid = row[PgTablespaceId]("oid"),
         spcname = row[String]("spcname"),
         spcowner = row[Long]("spcowner"),
         spcacl = row[Option[Array[String]]]("spcacl"),
@@ -46,7 +46,7 @@ object PgTablespaceRow {
       JsResult.fromTry(
         Try(
           PgTablespaceRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgTablespaceId],
             spcname = json.\("spcname").as[String],
             spcowner = json.\("spcowner").as[Long],
             spcacl = json.\("spcacl").toOption.map(_.as[Array[String]]),

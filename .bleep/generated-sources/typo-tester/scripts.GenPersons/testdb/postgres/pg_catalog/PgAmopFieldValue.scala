@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgAmopFieldValue[T](val name: String, val value: T)
 
 object PgAmopFieldValue {
-  case class oid(override val value: Long) extends PgAmopFieldValue("oid", value)
+  case class oid(override val value: PgAmopId) extends PgAmopFieldValue("oid", value)
   case class amopfamily(override val value: Long) extends PgAmopFieldValue("amopfamily", value)
   case class amoplefttype(override val value: Long) extends PgAmopFieldValue("amoplefttype", value)
   case class amoprighttype(override val value: Long) extends PgAmopFieldValue("amoprighttype", value)

@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTsDictRow(
-  oid: Long,
+  oid: PgTsDictId,
   dictname: String,
   dictnamespace: Long,
   dictowner: Long,
@@ -24,7 +24,7 @@ object PgTsDictRow {
   implicit val rowParser: RowParser[PgTsDictRow] = { row =>
     Success(
       PgTsDictRow(
-        oid = row[Long]("oid"),
+        oid = row[PgTsDictId]("oid"),
         dictname = row[String]("dictname"),
         dictnamespace = row[Long]("dictnamespace"),
         dictowner = row[Long]("dictowner"),
@@ -49,7 +49,7 @@ object PgTsDictRow {
       JsResult.fromTry(
         Try(
           PgTsDictRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgTsDictId],
             dictname = json.\("dictname").as[String],
             dictnamespace = json.\("dictnamespace").as[Long],
             dictowner = json.\("dictowner").as[Long],

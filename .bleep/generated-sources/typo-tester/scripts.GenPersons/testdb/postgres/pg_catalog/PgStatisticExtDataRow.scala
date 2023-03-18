@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatisticExtDataRow(
-  stxoid: Long,
+  stxoid: PgStatisticExtDataId,
   stxdndistinct: Option[String],
   stxddependencies: Option[String],
   stxdmcv: Option[String],
@@ -23,7 +23,7 @@ object PgStatisticExtDataRow {
   implicit val rowParser: RowParser[PgStatisticExtDataRow] = { row =>
     Success(
       PgStatisticExtDataRow(
-        stxoid = row[Long]("stxoid"),
+        stxoid = row[PgStatisticExtDataId]("stxoid"),
         stxdndistinct = row[Option[String]]("stxdndistinct"),
         stxddependencies = row[Option[String]]("stxddependencies"),
         stxdmcv = row[Option[String]]("stxdmcv"),
@@ -46,7 +46,7 @@ object PgStatisticExtDataRow {
       JsResult.fromTry(
         Try(
           PgStatisticExtDataRow(
-            stxoid = json.\("stxoid").as[Long],
+            stxoid = json.\("stxoid").as[PgStatisticExtDataId],
             stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
             stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
             stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),

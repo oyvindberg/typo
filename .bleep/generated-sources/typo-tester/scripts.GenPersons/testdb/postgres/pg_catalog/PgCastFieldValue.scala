@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgCastFieldValue[T](val name: String, val value: T)
 
 object PgCastFieldValue {
-  case class oid(override val value: Long) extends PgCastFieldValue("oid", value)
+  case class oid(override val value: PgCastId) extends PgCastFieldValue("oid", value)
   case class castsource(override val value: Long) extends PgCastFieldValue("castsource", value)
   case class casttarget(override val value: Long) extends PgCastFieldValue("casttarget", value)
   case class castfunc(override val value: Long) extends PgCastFieldValue("castfunc", value)

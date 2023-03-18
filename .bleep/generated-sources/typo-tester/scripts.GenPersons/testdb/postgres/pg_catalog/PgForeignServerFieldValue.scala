@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgForeignServerFieldValue[T](val name: String, val value: T)
 
 object PgForeignServerFieldValue {
-  case class oid(override val value: Long) extends PgForeignServerFieldValue("oid", value)
+  case class oid(override val value: PgForeignServerId) extends PgForeignServerFieldValue("oid", value)
   case class srvname(override val value: String) extends PgForeignServerFieldValue("srvname", value)
   case class srvowner(override val value: Long) extends PgForeignServerFieldValue("srvowner", value)
   case class srvfdw(override val value: Long) extends PgForeignServerFieldValue("srvfdw", value)

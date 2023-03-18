@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgDatabaseFieldValue[T](val name: String, val value: T)
 
 object PgDatabaseFieldValue {
-  case class oid(override val value: Long) extends PgDatabaseFieldValue("oid", value)
+  case class oid(override val value: PgDatabaseId) extends PgDatabaseFieldValue("oid", value)
   case class datname(override val value: String) extends PgDatabaseFieldValue("datname", value)
   case class datdba(override val value: Long) extends PgDatabaseFieldValue("datdba", value)
   case class encoding(override val value: Int) extends PgDatabaseFieldValue("encoding", value)

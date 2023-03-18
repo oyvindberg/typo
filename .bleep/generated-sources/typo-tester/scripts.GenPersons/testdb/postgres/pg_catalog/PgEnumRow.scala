@@ -12,7 +12,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgEnumRow(
-  oid: Long,
+  oid: PgEnumId,
   enumtypid: Long,
   enumsortorder: Float,
   enumlabel: String
@@ -22,7 +22,7 @@ object PgEnumRow {
   implicit val rowParser: RowParser[PgEnumRow] = { row =>
     Success(
       PgEnumRow(
-        oid = row[Long]("oid"),
+        oid = row[PgEnumId]("oid"),
         enumtypid = row[Long]("enumtypid"),
         enumsortorder = row[Float]("enumsortorder"),
         enumlabel = row[String]("enumlabel")
@@ -43,7 +43,7 @@ object PgEnumRow {
       JsResult.fromTry(
         Try(
           PgEnumRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").as[PgEnumId],
             enumtypid = json.\("enumtypid").as[Long],
             enumsortorder = json.\("enumsortorder").as[Float],
             enumlabel = json.\("enumlabel").as[String]

@@ -15,7 +15,9 @@ case class PgLargeobjectRow(
   loid: Long,
   pageno: Int,
   data: String
-)
+){
+  val loidAndPageno: PgLargeobjectId = PgLargeobjectId(loid, pageno)
+}
 
 object PgLargeobjectRow {
   implicit val rowParser: RowParser[PgLargeobjectRow] = { row =>

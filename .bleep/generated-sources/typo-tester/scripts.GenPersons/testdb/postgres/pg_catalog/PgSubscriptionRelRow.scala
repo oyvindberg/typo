@@ -16,7 +16,9 @@ case class PgSubscriptionRelRow(
   srrelid: Long,
   srsubstate: String,
   srsublsn: Option[String]
-)
+){
+  val srrelidAndSrsubid: PgSubscriptionRelId = PgSubscriptionRelId(srrelid, srsubid)
+}
 
 object PgSubscriptionRelRow {
   implicit val rowParser: RowParser[PgSubscriptionRelRow] = { row =>

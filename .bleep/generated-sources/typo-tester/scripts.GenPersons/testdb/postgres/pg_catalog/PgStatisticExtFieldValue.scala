@@ -7,7 +7,7 @@ package pg_catalog
 sealed abstract class PgStatisticExtFieldValue[T](val name: String, val value: T)
 
 object PgStatisticExtFieldValue {
-  case class oid(override val value: Long) extends PgStatisticExtFieldValue("oid", value)
+  case class oid(override val value: PgStatisticExtId) extends PgStatisticExtFieldValue("oid", value)
   case class stxrelid(override val value: Long) extends PgStatisticExtFieldValue("stxrelid", value)
   case class stxname(override val value: String) extends PgStatisticExtFieldValue("stxname", value)
   case class stxnamespace(override val value: Long) extends PgStatisticExtFieldValue("stxnamespace", value)

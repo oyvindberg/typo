@@ -15,7 +15,9 @@ case class PgDbRoleSettingRow(
   setdatabase: Long,
   setrole: Long,
   setconfig: Option[Array[String]]
-)
+){
+  val setdatabaseAndSetrole: PgDbRoleSettingId = PgDbRoleSettingId(setdatabase, setrole)
+}
 
 object PgDbRoleSettingRow {
   implicit val rowParser: RowParser[PgDbRoleSettingRow] = { row =>
