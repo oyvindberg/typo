@@ -14,7 +14,13 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val enums = Gen.genEnums
       val tables = Gen.genTables(enums)
 
-      println(tables.mkString("\n"))
+      println(
+        tables
+          .filter(
+            _.uniqueKeys.nonEmpty
+          )
+          .mkString("\n")
+      )
 
     } finally {
       conn.close()

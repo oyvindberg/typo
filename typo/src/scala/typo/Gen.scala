@@ -1,5 +1,6 @@
 package typo
 
+import typo.information_schema.TableConstraints
 import typo.sc.syntax._
 
 import java.sql.Connection
@@ -57,7 +58,7 @@ object Gen {
     val keyColumnUsage = information_schema.KeyColumnUsage.all
 
     val primaryKeys: Map[db.RelationName, db.PrimaryKey] = genPrimaryKeys(tableConstraints, keyColumnUsage)
-
+    val uniqueKeys: Map[db.RelationName, List[db.UniqueKey]] = genUniqueKeys(tableConstraints, keyColumnUsage)
     //      val referentialConstraints = information_schema.ReferentialConstraints.all(c)
     //      val constraintColumnUsage = information_schema.ConstraintColumnUsage.all(c)
     val pgTypes = information_schema.PgType.all
@@ -85,11 +86,41 @@ object Gen {
         name = relationName,
         cols = cols,
         primaryKey = primaryKeys.get(relationName),
-        uniqueKeys = Nil,
+        uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
         foreignKeys = Nil
       )
     }
+  }
 
+  def genUniqueKeys(
+      tableConstraints: List[information_schema.TableConstraints.Row],
+      keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
+  ): Map[db.RelationName, List[db.UniqueKey]] = {
+    val allUniqueConstraints: List[TableConstraints.Row] =
+      tableConstraints
+        .filter(_.constraint_type == "UNIQUE")
+
+    val allUniqueConstraintsByTable: Map[db.RelationName, List[TableConstraints.Row]] =
+      allUniqueConstraints
+        .groupBy(uc => db.RelationName(uc.table_schema, uc.table_name))
+
+    def toUniqueKey(tc: TableConstraints.Row): db.UniqueKey = {
+      val columnsInKey: List[db.ColName] =
+        keyColumnUsage
+          .filter { kcu =>
+            kcu.constraint_catalog == tc.constraint_catalog && kcu.constraint_schema == tc.constraint_schema && kcu.constraint_name == tc.constraint_name
+          }
+          .sortBy(_.ordinal_position)
+          .map(kcu => db.ColName(kcu.column_name))
+
+      db.UniqueKey(columnsInKey)
+    }
+
+    allUniqueConstraintsByTable
+      .map {
+        case (relName, tcs) =>
+          (relName, tcs.map(toUniqueKey))
+      }
   }
 
   def genPrimaryKeys(
@@ -102,7 +133,7 @@ object Gen {
         (
           db.RelationName(tc.table_schema, tc.table_name),
           db.PrimaryKey(
-            keyColumnUsage
+            colNames = keyColumnUsage
               .filter(kcu =>
                 tc.constraint_catalog == kcu.constraint_catalog
                   && tc.constraint_schema == kcu.constraint_schema
