@@ -2,6 +2,7 @@ package testdb
 package hardcoded
 
 import play.api.libs.json.JsError
+import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import play.api.libs.json.JsSuccess
@@ -26,6 +27,17 @@ object Defaulted {
       JsSuccess(UseDefault)
     case JsObject(Seq(("provided", providedJson: JsValue))) =>
       Json.fromJson[T](providedJson).map(Provided.apply)
+    case _ =>
+      JsError(s"Expected `Defaulted` json object structure")
+  }
+
+  implicit def readsOpt[T: Reads]: Reads[Defaulted[Option[T]]] = {
+    case JsString("defaulted") =>
+      JsSuccess(UseDefault)
+    case JsObject(Seq(("provided", JsNull))) =>
+      JsSuccess(Provided(None))
+    case JsObject(Seq(("provided", providedJson: JsValue))) =>
+      Json.fromJson[T](providedJson).map(x => Provided(Some(x)))
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
   }

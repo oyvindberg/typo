@@ -17,7 +17,7 @@ case class PgDescriptionRow(
   objsubid: Int,
   description: String
 ){
-  val objoidAndClassoidAndObjsubid: PgDescriptionId = PgDescriptionId(objoid, classoid, objsubid)
+  val compositeId: PgDescriptionId = PgDescriptionId(objoid, classoid, objsubid)
 }
 
 object PgDescriptionRow {

@@ -55,7 +55,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
             val underlying = scalaType(pkg, dbCol)
             ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault)
           }
-          val paramName = names.field(db.ColName(colNames.map(_.value).mkString("_and_")))
+          val paramName = sc.Ident("compositeId")
           Some(IdComputed.Composite(cols, qident, paramName))
       }
     }

@@ -44,7 +44,7 @@ case class PgStatisticRow(
   stavalues4: Option[String],
   stavalues5: Option[String]
 ){
-  val starelidAndStaattnumAndStainherit: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
+  val compositeId: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
 }
 
 object PgStatisticRow {

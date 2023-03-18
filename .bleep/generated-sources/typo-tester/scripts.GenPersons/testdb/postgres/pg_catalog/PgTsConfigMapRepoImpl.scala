@@ -11,8 +11,8 @@ trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
     SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map""".as(PgTsConfigMapRow.rowParser.*)
   }
-  override def selectById(mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId)(implicit c: Connection): Option[PgTsConfigMapRow] = {
-    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${mapcfgAndMaptokentypeAndMapseqno.mapcfg}, maptokentype = ${mapcfgAndMaptokentypeAndMapseqno.maptokentype}, mapseqno = ${mapcfgAndMaptokentypeAndMapseqno.mapseqno}""".as(PgTsConfigMapRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgTsConfigMapId)(implicit c: Connection): Option[PgTsConfigMapRow] = {
+    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}""".as(PgTsConfigMapRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgTsConfigMapFieldValue[_]])(implicit c: Connection): List[PgTsConfigMapRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
     }
 
   }
-  override def updateFieldValues(mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId, fieldValues: List[PgTsConfigMapFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgTsConfigMapId, fieldValues: List[PgTsConfigMapFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -42,25 +42,25 @@ trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
         }
         SQL"""update pg_catalog.pg_ts_config_map
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where mapcfg = ${mapcfgAndMaptokentypeAndMapseqno.mapcfg}, maptokentype = ${mapcfgAndMaptokentypeAndMapseqno.maptokentype}, mapseqno = ${mapcfgAndMaptokentypeAndMapseqno.mapseqno}"""
+          where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId, unsaved: PgTsConfigMapRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgTsConfigMapId, unsaved: PgTsConfigMapRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("mapdict", ParameterValue.from(unsaved.mapdict)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, ${namedParameters.map(_.name).mkString(", ")})
-      values (${mapcfgAndMaptokentypeAndMapseqno.mapcfg}, ${mapcfgAndMaptokentypeAndMapseqno.maptokentype}, ${mapcfgAndMaptokentypeAndMapseqno.mapseqno}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.mapcfg}, ${compositeId.maptokentype}, ${compositeId.mapseqno}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_ts_config_map where mapcfg = ${mapcfgAndMaptokentypeAndMapseqno.mapcfg}, maptokentype = ${mapcfgAndMaptokentypeAndMapseqno.maptokentype}, mapseqno = ${mapcfgAndMaptokentypeAndMapseqno.mapseqno}""".executeUpdate() > 0
+  override def delete(compositeId: PgTsConfigMapId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}""".executeUpdate() > 0
   }
 }

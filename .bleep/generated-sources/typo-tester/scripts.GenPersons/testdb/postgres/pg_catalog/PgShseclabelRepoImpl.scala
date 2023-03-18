@@ -11,8 +11,8 @@ trait PgShseclabelRepoImpl extends PgShseclabelRepo {
   override def selectAll(implicit c: Connection): List[PgShseclabelRow] = {
     SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel""".as(PgShseclabelRow.rowParser.*)
   }
-  override def selectById(objoidAndClassoidAndProvider: PgShseclabelId)(implicit c: Connection): Option[PgShseclabelRow] = {
-    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel where objoid = ${objoidAndClassoidAndProvider.objoid}, classoid = ${objoidAndClassoidAndProvider.classoid}, provider = ${objoidAndClassoidAndProvider.provider}""".as(PgShseclabelRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgShseclabelId)(implicit c: Connection): Option[PgShseclabelRow] = {
+    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}""".as(PgShseclabelRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgShseclabelFieldValue[_]])(implicit c: Connection): List[PgShseclabelRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ trait PgShseclabelRepoImpl extends PgShseclabelRepo {
     }
 
   }
-  override def updateFieldValues(objoidAndClassoidAndProvider: PgShseclabelId, fieldValues: List[PgShseclabelFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgShseclabelId, fieldValues: List[PgShseclabelFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -42,25 +42,25 @@ trait PgShseclabelRepoImpl extends PgShseclabelRepo {
         }
         SQL"""update pg_catalog.pg_shseclabel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where objoid = ${objoidAndClassoidAndProvider.objoid}, classoid = ${objoidAndClassoidAndProvider.classoid}, provider = ${objoidAndClassoidAndProvider.provider}"""
+          where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(objoidAndClassoidAndProvider: PgShseclabelId, unsaved: PgShseclabelRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgShseclabelId, unsaved: PgShseclabelRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("label", ParameterValue.from(unsaved.label)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_shseclabel(objoid, classoid, provider, ${namedParameters.map(_.name).mkString(", ")})
-      values (${objoidAndClassoidAndProvider.objoid}, ${objoidAndClassoidAndProvider.classoid}, ${objoidAndClassoidAndProvider.provider}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.objoid}, ${compositeId.classoid}, ${compositeId.provider}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(objoidAndClassoidAndProvider: PgShseclabelId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_shseclabel where objoid = ${objoidAndClassoidAndProvider.objoid}, classoid = ${objoidAndClassoidAndProvider.classoid}, provider = ${objoidAndClassoidAndProvider.provider}""".executeUpdate() > 0
+  override def delete(compositeId: PgShseclabelId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_shseclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}""".executeUpdate() > 0
   }
 }

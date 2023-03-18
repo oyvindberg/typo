@@ -11,8 +11,8 @@ trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
     SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting""".as(PgDbRoleSettingRow.rowParser.*)
   }
-  override def selectById(setdatabaseAndSetrole: PgDbRoleSettingId)(implicit c: Connection): Option[PgDbRoleSettingRow] = {
-    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${setdatabaseAndSetrole.setdatabase}, setrole = ${setdatabaseAndSetrole.setrole}""".as(PgDbRoleSettingRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgDbRoleSettingId)(implicit c: Connection): Option[PgDbRoleSettingRow] = {
+    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}""".as(PgDbRoleSettingRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): List[PgDbRoleSettingRow] = {
     fieldValues match {
@@ -29,7 +29,7 @@ trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
     }
 
   }
-  override def updateFieldValues(setdatabaseAndSetrole: PgDbRoleSettingId, fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgDbRoleSettingId, fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -40,25 +40,25 @@ trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
         }
         SQL"""update pg_catalog.pg_db_role_setting
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where setdatabase = ${setdatabaseAndSetrole.setdatabase}, setrole = ${setdatabaseAndSetrole.setrole}"""
+          where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(setdatabaseAndSetrole: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("setconfig", ParameterValue.from(unsaved.setconfig)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_db_role_setting(setdatabase, setrole, ${namedParameters.map(_.name).mkString(", ")})
-      values (${setdatabaseAndSetrole.setdatabase}, ${setdatabaseAndSetrole.setrole}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.setdatabase}, ${compositeId.setrole}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(setdatabaseAndSetrole: PgDbRoleSettingId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_db_role_setting where setdatabase = ${setdatabaseAndSetrole.setdatabase}, setrole = ${setdatabaseAndSetrole.setrole}""".executeUpdate() > 0
+  override def delete(compositeId: PgDbRoleSettingId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}""".executeUpdate() > 0
   }
 }

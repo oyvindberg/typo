@@ -11,8 +11,8 @@ trait PersonRepoImpl extends PersonRepo {
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser.*)
   }
-  override def selectById(oneAndTwo: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person where one = ${oneAndTwo.one}, two = ${oneAndTwo.two}""".as(PersonRow.rowParser.singleOpt)
+  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
+    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -29,7 +29,7 @@ trait PersonRepoImpl extends PersonRepo {
     }
 
   }
-  override def updateFieldValues(oneAndTwo: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -40,7 +40,7 @@ trait PersonRepoImpl extends PersonRepo {
         }
         SQL"""update compositepk.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where one = ${oneAndTwo.one}, two = ${oneAndTwo.two}"""
+          where one = ${compositeId.one}, two = ${compositeId.two}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
@@ -59,7 +59,7 @@ trait PersonRepoImpl extends PersonRepo {
       .executeInsert(PersonId.rowParser.single)
 
   }
-  override def delete(oneAndTwo: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where one = ${oneAndTwo.one}, two = ${oneAndTwo.two}""".executeUpdate() > 0
+  override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
+    SQL"""delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
   }
 }

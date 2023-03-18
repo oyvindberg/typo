@@ -16,7 +16,7 @@ case class PgDbRoleSettingRow(
   setrole: Long,
   setconfig: Option[Array[String]]
 ){
-  val setdatabaseAndSetrole: PgDbRoleSettingId = PgDbRoleSettingId(setdatabase, setrole)
+  val compositeId: PgDbRoleSettingId = PgDbRoleSettingId(setdatabase, setrole)
 }
 
 object PgDbRoleSettingRow {

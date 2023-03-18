@@ -17,7 +17,7 @@ case class PgAuthMembersRow(
   grantor: Long,
   adminOption: Boolean
 ){
-  val roleidAndMember: PgAuthMembersId = PgAuthMembersId(roleid, member)
+  val compositeId: PgAuthMembersId = PgAuthMembersId(roleid, member)
 }
 
 object PgAuthMembersRow {

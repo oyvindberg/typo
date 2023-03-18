@@ -11,8 +11,8 @@ trait PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
   override def selectAll(implicit c: Connection): List[PgSubscriptionRelRow] = {
     SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel""".as(PgSubscriptionRelRow.rowParser.*)
   }
-  override def selectById(srrelidAndSrsubid: PgSubscriptionRelId)(implicit c: Connection): Option[PgSubscriptionRelRow] = {
-    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${srrelidAndSrsubid.srrelid}, srsubid = ${srrelidAndSrsubid.srsubid}""".as(PgSubscriptionRelRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgSubscriptionRelId)(implicit c: Connection): Option[PgSubscriptionRelRow] = {
+    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}""".as(PgSubscriptionRelRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgSubscriptionRelFieldValue[_]])(implicit c: Connection): List[PgSubscriptionRelRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ trait PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
     }
 
   }
-  override def updateFieldValues(srrelidAndSrsubid: PgSubscriptionRelId, fieldValues: List[PgSubscriptionRelFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgSubscriptionRelId, fieldValues: List[PgSubscriptionRelFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -42,26 +42,26 @@ trait PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
         }
         SQL"""update pg_catalog.pg_subscription_rel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where srrelid = ${srrelidAndSrsubid.srrelid}, srsubid = ${srrelidAndSrsubid.srsubid}"""
+          where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(srrelidAndSrsubid: PgSubscriptionRelId, unsaved: PgSubscriptionRelRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgSubscriptionRelId, unsaved: PgSubscriptionRelRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("srsubstate", ParameterValue.from(unsaved.srsubstate))),
       Some(NamedParameter("srsublsn", ParameterValue.from(unsaved.srsublsn)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_subscription_rel(srrelid, srsubid, ${namedParameters.map(_.name).mkString(", ")})
-      values (${srrelidAndSrsubid.srrelid}, ${srrelidAndSrsubid.srsubid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.srrelid}, ${compositeId.srsubid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(srrelidAndSrsubid: PgSubscriptionRelId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_subscription_rel where srrelid = ${srrelidAndSrsubid.srrelid}, srsubid = ${srrelidAndSrsubid.srsubid}""".executeUpdate() > 0
+  override def delete(compositeId: PgSubscriptionRelId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}""".executeUpdate() > 0
   }
 }

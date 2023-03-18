@@ -17,7 +17,7 @@ case class PgShseclabelRow(
   provider: String,
   label: String
 ){
-  val objoidAndClassoidAndProvider: PgShseclabelId = PgShseclabelId(objoid, classoid, provider)
+  val compositeId: PgShseclabelId = PgShseclabelId(objoid, classoid, provider)
 }
 
 object PgShseclabelRow {

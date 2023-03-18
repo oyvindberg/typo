@@ -39,7 +39,7 @@ case class PgAttributeRow(
   attfdwoptions: Option[Array[String]],
   attmissingval: Option[String]
 ){
-  val attrelidAndAttnum: PgAttributeId = PgAttributeId(attrelid, attnum)
+  val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
 }
 
 object PgAttributeRow {

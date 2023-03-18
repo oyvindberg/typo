@@ -18,7 +18,7 @@ case class PgInitPrivsRow(
   privtype: String,
   initprivs: Array[String]
 ){
-  val objoidAndClassoidAndObjsubid: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
+  val compositeId: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
 }
 
 object PgInitPrivsRow {

@@ -11,8 +11,8 @@ trait PgInheritsRepoImpl extends PgInheritsRepo {
   override def selectAll(implicit c: Connection): List[PgInheritsRow] = {
     SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits""".as(PgInheritsRow.rowParser.*)
   }
-  override def selectById(inhrelidAndInhseqno: PgInheritsId)(implicit c: Connection): Option[PgInheritsRow] = {
-    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${inhrelidAndInhseqno.inhrelid}, inhseqno = ${inhrelidAndInhseqno.inhseqno}""".as(PgInheritsRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgInheritsId)(implicit c: Connection): Option[PgInheritsRow] = {
+    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}""".as(PgInheritsRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgInheritsFieldValue[_]])(implicit c: Connection): List[PgInheritsRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ trait PgInheritsRepoImpl extends PgInheritsRepo {
     }
 
   }
-  override def updateFieldValues(inhrelidAndInhseqno: PgInheritsId, fieldValues: List[PgInheritsFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgInheritsId, fieldValues: List[PgInheritsFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -42,26 +42,26 @@ trait PgInheritsRepoImpl extends PgInheritsRepo {
         }
         SQL"""update pg_catalog.pg_inherits
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where inhrelid = ${inhrelidAndInhseqno.inhrelid}, inhseqno = ${inhrelidAndInhseqno.inhseqno}"""
+          where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(inhrelidAndInhseqno: PgInheritsId, unsaved: PgInheritsRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgInheritsId, unsaved: PgInheritsRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("inhparent", ParameterValue.from(unsaved.inhparent))),
       Some(NamedParameter("inhdetachpending", ParameterValue.from(unsaved.inhdetachpending)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_inherits(inhrelid, inhseqno, ${namedParameters.map(_.name).mkString(", ")})
-      values (${inhrelidAndInhseqno.inhrelid}, ${inhrelidAndInhseqno.inhseqno}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.inhrelid}, ${compositeId.inhseqno}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(inhrelidAndInhseqno: PgInheritsId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_inherits where inhrelid = ${inhrelidAndInhseqno.inhrelid}, inhseqno = ${inhrelidAndInhseqno.inhseqno}""".executeUpdate() > 0
+  override def delete(compositeId: PgInheritsId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}""".executeUpdate() > 0
   }
 }

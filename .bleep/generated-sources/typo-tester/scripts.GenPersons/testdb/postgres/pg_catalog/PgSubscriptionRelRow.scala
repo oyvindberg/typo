@@ -17,7 +17,7 @@ case class PgSubscriptionRelRow(
   srsubstate: String,
   srsublsn: Option[String]
 ){
-  val srrelidAndSrsubid: PgSubscriptionRelId = PgSubscriptionRelId(srrelid, srsubid)
+  val compositeId: PgSubscriptionRelId = PgSubscriptionRelId(srrelid, srsubid)
 }
 
 object PgSubscriptionRelRow {

@@ -11,8 +11,8 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
   override def selectAll(implicit c: Connection): List[PgStatisticRow] = {
     SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic""".as(PgStatisticRow.rowParser.*)
   }
-  override def selectById(starelidAndStaattnumAndStainherit: PgStatisticId)(implicit c: Connection): Option[PgStatisticRow] = {
-    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${starelidAndStaattnumAndStainherit.starelid}, staattnum = ${starelidAndStaattnumAndStainherit.staattnum}, stainherit = ${starelidAndStaattnumAndStainherit.stainherit}""".as(PgStatisticRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgStatisticId)(implicit c: Connection): Option[PgStatisticRow] = {
+    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}""".as(PgStatisticRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgStatisticFieldValue[_]])(implicit c: Connection): List[PgStatisticRow] = {
     fieldValues match {
@@ -57,7 +57,7 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
     }
 
   }
-  override def updateFieldValues(starelidAndStaattnumAndStainherit: PgStatisticId, fieldValues: List[PgStatisticFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgStatisticId, fieldValues: List[PgStatisticFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -96,13 +96,13 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
         }
         SQL"""update pg_catalog.pg_statistic
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where starelid = ${starelidAndStaattnumAndStainherit.starelid}, staattnum = ${starelidAndStaattnumAndStainherit.staattnum}, stainherit = ${starelidAndStaattnumAndStainherit.stainherit}"""
+          where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(starelidAndStaattnumAndStainherit: PgStatisticId, unsaved: PgStatisticRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgStatisticId, unsaved: PgStatisticRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("stanullfrac", ParameterValue.from(unsaved.stanullfrac))),
       Some(NamedParameter("stawidth", ParameterValue.from(unsaved.stawidth))),
@@ -135,13 +135,13 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
     ).flatten
 
     SQL"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, ${namedParameters.map(_.name).mkString(", ")})
-      values (${starelidAndStaattnumAndStainherit.starelid}, ${starelidAndStaattnumAndStainherit.staattnum}, ${starelidAndStaattnumAndStainherit.stainherit}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.starelid}, ${compositeId.staattnum}, ${compositeId.stainherit}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(starelidAndStaattnumAndStainherit: PgStatisticId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_statistic where starelid = ${starelidAndStaattnumAndStainherit.starelid}, staattnum = ${starelidAndStaattnumAndStainherit.staattnum}, stainherit = ${starelidAndStaattnumAndStainherit.stainherit}""".executeUpdate() > 0
+  override def delete(compositeId: PgStatisticId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_statistic where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}""".executeUpdate() > 0
   }
 }

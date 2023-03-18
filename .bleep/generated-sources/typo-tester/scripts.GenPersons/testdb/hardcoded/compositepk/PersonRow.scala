@@ -16,7 +16,7 @@ case class PersonRow(
   two: Option[String],
   name: Option[String]
 ){
-  val oneAndTwo: PersonId = PersonId(one, two)
+  val compositeId: PersonId = PersonId(one, two)
 }
 
 object PersonRow {

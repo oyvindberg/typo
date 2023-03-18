@@ -17,7 +17,7 @@ case class PgInheritsRow(
   inhseqno: Int,
   inhdetachpending: Boolean
 ){
-  val inhrelidAndInhseqno: PgInheritsId = PgInheritsId(inhrelid, inhseqno)
+  val compositeId: PgInheritsId = PgInheritsId(inhrelid, inhseqno)
 }
 
 object PgInheritsRow {

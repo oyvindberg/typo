@@ -16,7 +16,7 @@ case class PgLargeobjectRow(
   pageno: Int,
   data: String
 ){
-  val loidAndPageno: PgLargeobjectId = PgLargeobjectId(loid, pageno)
+  val compositeId: PgLargeobjectId = PgLargeobjectId(loid, pageno)
 }
 
 object PgLargeobjectRow {

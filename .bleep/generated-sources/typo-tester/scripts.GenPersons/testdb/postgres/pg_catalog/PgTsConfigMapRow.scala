@@ -17,7 +17,7 @@ case class PgTsConfigMapRow(
   mapseqno: Int,
   mapdict: Long
 ){
-  val mapcfgAndMaptokentypeAndMapseqno: PgTsConfigMapId = PgTsConfigMapId(mapcfg, maptokentype, mapseqno)
+  val compositeId: PgTsConfigMapId = PgTsConfigMapId(mapcfg, maptokentype, mapseqno)
 }
 
 object PgTsConfigMapRow {

@@ -11,8 +11,8 @@ trait PgShdescriptionRepoImpl extends PgShdescriptionRepo {
   override def selectAll(implicit c: Connection): List[PgShdescriptionRow] = {
     SQL"""select objoid, classoid, description from pg_catalog.pg_shdescription""".as(PgShdescriptionRow.rowParser.*)
   }
-  override def selectById(objoidAndClassoid: PgShdescriptionId)(implicit c: Connection): Option[PgShdescriptionRow] = {
-    SQL"""select objoid, classoid, description from pg_catalog.pg_shdescription where objoid = ${objoidAndClassoid.objoid}, classoid = ${objoidAndClassoid.classoid}""".as(PgShdescriptionRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgShdescriptionId)(implicit c: Connection): Option[PgShdescriptionRow] = {
+    SQL"""select objoid, classoid, description from pg_catalog.pg_shdescription where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}""".as(PgShdescriptionRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgShdescriptionFieldValue[_]])(implicit c: Connection): List[PgShdescriptionRow] = {
     fieldValues match {
@@ -29,7 +29,7 @@ trait PgShdescriptionRepoImpl extends PgShdescriptionRepo {
     }
 
   }
-  override def updateFieldValues(objoidAndClassoid: PgShdescriptionId, fieldValues: List[PgShdescriptionFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgShdescriptionId, fieldValues: List[PgShdescriptionFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -40,25 +40,25 @@ trait PgShdescriptionRepoImpl extends PgShdescriptionRepo {
         }
         SQL"""update pg_catalog.pg_shdescription
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where objoid = ${objoidAndClassoid.objoid}, classoid = ${objoidAndClassoid.classoid}"""
+          where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(objoidAndClassoid: PgShdescriptionId, unsaved: PgShdescriptionRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgShdescriptionId, unsaved: PgShdescriptionRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("description", ParameterValue.from(unsaved.description)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_shdescription(objoid, classoid, ${namedParameters.map(_.name).mkString(", ")})
-      values (${objoidAndClassoid.objoid}, ${objoidAndClassoid.classoid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.objoid}, ${compositeId.classoid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(objoidAndClassoid: PgShdescriptionId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_shdescription where objoid = ${objoidAndClassoid.objoid}, classoid = ${objoidAndClassoid.classoid}""".executeUpdate() > 0
+  override def delete(compositeId: PgShdescriptionId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_shdescription where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}""".executeUpdate() > 0
   }
 }

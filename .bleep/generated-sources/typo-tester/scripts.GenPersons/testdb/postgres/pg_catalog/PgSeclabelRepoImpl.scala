@@ -11,8 +11,8 @@ trait PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def selectAll(implicit c: Connection): List[PgSeclabelRow] = {
     SQL"""select objoid, classoid, objsubid, provider, label from pg_catalog.pg_seclabel""".as(PgSeclabelRow.rowParser.*)
   }
-  override def selectById(objoidAndClassoidAndObjsubidAndProvider: PgSeclabelId)(implicit c: Connection): Option[PgSeclabelRow] = {
-    SQL"""select objoid, classoid, objsubid, provider, label from pg_catalog.pg_seclabel where objoid = ${objoidAndClassoidAndObjsubidAndProvider.objoid}, classoid = ${objoidAndClassoidAndObjsubidAndProvider.classoid}, objsubid = ${objoidAndClassoidAndObjsubidAndProvider.objsubid}, provider = ${objoidAndClassoidAndObjsubidAndProvider.provider}""".as(PgSeclabelRow.rowParser.singleOpt)
+  override def selectById(compositeId: PgSeclabelId)(implicit c: Connection): Option[PgSeclabelRow] = {
+    SQL"""select objoid, classoid, objsubid, provider, label from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}, provider = ${compositeId.provider}""".as(PgSeclabelRow.rowParser.singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgSeclabelFieldValue[_]])(implicit c: Connection): List[PgSeclabelRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ trait PgSeclabelRepoImpl extends PgSeclabelRepo {
     }
 
   }
-  override def updateFieldValues(objoidAndClassoidAndObjsubidAndProvider: PgSeclabelId, fieldValues: List[PgSeclabelFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgSeclabelId, fieldValues: List[PgSeclabelFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
       case Nil => 0
       case nonEmpty =>
@@ -44,25 +44,25 @@ trait PgSeclabelRepoImpl extends PgSeclabelRepo {
         }
         SQL"""update pg_catalog.pg_seclabel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where objoid = ${objoidAndClassoidAndObjsubidAndProvider.objoid}, classoid = ${objoidAndClassoidAndObjsubidAndProvider.classoid}, objsubid = ${objoidAndClassoidAndObjsubidAndProvider.objsubid}, provider = ${objoidAndClassoidAndObjsubidAndProvider.provider}"""
+          where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}, provider = ${compositeId.provider}"""
           .on(namedParams: _*)
           .executeUpdate()
     }
 
   }
-  override def insert(objoidAndClassoidAndObjsubidAndProvider: PgSeclabelId, unsaved: PgSeclabelRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgSeclabelId, unsaved: PgSeclabelRowUnsaved)(implicit c: Connection): Unit = {
     val namedParameters = List(
       Some(NamedParameter("label", ParameterValue.from(unsaved.label)))
     ).flatten
 
     SQL"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, ${namedParameters.map(_.name).mkString(", ")})
-      values (${objoidAndClassoidAndObjsubidAndProvider.objoid}, ${objoidAndClassoidAndObjsubidAndProvider.classoid}, ${objoidAndClassoidAndObjsubidAndProvider.objsubid}, ${objoidAndClassoidAndObjsubidAndProvider.provider}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      values (${compositeId.objoid}, ${compositeId.classoid}, ${compositeId.objsubid}, ${compositeId.provider}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
       """
       .on(namedParameters :_*)
       .execute()
 
   }
-  override def delete(objoidAndClassoidAndObjsubidAndProvider: PgSeclabelId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_seclabel where objoid = ${objoidAndClassoidAndObjsubidAndProvider.objoid}, classoid = ${objoidAndClassoidAndObjsubidAndProvider.classoid}, objsubid = ${objoidAndClassoidAndObjsubidAndProvider.objsubid}, provider = ${objoidAndClassoidAndObjsubidAndProvider.provider}""".executeUpdate() > 0
+  override def delete(compositeId: PgSeclabelId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}, provider = ${compositeId.provider}""".executeUpdate() > 0
   }
 }
