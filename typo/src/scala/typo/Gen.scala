@@ -53,7 +53,11 @@ object Gen {
   def genTables(enums: List[db.StringEnum])(implicit c: Connection): List[db.Table] = {
     val tableRows = information_schema.Tables.all
     val columns = information_schema.Columns.all
-    //      val tableConstraints = information_schema.TableConstraints.all(c)
+    val tableConstraints = information_schema.TableConstraints.all
+    val keyColumnUsage = information_schema.KeyColumnUsage.all
+
+    val primaryKeys: Map[db.RelationName, db.PrimaryKey] = genPrimaryKeys(tableConstraints, keyColumnUsage)
+
     //      val referentialConstraints = information_schema.ReferentialConstraints.all(c)
     //      val constraintColumnUsage = information_schema.ConstraintColumnUsage.all(c)
     val pgTypes = information_schema.PgType.all
@@ -73,18 +77,43 @@ object Gen {
             )
           }
 
+      val relationName = db.RelationName(
+        schema = table.table_schema,
+        name = table.table_name
+      )
       db.Table(
-        name = db.RelationName(
-          schema = table.table_schema,
-          name = table.table_name
-        ),
+        name = relationName,
         cols = cols,
-        primaryKey = None,
+        primaryKey = primaryKeys.get(relationName),
         uniqueKeys = Nil,
         foreignKeys = Nil
       )
     }
 
+  }
+
+  def genPrimaryKeys(
+      tableConstraints: List[information_schema.TableConstraints.Row],
+      keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
+  ): Map[db.RelationName, db.PrimaryKey] = {
+    tableConstraints
+      .filter(_.constraint_type == "PRIMARY KEY")
+      .map { tc =>
+        (
+          db.RelationName(tc.table_schema, tc.table_name),
+          db.PrimaryKey(
+            keyColumnUsage
+              .filter(kcu =>
+                tc.constraint_catalog == kcu.constraint_catalog
+                  && tc.constraint_schema == kcu.constraint_schema
+                  && tc.constraint_name == kcu.constraint_name
+              )
+              .sortBy(_.ordinal_position)
+              .map(kcu => db.ColName(kcu.column_name))
+          )
+        )
+      }
+      .toMap
   }
 
   def genEnums(implicit c: Connection): List[db.StringEnum] = {
@@ -124,7 +153,7 @@ object Gen {
             case Some(enum) =>
               db.Type.StringEnum(enum.name)
             case None =>
-              println(udtName)
+//              println(udtName)
               db.Type.Text
           }
 

@@ -3,6 +3,6 @@ target
 .DS_Store
 *.metals
 .bsp
-/.bleep
+/.bleep/
 /.bloop
 .vscode
