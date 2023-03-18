@@ -45,52 +45,56 @@ object Gen {
         )
       }
 
-    val enums: List[db.StringEnum] =
-      information_schema.PgEnum
-        .all(c)
-        .groupBy(_.name)
-        .map { case (relName, values) =>
-          db.StringEnum(relName, values.sortBy(_.enum_sort_order).map(_.enum_value))
-        }
-        .toList
+    val enums: List[db.StringEnum] = genEnums(c)
 
-    val tables = {
-      val tableRows = information_schema.Tables.all(c)
-      val columns = information_schema.Columns.all(c)
-//      val tableConstraints = information_schema.TableConstraints.all(c)
-//      val referentialConstraints = information_schema.ReferentialConstraints.all(c)
-//      val constraintColumnUsage = information_schema.ConstraintColumnUsage.all(c)
-      val pgTypes = information_schema.PgType.all(c)
-      val typeLookup = TypeLookup(pgTypes = pgTypes, enums = enums.map(e => (e.name.name, e)).toMap)
+    apply(pkg, genTables(enums)(c), enums, views, jsonLib, dbLib)
+  }
 
-      tableRows.map { table =>
-        val cols =
-          columns
-            .filter(c => c.table_catalog == table.table_catalog && c.table_schema == table.table_schema && c.table_name == table.table_name)
-            .sortBy(_.ordinal_position)
-            .map { c =>
-              db.Col(
-                name = db.ColName(c.column_name),
-                hasDefault = c.column_default.isDefined,
-                isNotNull = c.is_nullable == "NO",
-                tpe = typeLookup.fromUdtName(c.udt_name, c.character_maximum_length)
-              )
-            }
+  def genTables(enums: List[db.StringEnum])(implicit c: Connection): List[db.Table] = {
+    val tableRows = information_schema.Tables.all
+    val columns = information_schema.Columns.all
+    //      val tableConstraints = information_schema.TableConstraints.all(c)
+    //      val referentialConstraints = information_schema.ReferentialConstraints.all(c)
+    //      val constraintColumnUsage = information_schema.ConstraintColumnUsage.all(c)
+    val pgTypes = information_schema.PgType.all
+    val typeLookup = TypeLookup(pgTypes = pgTypes, enums = enums.map(e => (e.name.name, e)).toMap)
 
-        db.Table(
-          name = db.RelationName(
-            schema = table.table_schema,
-            name = table.table_name
-          ),
-          cols = cols,
-          primaryKey = None,
-          uniqueKeys = Nil,
-          foreignKeys = Nil
-        )
-      }
+    tableRows.map { table =>
+      val cols =
+        columns
+          .filter(c => c.table_catalog == table.table_catalog && c.table_schema == table.table_schema && c.table_name == table.table_name)
+          .sortBy(_.ordinal_position)
+          .map { c =>
+            db.Col(
+              name = db.ColName(c.column_name),
+              hasDefault = c.column_default.isDefined,
+              isNotNull = c.is_nullable == "NO",
+              tpe = typeLookup.fromUdtName(c.udt_name, c.character_maximum_length)
+            )
+          }
+
+      db.Table(
+        name = db.RelationName(
+          schema = table.table_schema,
+          name = table.table_name
+        ),
+        cols = cols,
+        primaryKey = None,
+        uniqueKeys = Nil,
+        foreignKeys = Nil
+      )
     }
 
-    apply(pkg, tables, enums, views, jsonLib, dbLib)
+  }
+
+  def genEnums(implicit c: Connection): List[db.StringEnum] = {
+    information_schema.PgEnum
+      .all(c)
+      .groupBy(_.name)
+      .map { case (relName, values) =>
+        db.StringEnum(relName, values.sortBy(_.enum_sort_order).map(_.enum_value))
+      }
+      .toList
   }
 
   case class TypeLookup(pgTypes: List[information_schema.PgType.Row], enums: Map[String, db.StringEnum]) {
