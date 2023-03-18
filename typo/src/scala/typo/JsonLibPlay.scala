@@ -14,17 +14,30 @@ object JsonLibPlay extends JsonLib {
   val JsError = sc.Type.Qualified("play.api.libs.json.JsError")
   val JsSuccess = sc.Type.Qualified("play.api.libs.json.JsSuccess")
   val JsValue = sc.Type.Qualified("play.api.libs.json.JsValue")
+  val JsNull = sc.Type.Qualified("play.api.libs.json.JsNull")
   val JsObject = sc.Type.Qualified("play.api.libs.json.JsObject")
   val JsResult = sc.Type.Qualified("play.api.libs.json.JsResult")
 
   override def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code] = {
     val T = sc.Type.Abstract(sc.Ident("T"))
     val defaultOfT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(T))
+    val defaultOfOptT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(sc.Type.Option.of(T)))
     val reader = code"""implicit def reads[$T: $ReadsName]: ${Reads(defaultOfT)} = {
             |    case $JsString("defaulted") =>
             |      $JsSuccess($useDefault)
             |    case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
             |      $Json.fromJson[T](providedJson).map($provided.apply)
+            |    case _ =>
+            |      $JsError(s"Expected `$defaulted` json object structure")
+            |  }
+            |""".stripMargin
+    val readerOpt = code"""implicit def readsOpt[$T: $ReadsName]: ${Reads(defaultOfOptT)} = {
+            |    case $JsString("defaulted") =>
+            |      $JsSuccess($useDefault)
+            |    case $JsObject(Seq(("provided", $JsNull))) =>
+            |      $JsSuccess($provided(${sc.Type.None}))
+            |    case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
+            |      $Json.fromJson[T](providedJson).map(x => $provided(${sc.Type.Some}(x)))
             |    case _ =>
             |      $JsError(s"Expected `$defaulted` json object structure")
             |  }
@@ -35,10 +48,8 @@ object JsonLibPlay extends JsonLib {
             |    case $useDefault      => $JsString("defaulted")
             |  }
             |""".stripMargin
-    List(
-      reader,
-      writer
-    )
+
+    List(reader, readerOpt, writer)
   }
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     val reader = code"""implicit val reads: ${Reads(wrapperType)} = (value: $JsValue) =>

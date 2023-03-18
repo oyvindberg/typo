@@ -74,23 +74,25 @@ object sc {
     val Float = Qualified("scala.Float")
     val Boolean = Qualified("scala.Boolean")
     val Option = Qualified("scala.Option")
+    val None = Qualified("scala.None")
+    val Some = Qualified("scala.Some")
     val List = Qualified("scala.List")
     val Map = Qualified("scala.Map")
     val Try = Qualified("scala.util.Try")
     val JavaMap = Qualified("java.util.Map")
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
-      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map)
+      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some)
         .map(x => (x.value.name, x.value))
         .toMap
 
     object Optional {
       def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
-        case Wildcard                        => None
-        case TApply(Option, scala.List(one)) => Some(one)
+        case Wildcard                        => scala.None
+        case TApply(Option, scala.List(one)) => scala.Some(one)
         case TApply(underlying, _)           => unapply(underlying)
-        case Qualified(_)                    => None
-        case Abstract(_)                     => None
+        case Qualified(_)                    => scala.None
+        case Abstract(_)                     => scala.None
         case Commented(underlying, _)        => unapply(underlying)
       }
     }
