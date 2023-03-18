@@ -99,10 +99,9 @@ object sc {
   def renderTree(tree: Tree): String = {
     tree match {
       case Ident(value) =>
-        value match {
-          case "type" => "`type`"
-          case other  => other
-        }
+        def isValidId(str: String) = str.head.isUnicodeIdentifierStart && str.drop(1).forall(_.isUnicodeIdentifierPart)
+        def escape(str: String) = s"`$str`"
+        if (value == "type" || !isValidId(value)) escape(value) else value
       case QIdent(value)    => value.map(renderTree).mkString(".")
       case Param(name, tpe) => renderTree(name) + ": " + renderTree(tpe)
       case StrLit(str)      => '"'.toString + str + '"'.toString
