@@ -18,9 +18,7 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
       col.pointsTo match {
         case Some((relationName, columnName)) =>
           val row = names.titleCase(relation.pkg, relationName, "Row")
-          // todo: until we have tables in the structure just explode these fields so we don't generate bogus imports
-          val renderedRow = sc.renderTree(row)
-          code"""/** Points to [[$renderedRow.${names.field(columnName)}]] */
+          code"""/** Points to [[$row.${names.field(columnName)}]] */
                 |  ${col.param}""".stripMargin
         case None => col.param.code
       }

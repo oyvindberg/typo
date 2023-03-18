@@ -21,6 +21,7 @@ package object testdb {
 
   implicit val str: ToDb[Array[String]] = writeArray[String]("_varchar")
   implicit val float: ToDb[Array[Float]] = writeArray[Float]("_float4")
+  implicit val short: ToDb[Array[Short]] = writeArray[Short]("_int2")
   implicit val int: ToDb[Array[Int]] = writeArray[Int]("_int4")
   implicit val long: ToDb[Array[Long]] = writeArray[Long]("_int8")
   implicit val boolean: ToDb[Array[Boolean]] = writeArray[Boolean]("_bool")

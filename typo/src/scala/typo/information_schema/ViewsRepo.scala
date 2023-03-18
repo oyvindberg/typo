@@ -6,7 +6,7 @@ import java.sql.Connection
 
 object ViewsRepo {
 
-  def fetch(c: Connection): List[ViewRow] = {
+  def all(c: Connection): List[ViewRow] = {
     SQL"""SELECT nc.nspname::information_schema.sql_identifier         AS table_schema,
                  c.relname::information_schema.sql_identifier          AS table_name,
                  c.relkind,

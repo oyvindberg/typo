@@ -19,7 +19,7 @@ object names {
   def titleCase(pkg: sc.QIdent, name: db.RelationName, suffix: String): sc.QIdent =
     pkg / sc.Ident(name.schema) / sc.Ident(titleCase(name.name)).appended(suffix)
 
-  def EnumName(pkg: sc.QIdent, name: db.EnumName): sc.QIdent =
+  def EnumName(pkg: sc.QIdent, name: db.RelationName): sc.QIdent =
     pkg / sc.Ident(name.schema) / sc.Ident(titleCase(name.name)).appended("Enum")
 
   def field(name: db.ColName): sc.Ident = camelCase(name)

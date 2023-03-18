@@ -9,25 +9,25 @@ import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
   val enums = List(
-    db.StringEnum(db.EnumName("myschema", "sector"), List("PUBLIC", "PRIVATE", "OTHER"))
+    db.StringEnum(db.RelationName("myschema", "sector"), List("PUBLIC", "PRIVATE", "OTHER"))
   )
 
   val person = db.Table(
     name = db.RelationName("myschema", "person"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true),
-      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(50), isNotNull = true, hasDefault = false),
-      db.Col(db.ColName("name"), db.Type.VarChar(100), isNotNull = true, hasDefault = false),
-      db.Col(db.ColName("nick_name"), db.Type.VarChar(30), isNotNull = false, hasDefault = false),
-      db.Col(db.ColName("blog_url"), db.Type.VarChar(100), isNotNull = false, hasDefault = false),
-      db.Col(db.ColName("email"), db.Type.VarChar(254), isNotNull = true, hasDefault = false),
-      db.Col(db.ColName("phone"), db.Type.VarChar(8), isNotNull = true, hasDefault = false),
+      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), isNotNull = true, hasDefault = false),
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), isNotNull = true, hasDefault = false),
+      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), isNotNull = false, hasDefault = false),
+      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), isNotNull = false, hasDefault = false),
+      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), isNotNull = true, hasDefault = false),
+      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), isNotNull = true, hasDefault = false),
       db.Col(db.ColName("likes_pizza"), db.Type.Boolean, isNotNull = true, hasDefault = false),
-      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(50), isNotNull = true, hasDefault = true),
-      db.Col(db.ColName("work_email"), db.Type.VarChar(254), isNotNull = false, hasDefault = false),
+      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(Some(50)), isNotNull = true, hasDefault = true),
+      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), isNotNull = false, hasDefault = false),
       db.Col(
         db.ColName("sector"),
-        db.Type.StringEnum(db.EnumName("myschema", "sector")),
+        db.Type.StringEnum(db.RelationName("myschema", "sector")),
         isNotNull = true,
         hasDefault = true
       )
@@ -43,7 +43,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     name = db.RelationName("myschema", "football_club"),
     cols = List(
       db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false),
-      db.Col(db.ColName("name"), db.Type.VarChar(100), isNotNull = true, hasDefault = false)
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), isNotNull = true, hasDefault = false)
     ),
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
@@ -94,19 +94,24 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
       DriverManager.getConnection(url, props)
     }
 
-    val views: List[View] = View.from(c)
-    val filesByRelPath: Map[RelPath, String] =
-      Gen(sc.QIdent(List(sc.Ident("testdb"))), all, enums, views, JsonLibPlay, DbLibAnorm).map {
+    val files1: Map[RelPath, String] =
+      Gen(sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), all, enums, views = Nil, JsonLibPlay, DbLibAnorm).map {
         case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render
+      }.toMap
+
+    val files2: Map[RelPath, String] =
+      Gen(sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, c).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+        relpath -> content.render
       }.toMap
 
     targets.foreach { target =>
       FileSync
         .syncStrings(
           target.sources,
-          filesByRelPath,
+          files1 ++ files2,
           deleteUnknowns = FileSync.DeleteUnknowns.Yes(maxDepth = None),
           soft = false // todo: bleep should use something better than timestamps
         )

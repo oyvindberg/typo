@@ -5,15 +5,15 @@ import typo.sc.syntax._
 case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
   val relation = RelationFiles(table.relation, dbLib, jsonLib)
 
-  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.map { qident =>
+  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsUnsaved).map { case (qident, colsUnsaved) =>
     val rowType = sc.Type.Qualified(qident)
 
     val str =
       code"""case class ${qident.name}(
-            |  ${table.colsUnsaved.map(_.param.code).mkCode(",\n  ")}
+            |  ${colsUnsaved.map(_.param.code).mkCode(",\n  ")}
             |)
             |object ${qident.name} {
-            |  ${jsonLib.instances(rowType, table.colsUnsaved).mkCode("\n  ")}
+            |  ${jsonLib.instances(rowType, colsUnsaved).mkCode("\n  ")}
             |}
             |""".stripMargin
 

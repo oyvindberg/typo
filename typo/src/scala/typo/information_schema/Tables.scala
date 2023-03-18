@@ -23,6 +23,7 @@ object Tables {
     SQL"""
         select *
         from information_schema.tables
+        where table_type = 'BASE TABLE'
       """
       .as(Tables.Row.parser.*)
 }

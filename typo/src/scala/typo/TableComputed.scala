@@ -1,5 +1,7 @@
 package typo
 
+import typo.db.Type
+
 case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.Table) {
   val allKeyNames: Set[db.ColName] =
     (dbTable.primaryKey.toList.flatMap(_.colNames) ++ dbTable.uniqueKeys.flatMap(_.cols) ++ dbTable.foreignKeys.map(_.col)).toSet
@@ -8,13 +10,31 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
     dbTable.cols.map(col => (col.name, col)).toMap
 
   def scalaType(pkg: sc.QIdent, col: db.Col): sc.Type = {
-    val baseTpe = col.tpe match {
-      case db.Type.BigInt           => sc.Type.Long
-      case db.Type.VarChar(_)       => sc.Type.String
-      case db.Type.Boolean          => sc.Type.Boolean
-      case db.Type.Text             => sc.Type.String
-      case db.Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
+    def go(tpe: db.Type): sc.Type = tpe match {
+      case Type.BigInt           => sc.Type.Long
+      case Type.Text             => sc.Type.String
+      case Type.AnyArray         => sc.Type.String // wip
+      case Type.Boolean          => sc.Type.Boolean
+      case Type.Char             => sc.Type.String
+      case Type.Name             => sc.Type.String
+      case Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
+      case Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
+      case Type.Inet             => sc.Type.String // wip
+      case Type.Oid              => sc.Type.Long // wip
+      case Type.VarChar(_)       => sc.Type.String
+      case Type.Float4           => sc.Type.Float
+      case Type.Float8           => sc.Type.Double
+      case Type.Int2             => sc.Type.Short
+      case Type.Int4             => sc.Type.Int
+      case Type.Int8             => sc.Type.Long
+      case Type.Json             => sc.Type.String // wip
+      case Type.Numeric          => sc.Type.BigDecimal
+      case Type.Timestamp        => sc.Type.LocalDateTime
+      case Type.TimestampTz      => sc.Type.ZonedDateTime
+      case Type.Array(tpe)       => sc.Type.Array.of(go(tpe))
     }
+    val baseTpe = go(col.tpe)
+
     if (col.isNotNull) baseTpe else sc.Type.Option.of(baseTpe)
   }
 
@@ -57,13 +77,14 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
 
   val relation = RelationComputed(pkg, dbTable.name, cols, maybeId)
 
-  val colsUnsaved: List[ColumnComputed] =
+  val colsUnsaved: Option[List[ColumnComputed]] = maybeId.map { _ =>
     dbColsAndCols
       .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
       .map { case (dbCol, col) =>
         val newType = if (dbCol.hasDefault) sc.Type.TApply(default.DefaultedType, List(col.tpe)) else col.tpe
         col.copy(tpe = newType)
       }
+  }.filter(_.nonEmpty)
 
   val RowUnsavedName: Option[sc.QIdent] =
     if (colsUnsaved.nonEmpty) Some(names.titleCase(pkg, dbTable.name, "RowUnsaved")) else None
@@ -79,7 +100,7 @@ case class TableComputed(pkg: sc.QIdent, default: DefaultComputed, dbTable: db.T
     val foo = List(
       maybeId match {
         case Some(id) =>
-          val updateMethod = RowUnsavedName.map { unsaved =>
+          val updateMethod = RowUnsavedName.zip(colsUnsaved).map { case (unsaved, colsUnsaved) =>
             val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
 
             if (id.cols.forall(_.hasDefault))
