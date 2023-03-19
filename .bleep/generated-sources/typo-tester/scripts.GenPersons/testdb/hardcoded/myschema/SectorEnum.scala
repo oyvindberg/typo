@@ -3,6 +3,7 @@ package hardcoded
 package myschema
 
 import anorm.Column
+import anorm.ParameterMetaData
 import anorm.SqlMappingError
 import anorm.ToStatement
 import play.api.libs.json.JsError
@@ -26,6 +27,10 @@ object SectorEnum {
       .mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
   implicit val toStatement: ToStatement[SectorEnum] =
     implicitly[ToStatement[String]].contramap(_.value)
+  implicit val parameterMetadata: ParameterMetaData[SectorEnum] = new ParameterMetaData[SectorEnum] {
+    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+}
   implicit val reads: Reads[SectorEnum] = (value: JsValue) =>
     value.validate[String].flatMap { str =>
       ByName.get(str) match {

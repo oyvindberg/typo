@@ -13,6 +13,7 @@ object DbLibAnorm extends DbLib {
   val SqlMappingError = sc.Type.Qualified("anorm.SqlMappingError")
   val SqlStringInterpolation = sc.Type.Qualified("anorm.SqlStringInterpolation")
   val SqlParser = sc.Type.Qualified("anorm.SqlParser")
+  val ParameterMetaData = sc.Type.Qualified("anorm.ParameterMetaData")
 
   val rowParserIdent = sc.Ident("rowParser")
   def interpolate(content: sc.Code) =
@@ -26,7 +27,13 @@ object DbLibAnorm extends DbLib {
     val toStatement =
       code"""|implicit val toStatement: ${ToStatement(wrapperType)} =
              |    implicitly[${ToStatement(underlying)}].contramap(_.value)""".stripMargin
-    List(column, toStatement)
+
+    val parameterMetadata =
+      code"""|implicit val parameterMetadata: $ParameterMetaData[$wrapperType] = new $ParameterMetaData[$wrapperType] {
+             |    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
+             |    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+             |}"""
+    List(column, toStatement, parameterMetadata)
   }
 
   override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
