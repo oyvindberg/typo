@@ -5,7 +5,7 @@ class PrimaryKeys(
     tableConstraints: List[information_schema.TableConstraints.Row],
     keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
 ) {
-  def asMap: Map[db.RelationName, db.PrimaryKey] = {
+  lazy val getAsMap: Map[db.RelationName, db.PrimaryKey] = {
     tableConstraints
       .filter(_.constraint_type == "PRIMARY KEY")
       .map { tc =>

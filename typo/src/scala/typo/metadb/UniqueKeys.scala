@@ -5,7 +5,7 @@ class UniqueKeys(
     tableConstraints: List[information_schema.TableConstraints.Row],
     keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
 ) {
-  def asMap: Map[db.RelationName, List[db.UniqueKey]] = {
+  lazy val getAsMap: Map[db.RelationName, List[db.UniqueKey]] = {
 
     val allUniqueConstraintsByTable: Map[db.RelationName, List[information_schema.TableConstraints.Row]] =
       tableConstraints

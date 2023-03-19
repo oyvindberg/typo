@@ -7,9 +7,9 @@ class ForeignKeys(
     keyColumnUsage: List[information_schema.KeyColumnUsage.Row],
     referentialConstraints: List[information_schema.ReferentialConstraints.Row]
 ) {
-  val fks: List[TableConstraints.Row] = tableConstraints.filter(_.constraint_type == "FOREIGN KEY")
+  lazy val fks: List[TableConstraints.Row] = tableConstraints.filter(_.constraint_type == "FOREIGN KEY")
 
-  def asMap: Map[db.RelationName, List[db.ForeignKey]] = {
+  lazy val getAsMap: Map[db.RelationName, List[db.ForeignKey]] = {
     fks
       .map { fk =>
         (

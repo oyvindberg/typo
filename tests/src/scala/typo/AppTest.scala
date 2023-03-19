@@ -15,7 +15,7 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
     try {
       val metaDb = new MetaDb(conn)
 
-      println(metaDb.foreignKeys.asMap)
+      println(metaDb.foreignKeys.getAsMap)
     } finally {
       conn.close()
     }
