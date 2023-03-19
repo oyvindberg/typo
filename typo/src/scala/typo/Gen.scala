@@ -7,6 +7,54 @@ import java.sql.Connection
 
 object Gen {
 
+  def apply(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib, c: Connection, header: sc.Code): List[sc.File] = {
+    val views: List[View] =
+      information_schema.ViewsRepo.all(c).map { view =>
+        val AnalyzeSql.Analyzed(Nil, columns) = AnalyzeSql.from(c, view.view_definition)
+
+        View(
+          name = db.RelationName(view.table_schema, view.table_name),
+          sql = view.view_definition,
+          isMaterialized = view.relkind == "m",
+          columns
+        )
+      }
+
+    val metaDB = new MetaDb(c)
+    apply(pkg, metaDB.tables.getAsList, metaDB.enums.getAsList, views, jsonLib, dbLib, header)
+  }
+
+  def apply(
+      pkg: sc.QIdent,
+      tables: List[db.Table],
+      enums: List[db.StringEnum],
+      views: List[View],
+      jsonLib: JsonLib,
+      dbLib: DbLib,
+      header: sc.Code
+  ): List[sc.File] = {
+    val default = DefaultComputed(pkg)
+    val enumFiles: List[sc.File] =
+      enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
+    val tableFiles: List[sc.File] =
+      tables.flatMap(table => TableFiles(TableComputed(pkg, default, table), dbLib, jsonLib).all)
+    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(pkg, view), dbLib, jsonLib).all)
+    val mostFiles: List[sc.File] =
+      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
+
+    val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
+      mostFiles.groupBy { _.pkg }.map { case (pkg, files) =>
+        (pkg, files.map { f => (f.name, f.tpe.value) }.toMap)
+      }
+
+    // package objects have weird scoping, so don't attempt to automatically write imports for them.
+    // this should be a stop-gap solution anyway
+    val pkgObject = List(packageObject(pkg, jsonLib, dbLib))
+
+    val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
+    allFiles.map { file => file.copy(contents = header ++ file.contents) }
+  }
+
   def stringEnumClass(pkg: sc.QIdent, `enum`: db.StringEnum, dbLib: DbLib, jsonLib: JsonLib): sc.File = {
     val qident = names.EnumName(pkg, `enum`.name)
     val EnumType = sc.Type.Qualified(qident)
@@ -33,23 +81,6 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  def apply(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib, c: Connection): List[sc.File] = {
-    val views: List[View] =
-      information_schema.ViewsRepo.all(c).map { view =>
-        val AnalyzeSql.Analyzed(Nil, columns) = AnalyzeSql.from(c, view.view_definition)
-
-        View(
-          name = db.RelationName(view.table_schema, view.table_name),
-          sql = view.view_definition,
-          isMaterialized = view.relkind == "m",
-          columns
-        )
-      }
-
-    val metaDB = new MetaDb(c)
-    apply(pkg, metaDB.tables.getAsList, metaDB.enums.getAsList, views, jsonLib, dbLib)
-  }
-
   def packageObject(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib) = {
     val parentPkg = pkg.idents.dropRight(1)
     val content =
@@ -62,33 +93,5 @@ object Gen {
              |""".stripMargin
 
     sc.File(sc.Type.Qualified(pkg / sc.Ident("package")), content)
-  }
-  def apply(
-      pkg: sc.QIdent,
-      tables: List[db.Table],
-      enums: List[db.StringEnum],
-      views: List[View],
-      jsonLib: JsonLib,
-      dbLib: DbLib
-  ): List[sc.File] = {
-    val default = DefaultComputed(pkg)
-    val enumFiles: List[sc.File] =
-      enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
-    val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(pkg, default, table), dbLib, jsonLib).all)
-    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(pkg, view), dbLib, jsonLib).all)
-    val allFiles: List[sc.File] =
-      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
-
-    val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
-      allFiles.groupBy { _.pkg }.map { case (pkg, files) =>
-        (pkg, files.map { f => (f.name, f.tpe.value) }.toMap)
-      }
-
-    // package objects have weird scoping, so don't attempt to automatically write imports for them.
-    // this should be a stop-gap solution anyway
-    val pkgObject = List(packageObject(pkg, jsonLib, dbLib))
-
-    allFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
   }
 }
