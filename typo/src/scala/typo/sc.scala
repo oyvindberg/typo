@@ -65,6 +65,8 @@ object sc {
     val Array = sc.Type.Qualified("scala.Array")
     val Ordering = sc.Type.Qualified("scala.math.Ordering")
     val Connection = sc.Type.Qualified("java.sql.Connection")
+    val PreparedStatement = sc.Type.Qualified("java.sql.PreparedStatement")
+    val Types = sc.Type.Qualified("java.sql.Types")
     val Unit = Qualified("scala.Unit")
     val Int = Qualified("scala.Int")
     val Double = Qualified("scala.Double")
@@ -77,12 +79,18 @@ object sc {
     val None = Qualified("scala.None")
     val Some = Qualified("scala.Some")
     val List = Qualified("scala.List")
-    val Map = Qualified("scala.Map")
+    val Map = Qualified("scala.collection.immutable.Map")
+    val Either = Qualified("scala.Either")
+    val Left = Qualified("scala.Left")
+    val Right = Qualified("scala.Right")
     val Try = Qualified("scala.util.Try")
     val JavaMap = Qualified("java.util.Map")
+    val MapHasAsJava = Qualified("scala.jdk.CollectionConverters.MapHasAsJava")
+    val MapHasAsScala = Qualified("scala.jdk.CollectionConverters.MapHasAsScala")
+
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
-      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some)
+      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right)
         .map(x => (x.value.name, x.value))
         .toMap
 

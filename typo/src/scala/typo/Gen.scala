@@ -50,6 +50,19 @@ object Gen {
     apply(pkg, metaDB.tables.getAsList, metaDB.enums.getAsList, views, jsonLib, dbLib)
   }
 
+  def packageObject(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib) = {
+    val parentPkg = pkg.idents.dropRight(1)
+    val content =
+      code"""|package ${parentPkg.map(_.code).mkCode(".")}
+             |
+             |package object ${pkg.name} {
+             |  ${dbLib.missingInstances.mkCode("\n  ")}
+             |  ${jsonLib.missingInstances.mkCode("\n  ")}
+             |}
+             |""".stripMargin
+
+    sc.File(sc.Type.Qualified(pkg / sc.Ident("package")), content)
+  }
   def apply(
       pkg: sc.QIdent,
       tables: List[db.Table],
@@ -72,6 +85,10 @@ object Gen {
         (pkg, files.map { f => (f.name, f.tpe.value) }.toMap)
       }
 
-    allFiles.map(file => addPackageAndImports(knownNamesByPkg, file))
+    // package objects have weird scoping, so don't attempt to automatically write imports for them.
+    // this should be a stop-gap solution anyway
+    val pkgObject = List(packageObject(pkg, jsonLib, dbLib))
+
+    allFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
   }
 }

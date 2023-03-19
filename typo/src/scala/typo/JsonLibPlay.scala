@@ -96,4 +96,18 @@ object JsonLibPlay extends JsonLib {
     List(
       code"""implicit val format: ${Format(wrapperType)} = implicitly[${Format(underlying)}].bimap(${wrapperType.value.name}.apply, _.value)"""
     )
+
+  override def missingInstances: List[sc.Code] = {
+    val postgresTypes = PostgresTypes.all.map { case (_, tpe) =>
+      code"""implicit val ${tpe.value.name.value}Format: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(_), _.getValue)"""
+    }
+    scala.collection.immutable.Map
+    val hstore = {
+      val javaMap = Format(sc.Type.JavaMap.of(sc.Type.String, sc.Type.String))
+      val scalaMap = Format(sc.Type.Map.of(sc.Type.String, sc.Type.String))
+      code"""implicit val hstoreFormat: ${javaMap} = implicitly[$scalaMap].bimap(x => ${sc.Type.MapHasAsJava}(x).asJava, x => ${sc.Type.MapHasAsScala}(x).asScala.toMap)"""
+    }
+
+    postgresTypes ++ List(hstore)
+  }
 }

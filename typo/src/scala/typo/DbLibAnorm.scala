@@ -14,6 +14,8 @@ object DbLibAnorm extends DbLib {
   val SqlStringInterpolation = sc.Type.Qualified("anorm.SqlStringInterpolation")
   val SqlParser = sc.Type.Qualified("anorm.SqlParser")
   val ParameterMetaData = sc.Type.Qualified("anorm.ParameterMetaData")
+  val MetaDataItem = sc.Type.Qualified("anorm.MetaDataItem")
+  val SqlRequestError = sc.Type.Qualified("anorm.SqlRequestError")
 
   val rowParserIdent = sc.Ident("rowParser")
   def interpolate(content: sc.Code) =
@@ -30,8 +32,8 @@ object DbLibAnorm extends DbLib {
 
     val parameterMetadata =
       code"""|implicit val parameterMetadata: $ParameterMetaData[$wrapperType] = new $ParameterMetaData[$wrapperType] {
-             |    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-             |    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+             |    override def sqlType: ${sc.Type.String} = implicitly[${ParameterMetaData.of(underlying)}].sqlType
+             |    override def jdbcType: ${sc.Type.Int} = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}"""
     List(column, toStatement, parameterMetadata)
   }
@@ -218,4 +220,55 @@ object DbLibAnorm extends DbLib {
         val sql = interpolate(code"""delete from ${table.relationName} where ${matchId(id)}""")
         code"$sql.executeUpdate() > 0"
     }
+
+  override def missingInstances: List[sc.Code] = {
+    def inout(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column(tpe)}"
+    def out(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)}"
+
+    val arrayTypes = List(
+      sc.Type.String -> sc.StrLit("_varchar"),
+      sc.Type.Float -> sc.StrLit("_float4"),
+      sc.Type.Short -> sc.StrLit("_int2"),
+      sc.Type.Int -> sc.StrLit("_int4"),
+      sc.Type.Long -> sc.StrLit("_int8"),
+      sc.Type.Boolean -> sc.StrLit("_bool"),
+      sc.Type.Double -> sc.StrLit("_float8"),
+      sc.Type.UUID -> sc.StrLit("_uuid"),
+      sc.Type.BigDecimal -> sc.StrLit("_decimal")
+    )
+
+    val arrayInstances = arrayTypes.map { case (tpe, elemType) =>
+      val arrayType = sc.Type.Array.of(tpe)
+      code"""|implicit val ${tpe.value.name}Array: ${out(arrayType)} = new ${out(arrayType)} {
+             |    override def sqlType: ${sc.Type.String} = $elemType
+             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
+             |    override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(x => x)))
+             |  }
+             |""".stripMargin
+    }
+
+    val postgresTypes = PostgresTypes.all.map { case (typeName, tpe) =>
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
+             |    override def sqlType: ${sc.Type.String} = $typeName
+             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+             |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+             |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |  }
+             |""".stripMargin
+    }
+    val hstore = {
+      val tpe = sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val hstoreDb: ${inout(tpe)} = new ${inout(tpe)} {
+             |    override def sqlType: ${sc.Type.String} = "hstore"
+             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+             |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+             |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |  }
+             |""".stripMargin
+    }
+
+    arrayInstances ++ postgresTypes ++ List(hstore)
+  }
 }
