@@ -184,7 +184,7 @@ object Gen {
             case Some(enum) =>
               db.Type.StringEnum(enum.name)
             case None =>
-//              println(udtName)
+              System.err.println(s"Couldn't translate type from column $udtName")
               db.Type.Text
           }
 
