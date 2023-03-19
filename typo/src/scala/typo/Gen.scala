@@ -1,6 +1,6 @@
 package typo
 
-import typo.information_schema.TableConstraints
+import typo.metadb.MetaDb
 import typo.sc.syntax._
 
 import java.sql.Connection
@@ -52,15 +52,12 @@ object Gen {
   }
 
   def genTables(enums: List[db.StringEnum])(implicit c: Connection): List[db.Table] = {
+    val metaDB = new MetaDb(c)
     val tableRows = information_schema.Tables.all
     val columns = information_schema.Columns.all
-    val tableConstraints = information_schema.TableConstraints.all
-    val keyColumnUsage = information_schema.KeyColumnUsage.all
 
-    val primaryKeys: Map[db.RelationName, db.PrimaryKey] = genPrimaryKeys(tableConstraints, keyColumnUsage)
-    val uniqueKeys: Map[db.RelationName, List[db.UniqueKey]] = genUniqueKeys(tableConstraints, keyColumnUsage)
-    //      val referentialConstraints = information_schema.ReferentialConstraints.all(c)
-    //      val constraintColumnUsage = information_schema.ConstraintColumnUsage.all(c)
+    val primaryKeys: Map[db.RelationName, db.PrimaryKey] = metaDB.primaryKeys.asMap
+    val uniqueKeys: Map[db.RelationName, List[db.UniqueKey]] = metaDB.uniqueKeys.asMap
     val pgTypes = information_schema.PgType.all
     val typeLookup = TypeLookup(pgTypes = pgTypes, enums = enums.map(e => (e.name.name, e)).toMap)
 
@@ -90,61 +87,6 @@ object Gen {
         foreignKeys = Nil
       )
     }
-  }
-
-  def genUniqueKeys(
-      tableConstraints: List[information_schema.TableConstraints.Row],
-      keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
-  ): Map[db.RelationName, List[db.UniqueKey]] = {
-    val allUniqueConstraints: List[TableConstraints.Row] =
-      tableConstraints
-        .filter(_.constraint_type == "UNIQUE")
-
-    val allUniqueConstraintsByTable: Map[db.RelationName, List[TableConstraints.Row]] =
-      allUniqueConstraints
-        .groupBy(uc => db.RelationName(uc.table_schema, uc.table_name))
-
-    def toUniqueKey(tc: TableConstraints.Row): db.UniqueKey = {
-      val columnsInKey: List[db.ColName] =
-        keyColumnUsage
-          .filter { kcu =>
-            kcu.constraint_catalog == tc.constraint_catalog && kcu.constraint_schema == tc.constraint_schema && kcu.constraint_name == tc.constraint_name
-          }
-          .sortBy(_.ordinal_position)
-          .map(kcu => db.ColName(kcu.column_name))
-
-      db.UniqueKey(columnsInKey)
-    }
-
-    allUniqueConstraintsByTable
-      .map {
-        case (relName, tcs) =>
-          (relName, tcs.map(toUniqueKey))
-      }
-  }
-
-  def genPrimaryKeys(
-      tableConstraints: List[information_schema.TableConstraints.Row],
-      keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
-  ): Map[db.RelationName, db.PrimaryKey] = {
-    tableConstraints
-      .filter(_.constraint_type == "PRIMARY KEY")
-      .map { tc =>
-        (
-          db.RelationName(tc.table_schema, tc.table_name),
-          db.PrimaryKey(
-            colNames = keyColumnUsage
-              .filter(kcu =>
-                tc.constraint_catalog == kcu.constraint_catalog
-                  && tc.constraint_schema == kcu.constraint_schema
-                  && tc.constraint_name == kcu.constraint_name
-              )
-              .sortBy(_.ordinal_position)
-              .map(kcu => db.ColName(kcu.column_name))
-          )
-        )
-      }
-      .toMap
   }
 
   def genEnums(implicit c: Connection): List[db.StringEnum] = {

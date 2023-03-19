@@ -32,9 +32,9 @@ object db {
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
   case class RelationName(schema: String, name: String)
-  case class PrimaryKey(colNames: List[ColName])
-  case class ForeignKey(col: ColName, otherTable: RelationName, otherColumn: ColName)
-  case class UniqueKey(cols: List[ColName])
+  case class PrimaryKey(colNames: List[ColName], constraintName: RelationName = RelationName("", ""))
+  case class ForeignKey(col: ColName, otherTable: RelationName, otherColumn: ColName, constraintName: RelationName = RelationName("", ""))
+  case class UniqueKey(cols: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class Table(
       name: RelationName,
       cols: List[Col],

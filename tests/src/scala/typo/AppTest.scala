@@ -2,26 +2,20 @@ package typo
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import typo.information_schema.{KeyColumnUsage, ReferentialConstraints}
+import typo.metadb.MetaDb
 
 import java.sql.{Connection, DriverManager}
 
 class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     val url = "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
-    implicit val conn: Connection = DriverManager.getConnection(url)
+    val conn: Connection = DriverManager.getConnection(url)
 
     try {
-      val enums = Gen.genEnums
-      val tables = Gen.genTables(enums)
+      val metaDb = new MetaDb(conn)
 
-      println(
-        tables
-          .filter(
-            _.uniqueKeys.nonEmpty
-          )
-          .mkString("\n")
-      )
-
+      println(metaDb.foreignKeys.asMap)
     } finally {
       conn.close()
     }
