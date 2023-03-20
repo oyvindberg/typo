@@ -24,7 +24,7 @@ object GeneratedSources {
              | *
              | * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
              | *
-             | * (If you're developing `typo` and want to change it: run `bleep generate-sources)
+             | * (If you're developing `typo` and want to change it: run `bleep generate-sources`)
              | */
              |""".stripMargin
 
