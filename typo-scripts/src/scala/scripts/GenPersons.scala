@@ -36,8 +36,8 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
     List(
-      db.ForeignKey(db.ColName("favourite_football_club_id"), db.RelationName("myschema", "football_club"), db.ColName("id")),
-      db.ForeignKey(db.ColName("marital_status_id"), db.RelationName("myschema", "marital_status"), db.ColName("id"))
+      db.ForeignKey(List(db.ColName("favourite_football_club_id")), db.RelationName("myschema", "football_club"), List(db.ColName("id"))),
+      db.ForeignKey(List(db.ColName("marital_status_id")), db.RelationName("myschema", "marital_status"), List(db.ColName("id")))
     )
   )
   val football_club = db.Table(

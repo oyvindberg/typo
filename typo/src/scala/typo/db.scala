@@ -33,7 +33,7 @@ object db {
   case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
   case class RelationName(schema: String, name: String)
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName = RelationName("", ""))
-  case class ForeignKey(col: ColName, otherTable: RelationName, otherColumn: ColName, constraintName: RelationName = RelationName("", ""))
+  case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class UniqueKey(cols: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class Table(
       name: RelationName,

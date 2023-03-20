@@ -20,9 +20,9 @@ class ForeignKeys(
           db.RelationName(fk.constraint_schema, fk.constraint_name)
         )
       }
-      .collect {
-        case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) if referringColumns.size == 1 && referredColumns.size == 1 =>
-          tableName -> db.ForeignKey(referringColumns.head, referredTable, referredColumns.head, constraintName)
+      .map {
+        case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
+          tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
       }
       .groupMap(_._1)(_._2)
   }
