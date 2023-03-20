@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait PgStatProgressBasebackupRepoImpl extends PgStatProgressBasebackupRepo {
           case PgStatProgressBasebackupFieldValue.tablespacesTotal(value) => NamedParameter("tablespaces_total", ParameterValue.from(value))
           case PgStatProgressBasebackupFieldValue.tablespacesStreamed(value) => NamedParameter("tablespaces_streamed", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_progress_basebackup where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_progress_basebackup where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatProgressBasebackupRow.rowParser.*)
     }

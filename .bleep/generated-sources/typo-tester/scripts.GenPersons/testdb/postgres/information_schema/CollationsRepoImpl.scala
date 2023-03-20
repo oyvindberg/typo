@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -26,7 +27,8 @@ trait CollationsRepoImpl extends CollationsRepo {
           case CollationsFieldValue.collationName(value) => NamedParameter("collation_name", ParameterValue.from(value))
           case CollationsFieldValue.padAttribute(value) => NamedParameter("pad_attribute", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.collations where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.collations where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(CollationsRow.rowParser.*)
     }

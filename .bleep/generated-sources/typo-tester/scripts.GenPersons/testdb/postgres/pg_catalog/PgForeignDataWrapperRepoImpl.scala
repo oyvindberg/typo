@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -35,7 +36,8 @@ trait PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
           case PgForeignDataWrapperFieldValue.fdwacl(value) => NamedParameter("fdwacl", ParameterValue.from(value))
           case PgForeignDataWrapperFieldValue.fdwoptions(value) => NamedParameter("fdwoptions", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_foreign_data_wrapper where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_foreign_data_wrapper where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgForeignDataWrapperRow.rowParser.*)
     }
@@ -54,9 +56,10 @@ trait PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
           case PgForeignDataWrapperFieldValue.fdwacl(value) => NamedParameter("fdwacl", ParameterValue.from(value))
           case PgForeignDataWrapperFieldValue.fdwoptions(value) => NamedParameter("fdwoptions", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_foreign_data_wrapper
+        val q = s"""update pg_catalog.pg_foreign_data_wrapper
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

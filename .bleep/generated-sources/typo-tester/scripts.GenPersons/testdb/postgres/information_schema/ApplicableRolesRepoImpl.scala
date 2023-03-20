@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -25,7 +26,8 @@ trait ApplicableRolesRepoImpl extends ApplicableRolesRepo {
           case ApplicableRolesFieldValue.roleName(value) => NamedParameter("role_name", ParameterValue.from(value))
           case ApplicableRolesFieldValue.isGrantable(value) => NamedParameter("is_grantable", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.applicable_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.applicable_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ApplicableRolesRow.rowParser.*)
     }

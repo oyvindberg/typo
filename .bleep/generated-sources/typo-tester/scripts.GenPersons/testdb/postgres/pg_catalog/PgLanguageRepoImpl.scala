@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -37,7 +38,8 @@ trait PgLanguageRepoImpl extends PgLanguageRepo {
           case PgLanguageFieldValue.lanvalidator(value) => NamedParameter("lanvalidator", ParameterValue.from(value))
           case PgLanguageFieldValue.lanacl(value) => NamedParameter("lanacl", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_language where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_language where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgLanguageRow.rowParser.*)
     }
@@ -58,9 +60,10 @@ trait PgLanguageRepoImpl extends PgLanguageRepo {
           case PgLanguageFieldValue.lanvalidator(value) => NamedParameter("lanvalidator", ParameterValue.from(value))
           case PgLanguageFieldValue.lanacl(value) => NamedParameter("lanacl", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_language
+        val q = s"""update pg_catalog.pg_language
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

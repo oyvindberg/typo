@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait PgUserMappingRepoImpl extends PgUserMappingRepo {
           case PgUserMappingFieldValue.umserver(value) => NamedParameter("umserver", ParameterValue.from(value))
           case PgUserMappingFieldValue.umoptions(value) => NamedParameter("umoptions", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_user_mapping where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_user_mapping where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgUserMappingRow.rowParser.*)
     }
@@ -48,9 +50,10 @@ trait PgUserMappingRepoImpl extends PgUserMappingRepo {
           case PgUserMappingFieldValue.umserver(value) => NamedParameter("umserver", ParameterValue.from(value))
           case PgUserMappingFieldValue.umoptions(value) => NamedParameter("umoptions", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_user_mapping
+        val q = s"""update pg_catalog.pg_user_mapping
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

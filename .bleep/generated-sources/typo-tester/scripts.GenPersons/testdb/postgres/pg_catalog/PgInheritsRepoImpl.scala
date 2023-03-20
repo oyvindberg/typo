@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgInheritsRepoImpl extends PgInheritsRepo {
           case PgInheritsFieldValue.inhseqno(value) => NamedParameter("inhseqno", ParameterValue.from(value))
           case PgInheritsFieldValue.inhdetachpending(value) => NamedParameter("inhdetachpending", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_inherits where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_inherits where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgInheritsRow.rowParser.*)
     }
@@ -45,9 +47,10 @@ trait PgInheritsRepoImpl extends PgInheritsRepo {
           case PgInheritsFieldValue.inhseqno(value) => NamedParameter("inhseqno", ParameterValue.from(value))
           case PgInheritsFieldValue.inhdetachpending(value) => NamedParameter("inhdetachpending", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_inherits
+        val q = s"""update pg_catalog.pg_inherits
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

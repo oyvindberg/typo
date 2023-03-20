@@ -9,6 +9,7 @@ package myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        SQL"""select * from myschema.marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from myschema.marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(MaritalStatusRow.rowParser.*)
     }
@@ -42,9 +44,10 @@ trait MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        SQL"""update myschema.marital_status
+        val q = s"""update myschema.marital_status
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = $id"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

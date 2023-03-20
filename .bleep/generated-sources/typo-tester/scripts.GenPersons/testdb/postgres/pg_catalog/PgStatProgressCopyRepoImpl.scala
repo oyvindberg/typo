@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait PgStatProgressCopyRepoImpl extends PgStatProgressCopyRepo {
           case PgStatProgressCopyFieldValue.tuplesProcessed(value) => NamedParameter("tuples_processed", ParameterValue.from(value))
           case PgStatProgressCopyFieldValue.tuplesExcluded(value) => NamedParameter("tuples_excluded", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_progress_copy where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_progress_copy where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatProgressCopyRow.rowParser.*)
     }

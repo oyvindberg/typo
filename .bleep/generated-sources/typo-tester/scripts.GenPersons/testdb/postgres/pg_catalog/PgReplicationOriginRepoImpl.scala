@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           case PgReplicationOriginFieldValue.roident(value) => NamedParameter("roident", ParameterValue.from(value))
           case PgReplicationOriginFieldValue.roname(value) => NamedParameter("roname", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_replication_origin where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_replication_origin where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgReplicationOriginRow.rowParser.*)
     }
@@ -44,9 +46,10 @@ trait PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           case PgReplicationOriginFieldValue.roident(value) => NamedParameter("roident", ParameterValue.from(value))
           case PgReplicationOriginFieldValue.roname(value) => NamedParameter("roname", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_replication_origin
+        val q = s"""update pg_catalog.pg_replication_origin
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where roident = $roident"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

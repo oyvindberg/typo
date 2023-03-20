@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait ViewRoutineUsageRepoImpl extends ViewRoutineUsageRepo {
           case ViewRoutineUsageFieldValue.specificSchema(value) => NamedParameter("specific_schema", ParameterValue.from(value))
           case ViewRoutineUsageFieldValue.specificName(value) => NamedParameter("specific_name", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.view_routine_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.view_routine_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ViewRoutineUsageRow.rowParser.*)
     }

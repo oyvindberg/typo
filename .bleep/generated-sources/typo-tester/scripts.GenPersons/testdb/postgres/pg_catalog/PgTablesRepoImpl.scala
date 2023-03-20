@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgTablesRepoImpl extends PgTablesRepo {
           case PgTablesFieldValue.hastriggers(value) => NamedParameter("hastriggers", ParameterValue.from(value))
           case PgTablesFieldValue.rowsecurity(value) => NamedParameter("rowsecurity", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTablesRow.rowParser.*)
     }

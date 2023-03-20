@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -38,7 +39,8 @@ trait PgStatProgressCreateIndexRepoImpl extends PgStatProgressCreateIndexRepo {
           case PgStatProgressCreateIndexFieldValue.partitionsTotal(value) => NamedParameter("partitions_total", ParameterValue.from(value))
           case PgStatProgressCreateIndexFieldValue.partitionsDone(value) => NamedParameter("partitions_done", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_progress_create_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_progress_create_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatProgressCreateIndexRow.rowParser.*)
     }

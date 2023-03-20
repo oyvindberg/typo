@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait PgStatReplicationSlotsRepoImpl extends PgStatReplicationSlotsRepo {
           case PgStatReplicationSlotsFieldValue.totalBytes(value) => NamedParameter("total_bytes", ParameterValue.from(value))
           case PgStatReplicationSlotsFieldValue.statsReset(value) => NamedParameter("stats_reset", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_replication_slots where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_replication_slots where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatReplicationSlotsRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait PgAmRepoImpl extends PgAmRepo {
           case PgAmFieldValue.amhandler(value) => NamedParameter("amhandler", ParameterValue.from(value))
           case PgAmFieldValue.amtype(value) => NamedParameter("amtype", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_am where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_am where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAmRow.rowParser.*)
     }
@@ -48,9 +50,10 @@ trait PgAmRepoImpl extends PgAmRepo {
           case PgAmFieldValue.amhandler(value) => NamedParameter("amhandler", ParameterValue.from(value))
           case PgAmFieldValue.amtype(value) => NamedParameter("amtype", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_am
+        val q = s"""update pg_catalog.pg_am
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

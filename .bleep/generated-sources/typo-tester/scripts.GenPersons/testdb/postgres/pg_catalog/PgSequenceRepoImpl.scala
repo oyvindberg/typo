@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -36,7 +37,8 @@ trait PgSequenceRepoImpl extends PgSequenceRepo {
           case PgSequenceFieldValue.seqcache(value) => NamedParameter("seqcache", ParameterValue.from(value))
           case PgSequenceFieldValue.seqcycle(value) => NamedParameter("seqcycle", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_sequence where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_sequence where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgSequenceRow.rowParser.*)
     }
@@ -56,9 +58,10 @@ trait PgSequenceRepoImpl extends PgSequenceRepo {
           case PgSequenceFieldValue.seqcache(value) => NamedParameter("seqcache", ParameterValue.from(value))
           case PgSequenceFieldValue.seqcycle(value) => NamedParameter("seqcycle", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_sequence
+        val q = s"""update pg_catalog.pg_sequence
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where seqrelid = $seqrelid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

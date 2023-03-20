@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgBackendMemoryContextsRepoImpl extends PgBackendMemoryContextsRepo {
           case PgBackendMemoryContextsFieldValue.freeChunks(value) => NamedParameter("free_chunks", ParameterValue.from(value))
           case PgBackendMemoryContextsFieldValue.usedBytes(value) => NamedParameter("used_bytes", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_backend_memory_contexts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_backend_memory_contexts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgBackendMemoryContextsRow.rowParser.*)
     }

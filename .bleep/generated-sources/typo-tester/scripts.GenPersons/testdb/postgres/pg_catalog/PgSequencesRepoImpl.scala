@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgSequencesRepoImpl extends PgSequencesRepo {
           case PgSequencesFieldValue.cacheSize(value) => NamedParameter("cache_size", ParameterValue.from(value))
           case PgSequencesFieldValue.lastValue(value) => NamedParameter("last_value", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgSequencesRow.rowParser.*)
     }

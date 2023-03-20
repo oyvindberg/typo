@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait TransformsRepoImpl extends TransformsRepo {
           case TransformsFieldValue.groupName(value) => NamedParameter("group_name", ParameterValue.from(value))
           case TransformsFieldValue.transformType(value) => NamedParameter("transform_type", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.transforms where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.transforms where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(TransformsRow.rowParser.*)
     }

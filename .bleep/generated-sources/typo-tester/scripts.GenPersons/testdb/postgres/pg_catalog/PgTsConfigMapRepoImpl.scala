@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           case PgTsConfigMapFieldValue.mapseqno(value) => NamedParameter("mapseqno", ParameterValue.from(value))
           case PgTsConfigMapFieldValue.mapdict(value) => NamedParameter("mapdict", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_ts_config_map where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_ts_config_map where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTsConfigMapRow.rowParser.*)
     }
@@ -45,9 +47,10 @@ trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           case PgTsConfigMapFieldValue.mapseqno(value) => NamedParameter("mapseqno", ParameterValue.from(value))
           case PgTsConfigMapFieldValue.mapdict(value) => NamedParameter("mapdict", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_ts_config_map
+        val q = s"""update pg_catalog.pg_ts_config_map
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

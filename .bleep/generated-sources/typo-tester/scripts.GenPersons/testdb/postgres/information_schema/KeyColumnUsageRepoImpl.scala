@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
           case KeyColumnUsageFieldValue.ordinalPosition(value) => NamedParameter("ordinal_position", ParameterValue.from(value))
           case KeyColumnUsageFieldValue.positionInUniqueConstraint(value) => NamedParameter("position_in_unique_constraint", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.key_column_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.key_column_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(KeyColumnUsageRow.rowParser.*)
     }

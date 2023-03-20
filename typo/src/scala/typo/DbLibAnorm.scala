@@ -16,6 +16,7 @@ object DbLibAnorm extends DbLib {
   val ParameterMetaData = sc.Type.Qualified("anorm.ParameterMetaData")
   val MetaDataItem = sc.Type.Qualified("anorm.MetaDataItem")
   val SqlRequestError = sc.Type.Qualified("anorm.SqlRequestError")
+  val SQL = sc.Type.Qualified("anorm.SQL")
 
   val rowParserIdent = sc.Ident("rowParser")
   def interpolate(content: sc.Code) =
@@ -117,8 +118,7 @@ object DbLibAnorm extends DbLib {
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           )
 
-        code""""""
-        val sql = interpolate(
+        val sql = sc.s(
           code"""select * from ${table.relationName} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
         )
         code"""${param.name} match {
@@ -127,7 +127,8 @@ object DbLibAnorm extends DbLib {
               |        val namedParams = nonEmpty.map{
               |          ${cases.mkCode("\n          ")}
               |        }
-              |        $sql
+              |        val q = $sql
+              |        $SQL(q)
               |          .on(namedParams: _*)
               |          .as(${table.RowName}.$rowParserIdent.*)
               |    }
@@ -139,7 +140,7 @@ object DbLibAnorm extends DbLib {
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
-        val sql = interpolate(
+        val sql = sc.s(
           code"""update ${table.relationName}
                 |          set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
                 |          where ${matchId(id)}""".stripMargin
@@ -150,7 +151,8 @@ object DbLibAnorm extends DbLib {
               |        val namedParams = nonEmpty.map{
               |          ${cases.mkCode("\n          ")}
               |        }
-              |        $sql
+              |        val q = $sql
+              |        $SQL(q)
               |          .on(namedParams: _*)
               |          .executeUpdate()
               |    }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgTsConfigRepoImpl extends PgTsConfigRepo {
           case PgTsConfigFieldValue.cfgowner(value) => NamedParameter("cfgowner", ParameterValue.from(value))
           case PgTsConfigFieldValue.cfgparser(value) => NamedParameter("cfgparser", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_ts_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_ts_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTsConfigRow.rowParser.*)
     }
@@ -50,9 +52,10 @@ trait PgTsConfigRepoImpl extends PgTsConfigRepo {
           case PgTsConfigFieldValue.cfgowner(value) => NamedParameter("cfgowner", ParameterValue.from(value))
           case PgTsConfigFieldValue.cfgparser(value) => NamedParameter("cfgparser", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_ts_config
+        val q = s"""update pg_catalog.pg_ts_config
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait RoutineTableUsageRepoImpl extends RoutineTableUsageRepo {
           case RoutineTableUsageFieldValue.tableSchema(value) => NamedParameter("table_schema", ParameterValue.from(value))
           case RoutineTableUsageFieldValue.tableName(value) => NamedParameter("table_name", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.routine_table_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.routine_table_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(RoutineTableUsageRow.rowParser.*)
     }

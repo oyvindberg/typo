@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -23,7 +24,8 @@ trait InformationSchemaCatalogNameRepoImpl extends InformationSchemaCatalogNameR
         val namedParams = nonEmpty.map{
           case InformationSchemaCatalogNameFieldValue.catalogName(value) => NamedParameter("catalog_name", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.information_schema_catalog_name where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.information_schema_catalog_name where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(InformationSchemaCatalogNameRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgDependRepoImpl extends PgDependRepo {
           case PgDependFieldValue.refobjsubid(value) => NamedParameter("refobjsubid", ParameterValue.from(value))
           case PgDependFieldValue.deptype(value) => NamedParameter("deptype", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_depend where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_depend where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgDependRow.rowParser.*)
     }

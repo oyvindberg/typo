@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -38,7 +39,8 @@ trait PgStatsExtExprsRepoImpl extends PgStatsExtExprsRepo {
           case PgStatsExtExprsFieldValue.mostCommonElemFreqs(value) => NamedParameter("most_common_elem_freqs", ParameterValue.from(value))
           case PgStatsExtExprsFieldValue.elemCountHistogram(value) => NamedParameter("elem_count_histogram", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stats_ext_exprs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stats_ext_exprs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatsExtExprsRow.rowParser.*)
     }

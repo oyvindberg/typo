@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -56,7 +57,8 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
           case PgStatisticFieldValue.stavalues4(value) => NamedParameter("stavalues4", ParameterValue.from(value))
           case PgStatisticFieldValue.stavalues5(value) => NamedParameter("stavalues5", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_statistic where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_statistic where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatisticRow.rowParser.*)
     }
@@ -99,9 +101,10 @@ trait PgStatisticRepoImpl extends PgStatisticRepo {
           case PgStatisticFieldValue.stavalues4(value) => NamedParameter("stavalues4", ParameterValue.from(value))
           case PgStatisticFieldValue.stavalues5(value) => NamedParameter("stavalues5", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_statistic
+        val q = s"""update pg_catalog.pg_statistic
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

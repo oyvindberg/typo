@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -54,7 +55,8 @@ trait ParametersRepoImpl extends ParametersRepo {
           case ParametersFieldValue.dtdIdentifier(value) => NamedParameter("dtd_identifier", ParameterValue.from(value))
           case ParametersFieldValue.parameterDefault(value) => NamedParameter("parameter_default", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.parameters where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.parameters where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ParametersRow.rowParser.*)
     }

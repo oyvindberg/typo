@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait PgAttrdefRepoImpl extends PgAttrdefRepo {
           case PgAttrdefFieldValue.adnum(value) => NamedParameter("adnum", ParameterValue.from(value))
           case PgAttrdefFieldValue.adbin(value) => NamedParameter("adbin", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_attrdef where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_attrdef where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAttrdefRow.rowParser.*)
     }
@@ -48,9 +50,10 @@ trait PgAttrdefRepoImpl extends PgAttrdefRepo {
           case PgAttrdefFieldValue.adnum(value) => NamedParameter("adnum", ParameterValue.from(value))
           case PgAttrdefFieldValue.adbin(value) => NamedParameter("adbin", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_attrdef
+        val q = s"""update pg_catalog.pg_attrdef
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

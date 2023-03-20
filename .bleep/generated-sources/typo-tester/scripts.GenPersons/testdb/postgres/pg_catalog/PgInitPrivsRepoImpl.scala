@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgInitPrivsRepoImpl extends PgInitPrivsRepo {
           case PgInitPrivsFieldValue.privtype(value) => NamedParameter("privtype", ParameterValue.from(value))
           case PgInitPrivsFieldValue.initprivs(value) => NamedParameter("initprivs", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_init_privs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_init_privs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgInitPrivsRow.rowParser.*)
     }
@@ -47,9 +49,10 @@ trait PgInitPrivsRepoImpl extends PgInitPrivsRepo {
           case PgInitPrivsFieldValue.privtype(value) => NamedParameter("privtype", ParameterValue.from(value))
           case PgInitPrivsFieldValue.initprivs(value) => NamedParameter("initprivs", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_init_privs
+        val q = s"""update pg_catalog.pg_init_privs
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

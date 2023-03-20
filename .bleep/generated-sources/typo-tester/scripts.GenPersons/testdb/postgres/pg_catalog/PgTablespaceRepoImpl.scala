@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgTablespaceRepoImpl extends PgTablespaceRepo {
           case PgTablespaceFieldValue.spcacl(value) => NamedParameter("spcacl", ParameterValue.from(value))
           case PgTablespaceFieldValue.spcoptions(value) => NamedParameter("spcoptions", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_tablespace where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_tablespace where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTablespaceRow.rowParser.*)
     }
@@ -50,9 +52,10 @@ trait PgTablespaceRepoImpl extends PgTablespaceRepo {
           case PgTablespaceFieldValue.spcacl(value) => NamedParameter("spcacl", ParameterValue.from(value))
           case PgTablespaceFieldValue.spcoptions(value) => NamedParameter("spcoptions", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_tablespace
+        val q = s"""update pg_catalog.pg_tablespace
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

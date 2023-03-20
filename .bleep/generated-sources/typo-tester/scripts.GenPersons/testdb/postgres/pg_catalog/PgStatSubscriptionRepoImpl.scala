@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgStatSubscriptionRepoImpl extends PgStatSubscriptionRepo {
           case PgStatSubscriptionFieldValue.latestEndLsn(value) => NamedParameter("latest_end_lsn", ParameterValue.from(value))
           case PgStatSubscriptionFieldValue.latestEndTime(value) => NamedParameter("latest_end_time", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatSubscriptionRow.rowParser.*)
     }

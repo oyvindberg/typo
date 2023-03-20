@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -66,7 +67,8 @@ trait ColumnsRepoImpl extends ColumnsRepo {
           case ColumnsFieldValue.generationExpression(value) => NamedParameter("generation_expression", ParameterValue.from(value))
           case ColumnsFieldValue.isUpdatable(value) => NamedParameter("is_updatable", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ColumnsRow.rowParser.*)
     }

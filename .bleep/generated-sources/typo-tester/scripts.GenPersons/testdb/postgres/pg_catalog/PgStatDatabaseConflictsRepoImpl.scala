@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgStatDatabaseConflictsRepoImpl extends PgStatDatabaseConflictsRepo {
           case PgStatDatabaseConflictsFieldValue.conflBufferpin(value) => NamedParameter("confl_bufferpin", ParameterValue.from(value))
           case PgStatDatabaseConflictsFieldValue.conflDeadlock(value) => NamedParameter("confl_deadlock", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_database_conflicts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_database_conflicts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatDatabaseConflictsRow.rowParser.*)
     }

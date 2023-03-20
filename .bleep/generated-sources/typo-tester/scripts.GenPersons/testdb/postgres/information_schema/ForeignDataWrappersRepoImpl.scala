@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait ForeignDataWrappersRepoImpl extends ForeignDataWrappersRepo {
           case ForeignDataWrappersFieldValue.libraryName(value) => NamedParameter("library_name", ParameterValue.from(value))
           case ForeignDataWrappersFieldValue.foreignDataWrapperLanguage(value) => NamedParameter("foreign_data_wrapper_language", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.foreign_data_wrappers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.foreign_data_wrappers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ForeignDataWrappersRow.rowParser.*)
     }

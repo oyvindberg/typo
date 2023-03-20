@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait ForeignServersRepoImpl extends ForeignServersRepo {
           case ForeignServersFieldValue.foreignServerVersion(value) => NamedParameter("foreign_server_version", ParameterValue.from(value))
           case ForeignServersFieldValue.authorizationIdentifier(value) => NamedParameter("authorization_identifier", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.foreign_servers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.foreign_servers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ForeignServersRow.rowParser.*)
     }

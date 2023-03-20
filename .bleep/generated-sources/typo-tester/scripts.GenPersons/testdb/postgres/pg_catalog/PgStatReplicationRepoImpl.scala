@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -42,7 +43,8 @@ trait PgStatReplicationRepoImpl extends PgStatReplicationRepo {
           case PgStatReplicationFieldValue.syncState(value) => NamedParameter("sync_state", ParameterValue.from(value))
           case PgStatReplicationFieldValue.replyTime(value) => NamedParameter("reply_time", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_replication where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_replication where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatReplicationRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -40,7 +41,8 @@ trait PgAuthidRepoImpl extends PgAuthidRepo {
           case PgAuthidFieldValue.rolpassword(value) => NamedParameter("rolpassword", ParameterValue.from(value))
           case PgAuthidFieldValue.rolvaliduntil(value) => NamedParameter("rolvaliduntil", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_authid where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_authid where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAuthidRow.rowParser.*)
     }
@@ -64,9 +66,10 @@ trait PgAuthidRepoImpl extends PgAuthidRepo {
           case PgAuthidFieldValue.rolpassword(value) => NamedParameter("rolpassword", ParameterValue.from(value))
           case PgAuthidFieldValue.rolvaliduntil(value) => NamedParameter("rolvaliduntil", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_authid
+        val q = s"""update pg_catalog.pg_authid
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

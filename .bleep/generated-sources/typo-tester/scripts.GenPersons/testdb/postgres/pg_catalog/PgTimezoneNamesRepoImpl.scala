@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -26,7 +27,8 @@ trait PgTimezoneNamesRepoImpl extends PgTimezoneNamesRepo {
           case PgTimezoneNamesFieldValue.utcOffset(value) => NamedParameter("utc_offset", ParameterValue.from(value))
           case PgTimezoneNamesFieldValue.isDst(value) => NamedParameter("is_dst", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_timezone_names where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_timezone_names where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTimezoneNamesRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
           case PgSubscriptionRelFieldValue.srsubstate(value) => NamedParameter("srsubstate", ParameterValue.from(value))
           case PgSubscriptionRelFieldValue.srsublsn(value) => NamedParameter("srsublsn", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_subscription_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_subscription_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgSubscriptionRelRow.rowParser.*)
     }
@@ -45,9 +47,10 @@ trait PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
           case PgSubscriptionRelFieldValue.srsubstate(value) => NamedParameter("srsubstate", ParameterValue.from(value))
           case PgSubscriptionRelFieldValue.srsublsn(value) => NamedParameter("srsublsn", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_subscription_rel
+        val q = s"""update pg_catalog.pg_subscription_rel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

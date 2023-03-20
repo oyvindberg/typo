@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -45,7 +46,8 @@ trait PgStatUserTablesRepoImpl extends PgStatUserTablesRepo {
           case PgStatUserTablesFieldValue.analyzeCount(value) => NamedParameter("analyze_count", ParameterValue.from(value))
           case PgStatUserTablesFieldValue.autoanalyzeCount(value) => NamedParameter("autoanalyze_count", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_user_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_user_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatUserTablesRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -25,7 +26,8 @@ trait PgGroupRepoImpl extends PgGroupRepo {
           case PgGroupFieldValue.grosysid(value) => NamedParameter("grosysid", ParameterValue.from(value))
           case PgGroupFieldValue.grolist(value) => NamedParameter("grolist", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_group where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_group where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgGroupRow.rowParser.*)
     }

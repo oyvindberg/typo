@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgStatSslRepoImpl extends PgStatSslRepo {
           case PgStatSslFieldValue.clientSerial(value) => NamedParameter("client_serial", ParameterValue.from(value))
           case PgStatSslFieldValue.issuerDn(value) => NamedParameter("issuer_dn", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_ssl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_ssl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatSslRow.rowParser.*)
     }

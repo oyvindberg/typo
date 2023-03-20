@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgStatBgwriterRepoImpl extends PgStatBgwriterRepo {
           case PgStatBgwriterFieldValue.buffersAlloc(value) => NamedParameter("buffers_alloc", ParameterValue.from(value))
           case PgStatBgwriterFieldValue.statsReset(value) => NamedParameter("stats_reset", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_bgwriter where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_bgwriter where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatBgwriterRow.rowParser.*)
     }

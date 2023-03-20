@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -24,7 +25,8 @@ trait PgConfigRepoImpl extends PgConfigRepo {
           case PgConfigFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case PgConfigFieldValue.setting(value) => NamedParameter("setting", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgConfigRow.rowParser.*)
     }

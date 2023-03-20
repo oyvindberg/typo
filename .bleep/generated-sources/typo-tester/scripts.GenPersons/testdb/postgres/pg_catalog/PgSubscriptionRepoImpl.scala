@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -39,7 +40,8 @@ trait PgSubscriptionRepoImpl extends PgSubscriptionRepo {
           case PgSubscriptionFieldValue.subsynccommit(value) => NamedParameter("subsynccommit", ParameterValue.from(value))
           case PgSubscriptionFieldValue.subpublications(value) => NamedParameter("subpublications", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgSubscriptionRow.rowParser.*)
     }
@@ -62,9 +64,10 @@ trait PgSubscriptionRepoImpl extends PgSubscriptionRepo {
           case PgSubscriptionFieldValue.subsynccommit(value) => NamedParameter("subsynccommit", ParameterValue.from(value))
           case PgSubscriptionFieldValue.subpublications(value) => NamedParameter("subpublications", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_subscription
+        val q = s"""update pg_catalog.pg_subscription
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

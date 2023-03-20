@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait DataTypePrivilegesRepoImpl extends DataTypePrivilegesRepo {
           case DataTypePrivilegesFieldValue.objectType(value) => NamedParameter("object_type", ParameterValue.from(value))
           case DataTypePrivilegesFieldValue.dtdIdentifier(value) => NamedParameter("dtd_identifier", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.data_type_privileges where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.data_type_privileges where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(DataTypePrivilegesRow.rowParser.*)
     }

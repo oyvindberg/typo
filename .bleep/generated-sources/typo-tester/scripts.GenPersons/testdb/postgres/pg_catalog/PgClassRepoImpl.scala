@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -61,7 +62,8 @@ trait PgClassRepoImpl extends PgClassRepo {
           case PgClassFieldValue.reloptions(value) => NamedParameter("reloptions", ParameterValue.from(value))
           case PgClassFieldValue.relpartbound(value) => NamedParameter("relpartbound", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_class where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_class where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgClassRow.rowParser.*)
     }
@@ -106,9 +108,10 @@ trait PgClassRepoImpl extends PgClassRepo {
           case PgClassFieldValue.reloptions(value) => NamedParameter("reloptions", ParameterValue.from(value))
           case PgClassFieldValue.relpartbound(value) => NamedParameter("relpartbound", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_class
+        val q = s"""update pg_catalog.pg_class
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

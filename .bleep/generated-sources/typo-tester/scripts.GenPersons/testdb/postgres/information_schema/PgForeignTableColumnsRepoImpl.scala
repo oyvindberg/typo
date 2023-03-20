@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -26,7 +27,8 @@ trait PgForeignTableColumnsRepoImpl extends PgForeignTableColumnsRepo {
           case PgForeignTableColumnsFieldValue.attname(value) => NamedParameter("attname", ParameterValue.from(value))
           case PgForeignTableColumnsFieldValue.attfdwoptions(value) => NamedParameter("attfdwoptions", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema._pg_foreign_table_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema._pg_foreign_table_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgForeignTableColumnsRow.rowParser.*)
     }

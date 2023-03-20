@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -43,7 +44,8 @@ trait PgOperatorRepoImpl extends PgOperatorRepo {
           case PgOperatorFieldValue.oprrest(value) => NamedParameter("oprrest", ParameterValue.from(value))
           case PgOperatorFieldValue.oprjoin(value) => NamedParameter("oprjoin", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_operator where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_operator where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgOperatorRow.rowParser.*)
     }
@@ -70,9 +72,10 @@ trait PgOperatorRepoImpl extends PgOperatorRepo {
           case PgOperatorFieldValue.oprrest(value) => NamedParameter("oprrest", ParameterValue.from(value))
           case PgOperatorFieldValue.oprjoin(value) => NamedParameter("oprjoin", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_operator
+        val q = s"""update pg_catalog.pg_operator
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

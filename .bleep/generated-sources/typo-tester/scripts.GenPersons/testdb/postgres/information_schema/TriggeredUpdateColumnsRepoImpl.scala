@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait TriggeredUpdateColumnsRepoImpl extends TriggeredUpdateColumnsRepo {
           case TriggeredUpdateColumnsFieldValue.eventObjectTable(value) => NamedParameter("event_object_table", ParameterValue.from(value))
           case TriggeredUpdateColumnsFieldValue.eventObjectColumn(value) => NamedParameter("event_object_column", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.triggered_update_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.triggered_update_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(TriggeredUpdateColumnsRow.rowParser.*)
     }

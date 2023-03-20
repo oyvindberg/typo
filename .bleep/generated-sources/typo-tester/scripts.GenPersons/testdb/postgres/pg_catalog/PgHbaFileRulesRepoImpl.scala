@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgHbaFileRulesRepoImpl extends PgHbaFileRulesRepo {
           case PgHbaFileRulesFieldValue.options(value) => NamedParameter("options", ParameterValue.from(value))
           case PgHbaFileRulesFieldValue.error(value) => NamedParameter("error", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_hba_file_rules where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_hba_file_rules where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgHbaFileRulesRow.rowParser.*)
     }

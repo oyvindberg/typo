@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -37,7 +38,8 @@ trait PgStatisticExtRepoImpl extends PgStatisticExtRepo {
           case PgStatisticExtFieldValue.stxkind(value) => NamedParameter("stxkind", ParameterValue.from(value))
           case PgStatisticExtFieldValue.stxexprs(value) => NamedParameter("stxexprs", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_statistic_ext where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_statistic_ext where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatisticExtRow.rowParser.*)
     }
@@ -58,9 +60,10 @@ trait PgStatisticExtRepoImpl extends PgStatisticExtRepo {
           case PgStatisticExtFieldValue.stxkind(value) => NamedParameter("stxkind", ParameterValue.from(value))
           case PgStatisticExtFieldValue.stxexprs(value) => NamedParameter("stxexprs", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_statistic_ext
+        val q = s"""update pg_catalog.pg_statistic_ext
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

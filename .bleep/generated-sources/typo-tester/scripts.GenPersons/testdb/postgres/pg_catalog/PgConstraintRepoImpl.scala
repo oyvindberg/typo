@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -53,7 +54,8 @@ trait PgConstraintRepoImpl extends PgConstraintRepo {
           case PgConstraintFieldValue.conexclop(value) => NamedParameter("conexclop", ParameterValue.from(value))
           case PgConstraintFieldValue.conbin(value) => NamedParameter("conbin", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_constraint where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_constraint where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgConstraintRow.rowParser.*)
     }
@@ -90,9 +92,10 @@ trait PgConstraintRepoImpl extends PgConstraintRepo {
           case PgConstraintFieldValue.conexclop(value) => NamedParameter("conexclop", ParameterValue.from(value))
           case PgConstraintFieldValue.conbin(value) => NamedParameter("conbin", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_constraint
+        val q = s"""update pg_catalog.pg_constraint
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

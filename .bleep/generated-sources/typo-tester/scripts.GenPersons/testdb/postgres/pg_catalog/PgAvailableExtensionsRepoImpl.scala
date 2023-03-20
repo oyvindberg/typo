@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -26,7 +27,8 @@ trait PgAvailableExtensionsRepoImpl extends PgAvailableExtensionsRepo {
           case PgAvailableExtensionsFieldValue.installedVersion(value) => NamedParameter("installed_version", ParameterValue.from(value))
           case PgAvailableExtensionsFieldValue.comment(value) => NamedParameter("comment", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_available_extensions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_available_extensions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAvailableExtensionsRow.rowParser.*)
     }

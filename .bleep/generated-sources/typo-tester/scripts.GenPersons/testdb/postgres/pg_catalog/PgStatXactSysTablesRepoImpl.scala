@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgStatXactSysTablesRepoImpl extends PgStatXactSysTablesRepo {
           case PgStatXactSysTablesFieldValue.nTupDel(value) => NamedParameter("n_tup_del", ParameterValue.from(value))
           case PgStatXactSysTablesFieldValue.nTupHotUpd(value) => NamedParameter("n_tup_hot_upd", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_xact_sys_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_xact_sys_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatXactSysTablesRow.rowParser.*)
     }

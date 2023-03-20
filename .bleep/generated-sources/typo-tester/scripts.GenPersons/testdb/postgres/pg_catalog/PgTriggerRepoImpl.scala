@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -47,7 +48,8 @@ trait PgTriggerRepoImpl extends PgTriggerRepo {
           case PgTriggerFieldValue.tgoldtable(value) => NamedParameter("tgoldtable", ParameterValue.from(value))
           case PgTriggerFieldValue.tgnewtable(value) => NamedParameter("tgnewtable", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTriggerRow.rowParser.*)
     }
@@ -78,9 +80,10 @@ trait PgTriggerRepoImpl extends PgTriggerRepo {
           case PgTriggerFieldValue.tgoldtable(value) => NamedParameter("tgoldtable", ParameterValue.from(value))
           case PgTriggerFieldValue.tgnewtable(value) => NamedParameter("tgnewtable", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_trigger
+        val q = s"""update pg_catalog.pg_trigger
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

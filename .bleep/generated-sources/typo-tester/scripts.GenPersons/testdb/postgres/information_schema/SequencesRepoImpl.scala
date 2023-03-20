@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -34,7 +35,8 @@ trait SequencesRepoImpl extends SequencesRepo {
           case SequencesFieldValue.increment(value) => NamedParameter("increment", ParameterValue.from(value))
           case SequencesFieldValue.cycleOption(value) => NamedParameter("cycle_option", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(SequencesRow.rowParser.*)
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -35,7 +36,8 @@ trait PgRangeRepoImpl extends PgRangeRepo {
           case PgRangeFieldValue.rngcanonical(value) => NamedParameter("rngcanonical", ParameterValue.from(value))
           case PgRangeFieldValue.rngsubdiff(value) => NamedParameter("rngsubdiff", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_range where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_range where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgRangeRow.rowParser.*)
     }
@@ -54,9 +56,10 @@ trait PgRangeRepoImpl extends PgRangeRepo {
           case PgRangeFieldValue.rngcanonical(value) => NamedParameter("rngcanonical", ParameterValue.from(value))
           case PgRangeFieldValue.rngsubdiff(value) => NamedParameter("rngsubdiff", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_range
+        val q = s"""update pg_catalog.pg_range
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where rngtypid = $rngtypid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

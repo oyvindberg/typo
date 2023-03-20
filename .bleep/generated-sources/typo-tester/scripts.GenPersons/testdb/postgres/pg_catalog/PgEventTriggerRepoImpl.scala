@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -35,7 +36,8 @@ trait PgEventTriggerRepoImpl extends PgEventTriggerRepo {
           case PgEventTriggerFieldValue.evtenabled(value) => NamedParameter("evtenabled", ParameterValue.from(value))
           case PgEventTriggerFieldValue.evttags(value) => NamedParameter("evttags", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_event_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_event_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgEventTriggerRow.rowParser.*)
     }
@@ -54,9 +56,10 @@ trait PgEventTriggerRepoImpl extends PgEventTriggerRepo {
           case PgEventTriggerFieldValue.evtenabled(value) => NamedParameter("evtenabled", ParameterValue.from(value))
           case PgEventTriggerFieldValue.evttags(value) => NamedParameter("evttags", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_event_trigger
+        val q = s"""update pg_catalog.pg_event_trigger
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

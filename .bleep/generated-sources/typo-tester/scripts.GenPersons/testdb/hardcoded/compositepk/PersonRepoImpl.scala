@@ -9,6 +9,7 @@ package compositepk
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""select * from compositepk.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from compositepk.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PersonRow.rowParser.*)
     }
@@ -43,9 +45,10 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""update compositepk.person
+        val q = s"""update compositepk.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where one = ${compositeId.one}, two = ${compositeId.two}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

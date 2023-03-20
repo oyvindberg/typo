@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           case PgDbRoleSettingFieldValue.setrole(value) => NamedParameter("setrole", ParameterValue.from(value))
           case PgDbRoleSettingFieldValue.setconfig(value) => NamedParameter("setconfig", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_db_role_setting where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_db_role_setting where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgDbRoleSettingRow.rowParser.*)
     }
@@ -43,9 +45,10 @@ trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           case PgDbRoleSettingFieldValue.setrole(value) => NamedParameter("setrole", ParameterValue.from(value))
           case PgDbRoleSettingFieldValue.setconfig(value) => NamedParameter("setconfig", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_db_role_setting
+        val q = s"""update pg_catalog.pg_db_role_setting
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

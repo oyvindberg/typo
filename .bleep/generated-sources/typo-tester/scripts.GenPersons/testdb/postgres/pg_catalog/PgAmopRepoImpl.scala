@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -37,7 +38,8 @@ trait PgAmopRepoImpl extends PgAmopRepo {
           case PgAmopFieldValue.amopmethod(value) => NamedParameter("amopmethod", ParameterValue.from(value))
           case PgAmopFieldValue.amopsortfamily(value) => NamedParameter("amopsortfamily", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_amop where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_amop where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAmopRow.rowParser.*)
     }
@@ -58,9 +60,10 @@ trait PgAmopRepoImpl extends PgAmopRepo {
           case PgAmopFieldValue.amopmethod(value) => NamedParameter("amopmethod", ParameterValue.from(value))
           case PgAmopFieldValue.amopsortfamily(value) => NamedParameter("amopsortfamily", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_amop
+        val q = s"""update pg_catalog.pg_amop
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

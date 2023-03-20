@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgStatSysIndexesRepoImpl extends PgStatSysIndexesRepo {
           case PgStatSysIndexesFieldValue.idxTupRead(value) => NamedParameter("idx_tup_read", ParameterValue.from(value))
           case PgStatSysIndexesFieldValue.idxTupFetch(value) => NamedParameter("idx_tup_fetch", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_sys_indexes where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_sys_indexes where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatSysIndexesRow.rowParser.*)
     }

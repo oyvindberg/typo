@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,7 +33,8 @@ trait ViewsRepoImpl extends ViewsRepo {
           case ViewsFieldValue.isTriggerDeletable(value) => NamedParameter("is_trigger_deletable", ParameterValue.from(value))
           case ViewsFieldValue.isTriggerInsertableInto(value) => NamedParameter("is_trigger_insertable_into", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.views where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.views where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ViewsRow.rowParser.*)
     }

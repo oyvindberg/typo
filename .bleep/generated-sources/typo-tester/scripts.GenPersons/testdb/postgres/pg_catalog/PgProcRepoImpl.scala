@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -58,7 +59,8 @@ trait PgProcRepoImpl extends PgProcRepo {
           case PgProcFieldValue.proconfig(value) => NamedParameter("proconfig", ParameterValue.from(value))
           case PgProcFieldValue.proacl(value) => NamedParameter("proacl", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_proc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_proc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgProcRow.rowParser.*)
     }
@@ -100,9 +102,10 @@ trait PgProcRepoImpl extends PgProcRepo {
           case PgProcFieldValue.proconfig(value) => NamedParameter("proconfig", ParameterValue.from(value))
           case PgProcFieldValue.proacl(value) => NamedParameter("proacl", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_proc
+        val q = s"""update pg_catalog.pg_proc
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

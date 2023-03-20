@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgAuthMembersRepoImpl extends PgAuthMembersRepo {
           case PgAuthMembersFieldValue.grantor(value) => NamedParameter("grantor", ParameterValue.from(value))
           case PgAuthMembersFieldValue.adminOption(value) => NamedParameter("admin_option", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_auth_members where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_auth_members where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAuthMembersRow.rowParser.*)
     }
@@ -45,9 +47,10 @@ trait PgAuthMembersRepoImpl extends PgAuthMembersRepo {
           case PgAuthMembersFieldValue.grantor(value) => NamedParameter("grantor", ParameterValue.from(value))
           case PgAuthMembersFieldValue.adminOption(value) => NamedParameter("admin_option", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_auth_members
+        val q = s"""update pg_catalog.pg_auth_members
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where roleid = ${compositeId.roleid}, member = ${compositeId.member}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

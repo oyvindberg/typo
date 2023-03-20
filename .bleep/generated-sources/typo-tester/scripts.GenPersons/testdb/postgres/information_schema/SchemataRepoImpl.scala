@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait SchemataRepoImpl extends SchemataRepo {
           case SchemataFieldValue.defaultCharacterSetName(value) => NamedParameter("default_character_set_name", ParameterValue.from(value))
           case SchemataFieldValue.sqlPath(value) => NamedParameter("sql_path", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.schemata where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.schemata where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(SchemataRow.rowParser.*)
     }

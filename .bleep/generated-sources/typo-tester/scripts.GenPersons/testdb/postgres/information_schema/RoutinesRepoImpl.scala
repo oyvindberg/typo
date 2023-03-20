@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -104,7 +105,8 @@ trait RoutinesRepoImpl extends RoutinesRepo {
           case RoutinesFieldValue.resultCastMaximumCardinality(value) => NamedParameter("result_cast_maximum_cardinality", ParameterValue.from(value))
           case RoutinesFieldValue.resultCastDtdIdentifier(value) => NamedParameter("result_cast_dtd_identifier", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.routines where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.routines where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(RoutinesRow.rowParser.*)
     }

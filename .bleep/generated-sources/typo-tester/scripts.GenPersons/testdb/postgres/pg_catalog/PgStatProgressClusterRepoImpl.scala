@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -34,7 +35,8 @@ trait PgStatProgressClusterRepoImpl extends PgStatProgressClusterRepo {
           case PgStatProgressClusterFieldValue.heapBlksScanned(value) => NamedParameter("heap_blks_scanned", ParameterValue.from(value))
           case PgStatProgressClusterFieldValue.indexRebuildCount(value) => NamedParameter("index_rebuild_count", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_progress_cluster where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_progress_cluster where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatProgressClusterRow.rowParser.*)
     }

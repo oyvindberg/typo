@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -36,7 +37,8 @@ trait PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           case PgPartitionedTableFieldValue.partcollation(value) => NamedParameter("partcollation", ParameterValue.from(value))
           case PgPartitionedTableFieldValue.partexprs(value) => NamedParameter("partexprs", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_partitioned_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_partitioned_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgPartitionedTableRow.rowParser.*)
     }
@@ -56,9 +58,10 @@ trait PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           case PgPartitionedTableFieldValue.partcollation(value) => NamedParameter("partcollation", ParameterValue.from(value))
           case PgPartitionedTableFieldValue.partexprs(value) => NamedParameter("partexprs", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_partitioned_table
+        val q = s"""update pg_catalog.pg_partitioned_table
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where partrelid = $partrelid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

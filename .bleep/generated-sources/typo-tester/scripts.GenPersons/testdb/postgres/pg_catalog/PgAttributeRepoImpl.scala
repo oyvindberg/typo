@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -51,7 +52,8 @@ trait PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attfdwoptions(value) => NamedParameter("attfdwoptions", ParameterValue.from(value))
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_attribute where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_attribute where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgAttributeRow.rowParser.*)
     }
@@ -89,9 +91,10 @@ trait PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attfdwoptions(value) => NamedParameter("attfdwoptions", ParameterValue.from(value))
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_attribute
+        val q = s"""update pg_catalog.pg_attribute
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

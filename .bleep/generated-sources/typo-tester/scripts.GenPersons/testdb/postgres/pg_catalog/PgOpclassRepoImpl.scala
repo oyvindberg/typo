@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -37,7 +38,8 @@ trait PgOpclassRepoImpl extends PgOpclassRepo {
           case PgOpclassFieldValue.opcdefault(value) => NamedParameter("opcdefault", ParameterValue.from(value))
           case PgOpclassFieldValue.opckeytype(value) => NamedParameter("opckeytype", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_opclass where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_opclass where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgOpclassRow.rowParser.*)
     }
@@ -58,9 +60,10 @@ trait PgOpclassRepoImpl extends PgOpclassRepo {
           case PgOpclassFieldValue.opcdefault(value) => NamedParameter("opcdefault", ParameterValue.from(value))
           case PgOpclassFieldValue.opckeytype(value) => NamedParameter("opckeytype", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_opclass
+        val q = s"""update pg_catalog.pg_opclass
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

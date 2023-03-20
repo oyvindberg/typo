@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -34,7 +35,8 @@ trait PgStatProgressAnalyzeRepoImpl extends PgStatProgressAnalyzeRepo {
           case PgStatProgressAnalyzeFieldValue.childTablesDone(value) => NamedParameter("child_tables_done", ParameterValue.from(value))
           case PgStatProgressAnalyzeFieldValue.currentChildTableRelid(value) => NamedParameter("current_child_table_relid", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_progress_analyze where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_progress_analyze where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatProgressAnalyzeRow.rowParser.*)
     }

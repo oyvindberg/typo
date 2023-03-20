@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -34,7 +35,8 @@ trait PgTsDictRepoImpl extends PgTsDictRepo {
           case PgTsDictFieldValue.dicttemplate(value) => NamedParameter("dicttemplate", ParameterValue.from(value))
           case PgTsDictFieldValue.dictinitoption(value) => NamedParameter("dictinitoption", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_ts_dict where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_ts_dict where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTsDictRow.rowParser.*)
     }
@@ -52,9 +54,10 @@ trait PgTsDictRepoImpl extends PgTsDictRepo {
           case PgTsDictFieldValue.dicttemplate(value) => NamedParameter("dicttemplate", ParameterValue.from(value))
           case PgTsDictFieldValue.dictinitoption(value) => NamedParameter("dictinitoption", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_ts_dict
+        val q = s"""update pg_catalog.pg_ts_dict
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

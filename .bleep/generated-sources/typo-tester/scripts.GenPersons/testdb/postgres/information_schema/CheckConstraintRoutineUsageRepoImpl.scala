@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait CheckConstraintRoutineUsageRepoImpl extends CheckConstraintRoutineUsageRep
           case CheckConstraintRoutineUsageFieldValue.specificSchema(value) => NamedParameter("specific_schema", ParameterValue.from(value))
           case CheckConstraintRoutineUsageFieldValue.specificName(value) => NamedParameter("specific_name", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.check_constraint_routine_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.check_constraint_routine_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(CheckConstraintRoutineUsageRow.rowParser.*)
     }

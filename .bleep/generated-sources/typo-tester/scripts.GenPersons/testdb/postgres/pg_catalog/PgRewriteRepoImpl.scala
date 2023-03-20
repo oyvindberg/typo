@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -36,7 +37,8 @@ trait PgRewriteRepoImpl extends PgRewriteRepo {
           case PgRewriteFieldValue.evQual(value) => NamedParameter("ev_qual", ParameterValue.from(value))
           case PgRewriteFieldValue.evAction(value) => NamedParameter("ev_action", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_rewrite where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_rewrite where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgRewriteRow.rowParser.*)
     }
@@ -56,9 +58,10 @@ trait PgRewriteRepoImpl extends PgRewriteRepo {
           case PgRewriteFieldValue.evQual(value) => NamedParameter("ev_qual", ParameterValue.from(value))
           case PgRewriteFieldValue.evAction(value) => NamedParameter("ev_action", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_rewrite
+        val q = s"""update pg_catalog.pg_rewrite
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

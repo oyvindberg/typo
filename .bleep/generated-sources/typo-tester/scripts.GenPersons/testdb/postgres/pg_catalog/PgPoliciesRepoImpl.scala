@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait PgPoliciesRepoImpl extends PgPoliciesRepo {
           case PgPoliciesFieldValue.qual(value) => NamedParameter("qual", ParameterValue.from(value))
           case PgPoliciesFieldValue.withCheck(value) => NamedParameter("with_check", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_policies where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_policies where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgPoliciesRow.rowParser.*)
     }

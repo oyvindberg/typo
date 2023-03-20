@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgUserMappingsRepoImpl extends PgUserMappingsRepo {
           case PgUserMappingsFieldValue.foreignServerName(value) => NamedParameter("foreign_server_name", ParameterValue.from(value))
           case PgUserMappingsFieldValue.srvowner(value) => NamedParameter("srvowner", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema._pg_user_mappings where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema._pg_user_mappings where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgUserMappingsRow.rowParser.*)
     }

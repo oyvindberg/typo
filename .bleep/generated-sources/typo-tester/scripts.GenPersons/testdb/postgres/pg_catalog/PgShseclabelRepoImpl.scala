@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,7 +30,8 @@ trait PgShseclabelRepoImpl extends PgShseclabelRepo {
           case PgShseclabelFieldValue.provider(value) => NamedParameter("provider", ParameterValue.from(value))
           case PgShseclabelFieldValue.label(value) => NamedParameter("label", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_shseclabel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_shseclabel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgShseclabelRow.rowParser.*)
     }
@@ -45,9 +47,10 @@ trait PgShseclabelRepoImpl extends PgShseclabelRepo {
           case PgShseclabelFieldValue.provider(value) => NamedParameter("provider", ParameterValue.from(value))
           case PgShseclabelFieldValue.label(value) => NamedParameter("label", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_shseclabel
+        val q = s"""update pg_catalog.pg_shseclabel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

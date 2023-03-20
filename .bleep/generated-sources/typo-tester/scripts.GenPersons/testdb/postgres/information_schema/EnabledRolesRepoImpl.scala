@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -23,7 +24,8 @@ trait EnabledRolesRepoImpl extends EnabledRolesRepo {
         val namedParams = nonEmpty.map{
           case EnabledRolesFieldValue.roleName(value) => NamedParameter("role_name", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.enabled_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.enabled_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(EnabledRolesRow.rowParser.*)
     }

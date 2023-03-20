@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           case PgLargeobjectFieldValue.pageno(value) => NamedParameter("pageno", ParameterValue.from(value))
           case PgLargeobjectFieldValue.data(value) => NamedParameter("data", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_largeobject where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_largeobject where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgLargeobjectRow.rowParser.*)
     }
@@ -43,9 +45,10 @@ trait PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           case PgLargeobjectFieldValue.pageno(value) => NamedParameter("pageno", ParameterValue.from(value))
           case PgLargeobjectFieldValue.data(value) => NamedParameter("data", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_largeobject
+        val q = s"""update pg_catalog.pg_largeobject
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where loid = ${compositeId.loid}, pageno = ${compositeId.pageno}"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

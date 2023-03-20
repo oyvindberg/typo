@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -39,7 +40,8 @@ trait TriggersRepoImpl extends TriggersRepo {
           case TriggersFieldValue.actionReferenceNewRow(value) => NamedParameter("action_reference_new_row", ParameterValue.from(value))
           case TriggersFieldValue.created(value) => NamedParameter("created", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.triggers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.triggers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(TriggersRow.rowParser.*)
     }

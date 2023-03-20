@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait PgPreparedXactsRepoImpl extends PgPreparedXactsRepo {
           case PgPreparedXactsFieldValue.owner(value) => NamedParameter("owner", ParameterValue.from(value))
           case PgPreparedXactsFieldValue.database(value) => NamedParameter("database", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_prepared_xacts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_prepared_xacts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgPreparedXactsRow.rowParser.*)
     }

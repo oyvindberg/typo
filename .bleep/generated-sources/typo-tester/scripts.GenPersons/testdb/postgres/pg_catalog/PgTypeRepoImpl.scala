@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -60,7 +61,8 @@ trait PgTypeRepoImpl extends PgTypeRepo {
           case PgTypeFieldValue.typdefault(value) => NamedParameter("typdefault", ParameterValue.from(value))
           case PgTypeFieldValue.typacl(value) => NamedParameter("typacl", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_type where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_type where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgTypeRow.rowParser.*)
     }
@@ -104,9 +106,10 @@ trait PgTypeRepoImpl extends PgTypeRepo {
           case PgTypeFieldValue.typdefault(value) => NamedParameter("typdefault", ParameterValue.from(value))
           case PgTypeFieldValue.typacl(value) => NamedParameter("typacl", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_type
+        val q = s"""update pg_catalog.pg_type
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

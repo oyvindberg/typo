@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgForeignTableRepoImpl extends PgForeignTableRepo {
           case PgForeignTableFieldValue.ftserver(value) => NamedParameter("ftserver", ParameterValue.from(value))
           case PgForeignTableFieldValue.ftoptions(value) => NamedParameter("ftoptions", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_foreign_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_foreign_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgForeignTableRow.rowParser.*)
     }
@@ -46,9 +48,10 @@ trait PgForeignTableRepoImpl extends PgForeignTableRepo {
           case PgForeignTableFieldValue.ftserver(value) => NamedParameter("ftserver", ParameterValue.from(value))
           case PgForeignTableFieldValue.ftoptions(value) => NamedParameter("ftoptions", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_foreign_table
+        val q = s"""update pg_catalog.pg_foreign_table
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where ftrelid = $ftrelid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -28,7 +29,8 @@ trait PgStatUserFunctionsRepoImpl extends PgStatUserFunctionsRepo {
           case PgStatUserFunctionsFieldValue.totalTime(value) => NamedParameter("total_time", ParameterValue.from(value))
           case PgStatUserFunctionsFieldValue.selfTime(value) => NamedParameter("self_time", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_user_functions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_user_functions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatUserFunctionsRow.rowParser.*)
     }

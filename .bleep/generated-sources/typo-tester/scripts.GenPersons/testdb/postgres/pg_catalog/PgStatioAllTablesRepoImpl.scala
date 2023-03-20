@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgStatioAllTablesRepoImpl extends PgStatioAllTablesRepo {
           case PgStatioAllTablesFieldValue.tidxBlksRead(value) => NamedParameter("tidx_blks_read", ParameterValue.from(value))
           case PgStatioAllTablesFieldValue.tidxBlksHit(value) => NamedParameter("tidx_blks_hit", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_statio_all_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_statio_all_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatioAllTablesRow.rowParser.*)
     }

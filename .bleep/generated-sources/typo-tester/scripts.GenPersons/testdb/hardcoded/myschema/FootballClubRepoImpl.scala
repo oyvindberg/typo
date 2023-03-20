@@ -9,6 +9,7 @@ package myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""select * from myschema.football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from myschema.football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(FootballClubRow.rowParser.*)
     }
@@ -44,9 +46,10 @@ trait FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        SQL"""update myschema.football_club
+        val q = s"""update myschema.football_club
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = $id"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -26,7 +27,8 @@ trait PgStatGssapiRepoImpl extends PgStatGssapiRepo {
           case PgStatGssapiFieldValue.principal(value) => NamedParameter("principal", ParameterValue.from(value))
           case PgStatGssapiFieldValue.encrypted(value) => NamedParameter("encrypted", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_gssapi where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_gssapi where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatGssapiRow.rowParser.*)
     }

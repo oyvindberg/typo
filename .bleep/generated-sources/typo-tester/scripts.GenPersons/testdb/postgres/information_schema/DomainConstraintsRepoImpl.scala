@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait DomainConstraintsRepoImpl extends DomainConstraintsRepo {
           case DomainConstraintsFieldValue.isDeferrable(value) => NamedParameter("is_deferrable", ParameterValue.from(value))
           case DomainConstraintsFieldValue.initiallyDeferred(value) => NamedParameter("initially_deferred", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.domain_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.domain_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(DomainConstraintsRow.rowParser.*)
     }

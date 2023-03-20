@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgPublicationRelRepoImpl extends PgPublicationRelRepo {
           case PgPublicationRelFieldValue.prpubid(value) => NamedParameter("prpubid", ParameterValue.from(value))
           case PgPublicationRelFieldValue.prrelid(value) => NamedParameter("prrelid", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_publication_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_publication_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgPublicationRelRow.rowParser.*)
     }
@@ -46,9 +48,10 @@ trait PgPublicationRelRepoImpl extends PgPublicationRelRepo {
           case PgPublicationRelFieldValue.prpubid(value) => NamedParameter("prpubid", ParameterValue.from(value))
           case PgPublicationRelFieldValue.prrelid(value) => NamedParameter("prrelid", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_publication_rel
+        val q = s"""update pg_catalog.pg_publication_rel
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

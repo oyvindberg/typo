@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -48,7 +49,8 @@ trait PgIndexRepoImpl extends PgIndexRepo {
           case PgIndexFieldValue.indexprs(value) => NamedParameter("indexprs", ParameterValue.from(value))
           case PgIndexFieldValue.indpred(value) => NamedParameter("indpred", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgIndexRow.rowParser.*)
     }
@@ -80,9 +82,10 @@ trait PgIndexRepoImpl extends PgIndexRepo {
           case PgIndexFieldValue.indexprs(value) => NamedParameter("indexprs", ParameterValue.from(value))
           case PgIndexFieldValue.indpred(value) => NamedParameter("indpred", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_index
+        val q = s"""update pg_catalog.pg_index
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where indexrelid = $indexrelid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait PgStatWalRepoImpl extends PgStatWalRepo {
           case PgStatWalFieldValue.walSyncTime(value) => NamedParameter("wal_sync_time", ParameterValue.from(value))
           case PgStatWalFieldValue.statsReset(value) => NamedParameter("stats_reset", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_wal where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_wal where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatWalRow.rowParser.*)
     }

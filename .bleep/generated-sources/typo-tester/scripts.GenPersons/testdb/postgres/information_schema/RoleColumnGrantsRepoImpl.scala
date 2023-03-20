@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,7 +31,8 @@ trait RoleColumnGrantsRepoImpl extends RoleColumnGrantsRepo {
           case RoleColumnGrantsFieldValue.privilegeType(value) => NamedParameter("privilege_type", ParameterValue.from(value))
           case RoleColumnGrantsFieldValue.isGrantable(value) => NamedParameter("is_grantable", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.role_column_grants where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.role_column_grants where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(RoleColumnGrantsRow.rowParser.*)
     }

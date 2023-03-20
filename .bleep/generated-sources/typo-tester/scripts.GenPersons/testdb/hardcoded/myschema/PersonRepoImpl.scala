@@ -9,6 +9,7 @@ package myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
@@ -41,7 +42,8 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        SQL"""select * from myschema.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from myschema.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PersonRow.rowParser.*)
     }
@@ -64,9 +66,10 @@ trait PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        SQL"""update myschema.person
+        val q = s"""update myschema.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = $id"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

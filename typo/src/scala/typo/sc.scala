@@ -87,10 +87,11 @@ object sc {
     val JavaMap = Qualified("java.util.Map")
     val MapHasAsJava = Qualified("scala.jdk.CollectionConverters.MapHasAsJava")
     val MapHasAsScala = Qualified("scala.jdk.CollectionConverters.MapHasAsScala")
+    val StringContext = Qualified("java.StringContext")
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
-      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right)
+      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right, StringContext)
         .map(x => (x.value.name, x.value))
         .toMap
 
@@ -212,4 +213,8 @@ object sc {
       }
     }
   }
+
+  // `s"..." interpolator
+  def s(content: sc.Code) =
+    sc.StringInterpolate(Type.StringContext, sc.Ident("s"), content)
 }

@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -31,7 +32,8 @@ trait ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
           case ReferentialConstraintsFieldValue.updateRule(value) => NamedParameter("update_rule", ParameterValue.from(value))
           case ReferentialConstraintsFieldValue.deleteRule(value) => NamedParameter("delete_rule", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.referential_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.referential_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(ReferentialConstraintsRow.rowParser.*)
     }

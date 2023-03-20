@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,7 +34,8 @@ trait PgDefaultAclRepoImpl extends PgDefaultAclRepo {
           case PgDefaultAclFieldValue.defaclobjtype(value) => NamedParameter("defaclobjtype", ParameterValue.from(value))
           case PgDefaultAclFieldValue.defaclacl(value) => NamedParameter("defaclacl", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_default_acl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_default_acl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgDefaultAclRow.rowParser.*)
     }
@@ -50,9 +52,10 @@ trait PgDefaultAclRepoImpl extends PgDefaultAclRepo {
           case PgDefaultAclFieldValue.defaclobjtype(value) => NamedParameter("defaclobjtype", ParameterValue.from(value))
           case PgDefaultAclFieldValue.defaclacl(value) => NamedParameter("defaclacl", ParameterValue.from(value))
         }
-        SQL"""update pg_catalog.pg_default_acl
+        val q = s"""update pg_catalog.pg_default_acl
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }

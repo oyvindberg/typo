@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -37,7 +38,8 @@ trait PgStatWalReceiverRepoImpl extends PgStatWalReceiverRepo {
           case PgStatWalReceiverFieldValue.senderPort(value) => NamedParameter("sender_port", ParameterValue.from(value))
           case PgStatWalReceiverFieldValue.conninfo(value) => NamedParameter("conninfo", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_stat_wal_receiver where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_stat_wal_receiver where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatWalReceiverRow.rowParser.*)
     }

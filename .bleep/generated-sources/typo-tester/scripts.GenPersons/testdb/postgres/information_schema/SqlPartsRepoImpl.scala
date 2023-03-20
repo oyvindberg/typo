@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait SqlPartsRepoImpl extends SqlPartsRepo {
           case SqlPartsFieldValue.isVerifiedBy(value) => NamedParameter("is_verified_by", ParameterValue.from(value))
           case SqlPartsFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.sql_parts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.sql_parts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(SqlPartsRow.rowParser.*)
     }

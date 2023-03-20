@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -25,7 +26,8 @@ trait PgPublicationTablesRepoImpl extends PgPublicationTablesRepo {
           case PgPublicationTablesFieldValue.schemaname(value) => NamedParameter("schemaname", ParameterValue.from(value))
           case PgPublicationTablesFieldValue.tablename(value) => NamedParameter("tablename", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_publication_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_publication_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgPublicationTablesRow.rowParser.*)
     }

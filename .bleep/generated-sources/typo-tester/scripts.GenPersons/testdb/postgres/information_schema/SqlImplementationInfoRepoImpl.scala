@@ -9,6 +9,7 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
           case SqlImplementationInfoFieldValue.characterValue(value) => NamedParameter("character_value", ParameterValue.from(value))
           case SqlImplementationInfoFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
         }
-        SQL"""select * from information_schema.sql_implementation_info where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from information_schema.sql_implementation_info where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(SqlImplementationInfoRow.rowParser.*)
     }

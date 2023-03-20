@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -27,7 +28,8 @@ trait PgStatioSysSequencesRepoImpl extends PgStatioSysSequencesRepo {
           case PgStatioSysSequencesFieldValue.blksRead(value) => NamedParameter("blks_read", ParameterValue.from(value))
           case PgStatioSysSequencesFieldValue.blksHit(value) => NamedParameter("blks_hit", ParameterValue.from(value))
         }
-        SQL"""select * from pg_catalog.pg_statio_sys_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select * from pg_catalog.pg_statio_sys_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        SQL(q)
           .on(namedParams: _*)
           .as(PgStatioSysSequencesRow.rowParser.*)
     }
