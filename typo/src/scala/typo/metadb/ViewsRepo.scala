@@ -1,4 +1,4 @@
-package typo.information_schema
+package typo.metadb
 
 import anorm.SqlStringInterpolation
 

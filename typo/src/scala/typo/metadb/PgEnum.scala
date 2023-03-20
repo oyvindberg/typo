@@ -1,7 +1,7 @@
-package typo
-package information_schema
+package typo.metadb
 
 import anorm.{RowParser, SqlStringInterpolation}
+import typo.db
 
 import java.sql.Connection
 

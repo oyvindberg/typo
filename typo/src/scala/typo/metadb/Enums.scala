@@ -2,7 +2,7 @@ package typo
 package metadb
 
 class Enums(
-    pgEnums: List[information_schema.PgEnum.Row]
+    pgEnums: List[PgEnum.Row]
 ) {
   lazy val getAsList: List[db.StringEnum] = pgEnums
     .groupBy(_.name)

@@ -9,7 +9,7 @@ class MetaDb(implicit c: Connection) {
   private lazy val tableConstraints = TableConstraintsRepoImpl.selectAll
   private lazy val keyColumnUsage = KeyColumnUsageRepoImpl.selectAll
   private lazy val referentialConstraints = ReferentialConstraintsRepoImpl.selectAll
-  private lazy val pgEnums = information_schema.PgEnum.all(c)
+  private lazy val pgEnums = PgEnum.all(c)
   private lazy val tablesRows = TablesRepoImpl.selectByFieldValues(List(TablesFieldValue.tableType(Some("BASE TABLE"))))(c)
   private lazy val columnsRows = ColumnsRepoImpl.selectAll
 
