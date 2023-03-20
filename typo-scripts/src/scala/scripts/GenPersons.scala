@@ -113,7 +113,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val files2: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, header)
-      Gen(options, c).map {
+      Gen(options, c, Selector.OnlyPostgresInternal).map {
         case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render

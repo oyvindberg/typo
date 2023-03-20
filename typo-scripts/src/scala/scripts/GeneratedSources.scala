@@ -33,7 +33,7 @@ object GeneratedSources {
     val filesByRelPath: Map[RelPath, String] = {
       val generated = sc.Ident("generated")
       val options = Options(pkg = sc.QIdent(List(sc.Ident("typo"), generated)), JsonLib.None, DbLibAnorm, header)
-      Gen(options, c).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen(options, c, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
         val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
         relpath -> content.render
       }.toMap
