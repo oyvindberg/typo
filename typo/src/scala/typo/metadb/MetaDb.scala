@@ -1,6 +1,8 @@
 package typo
 package metadb
 
+import typo.generated.information_schema.{TablesFieldValue, TablesRepoImpl}
+
 import java.sql.Connection
 
 class MetaDb(c: Connection) {
@@ -9,7 +11,7 @@ class MetaDb(c: Connection) {
   private lazy val referentialConstraints = information_schema.ReferentialConstraints.all(c)
   private lazy val pgEnums = information_schema.PgEnum.all(c)
   private lazy val pgTypes = information_schema.PgType.all(c)
-  private lazy val tablesRows = information_schema.Tables.all(c)
+  private lazy val tablesRows = TablesRepoImpl.selectByFieldValues(List(TablesFieldValue.tableType(Some("BASE TABLE"))))(c)
   private lazy val columnsRows = information_schema.Columns.all(c)
 
   lazy val foreignKeys = new ForeignKeys(tableConstraints, keyColumnUsage, referentialConstraints)

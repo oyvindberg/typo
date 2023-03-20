@@ -1,8 +1,10 @@
 package typo
 package metadb
 
+import typo.generated.information_schema.TablesRow
+
 class Tables(
-    tableRows: List[information_schema.Tables.Row],
+    tableRows: List[TablesRow],
     columns: List[information_schema.Columns.Row],
     primaryKeys: Map[db.RelationName, db.PrimaryKey],
     uniqueKeys: Map[db.RelationName, List[db.UniqueKey]],
@@ -14,7 +16,7 @@ class Tables(
     tableRows.map { table =>
       val cols: List[db.Col] =
         columns
-          .filter(c => c.table_catalog == table.table_catalog && c.table_schema == table.table_schema && c.table_name == table.table_name)
+          .filter(c => c.table_catalog == table.tableCatalog.get && c.table_schema == table.tableSchema.get && c.table_name == table.tableName.get)
           .sortBy(_.ordinal_position)
           .map { c =>
             db.Col(
@@ -26,8 +28,8 @@ class Tables(
           }
 
       val tableName = db.RelationName(
-        schema = table.table_schema,
-        name = table.table_name
+        schema = table.tableSchema.get,
+        name = table.tableName.get
       )
       db.Table(
         name = tableName,
