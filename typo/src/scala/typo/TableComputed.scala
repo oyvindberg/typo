@@ -5,7 +5,8 @@ import typo.db.Type
 case class TableComputed(options: Options, default: DefaultComputed, dbTable: db.Table) {
   val allKeyNames: Set[db.ColName] =
     (dbTable.primaryKey.toList.flatMap(_.colNames) ++ dbTable.uniqueKeys.flatMap(_.cols) ++ dbTable.foreignKeys.flatMap(_.cols)).toSet
-
+  val pointsTo: Map[db.ColName, (db.RelationName, db.ColName)] =
+    dbTable.foreignKeys.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (fk.otherTable, cn)))).toMap
   val dbColsByName: Map[db.ColName, db.Col] =
     dbTable.cols.map(col => (col.name, col)).toMap
 
@@ -45,7 +46,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         case Nil => None
         case colName :: Nil =>
           val dbCol = dbColsByName(colName)
-          val col = ColumnComputed(None, names.field(dbCol.name), scalaType(options.pkg, dbCol), dbCol.name, dbCol.hasDefault)
+          val col = ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), scalaType(options.pkg, dbCol), dbCol.name, dbCol.hasDefault)
           Some(IdComputed.Unary(col, qident))
 
         case colNames =>
@@ -66,10 +67,11 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         if (!isNotNull) {
           sys.error(s"assumption: id column in ${dbTable.name} should be not null")
         }
-        dbCol -> ColumnComputed(None, names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
+        dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
       case dbCol =>
         val finalType: sc.Type = scalaType(options.pkg, dbCol)
-        dbCol -> ColumnComputed(None, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
+        allKeyNames
+        dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
     }
   }
 

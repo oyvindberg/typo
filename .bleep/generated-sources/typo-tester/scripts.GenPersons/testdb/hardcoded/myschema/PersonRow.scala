@@ -18,6 +18,7 @@ import scala.util.Try
 
 case class PersonRow(
   id: PersonId,
+  /** Points to [[FootballClubRow.id]] */
   favouriteFootballClubId: String,
   name: String,
   nickName: Option[String],
@@ -25,6 +26,7 @@ case class PersonRow(
   email: String,
   phone: String,
   likesPizza: Boolean,
+  /** Points to [[MaritalStatusRow.id]] */
   maritalStatusId: String,
   workEmail: Option[String],
   sector: SectorEnum
