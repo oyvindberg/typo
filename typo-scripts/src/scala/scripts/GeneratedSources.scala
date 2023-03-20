@@ -6,12 +6,12 @@ import typo._
 import typo.sc.syntax.CodeInterpolator
 
 import java.nio.file.Path
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager}
 import java.util
 
 object GeneratedSources {
   def main(args: Array[String]): Unit = {
-    val c = {
+    implicit val c: Connection = {
       val url = "jdbc:postgresql://localhost/postgres"
       val props = new util.Properties
       props.setProperty("user", "postgres")
@@ -33,7 +33,7 @@ object GeneratedSources {
     val filesByRelPath: Map[RelPath, String] = {
       val generated = sc.Ident("generated")
       val options = Options(pkg = sc.QIdent(List(sc.Ident("typo"), generated)), JsonLib.None, DbLibAnorm, header)
-      Gen(options, c, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen(options, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
         val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
         relpath -> content.render
       }.toMap

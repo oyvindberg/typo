@@ -6,7 +6,7 @@ import typo.sc.syntax._
 import java.sql.Connection
 
 object Gen {
-  def apply(options: Options, c: Connection, selector: Selector): List[sc.File] = {
+  def apply(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
     val views: List[View] =
       information_schema.ViewsRepo.all(c).map { view =>
         val AnalyzeSql.Analyzed(Nil, columns) = AnalyzeSql.from(c, view.view_definition)
@@ -18,7 +18,7 @@ object Gen {
         )
       }
 
-    val metaDB = new MetaDb(c)
+    val metaDB = new MetaDb
     apply(
       options,
       metaDB.tables.getAsList.filter(x => selector.include(x.name)),

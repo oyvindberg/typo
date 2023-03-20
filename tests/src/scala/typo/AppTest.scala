@@ -8,11 +8,12 @@ import java.sql.{Connection, DriverManager}
 
 class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
-    val url = "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
-    val conn: Connection = DriverManager.getConnection(url)
+    implicit val conn: Connection = DriverManager.getConnection(
+      "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
+    )
 
     try {
-      val metaDb = new MetaDb(conn)
+      val metaDb = new MetaDb
 
       println(metaDb.foreignKeys.getAsMap)
     } finally {
@@ -21,5 +22,3 @@ class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
     assert(true)
   }
 }
-
-

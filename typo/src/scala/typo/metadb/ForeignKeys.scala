@@ -1,81 +1,79 @@
 package typo
 package metadb
-import typo.information_schema.TableConstraints
+import typo.generated.information_schema.{KeyColumnUsageRow, ReferentialConstraintsRow, TableConstraintsRow}
 
 class ForeignKeys(
-    tableConstraints: List[information_schema.TableConstraints.Row],
-    keyColumnUsage: List[information_schema.KeyColumnUsage.Row],
-    referentialConstraints: List[information_schema.ReferentialConstraints.Row]
+    tableConstraints: List[TableConstraintsRow],
+    keyColumnUsage: List[KeyColumnUsageRow],
+    referentialConstraints: List[ReferentialConstraintsRow]
 ) {
-  lazy val fks: List[TableConstraints.Row] = tableConstraints.filter(_.constraint_type == "FOREIGN KEY")
+  lazy val fks: List[TableConstraintsRow] = tableConstraints.filter(_.constraintType.contains("FOREIGN KEY"))
 
   lazy val getAsMap: Map[db.RelationName, List[db.ForeignKey]] = {
     fks
       .map { fk =>
         (
-          db.RelationName(fk.table_schema, fk.table_name),
+          db.RelationName(fk.tableSchema.get, fk.tableName.get),
           getReferringColumns(fk),
           getReferredTable(fk),
           getReferredColumns(fk),
-          db.RelationName(fk.constraint_schema, fk.constraint_name)
+          db.RelationName(fk.constraintSchema.get, fk.constraintName.get)
         )
       }
-      .collect {
-        case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
-          tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
+      .collect { case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
+        tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
       }
       .groupMap(_._1)(_._2)
   }
 
-  private def getReferringColumns(fk: information_schema.TableConstraints.Row): List[db.ColName] = {
+  private def getReferringColumns(fk: TableConstraintsRow): List[db.ColName] = {
     val kcus =
       keyColumnUsage.filter { kcu =>
-        fk.constraint_catalog == kcu.constraint_catalog &&
-        fk.constraint_schema == kcu.constraint_schema &&
-        fk.constraint_name == kcu.constraint_name
+        fk.constraintCatalog == kcu.constraintCatalog &&
+        fk.constraintSchema == kcu.constraintSchema &&
+        fk.constraintName == kcu.constraintName
       }
 
     kcus
-      .sortBy(_.ordinal_position)
-      .map(kcu => db.ColName(kcu.column_name))
+      .sortBy(_.ordinalPosition)
+      .map(kcu => db.ColName(kcu.columnName.get))
   }
 
-  private def getReferredTable(fk: information_schema.TableConstraints.Row): Option[db.RelationName] = {
+  private def getReferredTable(fk: TableConstraintsRow): Option[db.RelationName] = {
     referentialConstraints
       .find { rc =>
-        fk.constraint_catalog == rc.constraint_catalog &&
-        fk.constraint_schema == rc.constraint_schema &&
-        fk.constraint_name == rc.constraint_name
+        fk.constraintCatalog == rc.constraintCatalog &&
+        fk.constraintSchema == rc.constraintSchema &&
+        fk.constraintName == rc.constraintName
       }
       .flatMap { rc =>
         tableConstraints.find { tc =>
-          tc.constraint_catalog == rc.unique_constraint_catalog &&
-          tc.constraint_schema == rc.unique_constraint_schema &&
-          tc.constraint_name == rc.unique_constraint_name
-
+          tc.constraintCatalog == rc.uniqueConstraintCatalog &&
+          tc.constraintSchema == rc.uniqueConstraintSchema &&
+          tc.constraintName == rc.uniqueConstraintName
         }
       }
       .map { tc =>
-        db.RelationName(tc.table_schema, tc.table_name)
+        db.RelationName(tc.tableSchema.get, tc.tableName.get)
       }
   }
 
-  private def getReferredColumns(fk: information_schema.TableConstraints.Row): List[db.ColName] = {
+  private def getReferredColumns(fk: TableConstraintsRow): List[db.ColName] = {
     referentialConstraints
       .filter { rc =>
-        fk.constraint_catalog == rc.constraint_catalog &&
-        fk.constraint_schema == rc.constraint_schema &&
-        fk.constraint_name == rc.constraint_name
+        fk.constraintCatalog == rc.constraintCatalog &&
+        fk.constraintSchema == rc.constraintSchema &&
+        fk.constraintName == rc.constraintName
       }
       .flatMap { rc =>
         keyColumnUsage
           .filter { kcu =>
-            kcu.constraint_catalog == rc.unique_constraint_catalog &&
-            kcu.constraint_schema == rc.unique_constraint_schema &&
-            kcu.constraint_name == rc.unique_constraint_name
+            kcu.constraintCatalog == rc.uniqueConstraintCatalog &&
+            kcu.constraintSchema == rc.uniqueConstraintSchema &&
+            kcu.constraintName == rc.uniqueConstraintName
           }
-          .sortBy(_.ordinal_position)
-          .map(kcu => db.ColName(kcu.column_name))
+          .sortBy(_.ordinalPosition)
+          .map(kcu => db.ColName(kcu.columnName.get))
       }
   }
 

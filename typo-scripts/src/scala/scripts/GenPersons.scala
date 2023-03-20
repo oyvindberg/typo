@@ -5,7 +5,7 @@ import bleep.logging.Logger
 import typo._
 import typo.sc.syntax.CodeInterpolator
 
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager}
 import java.util
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
@@ -87,7 +87,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val all = List(person, football_club, marital_status, cpk_person)
 
   override def run(started: Started, commands: Commands, targets: List[Target], args: List[String]): Unit = {
-    val c = {
+    implicit val c: Connection = {
       val url = "jdbc:postgresql://localhost/postgres"
       val props = new util.Properties
       props.setProperty("user", "postgres")
@@ -104,19 +104,17 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val files1: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), JsonLibPlay, DbLibAnorm, header)
-      Gen(options, all, enums, views = Nil).map {
-        case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
-          val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-          relpath -> content.render
+      Gen(options, all, enums, views = Nil).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+        relpath -> content.render
       }.toMap
     }
 
     val files2: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, header)
-      Gen(options, c, Selector.OnlyPostgresInternal).map {
-        case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
-          val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-          relpath -> content.render
+      Gen(options, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+        relpath -> content.render
       }.toMap
     }
 

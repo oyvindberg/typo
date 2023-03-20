@@ -1,26 +1,28 @@
 package typo
 package metadb
 
+import typo.generated.information_schema.{KeyColumnUsageRow, TableConstraintsRow}
+
 class PrimaryKeys(
-    tableConstraints: List[information_schema.TableConstraints.Row],
-    keyColumnUsage: List[information_schema.KeyColumnUsage.Row]
+    tableConstraints: List[TableConstraintsRow],
+    keyColumnUsage: List[KeyColumnUsageRow]
 ) {
   lazy val getAsMap: Map[db.RelationName, db.PrimaryKey] = {
     tableConstraints
-      .filter(_.constraint_type == "PRIMARY KEY")
+      .filter(_.constraintType.contains("PRIMARY KEY"))
       .map { tc =>
         (
-          db.RelationName(tc.table_schema, tc.table_name),
+          db.RelationName(tc.tableSchema.get, tc.tableName.get),
           db.PrimaryKey(
             colNames = keyColumnUsage
               .filter(kcu =>
-                tc.constraint_catalog == kcu.constraint_catalog
-                  && tc.constraint_schema == kcu.constraint_schema
-                  && tc.constraint_name == kcu.constraint_name
+                tc.constraintCatalog == kcu.constraintCatalog
+                  && tc.constraintSchema == kcu.constraintSchema
+                  && tc.constraintName == kcu.constraintName
               )
-              .sortBy(_.ordinal_position)
-              .map(kcu => db.ColName(kcu.column_name)),
-            constraintName = db.RelationName(tc.constraint_schema, tc.constraint_name)
+              .sortBy(_.ordinalPosition)
+              .map(kcu => db.ColName(kcu.columnName.get)),
+            constraintName = db.RelationName(tc.constraintSchema.get, tc.constraintName.get)
           )
         )
       }

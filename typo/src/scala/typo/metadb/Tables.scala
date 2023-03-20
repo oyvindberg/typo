@@ -1,11 +1,11 @@
 package typo
 package metadb
 
-import typo.generated.information_schema.TablesRow
+import typo.generated.information_schema.{ColumnsRow, TablesRow}
 
 class Tables(
     tableRows: List[TablesRow],
-    columns: List[information_schema.Columns.Row],
+    columns: List[ColumnsRow],
     primaryKeys: Map[db.RelationName, db.PrimaryKey],
     uniqueKeys: Map[db.RelationName, List[db.UniqueKey]],
     foreignKeys: Map[db.RelationName, List[db.ForeignKey]],
@@ -16,14 +16,14 @@ class Tables(
     tableRows.map { table =>
       val cols: List[db.Col] =
         columns
-          .filter(c => c.table_catalog == table.tableCatalog.get && c.table_schema == table.tableSchema.get && c.table_name == table.tableName.get)
-          .sortBy(_.ordinal_position)
+          .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
+          .sortBy(_.ordinalPosition)
           .map { c =>
             db.Col(
-              name = db.ColName(c.column_name),
-              hasDefault = c.column_default.isDefined,
-              isNotNull = c.is_nullable == "NO",
-              tpe = typeFromUdtName(c.udt_name, c.character_maximum_length)
+              name = db.ColName(c.columnName.get),
+              hasDefault = c.columnDefault.isDefined,
+              isNotNull = c.isNullable.contains("NO"),
+              tpe = typeFromUdtName(c.udtName.get, c.characterMaximumLength)
             )
           }
 
