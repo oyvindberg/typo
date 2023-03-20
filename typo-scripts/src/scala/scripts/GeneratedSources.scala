@@ -30,19 +30,19 @@ object GeneratedSources {
 
     val typoSources = Path.of(sys.props("user.dir")).resolve("typo/generated-and-checked-in")
 
-    val files: Map[RelPath, String] = {
+    val filesByRelPath: Map[RelPath, String] = {
       val generated = sc.Ident("generated")
-      Gen(sc.QIdent(List(sc.Ident("typo"), generated)), JsonLib.None, DbLibAnorm, c, header).map {
-        case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
-          val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-          relpath -> content.render
+      val options = Options(pkg = sc.QIdent(List(sc.Ident("typo"), generated)), JsonLib.None, DbLibAnorm, header)
+      Gen(options, c).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+        relpath -> content.render
       }.toMap
     }
 
     FileSync
       .syncStrings(
         typoSources,
-        files,
+        filesByRelPath,
         deleteUnknowns = FileSync.DeleteUnknowns.Yes(maxDepth = None),
         soft = true
       )

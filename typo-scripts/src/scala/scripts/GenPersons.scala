@@ -102,18 +102,23 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
              | */
              |""".stripMargin
 
-    val files1: Map[RelPath, String] =
-      Gen(sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), all, enums, views = Nil, JsonLibPlay, DbLibAnorm, header).map {
+    val files1: Map[RelPath, String] = {
+      val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), JsonLibPlay, DbLibAnorm, header)
+      Gen(options, all, enums, views = Nil).map {
         case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render
       }.toMap
+    }
 
-    val files2: Map[RelPath, String] =
-      Gen(sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, c, header).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
-        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-        relpath -> content.render
+    val files2: Map[RelPath, String] = {
+      val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, header)
+      Gen(options, c).map {
+        case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+          val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+          relpath -> content.render
       }.toMap
+    }
 
     targets.foreach { target =>
       FileSync

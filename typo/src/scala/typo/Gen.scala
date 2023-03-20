@@ -6,12 +6,10 @@ import typo.sc.syntax._
 import java.sql.Connection
 
 object Gen {
-
-  def apply(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib, c: Connection, header: sc.Code): List[sc.File] = {
+  def apply(options: Options, c: Connection): List[sc.File] = {
     val views: List[View] =
       information_schema.ViewsRepo.all(c).map { view =>
         val AnalyzeSql.Analyzed(Nil, columns) = AnalyzeSql.from(c, view.view_definition)
-
         View(
           name = db.RelationName(view.table_schema, view.table_name),
           sql = view.view_definition,
@@ -21,26 +19,23 @@ object Gen {
       }
 
     val metaDB = new MetaDb(c)
-    apply(pkg, metaDB.tables.getAsList, metaDB.enums.getAsList, views, jsonLib, dbLib, header)
+    apply(options, metaDB.tables.getAsList, metaDB.enums.getAsList, views)
   }
 
   def apply(
-      pkg: sc.QIdent,
+      options: Options,
       tables: List[db.Table],
       enums: List[db.StringEnum],
       views: List[View],
-      jsonLib: JsonLib,
-      dbLib: DbLib,
-      header: sc.Code
   ): List[sc.File] = {
-    val default = DefaultComputed(pkg)
+    val default = DefaultComputed(options.pkg)
     val enumFiles: List[sc.File] =
-      enums.map(stringEnumClass(pkg, _, dbLib, jsonLib))
+      enums.map(stringEnumClass(options))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(pkg, default, table), dbLib, jsonLib).all)
-    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(pkg, view), dbLib, jsonLib).all)
+      tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all)
+    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all)
     val mostFiles: List[sc.File] =
-      List(DefaultFile(default, jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
+      List(DefaultFile(default, options.jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
       mostFiles.groupBy { _.pkg }.map { case (pkg, files) =>
@@ -49,14 +44,14 @@ object Gen {
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.
     // this should be a stop-gap solution anyway
-    val pkgObject = List(packageObject(pkg, jsonLib, dbLib))
+    val pkgObject = List(packageObject(options))
 
     val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
-    allFiles.map { file => file.copy(contents = header ++ file.contents) }
+    allFiles.map { file => file.copy(contents = options.header ++ file.contents) }
   }
 
-  def stringEnumClass(pkg: sc.QIdent, `enum`: db.StringEnum, dbLib: DbLib, jsonLib: JsonLib): sc.File = {
-    val qident = names.EnumName(pkg, `enum`.name)
+  def stringEnumClass(options: Options)(`enum`: db.StringEnum): sc.File = {
+    val qident = names.EnumName(options.pkg, `enum`.name)
     val EnumType = sc.Type.Qualified(qident)
 
     val members = `enum`.values.map { value =>
@@ -73,25 +68,25 @@ object Gen {
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
             |  val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
-            |  ${dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
-            |  ${jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
+            |  ${options.dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
+            |  ${options.jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
             |}
             |""".stripMargin
 
     sc.File(EnumType, str)
   }
 
-  def packageObject(pkg: sc.QIdent, jsonLib: JsonLib, dbLib: DbLib) = {
-    val parentPkg = pkg.idents.dropRight(1)
+  def packageObject(options: Options) = {
+    val parentPkg = options.pkg.idents.dropRight(1)
     val content =
       code"""|package ${parentPkg.map(_.code).mkCode(".")}
              |
-             |package object ${pkg.name} {
-             |  ${dbLib.missingInstances.mkCode("\n  ")}
-             |  ${jsonLib.missingInstances.mkCode("\n  ")}
+             |package object ${options.pkg.name} {
+             |  ${options.dbLib.missingInstances.mkCode("\n  ")}
+             |  ${options.jsonLib.missingInstances.mkCode("\n  ")}
              |}
              |""".stripMargin
 
-    sc.File(sc.Type.Qualified(pkg / sc.Ident("package")), content)
+    sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content)
   }
 }

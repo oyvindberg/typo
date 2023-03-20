@@ -2,7 +2,7 @@ package typo
 
 import typo.sc.syntax._
 
-case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: JsonLib) {
+case class RelationFiles(relation: RelationComputed, options: Options) {
   val RowFile: sc.File = {
     val rowType = sc.Type.Qualified(relation.RowName)
 
@@ -29,8 +29,8 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
             |)$compositeId
             |
             |object ${relation.RowName.name} {
-            |  ${dbLib.instances(rowType, relation.cols).mkCode("\n  ")}
-            |  ${jsonLib.instances(rowType, relation.cols).mkCode("\n  ")}
+            |  ${options.dbLib.instances(rowType, relation.cols).mkCode("\n  ")}
+            |  ${options.jsonLib.instances(rowType, relation.cols).mkCode("\n  ")}
             |}
             |""".stripMargin
 
@@ -58,7 +58,7 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
     val tpe = sc.Type.Qualified(relation.RepoName)
     val str =
       code"""trait ${relation.RepoName.name} {
-            |  ${repoMethods.map(dbLib.repoSig).mkCode("\n  ")}
+            |  ${repoMethods.map(options.dbLib.repoSig).mkCode("\n  ")}
             |}
             |""".stripMargin
 
@@ -67,8 +67,8 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
 
   def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
     val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
-      val impl: sc.Code = dbLib.repoImpl(relation, repoMethod)
-      code"""|override ${dbLib.repoSig(repoMethod)} = {
+      val impl: sc.Code = options.dbLib.repoImpl(relation, repoMethod)
+      code"""|override ${options.dbLib.repoSig(repoMethod)} = {
                |    $impl
                |  }""".stripMargin
     }
