@@ -58,7 +58,7 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
     }
 
   }
-  override def insert(compositeId: PgSubscriptionRelId, unsaved: PgSubscriptionRelRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgSubscriptionRelId, unsaved: PgSubscriptionRelRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("srsubstate", ParameterValue.from(unsaved.srsubstate))),
       Some(NamedParameter("srsublsn", ParameterValue.from(unsaved.srsublsn)))

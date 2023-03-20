@@ -61,7 +61,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     }
 
   }
-  override def insert(oid: PgTsConfigId, unsaved: PgTsConfigRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTsConfigId, unsaved: PgTsConfigRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("cfgname", ParameterValue.from(unsaved.cfgname))),
       Some(NamedParameter("cfgnamespace", ParameterValue.from(unsaved.cfgnamespace))),

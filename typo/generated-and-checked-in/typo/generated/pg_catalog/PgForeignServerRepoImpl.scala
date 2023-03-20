@@ -69,7 +69,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     }
 
   }
-  override def insert(oid: PgForeignServerId, unsaved: PgForeignServerRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgForeignServerId, unsaved: PgForeignServerRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("srvname", ParameterValue.from(unsaved.srvname))),
       Some(NamedParameter("srvowner", ParameterValue.from(unsaved.srvowner))),

@@ -61,7 +61,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     }
 
   }
-  override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("nspname", ParameterValue.from(unsaved.nspname))),
       Some(NamedParameter("nspowner", ParameterValue.from(unsaved.nspowner))),

@@ -61,7 +61,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
     }
 
   }
-  override def insert(oid: PgEnumId, unsaved: PgEnumRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgEnumId, unsaved: PgEnumRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("enumtypid", ParameterValue.from(unsaved.enumtypid))),
       Some(NamedParameter("enumsortorder", ParameterValue.from(unsaved.enumsortorder))),

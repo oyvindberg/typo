@@ -93,7 +93,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
     }
 
   }
-  override def insert(indexrelid: PgIndexId, unsaved: PgIndexRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(indexrelid: PgIndexId, unsaved: PgIndexRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("indrelid", ParameterValue.from(unsaved.indrelid))),
       Some(NamedParameter("indnatts", ParameterValue.from(unsaved.indnatts))),

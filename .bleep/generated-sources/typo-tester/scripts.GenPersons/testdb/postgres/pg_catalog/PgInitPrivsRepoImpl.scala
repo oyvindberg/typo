@@ -58,7 +58,7 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
     }
 
   }
-  override def insert(compositeId: PgInitPrivsId, unsaved: PgInitPrivsRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgInitPrivsId, unsaved: PgInitPrivsRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("privtype", ParameterValue.from(unsaved.privtype))),
       Some(NamedParameter("initprivs", ParameterValue.from(unsaved.initprivs)))

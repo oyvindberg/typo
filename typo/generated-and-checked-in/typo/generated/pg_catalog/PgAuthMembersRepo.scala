@@ -16,7 +16,7 @@ trait PgAuthMembersRepo {
   def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow]
   def selectByFieldValues(fieldValues: List[PgAuthMembersFieldValue[_]])(implicit c: Connection): List[PgAuthMembersRow]
   def updateFieldValues(compositeId: PgAuthMembersId, fieldValues: List[PgAuthMembersFieldValue[_]])(implicit c: Connection): Int
-  def insert(compositeId: PgAuthMembersId, unsaved: PgAuthMembersRowUnsaved)(implicit c: Connection): Unit
+  def insert(compositeId: PgAuthMembersId, unsaved: PgAuthMembersRowUnsaved)(implicit c: Connection): Boolean
   def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean
   def selectByUnique(member: Long, roleid: Long)(implicit c: Connection): Option[PgAuthMembersRow]
 }

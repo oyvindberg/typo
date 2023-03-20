@@ -103,7 +103,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     }
 
   }
-  override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("conname", ParameterValue.from(unsaved.conname))),
       Some(NamedParameter("connamespace", ParameterValue.from(unsaved.connamespace))),

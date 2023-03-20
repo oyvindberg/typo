@@ -67,7 +67,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     }
 
   }
-  override def insert(oid: PgEventTriggerId, unsaved: PgEventTriggerRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgEventTriggerId, unsaved: PgEventTriggerRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("evtname", ParameterValue.from(unsaved.evtname))),
       Some(NamedParameter("evtevent", ParameterValue.from(unsaved.evtevent))),

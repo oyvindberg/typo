@@ -61,7 +61,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     }
 
   }
-  override def insert(oid: PgDefaultAclId, unsaved: PgDefaultAclRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgDefaultAclId, unsaved: PgDefaultAclRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("defaclrole", ParameterValue.from(unsaved.defaclrole))),
       Some(NamedParameter("defaclnamespace", ParameterValue.from(unsaved.defaclnamespace))),

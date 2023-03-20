@@ -69,7 +69,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     }
 
   }
-  override def insert(oid: PgOpclassId, unsaved: PgOpclassRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgOpclassId, unsaved: PgOpclassRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("opcmethod", ParameterValue.from(unsaved.opcmethod))),
       Some(NamedParameter("opcname", ParameterValue.from(unsaved.opcname))),

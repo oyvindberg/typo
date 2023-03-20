@@ -15,7 +15,7 @@ trait PgTablespaceRepo {
   def selectByIds(oids: List[PgTablespaceId])(implicit c: Connection): List[PgTablespaceRow]
   def selectByFieldValues(fieldValues: List[PgTablespaceFieldValue[_]])(implicit c: Connection): List[PgTablespaceRow]
   def updateFieldValues(oid: PgTablespaceId, fieldValues: List[PgTablespaceFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgTablespaceId, unsaved: PgTablespaceRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgTablespaceId, unsaved: PgTablespaceRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean
   def selectByUnique(spcname: String)(implicit c: Connection): Option[PgTablespaceRow]
 }

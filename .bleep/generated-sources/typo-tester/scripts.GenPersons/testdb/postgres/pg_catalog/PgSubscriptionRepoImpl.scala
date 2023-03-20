@@ -73,7 +73,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
     }
 
   }
-  override def insert(oid: PgSubscriptionId, unsaved: PgSubscriptionRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgSubscriptionId, unsaved: PgSubscriptionRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("subdbid", ParameterValue.from(unsaved.subdbid))),
       Some(NamedParameter("subname", ParameterValue.from(unsaved.subname))),

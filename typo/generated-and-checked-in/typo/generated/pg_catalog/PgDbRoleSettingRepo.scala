@@ -16,6 +16,6 @@ trait PgDbRoleSettingRepo {
   def selectById(compositeId: PgDbRoleSettingId)(implicit c: Connection): Option[PgDbRoleSettingRow]
   def selectByFieldValues(fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): List[PgDbRoleSettingRow]
   def updateFieldValues(compositeId: PgDbRoleSettingId, fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): Int
-  def insert(compositeId: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Unit
+  def insert(compositeId: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Boolean
   def delete(compositeId: PgDbRoleSettingId)(implicit c: Connection): Boolean
 }

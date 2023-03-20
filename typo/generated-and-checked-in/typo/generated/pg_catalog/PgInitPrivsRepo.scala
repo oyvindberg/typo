@@ -16,6 +16,6 @@ trait PgInitPrivsRepo {
   def selectById(compositeId: PgInitPrivsId)(implicit c: Connection): Option[PgInitPrivsRow]
   def selectByFieldValues(fieldValues: List[PgInitPrivsFieldValue[_]])(implicit c: Connection): List[PgInitPrivsRow]
   def updateFieldValues(compositeId: PgInitPrivsId, fieldValues: List[PgInitPrivsFieldValue[_]])(implicit c: Connection): Int
-  def insert(compositeId: PgInitPrivsId, unsaved: PgInitPrivsRowUnsaved)(implicit c: Connection): Unit
+  def insert(compositeId: PgInitPrivsId, unsaved: PgInitPrivsRowUnsaved)(implicit c: Connection): Boolean
   def delete(compositeId: PgInitPrivsId)(implicit c: Connection): Boolean
 }

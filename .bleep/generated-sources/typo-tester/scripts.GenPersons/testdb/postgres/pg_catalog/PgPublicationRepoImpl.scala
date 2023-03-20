@@ -69,7 +69,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     }
 
   }
-  override def insert(oid: PgPublicationId, unsaved: PgPublicationRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgPublicationId, unsaved: PgPublicationRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("pubname", ParameterValue.from(unsaved.pubname))),
       Some(NamedParameter("pubowner", ParameterValue.from(unsaved.pubowner))),

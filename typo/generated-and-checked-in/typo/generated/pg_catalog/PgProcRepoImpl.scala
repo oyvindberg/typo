@@ -113,7 +113,7 @@ object PgProcRepoImpl extends PgProcRepo {
     }
 
   }
-  override def insert(oid: PgProcId, unsaved: PgProcRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgProcId, unsaved: PgProcRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("proname", ParameterValue.from(unsaved.proname))),
       Some(NamedParameter("pronamespace", ParameterValue.from(unsaved.pronamespace))),

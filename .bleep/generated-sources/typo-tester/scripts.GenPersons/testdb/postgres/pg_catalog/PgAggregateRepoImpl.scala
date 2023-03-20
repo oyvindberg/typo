@@ -95,7 +95,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     }
 
   }
-  override def insert(aggfnoid: PgAggregateId, unsaved: PgAggregateRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(aggfnoid: PgAggregateId, unsaved: PgAggregateRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("aggkind", ParameterValue.from(unsaved.aggkind))),
       Some(NamedParameter("aggnumdirectargs", ParameterValue.from(unsaved.aggnumdirectargs))),

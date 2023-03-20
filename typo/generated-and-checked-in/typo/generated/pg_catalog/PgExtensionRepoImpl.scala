@@ -69,7 +69,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     }
 
   }
-  override def insert(oid: PgExtensionId, unsaved: PgExtensionRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgExtensionId, unsaved: PgExtensionRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("extname", ParameterValue.from(unsaved.extname))),
       Some(NamedParameter("extowner", ParameterValue.from(unsaved.extowner))),

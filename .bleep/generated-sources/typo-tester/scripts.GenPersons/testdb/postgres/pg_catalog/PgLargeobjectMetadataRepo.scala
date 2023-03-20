@@ -15,6 +15,6 @@ trait PgLargeobjectMetadataRepo {
   def selectByIds(oids: List[PgLargeobjectMetadataId])(implicit c: Connection): List[PgLargeobjectMetadataRow]
   def selectByFieldValues(fieldValues: List[PgLargeobjectMetadataFieldValue[_]])(implicit c: Connection): List[PgLargeobjectMetadataRow]
   def updateFieldValues(oid: PgLargeobjectMetadataId, fieldValues: List[PgLargeobjectMetadataFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgLargeobjectMetadataId, unsaved: PgLargeobjectMetadataRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgLargeobjectMetadataId, unsaved: PgLargeobjectMetadataRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgLargeobjectMetadataId)(implicit c: Connection): Boolean
 }

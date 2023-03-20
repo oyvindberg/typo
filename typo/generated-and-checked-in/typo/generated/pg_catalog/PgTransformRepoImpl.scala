@@ -63,7 +63,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
     }
 
   }
-  override def insert(oid: PgTransformId, unsaved: PgTransformRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTransformId, unsaved: PgTransformRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("trftype", ParameterValue.from(unsaved.trftype))),
       Some(NamedParameter("trflang", ParameterValue.from(unsaved.trflang))),

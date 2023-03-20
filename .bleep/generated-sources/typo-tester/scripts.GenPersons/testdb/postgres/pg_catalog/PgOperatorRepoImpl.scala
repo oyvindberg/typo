@@ -81,7 +81,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
     }
 
   }
-  override def insert(oid: PgOperatorId, unsaved: PgOperatorRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgOperatorId, unsaved: PgOperatorRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("oprname", ParameterValue.from(unsaved.oprname))),
       Some(NamedParameter("oprnamespace", ParameterValue.from(unsaved.oprnamespace))),

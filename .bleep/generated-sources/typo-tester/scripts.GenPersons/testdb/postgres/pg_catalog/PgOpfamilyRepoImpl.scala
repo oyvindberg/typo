@@ -61,7 +61,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     }
 
   }
-  override def insert(oid: PgOpfamilyId, unsaved: PgOpfamilyRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgOpfamilyId, unsaved: PgOpfamilyRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("opfmethod", ParameterValue.from(unsaved.opfmethod))),
       Some(NamedParameter("opfname", ParameterValue.from(unsaved.opfname))),

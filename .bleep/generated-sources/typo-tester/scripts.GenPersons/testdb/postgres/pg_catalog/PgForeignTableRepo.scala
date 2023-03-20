@@ -15,6 +15,6 @@ trait PgForeignTableRepo {
   def selectByIds(ftrelids: List[PgForeignTableId])(implicit c: Connection): List[PgForeignTableRow]
   def selectByFieldValues(fieldValues: List[PgForeignTableFieldValue[_]])(implicit c: Connection): List[PgForeignTableRow]
   def updateFieldValues(ftrelid: PgForeignTableId, fieldValues: List[PgForeignTableFieldValue[_]])(implicit c: Connection): Int
-  def insert(ftrelid: PgForeignTableId, unsaved: PgForeignTableRowUnsaved)(implicit c: Connection): Unit
+  def insert(ftrelid: PgForeignTableId, unsaved: PgForeignTableRowUnsaved)(implicit c: Connection): Boolean
   def delete(ftrelid: PgForeignTableId)(implicit c: Connection): Boolean
 }

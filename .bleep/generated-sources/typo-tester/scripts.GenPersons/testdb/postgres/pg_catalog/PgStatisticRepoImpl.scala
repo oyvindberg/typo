@@ -110,7 +110,7 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
     }
 
   }
-  override def insert(compositeId: PgStatisticId, unsaved: PgStatisticRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgStatisticId, unsaved: PgStatisticRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("stanullfrac", ParameterValue.from(unsaved.stanullfrac))),
       Some(NamedParameter("stawidth", ParameterValue.from(unsaved.stawidth))),

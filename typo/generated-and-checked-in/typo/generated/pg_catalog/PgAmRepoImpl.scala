@@ -61,7 +61,7 @@ object PgAmRepoImpl extends PgAmRepo {
     }
 
   }
-  override def insert(oid: PgAmId, unsaved: PgAmRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgAmId, unsaved: PgAmRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("amname", ParameterValue.from(unsaved.amname))),
       Some(NamedParameter("amhandler", ParameterValue.from(unsaved.amhandler))),

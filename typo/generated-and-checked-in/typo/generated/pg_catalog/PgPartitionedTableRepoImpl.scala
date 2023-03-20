@@ -69,7 +69,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     }
 
   }
-  override def insert(partrelid: PgPartitionedTableId, unsaved: PgPartitionedTableRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(partrelid: PgPartitionedTableId, unsaved: PgPartitionedTableRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("partstrat", ParameterValue.from(unsaved.partstrat))),
       Some(NamedParameter("partnatts", ParameterValue.from(unsaved.partnatts))),

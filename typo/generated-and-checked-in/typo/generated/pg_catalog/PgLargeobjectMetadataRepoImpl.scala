@@ -59,7 +59,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     }
 
   }
-  override def insert(oid: PgLargeobjectMetadataId, unsaved: PgLargeobjectMetadataRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgLargeobjectMetadataId, unsaved: PgLargeobjectMetadataRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("lomowner", ParameterValue.from(unsaved.lomowner))),
       Some(NamedParameter("lomacl", ParameterValue.from(unsaved.lomacl)))

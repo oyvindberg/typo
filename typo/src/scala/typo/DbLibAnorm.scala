@@ -75,9 +75,9 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.InsertDbGeneratedKey(id, _, unsavedParam, _) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): ${id.tpe}"
     case RepoMethod.InsertProvidedKey(id, _, unsavedParam, _) =>
-      code"def insert(${id.param}, $unsavedParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
+      code"def insert(${id.param}, $unsavedParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.InsertOnlyKey(id) =>
-      code"def insert(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Unit}"
+      code"def insert(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.Delete(id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
   }

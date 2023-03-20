@@ -59,7 +59,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
     }
 
   }
-  override def insert(oid: PgUserMappingId, unsaved: PgUserMappingRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgUserMappingId, unsaved: PgUserMappingRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("umuser", ParameterValue.from(unsaved.umuser))),
       Some(NamedParameter("umserver", ParameterValue.from(unsaved.umserver))),

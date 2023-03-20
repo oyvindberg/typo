@@ -15,6 +15,6 @@ trait FootballClubRepo {
   def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow]
   def selectByFieldValues(fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): List[FootballClubRow]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Int
-  def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit
+  def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean
   def delete(id: FootballClubId)(implicit c: Connection): Boolean
 }

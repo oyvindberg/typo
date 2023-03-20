@@ -58,7 +58,7 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
     }
 
   }
-  override def insert(compositeId: PgSeclabelId, unsaved: PgSeclabelRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgSeclabelId, unsaved: PgSeclabelRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("label", ParameterValue.from(unsaved.label)))
     ).flatten

@@ -65,7 +65,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     }
 
   }
-  override def insert(oid: PgTsDictId, unsaved: PgTsDictRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTsDictId, unsaved: PgTsDictRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("dictname", ParameterValue.from(unsaved.dictname))),
       Some(NamedParameter("dictnamespace", ParameterValue.from(unsaved.dictnamespace))),

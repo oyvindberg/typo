@@ -57,7 +57,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     }
 
   }
-  override def insert(ftrelid: PgForeignTableId, unsaved: PgForeignTableRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(ftrelid: PgForeignTableId, unsaved: PgForeignTableRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("ftserver", ParameterValue.from(unsaved.ftserver))),
       Some(NamedParameter("ftoptions", ParameterValue.from(unsaved.ftoptions)))

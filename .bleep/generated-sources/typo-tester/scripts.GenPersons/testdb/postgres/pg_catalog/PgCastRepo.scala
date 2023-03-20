@@ -15,7 +15,7 @@ trait PgCastRepo {
   def selectByIds(oids: List[PgCastId])(implicit c: Connection): List[PgCastRow]
   def selectByFieldValues(fieldValues: List[PgCastFieldValue[_]])(implicit c: Connection): List[PgCastRow]
   def updateFieldValues(oid: PgCastId, fieldValues: List[PgCastFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgCastId, unsaved: PgCastRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgCastId, unsaved: PgCastRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgCastId)(implicit c: Connection): Boolean
   def selectByUnique(castsource: Long, casttarget: Long)(implicit c: Connection): Option[PgCastRow]
 }

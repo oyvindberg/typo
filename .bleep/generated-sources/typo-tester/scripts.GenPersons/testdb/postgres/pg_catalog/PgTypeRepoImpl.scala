@@ -115,7 +115,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
     }
 
   }
-  override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("typname", ParameterValue.from(unsaved.typname))),
       Some(NamedParameter("typnamespace", ParameterValue.from(unsaved.typnamespace))),

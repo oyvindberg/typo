@@ -77,7 +77,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
     }
 
   }
-  override def insert(oid: PgAuthidId, unsaved: PgAuthidRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgAuthidId, unsaved: PgAuthidRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("rolname", ParameterValue.from(unsaved.rolname))),
       Some(NamedParameter("rolsuper", ParameterValue.from(unsaved.rolsuper))),

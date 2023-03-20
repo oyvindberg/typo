@@ -89,7 +89,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     }
 
   }
-  override def insert(oid: PgTriggerId, unsaved: PgTriggerRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTriggerId, unsaved: PgTriggerRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("tgrelid", ParameterValue.from(unsaved.tgrelid))),
       Some(NamedParameter("tgparentid", ParameterValue.from(unsaved.tgparentid))),

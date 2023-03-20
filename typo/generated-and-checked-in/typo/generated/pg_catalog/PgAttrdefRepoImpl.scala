@@ -61,7 +61,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     }
 
   }
-  override def insert(oid: PgAttrdefId, unsaved: PgAttrdefRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgAttrdefId, unsaved: PgAttrdefRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("adrelid", ParameterValue.from(unsaved.adrelid))),
       Some(NamedParameter("adnum", ParameterValue.from(unsaved.adnum))),

@@ -56,7 +56,7 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
     }
 
   }
-  override def insert(compositeId: PgTsConfigMapId, unsaved: PgTsConfigMapRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgTsConfigMapId, unsaved: PgTsConfigMapRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("mapdict", ParameterValue.from(unsaved.mapdict)))
     ).flatten

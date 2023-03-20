@@ -56,7 +56,7 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
     }
 
   }
-  override def insert(compositeId: PgShdescriptionId, unsaved: PgShdescriptionRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgShdescriptionId, unsaved: PgShdescriptionRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("description", ParameterValue.from(unsaved.description)))
     ).flatten

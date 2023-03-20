@@ -55,7 +55,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     }
 
   }
-  override def insert(roident: PgReplicationOriginId, unsaved: PgReplicationOriginRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(roident: PgReplicationOriginId, unsaved: PgReplicationOriginRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("roname", ParameterValue.from(unsaved.roname)))
     ).flatten

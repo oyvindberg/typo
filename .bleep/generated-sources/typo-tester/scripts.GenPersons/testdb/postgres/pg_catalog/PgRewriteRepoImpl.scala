@@ -67,7 +67,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     }
 
   }
-  override def insert(oid: PgRewriteId, unsaved: PgRewriteRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgRewriteId, unsaved: PgRewriteRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("rulename", ParameterValue.from(unsaved.rulename))),
       Some(NamedParameter("ev_class", ParameterValue.from(unsaved.evClass))),

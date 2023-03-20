@@ -70,7 +70,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
       case dbCol =>
         val finalType: sc.Type = scalaType(options.pkg, dbCol)
-        allKeyNames
+
         dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
     }
   }

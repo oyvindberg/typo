@@ -14,6 +14,6 @@ trait PgLargeobjectRepo {
   def selectById(compositeId: PgLargeobjectId)(implicit c: Connection): Option[PgLargeobjectRow]
   def selectByFieldValues(fieldValues: List[PgLargeobjectFieldValue[_]])(implicit c: Connection): List[PgLargeobjectRow]
   def updateFieldValues(compositeId: PgLargeobjectId, fieldValues: List[PgLargeobjectFieldValue[_]])(implicit c: Connection): Int
-  def insert(compositeId: PgLargeobjectId, unsaved: PgLargeobjectRowUnsaved)(implicit c: Connection): Unit
+  def insert(compositeId: PgLargeobjectId, unsaved: PgLargeobjectRowUnsaved)(implicit c: Connection): Boolean
   def delete(compositeId: PgLargeobjectId)(implicit c: Connection): Boolean
 }

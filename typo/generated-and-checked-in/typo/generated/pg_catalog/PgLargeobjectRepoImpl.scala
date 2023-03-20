@@ -56,7 +56,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
     }
 
   }
-  override def insert(compositeId: PgLargeobjectId, unsaved: PgLargeobjectRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgLargeobjectId, unsaved: PgLargeobjectRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("data", ParameterValue.from(unsaved.data)))
     ).flatten

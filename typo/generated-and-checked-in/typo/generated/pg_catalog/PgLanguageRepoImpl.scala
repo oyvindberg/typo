@@ -71,7 +71,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     }
 
   }
-  override def insert(oid: PgLanguageId, unsaved: PgLanguageRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgLanguageId, unsaved: PgLanguageRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("lanname", ParameterValue.from(unsaved.lanname))),
       Some(NamedParameter("lanowner", ParameterValue.from(unsaved.lanowner))),

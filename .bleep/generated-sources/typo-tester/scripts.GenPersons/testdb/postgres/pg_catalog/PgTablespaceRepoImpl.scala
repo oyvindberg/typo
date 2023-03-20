@@ -61,7 +61,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     }
 
   }
-  override def insert(oid: PgTablespaceId, unsaved: PgTablespaceRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTablespaceId, unsaved: PgTablespaceRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("spcname", ParameterValue.from(unsaved.spcname))),
       Some(NamedParameter("spcowner", ParameterValue.from(unsaved.spcowner))),

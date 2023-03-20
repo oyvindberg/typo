@@ -69,7 +69,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     }
 
   }
-  override def insert(oid: PgTsParserId, unsaved: PgTsParserRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTsParserId, unsaved: PgTsParserRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("prsname", ParameterValue.from(unsaved.prsname))),
       Some(NamedParameter("prsnamespace", ParameterValue.from(unsaved.prsnamespace))),

@@ -20,7 +20,7 @@ class ForeignKeys(
           db.RelationName(fk.constraint_schema, fk.constraint_name)
         )
       }
-      .map {
+      .collect {
         case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
           tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
       }

@@ -67,7 +67,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
     }
 
   }
-  override def insert(seqrelid: PgSequenceId, unsaved: PgSequenceRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(seqrelid: PgSequenceId, unsaved: PgSequenceRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("seqtypid", ParameterValue.from(unsaved.seqtypid))),
       Some(NamedParameter("seqstart", ParameterValue.from(unsaved.seqstart))),

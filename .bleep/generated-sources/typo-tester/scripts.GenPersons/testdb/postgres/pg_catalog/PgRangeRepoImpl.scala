@@ -65,7 +65,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
     }
 
   }
-  override def insert(rngtypid: PgRangeId, unsaved: PgRangeRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(rngtypid: PgRangeId, unsaved: PgRangeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("rngsubtype", ParameterValue.from(unsaved.rngsubtype))),
       Some(NamedParameter("rngmultitypid", ParameterValue.from(unsaved.rngmultitypid))),

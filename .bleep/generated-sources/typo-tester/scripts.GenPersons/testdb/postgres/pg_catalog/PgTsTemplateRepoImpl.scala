@@ -61,7 +61,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     }
 
   }
-  override def insert(oid: PgTsTemplateId, unsaved: PgTsTemplateRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgTsTemplateId, unsaved: PgTsTemplateRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("tmplname", ParameterValue.from(unsaved.tmplname))),
       Some(NamedParameter("tmplnamespace", ParameterValue.from(unsaved.tmplnamespace))),

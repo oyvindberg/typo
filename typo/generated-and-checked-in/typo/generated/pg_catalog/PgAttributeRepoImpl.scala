@@ -102,7 +102,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     }
 
   }
-  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("attname", ParameterValue.from(unsaved.attname))),
       Some(NamedParameter("atttypid", ParameterValue.from(unsaved.atttypid))),

@@ -55,7 +55,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     }
 
   }
-  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
     ).flatten

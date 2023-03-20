@@ -117,7 +117,7 @@ object PgClassRepoImpl extends PgClassRepo {
     }
 
   }
-  override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("relname", ParameterValue.from(unsaved.relname))),
       Some(NamedParameter("relnamespace", ParameterValue.from(unsaved.relnamespace))),

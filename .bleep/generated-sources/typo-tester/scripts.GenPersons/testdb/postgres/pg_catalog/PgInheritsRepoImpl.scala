@@ -56,7 +56,7 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
     }
 
   }
-  override def insert(compositeId: PgInheritsId, unsaved: PgInheritsRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgInheritsId, unsaved: PgInheritsRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("inhparent", ParameterValue.from(unsaved.inhparent))),
       Some(NamedParameter("inhdetachpending", ParameterValue.from(unsaved.inhdetachpending)))

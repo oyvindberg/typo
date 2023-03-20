@@ -73,7 +73,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
     }
 
   }
-  override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("collname", ParameterValue.from(unsaved.collname))),
       Some(NamedParameter("collnamespace", ParameterValue.from(unsaved.collnamespace))),

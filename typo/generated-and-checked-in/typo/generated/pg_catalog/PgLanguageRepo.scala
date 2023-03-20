@@ -17,7 +17,7 @@ trait PgLanguageRepo {
   def selectByIds(oids: List[PgLanguageId])(implicit c: Connection): List[PgLanguageRow]
   def selectByFieldValues(fieldValues: List[PgLanguageFieldValue[_]])(implicit c: Connection): List[PgLanguageRow]
   def updateFieldValues(oid: PgLanguageId, fieldValues: List[PgLanguageFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgLanguageId, unsaved: PgLanguageRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgLanguageId, unsaved: PgLanguageRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgLanguageId)(implicit c: Connection): Boolean
   def selectByUnique(lanname: String)(implicit c: Connection): Option[PgLanguageRow]
 }

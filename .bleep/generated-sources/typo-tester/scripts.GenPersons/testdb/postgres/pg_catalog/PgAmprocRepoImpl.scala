@@ -63,7 +63,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     }
 
   }
-  override def insert(oid: PgAmprocId, unsaved: PgAmprocRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgAmprocId, unsaved: PgAmprocRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("amprocfamily", ParameterValue.from(unsaved.amprocfamily))),
       Some(NamedParameter("amproclefttype", ParameterValue.from(unsaved.amproclefttype))),

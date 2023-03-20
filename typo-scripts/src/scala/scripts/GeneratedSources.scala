@@ -48,5 +48,6 @@ object GeneratedSources {
       )
 
     cli("add to git", typoSources, List("git", "add", "-f", typoSources.toString), Logger.DevNull, cli.Out.Raw)
+    ()
   }
 }

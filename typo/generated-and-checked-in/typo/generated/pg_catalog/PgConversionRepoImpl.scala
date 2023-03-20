@@ -69,7 +69,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
     }
 
   }
-  override def insert(oid: PgConversionId, unsaved: PgConversionRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgConversionId, unsaved: PgConversionRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("conname", ParameterValue.from(unsaved.conname))),
       Some(NamedParameter("connamespace", ParameterValue.from(unsaved.connamespace))),

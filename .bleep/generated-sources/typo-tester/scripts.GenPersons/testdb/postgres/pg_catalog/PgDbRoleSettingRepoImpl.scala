@@ -54,7 +54,7 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
     }
 
   }
-  override def insert(compositeId: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgDbRoleSettingId, unsaved: PgDbRoleSettingRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("setconfig", ParameterValue.from(unsaved.setconfig)))
     ).flatten

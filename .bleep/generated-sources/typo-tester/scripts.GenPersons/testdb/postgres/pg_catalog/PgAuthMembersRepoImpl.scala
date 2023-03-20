@@ -56,7 +56,7 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     }
 
   }
-  override def insert(compositeId: PgAuthMembersId, unsaved: PgAuthMembersRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(compositeId: PgAuthMembersId, unsaved: PgAuthMembersRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("grantor", ParameterValue.from(unsaved.grantor))),
       Some(NamedParameter("admin_option", ParameterValue.from(unsaved.adminOption)))

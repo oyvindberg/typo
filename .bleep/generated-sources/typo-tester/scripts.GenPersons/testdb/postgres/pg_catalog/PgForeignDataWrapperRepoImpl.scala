@@ -65,7 +65,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
     }
 
   }
-  override def insert(oid: PgForeignDataWrapperId, unsaved: PgForeignDataWrapperRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgForeignDataWrapperId, unsaved: PgForeignDataWrapperRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("fdwname", ParameterValue.from(unsaved.fdwname))),
       Some(NamedParameter("fdwowner", ParameterValue.from(unsaved.fdwowner))),

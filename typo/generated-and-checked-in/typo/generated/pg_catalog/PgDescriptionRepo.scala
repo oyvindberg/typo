@@ -16,6 +16,6 @@ trait PgDescriptionRepo {
   def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow]
   def selectByFieldValues(fieldValues: List[PgDescriptionFieldValue[_]])(implicit c: Connection): List[PgDescriptionRow]
   def updateFieldValues(compositeId: PgDescriptionId, fieldValues: List[PgDescriptionFieldValue[_]])(implicit c: Connection): Int
-  def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): Unit
+  def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): Boolean
   def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean
 }

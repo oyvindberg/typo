@@ -17,7 +17,7 @@ trait PgDatabaseRepo {
   def selectByIds(oids: List[PgDatabaseId])(implicit c: Connection): List[PgDatabaseRow]
   def selectByFieldValues(fieldValues: List[PgDatabaseFieldValue[_]])(implicit c: Connection): List[PgDatabaseRow]
   def updateFieldValues(oid: PgDatabaseId, fieldValues: List[PgDatabaseFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgDatabaseId, unsaved: PgDatabaseRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgDatabaseId, unsaved: PgDatabaseRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgDatabaseId)(implicit c: Connection): Boolean
   def selectByUnique(datname: String)(implicit c: Connection): Option[PgDatabaseRow]
 }

@@ -2,7 +2,6 @@ package typo
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import typo.information_schema.{KeyColumnUsage, ReferentialConstraints}
 import typo.metadb.MetaDb
 
 import java.sql.{Connection, DriverManager}

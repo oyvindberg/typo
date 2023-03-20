@@ -65,7 +65,7 @@ object PgCastRepoImpl extends PgCastRepo {
     }
 
   }
-  override def insert(oid: PgCastId, unsaved: PgCastRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgCastId, unsaved: PgCastRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("castsource", ParameterValue.from(unsaved.castsource))),
       Some(NamedParameter("casttarget", ParameterValue.from(unsaved.casttarget))),

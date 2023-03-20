@@ -69,7 +69,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     }
 
   }
-  override def insert(oid: PgStatisticExtId, unsaved: PgStatisticExtRowUnsaved)(implicit c: Connection): Unit = {
+  override def insert(oid: PgStatisticExtId, unsaved: PgStatisticExtRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("stxrelid", ParameterValue.from(unsaved.stxrelid))),
       Some(NamedParameter("stxname", ParameterValue.from(unsaved.stxname))),

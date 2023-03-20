@@ -15,7 +15,7 @@ trait PgConstraintRepo {
   def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow]
   def selectByFieldValues(fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): List[PgConstraintRow]
   def updateFieldValues(oid: PgConstraintId, fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): Int
-  def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Unit
+  def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgConstraintId)(implicit c: Connection): Boolean
   def selectByUnique(conrelid: Long, contypid: Long, conname: String)(implicit c: Connection): Option[PgConstraintRow]
 }
