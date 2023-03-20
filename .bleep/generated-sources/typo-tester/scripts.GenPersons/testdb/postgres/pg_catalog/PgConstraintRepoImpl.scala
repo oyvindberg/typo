@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgConstraintRepoImpl extends PgConstraintRepo {
+object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint""".as(PgConstraintRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgUserMappingsRepoImpl extends PgUserMappingsRepo {
+object PgUserMappingsRepoImpl extends PgUserMappingsRepo {
   override def selectAll(implicit c: Connection): List[PgUserMappingsRow] = {
     SQL"""select oid, umoptions, umuser, authorization_identifier, foreign_server_catalog, foreign_server_name, srvowner from information_schema._pg_user_mappings""".as(PgUserMappingsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatioUserSequencesRepoImpl extends PgStatioUserSequencesRepo {
+object PgStatioUserSequencesRepoImpl extends PgStatioUserSequencesRepo {
   override def selectAll(implicit c: Connection): List[PgStatioUserSequencesRow] = {
     SQL"""select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_user_sequences""".as(PgStatioUserSequencesRow.rowParser.*)
   }

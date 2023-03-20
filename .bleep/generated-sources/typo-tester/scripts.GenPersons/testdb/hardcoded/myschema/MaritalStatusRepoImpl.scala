@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait MaritalStatusRepoImpl extends MaritalStatusRepo {
+object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select id from myschema.marital_status""".as(MaritalStatusRow.rowParser.*)
   }

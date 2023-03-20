@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait TransformsRepoImpl extends TransformsRepo {
+object TransformsRepoImpl extends TransformsRepo {
   override def selectAll(implicit c: Connection): List[TransformsRow] = {
     SQL"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, specific_name, group_name, transform_type from information_schema.transforms""".as(TransformsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgDefaultAclRepoImpl extends PgDefaultAclRepo {
+object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def selectAll(implicit c: Connection): List[PgDefaultAclRow] = {
     SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl""".as(PgDefaultAclRow.rowParser.*)
   }

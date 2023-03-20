@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgShmemAllocationsRepoImpl extends PgShmemAllocationsRepo {
+object PgShmemAllocationsRepoImpl extends PgShmemAllocationsRepo {
   override def selectAll(implicit c: Connection): List[PgShmemAllocationsRow] = {
     SQL"""select name, off, size, allocated_size from pg_catalog.pg_shmem_allocations""".as(PgShmemAllocationsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTransformRepoImpl extends PgTransformRepo {
+object PgTransformRepoImpl extends PgTransformRepo {
   override def selectAll(implicit c: Connection): List[PgTransformRow] = {
     SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform""".as(PgTransformRow.rowParser.*)
   }

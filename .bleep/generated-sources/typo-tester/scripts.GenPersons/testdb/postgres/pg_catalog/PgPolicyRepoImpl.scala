@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgPolicyRepoImpl extends PgPolicyRepo {
+object PgPolicyRepoImpl extends PgPolicyRepo {
   override def selectAll(implicit c: Connection): List[PgPolicyRow] = {
     SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy""".as(PgPolicyRow.rowParser.*)
   }

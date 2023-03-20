@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait SchemataRepoImpl extends SchemataRepo {
+object SchemataRepoImpl extends SchemataRepo {
   override def selectAll(implicit c: Connection): List[SchemataRow] = {
     SQL"""select catalog_name, schema_name, schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path from information_schema.schemata""".as(SchemataRow.rowParser.*)
   }

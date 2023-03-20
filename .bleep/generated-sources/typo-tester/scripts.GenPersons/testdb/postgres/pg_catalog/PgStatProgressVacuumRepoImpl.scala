@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatProgressVacuumRepoImpl extends PgStatProgressVacuumRepo {
+object PgStatProgressVacuumRepoImpl extends PgStatProgressVacuumRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressVacuumRow] = {
     SQL"""select pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuples, num_dead_tuples from pg_catalog.pg_stat_progress_vacuum""".as(PgStatProgressVacuumRow.rowParser.*)
   }

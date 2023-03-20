@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatGssapiRepoImpl extends PgStatGssapiRepo {
+object PgStatGssapiRepoImpl extends PgStatGssapiRepo {
   override def selectAll(implicit c: Connection): List[PgStatGssapiRow] = {
     SQL"""select pid, gss_authenticated, principal, encrypted from pg_catalog.pg_stat_gssapi""".as(PgStatGssapiRow.rowParser.*)
   }

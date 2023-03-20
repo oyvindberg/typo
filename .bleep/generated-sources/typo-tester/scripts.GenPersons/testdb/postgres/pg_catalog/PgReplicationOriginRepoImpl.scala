@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
+object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def selectAll(implicit c: Connection): List[PgReplicationOriginRow] = {
     SQL"""select roident, roname from pg_catalog.pg_replication_origin""".as(PgReplicationOriginRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait ConstraintTableUsageRepoImpl extends ConstraintTableUsageRepo {
+object ConstraintTableUsageRepoImpl extends ConstraintTableUsageRepo {
   override def selectAll(implicit c: Connection): List[ConstraintTableUsageRow] = {
     SQL"""select table_catalog, table_schema, table_name, constraint_catalog, constraint_schema, constraint_name from information_schema.constraint_table_usage""".as(ConstraintTableUsageRow.rowParser.*)
   }

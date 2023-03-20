@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgPublicationRelRepoImpl extends PgPublicationRelRepo {
+object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
     SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel""".as(PgPublicationRelRow.rowParser.*)
   }

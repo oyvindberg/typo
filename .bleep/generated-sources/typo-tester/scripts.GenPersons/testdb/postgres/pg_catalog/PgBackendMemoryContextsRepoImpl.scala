@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgBackendMemoryContextsRepoImpl extends PgBackendMemoryContextsRepo {
+object PgBackendMemoryContextsRepoImpl extends PgBackendMemoryContextsRepo {
   override def selectAll(implicit c: Connection): List[PgBackendMemoryContextsRow] = {
     SQL"""select name, ident, parent, level, total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".as(PgBackendMemoryContextsRow.rowParser.*)
   }

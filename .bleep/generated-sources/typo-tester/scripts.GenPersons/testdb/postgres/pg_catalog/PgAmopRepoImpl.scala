@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgAmopRepoImpl extends PgAmopRepo {
+object PgAmopRepoImpl extends PgAmopRepo {
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
     SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop""".as(PgAmopRow.rowParser.*)
   }

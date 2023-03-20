@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait RoleRoutineGrantsRepoImpl extends RoleRoutineGrantsRepo {
+object RoleRoutineGrantsRepoImpl extends RoleRoutineGrantsRepo {
   override def selectAll(implicit c: Connection): List[RoleRoutineGrantsRow] = {
     SQL"""select grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, privilege_type, is_grantable from information_schema.role_routine_grants""".as(RoleRoutineGrantsRow.rowParser.*)
   }

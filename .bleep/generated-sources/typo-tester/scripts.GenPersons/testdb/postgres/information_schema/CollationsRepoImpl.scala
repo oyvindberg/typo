@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait CollationsRepoImpl extends CollationsRepo {
+object CollationsRepoImpl extends CollationsRepo {
   override def selectAll(implicit c: Connection): List[CollationsRow] = {
     SQL"""select collation_catalog, collation_schema, collation_name, pad_attribute from information_schema.collations""".as(CollationsRow.rowParser.*)
   }

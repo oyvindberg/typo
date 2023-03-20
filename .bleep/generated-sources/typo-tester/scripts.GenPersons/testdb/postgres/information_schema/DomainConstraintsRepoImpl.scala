@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait DomainConstraintsRepoImpl extends DomainConstraintsRepo {
+object DomainConstraintsRepoImpl extends DomainConstraintsRepo {
   override def selectAll(implicit c: Connection): List[DomainConstraintsRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, domain_catalog, domain_schema, domain_name, is_deferrable, initially_deferred from information_schema.domain_constraints""".as(DomainConstraintsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PersonRepoImpl extends PersonRepo {
+object PersonRepoImpl extends PersonRepo {
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser.*)
   }

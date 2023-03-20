@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTsConfigRepoImpl extends PgTsConfigRepo {
+object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def selectAll(implicit c: Connection): List[PgTsConfigRow] = {
     SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config""".as(PgTsConfigRow.rowParser.*)
   }

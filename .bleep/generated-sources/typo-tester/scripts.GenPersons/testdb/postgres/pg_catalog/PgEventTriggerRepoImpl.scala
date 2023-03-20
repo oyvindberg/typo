@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgEventTriggerRepoImpl extends PgEventTriggerRepo {
+object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def selectAll(implicit c: Connection): List[PgEventTriggerRow] = {
     SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger""".as(PgEventTriggerRow.rowParser.*)
   }

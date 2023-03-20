@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait CheckConstraintsRepoImpl extends CheckConstraintsRepo {
+object CheckConstraintsRepoImpl extends CheckConstraintsRepo {
   override def selectAll(implicit c: Connection): List[CheckConstraintsRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, check_clause from information_schema.check_constraints""".as(CheckConstraintsRow.rowParser.*)
   }

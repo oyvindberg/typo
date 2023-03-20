@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgOpclassRepoImpl extends PgOpclassRepo {
+object PgOpclassRepoImpl extends PgOpclassRepo {
   override def selectAll(implicit c: Connection): List[PgOpclassRow] = {
     SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass""".as(PgOpclassRow.rowParser.*)
   }

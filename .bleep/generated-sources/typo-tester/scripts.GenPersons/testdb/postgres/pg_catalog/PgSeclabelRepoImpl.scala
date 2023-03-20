@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgSeclabelRepoImpl extends PgSeclabelRepo {
+object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def selectAll(implicit c: Connection): List[PgSeclabelRow] = {
     SQL"""select objoid, classoid, objsubid, provider, label from pg_catalog.pg_seclabel""".as(PgSeclabelRow.rowParser.*)
   }

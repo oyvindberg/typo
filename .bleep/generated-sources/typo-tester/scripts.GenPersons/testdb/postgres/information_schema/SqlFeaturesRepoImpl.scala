@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait SqlFeaturesRepoImpl extends SqlFeaturesRepo {
+object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
   override def selectAll(implicit c: Connection): List[SqlFeaturesRow] = {
     SQL"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, comments from information_schema.sql_features""".as(SqlFeaturesRow.rowParser.*)
   }

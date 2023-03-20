@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatWalReceiverRepoImpl extends PgStatWalReceiverRepo {
+object PgStatWalReceiverRepoImpl extends PgStatWalReceiverRepo {
   override def selectAll(implicit c: Connection): List[PgStatWalReceiverRow] = {
     SQL"""select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time, slot_name, sender_host, sender_port, conninfo from pg_catalog.pg_stat_wal_receiver""".as(PgStatWalReceiverRow.rowParser.*)
   }

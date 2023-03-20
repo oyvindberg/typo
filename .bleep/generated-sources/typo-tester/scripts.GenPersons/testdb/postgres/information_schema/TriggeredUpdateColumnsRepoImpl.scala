@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait TriggeredUpdateColumnsRepoImpl extends TriggeredUpdateColumnsRepo {
+object TriggeredUpdateColumnsRepoImpl extends TriggeredUpdateColumnsRepo {
   override def selectAll(implicit c: Connection): List[TriggeredUpdateColumnsRow] = {
     SQL"""select trigger_catalog, trigger_schema, trigger_name, event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".as(TriggeredUpdateColumnsRow.rowParser.*)
   }

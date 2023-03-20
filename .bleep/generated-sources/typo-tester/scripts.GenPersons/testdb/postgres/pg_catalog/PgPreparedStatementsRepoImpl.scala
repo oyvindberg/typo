@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgPreparedStatementsRepoImpl extends PgPreparedStatementsRepo {
+object PgPreparedStatementsRepoImpl extends PgPreparedStatementsRepo {
   override def selectAll(implicit c: Connection): List[PgPreparedStatementsRow] = {
     SQL"""select name, statement, prepare_time, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".as(PgPreparedStatementsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait ForeignDataWrapperOptionsRepoImpl extends ForeignDataWrapperOptionsRepo {
+object ForeignDataWrapperOptionsRepoImpl extends ForeignDataWrapperOptionsRepo {
   override def selectAll(implicit c: Connection): List[ForeignDataWrapperOptionsRow] = {
     SQL"""select foreign_data_wrapper_catalog, foreign_data_wrapper_name, option_name, option_value from information_schema.foreign_data_wrapper_options""".as(ForeignDataWrapperOptionsRow.rowParser.*)
   }

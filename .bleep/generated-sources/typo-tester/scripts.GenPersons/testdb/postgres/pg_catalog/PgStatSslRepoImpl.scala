@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatSslRepoImpl extends PgStatSslRepo {
+object PgStatSslRepoImpl extends PgStatSslRepo {
   override def selectAll(implicit c: Connection): List[PgStatSslRow] = {
     SQL"""select pid, ssl, version, cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".as(PgStatSslRow.rowParser.*)
   }

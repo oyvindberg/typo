@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait RoutineColumnUsageRepoImpl extends RoutineColumnUsageRepo {
+object RoutineColumnUsageRepoImpl extends RoutineColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[RoutineColumnUsageRow] = {
     SQL"""select specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, table_catalog, table_schema, table_name, column_name from information_schema.routine_column_usage""".as(RoutineColumnUsageRow.rowParser.*)
   }

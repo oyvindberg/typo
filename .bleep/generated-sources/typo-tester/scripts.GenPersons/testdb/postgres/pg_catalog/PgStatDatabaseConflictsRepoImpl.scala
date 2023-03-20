@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatDatabaseConflictsRepoImpl extends PgStatDatabaseConflictsRepo {
+object PgStatDatabaseConflictsRepoImpl extends PgStatDatabaseConflictsRepo {
   override def selectAll(implicit c: Connection): List[PgStatDatabaseConflictsRow] = {
     SQL"""select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock from pg_catalog.pg_stat_database_conflicts""".as(PgStatDatabaseConflictsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTimezoneAbbrevsRepoImpl extends PgTimezoneAbbrevsRepo {
+object PgTimezoneAbbrevsRepoImpl extends PgTimezoneAbbrevsRepo {
   override def selectAll(implicit c: Connection): List[PgTimezoneAbbrevsRow] = {
     SQL"""select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs""".as(PgTimezoneAbbrevsRow.rowParser.*)
   }

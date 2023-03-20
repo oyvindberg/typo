@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgInheritsRepoImpl extends PgInheritsRepo {
+object PgInheritsRepoImpl extends PgInheritsRepo {
   override def selectAll(implicit c: Connection): List[PgInheritsRow] = {
     SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits""".as(PgInheritsRow.rowParser.*)
   }

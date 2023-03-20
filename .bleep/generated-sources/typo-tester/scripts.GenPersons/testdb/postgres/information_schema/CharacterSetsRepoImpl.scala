@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait CharacterSetsRepoImpl extends CharacterSetsRepo {
+object CharacterSetsRepoImpl extends CharacterSetsRepo {
   override def selectAll(implicit c: Connection): List[CharacterSetsRow] = {
     SQL"""select character_set_catalog, character_set_schema, character_set_name, character_repertoire, form_of_use, default_collate_catalog, default_collate_schema, default_collate_name from information_schema.character_sets""".as(CharacterSetsRow.rowParser.*)
   }

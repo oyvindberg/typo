@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTsTemplateRepoImpl extends PgTsTemplateRepo {
+object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def selectAll(implicit c: Connection): List[PgTsTemplateRow] = {
     SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template""".as(PgTsTemplateRow.rowParser.*)
   }

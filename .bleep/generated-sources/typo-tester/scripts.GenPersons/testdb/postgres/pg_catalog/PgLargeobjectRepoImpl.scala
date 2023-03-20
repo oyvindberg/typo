@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgLargeobjectRepoImpl extends PgLargeobjectRepo {
+object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   override def selectAll(implicit c: Connection): List[PgLargeobjectRow] = {
     SQL"""select loid, pageno, data from pg_catalog.pg_largeobject""".as(PgLargeobjectRow.rowParser.*)
   }

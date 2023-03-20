@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgLocksRepoImpl extends PgLocksRepo {
+object PgLocksRepoImpl extends PgLocksRepo {
   override def selectAll(implicit c: Connection): List[PgLocksRow] = {
     SQL"""select locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart from pg_catalog.pg_locks""".as(PgLocksRow.rowParser.*)
   }

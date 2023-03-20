@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait SequencesRepoImpl extends SequencesRepo {
+object SequencesRepoImpl extends SequencesRepo {
   override def selectAll(implicit c: Connection): List[SequencesRow] = {
     SQL"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, increment, cycle_option from information_schema.sequences""".as(SequencesRow.rowParser.*)
   }

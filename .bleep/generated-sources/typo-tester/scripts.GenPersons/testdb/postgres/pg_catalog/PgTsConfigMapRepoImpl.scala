@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
+object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
     SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map""".as(PgTsConfigMapRow.rowParser.*)
   }

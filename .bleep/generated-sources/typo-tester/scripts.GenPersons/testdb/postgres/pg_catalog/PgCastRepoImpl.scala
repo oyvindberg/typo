@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgCastRepoImpl extends PgCastRepo {
+object PgCastRepoImpl extends PgCastRepo {
   override def selectAll(implicit c: Connection): List[PgCastRow] = {
     SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast""".as(PgCastRow.rowParser.*)
   }

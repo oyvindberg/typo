@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
+object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
     SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data""".as(PgStatisticExtDataRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgViewsRepoImpl extends PgViewsRepo {
+object PgViewsRepoImpl extends PgViewsRepo {
   override def selectAll(implicit c: Connection): List[PgViewsRow] = {
     SQL"""select schemaname, viewname, viewowner, definition from pg_catalog.pg_views""".as(PgViewsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait ViewTableUsageRepoImpl extends ViewTableUsageRepo {
+object ViewTableUsageRepoImpl extends ViewTableUsageRepo {
   override def selectAll(implicit c: Connection): List[ViewTableUsageRow] = {
     SQL"""select view_catalog, view_schema, view_name, table_catalog, table_schema, table_name from information_schema.view_table_usage""".as(ViewTableUsageRow.rowParser.*)
   }

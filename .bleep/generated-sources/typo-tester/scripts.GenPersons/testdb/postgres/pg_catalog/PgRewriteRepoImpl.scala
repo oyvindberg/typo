@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgRewriteRepoImpl extends PgRewriteRepo {
+object PgRewriteRepoImpl extends PgRewriteRepo {
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
     SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite""".as(PgRewriteRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatWalRepoImpl extends PgStatWalRepo {
+object PgStatWalRepoImpl extends PgStatWalRepo {
   override def selectAll(implicit c: Connection): List[PgStatWalRow] = {
     SQL"""select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset from pg_catalog.pg_stat_wal""".as(PgStatWalRow.rowParser.*)
   }

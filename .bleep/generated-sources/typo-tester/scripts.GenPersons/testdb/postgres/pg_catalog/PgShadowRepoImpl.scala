@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgShadowRepoImpl extends PgShadowRepo {
+object PgShadowRepoImpl extends PgShadowRepo {
   override def selectAll(implicit c: Connection): List[PgShadowRow] = {
     SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig from pg_catalog.pg_shadow""".as(PgShadowRow.rowParser.*)
   }

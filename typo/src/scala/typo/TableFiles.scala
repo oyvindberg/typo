@@ -51,7 +51,7 @@ case class TableFiles(table: TableComputed, dbLib: DbLib, jsonLib: JsonLib) {
     Some(relation.RowFile),
     UnsavedRowFile,
     table.repoMethods.map(relation.RepoTraitFile),
-    table.repoMethods.map(relation.RepoImplTraitFile),
+    table.repoMethods.map(relation.RepoImplFile),
     Some(relation.FieldValueFile),
     IdFile
   ).flatten

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgIndexesRepoImpl extends PgIndexesRepo {
+object PgIndexesRepoImpl extends PgIndexesRepo {
   override def selectAll(implicit c: Connection): List[PgIndexesRow] = {
     SQL"""select schemaname, tablename, indexname, tablespace, indexdef from pg_catalog.pg_indexes""".as(PgIndexesRow.rowParser.*)
   }

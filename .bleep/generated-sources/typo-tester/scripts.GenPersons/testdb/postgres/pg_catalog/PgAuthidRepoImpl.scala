@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgAuthidRepoImpl extends PgAuthidRepo {
+object PgAuthidRepoImpl extends PgAuthidRepo {
   override def selectAll(implicit c: Connection): List[PgAuthidRow] = {
     SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid""".as(PgAuthidRow.rowParser.*)
   }

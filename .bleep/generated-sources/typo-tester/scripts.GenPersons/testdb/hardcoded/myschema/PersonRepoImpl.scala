@@ -15,7 +15,7 @@ import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
 import testdb.hardcoded.Defaulted.UseDefault
 
-trait PersonRepoImpl extends PersonRepo {
+object PersonRepoImpl extends PersonRepo {
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".as(PersonRow.rowParser.*)
   }

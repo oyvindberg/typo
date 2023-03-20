@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgCollationRepoImpl extends PgCollationRepo {
+object PgCollationRepoImpl extends PgCollationRepo {
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(PgCollationRow.rowParser.*)
   }

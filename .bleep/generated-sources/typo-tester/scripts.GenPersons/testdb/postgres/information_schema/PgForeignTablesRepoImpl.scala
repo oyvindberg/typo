@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgForeignTablesRepoImpl extends PgForeignTablesRepo {
+object PgForeignTablesRepoImpl extends PgForeignTablesRepo {
   override def selectAll(implicit c: Connection): List[PgForeignTablesRow] = {
     SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier from information_schema._pg_foreign_tables""".as(PgForeignTablesRow.rowParser.*)
   }

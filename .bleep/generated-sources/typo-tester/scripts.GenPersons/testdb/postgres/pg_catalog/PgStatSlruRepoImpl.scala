@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatSlruRepoImpl extends PgStatSlruRepo {
+object PgStatSlruRepoImpl extends PgStatSlruRepo {
   override def selectAll(implicit c: Connection): List[PgStatSlruRow] = {
     SQL"""select name, blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset from pg_catalog.pg_stat_slru""".as(PgStatSlruRow.rowParser.*)
   }

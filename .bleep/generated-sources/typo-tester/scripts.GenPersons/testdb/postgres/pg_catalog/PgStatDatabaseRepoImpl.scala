@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatDatabaseRepoImpl extends PgStatDatabaseRepo {
+object PgStatDatabaseRepoImpl extends PgStatDatabaseRepo {
   override def selectAll(implicit c: Connection): List[PgStatDatabaseRow] = {
     SQL"""select datid, datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit, tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted, conflicts, temp_files, temp_bytes, deadlocks, checksum_failures, checksum_last_failure, blk_read_time, blk_write_time, session_time, active_time, idle_in_transaction_time, sessions, sessions_abandoned, sessions_fatal, sessions_killed, stats_reset from pg_catalog.pg_stat_database""".as(PgStatDatabaseRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
+object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def selectAll(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
     SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata""".as(PgLargeobjectMetadataRow.rowParser.*)
   }

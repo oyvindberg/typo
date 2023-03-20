@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
+object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
   override def selectAll(implicit c: Connection): List[ReferentialConstraintsRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints""".as(ReferentialConstraintsRow.rowParser.*)
   }

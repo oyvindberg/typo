@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTablespaceRepoImpl extends PgTablespaceRepo {
+object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def selectAll(implicit c: Connection): List[PgTablespaceRow] = {
     SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace""".as(PgTablespaceRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait UserMappingsRepoImpl extends UserMappingsRepo {
+object UserMappingsRepoImpl extends UserMappingsRepo {
   override def selectAll(implicit c: Connection): List[UserMappingsRow] = {
     SQL"""select authorization_identifier, foreign_server_catalog, foreign_server_name from information_schema.user_mappings""".as(UserMappingsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgFileSettingsRepoImpl extends PgFileSettingsRepo {
+object PgFileSettingsRepoImpl extends PgFileSettingsRepo {
   override def selectAll(implicit c: Connection): List[PgFileSettingsRow] = {
     SQL"""select sourcefile, sourceline, seqno, name, setting, applied, error from pg_catalog.pg_file_settings""".as(PgFileSettingsRow.rowParser.*)
   }

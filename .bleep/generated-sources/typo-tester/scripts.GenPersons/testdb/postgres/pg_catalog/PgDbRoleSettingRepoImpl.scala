@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
+object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
     SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting""".as(PgDbRoleSettingRow.rowParser.*)
   }

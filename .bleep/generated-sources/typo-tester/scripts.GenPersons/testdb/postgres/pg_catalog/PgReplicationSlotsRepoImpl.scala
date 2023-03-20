@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgReplicationSlotsRepoImpl extends PgReplicationSlotsRepo {
+object PgReplicationSlotsRepoImpl extends PgReplicationSlotsRepo {
   override def selectAll(implicit c: Connection): List[PgReplicationSlotsRow] = {
     SQL"""select slot_name, plugin, slot_type, datoid, database, temporary, active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn, wal_status, safe_wal_size, two_phase from pg_catalog.pg_replication_slots""".as(PgReplicationSlotsRow.rowParser.*)
   }

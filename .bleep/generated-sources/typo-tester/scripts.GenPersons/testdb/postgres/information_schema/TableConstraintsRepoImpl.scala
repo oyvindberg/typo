@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait TableConstraintsRepoImpl extends TableConstraintsRepo {
+object TableConstraintsRepoImpl extends TableConstraintsRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced from information_schema.table_constraints""".as(TableConstraintsRow.rowParser.*)
   }

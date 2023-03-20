@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgEnumRepoImpl extends PgEnumRepo {
+object PgEnumRepoImpl extends PgEnumRepo {
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
     SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum""".as(PgEnumRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait InformationSchemaCatalogNameRepoImpl extends InformationSchemaCatalogNameRepo {
+object InformationSchemaCatalogNameRepoImpl extends InformationSchemaCatalogNameRepo {
   override def selectAll(implicit c: Connection): List[InformationSchemaCatalogNameRow] = {
     SQL"""select catalog_name from information_schema.information_schema_catalog_name""".as(InformationSchemaCatalogNameRow.rowParser.*)
   }

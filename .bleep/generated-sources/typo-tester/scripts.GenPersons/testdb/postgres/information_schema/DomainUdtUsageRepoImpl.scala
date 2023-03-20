@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait DomainUdtUsageRepoImpl extends DomainUdtUsageRepo {
+object DomainUdtUsageRepoImpl extends DomainUdtUsageRepo {
   override def selectAll(implicit c: Connection): List[DomainUdtUsageRow] = {
     SQL"""select udt_catalog, udt_schema, udt_name, domain_catalog, domain_schema, domain_name from information_schema.domain_udt_usage""".as(DomainUdtUsageRow.rowParser.*)
   }

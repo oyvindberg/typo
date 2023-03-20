@@ -65,7 +65,7 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
     sc.File(tpe, str)
   }
 
-  def RepoImplTraitFile(repoMethods: List[RepoMethod]): sc.File = {
+  def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
     val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
       val impl: sc.Code = dbLib.repoImpl(relation, repoMethod)
       code"""|override ${dbLib.repoSig(repoMethod)} = {
@@ -74,7 +74,7 @@ case class RelationFiles(relation: RelationComputed, dbLib: DbLib, jsonLib: Json
     }
 
     val str =
-      code"""trait ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
+      code"""object ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
               |  ${renderedMethods.mkCode("\n  ")}
               |}
               |""".stripMargin

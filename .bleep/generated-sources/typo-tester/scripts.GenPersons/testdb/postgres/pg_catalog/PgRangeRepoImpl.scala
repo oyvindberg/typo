@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgRangeRepoImpl extends PgRangeRepo {
+object PgRangeRepoImpl extends PgRangeRepo {
   override def selectAll(implicit c: Connection): List[PgRangeRow] = {
     SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range""".as(PgRangeRow.rowParser.*)
   }

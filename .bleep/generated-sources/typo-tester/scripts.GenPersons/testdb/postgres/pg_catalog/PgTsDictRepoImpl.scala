@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgTsDictRepoImpl extends PgTsDictRepo {
+object PgTsDictRepoImpl extends PgTsDictRepo {
   override def selectAll(implicit c: Connection): List[PgTsDictRow] = {
     SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict""".as(PgTsDictRow.rowParser.*)
   }

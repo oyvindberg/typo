@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
+object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
     SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table""".as(PgPartitionedTableRow.rowParser.*)
   }

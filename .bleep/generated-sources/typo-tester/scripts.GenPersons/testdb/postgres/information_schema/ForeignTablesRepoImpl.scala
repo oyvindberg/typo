@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait ForeignTablesRepoImpl extends ForeignTablesRepo {
+object ForeignTablesRepoImpl extends ForeignTablesRepo {
   override def selectAll(implicit c: Connection): List[ForeignTablesRow] = {
     SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name from information_schema.foreign_tables""".as(ForeignTablesRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatUserFunctionsRepoImpl extends PgStatUserFunctionsRepo {
+object PgStatUserFunctionsRepoImpl extends PgStatUserFunctionsRepo {
   override def selectAll(implicit c: Connection): List[PgStatUserFunctionsRow] = {
     SQL"""select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_user_functions""".as(PgStatUserFunctionsRow.rowParser.*)
   }

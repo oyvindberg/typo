@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgHbaFileRulesRepoImpl extends PgHbaFileRulesRepo {
+object PgHbaFileRulesRepoImpl extends PgHbaFileRulesRepo {
   override def selectAll(implicit c: Connection): List[PgHbaFileRulesRow] = {
     SQL"""select line_number, type, database, user_name, address, netmask, auth_method, options, error from pg_catalog.pg_hba_file_rules""".as(PgHbaFileRulesRow.rowParser.*)
   }

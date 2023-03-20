@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgCursorsRepoImpl extends PgCursorsRepo {
+object PgCursorsRepoImpl extends PgCursorsRepo {
   override def selectAll(implicit c: Connection): List[PgCursorsRow] = {
     SQL"""select name, statement, is_holdable, is_binary, is_scrollable, creation_time from pg_catalog.pg_cursors""".as(PgCursorsRow.rowParser.*)
   }

@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgStatProgressBasebackupRepoImpl extends PgStatProgressBasebackupRepo {
+object PgStatProgressBasebackupRepoImpl extends PgStatProgressBasebackupRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressBasebackupRow] = {
     SQL"""select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup""".as(PgStatProgressBasebackupRow.rowParser.*)
   }

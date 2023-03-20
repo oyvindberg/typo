@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait SqlSizingRepoImpl extends SqlSizingRepo {
+object SqlSizingRepoImpl extends SqlSizingRepo {
   override def selectAll(implicit c: Connection): List[SqlSizingRow] = {
     SQL"""select sizing_id, sizing_name, supported_value, comments from information_schema.sql_sizing""".as(SqlSizingRow.rowParser.*)
   }

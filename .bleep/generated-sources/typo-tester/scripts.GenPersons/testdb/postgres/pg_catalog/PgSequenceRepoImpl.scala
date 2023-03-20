@@ -13,7 +13,7 @@ import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-trait PgSequenceRepoImpl extends PgSequenceRepo {
+object PgSequenceRepoImpl extends PgSequenceRepo {
   override def selectAll(implicit c: Connection): List[PgSequenceRow] = {
     SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence""".as(PgSequenceRow.rowParser.*)
   }
