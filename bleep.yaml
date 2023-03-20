@@ -15,6 +15,7 @@ projects:
       - org.playframework.anorm::anorm:2.7.0
     platform:
       mainClass: com.foo.App
+    sources: ./generated-and-checked-in
   typo-scripts:
     dependsOn: typo
     dependencies: build.bleep::bleep-core:${BLEEP_VERSION}
@@ -28,6 +29,8 @@ projects:
       - com.typesafe.play::play-json:2.10.0-RC7
     extends: template-common
     sourcegen: typo-scripts/scripts.GenPersons
+scripts:
+  generate-sources: typo-scripts/scripts.GeneratedSources
 templates:
   template-common:
     platform:
