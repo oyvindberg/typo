@@ -43,6 +43,7 @@ class Tables(
 
   private def typeFromUdtName(udtName: String, characterMaximumLength: Option[Int]): db.Type = {
     udtName match {
+      case "aclitem"                  => db.Type.Text // i.e. "postgres=arwdDxt/postgres"
       case "anyarray"                 => db.Type.AnyArray
       case "bool"                     => db.Type.Boolean
       case "char"                     => db.Type.Char
