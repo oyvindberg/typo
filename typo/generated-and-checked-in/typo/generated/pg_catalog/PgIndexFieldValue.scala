@@ -28,10 +28,10 @@ object PgIndexFieldValue {
   case class indisready(override val value: Boolean) extends PgIndexFieldValue("indisready", value)
   case class indislive(override val value: Boolean) extends PgIndexFieldValue("indislive", value)
   case class indisreplident(override val value: Boolean) extends PgIndexFieldValue("indisreplident", value)
-  case class indkey(override val value: String) extends PgIndexFieldValue("indkey", value)
+  case class indkey(override val value: Array[Short]) extends PgIndexFieldValue("indkey", value)
   case class indcollation(override val value: Array[Long]) extends PgIndexFieldValue("indcollation", value)
   case class indclass(override val value: Array[Long]) extends PgIndexFieldValue("indclass", value)
-  case class indoption(override val value: String) extends PgIndexFieldValue("indoption", value)
+  case class indoption(override val value: Array[Short]) extends PgIndexFieldValue("indoption", value)
   case class indexprs(override val value: Option[String]) extends PgIndexFieldValue("indexprs", value)
   case class indpred(override val value: Option[String]) extends PgIndexFieldValue("indpred", value)
 }

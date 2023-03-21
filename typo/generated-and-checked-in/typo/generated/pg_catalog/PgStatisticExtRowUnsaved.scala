@@ -17,7 +17,7 @@ case class PgStatisticExtRowUnsaved(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: String,
+  stxkeys: Array[Short],
   stxkind: Array[String],
   stxexprs: Option[String]
 )

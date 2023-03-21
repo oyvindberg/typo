@@ -25,7 +25,7 @@ case class PgTriggerRowUnsaved(
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
   tgnargs: Short,
-  tgattr: String,
+  tgattr: Array[Short],
   tgargs: String,
   tgqual: Option[String],
   tgoldtable: Option[String],

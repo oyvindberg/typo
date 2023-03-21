@@ -19,7 +19,7 @@ case class PgStatisticExtRow(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: String,
+  stxkeys: Array[Short],
   stxkind: Array[String],
   stxexprs: Option[String]
 )
@@ -34,7 +34,7 @@ object PgStatisticExtRow {
         stxnamespace = row[Long]("stxnamespace"),
         stxowner = row[Long]("stxowner"),
         stxstattarget = row[Int]("stxstattarget"),
-        stxkeys = row[String]("stxkeys"),
+        stxkeys = row[Array[Short]]("stxkeys"),
         stxkind = row[Array[String]]("stxkind"),
         stxexprs = row[Option[String]]("stxexprs")
       )

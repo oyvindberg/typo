@@ -15,7 +15,7 @@ case class PgPartitionedTableRowUnsaved(
   partstrat: String,
   partnatts: Short,
   partdefid: Long,
-  partattrs: String,
+  partattrs: Array[Short],
   partclass: Array[Long],
   partcollation: Array[Long],
   partexprs: Option[String]

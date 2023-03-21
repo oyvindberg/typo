@@ -28,7 +28,7 @@ object PgTriggerFieldValue {
   case class tgdeferrable(override val value: Boolean) extends PgTriggerFieldValue("tgdeferrable", value)
   case class tginitdeferred(override val value: Boolean) extends PgTriggerFieldValue("tginitdeferred", value)
   case class tgnargs(override val value: Short) extends PgTriggerFieldValue("tgnargs", value)
-  case class tgattr(override val value: String) extends PgTriggerFieldValue("tgattr", value)
+  case class tgattr(override val value: Array[Short]) extends PgTriggerFieldValue("tgattr", value)
   case class tgargs(override val value: String) extends PgTriggerFieldValue("tgargs", value)
   case class tgqual(override val value: Option[String]) extends PgTriggerFieldValue("tgqual", value)
   case class tgoldtable(override val value: Option[String]) extends PgTriggerFieldValue("tgoldtable", value)

@@ -17,7 +17,7 @@ case class PgPartitionedTableRow(
   partstrat: String,
   partnatts: Short,
   partdefid: Long,
-  partattrs: String,
+  partattrs: Array[Short],
   partclass: Array[Long],
   partcollation: Array[Long],
   partexprs: Option[String]
@@ -31,7 +31,7 @@ object PgPartitionedTableRow {
         partstrat = row[String]("partstrat"),
         partnatts = row[Short]("partnatts"),
         partdefid = row[Long]("partdefid"),
-        partattrs = row[String]("partattrs"),
+        partattrs = row[Array[Short]]("partattrs"),
         partclass = row[Array[Long]]("partclass"),
         partcollation = row[Array[Long]]("partcollation"),
         partexprs = row[Option[String]]("partexprs")

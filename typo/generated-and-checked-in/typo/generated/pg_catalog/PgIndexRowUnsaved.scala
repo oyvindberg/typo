@@ -25,10 +25,10 @@ case class PgIndexRowUnsaved(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: String,
+  indkey: Array[Short],
   indcollation: Array[Long],
   indclass: Array[Long],
-  indoption: String,
+  indoption: Array[Short],
   indexprs: Option[String],
   indpred: Option[String]
 )

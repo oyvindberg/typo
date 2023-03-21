@@ -52,6 +52,7 @@ class Tables(
       case "hstore"                   => db.Type.Hstore
       case "inet"                     => db.Type.Inet
       case "int2"                     => db.Type.Int2
+      case "int2vector"               => db.Type.Vector(db.Type.Int2)
       case "int4"                     => db.Type.Int4
       case "int8"                     => db.Type.Int8
       case "json"                     => db.Type.Json
