@@ -64,6 +64,7 @@ class Tables(
       case "timestamp"                => db.Type.Timestamp
       case "timestamptz"              => db.Type.TimestampTz
       case "varchar"                  => db.Type.VarChar(characterMaximumLength)
+      case "xid"                      => db.Type.Int4 // transaction ID
       case str if str.startsWith("_") => db.Type.Array(typeFromUdtName(udtName.drop(1), characterMaximumLength))
       case typeName =>
         enums.get(typeName) match {

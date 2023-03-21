@@ -39,8 +39,8 @@ case class PgClassRowUnsaved(
   relreplident: String,
   relispartition: Boolean,
   relrewrite: Long,
-  relfrozenxid: String,
-  relminmxid: String,
+  relfrozenxid: Int,
+  relminmxid: Int,
   relacl: Option[Array[String]],
   reloptions: Option[Array[String]],
   relpartbound: Option[String]

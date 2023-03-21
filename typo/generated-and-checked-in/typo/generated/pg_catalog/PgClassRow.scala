@@ -41,8 +41,8 @@ case class PgClassRow(
   relreplident: String,
   relispartition: Boolean,
   relrewrite: Long,
-  relfrozenxid: String,
-  relminmxid: String,
+  relfrozenxid: Int,
+  relminmxid: Int,
   relacl: Option[Array[String]],
   reloptions: Option[Array[String]],
   relpartbound: Option[String]
@@ -80,8 +80,8 @@ object PgClassRow {
         relreplident = row[String]("relreplident"),
         relispartition = row[Boolean]("relispartition"),
         relrewrite = row[Long]("relrewrite"),
-        relfrozenxid = row[String]("relfrozenxid"),
-        relminmxid = row[String]("relminmxid"),
+        relfrozenxid = row[Int]("relfrozenxid"),
+        relminmxid = row[Int]("relminmxid"),
         relacl = row[Option[Array[String]]]("relacl"),
         reloptions = row[Option[Array[String]]]("reloptions"),
         relpartbound = row[Option[String]]("relpartbound")

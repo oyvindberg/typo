@@ -21,8 +21,8 @@ case class PgDatabaseRowUnsaved(
   datallowconn: Boolean,
   datconnlimit: Int,
   datlastsysoid: Long,
-  datfrozenxid: String,
-  datminmxid: String,
+  datfrozenxid: Int,
+  datminmxid: Int,
   dattablespace: Long,
   datacl: Option[Array[String]]
 )

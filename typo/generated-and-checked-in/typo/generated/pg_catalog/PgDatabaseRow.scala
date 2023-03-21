@@ -23,8 +23,8 @@ case class PgDatabaseRow(
   datallowconn: Boolean,
   datconnlimit: Int,
   datlastsysoid: Long,
-  datfrozenxid: String,
-  datminmxid: String,
+  datfrozenxid: Int,
+  datminmxid: Int,
   dattablespace: Long,
   datacl: Option[Array[String]]
 )
@@ -43,8 +43,8 @@ object PgDatabaseRow {
         datallowconn = row[Boolean]("datallowconn"),
         datconnlimit = row[Int]("datconnlimit"),
         datlastsysoid = row[Long]("datlastsysoid"),
-        datfrozenxid = row[String]("datfrozenxid"),
-        datminmxid = row[String]("datminmxid"),
+        datfrozenxid = row[Int]("datfrozenxid"),
+        datminmxid = row[Int]("datminmxid"),
         dattablespace = row[Long]("dattablespace"),
         datacl = row[Option[Array[String]]]("datacl")
       )
