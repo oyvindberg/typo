@@ -16,8 +16,8 @@ case class PgTransformRow(
   oid: PgTransformId,
   trftype: Long,
   trflang: Long,
-  trffromsql: String,
-  trftosql: String
+  trffromsql: Long,
+  trftosql: Long
 )
 
 object PgTransformRow {
@@ -27,8 +27,8 @@ object PgTransformRow {
         oid = row[PgTransformId]("oid"),
         trftype = row[Long]("trftype"),
         trflang = row[Long]("trflang"),
-        trffromsql = row[String]("trffromsql"),
-        trftosql = row[String]("trftosql")
+        trffromsql = row[Long]("trffromsql"),
+        trftosql = row[Long]("trftosql")
       )
     )
   }

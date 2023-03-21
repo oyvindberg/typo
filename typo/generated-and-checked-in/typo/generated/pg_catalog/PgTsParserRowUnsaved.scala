@@ -14,11 +14,11 @@ package pg_catalog
 case class PgTsParserRowUnsaved(
   prsname: String,
   prsnamespace: Long,
-  prsstart: String,
-  prstoken: String,
-  prsend: String,
-  prsheadline: String,
-  prslextype: String
+  prsstart: Long,
+  prstoken: Long,
+  prsend: Long,
+  prsheadline: Long,
+  prslextype: Long
 )
 object PgTsParserRowUnsaved {
   

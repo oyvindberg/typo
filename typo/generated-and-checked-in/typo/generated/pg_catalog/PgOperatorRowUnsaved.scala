@@ -23,9 +23,9 @@ case class PgOperatorRowUnsaved(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: String,
-  oprrest: String,
-  oprjoin: String
+  oprcode: Long,
+  oprrest: Long,
+  oprjoin: Long
 )
 object PgOperatorRowUnsaved {
   

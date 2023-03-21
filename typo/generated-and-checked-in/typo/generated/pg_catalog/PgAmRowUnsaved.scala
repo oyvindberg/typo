@@ -13,7 +13,7 @@ package pg_catalog
 
 case class PgAmRowUnsaved(
   amname: String,
-  amhandler: String,
+  amhandler: Long,
   amtype: String
 )
 object PgAmRowUnsaved {

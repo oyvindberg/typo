@@ -20,6 +20,6 @@ object PgConversionFieldValue {
   case class conowner(override val value: Long) extends PgConversionFieldValue("conowner", value)
   case class conforencoding(override val value: Int) extends PgConversionFieldValue("conforencoding", value)
   case class contoencoding(override val value: Int) extends PgConversionFieldValue("contoencoding", value)
-  case class conproc(override val value: String) extends PgConversionFieldValue("conproc", value)
+  case class conproc(override val value: Long) extends PgConversionFieldValue("conproc", value)
   case class condefault(override val value: Boolean) extends PgConversionFieldValue("condefault", value)
 }

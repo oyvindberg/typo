@@ -14,8 +14,8 @@ package pg_catalog
 case class PgTransformRowUnsaved(
   trftype: Long,
   trflang: Long,
-  trffromsql: String,
-  trftosql: String
+  trffromsql: Long,
+  trftosql: Long
 )
 object PgTransformRowUnsaved {
   

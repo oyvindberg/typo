@@ -14,8 +14,8 @@ package pg_catalog
 case class PgTsTemplateRowUnsaved(
   tmplname: String,
   tmplnamespace: Long,
-  tmplinit: String,
-  tmpllexize: String
+  tmplinit: Long,
+  tmpllexize: Long
 )
 object PgTsTemplateRowUnsaved {
   

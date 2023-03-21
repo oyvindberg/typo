@@ -17,7 +17,7 @@ case class PgConversionRowUnsaved(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: String,
+  conproc: Long,
   condefault: Boolean
 )
 object PgConversionRowUnsaved {

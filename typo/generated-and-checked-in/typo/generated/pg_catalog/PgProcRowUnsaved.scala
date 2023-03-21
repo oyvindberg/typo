@@ -19,7 +19,7 @@ case class PgProcRowUnsaved(
   procost: Float,
   prorows: Float,
   provariadic: Long,
-  prosupport: String,
+  prosupport: Long,
   prokind: String,
   prosecdef: Boolean,
   proleakproof: Boolean,

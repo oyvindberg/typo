@@ -18,7 +18,7 @@ case class PgAmprocRow(
   amproclefttype: Long,
   amprocrighttype: Long,
   amprocnum: Short,
-  amproc: String
+  amproc: Long
 )
 
 object PgAmprocRow {
@@ -30,7 +30,7 @@ object PgAmprocRow {
         amproclefttype = row[Long]("amproclefttype"),
         amprocrighttype = row[Long]("amprocrighttype"),
         amprocnum = row[Short]("amprocnum"),
-        amproc = row[String]("amproc")
+        amproc = row[Long]("amproc")
       )
     )
   }

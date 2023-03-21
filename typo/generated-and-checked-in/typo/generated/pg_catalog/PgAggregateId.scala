@@ -14,11 +14,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.ToStatement
 
-case class PgAggregateId(value: String) extends AnyVal
+case class PgAggregateId(value: Long) extends AnyVal
 object PgAggregateId {
   implicit val ordering: Ordering[PgAggregateId] = Ordering.by(_.value)
   
-  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val column: Column[PgAggregateId] = implicitly[Column[String]].map(PgAggregateId.apply)
+  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit val column: Column[PgAggregateId] = implicitly[Column[Long]].map(PgAggregateId.apply)
   implicit val rowParser: RowParser[PgAggregateId] = SqlParser.get[PgAggregateId]("aggfnoid")
 }

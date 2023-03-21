@@ -19,5 +19,5 @@ object PgAmprocFieldValue {
   case class amproclefttype(override val value: Long) extends PgAmprocFieldValue("amproclefttype", value)
   case class amprocrighttype(override val value: Long) extends PgAmprocFieldValue("amprocrighttype", value)
   case class amprocnum(override val value: Short) extends PgAmprocFieldValue("amprocnum", value)
-  case class amproc(override val value: String) extends PgAmprocFieldValue("amproc", value)
+  case class amproc(override val value: Long) extends PgAmprocFieldValue("amproc", value)
 }

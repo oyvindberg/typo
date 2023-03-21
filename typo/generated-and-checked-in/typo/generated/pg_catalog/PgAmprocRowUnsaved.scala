@@ -16,7 +16,7 @@ case class PgAmprocRowUnsaved(
   amproclefttype: Long,
   amprocrighttype: Long,
   amprocnum: Short,
-  amproc: String
+  amproc: Long
 )
 object PgAmprocRowUnsaved {
   

@@ -16,8 +16,8 @@ case class PgTsTemplateRow(
   oid: PgTsTemplateId,
   tmplname: String,
   tmplnamespace: Long,
-  tmplinit: String,
-  tmpllexize: String
+  tmplinit: Long,
+  tmpllexize: Long
 )
 
 object PgTsTemplateRow {
@@ -27,8 +27,8 @@ object PgTsTemplateRow {
         oid = row[PgTsTemplateId]("oid"),
         tmplname = row[String]("tmplname"),
         tmplnamespace = row[Long]("tmplnamespace"),
-        tmplinit = row[String]("tmplinit"),
-        tmpllexize = row[String]("tmpllexize")
+        tmplinit = row[Long]("tmplinit"),
+        tmpllexize = row[Long]("tmpllexize")
       )
     )
   }

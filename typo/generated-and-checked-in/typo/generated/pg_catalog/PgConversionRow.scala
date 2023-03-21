@@ -19,7 +19,7 @@ case class PgConversionRow(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: String,
+  conproc: Long,
   condefault: Boolean
 )
 
@@ -33,7 +33,7 @@ object PgConversionRow {
         conowner = row[Long]("conowner"),
         conforencoding = row[Int]("conforencoding"),
         contoencoding = row[Int]("contoencoding"),
-        conproc = row[String]("conproc"),
+        conproc = row[Long]("conproc"),
         condefault = row[Boolean]("condefault")
       )
     )

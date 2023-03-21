@@ -18,8 +18,8 @@ case class PgRangeRow(
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: String,
-  rngsubdiff: String
+  rngcanonical: Long,
+  rngsubdiff: Long
 )
 
 object PgRangeRow {
@@ -31,8 +31,8 @@ object PgRangeRow {
         rngmultitypid = row[Long]("rngmultitypid"),
         rngcollation = row[Long]("rngcollation"),
         rngsubopc = row[Long]("rngsubopc"),
-        rngcanonical = row[String]("rngcanonical"),
-        rngsubdiff = row[String]("rngsubdiff")
+        rngcanonical = row[Long]("rngcanonical"),
+        rngsubdiff = row[Long]("rngsubdiff")
       )
     )
   }

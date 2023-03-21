@@ -17,6 +17,6 @@ object PgTransformFieldValue {
   case class oid(override val value: PgTransformId) extends PgTransformFieldValue("oid", value)
   case class trftype(override val value: Long) extends PgTransformFieldValue("trftype", value)
   case class trflang(override val value: Long) extends PgTransformFieldValue("trflang", value)
-  case class trffromsql(override val value: String) extends PgTransformFieldValue("trffromsql", value)
-  case class trftosql(override val value: String) extends PgTransformFieldValue("trftosql", value)
+  case class trffromsql(override val value: Long) extends PgTransformFieldValue("trffromsql", value)
+  case class trftosql(override val value: Long) extends PgTransformFieldValue("trftosql", value)
 }

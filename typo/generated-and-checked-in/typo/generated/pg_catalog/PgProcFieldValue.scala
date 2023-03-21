@@ -22,7 +22,7 @@ object PgProcFieldValue {
   case class procost(override val value: Float) extends PgProcFieldValue("procost", value)
   case class prorows(override val value: Float) extends PgProcFieldValue("prorows", value)
   case class provariadic(override val value: Long) extends PgProcFieldValue("provariadic", value)
-  case class prosupport(override val value: String) extends PgProcFieldValue("prosupport", value)
+  case class prosupport(override val value: Long) extends PgProcFieldValue("prosupport", value)
   case class prokind(override val value: String) extends PgProcFieldValue("prokind", value)
   case class prosecdef(override val value: Boolean) extends PgProcFieldValue("prosecdef", value)
   case class proleakproof(override val value: Boolean) extends PgProcFieldValue("proleakproof", value)

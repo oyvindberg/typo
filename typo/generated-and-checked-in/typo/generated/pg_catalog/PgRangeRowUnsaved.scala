@@ -16,8 +16,8 @@ case class PgRangeRowUnsaved(
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: String,
-  rngsubdiff: String
+  rngcanonical: Long,
+  rngsubdiff: Long
 )
 object PgRangeRowUnsaved {
   

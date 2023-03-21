@@ -25,9 +25,9 @@ case class PgOperatorRow(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: String,
-  oprrest: String,
-  oprjoin: String
+  oprcode: Long,
+  oprrest: Long,
+  oprjoin: Long
 )
 
 object PgOperatorRow {
@@ -46,9 +46,9 @@ object PgOperatorRow {
         oprresult = row[Long]("oprresult"),
         oprcom = row[Long]("oprcom"),
         oprnegate = row[Long]("oprnegate"),
-        oprcode = row[String]("oprcode"),
-        oprrest = row[String]("oprrest"),
-        oprjoin = row[String]("oprjoin")
+        oprcode = row[Long]("oprcode"),
+        oprrest = row[Long]("oprrest"),
+        oprjoin = row[Long]("oprjoin")
       )
     )
   }

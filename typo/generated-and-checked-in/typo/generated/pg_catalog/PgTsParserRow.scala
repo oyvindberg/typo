@@ -16,11 +16,11 @@ case class PgTsParserRow(
   oid: PgTsParserId,
   prsname: String,
   prsnamespace: Long,
-  prsstart: String,
-  prstoken: String,
-  prsend: String,
-  prsheadline: String,
-  prslextype: String
+  prsstart: Long,
+  prstoken: Long,
+  prsend: Long,
+  prsheadline: Long,
+  prslextype: Long
 )
 
 object PgTsParserRow {
@@ -30,11 +30,11 @@ object PgTsParserRow {
         oid = row[PgTsParserId]("oid"),
         prsname = row[String]("prsname"),
         prsnamespace = row[Long]("prsnamespace"),
-        prsstart = row[String]("prsstart"),
-        prstoken = row[String]("prstoken"),
-        prsend = row[String]("prsend"),
-        prsheadline = row[String]("prsheadline"),
-        prslextype = row[String]("prslextype")
+        prsstart = row[Long]("prsstart"),
+        prstoken = row[Long]("prstoken"),
+        prsend = row[Long]("prsend"),
+        prsheadline = row[Long]("prsheadline"),
+        prslextype = row[Long]("prslextype")
       )
     )
   }

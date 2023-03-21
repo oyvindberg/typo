@@ -19,6 +19,6 @@ object PgRangeFieldValue {
   case class rngmultitypid(override val value: Long) extends PgRangeFieldValue("rngmultitypid", value)
   case class rngcollation(override val value: Long) extends PgRangeFieldValue("rngcollation", value)
   case class rngsubopc(override val value: Long) extends PgRangeFieldValue("rngsubopc", value)
-  case class rngcanonical(override val value: String) extends PgRangeFieldValue("rngcanonical", value)
-  case class rngsubdiff(override val value: String) extends PgRangeFieldValue("rngsubdiff", value)
+  case class rngcanonical(override val value: Long) extends PgRangeFieldValue("rngcanonical", value)
+  case class rngsubdiff(override val value: Long) extends PgRangeFieldValue("rngsubdiff", value)
 }

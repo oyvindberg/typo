@@ -57,8 +57,9 @@ class Tables(
       case "json"                     => db.Type.Json
       case "name"                     => db.Type.Name
       case "numeric"                  => db.Type.Numeric
-      case "pg_node_tree"             => db.Type.Text // Expression trees (in nodeToString() representation)
       case "oid"                      => db.Type.Oid
+      case "pg_node_tree"             => db.Type.Text // Expression trees (in nodeToString() representation)
+      case "regproc"                  => db.Type.Oid // registered procedure (references pg_proc.oid)
       case "text"                     => db.Type.Text
       case "timestamp"                => db.Type.Timestamp
       case "timestamptz"              => db.Type.TimestampTz

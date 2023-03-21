@@ -15,7 +15,7 @@ import anorm.Success
 case class PgAmRow(
   oid: PgAmId,
   amname: String,
-  amhandler: String,
+  amhandler: Long,
   amtype: String
 )
 
@@ -25,7 +25,7 @@ object PgAmRow {
       PgAmRow(
         oid = row[PgAmId]("oid"),
         amname = row[String]("amname"),
-        amhandler = row[String]("amhandler"),
+        amhandler = row[Long]("amhandler"),
         amtype = row[String]("amtype")
       )
     )
