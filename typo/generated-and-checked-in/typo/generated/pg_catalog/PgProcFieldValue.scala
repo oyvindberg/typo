@@ -33,7 +33,7 @@ object PgProcFieldValue {
   case class pronargs(override val value: Short) extends PgProcFieldValue("pronargs", value)
   case class pronargdefaults(override val value: Short) extends PgProcFieldValue("pronargdefaults", value)
   case class prorettype(override val value: Long) extends PgProcFieldValue("prorettype", value)
-  case class proargtypes(override val value: String) extends PgProcFieldValue("proargtypes", value)
+  case class proargtypes(override val value: Array[Long]) extends PgProcFieldValue("proargtypes", value)
   case class proallargtypes(override val value: Option[Array[Long]]) extends PgProcFieldValue("proallargtypes", value)
   case class proargmodes(override val value: Option[Array[String]]) extends PgProcFieldValue("proargmodes", value)
   case class proargnames(override val value: Option[Array[String]]) extends PgProcFieldValue("proargnames", value)

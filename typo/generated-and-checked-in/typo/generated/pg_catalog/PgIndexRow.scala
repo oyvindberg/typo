@@ -28,8 +28,8 @@ case class PgIndexRow(
   indislive: Boolean,
   indisreplident: Boolean,
   indkey: String,
-  indcollation: String,
-  indclass: String,
+  indcollation: Array[Long],
+  indclass: Array[Long],
   indoption: String,
   indexprs: Option[String],
   indpred: Option[String]
@@ -54,8 +54,8 @@ object PgIndexRow {
         indislive = row[Boolean]("indislive"),
         indisreplident = row[Boolean]("indisreplident"),
         indkey = row[String]("indkey"),
-        indcollation = row[String]("indcollation"),
-        indclass = row[String]("indclass"),
+        indcollation = row[Array[Long]]("indcollation"),
+        indclass = row[Array[Long]]("indclass"),
         indoption = row[String]("indoption"),
         indexprs = row[Option[String]]("indexprs"),
         indpred = row[Option[String]]("indpred")

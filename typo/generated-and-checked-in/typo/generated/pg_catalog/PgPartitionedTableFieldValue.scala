@@ -19,7 +19,7 @@ object PgPartitionedTableFieldValue {
   case class partnatts(override val value: Short) extends PgPartitionedTableFieldValue("partnatts", value)
   case class partdefid(override val value: Long) extends PgPartitionedTableFieldValue("partdefid", value)
   case class partattrs(override val value: String) extends PgPartitionedTableFieldValue("partattrs", value)
-  case class partclass(override val value: String) extends PgPartitionedTableFieldValue("partclass", value)
-  case class partcollation(override val value: String) extends PgPartitionedTableFieldValue("partcollation", value)
+  case class partclass(override val value: Array[Long]) extends PgPartitionedTableFieldValue("partclass", value)
+  case class partcollation(override val value: Array[Long]) extends PgPartitionedTableFieldValue("partcollation", value)
   case class partexprs(override val value: Option[String]) extends PgPartitionedTableFieldValue("partexprs", value)
 }

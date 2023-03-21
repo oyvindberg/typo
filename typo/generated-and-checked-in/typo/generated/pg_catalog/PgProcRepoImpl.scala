@@ -156,7 +156,7 @@ object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_proc where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(proname: String, proargtypes: String, pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
+  override def selectByUnique(proname: String, proargtypes: Array[Long], pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
     ???
   }
 }

@@ -33,6 +33,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
       case Type.Timestamp        => sc.Type.LocalDateTime
       case Type.TimestampTz      => sc.Type.ZonedDateTime
       case Type.Array(tpe)       => sc.Type.Array.of(go(tpe))
+      case Type.Vector(tpe)      => sc.Type.Array.of(go(tpe))
     }
     val baseTpe = go(col.tpe)
 

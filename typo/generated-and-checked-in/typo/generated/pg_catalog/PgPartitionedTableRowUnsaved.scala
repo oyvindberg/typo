@@ -16,8 +16,8 @@ case class PgPartitionedTableRowUnsaved(
   partnatts: Short,
   partdefid: Long,
   partattrs: String,
-  partclass: String,
-  partcollation: String,
+  partclass: Array[Long],
+  partcollation: Array[Long],
   partexprs: Option[String]
 )
 object PgPartitionedTableRowUnsaved {

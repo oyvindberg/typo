@@ -30,7 +30,7 @@ case class PgProcRowUnsaved(
   pronargs: Short,
   pronargdefaults: Short,
   prorettype: Long,
-  proargtypes: String,
+  proargtypes: Array[Long],
   proallargtypes: Option[Array[Long]],
   proargmodes: Option[Array[String]],
   proargnames: Option[Array[String]],
