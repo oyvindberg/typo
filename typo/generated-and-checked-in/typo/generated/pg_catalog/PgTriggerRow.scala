@@ -34,8 +34,8 @@ case class PgTriggerRow(
   tgdeferrable: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgdeferrable","ordinal_position":12,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   tginitdeferred: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tginitdeferred","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   tgnargs: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgnargs","ordinal_position":14,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  tgattr: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgattr","ordinal_position":15,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  tgargs: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgargs","ordinal_position":16,"is_nullable":"NO","data_type":"bytea","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  tgattr: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgattr","ordinal_position":15,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  tgargs: Array[Byte] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgargs","ordinal_position":16,"is_nullable":"NO","data_type":"bytea","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   tgqual: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgqual","ordinal_position":17,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   tgoldtable: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgoldtable","ordinal_position":18,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   tgnewtable: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_trigger","column_name":"tgnewtable","ordinal_position":19,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
@@ -59,8 +59,8 @@ object PgTriggerRow {
         tgdeferrable = row[Boolean]("tgdeferrable"),
         tginitdeferred = row[Boolean]("tginitdeferred"),
         tgnargs = row[Int]("tgnargs"),
-        tgattr = row[Array[Int]]("tgattr"),
-        tgargs = row[String]("tgargs"),
+        tgattr = row[PGobject]("tgattr"),
+        tgargs = row[Array[Byte]]("tgargs"),
         tgqual = row[Option[PGobject]]("tgqual"),
         tgoldtable = row[Option[String]]("tgoldtable"),
         tgnewtable = row[Option[String]]("tgnewtable")
@@ -110,8 +110,8 @@ object PgTriggerRow {
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
             tgnargs = json.\("tgnargs").as[Int],
-            tgattr = json.\("tgattr").as[Array[Int]],
-            tgargs = json.\("tgargs").as[String],
+            tgattr = json.\("tgattr").as[PGobject],
+            tgargs = json.\("tgargs").as[Array[Byte]],
             tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])

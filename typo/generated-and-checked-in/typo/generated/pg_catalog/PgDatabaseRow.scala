@@ -30,8 +30,8 @@ case class PgDatabaseRow(
   datallowconn: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datallowconn","ordinal_position":8,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   datconnlimit: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datconnlimit","ordinal_position":9,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   datlastsysoid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datlastsysoid","ordinal_position":10,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  datfrozenxid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datfrozenxid","ordinal_position":11,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  datminmxid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datminmxid","ordinal_position":12,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  datfrozenxid: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datfrozenxid","ordinal_position":11,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  datminmxid: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datminmxid","ordinal_position":12,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   dattablespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"dattablespace","ordinal_position":13,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   datacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_database","column_name":"datacl","ordinal_position":14,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -50,8 +50,8 @@ object PgDatabaseRow {
         datallowconn = row[Boolean]("datallowconn"),
         datconnlimit = row[Int]("datconnlimit"),
         datlastsysoid = row[Long]("datlastsysoid"),
-        datfrozenxid = row[Int]("datfrozenxid"),
-        datminmxid = row[Int]("datminmxid"),
+        datfrozenxid = row[PGobject]("datfrozenxid"),
+        datminmxid = row[PGobject]("datminmxid"),
         dattablespace = row[Long]("dattablespace"),
         datacl = row[Option[Array[PGobject]]]("datacl")
       )
@@ -91,8 +91,8 @@ object PgDatabaseRow {
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
             datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[Int],
-            datminmxid = json.\("datminmxid").as[Int],
+            datfrozenxid = json.\("datfrozenxid").as[PGobject],
+            datminmxid = json.\("datminmxid").as[PGobject],
             dattablespace = json.\("dattablespace").as[Long],
             datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
           )

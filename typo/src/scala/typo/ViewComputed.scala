@@ -52,6 +52,8 @@ object ViewComputed {
       col.columnTypeName match {
         case "hstore" =>
           sc.Type.JavaMap.of(sc.Type.String, sc.Type.String).withComment(col.columnTypeName)
+        case "regtype" | "anyarray" =>
+          sc.Type.PGobject.withComment(col.columnTypeName)
         case other =>
           sc.Type.Qualified(col.columnClassName).withComment(other)
       }
@@ -69,8 +71,9 @@ object ViewComputed {
             case "_float4"               => Some(sc.Type.Array.of(sc.Type.Float))
             case "_float8"               => Some(sc.Type.Array.of(sc.Type.Double))
             case "_uuid"                 => Some(sc.Type.Array.of(sc.Type.UUID))
+            case "_regtype"              => Some(sc.Type.Array.of(sc.Type.PGobject))
             case "_decimal" | "_numeric" => Some(sc.Type.Array.of(sc.Type.BigDecimal))
-            case "_varchar" | "_char" | "_text" | "_bpchar" | "_name" | "_regtype" =>
+            case "_varchar" | "_char" | "_text" | "_bpchar" | "_name" =>
               Some(sc.Type.Array.of(sc.Type.String))
             case _ => None
           }

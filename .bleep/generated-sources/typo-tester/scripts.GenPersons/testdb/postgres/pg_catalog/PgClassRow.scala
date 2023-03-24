@@ -46,8 +46,8 @@ case class PgClassRow(
   relreplident: String,
   relispartition: Boolean,
   relrewrite: Long,
-  relfrozenxid: Int,
-  relminmxid: Int,
+  relfrozenxid: PGobject,
+  relminmxid: PGobject,
   relacl: Option[Array[PGobject]],
   reloptions: Option[Array[String]],
   relpartbound: Option[PGobject]
@@ -85,8 +85,8 @@ object PgClassRow {
         relreplident = row[String]("relreplident"),
         relispartition = row[Boolean]("relispartition"),
         relrewrite = row[Long]("relrewrite"),
-        relfrozenxid = row[Int]("relfrozenxid"),
-        relminmxid = row[Int]("relminmxid"),
+        relfrozenxid = row[PGobject]("relfrozenxid"),
+        relminmxid = row[PGobject]("relminmxid"),
         relacl = row[Option[Array[PGobject]]]("relacl"),
         reloptions = row[Option[Array[String]]]("reloptions"),
         relpartbound = row[Option[PGobject]]("relpartbound")
@@ -164,8 +164,8 @@ object PgClassRow {
             relreplident = json.\("relreplident").as[String],
             relispartition = json.\("relispartition").as[Boolean],
             relrewrite = json.\("relrewrite").as[Long],
-            relfrozenxid = json.\("relfrozenxid").as[Int],
-            relminmxid = json.\("relminmxid").as[Int],
+            relfrozenxid = json.\("relfrozenxid").as[PGobject],
+            relminmxid = json.\("relminmxid").as[PGobject],
             relacl = json.\("relacl").toOption.map(_.as[Array[PGobject]]),
             reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
             relpartbound = json.\("relpartbound").toOption.map(_.as[PGobject])

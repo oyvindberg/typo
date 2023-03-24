@@ -22,9 +22,9 @@ case class PgPartitionedTableRow(
   partstrat: String,
   partnatts: Int,
   partdefid: Long,
-  partattrs: Array[Int],
-  partclass: Array[Long],
-  partcollation: Array[Long],
+  partattrs: PGobject,
+  partclass: PGobject,
+  partcollation: PGobject,
   partexprs: Option[PGobject]
 )
 
@@ -36,9 +36,9 @@ object PgPartitionedTableRow {
         partstrat = row[String]("partstrat"),
         partnatts = row[Int]("partnatts"),
         partdefid = row[Long]("partdefid"),
-        partattrs = row[Array[Int]]("partattrs"),
-        partclass = row[Array[Long]]("partclass"),
-        partcollation = row[Array[Long]]("partcollation"),
+        partattrs = row[PGobject]("partattrs"),
+        partclass = row[PGobject]("partclass"),
+        partcollation = row[PGobject]("partcollation"),
         partexprs = row[Option[PGobject]]("partexprs")
       )
     )
@@ -65,9 +65,9 @@ object PgPartitionedTableRow {
             partstrat = json.\("partstrat").as[String],
             partnatts = json.\("partnatts").as[Int],
             partdefid = json.\("partdefid").as[Long],
-            partattrs = json.\("partattrs").as[Array[Int]],
-            partclass = json.\("partclass").as[Array[Long]],
-            partcollation = json.\("partcollation").as[Array[Long]],
+            partattrs = json.\("partattrs").as[PGobject],
+            partclass = json.\("partclass").as[PGobject],
+            partcollation = json.\("partcollation").as[PGobject],
             partexprs = json.\("partexprs").toOption.map(_.as[PGobject])
           )
         )

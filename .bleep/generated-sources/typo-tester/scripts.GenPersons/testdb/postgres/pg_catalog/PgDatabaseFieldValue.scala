@@ -22,8 +22,8 @@ object PgDatabaseFieldValue {
   case class datallowconn(override val value: Boolean) extends PgDatabaseFieldValue("datallowconn", value)
   case class datconnlimit(override val value: Int) extends PgDatabaseFieldValue("datconnlimit", value)
   case class datlastsysoid(override val value: Long) extends PgDatabaseFieldValue("datlastsysoid", value)
-  case class datfrozenxid(override val value: Int) extends PgDatabaseFieldValue("datfrozenxid", value)
-  case class datminmxid(override val value: Int) extends PgDatabaseFieldValue("datminmxid", value)
+  case class datfrozenxid(override val value: PGobject) extends PgDatabaseFieldValue("datfrozenxid", value)
+  case class datminmxid(override val value: PGobject) extends PgDatabaseFieldValue("datminmxid", value)
   case class dattablespace(override val value: Long) extends PgDatabaseFieldValue("dattablespace", value)
   case class datacl(override val value: Option[Array[PGobject]]) extends PgDatabaseFieldValue("datacl", value)
 }

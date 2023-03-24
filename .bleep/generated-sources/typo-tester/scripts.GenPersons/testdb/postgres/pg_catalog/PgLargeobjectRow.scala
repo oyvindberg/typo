@@ -19,7 +19,7 @@ import scala.util.Try
 case class PgLargeobjectRow(
   loid: Long,
   pageno: Int,
-  data: String
+  data: Array[Byte]
 ){
   val compositeId: PgLargeobjectId = PgLargeobjectId(loid, pageno)
 }
@@ -30,7 +30,7 @@ object PgLargeobjectRow {
       PgLargeobjectRow(
         loid = row[Long]("loid"),
         pageno = row[Int]("pageno"),
-        data = row[String]("data")
+        data = row[Array[Byte]]("data")
       )
     )
   }
@@ -49,7 +49,7 @@ object PgLargeobjectRow {
           PgLargeobjectRow(
             loid = json.\("loid").as[Long],
             pageno = json.\("pageno").as[Int],
-            data = json.\("data").as[String]
+            data = json.\("data").as[Array[Byte]]
           )
         )
       )

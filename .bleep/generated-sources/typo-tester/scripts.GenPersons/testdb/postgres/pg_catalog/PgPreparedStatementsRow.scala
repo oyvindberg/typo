@@ -10,6 +10,7 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,7 +22,7 @@ case class PgPreparedStatementsRow(
   name: /* unknown nullability */ Option[String],
   statement: /* unknown nullability */ Option[String],
   prepareTime: /* unknown nullability */ Option[LocalDateTime],
-  parameterTypes: /* unknown nullability */ Option[Array[String]],
+  parameterTypes: /* unknown nullability */ Option[Array[PGobject]],
   fromSql: /* unknown nullability */ Option[Boolean],
   genericPlans: /* unknown nullability */ Option[Long],
   customPlans: /* unknown nullability */ Option[Long]
@@ -34,7 +35,7 @@ object PgPreparedStatementsRow {
         name = row[/* unknown nullability */ Option[String]]("name"),
         statement = row[/* unknown nullability */ Option[String]]("statement"),
         prepareTime = row[/* unknown nullability */ Option[LocalDateTime]]("prepare_time"),
-        parameterTypes = row[/* unknown nullability */ Option[Array[String]]]("parameter_types"),
+        parameterTypes = row[/* unknown nullability */ Option[Array[PGobject]]]("parameter_types"),
         fromSql = row[/* unknown nullability */ Option[Boolean]]("from_sql"),
         genericPlans = row[/* unknown nullability */ Option[Long]]("generic_plans"),
         customPlans = row[/* unknown nullability */ Option[Long]]("custom_plans")
@@ -61,7 +62,7 @@ object PgPreparedStatementsRow {
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
             prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
-            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[String]]),
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[PGobject]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
             customPlans = json.\("custom_plans").toOption.map(_.as[Long])

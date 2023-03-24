@@ -31,8 +31,8 @@ case class PgTriggerRowUnsaved(
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
   tgnargs: Int,
-  tgattr: Array[Int],
-  tgargs: String,
+  tgattr: PGobject,
+  tgargs: Array[Byte],
   tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
@@ -78,8 +78,8 @@ object PgTriggerRowUnsaved {
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
             tgnargs = json.\("tgnargs").as[Int],
-            tgattr = json.\("tgattr").as[Array[Int]],
-            tgargs = json.\("tgargs").as[String],
+            tgattr = json.\("tgattr").as[PGobject],
+            tgargs = json.\("tgargs").as[Array[Byte]],
             tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])

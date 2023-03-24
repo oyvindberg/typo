@@ -45,8 +45,8 @@ case class PgClassRowUnsaved(
   relreplident: String,
   relispartition: Boolean,
   relrewrite: Long,
-  relfrozenxid: Int,
-  relminmxid: Int,
+  relfrozenxid: PGobject,
+  relminmxid: PGobject,
   relacl: Option[Array[PGobject]],
   reloptions: Option[Array[String]],
   relpartbound: Option[PGobject]
@@ -120,8 +120,8 @@ object PgClassRowUnsaved {
             relreplident = json.\("relreplident").as[String],
             relispartition = json.\("relispartition").as[Boolean],
             relrewrite = json.\("relrewrite").as[Long],
-            relfrozenxid = json.\("relfrozenxid").as[Int],
-            relminmxid = json.\("relminmxid").as[Int],
+            relfrozenxid = json.\("relfrozenxid").as[PGobject],
+            relminmxid = json.\("relminmxid").as[PGobject],
             relacl = json.\("relacl").toOption.map(_.as[Array[PGobject]]),
             reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
             relpartbound = json.\("relpartbound").toOption.map(_.as[PGobject])

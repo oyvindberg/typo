@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,7 +25,7 @@ case class PgSequencesRow(
   /** Points to [[PgClassRow.relname]] */
   sequencename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequencename","columnName":"sequencename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   sequenceowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequenceowner","columnName":"sequenceowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  dataType: /* unknown nullability */ Option[/* regtype */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"data_type","columnName":"data_type","columnType":"Other","columnTypeName":"regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  dataType: /* unknown nullability */ Option[/* regtype */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"data_type","columnName":"data_type","columnType":"Other","columnTypeName":"regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgSequenceRow.seqstart]] */
   startValue: Long /* {"baseColumnName":"seqstart","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"start_value","columnName":"start_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqmin]] */
@@ -47,7 +48,7 @@ object PgSequencesRow {
         schemaname = row[String]("schemaname"),
         sequencename = row[String]("sequencename"),
         sequenceowner = row[/* unknown nullability */ Option[String]]("sequenceowner"),
-        dataType = row[/* unknown nullability */ Option[/* regtype */ String]]("data_type"),
+        dataType = row[/* unknown nullability */ Option[/* regtype */ PGobject]]("data_type"),
         startValue = row[Long]("start_value"),
         minValue = row[Long]("min_value"),
         maxValue = row[Long]("max_value"),
@@ -82,7 +83,7 @@ object PgSequencesRow {
             schemaname = json.\("schemaname").as[String],
             sequencename = json.\("sequencename").as[String],
             sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
-            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ String]),
+            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ PGobject]),
             startValue = json.\("start_value").as[Long],
             minValue = json.\("min_value").as[Long],
             maxValue = json.\("max_value").as[Long],

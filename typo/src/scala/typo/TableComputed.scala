@@ -26,7 +26,8 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
       case Type.VarChar(_)       => sc.Type.String
       case Type.Float4           => sc.Type.Float
       case Type.Float8           => sc.Type.Double
-      case Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead
+      case Type.Bytea            => sc.Type.Array.of(sc.Type.Byte)
+      case Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead of floats
       case Type.Int4             => sc.Type.Int
       case Type.Int8             => sc.Type.Long
       case Type.Json             => sc.Type.String // wip
@@ -34,7 +35,6 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
       case Type.Timestamp        => sc.Type.LocalDateTime
       case Type.TimestampTz      => sc.Type.ZonedDateTime
       case Type.Array(tpe)       => sc.Type.Array.of(go(tpe))
-      case Type.Vector(tpe)      => sc.Type.Array.of(go(tpe))
     }
     val baseTpe = go(col.tpe)
 
@@ -48,7 +48,14 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         case Nil => None
         case colName :: Nil =>
           val dbCol = dbColsByName(colName)
-          val col = ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), scalaType(options.pkg, dbCol), dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
+          val col = ColumnComputed(
+            pointsTo.get(dbCol.name),
+            names.field(dbCol.name),
+            scalaType(options.pkg, dbCol),
+            dbCol.name,
+            dbCol.hasDefault,
+            dbCol.jsonDescription
+          )
           Some(IdComputed.Unary(col, qident))
 
         case colNames =>
@@ -81,14 +88,16 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
 
   val relation = RelationComputed(options.pkg, dbTable.name, cols, maybeId)
 
-  val colsUnsaved: Option[List[ColumnComputed]] = maybeId.map { _ =>
-    dbColsAndCols
-      .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
-      .map { case (dbCol, col) =>
-        val newType = if (dbCol.hasDefault) sc.Type.TApply(default.DefaultedType, List(col.tpe)) else col.tpe
-        col.copy(tpe = newType)
-      }
-  }.filter(_.nonEmpty)
+  val colsUnsaved: Option[List[ColumnComputed]] = maybeId
+    .map { _ =>
+      dbColsAndCols
+        .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
+        .map { case (dbCol, col) =>
+          val newType = if (dbCol.hasDefault) sc.Type.TApply(default.DefaultedType, List(col.tpe)) else col.tpe
+          col.copy(tpe = newType)
+        }
+    }
+    .filter(_.nonEmpty)
 
   val RowUnsavedName: Option[sc.QIdent] =
     if (colsUnsaved.nonEmpty) Some(names.titleCase(options.pkg, dbTable.name, "RowUnsaved")) else None

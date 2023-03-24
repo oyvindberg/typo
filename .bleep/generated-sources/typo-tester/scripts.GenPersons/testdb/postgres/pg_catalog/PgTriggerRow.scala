@@ -32,8 +32,8 @@ case class PgTriggerRow(
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
   tgnargs: Int,
-  tgattr: Array[Int],
-  tgargs: String,
+  tgattr: PGobject,
+  tgargs: Array[Byte],
   tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
@@ -57,8 +57,8 @@ object PgTriggerRow {
         tgdeferrable = row[Boolean]("tgdeferrable"),
         tginitdeferred = row[Boolean]("tginitdeferred"),
         tgnargs = row[Int]("tgnargs"),
-        tgattr = row[Array[Int]]("tgattr"),
-        tgargs = row[String]("tgargs"),
+        tgattr = row[PGobject]("tgattr"),
+        tgargs = row[Array[Byte]]("tgargs"),
         tgqual = row[Option[PGobject]]("tgqual"),
         tgoldtable = row[Option[String]]("tgoldtable"),
         tgnewtable = row[Option[String]]("tgnewtable")
@@ -108,8 +108,8 @@ object PgTriggerRow {
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
             tgnargs = json.\("tgnargs").as[Int],
-            tgattr = json.\("tgattr").as[Array[Int]],
-            tgargs = json.\("tgargs").as[String],
+            tgattr = json.\("tgattr").as[PGobject],
+            tgargs = json.\("tgargs").as[Array[Byte]],
             tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])

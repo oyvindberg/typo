@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,7 +23,7 @@ case class PgSequencesRow(
   /** Points to [[PgClassRow.relname]] */
   sequencename: String,
   sequenceowner: /* unknown nullability */ Option[String],
-  dataType: /* unknown nullability */ Option[/* regtype */ String],
+  dataType: /* unknown nullability */ Option[/* regtype */ PGobject],
   /** Points to [[PgSequenceRow.seqstart]] */
   startValue: Long,
   /** Points to [[PgSequenceRow.seqmin]] */
@@ -45,7 +46,7 @@ object PgSequencesRow {
         schemaname = row[String]("schemaname"),
         sequencename = row[String]("sequencename"),
         sequenceowner = row[/* unknown nullability */ Option[String]]("sequenceowner"),
-        dataType = row[/* unknown nullability */ Option[/* regtype */ String]]("data_type"),
+        dataType = row[/* unknown nullability */ Option[/* regtype */ PGobject]]("data_type"),
         startValue = row[Long]("start_value"),
         minValue = row[Long]("min_value"),
         maxValue = row[Long]("max_value"),
@@ -80,7 +81,7 @@ object PgSequencesRow {
             schemaname = json.\("schemaname").as[String],
             sequencename = json.\("sequencename").as[String],
             sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
-            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ String]),
+            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ PGobject]),
             startValue = json.\("start_value").as[Long],
             minValue = json.\("min_value").as[Long],
             maxValue = json.\("max_value").as[Long],

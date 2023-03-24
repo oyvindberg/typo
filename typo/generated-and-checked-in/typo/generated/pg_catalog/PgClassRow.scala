@@ -48,8 +48,8 @@ case class PgClassRow(
   relreplident: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relreplident","ordinal_position":26,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   relispartition: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relispartition","ordinal_position":27,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   relrewrite: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relrewrite","ordinal_position":28,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  relfrozenxid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relfrozenxid","ordinal_position":29,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  relminmxid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relminmxid","ordinal_position":30,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  relfrozenxid: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relfrozenxid","ordinal_position":29,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  relminmxid: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relminmxid","ordinal_position":30,"is_nullable":"NO","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   relacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relacl","ordinal_position":31,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"31","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   reloptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"reloptions","ordinal_position":32,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"32","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   relpartbound: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_class","column_name":"relpartbound","ordinal_position":33,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"33","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
@@ -87,8 +87,8 @@ object PgClassRow {
         relreplident = row[String]("relreplident"),
         relispartition = row[Boolean]("relispartition"),
         relrewrite = row[Long]("relrewrite"),
-        relfrozenxid = row[Int]("relfrozenxid"),
-        relminmxid = row[Int]("relminmxid"),
+        relfrozenxid = row[PGobject]("relfrozenxid"),
+        relminmxid = row[PGobject]("relminmxid"),
         relacl = row[Option[Array[PGobject]]]("relacl"),
         reloptions = row[Option[Array[String]]]("reloptions"),
         relpartbound = row[Option[PGobject]]("relpartbound")
@@ -166,8 +166,8 @@ object PgClassRow {
             relreplident = json.\("relreplident").as[String],
             relispartition = json.\("relispartition").as[Boolean],
             relrewrite = json.\("relrewrite").as[Long],
-            relfrozenxid = json.\("relfrozenxid").as[Int],
-            relminmxid = json.\("relminmxid").as[Int],
+            relfrozenxid = json.\("relfrozenxid").as[PGobject],
+            relminmxid = json.\("relminmxid").as[PGobject],
             relacl = json.\("relacl").toOption.map(_.as[Array[PGobject]]),
             reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
             relpartbound = json.\("relpartbound").toOption.map(_.as[PGobject])

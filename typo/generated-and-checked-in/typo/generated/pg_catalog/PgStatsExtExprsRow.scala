@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -32,11 +33,11 @@ case class PgStatsExtExprsRow(
   nullFrac: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"null_frac","columnName":"null_frac","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
   avgWidth: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"avg_width","columnName":"avg_width","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
   nDistinct: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"n_distinct","columnName":"n_distinct","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  mostCommonVals: /* unknown nullability */ Option[/* anyarray */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_vals","columnName":"most_common_vals","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  mostCommonVals: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_vals","columnName":"most_common_vals","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   mostCommonFreqs: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"most_common_freqs","columnName":"most_common_freqs","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  histogramBounds: /* unknown nullability */ Option[/* anyarray */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"histogram_bounds","columnName":"histogram_bounds","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  histogramBounds: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"histogram_bounds","columnName":"histogram_bounds","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   correlation: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"correlation","columnName":"correlation","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  mostCommonElems: /* unknown nullability */ Option[/* anyarray */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_elems","columnName":"most_common_elems","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  mostCommonElems: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_elems","columnName":"most_common_elems","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   mostCommonElemFreqs: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"most_common_elem_freqs","columnName":"most_common_elem_freqs","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
   elemCountHistogram: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"elem_count_histogram","columnName":"elem_count_histogram","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */
 )
@@ -54,11 +55,11 @@ object PgStatsExtExprsRow {
         nullFrac = row[/* unknown nullability */ Option[Float]]("null_frac"),
         avgWidth = row[/* unknown nullability */ Option[Int]]("avg_width"),
         nDistinct = row[/* unknown nullability */ Option[Float]]("n_distinct"),
-        mostCommonVals = row[/* unknown nullability */ Option[/* anyarray */ String]]("most_common_vals"),
+        mostCommonVals = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_vals"),
         mostCommonFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_freqs"),
-        histogramBounds = row[/* unknown nullability */ Option[/* anyarray */ String]]("histogram_bounds"),
+        histogramBounds = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("histogram_bounds"),
         correlation = row[/* unknown nullability */ Option[Float]]("correlation"),
-        mostCommonElems = row[/* unknown nullability */ Option[/* anyarray */ String]]("most_common_elems"),
+        mostCommonElems = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_elems"),
         mostCommonElemFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_elem_freqs"),
         elemCountHistogram = row[/* unknown nullability */ Option[Array[Float]]]("elem_count_histogram")
       )
@@ -99,11 +100,11 @@ object PgStatsExtExprsRow {
             nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
             avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
             nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
-            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ String]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ PGobject]),
             mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
-            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ String]),
+            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ PGobject]),
             correlation = json.\("correlation").toOption.map(_.as[Float]),
-            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ String]),
+            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ PGobject]),
             mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
             elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
           )

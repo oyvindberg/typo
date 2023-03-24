@@ -24,7 +24,7 @@ case class PgStatisticExtRow(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: Array[Int],
+  stxkeys: PGobject,
   stxkind: Array[String],
   stxexprs: Option[PGobject]
 )
@@ -39,7 +39,7 @@ object PgStatisticExtRow {
         stxnamespace = row[Long]("stxnamespace"),
         stxowner = row[Long]("stxowner"),
         stxstattarget = row[Int]("stxstattarget"),
-        stxkeys = row[Array[Int]]("stxkeys"),
+        stxkeys = row[PGobject]("stxkeys"),
         stxkind = row[Array[String]]("stxkind"),
         stxexprs = row[Option[PGobject]]("stxexprs")
       )
@@ -70,7 +70,7 @@ object PgStatisticExtRow {
             stxnamespace = json.\("stxnamespace").as[Long],
             stxowner = json.\("stxowner").as[Long],
             stxstattarget = json.\("stxstattarget").as[Int],
-            stxkeys = json.\("stxkeys").as[Array[Int]],
+            stxkeys = json.\("stxkeys").as[PGobject],
             stxkind = json.\("stxkind").as[Array[String]],
             stxexprs = json.\("stxexprs").toOption.map(_.as[PGobject])
           )

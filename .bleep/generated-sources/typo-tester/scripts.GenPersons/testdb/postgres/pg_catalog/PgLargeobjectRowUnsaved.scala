@@ -15,7 +15,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLargeobjectRowUnsaved(
-  data: String
+  data: Array[Byte]
 )
 object PgLargeobjectRowUnsaved {
   implicit val oFormat: OFormat[PgLargeobjectRowUnsaved] = new OFormat[PgLargeobjectRowUnsaved]{
@@ -28,7 +28,7 @@ object PgLargeobjectRowUnsaved {
       JsResult.fromTry(
         Try(
           PgLargeobjectRowUnsaved(
-            data = json.\("data").as[String]
+            data = json.\("data").as[Array[Byte]]
           )
         )
       )

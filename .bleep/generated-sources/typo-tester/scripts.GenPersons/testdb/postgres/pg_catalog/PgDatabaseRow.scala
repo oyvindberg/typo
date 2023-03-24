@@ -28,8 +28,8 @@ case class PgDatabaseRow(
   datallowconn: Boolean,
   datconnlimit: Int,
   datlastsysoid: Long,
-  datfrozenxid: Int,
-  datminmxid: Int,
+  datfrozenxid: PGobject,
+  datminmxid: PGobject,
   dattablespace: Long,
   datacl: Option[Array[PGobject]]
 )
@@ -48,8 +48,8 @@ object PgDatabaseRow {
         datallowconn = row[Boolean]("datallowconn"),
         datconnlimit = row[Int]("datconnlimit"),
         datlastsysoid = row[Long]("datlastsysoid"),
-        datfrozenxid = row[Int]("datfrozenxid"),
-        datminmxid = row[Int]("datminmxid"),
+        datfrozenxid = row[PGobject]("datfrozenxid"),
+        datminmxid = row[PGobject]("datminmxid"),
         dattablespace = row[Long]("dattablespace"),
         datacl = row[Option[Array[PGobject]]]("datacl")
       )
@@ -89,8 +89,8 @@ object PgDatabaseRow {
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
             datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[Int],
-            datminmxid = json.\("datminmxid").as[Int],
+            datfrozenxid = json.\("datfrozenxid").as[PGobject],
+            datminmxid = json.\("datminmxid").as[PGobject],
             dattablespace = json.\("dattablespace").as[Long],
             datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
           )

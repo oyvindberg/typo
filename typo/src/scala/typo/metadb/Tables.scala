@@ -54,21 +54,23 @@ class Tables(
       case "hstore"                   => db.Type.Hstore
       case "inet"                     => db.Type.Inet
       case "int2"                     => db.Type.Int2
-      case "int2vector"               => db.Type.Vector(db.Type.Int2)
+      case "int2vector"               => db.Type.PgObject
       case "int4"                     => db.Type.Int4
       case "int8"                     => db.Type.Int8
       case "json"                     => db.Type.Json
       case "name"                     => db.Type.Name
       case "numeric"                  => db.Type.Numeric
       case "oid"                      => db.Type.Oid
-      case "oidvector"                => db.Type.Vector(db.Type.Oid) // space separated oids referencing i.e. pg_collation.oid
+      case "oidvector"                => db.Type.PgObject // space separated oids referencing i.e. pg_collation.oid
       case "pg_node_tree"             => db.Type.PgObject // Expression trees (in nodeToString() representation)
       case "regproc"                  => db.Type.PgObject
       case "text"                     => db.Type.Text
       case "timestamp"                => db.Type.Timestamp
       case "timestamptz"              => db.Type.TimestampTz
       case "varchar"                  => db.Type.VarChar(characterMaximumLength)
-      case "xid"                      => db.Type.Int4 // transaction ID
+      case "xid"                      => db.Type.PgObject // transaction ID
+      case "regtype"                  => db.Type.PgObject
+      case "bytea"                    => db.Type.Bytea
       case str if str.startsWith("_") => db.Type.Array(typeFromUdtName(udtName.drop(1), characterMaximumLength))
       case typeName =>
         enums.get(typeName) match {

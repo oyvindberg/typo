@@ -12,6 +12,7 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,7 +24,7 @@ case class PgPreparedStatementsRow(
   name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   statement: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statement","columnName":"statement","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   prepareTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"prepare_time","columnName":"prepare_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  parameterTypes: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"parameter_types","columnName":"parameter_types","columnType":"Array","columnTypeName":"_regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  parameterTypes: /* unknown nullability */ Option[Array[PGobject]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"parameter_types","columnName":"parameter_types","columnType":"Array","columnTypeName":"_regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   fromSql: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"from_sql","columnName":"from_sql","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
   genericPlans: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"generic_plans","columnName":"generic_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
   customPlans: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"custom_plans","columnName":"custom_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
@@ -36,7 +37,7 @@ object PgPreparedStatementsRow {
         name = row[/* unknown nullability */ Option[String]]("name"),
         statement = row[/* unknown nullability */ Option[String]]("statement"),
         prepareTime = row[/* unknown nullability */ Option[LocalDateTime]]("prepare_time"),
-        parameterTypes = row[/* unknown nullability */ Option[Array[String]]]("parameter_types"),
+        parameterTypes = row[/* unknown nullability */ Option[Array[PGobject]]]("parameter_types"),
         fromSql = row[/* unknown nullability */ Option[Boolean]]("from_sql"),
         genericPlans = row[/* unknown nullability */ Option[Long]]("generic_plans"),
         customPlans = row[/* unknown nullability */ Option[Long]]("custom_plans")
@@ -63,7 +64,7 @@ object PgPreparedStatementsRow {
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
             prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
-            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[String]]),
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[PGobject]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
             customPlans = json.\("custom_plans").toOption.map(_.as[Long])

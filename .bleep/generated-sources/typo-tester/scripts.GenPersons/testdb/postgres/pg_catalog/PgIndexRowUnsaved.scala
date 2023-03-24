@@ -29,10 +29,10 @@ case class PgIndexRowUnsaved(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: Array[Int],
-  indcollation: Array[Long],
-  indclass: Array[Long],
-  indoption: Array[Int],
+  indkey: PGobject,
+  indcollation: PGobject,
+  indclass: PGobject,
+  indoption: PGobject,
   indexprs: Option[PGobject],
   indpred: Option[PGobject]
 )
@@ -78,10 +78,10 @@ object PgIndexRowUnsaved {
             indisready = json.\("indisready").as[Boolean],
             indislive = json.\("indislive").as[Boolean],
             indisreplident = json.\("indisreplident").as[Boolean],
-            indkey = json.\("indkey").as[Array[Int]],
-            indcollation = json.\("indcollation").as[Array[Long]],
-            indclass = json.\("indclass").as[Array[Long]],
-            indoption = json.\("indoption").as[Array[Int]],
+            indkey = json.\("indkey").as[PGobject],
+            indcollation = json.\("indcollation").as[PGobject],
+            indclass = json.\("indclass").as[PGobject],
+            indoption = json.\("indoption").as[PGobject],
             indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
             indpred = json.\("indpred").toOption.map(_.as[PGobject])
           )

@@ -10,6 +10,7 @@ package generated
 package pg_catalog
 
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 trait PgProcRepo {
   def selectAll(implicit c: Connection): List[PgProcRow]
@@ -19,5 +20,5 @@ trait PgProcRepo {
   def updateFieldValues(oid: PgProcId, fieldValues: List[PgProcFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgProcId, unsaved: PgProcRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgProcId)(implicit c: Connection): Boolean
-  def selectByUnique(proname: String, proargtypes: Array[Long], pronamespace: Long)(implicit c: Connection): Option[PgProcRow]
+  def selectByUnique(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow]
 }

@@ -34,10 +34,10 @@ case class PgIndexRow(
   indisready: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisready","ordinal_position":12,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   indislive: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indislive","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   indisreplident: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisreplident","ordinal_position":14,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  indkey: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indkey","ordinal_position":15,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  indcollation: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indcollation","ordinal_position":16,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  indclass: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indclass","ordinal_position":17,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  indoption: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indoption","ordinal_position":18,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indkey: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indkey","ordinal_position":15,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indcollation: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indcollation","ordinal_position":16,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indclass: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indclass","ordinal_position":17,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indoption: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indoption","ordinal_position":18,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   indexprs: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indexprs","ordinal_position":19,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   indpred: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indpred","ordinal_position":20,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -60,10 +60,10 @@ object PgIndexRow {
         indisready = row[Boolean]("indisready"),
         indislive = row[Boolean]("indislive"),
         indisreplident = row[Boolean]("indisreplident"),
-        indkey = row[Array[Int]]("indkey"),
-        indcollation = row[Array[Long]]("indcollation"),
-        indclass = row[Array[Long]]("indclass"),
-        indoption = row[Array[Int]]("indoption"),
+        indkey = row[PGobject]("indkey"),
+        indcollation = row[PGobject]("indcollation"),
+        indclass = row[PGobject]("indclass"),
+        indoption = row[PGobject]("indoption"),
         indexprs = row[Option[PGobject]]("indexprs"),
         indpred = row[Option[PGobject]]("indpred")
       )
@@ -113,10 +113,10 @@ object PgIndexRow {
             indisready = json.\("indisready").as[Boolean],
             indislive = json.\("indislive").as[Boolean],
             indisreplident = json.\("indisreplident").as[Boolean],
-            indkey = json.\("indkey").as[Array[Int]],
-            indcollation = json.\("indcollation").as[Array[Long]],
-            indclass = json.\("indclass").as[Array[Long]],
-            indoption = json.\("indoption").as[Array[Int]],
+            indkey = json.\("indkey").as[PGobject],
+            indcollation = json.\("indcollation").as[PGobject],
+            indclass = json.\("indclass").as[PGobject],
+            indoption = json.\("indoption").as[PGobject],
             indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
             indpred = json.\("indpred").toOption.map(_.as[PGobject])
           )

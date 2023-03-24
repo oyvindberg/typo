@@ -12,6 +12,7 @@ import anorm.ParameterValue
 import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object PgProcRepoImpl extends PgProcRepo {
   override def selectAll(implicit c: Connection): List[PgProcRow] = {
@@ -154,7 +155,7 @@ object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_proc where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(proname: String, proargtypes: Array[Long], pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
+  override def selectByUnique(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
     ???
   }
 }

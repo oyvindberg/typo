@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgSequencesFieldValue[T](val name: String, val value: T)
 
@@ -17,7 +17,7 @@ object PgSequencesFieldValue {
   case class schemaname(override val value: String) extends PgSequencesFieldValue("schemaname", value)
   case class sequencename(override val value: String) extends PgSequencesFieldValue("sequencename", value)
   case class sequenceowner(override val value: /* unknown nullability */ Option[String]) extends PgSequencesFieldValue("sequenceowner", value)
-  case class dataType(override val value: /* unknown nullability */ Option[/* regtype */ String]) extends PgSequencesFieldValue("data_type", value)
+  case class dataType(override val value: /* unknown nullability */ Option[/* regtype */ PGobject]) extends PgSequencesFieldValue("data_type", value)
   case class startValue(override val value: Long) extends PgSequencesFieldValue("start_value", value)
   case class minValue(override val value: Long) extends PgSequencesFieldValue("min_value", value)
   case class maxValue(override val value: Long) extends PgSequencesFieldValue("max_value", value)

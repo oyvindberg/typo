@@ -21,7 +21,7 @@ import scala.util.Try
 case class PgLargeobjectRow(
   loid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_largeobject","column_name":"loid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   pageno: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_largeobject","column_name":"pageno","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  data: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_largeobject","column_name":"data","ordinal_position":3,"is_nullable":"NO","data_type":"bytea","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  data: Array[Byte] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_largeobject","column_name":"data","ordinal_position":3,"is_nullable":"NO","data_type":"bytea","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgLargeobjectId = PgLargeobjectId(loid, pageno)
 }
@@ -32,7 +32,7 @@ object PgLargeobjectRow {
       PgLargeobjectRow(
         loid = row[Long]("loid"),
         pageno = row[Int]("pageno"),
-        data = row[String]("data")
+        data = row[Array[Byte]]("data")
       )
     )
   }
@@ -51,7 +51,7 @@ object PgLargeobjectRow {
           PgLargeobjectRow(
             loid = json.\("loid").as[Long],
             pageno = json.\("pageno").as[Int],
-            data = json.\("data").as[String]
+            data = json.\("data").as[Array[Byte]]
           )
         )
       )

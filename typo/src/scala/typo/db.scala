@@ -29,7 +29,7 @@ object db {
     case object Timestamp extends Type
     case object TimestampTz extends Type
     case class Array(tpe: Type) extends Type
-    case class Vector(tpe: Type) extends Type
+    case object Bytea extends Type
   }
 
   case class StringEnum(name: db.RelationName, values: List[String])
