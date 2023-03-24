@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgDatabaseRowUnsaved(
   datname: String,
@@ -24,7 +24,7 @@ case class PgDatabaseRowUnsaved(
   datfrozenxid: Int,
   datminmxid: Int,
   dattablespace: Long,
-  datacl: Option[Array[String]]
+  datacl: Option[Array[PGobject]]
 )
 object PgDatabaseRowUnsaved {
   

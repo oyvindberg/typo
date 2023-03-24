@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgRangeRow(
   rngtypid: PgRangeId,
@@ -18,8 +19,8 @@ case class PgRangeRow(
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: Long,
-  rngsubdiff: Long
+  rngcanonical: PGobject,
+  rngsubdiff: PGobject
 )
 
 object PgRangeRow {
@@ -31,8 +32,8 @@ object PgRangeRow {
         rngmultitypid = row[Long]("rngmultitypid"),
         rngcollation = row[Long]("rngcollation"),
         rngsubopc = row[Long]("rngsubopc"),
-        rngcanonical = row[Long]("rngcanonical"),
-        rngsubdiff = row[Long]("rngsubdiff")
+        rngcanonical = row[PGobject]("rngcanonical"),
+        rngsubdiff = row[PGobject]("rngsubdiff")
       )
     )
   }

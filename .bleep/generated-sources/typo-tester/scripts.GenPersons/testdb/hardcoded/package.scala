@@ -60,6 +60,12 @@ package object hardcoded {
     override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.math.BigDecimal]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_decimal", v.map(x => x)))
   }
 
+  implicit val PGobjectArray: anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] = new anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] {
+    override def sqlType: java.lang.String = "_aclitem"
+    override def jdbcType: scala.Int = java.sql.Types.ARRAY
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[org.postgresql.util.PGobject]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_aclitem", v.map(x => x)))
+  }
+
   implicit val PGboxDb: anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] = new anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] {
     override def sqlType: java.lang.String = "box"
     override def jdbcType: scala.Int = java.sql.Types.OTHER
@@ -130,6 +136,13 @@ package object hardcoded {
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, java.util.Map[java.lang.String, java.lang.String]] = scala.Right(v1.asInstanceOf[java.util.Map[java.lang.String, java.lang.String]])
   }
 
+  implicit val pgObjectDb: anorm.ToStatement[org.postgresql.util.PGobject] with anorm.ParameterMetaData[org.postgresql.util.PGobject] with anorm.Column[org.postgresql.util.PGobject] = new anorm.ToStatement[org.postgresql.util.PGobject] with anorm.ParameterMetaData[org.postgresql.util.PGobject] with anorm.Column[org.postgresql.util.PGobject] {
+    override def sqlType: java.lang.String = "hstore"
+    override def jdbcType: scala.Int = java.sql.Types.OTHER
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.util.PGobject): scala.Unit = s.setObject(index, v)
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGobject] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGobject])
+  }
+
   implicit val PGboxFormat: play.api.libs.json.Format[org.postgresql.geometric.PGbox] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGbox](new org.postgresql.geometric.PGbox(_), _.getValue)
   implicit val PGcircleFormat: play.api.libs.json.Format[org.postgresql.geometric.PGcircle] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGcircle](new org.postgresql.geometric.PGcircle(_), _.getValue)
   implicit val PGlineFormat: play.api.libs.json.Format[org.postgresql.geometric.PGline] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGline](new org.postgresql.geometric.PGline(_), _.getValue)
@@ -140,4 +153,27 @@ package object hardcoded {
   implicit val PGIntervalFormat: play.api.libs.json.Format[org.postgresql.util.PGInterval] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGInterval](new org.postgresql.util.PGInterval(_), _.getValue)
   implicit val PGmoneyFormat: play.api.libs.json.Format[org.postgresql.util.PGmoney] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGmoney](new org.postgresql.util.PGmoney(_), _.getValue)
   implicit val hstoreFormat: play.api.libs.json.Format[java.util.Map[java.lang.String, java.lang.String]] = implicitly[play.api.libs.json.Format[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].bimap(x => scala.jdk.CollectionConverters.MapHasAsJava(x).asJava, x => scala.jdk.CollectionConverters.MapHasAsScala(x).asScala.toMap)
+  implicit val pgObjectFormat: play.api.libs.json.OFormat[org.postgresql.util.PGobject] =
+    new play.api.libs.json.OFormat[org.postgresql.util.PGobject] {
+      override def writes(o: org.postgresql.util.PGobject): play.api.libs.json.JsObject =
+        play.api.libs.json.JsObject(scala.collection.immutable.Map("type" -> play.api.libs.json.JsString(o.getType), "value" -> play.api.libs.json.JsString(o.getValue)))
+
+      override def reads(json: play.api.libs.json.JsValue): play.api.libs.json.JsResult[org.postgresql.util.PGobject] = json match {
+        case play.api.libs.json.JsObject(fields) =>
+          val t = fields.get("type").map(_.as[String])
+          val v = fields.get("value").map(_.as[String])
+          (t, v) match {
+            case (scala.Some(t), scala.Some(v)) =>
+              val o = new org.postgresql.util.PGobject()
+              o.setType(t)
+              o.setValue(v)
+              play.api.libs.json.JsSuccess(o)
+            case _ => play.api.libs.json.JsError("Invalid PGobject")
+          }
+        case _ => play.api.libs.json.JsError("Invalid PGobject")
+      }
+    }
+
+  implicit val pgObjectOrdering: scala.math.Ordering[org.postgresql.util.PGobject] =
+    scala.math.Ordering.by(x => (x.getType, x.getValue))
 }

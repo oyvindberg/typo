@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,8 +20,8 @@ case class PgRangeRowUnsaved(
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: String,
-  rngsubdiff: String
+  rngcanonical: PGobject,
+  rngsubdiff: PGobject
 )
 object PgRangeRowUnsaved {
   implicit val oFormat: OFormat[PgRangeRowUnsaved] = new OFormat[PgRangeRowUnsaved]{
@@ -42,8 +43,8 @@ object PgRangeRowUnsaved {
             rngmultitypid = json.\("rngmultitypid").as[Long],
             rngcollation = json.\("rngcollation").as[Long],
             rngsubopc = json.\("rngsubopc").as[Long],
-            rngcanonical = json.\("rngcanonical").as[String],
-            rngsubdiff = json.\("rngsubdiff").as[String]
+            rngcanonical = json.\("rngcanonical").as[PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[PGobject]
           )
         )
       )

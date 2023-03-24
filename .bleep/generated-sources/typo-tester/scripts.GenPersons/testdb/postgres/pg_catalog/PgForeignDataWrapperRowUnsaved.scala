@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,7 +20,7 @@ case class PgForeignDataWrapperRowUnsaved(
   fdwowner: Long,
   fdwhandler: Long,
   fdwvalidator: Long,
-  fdwacl: Option[Array[String]],
+  fdwacl: Option[Array[PGobject]],
   fdwoptions: Option[Array[String]]
 )
 object PgForeignDataWrapperRowUnsaved {
@@ -42,7 +43,7 @@ object PgForeignDataWrapperRowUnsaved {
             fdwowner = json.\("fdwowner").as[Long],
             fdwhandler = json.\("fdwhandler").as[Long],
             fdwvalidator = json.\("fdwvalidator").as[Long],
-            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[String]]),
+            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[PGobject]]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
           )
         )

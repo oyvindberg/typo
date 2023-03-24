@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgConstraintRow(
   oid: PgConstraintId,
@@ -31,13 +32,13 @@ case class PgConstraintRow(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Short]],
-  confkey: Option[Array[Short]],
+  conkey: Option[Array[Int]],
+  confkey: Option[Array[Int]],
   conpfeqop: Option[Array[Long]],
   conppeqop: Option[Array[Long]],
   conffeqop: Option[Array[Long]],
   conexclop: Option[Array[Long]],
-  conbin: Option[String]
+  conbin: Option[PGobject]
 )
 
 object PgConstraintRow {
@@ -62,13 +63,13 @@ object PgConstraintRow {
         conislocal = row[Boolean]("conislocal"),
         coninhcount = row[Int]("coninhcount"),
         connoinherit = row[Boolean]("connoinherit"),
-        conkey = row[Option[Array[Short]]]("conkey"),
-        confkey = row[Option[Array[Short]]]("confkey"),
+        conkey = row[Option[Array[Int]]]("conkey"),
+        confkey = row[Option[Array[Int]]]("confkey"),
         conpfeqop = row[Option[Array[Long]]]("conpfeqop"),
         conppeqop = row[Option[Array[Long]]]("conppeqop"),
         conffeqop = row[Option[Array[Long]]]("conffeqop"),
         conexclop = row[Option[Array[Long]]]("conexclop"),
-        conbin = row[Option[String]]("conbin")
+        conbin = row[Option[PGobject]]("conbin")
       )
     )
   }

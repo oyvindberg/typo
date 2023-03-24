@@ -11,13 +11,14 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgInitPrivsRow(
   objoid: Long,
   classoid: Long,
   objsubid: Int,
   privtype: String,
-  initprivs: Array[String]
+  initprivs: Array[PGobject]
 ){
   val compositeId: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
 }
@@ -30,7 +31,7 @@ object PgInitPrivsRow {
         classoid = row[Long]("classoid"),
         objsubid = row[Int]("objsubid"),
         privtype = row[String]("privtype"),
-        initprivs = row[Array[String]]("initprivs")
+        initprivs = row[Array[PGobject]]("initprivs")
       )
     )
   }

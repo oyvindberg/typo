@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,16 +19,16 @@ import scala.util.Try
 
 case class PgStatisticRow(
   starelid: Long,
-  staattnum: Short,
+  staattnum: Int,
   stainherit: Boolean,
   stanullfrac: Float,
   stawidth: Int,
   stadistinct: Float,
-  stakind1: Short,
-  stakind2: Short,
-  stakind3: Short,
-  stakind4: Short,
-  stakind5: Short,
+  stakind1: Int,
+  stakind2: Int,
+  stakind3: Int,
+  stakind4: Int,
+  stakind5: Int,
   staop1: Long,
   staop2: Long,
   staop3: Long,
@@ -43,11 +44,11 @@ case class PgStatisticRow(
   stanumbers3: Option[Array[Float]],
   stanumbers4: Option[Array[Float]],
   stanumbers5: Option[Array[Float]],
-  stavalues1: Option[String],
-  stavalues2: Option[String],
-  stavalues3: Option[String],
-  stavalues4: Option[String],
-  stavalues5: Option[String]
+  stavalues1: Option[PGobject],
+  stavalues2: Option[PGobject],
+  stavalues3: Option[PGobject],
+  stavalues4: Option[PGobject],
+  stavalues5: Option[PGobject]
 ){
   val compositeId: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
 }
@@ -57,16 +58,16 @@ object PgStatisticRow {
     Success(
       PgStatisticRow(
         starelid = row[Long]("starelid"),
-        staattnum = row[Short]("staattnum"),
+        staattnum = row[Int]("staattnum"),
         stainherit = row[Boolean]("stainherit"),
         stanullfrac = row[Float]("stanullfrac"),
         stawidth = row[Int]("stawidth"),
         stadistinct = row[Float]("stadistinct"),
-        stakind1 = row[Short]("stakind1"),
-        stakind2 = row[Short]("stakind2"),
-        stakind3 = row[Short]("stakind3"),
-        stakind4 = row[Short]("stakind4"),
-        stakind5 = row[Short]("stakind5"),
+        stakind1 = row[Int]("stakind1"),
+        stakind2 = row[Int]("stakind2"),
+        stakind3 = row[Int]("stakind3"),
+        stakind4 = row[Int]("stakind4"),
+        stakind5 = row[Int]("stakind5"),
         staop1 = row[Long]("staop1"),
         staop2 = row[Long]("staop2"),
         staop3 = row[Long]("staop3"),
@@ -82,11 +83,11 @@ object PgStatisticRow {
         stanumbers3 = row[Option[Array[Float]]]("stanumbers3"),
         stanumbers4 = row[Option[Array[Float]]]("stanumbers4"),
         stanumbers5 = row[Option[Array[Float]]]("stanumbers5"),
-        stavalues1 = row[Option[String]]("stavalues1"),
-        stavalues2 = row[Option[String]]("stavalues2"),
-        stavalues3 = row[Option[String]]("stavalues3"),
-        stavalues4 = row[Option[String]]("stavalues4"),
-        stavalues5 = row[Option[String]]("stavalues5")
+        stavalues1 = row[Option[PGobject]]("stavalues1"),
+        stavalues2 = row[Option[PGobject]]("stavalues2"),
+        stavalues3 = row[Option[PGobject]]("stavalues3"),
+        stavalues4 = row[Option[PGobject]]("stavalues4"),
+        stavalues5 = row[Option[PGobject]]("stavalues5")
       )
     )
   }
@@ -132,16 +133,16 @@ object PgStatisticRow {
         Try(
           PgStatisticRow(
             starelid = json.\("starelid").as[Long],
-            staattnum = json.\("staattnum").as[Short],
+            staattnum = json.\("staattnum").as[Int],
             stainherit = json.\("stainherit").as[Boolean],
             stanullfrac = json.\("stanullfrac").as[Float],
             stawidth = json.\("stawidth").as[Int],
             stadistinct = json.\("stadistinct").as[Float],
-            stakind1 = json.\("stakind1").as[Short],
-            stakind2 = json.\("stakind2").as[Short],
-            stakind3 = json.\("stakind3").as[Short],
-            stakind4 = json.\("stakind4").as[Short],
-            stakind5 = json.\("stakind5").as[Short],
+            stakind1 = json.\("stakind1").as[Int],
+            stakind2 = json.\("stakind2").as[Int],
+            stakind3 = json.\("stakind3").as[Int],
+            stakind4 = json.\("stakind4").as[Int],
+            stakind5 = json.\("stakind5").as[Int],
             staop1 = json.\("staop1").as[Long],
             staop2 = json.\("staop2").as[Long],
             staop3 = json.\("staop3").as[Long],
@@ -157,11 +158,11 @@ object PgStatisticRow {
             stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
             stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
             stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
-            stavalues1 = json.\("stavalues1").toOption.map(_.as[String]),
-            stavalues2 = json.\("stavalues2").toOption.map(_.as[String]),
-            stavalues3 = json.\("stavalues3").toOption.map(_.as[String]),
-            stavalues4 = json.\("stavalues4").toOption.map(_.as[String]),
-            stavalues5 = json.\("stavalues5").toOption.map(_.as[String])
+            stavalues1 = json.\("stavalues1").toOption.map(_.as[PGobject]),
+            stavalues2 = json.\("stavalues2").toOption.map(_.as[PGobject]),
+            stavalues3 = json.\("stavalues3").toOption.map(_.as[PGobject]),
+            stavalues4 = json.\("stavalues4").toOption.map(_.as[PGobject]),
+            stavalues5 = json.\("stavalues5").toOption.map(_.as[PGobject])
           )
         )
       )

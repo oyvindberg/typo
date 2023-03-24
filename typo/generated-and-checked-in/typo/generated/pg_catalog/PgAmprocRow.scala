@@ -11,14 +11,15 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgAmprocRow(
   oid: PgAmprocId,
   amprocfamily: Long,
   amproclefttype: Long,
   amprocrighttype: Long,
-  amprocnum: Short,
-  amproc: Long
+  amprocnum: Int,
+  amproc: PGobject
 )
 
 object PgAmprocRow {
@@ -29,8 +30,8 @@ object PgAmprocRow {
         amprocfamily = row[Long]("amprocfamily"),
         amproclefttype = row[Long]("amproclefttype"),
         amprocrighttype = row[Long]("amprocrighttype"),
-        amprocnum = row[Short]("amprocnum"),
-        amproc = row[Long]("amproc")
+        amprocnum = row[Int]("amprocnum"),
+        amproc = row[PGobject]("amproc")
       )
     )
   }

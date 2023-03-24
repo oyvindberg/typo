@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -16,8 +17,8 @@ import scala.util.Try
 
 case class PgAttrdefRowUnsaved(
   adrelid: Long,
-  adnum: Short,
-  adbin: String
+  adnum: Int,
+  adbin: PGobject
 )
 object PgAttrdefRowUnsaved {
   implicit val oFormat: OFormat[PgAttrdefRowUnsaved] = new OFormat[PgAttrdefRowUnsaved]{
@@ -33,8 +34,8 @@ object PgAttrdefRowUnsaved {
         Try(
           PgAttrdefRowUnsaved(
             adrelid = json.\("adrelid").as[Long],
-            adnum = json.\("adnum").as[Short],
-            adbin = json.\("adbin").as[String]
+            adnum = json.\("adnum").as[Int],
+            adbin = json.\("adbin").as[PGobject]
           )
         )
       )

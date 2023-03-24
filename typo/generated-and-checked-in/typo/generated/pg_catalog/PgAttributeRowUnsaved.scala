@@ -9,13 +9,13 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgAttributeRowUnsaved(
   attname: String,
   atttypid: Long,
   attstattarget: Int,
-  attlen: Short,
+  attlen: Int,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -32,10 +32,10 @@ case class PgAttributeRowUnsaved(
   attislocal: Boolean,
   attinhcount: Int,
   attcollation: Long,
-  attacl: Option[Array[String]],
+  attacl: Option[Array[PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[String]
+  attmissingval: Option[PGobject]
 )
 object PgAttributeRowUnsaved {
   

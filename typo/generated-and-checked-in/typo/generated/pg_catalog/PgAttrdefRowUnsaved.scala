@@ -9,12 +9,12 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgAttrdefRowUnsaved(
   adrelid: Long,
-  adnum: Short,
-  adbin: String
+  adnum: Int,
+  adbin: PGobject
 )
 object PgAttrdefRowUnsaved {
   

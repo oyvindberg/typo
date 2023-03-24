@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,7 +18,7 @@ import scala.util.Try
 case class PgTablespaceRowUnsaved(
   spcname: String,
   spcowner: Long,
-  spcacl: Option[Array[String]],
+  spcacl: Option[Array[PGobject]],
   spcoptions: Option[Array[String]]
 )
 object PgTablespaceRowUnsaved {
@@ -36,7 +37,7 @@ object PgTablespaceRowUnsaved {
           PgTablespaceRowUnsaved(
             spcname = json.\("spcname").as[String],
             spcowner = json.\("spcowner").as[Long],
-            spcacl = json.\("spcacl").toOption.map(_.as[Array[String]]),
+            spcacl = json.\("spcacl").toOption.map(_.as[Array[PGobject]]),
             spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
           )
         )

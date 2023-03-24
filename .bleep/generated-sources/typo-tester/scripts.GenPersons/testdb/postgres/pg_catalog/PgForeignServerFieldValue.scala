@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgForeignServerFieldValue[T](val name: String, val value: T)
 
@@ -18,6 +18,6 @@ object PgForeignServerFieldValue {
   case class srvfdw(override val value: Long) extends PgForeignServerFieldValue("srvfdw", value)
   case class srvtype(override val value: Option[String]) extends PgForeignServerFieldValue("srvtype", value)
   case class srvversion(override val value: Option[String]) extends PgForeignServerFieldValue("srvversion", value)
-  case class srvacl(override val value: Option[Array[String]]) extends PgForeignServerFieldValue("srvacl", value)
+  case class srvacl(override val value: Option[Array[PGobject]]) extends PgForeignServerFieldValue("srvacl", value)
   case class srvoptions(override val value: Option[Array[String]]) extends PgForeignServerFieldValue("srvoptions", value)
 }

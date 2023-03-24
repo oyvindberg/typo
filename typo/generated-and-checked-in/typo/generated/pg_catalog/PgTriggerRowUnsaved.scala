@@ -9,14 +9,14 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTriggerRowUnsaved(
   tgrelid: Long,
   tgparentid: Long,
   tgname: String,
   tgfoid: Long,
-  tgtype: Short,
+  tgtype: Int,
   tgenabled: String,
   tgisinternal: Boolean,
   tgconstrrelid: Long,
@@ -24,10 +24,10 @@ case class PgTriggerRowUnsaved(
   tgconstraint: Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
-  tgnargs: Short,
-  tgattr: Array[Short],
+  tgnargs: Int,
+  tgattr: Array[Int],
   tgargs: String,
-  tgqual: Option[String],
+  tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )

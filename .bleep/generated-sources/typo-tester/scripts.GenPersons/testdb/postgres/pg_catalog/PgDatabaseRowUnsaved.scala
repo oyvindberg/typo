@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,10 +25,10 @@ case class PgDatabaseRowUnsaved(
   datallowconn: Boolean,
   datconnlimit: Int,
   datlastsysoid: Long,
-  datfrozenxid: String,
-  datminmxid: String,
+  datfrozenxid: Int,
+  datminmxid: Int,
   dattablespace: Long,
-  datacl: Option[Array[String]]
+  datacl: Option[Array[PGobject]]
 )
 object PgDatabaseRowUnsaved {
   implicit val oFormat: OFormat[PgDatabaseRowUnsaved] = new OFormat[PgDatabaseRowUnsaved]{
@@ -61,10 +62,10 @@ object PgDatabaseRowUnsaved {
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
             datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[String],
-            datminmxid = json.\("datminmxid").as[String],
+            datfrozenxid = json.\("datfrozenxid").as[Int],
+            datminmxid = json.\("datminmxid").as[Int],
             dattablespace = json.\("dattablespace").as[Long],
-            datacl = json.\("datacl").toOption.map(_.as[Array[String]])
+            datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

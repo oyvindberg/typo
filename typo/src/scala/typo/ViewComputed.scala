@@ -101,7 +101,7 @@ object ViewComputed {
         case JdbcType.Ref                   => None
         case JdbcType.RefCursor             => None
         case JdbcType.RowId                 => None
-        case JdbcType.SmallInt              => Some(sc.Type.Short)
+        case JdbcType.SmallInt              => Some(sc.Type.Int)
         case JdbcType.SqlXml                => None
         case JdbcType.Struct                => None
         case JdbcType.Time                  => Some(sc.Type.LocalTime)

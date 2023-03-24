@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -16,15 +17,15 @@ import scala.util.Try
 
 case class PgAggregateRowUnsaved(
   aggkind: String,
-  aggnumdirectargs: Short,
-  aggtransfn: String,
-  aggfinalfn: String,
-  aggcombinefn: String,
-  aggserialfn: String,
-  aggdeserialfn: String,
-  aggmtransfn: String,
-  aggminvtransfn: String,
-  aggmfinalfn: String,
+  aggnumdirectargs: Int,
+  aggtransfn: PGobject,
+  aggfinalfn: PGobject,
+  aggcombinefn: PGobject,
+  aggserialfn: PGobject,
+  aggdeserialfn: PGobject,
+  aggmtransfn: PGobject,
+  aggminvtransfn: PGobject,
+  aggmfinalfn: PGobject,
   aggfinalextra: Boolean,
   aggmfinalextra: Boolean,
   aggfinalmodify: String,
@@ -69,15 +70,15 @@ object PgAggregateRowUnsaved {
         Try(
           PgAggregateRowUnsaved(
             aggkind = json.\("aggkind").as[String],
-            aggnumdirectargs = json.\("aggnumdirectargs").as[Short],
-            aggtransfn = json.\("aggtransfn").as[String],
-            aggfinalfn = json.\("aggfinalfn").as[String],
-            aggcombinefn = json.\("aggcombinefn").as[String],
-            aggserialfn = json.\("aggserialfn").as[String],
-            aggdeserialfn = json.\("aggdeserialfn").as[String],
-            aggmtransfn = json.\("aggmtransfn").as[String],
-            aggminvtransfn = json.\("aggminvtransfn").as[String],
-            aggmfinalfn = json.\("aggmfinalfn").as[String],
+            aggnumdirectargs = json.\("aggnumdirectargs").as[Int],
+            aggtransfn = json.\("aggtransfn").as[PGobject],
+            aggfinalfn = json.\("aggfinalfn").as[PGobject],
+            aggcombinefn = json.\("aggcombinefn").as[PGobject],
+            aggserialfn = json.\("aggserialfn").as[PGobject],
+            aggdeserialfn = json.\("aggdeserialfn").as[PGobject],
+            aggmtransfn = json.\("aggmtransfn").as[PGobject],
+            aggminvtransfn = json.\("aggminvtransfn").as[PGobject],
+            aggmfinalfn = json.\("aggmfinalfn").as[PGobject],
             aggfinalextra = json.\("aggfinalextra").as[Boolean],
             aggmfinalextra = json.\("aggmfinalextra").as[Boolean],
             aggfinalmodify = json.\("aggfinalmodify").as[String],

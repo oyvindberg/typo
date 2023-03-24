@@ -11,11 +11,12 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgLargeobjectMetadataRow(
   oid: PgLargeobjectMetadataId,
   lomowner: Long,
-  lomacl: Option[Array[String]]
+  lomacl: Option[Array[PGobject]]
 )
 
 object PgLargeobjectMetadataRow {
@@ -24,7 +25,7 @@ object PgLargeobjectMetadataRow {
       PgLargeobjectMetadataRow(
         oid = row[PgLargeobjectMetadataId]("oid"),
         lomowner = row[Long]("lomowner"),
-        lomacl = row[Option[Array[String]]]("lomacl")
+        lomacl = row[Option[Array[PGobject]]]("lomacl")
       )
     )
   }

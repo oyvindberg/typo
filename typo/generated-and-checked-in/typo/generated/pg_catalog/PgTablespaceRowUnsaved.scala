@@ -9,12 +9,12 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTablespaceRowUnsaved(
   spcname: String,
   spcowner: Long,
-  spcacl: Option[Array[String]],
+  spcacl: Option[Array[PGobject]],
   spcoptions: Option[Array[String]]
 )
 object PgTablespaceRowUnsaved {

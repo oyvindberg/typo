@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgClassRow(
   oid: PgClassId,
@@ -30,8 +31,8 @@ case class PgClassRow(
   relisshared: Boolean,
   relpersistence: String,
   relkind: String,
-  relnatts: Short,
-  relchecks: Short,
+  relnatts: Int,
+  relchecks: Int,
   relhasrules: Boolean,
   relhastriggers: Boolean,
   relhassubclass: Boolean,
@@ -43,9 +44,9 @@ case class PgClassRow(
   relrewrite: Long,
   relfrozenxid: Int,
   relminmxid: Int,
-  relacl: Option[Array[String]],
+  relacl: Option[Array[PGobject]],
   reloptions: Option[Array[String]],
-  relpartbound: Option[String]
+  relpartbound: Option[PGobject]
 )
 
 object PgClassRow {
@@ -69,8 +70,8 @@ object PgClassRow {
         relisshared = row[Boolean]("relisshared"),
         relpersistence = row[String]("relpersistence"),
         relkind = row[String]("relkind"),
-        relnatts = row[Short]("relnatts"),
-        relchecks = row[Short]("relchecks"),
+        relnatts = row[Int]("relnatts"),
+        relchecks = row[Int]("relchecks"),
         relhasrules = row[Boolean]("relhasrules"),
         relhastriggers = row[Boolean]("relhastriggers"),
         relhassubclass = row[Boolean]("relhassubclass"),
@@ -82,9 +83,9 @@ object PgClassRow {
         relrewrite = row[Long]("relrewrite"),
         relfrozenxid = row[Int]("relfrozenxid"),
         relminmxid = row[Int]("relminmxid"),
-        relacl = row[Option[Array[String]]]("relacl"),
+        relacl = row[Option[Array[PGobject]]]("relacl"),
         reloptions = row[Option[Array[String]]]("reloptions"),
-        relpartbound = row[Option[String]]("relpartbound")
+        relpartbound = row[Option[PGobject]]("relpartbound")
       )
     )
   }

@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,7 +18,7 @@ import scala.util.Try
 case class PgNamespaceRowUnsaved(
   nspname: String,
   nspowner: Long,
-  nspacl: Option[Array[String]]
+  nspacl: Option[Array[PGobject]]
 )
 object PgNamespaceRowUnsaved {
   implicit val oFormat: OFormat[PgNamespaceRowUnsaved] = new OFormat[PgNamespaceRowUnsaved]{
@@ -34,7 +35,7 @@ object PgNamespaceRowUnsaved {
           PgNamespaceRowUnsaved(
             nspname = json.\("nspname").as[String],
             nspowner = json.\("nspowner").as[Long],
-            nspacl = json.\("nspacl").toOption.map(_.as[Array[String]])
+            nspacl = json.\("nspacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

@@ -9,11 +9,11 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgAmRowUnsaved(
   amname: String,
-  amhandler: Long,
+  amhandler: PGobject,
   amtype: String
 )
 object PgAmRowUnsaved {

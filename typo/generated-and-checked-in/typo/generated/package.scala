@@ -62,6 +62,12 @@ package object generated {
     override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.math.BigDecimal]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_decimal", v.map(x => x)))
   }
 
+  implicit val PGobjectArray: anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] = new anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] {
+    override def sqlType: java.lang.String = "_aclitem"
+    override def jdbcType: scala.Int = java.sql.Types.ARRAY
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[org.postgresql.util.PGobject]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_aclitem", v.map(x => x)))
+  }
+
   implicit val PGboxDb: anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] = new anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] {
     override def sqlType: java.lang.String = "box"
     override def jdbcType: scala.Int = java.sql.Types.OTHER
@@ -132,5 +138,14 @@ package object generated {
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, java.util.Map[java.lang.String, java.lang.String]] = scala.Right(v1.asInstanceOf[java.util.Map[java.lang.String, java.lang.String]])
   }
 
+  implicit val pgObjectDb: anorm.ToStatement[org.postgresql.util.PGobject] with anorm.ParameterMetaData[org.postgresql.util.PGobject] with anorm.Column[org.postgresql.util.PGobject] = new anorm.ToStatement[org.postgresql.util.PGobject] with anorm.ParameterMetaData[org.postgresql.util.PGobject] with anorm.Column[org.postgresql.util.PGobject] {
+    override def sqlType: java.lang.String = "hstore"
+    override def jdbcType: scala.Int = java.sql.Types.OTHER
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.util.PGobject): scala.Unit = s.setObject(index, v)
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGobject] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGobject])
+  }
+
   
+  implicit val pgObjectOrdering: scala.math.Ordering[org.postgresql.util.PGobject] =
+    scala.math.Ordering.by(x => (x.getType, x.getValue))
 }

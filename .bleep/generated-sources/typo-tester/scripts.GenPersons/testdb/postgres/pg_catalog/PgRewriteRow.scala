@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,8 +24,8 @@ case class PgRewriteRow(
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: String,
-  evAction: String
+  evQual: PGobject,
+  evAction: PGobject
 )
 
 object PgRewriteRow {
@@ -37,8 +38,8 @@ object PgRewriteRow {
         evType = row[String]("ev_type"),
         evEnabled = row[String]("ev_enabled"),
         isInstead = row[Boolean]("is_instead"),
-        evQual = row[String]("ev_qual"),
-        evAction = row[String]("ev_action")
+        evQual = row[PGobject]("ev_qual"),
+        evAction = row[PGobject]("ev_action")
       )
     )
   }
@@ -66,8 +67,8 @@ object PgRewriteRow {
             evType = json.\("ev_type").as[String],
             evEnabled = json.\("ev_enabled").as[String],
             isInstead = json.\("is_instead").as[Boolean],
-            evQual = json.\("ev_qual").as[String],
-            evAction = json.\("ev_action").as[String]
+            evQual = json.\("ev_qual").as[PGobject],
+            evAction = json.\("ev_action").as[PGobject]
           )
         )
       )

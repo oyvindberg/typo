@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,8 +22,8 @@ case class PgAttributeRow(
   attname: String,
   atttypid: Long,
   attstattarget: Int,
-  attlen: Short,
-  attnum: Short,
+  attlen: Int,
+  attnum: Int,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -39,10 +40,10 @@ case class PgAttributeRow(
   attislocal: Boolean,
   attinhcount: Int,
   attcollation: Long,
-  attacl: Option[Array[String]],
+  attacl: Option[Array[PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[String]
+  attmissingval: Option[PGobject]
 ){
   val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
 }
@@ -55,8 +56,8 @@ object PgAttributeRow {
         attname = row[String]("attname"),
         atttypid = row[Long]("atttypid"),
         attstattarget = row[Int]("attstattarget"),
-        attlen = row[Short]("attlen"),
-        attnum = row[Short]("attnum"),
+        attlen = row[Int]("attlen"),
+        attnum = row[Int]("attnum"),
         attndims = row[Int]("attndims"),
         attcacheoff = row[Int]("attcacheoff"),
         atttypmod = row[Int]("atttypmod"),
@@ -73,10 +74,10 @@ object PgAttributeRow {
         attislocal = row[Boolean]("attislocal"),
         attinhcount = row[Int]("attinhcount"),
         attcollation = row[Long]("attcollation"),
-        attacl = row[Option[Array[String]]]("attacl"),
+        attacl = row[Option[Array[PGobject]]]("attacl"),
         attoptions = row[Option[Array[String]]]("attoptions"),
         attfdwoptions = row[Option[Array[String]]]("attfdwoptions"),
-        attmissingval = row[Option[String]]("attmissingval")
+        attmissingval = row[Option[PGobject]]("attmissingval")
       )
     )
   }
@@ -120,8 +121,8 @@ object PgAttributeRow {
             attname = json.\("attname").as[String],
             atttypid = json.\("atttypid").as[Long],
             attstattarget = json.\("attstattarget").as[Int],
-            attlen = json.\("attlen").as[Short],
-            attnum = json.\("attnum").as[Short],
+            attlen = json.\("attlen").as[Int],
+            attnum = json.\("attnum").as[Int],
             attndims = json.\("attndims").as[Int],
             attcacheoff = json.\("attcacheoff").as[Int],
             atttypmod = json.\("atttypmod").as[Int],
@@ -138,10 +139,10 @@ object PgAttributeRow {
             attislocal = json.\("attislocal").as[Boolean],
             attinhcount = json.\("attinhcount").as[Int],
             attcollation = json.\("attcollation").as[Long],
-            attacl = json.\("attacl").toOption.map(_.as[Array[String]]),
+            attacl = json.\("attacl").toOption.map(_.as[Array[PGobject]]),
             attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-            attmissingval = json.\("attmissingval").toOption.map(_.as[String])
+            attmissingval = json.\("attmissingval").toOption.map(_.as[PGobject])
           )
         )
       )

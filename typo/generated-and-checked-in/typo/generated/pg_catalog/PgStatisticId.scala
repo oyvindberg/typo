@@ -12,7 +12,7 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 
-case class PgStatisticId(starelid: Long, staattnum: Short, stainherit: Boolean)
+case class PgStatisticId(starelid: Long, staattnum: Int, stainherit: Boolean)
 object PgStatisticId {
   implicit val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
   
@@ -20,7 +20,7 @@ object PgStatisticId {
     Success(
       PgStatisticId(
         starelid = row[Long]("starelid"),
-        staattnum = row[Short]("staattnum"),
+        staattnum = row[Int]("staattnum"),
         stainherit = row[Boolean]("stainherit")
       )
     )

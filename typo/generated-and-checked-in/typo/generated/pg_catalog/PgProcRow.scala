@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgProcRow(
   oid: PgProcId,
@@ -21,7 +22,7 @@ case class PgProcRow(
   procost: Float,
   prorows: Float,
   provariadic: Long,
-  prosupport: Long,
+  prosupport: PGobject,
   prokind: String,
   prosecdef: Boolean,
   proleakproof: Boolean,
@@ -29,20 +30,20 @@ case class PgProcRow(
   proretset: Boolean,
   provolatile: String,
   proparallel: String,
-  pronargs: Short,
-  pronargdefaults: Short,
+  pronargs: Int,
+  pronargdefaults: Int,
   prorettype: Long,
   proargtypes: Array[Long],
   proallargtypes: Option[Array[Long]],
   proargmodes: Option[Array[String]],
   proargnames: Option[Array[String]],
-  proargdefaults: Option[String],
+  proargdefaults: Option[PGobject],
   protrftypes: Option[Array[Long]],
   prosrc: String,
   probin: Option[String],
-  prosqlbody: Option[String],
+  prosqlbody: Option[PGobject],
   proconfig: Option[Array[String]],
-  proacl: Option[Array[String]]
+  proacl: Option[Array[PGobject]]
 )
 
 object PgProcRow {
@@ -57,7 +58,7 @@ object PgProcRow {
         procost = row[Float]("procost"),
         prorows = row[Float]("prorows"),
         provariadic = row[Long]("provariadic"),
-        prosupport = row[Long]("prosupport"),
+        prosupport = row[PGobject]("prosupport"),
         prokind = row[String]("prokind"),
         prosecdef = row[Boolean]("prosecdef"),
         proleakproof = row[Boolean]("proleakproof"),
@@ -65,20 +66,20 @@ object PgProcRow {
         proretset = row[Boolean]("proretset"),
         provolatile = row[String]("provolatile"),
         proparallel = row[String]("proparallel"),
-        pronargs = row[Short]("pronargs"),
-        pronargdefaults = row[Short]("pronargdefaults"),
+        pronargs = row[Int]("pronargs"),
+        pronargdefaults = row[Int]("pronargdefaults"),
         prorettype = row[Long]("prorettype"),
         proargtypes = row[Array[Long]]("proargtypes"),
         proallargtypes = row[Option[Array[Long]]]("proallargtypes"),
         proargmodes = row[Option[Array[String]]]("proargmodes"),
         proargnames = row[Option[Array[String]]]("proargnames"),
-        proargdefaults = row[Option[String]]("proargdefaults"),
+        proargdefaults = row[Option[PGobject]]("proargdefaults"),
         protrftypes = row[Option[Array[Long]]]("protrftypes"),
         prosrc = row[String]("prosrc"),
         probin = row[Option[String]]("probin"),
-        prosqlbody = row[Option[String]]("prosqlbody"),
+        prosqlbody = row[Option[PGobject]]("prosqlbody"),
         proconfig = row[Option[Array[String]]]("proconfig"),
-        proacl = row[Option[Array[String]]]("proacl")
+        proacl = row[Option[Array[PGobject]]]("proacl")
       )
     )
   }

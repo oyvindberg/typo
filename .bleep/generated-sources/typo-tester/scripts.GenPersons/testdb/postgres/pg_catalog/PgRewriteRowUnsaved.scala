@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,8 +21,8 @@ case class PgRewriteRowUnsaved(
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: String,
-  evAction: String
+  evQual: PGobject,
+  evAction: PGobject
 )
 object PgRewriteRowUnsaved {
   implicit val oFormat: OFormat[PgRewriteRowUnsaved] = new OFormat[PgRewriteRowUnsaved]{
@@ -45,8 +46,8 @@ object PgRewriteRowUnsaved {
             evType = json.\("ev_type").as[String],
             evEnabled = json.\("ev_enabled").as[String],
             isInstead = json.\("is_instead").as[Boolean],
-            evQual = json.\("ev_qual").as[String],
-            evAction = json.\("ev_action").as[String]
+            evQual = json.\("ev_qual").as[PGobject],
+            evAction = json.\("ev_action").as[PGobject]
           )
         )
       )

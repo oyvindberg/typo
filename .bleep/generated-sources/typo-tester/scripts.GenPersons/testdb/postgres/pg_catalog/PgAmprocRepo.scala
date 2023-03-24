@@ -17,5 +17,5 @@ trait PgAmprocRepo {
   def updateFieldValues(oid: PgAmprocId, fieldValues: List[PgAmprocFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgAmprocId, unsaved: PgAmprocRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgAmprocId)(implicit c: Connection): Boolean
-  def selectByUnique(amprocfamily: Long, amproclefttype: Long, amprocrighttype: Long, amprocnum: Short)(implicit c: Connection): Option[PgAmprocRow]
+  def selectByUnique(amprocfamily: Long, amproclefttype: Long, amprocrighttype: Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow]
 }

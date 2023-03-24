@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,11 +19,11 @@ case class PgStatisticRowUnsaved(
   stanullfrac: Float,
   stawidth: Int,
   stadistinct: Float,
-  stakind1: Short,
-  stakind2: Short,
-  stakind3: Short,
-  stakind4: Short,
-  stakind5: Short,
+  stakind1: Int,
+  stakind2: Int,
+  stakind3: Int,
+  stakind4: Int,
+  stakind5: Int,
   staop1: Long,
   staop2: Long,
   staop3: Long,
@@ -38,11 +39,11 @@ case class PgStatisticRowUnsaved(
   stanumbers3: Option[Array[Float]],
   stanumbers4: Option[Array[Float]],
   stanumbers5: Option[Array[Float]],
-  stavalues1: Option[String],
-  stavalues2: Option[String],
-  stavalues3: Option[String],
-  stavalues4: Option[String],
-  stavalues5: Option[String]
+  stavalues1: Option[PGobject],
+  stavalues2: Option[PGobject],
+  stavalues3: Option[PGobject],
+  stavalues4: Option[PGobject],
+  stavalues5: Option[PGobject]
 )
 object PgStatisticRowUnsaved {
   implicit val oFormat: OFormat[PgStatisticRowUnsaved] = new OFormat[PgStatisticRowUnsaved]{
@@ -85,11 +86,11 @@ object PgStatisticRowUnsaved {
             stanullfrac = json.\("stanullfrac").as[Float],
             stawidth = json.\("stawidth").as[Int],
             stadistinct = json.\("stadistinct").as[Float],
-            stakind1 = json.\("stakind1").as[Short],
-            stakind2 = json.\("stakind2").as[Short],
-            stakind3 = json.\("stakind3").as[Short],
-            stakind4 = json.\("stakind4").as[Short],
-            stakind5 = json.\("stakind5").as[Short],
+            stakind1 = json.\("stakind1").as[Int],
+            stakind2 = json.\("stakind2").as[Int],
+            stakind3 = json.\("stakind3").as[Int],
+            stakind4 = json.\("stakind4").as[Int],
+            stakind5 = json.\("stakind5").as[Int],
             staop1 = json.\("staop1").as[Long],
             staop2 = json.\("staop2").as[Long],
             staop3 = json.\("staop3").as[Long],
@@ -105,11 +106,11 @@ object PgStatisticRowUnsaved {
             stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
             stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
             stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
-            stavalues1 = json.\("stavalues1").toOption.map(_.as[String]),
-            stavalues2 = json.\("stavalues2").toOption.map(_.as[String]),
-            stavalues3 = json.\("stavalues3").toOption.map(_.as[String]),
-            stavalues4 = json.\("stavalues4").toOption.map(_.as[String]),
-            stavalues5 = json.\("stavalues5").toOption.map(_.as[String])
+            stavalues1 = json.\("stavalues1").toOption.map(_.as[PGobject]),
+            stavalues2 = json.\("stavalues2").toOption.map(_.as[PGobject]),
+            stavalues3 = json.\("stavalues3").toOption.map(_.as[PGobject]),
+            stavalues4 = json.\("stavalues4").toOption.map(_.as[PGobject]),
+            stavalues5 = json.\("stavalues5").toOption.map(_.as[PGobject])
           )
         )
       )

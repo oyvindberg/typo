@@ -11,12 +11,13 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgNamespaceRow(
   oid: PgNamespaceId,
   nspname: String,
   nspowner: Long,
-  nspacl: Option[Array[String]]
+  nspacl: Option[Array[PGobject]]
 )
 
 object PgNamespaceRow {
@@ -26,7 +27,7 @@ object PgNamespaceRow {
         oid = row[PgNamespaceId]("oid"),
         nspname = row[String]("nspname"),
         nspowner = row[Long]("nspowner"),
-        nspacl = row[Option[Array[String]]]("nspacl")
+        nspacl = row[Option[Array[PGobject]]]("nspacl")
       )
     )
   }

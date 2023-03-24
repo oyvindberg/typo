@@ -12,7 +12,7 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 
-case class PgAttributeId(attrelid: Long, attnum: Short)
+case class PgAttributeId(attrelid: Long, attnum: Int)
 object PgAttributeId {
   implicit val ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
   
@@ -20,7 +20,7 @@ object PgAttributeId {
     Success(
       PgAttributeId(
         attrelid = row[Long]("attrelid"),
-        attnum = row[Short]("attnum")
+        attnum = row[Int]("attnum")
       )
     )
   }

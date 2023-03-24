@@ -17,5 +17,5 @@ trait PgAttrdefRepo {
   def updateFieldValues(oid: PgAttrdefId, fieldValues: List[PgAttrdefFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgAttrdefId, unsaved: PgAttrdefRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgAttrdefId)(implicit c: Connection): Boolean
-  def selectByUnique(adrelid: Long, adnum: Short)(implicit c: Connection): Option[PgAttrdefRow]
+  def selectByUnique(adrelid: Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow]
 }

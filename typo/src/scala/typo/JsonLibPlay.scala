@@ -101,13 +101,38 @@ object JsonLibPlay extends JsonLib {
     val postgresTypes = PostgresTypes.all.map { case (_, tpe) =>
       code"""implicit val ${tpe.value.name.value}Format: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(_), _.getValue)"""
     }
-    scala.collection.immutable.Map
+
     val hstore = {
       val javaMap = Format(sc.Type.JavaMap.of(sc.Type.String, sc.Type.String))
       val scalaMap = Format(sc.Type.Map.of(sc.Type.String, sc.Type.String))
       code"""implicit val hstoreFormat: ${javaMap} = implicitly[$scalaMap].bimap(x => ${sc.Type.MapHasAsJava}(x).asJava, x => ${sc.Type.MapHasAsScala}(x).asScala.toMap)"""
     }
 
-    postgresTypes ++ List(hstore)
+    val pgObjectFormat = {
+      val formatType = OFormat(sc.Type.PGobject)
+      code"""implicit val pgObjectFormat: $formatType =
+            |    new $formatType {
+            |      override def writes(o: ${sc.Type.PGobject}): $JsObject =
+            |        $JsObject(${sc.Type.Map}("type" -> $JsString(o.getType), "value" -> $JsString(o.getValue)))
+            |
+            |      override def reads(json: $JsValue): $JsResult[${sc.Type.PGobject}] = json match {
+            |        case $JsObject(fields) =>
+            |          val t = fields.get("type").map(_.as[String])
+            |          val v = fields.get("value").map(_.as[String])
+            |          (t, v) match {
+            |            case (${sc.Type.Some}(t), ${sc.Type.Some}(v)) =>
+            |              val o = new ${sc.Type.PGobject}()
+            |              o.setType(t)
+            |              o.setValue(v)
+            |              $JsSuccess(o)
+            |            case _ => $JsError("Invalid PGobject")
+            |          }
+            |        case _ => $JsError("Invalid PGobject")
+            |      }
+            |    }
+            |""".stripMargin
+    }
+
+    postgresTypes ++ List(hstore, pgObjectFormat)
   }
 }

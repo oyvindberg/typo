@@ -11,13 +11,14 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTsTemplateRow(
   oid: PgTsTemplateId,
   tmplname: String,
   tmplnamespace: Long,
-  tmplinit: Long,
-  tmpllexize: Long
+  tmplinit: PGobject,
+  tmpllexize: PGobject
 )
 
 object PgTsTemplateRow {
@@ -27,8 +28,8 @@ object PgTsTemplateRow {
         oid = row[PgTsTemplateId]("oid"),
         tmplname = row[String]("tmplname"),
         tmplnamespace = row[Long]("tmplnamespace"),
-        tmplinit = row[Long]("tmplinit"),
-        tmpllexize = row[Long]("tmpllexize")
+        tmplinit = row[PGobject]("tmplinit"),
+        tmpllexize = row[PGobject]("tmpllexize")
       )
     )
   }

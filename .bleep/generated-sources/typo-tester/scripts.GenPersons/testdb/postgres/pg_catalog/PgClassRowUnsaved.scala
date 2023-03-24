@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -31,8 +32,8 @@ case class PgClassRowUnsaved(
   relisshared: Boolean,
   relpersistence: String,
   relkind: String,
-  relnatts: Short,
-  relchecks: Short,
+  relnatts: Int,
+  relchecks: Int,
   relhasrules: Boolean,
   relhastriggers: Boolean,
   relhassubclass: Boolean,
@@ -42,11 +43,11 @@ case class PgClassRowUnsaved(
   relreplident: String,
   relispartition: Boolean,
   relrewrite: Long,
-  relfrozenxid: String,
-  relminmxid: String,
-  relacl: Option[Array[String]],
+  relfrozenxid: Int,
+  relminmxid: Int,
+  relacl: Option[Array[PGobject]],
   reloptions: Option[Array[String]],
-  relpartbound: Option[String]
+  relpartbound: Option[PGobject]
 )
 object PgClassRowUnsaved {
   implicit val oFormat: OFormat[PgClassRowUnsaved] = new OFormat[PgClassRowUnsaved]{
@@ -106,8 +107,8 @@ object PgClassRowUnsaved {
             relisshared = json.\("relisshared").as[Boolean],
             relpersistence = json.\("relpersistence").as[String],
             relkind = json.\("relkind").as[String],
-            relnatts = json.\("relnatts").as[Short],
-            relchecks = json.\("relchecks").as[Short],
+            relnatts = json.\("relnatts").as[Int],
+            relchecks = json.\("relchecks").as[Int],
             relhasrules = json.\("relhasrules").as[Boolean],
             relhastriggers = json.\("relhastriggers").as[Boolean],
             relhassubclass = json.\("relhassubclass").as[Boolean],
@@ -117,11 +118,11 @@ object PgClassRowUnsaved {
             relreplident = json.\("relreplident").as[String],
             relispartition = json.\("relispartition").as[Boolean],
             relrewrite = json.\("relrewrite").as[Long],
-            relfrozenxid = json.\("relfrozenxid").as[String],
-            relminmxid = json.\("relminmxid").as[String],
-            relacl = json.\("relacl").toOption.map(_.as[Array[String]]),
+            relfrozenxid = json.\("relfrozenxid").as[Int],
+            relminmxid = json.\("relminmxid").as[Int],
+            relacl = json.\("relacl").toOption.map(_.as[Array[PGobject]]),
             reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
-            relpartbound = json.\("relpartbound").toOption.map(_.as[String])
+            relpartbound = json.\("relpartbound").toOption.map(_.as[PGobject])
           )
         )
       )

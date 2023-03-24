@@ -9,11 +9,11 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgLargeobjectMetadataRowUnsaved(
   lomowner: Long,
-  lomacl: Option[Array[String]]
+  lomacl: Option[Array[PGobject]]
 )
 object PgLargeobjectMetadataRowUnsaved {
   

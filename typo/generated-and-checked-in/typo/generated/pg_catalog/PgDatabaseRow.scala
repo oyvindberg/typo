@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgDatabaseRow(
   oid: PgDatabaseId,
@@ -26,7 +27,7 @@ case class PgDatabaseRow(
   datfrozenxid: Int,
   datminmxid: Int,
   dattablespace: Long,
-  datacl: Option[Array[String]]
+  datacl: Option[Array[PGobject]]
 )
 
 object PgDatabaseRow {
@@ -46,7 +47,7 @@ object PgDatabaseRow {
         datfrozenxid = row[Int]("datfrozenxid"),
         datminmxid = row[Int]("datminmxid"),
         dattablespace = row[Long]("dattablespace"),
-        datacl = row[Option[Array[String]]]("datacl")
+        datacl = row[Option[Array[PGobject]]]("datacl")
       )
     )
   }

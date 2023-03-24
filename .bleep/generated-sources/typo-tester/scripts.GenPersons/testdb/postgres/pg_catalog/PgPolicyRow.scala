@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,8 +24,8 @@ case class PgPolicyRow(
   polcmd: String,
   polpermissive: Boolean,
   polroles: Array[Long],
-  polqual: Option[String],
-  polwithcheck: Option[String]
+  polqual: Option[PGobject],
+  polwithcheck: Option[PGobject]
 )
 
 object PgPolicyRow {
@@ -37,8 +38,8 @@ object PgPolicyRow {
         polcmd = row[String]("polcmd"),
         polpermissive = row[Boolean]("polpermissive"),
         polroles = row[Array[Long]]("polroles"),
-        polqual = row[Option[String]]("polqual"),
-        polwithcheck = row[Option[String]]("polwithcheck")
+        polqual = row[Option[PGobject]]("polqual"),
+        polwithcheck = row[Option[PGobject]]("polwithcheck")
       )
     )
   }
@@ -66,8 +67,8 @@ object PgPolicyRow {
             polcmd = json.\("polcmd").as[String],
             polpermissive = json.\("polpermissive").as[Boolean],
             polroles = json.\("polroles").as[Array[Long]],
-            polqual = json.\("polqual").toOption.map(_.as[String]),
-            polwithcheck = json.\("polwithcheck").toOption.map(_.as[String])
+            polqual = json.\("polqual").toOption.map(_.as[PGobject]),
+            polwithcheck = json.\("polwithcheck").toOption.map(_.as[PGobject])
           )
         )
       )

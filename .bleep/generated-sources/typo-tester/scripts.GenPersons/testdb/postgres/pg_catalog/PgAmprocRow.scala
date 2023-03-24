@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,8 +22,8 @@ case class PgAmprocRow(
   amprocfamily: Long,
   amproclefttype: Long,
   amprocrighttype: Long,
-  amprocnum: Short,
-  amproc: String
+  amprocnum: Int,
+  amproc: PGobject
 )
 
 object PgAmprocRow {
@@ -33,8 +34,8 @@ object PgAmprocRow {
         amprocfamily = row[Long]("amprocfamily"),
         amproclefttype = row[Long]("amproclefttype"),
         amprocrighttype = row[Long]("amprocrighttype"),
-        amprocnum = row[Short]("amprocnum"),
-        amproc = row[String]("amproc")
+        amprocnum = row[Int]("amprocnum"),
+        amproc = row[PGobject]("amproc")
       )
     )
   }
@@ -58,8 +59,8 @@ object PgAmprocRow {
             amprocfamily = json.\("amprocfamily").as[Long],
             amproclefttype = json.\("amproclefttype").as[Long],
             amprocrighttype = json.\("amprocrighttype").as[Long],
-            amprocnum = json.\("amprocnum").as[Short],
-            amproc = json.\("amproc").as[String]
+            amprocnum = json.\("amprocnum").as[Int],
+            amproc = json.\("amproc").as[PGobject]
           )
         )
       )

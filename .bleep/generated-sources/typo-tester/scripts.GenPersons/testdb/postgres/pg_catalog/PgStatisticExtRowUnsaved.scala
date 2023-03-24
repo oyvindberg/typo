@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,9 +21,9 @@ case class PgStatisticExtRowUnsaved(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: String,
+  stxkeys: Array[Int],
   stxkind: Array[String],
-  stxexprs: Option[String]
+  stxexprs: Option[PGobject]
 )
 object PgStatisticExtRowUnsaved {
   implicit val oFormat: OFormat[PgStatisticExtRowUnsaved] = new OFormat[PgStatisticExtRowUnsaved]{
@@ -47,9 +48,9 @@ object PgStatisticExtRowUnsaved {
             stxnamespace = json.\("stxnamespace").as[Long],
             stxowner = json.\("stxowner").as[Long],
             stxstattarget = json.\("stxstattarget").as[Int],
-            stxkeys = json.\("stxkeys").as[String],
+            stxkeys = json.\("stxkeys").as[Array[Int]],
             stxkind = json.\("stxkind").as[Array[String]],
-            stxexprs = json.\("stxexprs").toOption.map(_.as[String])
+            stxexprs = json.\("stxexprs").toOption.map(_.as[PGobject])
           )
         )
       )

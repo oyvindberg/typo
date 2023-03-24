@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,9 +24,9 @@ case class PgStatisticExtRow(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: String,
+  stxkeys: Array[Int],
   stxkind: Array[String],
-  stxexprs: Option[String]
+  stxexprs: Option[PGobject]
 )
 
 object PgStatisticExtRow {
@@ -38,9 +39,9 @@ object PgStatisticExtRow {
         stxnamespace = row[Long]("stxnamespace"),
         stxowner = row[Long]("stxowner"),
         stxstattarget = row[Int]("stxstattarget"),
-        stxkeys = row[String]("stxkeys"),
+        stxkeys = row[Array[Int]]("stxkeys"),
         stxkind = row[Array[String]]("stxkind"),
-        stxexprs = row[Option[String]]("stxexprs")
+        stxexprs = row[Option[PGobject]]("stxexprs")
       )
     )
   }
@@ -69,9 +70,9 @@ object PgStatisticExtRow {
             stxnamespace = json.\("stxnamespace").as[Long],
             stxowner = json.\("stxowner").as[Long],
             stxstattarget = json.\("stxstattarget").as[Int],
-            stxkeys = json.\("stxkeys").as[String],
+            stxkeys = json.\("stxkeys").as[Array[Int]],
             stxkind = json.\("stxkind").as[Array[String]],
-            stxexprs = json.\("stxexprs").toOption.map(_.as[String])
+            stxexprs = json.\("stxexprs").toOption.map(_.as[PGobject])
           )
         )
       )

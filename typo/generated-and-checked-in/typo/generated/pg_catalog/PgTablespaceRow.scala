@@ -11,12 +11,13 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTablespaceRow(
   oid: PgTablespaceId,
   spcname: String,
   spcowner: Long,
-  spcacl: Option[Array[String]],
+  spcacl: Option[Array[PGobject]],
   spcoptions: Option[Array[String]]
 )
 
@@ -27,7 +28,7 @@ object PgTablespaceRow {
         oid = row[PgTablespaceId]("oid"),
         spcname = row[String]("spcname"),
         spcowner = row[Long]("spcowner"),
-        spcacl = row[Option[Array[String]]]("spcacl"),
+        spcacl = row[Option[Array[PGobject]]]("spcacl"),
         spcoptions = row[Option[Array[String]]]("spcoptions")
       )
     )

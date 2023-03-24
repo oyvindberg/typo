@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgLanguageRow(
   oid: PgLanguageId,
@@ -21,7 +22,7 @@ case class PgLanguageRow(
   lanplcallfoid: Long,
   laninline: Long,
   lanvalidator: Long,
-  lanacl: Option[Array[String]]
+  lanacl: Option[Array[PGobject]]
 )
 
 object PgLanguageRow {
@@ -36,7 +37,7 @@ object PgLanguageRow {
         lanplcallfoid = row[Long]("lanplcallfoid"),
         laninline = row[Long]("laninline"),
         lanvalidator = row[Long]("lanvalidator"),
-        lanacl = row[Option[Array[String]]]("lanacl")
+        lanacl = row[Option[Array[PGobject]]]("lanacl")
       )
     )
   }

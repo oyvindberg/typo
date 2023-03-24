@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +21,7 @@ case class PgForeignServerRowUnsaved(
   srvfdw: Long,
   srvtype: Option[String],
   srvversion: Option[String],
-  srvacl: Option[Array[String]],
+  srvacl: Option[Array[PGobject]],
   srvoptions: Option[Array[String]]
 )
 object PgForeignServerRowUnsaved {
@@ -45,7 +46,7 @@ object PgForeignServerRowUnsaved {
             srvfdw = json.\("srvfdw").as[Long],
             srvtype = json.\("srvtype").toOption.map(_.as[String]),
             srvversion = json.\("srvversion").toOption.map(_.as[String]),
-            srvacl = json.\("srvacl").toOption.map(_.as[Array[String]]),
+            srvacl = json.\("srvacl").toOption.map(_.as[Array[PGobject]]),
             srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]])
           )
         )

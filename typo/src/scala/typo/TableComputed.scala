@@ -12,9 +12,10 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
 
   def scalaType(pkg: sc.QIdent, col: db.Col): sc.Type = {
     def go(tpe: db.Type): sc.Type = tpe match {
+      case Type.PgObject         => sc.Type.PGobject
       case Type.BigInt           => sc.Type.Long
       case Type.Text             => sc.Type.String
-      case Type.AnyArray         => sc.Type.String // wip
+      case Type.AnyArray         => sc.Type.PGobject
       case Type.Boolean          => sc.Type.Boolean
       case Type.Char             => sc.Type.String
       case Type.Name             => sc.Type.String
@@ -25,7 +26,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
       case Type.VarChar(_)       => sc.Type.String
       case Type.Float4           => sc.Type.Float
       case Type.Float8           => sc.Type.Double
-      case Type.Int2             => sc.Type.Short
+      case Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead
       case Type.Int4             => sc.Type.Int
       case Type.Int8             => sc.Type.Long
       case Type.Json             => sc.Type.String // wip

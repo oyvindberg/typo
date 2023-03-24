@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgForeignServerRowUnsaved(
   srvname: String,
@@ -17,7 +17,7 @@ case class PgForeignServerRowUnsaved(
   srvfdw: Long,
   srvtype: Option[String],
   srvversion: Option[String],
-  srvacl: Option[Array[String]],
+  srvacl: Option[Array[PGobject]],
   srvoptions: Option[Array[String]]
 )
 object PgForeignServerRowUnsaved {

@@ -15,7 +15,7 @@ case class PgAmopRowUnsaved(
   amopfamily: Long,
   amoplefttype: Long,
   amoprighttype: Long,
-  amopstrategy: Short,
+  amopstrategy: Int,
   amoppurpose: String,
   amopopr: Long,
   amopmethod: Long,

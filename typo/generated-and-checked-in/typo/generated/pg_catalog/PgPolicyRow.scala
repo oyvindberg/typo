@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgPolicyRow(
   oid: PgPolicyId,
@@ -19,8 +20,8 @@ case class PgPolicyRow(
   polcmd: String,
   polpermissive: Boolean,
   polroles: Array[Long],
-  polqual: Option[String],
-  polwithcheck: Option[String]
+  polqual: Option[PGobject],
+  polwithcheck: Option[PGobject]
 )
 
 object PgPolicyRow {
@@ -33,8 +34,8 @@ object PgPolicyRow {
         polcmd = row[String]("polcmd"),
         polpermissive = row[Boolean]("polpermissive"),
         polroles = row[Array[Long]]("polroles"),
-        polqual = row[Option[String]]("polqual"),
-        polwithcheck = row[Option[String]]("polwithcheck")
+        polqual = row[Option[PGobject]]("polqual"),
+        polwithcheck = row[Option[PGobject]]("polwithcheck")
       )
     )
   }

@@ -78,7 +78,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def delete(oid: PgAttrdefId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_attrdef where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(adrelid: Long, adnum: Short)(implicit c: Connection): Option[PgAttrdefRow] = {
+  override def selectByUnique(adrelid: Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
     ???
   }
 }

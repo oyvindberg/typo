@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,7 +22,7 @@ case class PgInitPrivsRow(
   classoid: Long,
   objsubid: Int,
   privtype: String,
-  initprivs: Array[String]
+  initprivs: Array[PGobject]
 ){
   val compositeId: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
 }
@@ -34,7 +35,7 @@ object PgInitPrivsRow {
         classoid = row[Long]("classoid"),
         objsubid = row[Int]("objsubid"),
         privtype = row[String]("privtype"),
-        initprivs = row[Array[String]]("initprivs")
+        initprivs = row[Array[PGobject]]("initprivs")
       )
     )
   }
@@ -57,7 +58,7 @@ object PgInitPrivsRow {
             classoid = json.\("classoid").as[Long],
             objsubid = json.\("objsubid").as[Int],
             privtype = json.\("privtype").as[String],
-            initprivs = json.\("initprivs").as[Array[String]]
+            initprivs = json.\("initprivs").as[Array[PGobject]]
           )
         )
       )

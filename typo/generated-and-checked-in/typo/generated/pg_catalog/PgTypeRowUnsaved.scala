@@ -9,13 +9,13 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTypeRowUnsaved(
   typname: String,
   typnamespace: Long,
   typowner: Long,
-  typlen: Short,
+  typlen: Int,
   typbyval: Boolean,
   typtype: String,
   typcategory: String,
@@ -23,16 +23,16 @@ case class PgTypeRowUnsaved(
   typisdefined: Boolean,
   typdelim: String,
   typrelid: Long,
-  typsubscript: Long,
+  typsubscript: PGobject,
   typelem: Long,
   typarray: Long,
-  typinput: Long,
-  typoutput: Long,
-  typreceive: Long,
-  typsend: Long,
-  typmodin: Long,
-  typmodout: Long,
-  typanalyze: Long,
+  typinput: PGobject,
+  typoutput: PGobject,
+  typreceive: PGobject,
+  typsend: PGobject,
+  typmodin: PGobject,
+  typmodout: PGobject,
+  typanalyze: PGobject,
   typalign: String,
   typstorage: String,
   typnotnull: Boolean,
@@ -40,9 +40,9 @@ case class PgTypeRowUnsaved(
   typtypmod: Int,
   typndims: Int,
   typcollation: Long,
-  typdefaultbin: Option[String],
+  typdefaultbin: Option[PGobject],
   typdefault: Option[String],
-  typacl: Option[Array[String]]
+  typacl: Option[Array[PGobject]]
 )
 object PgTypeRowUnsaved {
   

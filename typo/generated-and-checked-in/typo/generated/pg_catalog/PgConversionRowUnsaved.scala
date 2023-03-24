@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgConversionRowUnsaved(
   conname: String,
@@ -17,7 +17,7 @@ case class PgConversionRowUnsaved(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: Long,
+  conproc: PGobject,
   condefault: Boolean
 )
 object PgConversionRowUnsaved {

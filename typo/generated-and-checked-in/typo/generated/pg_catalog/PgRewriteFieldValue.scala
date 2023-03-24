@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgRewriteFieldValue[T](val name: String, val value: T)
 
@@ -20,6 +20,6 @@ object PgRewriteFieldValue {
   case class evType(override val value: String) extends PgRewriteFieldValue("ev_type", value)
   case class evEnabled(override val value: String) extends PgRewriteFieldValue("ev_enabled", value)
   case class isInstead(override val value: Boolean) extends PgRewriteFieldValue("is_instead", value)
-  case class evQual(override val value: String) extends PgRewriteFieldValue("ev_qual", value)
-  case class evAction(override val value: String) extends PgRewriteFieldValue("ev_action", value)
+  case class evQual(override val value: PGobject) extends PgRewriteFieldValue("ev_qual", value)
+  case class evAction(override val value: PGobject) extends PgRewriteFieldValue("ev_action", value)
 }

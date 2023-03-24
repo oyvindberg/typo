@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgOperatorRow(
   oid: PgOperatorId,
@@ -25,9 +26,9 @@ case class PgOperatorRow(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: Long,
-  oprrest: Long,
-  oprjoin: Long
+  oprcode: PGobject,
+  oprrest: PGobject,
+  oprjoin: PGobject
 )
 
 object PgOperatorRow {
@@ -46,9 +47,9 @@ object PgOperatorRow {
         oprresult = row[Long]("oprresult"),
         oprcom = row[Long]("oprcom"),
         oprnegate = row[Long]("oprnegate"),
-        oprcode = row[Long]("oprcode"),
-        oprrest = row[Long]("oprrest"),
-        oprjoin = row[Long]("oprjoin")
+        oprcode = row[PGobject]("oprcode"),
+        oprrest = row[PGobject]("oprrest"),
+        oprjoin = row[PGobject]("oprjoin")
       )
     )
   }

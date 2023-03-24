@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgForeignDataWrapperFieldValue[T](val name: String, val value: T)
 
@@ -19,6 +19,6 @@ object PgForeignDataWrapperFieldValue {
   case class fdwowner(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwowner", value)
   case class fdwhandler(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwhandler", value)
   case class fdwvalidator(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwvalidator", value)
-  case class fdwacl(override val value: Option[Array[String]]) extends PgForeignDataWrapperFieldValue("fdwacl", value)
+  case class fdwacl(override val value: Option[Array[PGobject]]) extends PgForeignDataWrapperFieldValue("fdwacl", value)
   case class fdwoptions(override val value: Option[Array[String]]) extends PgForeignDataWrapperFieldValue("fdwoptions", value)
 }

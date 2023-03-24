@@ -9,14 +9,14 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgForeignDataWrapperRowUnsaved(
   fdwname: String,
   fdwowner: Long,
   fdwhandler: Long,
   fdwvalidator: Long,
-  fdwacl: Option[Array[String]],
+  fdwacl: Option[Array[PGobject]],
   fdwoptions: Option[Array[String]]
 )
 object PgForeignDataWrapperRowUnsaved {

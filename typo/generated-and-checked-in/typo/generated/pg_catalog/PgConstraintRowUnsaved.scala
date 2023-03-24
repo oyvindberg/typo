@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgConstraintRowUnsaved(
   conname: String,
@@ -29,13 +29,13 @@ case class PgConstraintRowUnsaved(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Short]],
-  confkey: Option[Array[Short]],
+  conkey: Option[Array[Int]],
+  confkey: Option[Array[Int]],
   conpfeqop: Option[Array[Long]],
   conppeqop: Option[Array[Long]],
   conffeqop: Option[Array[Long]],
   conexclop: Option[Array[Long]],
-  conbin: Option[String]
+  conbin: Option[PGobject]
 )
 object PgConstraintRowUnsaved {
   

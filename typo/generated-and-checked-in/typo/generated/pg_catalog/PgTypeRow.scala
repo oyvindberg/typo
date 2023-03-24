@@ -11,13 +11,14 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTypeRow(
   oid: PgTypeId,
   typname: String,
   typnamespace: Long,
   typowner: Long,
-  typlen: Short,
+  typlen: Int,
   typbyval: Boolean,
   typtype: String,
   typcategory: String,
@@ -25,16 +26,16 @@ case class PgTypeRow(
   typisdefined: Boolean,
   typdelim: String,
   typrelid: Long,
-  typsubscript: Long,
+  typsubscript: PGobject,
   typelem: Long,
   typarray: Long,
-  typinput: Long,
-  typoutput: Long,
-  typreceive: Long,
-  typsend: Long,
-  typmodin: Long,
-  typmodout: Long,
-  typanalyze: Long,
+  typinput: PGobject,
+  typoutput: PGobject,
+  typreceive: PGobject,
+  typsend: PGobject,
+  typmodin: PGobject,
+  typmodout: PGobject,
+  typanalyze: PGobject,
   typalign: String,
   typstorage: String,
   typnotnull: Boolean,
@@ -42,9 +43,9 @@ case class PgTypeRow(
   typtypmod: Int,
   typndims: Int,
   typcollation: Long,
-  typdefaultbin: Option[String],
+  typdefaultbin: Option[PGobject],
   typdefault: Option[String],
-  typacl: Option[Array[String]]
+  typacl: Option[Array[PGobject]]
 )
 
 object PgTypeRow {
@@ -55,7 +56,7 @@ object PgTypeRow {
         typname = row[String]("typname"),
         typnamespace = row[Long]("typnamespace"),
         typowner = row[Long]("typowner"),
-        typlen = row[Short]("typlen"),
+        typlen = row[Int]("typlen"),
         typbyval = row[Boolean]("typbyval"),
         typtype = row[String]("typtype"),
         typcategory = row[String]("typcategory"),
@@ -63,16 +64,16 @@ object PgTypeRow {
         typisdefined = row[Boolean]("typisdefined"),
         typdelim = row[String]("typdelim"),
         typrelid = row[Long]("typrelid"),
-        typsubscript = row[Long]("typsubscript"),
+        typsubscript = row[PGobject]("typsubscript"),
         typelem = row[Long]("typelem"),
         typarray = row[Long]("typarray"),
-        typinput = row[Long]("typinput"),
-        typoutput = row[Long]("typoutput"),
-        typreceive = row[Long]("typreceive"),
-        typsend = row[Long]("typsend"),
-        typmodin = row[Long]("typmodin"),
-        typmodout = row[Long]("typmodout"),
-        typanalyze = row[Long]("typanalyze"),
+        typinput = row[PGobject]("typinput"),
+        typoutput = row[PGobject]("typoutput"),
+        typreceive = row[PGobject]("typreceive"),
+        typsend = row[PGobject]("typsend"),
+        typmodin = row[PGobject]("typmodin"),
+        typmodout = row[PGobject]("typmodout"),
+        typanalyze = row[PGobject]("typanalyze"),
         typalign = row[String]("typalign"),
         typstorage = row[String]("typstorage"),
         typnotnull = row[Boolean]("typnotnull"),
@@ -80,9 +81,9 @@ object PgTypeRow {
         typtypmod = row[Int]("typtypmod"),
         typndims = row[Int]("typndims"),
         typcollation = row[Long]("typcollation"),
-        typdefaultbin = row[Option[String]]("typdefaultbin"),
+        typdefaultbin = row[Option[PGobject]]("typdefaultbin"),
         typdefault = row[Option[String]]("typdefault"),
-        typacl = row[Option[Array[String]]]("typacl")
+        typacl = row[Option[Array[PGobject]]]("typacl")
       )
     )
   }

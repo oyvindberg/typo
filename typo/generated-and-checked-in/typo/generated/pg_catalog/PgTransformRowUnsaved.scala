@@ -9,13 +9,13 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTransformRowUnsaved(
   trftype: Long,
   trflang: Long,
-  trffromsql: Long,
-  trftosql: Long
+  trffromsql: PGobject,
+  trftosql: PGobject
 )
 object PgTransformRowUnsaved {
   

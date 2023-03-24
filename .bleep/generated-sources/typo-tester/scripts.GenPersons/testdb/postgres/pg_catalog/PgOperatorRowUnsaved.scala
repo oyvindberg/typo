@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -26,9 +27,9 @@ case class PgOperatorRowUnsaved(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: String,
-  oprrest: String,
-  oprjoin: String
+  oprcode: PGobject,
+  oprrest: PGobject,
+  oprjoin: PGobject
 )
 object PgOperatorRowUnsaved {
   implicit val oFormat: OFormat[PgOperatorRowUnsaved] = new OFormat[PgOperatorRowUnsaved]{
@@ -65,9 +66,9 @@ object PgOperatorRowUnsaved {
             oprresult = json.\("oprresult").as[Long],
             oprcom = json.\("oprcom").as[Long],
             oprnegate = json.\("oprnegate").as[Long],
-            oprcode = json.\("oprcode").as[String],
-            oprrest = json.\("oprrest").as[String],
-            oprjoin = json.\("oprjoin").as[String]
+            oprcode = json.\("oprcode").as[PGobject],
+            oprrest = json.\("oprrest").as[PGobject],
+            oprjoin = json.\("oprjoin").as[PGobject]
           )
         )
       )

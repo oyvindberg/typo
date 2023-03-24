@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,7 +19,7 @@ case class PgTypeRowUnsaved(
   typname: String,
   typnamespace: Long,
   typowner: Long,
-  typlen: Short,
+  typlen: Int,
   typbyval: Boolean,
   typtype: String,
   typcategory: String,
@@ -26,16 +27,16 @@ case class PgTypeRowUnsaved(
   typisdefined: Boolean,
   typdelim: String,
   typrelid: Long,
-  typsubscript: String,
+  typsubscript: PGobject,
   typelem: Long,
   typarray: Long,
-  typinput: String,
-  typoutput: String,
-  typreceive: String,
-  typsend: String,
-  typmodin: String,
-  typmodout: String,
-  typanalyze: String,
+  typinput: PGobject,
+  typoutput: PGobject,
+  typreceive: PGobject,
+  typsend: PGobject,
+  typmodin: PGobject,
+  typmodout: PGobject,
+  typanalyze: PGobject,
   typalign: String,
   typstorage: String,
   typnotnull: Boolean,
@@ -43,9 +44,9 @@ case class PgTypeRowUnsaved(
   typtypmod: Int,
   typndims: Int,
   typcollation: Long,
-  typdefaultbin: Option[String],
+  typdefaultbin: Option[PGobject],
   typdefault: Option[String],
-  typacl: Option[Array[String]]
+  typacl: Option[Array[PGobject]]
 )
 object PgTypeRowUnsaved {
   implicit val oFormat: OFormat[PgTypeRowUnsaved] = new OFormat[PgTypeRowUnsaved]{
@@ -91,7 +92,7 @@ object PgTypeRowUnsaved {
             typname = json.\("typname").as[String],
             typnamespace = json.\("typnamespace").as[Long],
             typowner = json.\("typowner").as[Long],
-            typlen = json.\("typlen").as[Short],
+            typlen = json.\("typlen").as[Int],
             typbyval = json.\("typbyval").as[Boolean],
             typtype = json.\("typtype").as[String],
             typcategory = json.\("typcategory").as[String],
@@ -99,16 +100,16 @@ object PgTypeRowUnsaved {
             typisdefined = json.\("typisdefined").as[Boolean],
             typdelim = json.\("typdelim").as[String],
             typrelid = json.\("typrelid").as[Long],
-            typsubscript = json.\("typsubscript").as[String],
+            typsubscript = json.\("typsubscript").as[PGobject],
             typelem = json.\("typelem").as[Long],
             typarray = json.\("typarray").as[Long],
-            typinput = json.\("typinput").as[String],
-            typoutput = json.\("typoutput").as[String],
-            typreceive = json.\("typreceive").as[String],
-            typsend = json.\("typsend").as[String],
-            typmodin = json.\("typmodin").as[String],
-            typmodout = json.\("typmodout").as[String],
-            typanalyze = json.\("typanalyze").as[String],
+            typinput = json.\("typinput").as[PGobject],
+            typoutput = json.\("typoutput").as[PGobject],
+            typreceive = json.\("typreceive").as[PGobject],
+            typsend = json.\("typsend").as[PGobject],
+            typmodin = json.\("typmodin").as[PGobject],
+            typmodout = json.\("typmodout").as[PGobject],
+            typanalyze = json.\("typanalyze").as[PGobject],
             typalign = json.\("typalign").as[String],
             typstorage = json.\("typstorage").as[String],
             typnotnull = json.\("typnotnull").as[Boolean],
@@ -116,9 +117,9 @@ object PgTypeRowUnsaved {
             typtypmod = json.\("typtypmod").as[Int],
             typndims = json.\("typndims").as[Int],
             typcollation = json.\("typcollation").as[Long],
-            typdefaultbin = json.\("typdefaultbin").toOption.map(_.as[String]),
+            typdefaultbin = json.\("typdefaultbin").toOption.map(_.as[PGobject]),
             typdefault = json.\("typdefault").toOption.map(_.as[String]),
-            typacl = json.\("typacl").toOption.map(_.as[Array[String]])
+            typacl = json.\("typacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

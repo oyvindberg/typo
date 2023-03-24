@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +26,7 @@ case class PgLanguageRow(
   lanplcallfoid: Long,
   laninline: Long,
   lanvalidator: Long,
-  lanacl: Option[Array[String]]
+  lanacl: Option[Array[PGobject]]
 )
 
 object PgLanguageRow {
@@ -40,7 +41,7 @@ object PgLanguageRow {
         lanplcallfoid = row[Long]("lanplcallfoid"),
         laninline = row[Long]("laninline"),
         lanvalidator = row[Long]("lanvalidator"),
-        lanacl = row[Option[Array[String]]]("lanacl")
+        lanacl = row[Option[Array[PGobject]]]("lanacl")
       )
     )
   }
@@ -71,7 +72,7 @@ object PgLanguageRow {
             lanplcallfoid = json.\("lanplcallfoid").as[Long],
             laninline = json.\("laninline").as[Long],
             lanvalidator = json.\("lanvalidator").as[Long],
-            lanacl = json.\("lanacl").toOption.map(_.as[Array[String]])
+            lanacl = json.\("lanacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

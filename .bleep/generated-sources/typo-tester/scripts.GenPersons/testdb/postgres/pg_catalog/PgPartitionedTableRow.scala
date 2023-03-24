@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,12 +20,12 @@ import scala.util.Try
 case class PgPartitionedTableRow(
   partrelid: PgPartitionedTableId,
   partstrat: String,
-  partnatts: Short,
+  partnatts: Int,
   partdefid: Long,
-  partattrs: String,
-  partclass: String,
-  partcollation: String,
-  partexprs: Option[String]
+  partattrs: Array[Int],
+  partclass: Array[Long],
+  partcollation: Array[Long],
+  partexprs: Option[PGobject]
 )
 
 object PgPartitionedTableRow {
@@ -33,12 +34,12 @@ object PgPartitionedTableRow {
       PgPartitionedTableRow(
         partrelid = row[PgPartitionedTableId]("partrelid"),
         partstrat = row[String]("partstrat"),
-        partnatts = row[Short]("partnatts"),
+        partnatts = row[Int]("partnatts"),
         partdefid = row[Long]("partdefid"),
-        partattrs = row[String]("partattrs"),
-        partclass = row[String]("partclass"),
-        partcollation = row[String]("partcollation"),
-        partexprs = row[Option[String]]("partexprs")
+        partattrs = row[Array[Int]]("partattrs"),
+        partclass = row[Array[Long]]("partclass"),
+        partcollation = row[Array[Long]]("partcollation"),
+        partexprs = row[Option[PGobject]]("partexprs")
       )
     )
   }
@@ -62,12 +63,12 @@ object PgPartitionedTableRow {
           PgPartitionedTableRow(
             partrelid = json.\("partrelid").as[PgPartitionedTableId],
             partstrat = json.\("partstrat").as[String],
-            partnatts = json.\("partnatts").as[Short],
+            partnatts = json.\("partnatts").as[Int],
             partdefid = json.\("partdefid").as[Long],
-            partattrs = json.\("partattrs").as[String],
-            partclass = json.\("partclass").as[String],
-            partcollation = json.\("partcollation").as[String],
-            partexprs = json.\("partexprs").toOption.map(_.as[String])
+            partattrs = json.\("partattrs").as[Array[Int]],
+            partclass = json.\("partclass").as[Array[Long]],
+            partcollation = json.\("partcollation").as[Array[Long]],
+            partexprs = json.\("partexprs").toOption.map(_.as[PGobject])
           )
         )
       )

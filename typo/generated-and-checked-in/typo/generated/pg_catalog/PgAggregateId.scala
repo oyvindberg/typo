@@ -13,12 +13,13 @@ import anorm.Column
 import anorm.RowParser
 import anorm.SqlParser
 import anorm.ToStatement
+import org.postgresql.util.PGobject
 
-case class PgAggregateId(value: Long) extends AnyVal
+case class PgAggregateId(value: PGobject) extends AnyVal
 object PgAggregateId {
   implicit val ordering: Ordering[PgAggregateId] = Ordering.by(_.value)
   
-  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val column: Column[PgAggregateId] = implicitly[Column[Long]].map(PgAggregateId.apply)
+  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[PGobject]].contramap(_.value)
+  implicit val column: Column[PgAggregateId] = implicitly[Column[PGobject]].map(PgAggregateId.apply)
   implicit val rowParser: RowParser[PgAggregateId] = SqlParser.get[PgAggregateId]("aggfnoid")
 }

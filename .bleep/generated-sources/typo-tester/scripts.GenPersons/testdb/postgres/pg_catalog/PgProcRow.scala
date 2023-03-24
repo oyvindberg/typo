@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +26,7 @@ case class PgProcRow(
   procost: Float,
   prorows: Float,
   provariadic: Long,
-  prosupport: String,
+  prosupport: PGobject,
   prokind: String,
   prosecdef: Boolean,
   proleakproof: Boolean,
@@ -33,20 +34,20 @@ case class PgProcRow(
   proretset: Boolean,
   provolatile: String,
   proparallel: String,
-  pronargs: Short,
-  pronargdefaults: Short,
+  pronargs: Int,
+  pronargdefaults: Int,
   prorettype: Long,
-  proargtypes: String,
+  proargtypes: Array[Long],
   proallargtypes: Option[Array[Long]],
   proargmodes: Option[Array[String]],
   proargnames: Option[Array[String]],
-  proargdefaults: Option[String],
+  proargdefaults: Option[PGobject],
   protrftypes: Option[Array[Long]],
   prosrc: String,
   probin: Option[String],
-  prosqlbody: Option[String],
+  prosqlbody: Option[PGobject],
   proconfig: Option[Array[String]],
-  proacl: Option[Array[String]]
+  proacl: Option[Array[PGobject]]
 )
 
 object PgProcRow {
@@ -61,7 +62,7 @@ object PgProcRow {
         procost = row[Float]("procost"),
         prorows = row[Float]("prorows"),
         provariadic = row[Long]("provariadic"),
-        prosupport = row[String]("prosupport"),
+        prosupport = row[PGobject]("prosupport"),
         prokind = row[String]("prokind"),
         prosecdef = row[Boolean]("prosecdef"),
         proleakproof = row[Boolean]("proleakproof"),
@@ -69,20 +70,20 @@ object PgProcRow {
         proretset = row[Boolean]("proretset"),
         provolatile = row[String]("provolatile"),
         proparallel = row[String]("proparallel"),
-        pronargs = row[Short]("pronargs"),
-        pronargdefaults = row[Short]("pronargdefaults"),
+        pronargs = row[Int]("pronargs"),
+        pronargdefaults = row[Int]("pronargdefaults"),
         prorettype = row[Long]("prorettype"),
-        proargtypes = row[String]("proargtypes"),
+        proargtypes = row[Array[Long]]("proargtypes"),
         proallargtypes = row[Option[Array[Long]]]("proallargtypes"),
         proargmodes = row[Option[Array[String]]]("proargmodes"),
         proargnames = row[Option[Array[String]]]("proargnames"),
-        proargdefaults = row[Option[String]]("proargdefaults"),
+        proargdefaults = row[Option[PGobject]]("proargdefaults"),
         protrftypes = row[Option[Array[Long]]]("protrftypes"),
         prosrc = row[String]("prosrc"),
         probin = row[Option[String]]("probin"),
-        prosqlbody = row[Option[String]]("prosqlbody"),
+        prosqlbody = row[Option[PGobject]]("prosqlbody"),
         proconfig = row[Option[Array[String]]]("proconfig"),
-        proacl = row[Option[Array[String]]]("proacl")
+        proacl = row[Option[Array[PGobject]]]("proacl")
       )
     )
   }
@@ -134,7 +135,7 @@ object PgProcRow {
             procost = json.\("procost").as[Float],
             prorows = json.\("prorows").as[Float],
             provariadic = json.\("provariadic").as[Long],
-            prosupport = json.\("prosupport").as[String],
+            prosupport = json.\("prosupport").as[PGobject],
             prokind = json.\("prokind").as[String],
             prosecdef = json.\("prosecdef").as[Boolean],
             proleakproof = json.\("proleakproof").as[Boolean],
@@ -142,20 +143,20 @@ object PgProcRow {
             proretset = json.\("proretset").as[Boolean],
             provolatile = json.\("provolatile").as[String],
             proparallel = json.\("proparallel").as[String],
-            pronargs = json.\("pronargs").as[Short],
-            pronargdefaults = json.\("pronargdefaults").as[Short],
+            pronargs = json.\("pronargs").as[Int],
+            pronargdefaults = json.\("pronargdefaults").as[Int],
             prorettype = json.\("prorettype").as[Long],
-            proargtypes = json.\("proargtypes").as[String],
+            proargtypes = json.\("proargtypes").as[Array[Long]],
             proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[Long]]),
             proargmodes = json.\("proargmodes").toOption.map(_.as[Array[String]]),
             proargnames = json.\("proargnames").toOption.map(_.as[Array[String]]),
-            proargdefaults = json.\("proargdefaults").toOption.map(_.as[String]),
+            proargdefaults = json.\("proargdefaults").toOption.map(_.as[PGobject]),
             protrftypes = json.\("protrftypes").toOption.map(_.as[Array[Long]]),
             prosrc = json.\("prosrc").as[String],
             probin = json.\("probin").toOption.map(_.as[String]),
-            prosqlbody = json.\("prosqlbody").toOption.map(_.as[String]),
+            prosqlbody = json.\("prosqlbody").toOption.map(_.as[PGobject]),
             proconfig = json.\("proconfig").toOption.map(_.as[Array[String]]),
-            proacl = json.\("proacl").toOption.map(_.as[Array[String]])
+            proacl = json.\("proacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

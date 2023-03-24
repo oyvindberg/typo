@@ -11,14 +11,15 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgAttributeRow(
   attrelid: Long,
   attname: String,
   atttypid: Long,
   attstattarget: Int,
-  attlen: Short,
-  attnum: Short,
+  attlen: Int,
+  attnum: Int,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -35,10 +36,10 @@ case class PgAttributeRow(
   attislocal: Boolean,
   attinhcount: Int,
   attcollation: Long,
-  attacl: Option[Array[String]],
+  attacl: Option[Array[PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[String]
+  attmissingval: Option[PGobject]
 ){
   val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
 }
@@ -51,8 +52,8 @@ object PgAttributeRow {
         attname = row[String]("attname"),
         atttypid = row[Long]("atttypid"),
         attstattarget = row[Int]("attstattarget"),
-        attlen = row[Short]("attlen"),
-        attnum = row[Short]("attnum"),
+        attlen = row[Int]("attlen"),
+        attnum = row[Int]("attnum"),
         attndims = row[Int]("attndims"),
         attcacheoff = row[Int]("attcacheoff"),
         atttypmod = row[Int]("atttypmod"),
@@ -69,10 +70,10 @@ object PgAttributeRow {
         attislocal = row[Boolean]("attislocal"),
         attinhcount = row[Int]("attinhcount"),
         attcollation = row[Long]("attcollation"),
-        attacl = row[Option[Array[String]]]("attacl"),
+        attacl = row[Option[Array[PGobject]]]("attacl"),
         attoptions = row[Option[Array[String]]]("attoptions"),
         attfdwoptions = row[Option[Array[String]]]("attfdwoptions"),
-        attmissingval = row[Option[String]]("attmissingval")
+        attmissingval = row[Option[PGobject]]("attmissingval")
       )
     )
   }

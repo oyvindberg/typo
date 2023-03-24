@@ -11,16 +11,17 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgPartitionedTableRow(
   partrelid: PgPartitionedTableId,
   partstrat: String,
-  partnatts: Short,
+  partnatts: Int,
   partdefid: Long,
-  partattrs: Array[Short],
+  partattrs: Array[Int],
   partclass: Array[Long],
   partcollation: Array[Long],
-  partexprs: Option[String]
+  partexprs: Option[PGobject]
 )
 
 object PgPartitionedTableRow {
@@ -29,12 +30,12 @@ object PgPartitionedTableRow {
       PgPartitionedTableRow(
         partrelid = row[PgPartitionedTableId]("partrelid"),
         partstrat = row[String]("partstrat"),
-        partnatts = row[Short]("partnatts"),
+        partnatts = row[Int]("partnatts"),
         partdefid = row[Long]("partdefid"),
-        partattrs = row[Array[Short]]("partattrs"),
+        partattrs = row[Array[Int]]("partattrs"),
         partclass = row[Array[Long]]("partclass"),
         partcollation = row[Array[Long]]("partcollation"),
-        partexprs = row[Option[String]]("partexprs")
+        partexprs = row[Option[PGobject]]("partexprs")
       )
     )
   }

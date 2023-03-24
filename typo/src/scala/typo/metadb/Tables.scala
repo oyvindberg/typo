@@ -43,7 +43,7 @@ class Tables(
 
   private def typeFromUdtName(udtName: String, characterMaximumLength: Option[Int]): db.Type = {
     udtName match {
-      case "aclitem"                  => db.Type.Text // i.e. "postgres=arwdDxt/postgres"
+      case "aclitem"                  => db.Type.PgObject // i.e. "postgres=arwdDxt/postgres"
       case "anyarray"                 => db.Type.AnyArray
       case "bool"                     => db.Type.Boolean
       case "char"                     => db.Type.Char
@@ -60,8 +60,8 @@ class Tables(
       case "numeric"                  => db.Type.Numeric
       case "oid"                      => db.Type.Oid
       case "oidvector"                => db.Type.Vector(db.Type.Oid) // space separated oids referencing i.e. pg_collation.oid
-      case "pg_node_tree"             => db.Type.Text // Expression trees (in nodeToString() representation)
-      case "regproc"                  => db.Type.Oid // registered procedure (references pg_proc.oid)
+      case "pg_node_tree"             => db.Type.PgObject // Expression trees (in nodeToString() representation)
+      case "regproc"                  => db.Type.PgObject
       case "text"                     => db.Type.Text
       case "timestamp"                => db.Type.Timestamp
       case "timestamptz"              => db.Type.TimestampTz

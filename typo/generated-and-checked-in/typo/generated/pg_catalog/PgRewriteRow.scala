@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgRewriteRow(
   oid: PgRewriteId,
@@ -19,8 +20,8 @@ case class PgRewriteRow(
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: String,
-  evAction: String
+  evQual: PGobject,
+  evAction: PGobject
 )
 
 object PgRewriteRow {
@@ -33,8 +34,8 @@ object PgRewriteRow {
         evType = row[String]("ev_type"),
         evEnabled = row[String]("ev_enabled"),
         isInstead = row[Boolean]("is_instead"),
-        evQual = row[String]("ev_qual"),
-        evAction = row[String]("ev_action")
+        evQual = row[PGobject]("ev_qual"),
+        evAction = row[PGobject]("ev_action")
       )
     )
   }

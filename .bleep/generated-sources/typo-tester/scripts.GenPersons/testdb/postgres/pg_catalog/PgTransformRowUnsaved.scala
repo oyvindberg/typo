@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,8 +18,8 @@ import scala.util.Try
 case class PgTransformRowUnsaved(
   trftype: Long,
   trflang: Long,
-  trffromsql: String,
-  trftosql: String
+  trffromsql: PGobject,
+  trftosql: PGobject
 )
 object PgTransformRowUnsaved {
   implicit val oFormat: OFormat[PgTransformRowUnsaved] = new OFormat[PgTransformRowUnsaved]{
@@ -36,8 +37,8 @@ object PgTransformRowUnsaved {
           PgTransformRowUnsaved(
             trftype = json.\("trftype").as[Long],
             trflang = json.\("trflang").as[Long],
-            trffromsql = json.\("trffromsql").as[String],
-            trftosql = json.\("trftosql").as[String]
+            trffromsql = json.\("trffromsql").as[PGobject],
+            trftosql = json.\("trftosql").as[PGobject]
           )
         )
       )

@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgClassFieldValue[T](val name: String, val value: T)
 
@@ -29,8 +29,8 @@ object PgClassFieldValue {
   case class relisshared(override val value: Boolean) extends PgClassFieldValue("relisshared", value)
   case class relpersistence(override val value: String) extends PgClassFieldValue("relpersistence", value)
   case class relkind(override val value: String) extends PgClassFieldValue("relkind", value)
-  case class relnatts(override val value: Short) extends PgClassFieldValue("relnatts", value)
-  case class relchecks(override val value: Short) extends PgClassFieldValue("relchecks", value)
+  case class relnatts(override val value: Int) extends PgClassFieldValue("relnatts", value)
+  case class relchecks(override val value: Int) extends PgClassFieldValue("relchecks", value)
   case class relhasrules(override val value: Boolean) extends PgClassFieldValue("relhasrules", value)
   case class relhastriggers(override val value: Boolean) extends PgClassFieldValue("relhastriggers", value)
   case class relhassubclass(override val value: Boolean) extends PgClassFieldValue("relhassubclass", value)
@@ -40,9 +40,9 @@ object PgClassFieldValue {
   case class relreplident(override val value: String) extends PgClassFieldValue("relreplident", value)
   case class relispartition(override val value: Boolean) extends PgClassFieldValue("relispartition", value)
   case class relrewrite(override val value: Long) extends PgClassFieldValue("relrewrite", value)
-  case class relfrozenxid(override val value: String) extends PgClassFieldValue("relfrozenxid", value)
-  case class relminmxid(override val value: String) extends PgClassFieldValue("relminmxid", value)
-  case class relacl(override val value: Option[Array[String]]) extends PgClassFieldValue("relacl", value)
+  case class relfrozenxid(override val value: Int) extends PgClassFieldValue("relfrozenxid", value)
+  case class relminmxid(override val value: Int) extends PgClassFieldValue("relminmxid", value)
+  case class relacl(override val value: Option[Array[PGobject]]) extends PgClassFieldValue("relacl", value)
   case class reloptions(override val value: Option[Array[String]]) extends PgClassFieldValue("reloptions", value)
-  case class relpartbound(override val value: Option[String]) extends PgClassFieldValue("relpartbound", value)
+  case class relpartbound(override val value: Option[PGobject]) extends PgClassFieldValue("relpartbound", value)
 }

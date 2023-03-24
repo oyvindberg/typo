@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,7 +19,7 @@ case class PgAttributeRowUnsaved(
   attname: String,
   atttypid: Long,
   attstattarget: Int,
-  attlen: Short,
+  attlen: Int,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -35,10 +36,10 @@ case class PgAttributeRowUnsaved(
   attislocal: Boolean,
   attinhcount: Int,
   attcollation: Long,
-  attacl: Option[Array[String]],
+  attacl: Option[Array[PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[String]
+  attmissingval: Option[PGobject]
 )
 object PgAttributeRowUnsaved {
   implicit val oFormat: OFormat[PgAttributeRowUnsaved] = new OFormat[PgAttributeRowUnsaved]{
@@ -77,7 +78,7 @@ object PgAttributeRowUnsaved {
             attname = json.\("attname").as[String],
             atttypid = json.\("atttypid").as[Long],
             attstattarget = json.\("attstattarget").as[Int],
-            attlen = json.\("attlen").as[Short],
+            attlen = json.\("attlen").as[Int],
             attndims = json.\("attndims").as[Int],
             attcacheoff = json.\("attcacheoff").as[Int],
             atttypmod = json.\("atttypmod").as[Int],
@@ -94,10 +95,10 @@ object PgAttributeRowUnsaved {
             attislocal = json.\("attislocal").as[Boolean],
             attinhcount = json.\("attinhcount").as[Int],
             attcollation = json.\("attcollation").as[Long],
-            attacl = json.\("attacl").toOption.map(_.as[Array[String]]),
+            attacl = json.\("attacl").toOption.map(_.as[Array[PGobject]]),
             attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-            attmissingval = json.\("attmissingval").toOption.map(_.as[String])
+            attmissingval = json.\("attmissingval").toOption.map(_.as[PGobject])
           )
         )
       )

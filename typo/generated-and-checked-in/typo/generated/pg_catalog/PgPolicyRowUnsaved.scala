@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgPolicyRowUnsaved(
   polname: String,
@@ -17,8 +17,8 @@ case class PgPolicyRowUnsaved(
   polcmd: String,
   polpermissive: Boolean,
   polroles: Array[Long],
-  polqual: Option[String],
-  polwithcheck: Option[String]
+  polqual: Option[PGobject],
+  polwithcheck: Option[PGobject]
 )
 object PgPolicyRowUnsaved {
   

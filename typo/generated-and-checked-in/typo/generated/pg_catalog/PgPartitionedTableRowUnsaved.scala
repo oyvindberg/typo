@@ -9,16 +9,16 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgPartitionedTableRowUnsaved(
   partstrat: String,
-  partnatts: Short,
+  partnatts: Int,
   partdefid: Long,
-  partattrs: Array[Short],
+  partattrs: Array[Int],
   partclass: Array[Long],
   partcollation: Array[Long],
-  partexprs: Option[String]
+  partexprs: Option[PGobject]
 )
 object PgPartitionedTableRowUnsaved {
   

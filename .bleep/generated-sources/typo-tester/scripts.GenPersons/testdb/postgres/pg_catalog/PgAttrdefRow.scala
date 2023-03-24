@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,8 +20,8 @@ import scala.util.Try
 case class PgAttrdefRow(
   oid: PgAttrdefId,
   adrelid: Long,
-  adnum: Short,
-  adbin: String
+  adnum: Int,
+  adbin: PGobject
 )
 
 object PgAttrdefRow {
@@ -29,8 +30,8 @@ object PgAttrdefRow {
       PgAttrdefRow(
         oid = row[PgAttrdefId]("oid"),
         adrelid = row[Long]("adrelid"),
-        adnum = row[Short]("adnum"),
-        adbin = row[String]("adbin")
+        adnum = row[Int]("adnum"),
+        adbin = row[PGobject]("adbin")
       )
     )
   }
@@ -50,8 +51,8 @@ object PgAttrdefRow {
           PgAttrdefRow(
             oid = json.\("oid").as[PgAttrdefId],
             adrelid = json.\("adrelid").as[Long],
-            adnum = json.\("adnum").as[Short],
-            adbin = json.\("adbin").as[String]
+            adnum = json.\("adnum").as[Int],
+            adbin = json.\("adbin").as[PGobject]
           )
         )
       )

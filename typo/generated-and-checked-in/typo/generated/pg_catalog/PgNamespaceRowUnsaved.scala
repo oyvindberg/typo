@@ -9,12 +9,12 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgNamespaceRowUnsaved(
   nspname: String,
   nspowner: Long,
-  nspacl: Option[Array[String]]
+  nspacl: Option[Array[PGobject]]
 )
 object PgNamespaceRowUnsaved {
   

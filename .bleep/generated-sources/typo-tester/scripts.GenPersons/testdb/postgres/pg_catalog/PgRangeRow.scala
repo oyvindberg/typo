@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,8 +23,8 @@ case class PgRangeRow(
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: String,
-  rngsubdiff: String
+  rngcanonical: PGobject,
+  rngsubdiff: PGobject
 )
 
 object PgRangeRow {
@@ -35,8 +36,8 @@ object PgRangeRow {
         rngmultitypid = row[Long]("rngmultitypid"),
         rngcollation = row[Long]("rngcollation"),
         rngsubopc = row[Long]("rngsubopc"),
-        rngcanonical = row[String]("rngcanonical"),
-        rngsubdiff = row[String]("rngsubdiff")
+        rngcanonical = row[PGobject]("rngcanonical"),
+        rngsubdiff = row[PGobject]("rngsubdiff")
       )
     )
   }
@@ -62,8 +63,8 @@ object PgRangeRow {
             rngmultitypid = json.\("rngmultitypid").as[Long],
             rngcollation = json.\("rngcollation").as[Long],
             rngsubopc = json.\("rngsubopc").as[Long],
-            rngcanonical = json.\("rngcanonical").as[String],
-            rngsubdiff = json.\("rngsubdiff").as[String]
+            rngcanonical = json.\("rngcanonical").as[PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[PGobject]
           )
         )
       )

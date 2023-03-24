@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgClassRowUnsaved(
   relname: String,
@@ -28,8 +28,8 @@ case class PgClassRowUnsaved(
   relisshared: Boolean,
   relpersistence: String,
   relkind: String,
-  relnatts: Short,
-  relchecks: Short,
+  relnatts: Int,
+  relchecks: Int,
   relhasrules: Boolean,
   relhastriggers: Boolean,
   relhassubclass: Boolean,
@@ -41,9 +41,9 @@ case class PgClassRowUnsaved(
   relrewrite: Long,
   relfrozenxid: Int,
   relminmxid: Int,
-  relacl: Option[Array[String]],
+  relacl: Option[Array[PGobject]],
   reloptions: Option[Array[String]],
-  relpartbound: Option[String]
+  relpartbound: Option[PGobject]
 )
 object PgClassRowUnsaved {
   

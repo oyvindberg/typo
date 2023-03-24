@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +21,7 @@ case class PgConversionRowUnsaved(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: String,
+  conproc: PGobject,
   condefault: Boolean
 )
 object PgConversionRowUnsaved {
@@ -45,7 +46,7 @@ object PgConversionRowUnsaved {
             conowner = json.\("conowner").as[Long],
             conforencoding = json.\("conforencoding").as[Int],
             contoencoding = json.\("contoencoding").as[Int],
-            conproc = json.\("conproc").as[String],
+            conproc = json.\("conproc").as[PGobject],
             condefault = json.\("condefault").as[Boolean]
           )
         )

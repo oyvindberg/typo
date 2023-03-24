@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgOperatorFieldValue[T](val name: String, val value: T)
 
@@ -24,7 +24,7 @@ object PgOperatorFieldValue {
   case class oprresult(override val value: Long) extends PgOperatorFieldValue("oprresult", value)
   case class oprcom(override val value: Long) extends PgOperatorFieldValue("oprcom", value)
   case class oprnegate(override val value: Long) extends PgOperatorFieldValue("oprnegate", value)
-  case class oprcode(override val value: String) extends PgOperatorFieldValue("oprcode", value)
-  case class oprrest(override val value: String) extends PgOperatorFieldValue("oprrest", value)
-  case class oprjoin(override val value: String) extends PgOperatorFieldValue("oprjoin", value)
+  case class oprcode(override val value: PGobject) extends PgOperatorFieldValue("oprcode", value)
+  case class oprrest(override val value: PGobject) extends PgOperatorFieldValue("oprrest", value)
+  case class oprjoin(override val value: PGobject) extends PgOperatorFieldValue("oprjoin", value)
 }

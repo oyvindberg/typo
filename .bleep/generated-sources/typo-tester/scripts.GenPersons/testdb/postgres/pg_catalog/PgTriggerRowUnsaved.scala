@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,7 +20,7 @@ case class PgTriggerRowUnsaved(
   tgparentid: Long,
   tgname: String,
   tgfoid: Long,
-  tgtype: Short,
+  tgtype: Int,
   tgenabled: String,
   tgisinternal: Boolean,
   tgconstrrelid: Long,
@@ -27,10 +28,10 @@ case class PgTriggerRowUnsaved(
   tgconstraint: Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
-  tgnargs: Short,
-  tgattr: String,
+  tgnargs: Int,
+  tgattr: Array[Int],
   tgargs: String,
-  tgqual: Option[String],
+  tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )
@@ -66,7 +67,7 @@ object PgTriggerRowUnsaved {
             tgparentid = json.\("tgparentid").as[Long],
             tgname = json.\("tgname").as[String],
             tgfoid = json.\("tgfoid").as[Long],
-            tgtype = json.\("tgtype").as[Short],
+            tgtype = json.\("tgtype").as[Int],
             tgenabled = json.\("tgenabled").as[String],
             tgisinternal = json.\("tgisinternal").as[Boolean],
             tgconstrrelid = json.\("tgconstrrelid").as[Long],
@@ -74,10 +75,10 @@ object PgTriggerRowUnsaved {
             tgconstraint = json.\("tgconstraint").as[Long],
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
-            tgnargs = json.\("tgnargs").as[Short],
-            tgattr = json.\("tgattr").as[String],
+            tgnargs = json.\("tgnargs").as[Int],
+            tgattr = json.\("tgattr").as[Array[Int]],
             tgargs = json.\("tgargs").as[String],
-            tgqual = json.\("tgqual").toOption.map(_.as[String]),
+            tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
           )

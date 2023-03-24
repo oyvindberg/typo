@@ -9,13 +9,13 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgDefaultAclRowUnsaved(
   defaclrole: Long,
   defaclnamespace: Long,
   defaclobjtype: String,
-  defaclacl: Array[String]
+  defaclacl: Array[PGobject]
 )
 object PgDefaultAclRowUnsaved {
   

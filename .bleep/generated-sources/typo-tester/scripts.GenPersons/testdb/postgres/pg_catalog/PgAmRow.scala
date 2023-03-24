@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,7 +20,7 @@ import scala.util.Try
 case class PgAmRow(
   oid: PgAmId,
   amname: String,
-  amhandler: String,
+  amhandler: PGobject,
   amtype: String
 )
 
@@ -29,7 +30,7 @@ object PgAmRow {
       PgAmRow(
         oid = row[PgAmId]("oid"),
         amname = row[String]("amname"),
-        amhandler = row[String]("amhandler"),
+        amhandler = row[PGobject]("amhandler"),
         amtype = row[String]("amtype")
       )
     )
@@ -50,7 +51,7 @@ object PgAmRow {
           PgAmRow(
             oid = json.\("oid").as[PgAmId],
             amname = json.\("amname").as[String],
-            amhandler = json.\("amhandler").as[String],
+            amhandler = json.\("amhandler").as[PGobject],
             amtype = json.\("amtype").as[String]
           )
         )

@@ -9,11 +9,11 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgInitPrivsRowUnsaved(
   privtype: String,
-  initprivs: Array[String]
+  initprivs: Array[PGobject]
 )
 object PgInitPrivsRowUnsaved {
   

@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgLanguageFieldValue[T](val name: String, val value: T)
 
@@ -20,5 +20,5 @@ object PgLanguageFieldValue {
   case class lanplcallfoid(override val value: Long) extends PgLanguageFieldValue("lanplcallfoid", value)
   case class laninline(override val value: Long) extends PgLanguageFieldValue("laninline", value)
   case class lanvalidator(override val value: Long) extends PgLanguageFieldValue("lanvalidator", value)
-  case class lanacl(override val value: Option[Array[String]]) extends PgLanguageFieldValue("lanacl", value)
+  case class lanacl(override val value: Option[Array[PGobject]]) extends PgLanguageFieldValue("lanacl", value)
 }

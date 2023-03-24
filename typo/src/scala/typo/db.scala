@@ -15,6 +15,7 @@ object db {
     case object Hstore extends Type
     case object Inet extends Type
     case object Oid extends Type
+    case object PgObject extends Type
     case class VarChar(maxLength: Option[Int]) extends Type
     case object Float4 extends Type
     case object Float8 extends Type

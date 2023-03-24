@@ -84,7 +84,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_amproc where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(amprocfamily: Long, amproclefttype: Long, amprocrighttype: Long, amprocnum: Short)(implicit c: Connection): Option[PgAmprocRow] = {
+  override def selectByUnique(amprocfamily: Long, amproclefttype: Long, amprocrighttype: Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
     ???
   }
 }

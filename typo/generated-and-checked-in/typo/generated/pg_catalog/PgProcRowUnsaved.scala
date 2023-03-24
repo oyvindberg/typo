@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgProcRowUnsaved(
   proname: String,
@@ -19,7 +19,7 @@ case class PgProcRowUnsaved(
   procost: Float,
   prorows: Float,
   provariadic: Long,
-  prosupport: Long,
+  prosupport: PGobject,
   prokind: String,
   prosecdef: Boolean,
   proleakproof: Boolean,
@@ -27,20 +27,20 @@ case class PgProcRowUnsaved(
   proretset: Boolean,
   provolatile: String,
   proparallel: String,
-  pronargs: Short,
-  pronargdefaults: Short,
+  pronargs: Int,
+  pronargdefaults: Int,
   prorettype: Long,
   proargtypes: Array[Long],
   proallargtypes: Option[Array[Long]],
   proargmodes: Option[Array[String]],
   proargnames: Option[Array[String]],
-  proargdefaults: Option[String],
+  proargdefaults: Option[PGobject],
   protrftypes: Option[Array[Long]],
   prosrc: String,
   probin: Option[String],
-  prosqlbody: Option[String],
+  prosqlbody: Option[PGobject],
   proconfig: Option[Array[String]],
-  proacl: Option[Array[String]]
+  proacl: Option[Array[PGobject]]
 )
 object PgProcRowUnsaved {
   

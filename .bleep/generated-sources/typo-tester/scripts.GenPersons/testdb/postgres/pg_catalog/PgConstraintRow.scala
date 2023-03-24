@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -35,13 +36,13 @@ case class PgConstraintRow(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Short]],
-  confkey: Option[Array[Short]],
+  conkey: Option[Array[Int]],
+  confkey: Option[Array[Int]],
   conpfeqop: Option[Array[Long]],
   conppeqop: Option[Array[Long]],
   conffeqop: Option[Array[Long]],
   conexclop: Option[Array[Long]],
-  conbin: Option[String]
+  conbin: Option[PGobject]
 )
 
 object PgConstraintRow {
@@ -66,13 +67,13 @@ object PgConstraintRow {
         conislocal = row[Boolean]("conislocal"),
         coninhcount = row[Int]("coninhcount"),
         connoinherit = row[Boolean]("connoinherit"),
-        conkey = row[Option[Array[Short]]]("conkey"),
-        confkey = row[Option[Array[Short]]]("confkey"),
+        conkey = row[Option[Array[Int]]]("conkey"),
+        confkey = row[Option[Array[Int]]]("confkey"),
         conpfeqop = row[Option[Array[Long]]]("conpfeqop"),
         conppeqop = row[Option[Array[Long]]]("conppeqop"),
         conffeqop = row[Option[Array[Long]]]("conffeqop"),
         conexclop = row[Option[Array[Long]]]("conexclop"),
-        conbin = row[Option[String]]("conbin")
+        conbin = row[Option[PGobject]]("conbin")
       )
     )
   }
@@ -129,13 +130,13 @@ object PgConstraintRow {
             conislocal = json.\("conislocal").as[Boolean],
             coninhcount = json.\("coninhcount").as[Int],
             connoinherit = json.\("connoinherit").as[Boolean],
-            conkey = json.\("conkey").toOption.map(_.as[Array[Short]]),
-            confkey = json.\("confkey").toOption.map(_.as[Array[Short]]),
+            conkey = json.\("conkey").toOption.map(_.as[Array[Int]]),
+            confkey = json.\("confkey").toOption.map(_.as[Array[Int]]),
             conpfeqop = json.\("conpfeqop").toOption.map(_.as[Array[Long]]),
             conppeqop = json.\("conppeqop").toOption.map(_.as[Array[Long]]),
             conffeqop = json.\("conffeqop").toOption.map(_.as[Array[Long]]),
             conexclop = json.\("conexclop").toOption.map(_.as[Array[Long]]),
-            conbin = json.\("conbin").toOption.map(_.as[String])
+            conbin = json.\("conbin").toOption.map(_.as[PGobject])
           )
         )
       )

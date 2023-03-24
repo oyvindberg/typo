@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgConstraintFieldValue[T](val name: String, val value: T)
 
@@ -30,11 +30,11 @@ object PgConstraintFieldValue {
   case class conislocal(override val value: Boolean) extends PgConstraintFieldValue("conislocal", value)
   case class coninhcount(override val value: Int) extends PgConstraintFieldValue("coninhcount", value)
   case class connoinherit(override val value: Boolean) extends PgConstraintFieldValue("connoinherit", value)
-  case class conkey(override val value: Option[Array[Short]]) extends PgConstraintFieldValue("conkey", value)
-  case class confkey(override val value: Option[Array[Short]]) extends PgConstraintFieldValue("confkey", value)
+  case class conkey(override val value: Option[Array[Int]]) extends PgConstraintFieldValue("conkey", value)
+  case class confkey(override val value: Option[Array[Int]]) extends PgConstraintFieldValue("confkey", value)
   case class conpfeqop(override val value: Option[Array[Long]]) extends PgConstraintFieldValue("conpfeqop", value)
   case class conppeqop(override val value: Option[Array[Long]]) extends PgConstraintFieldValue("conppeqop", value)
   case class conffeqop(override val value: Option[Array[Long]]) extends PgConstraintFieldValue("conffeqop", value)
   case class conexclop(override val value: Option[Array[Long]]) extends PgConstraintFieldValue("conexclop", value)
-  case class conbin(override val value: Option[String]) extends PgConstraintFieldValue("conbin", value)
+  case class conbin(override val value: Option[PGobject]) extends PgConstraintFieldValue("conbin", value)
 }

@@ -9,15 +9,15 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgRangeRowUnsaved(
   rngsubtype: Long,
   rngmultitypid: Long,
   rngcollation: Long,
   rngsubopc: Long,
-  rngcanonical: Long,
-  rngsubdiff: Long
+  rngcanonical: PGobject,
+  rngsubdiff: PGobject
 )
 object PgRangeRowUnsaved {
   

@@ -236,7 +236,8 @@ object DbLibAnorm extends DbLib {
       sc.Type.Boolean -> sc.StrLit("_bool"),
       sc.Type.Double -> sc.StrLit("_float8"),
       sc.Type.UUID -> sc.StrLit("_uuid"),
-      sc.Type.BigDecimal -> sc.StrLit("_decimal")
+      sc.Type.BigDecimal -> sc.StrLit("_decimal"),
+      sc.Type.PGobject -> sc.StrLit("_aclitem")
     )
 
     val arrayInstances = arrayTypes.map { case (tpe, elemType) =>
@@ -271,6 +272,18 @@ object DbLibAnorm extends DbLib {
              |""".stripMargin
     }
 
-    arrayInstances ++ postgresTypes ++ List(hstore)
+    val pgObject = {
+      val tpe = sc.Type.PGobject
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val pgObjectDb: ${inout(tpe)} = new ${inout(tpe)} {
+           |    override def sqlType: ${sc.Type.String} = "hstore"
+           |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+           |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+           |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+           |  }
+           |""".stripMargin
+    }
+
+    arrayInstances ++ postgresTypes ++ List(hstore, pgObject)
   }
 }

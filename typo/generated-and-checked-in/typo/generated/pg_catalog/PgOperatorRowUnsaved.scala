@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgOperatorRowUnsaved(
   oprname: String,
@@ -23,9 +23,9 @@ case class PgOperatorRowUnsaved(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: Long,
-  oprrest: Long,
-  oprjoin: Long
+  oprcode: PGobject,
+  oprrest: PGobject,
+  oprjoin: PGobject
 )
 object PgOperatorRowUnsaved {
   

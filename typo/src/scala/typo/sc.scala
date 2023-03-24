@@ -88,6 +88,7 @@ object sc {
     val MapHasAsJava = Qualified("scala.jdk.CollectionConverters.MapHasAsJava")
     val MapHasAsScala = Qualified("scala.jdk.CollectionConverters.MapHasAsScala")
     val StringContext = Qualified("java.StringContext")
+    val PGobject = Qualified("org.postgresql.util.PGobject")
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =

@@ -9,12 +9,12 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgIndexRowUnsaved(
   indrelid: Long,
-  indnatts: Short,
-  indnkeyatts: Short,
+  indnatts: Int,
+  indnkeyatts: Int,
   indisunique: Boolean,
   indisprimary: Boolean,
   indisexclusion: Boolean,
@@ -25,12 +25,12 @@ case class PgIndexRowUnsaved(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: Array[Short],
+  indkey: Array[Int],
   indcollation: Array[Long],
   indclass: Array[Long],
-  indoption: Array[Short],
-  indexprs: Option[String],
-  indpred: Option[String]
+  indoption: Array[Int],
+  indexprs: Option[PGobject],
+  indpred: Option[PGobject]
 )
 object PgIndexRowUnsaved {
   

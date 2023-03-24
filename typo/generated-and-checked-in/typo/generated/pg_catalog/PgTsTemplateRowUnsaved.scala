@@ -9,13 +9,13 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTsTemplateRowUnsaved(
   tmplname: String,
   tmplnamespace: Long,
-  tmplinit: Long,
-  tmpllexize: Long
+  tmplinit: PGobject,
+  tmpllexize: PGobject
 )
 object PgTsTemplateRowUnsaved {
   

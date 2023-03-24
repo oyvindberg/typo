@@ -11,12 +11,13 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgAttrdefRow(
   oid: PgAttrdefId,
   adrelid: Long,
-  adnum: Short,
-  adbin: String
+  adnum: Int,
+  adbin: PGobject
 )
 
 object PgAttrdefRow {
@@ -25,8 +26,8 @@ object PgAttrdefRow {
       PgAttrdefRow(
         oid = row[PgAttrdefId]("oid"),
         adrelid = row[Long]("adrelid"),
-        adnum = row[Short]("adnum"),
-        adbin = row[String]("adbin")
+        adnum = row[Int]("adnum"),
+        adbin = row[PGobject]("adbin")
       )
     )
   }

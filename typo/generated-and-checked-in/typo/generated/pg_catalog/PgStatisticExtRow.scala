@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgStatisticExtRow(
   oid: PgStatisticExtId,
@@ -19,9 +20,9 @@ case class PgStatisticExtRow(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: Array[Short],
+  stxkeys: Array[Int],
   stxkind: Array[String],
-  stxexprs: Option[String]
+  stxexprs: Option[PGobject]
 )
 
 object PgStatisticExtRow {
@@ -34,9 +35,9 @@ object PgStatisticExtRow {
         stxnamespace = row[Long]("stxnamespace"),
         stxowner = row[Long]("stxowner"),
         stxstattarget = row[Int]("stxstattarget"),
-        stxkeys = row[Array[Short]]("stxkeys"),
+        stxkeys = row[Array[Int]]("stxkeys"),
         stxkind = row[Array[String]]("stxkind"),
-        stxexprs = row[Option[String]]("stxexprs")
+        stxexprs = row[Option[PGobject]]("stxexprs")
       )
     )
   }

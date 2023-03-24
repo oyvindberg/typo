@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTriggerRow(
   oid: PgTriggerId,
@@ -18,7 +19,7 @@ case class PgTriggerRow(
   tgparentid: Long,
   tgname: String,
   tgfoid: Long,
-  tgtype: Short,
+  tgtype: Int,
   tgenabled: String,
   tgisinternal: Boolean,
   tgconstrrelid: Long,
@@ -26,10 +27,10 @@ case class PgTriggerRow(
   tgconstraint: Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
-  tgnargs: Short,
-  tgattr: Array[Short],
+  tgnargs: Int,
+  tgattr: Array[Int],
   tgargs: String,
-  tgqual: Option[String],
+  tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )
@@ -43,7 +44,7 @@ object PgTriggerRow {
         tgparentid = row[Long]("tgparentid"),
         tgname = row[String]("tgname"),
         tgfoid = row[Long]("tgfoid"),
-        tgtype = row[Short]("tgtype"),
+        tgtype = row[Int]("tgtype"),
         tgenabled = row[String]("tgenabled"),
         tgisinternal = row[Boolean]("tgisinternal"),
         tgconstrrelid = row[Long]("tgconstrrelid"),
@@ -51,10 +52,10 @@ object PgTriggerRow {
         tgconstraint = row[Long]("tgconstraint"),
         tgdeferrable = row[Boolean]("tgdeferrable"),
         tginitdeferred = row[Boolean]("tginitdeferred"),
-        tgnargs = row[Short]("tgnargs"),
-        tgattr = row[Array[Short]]("tgattr"),
+        tgnargs = row[Int]("tgnargs"),
+        tgattr = row[Array[Int]]("tgattr"),
         tgargs = row[String]("tgargs"),
-        tgqual = row[Option[String]]("tgqual"),
+        tgqual = row[Option[PGobject]]("tgqual"),
         tgoldtable = row[Option[String]]("tgoldtable"),
         tgnewtable = row[Option[String]]("tgnewtable")
       )

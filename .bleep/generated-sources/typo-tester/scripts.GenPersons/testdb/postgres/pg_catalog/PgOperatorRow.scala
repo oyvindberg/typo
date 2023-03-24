@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -29,9 +30,9 @@ case class PgOperatorRow(
   oprresult: Long,
   oprcom: Long,
   oprnegate: Long,
-  oprcode: String,
-  oprrest: String,
-  oprjoin: String
+  oprcode: PGobject,
+  oprrest: PGobject,
+  oprjoin: PGobject
 )
 
 object PgOperatorRow {
@@ -50,9 +51,9 @@ object PgOperatorRow {
         oprresult = row[Long]("oprresult"),
         oprcom = row[Long]("oprcom"),
         oprnegate = row[Long]("oprnegate"),
-        oprcode = row[String]("oprcode"),
-        oprrest = row[String]("oprrest"),
-        oprjoin = row[String]("oprjoin")
+        oprcode = row[PGobject]("oprcode"),
+        oprrest = row[PGobject]("oprrest"),
+        oprjoin = row[PGobject]("oprjoin")
       )
     )
   }
@@ -93,9 +94,9 @@ object PgOperatorRow {
             oprresult = json.\("oprresult").as[Long],
             oprcom = json.\("oprcom").as[Long],
             oprnegate = json.\("oprnegate").as[Long],
-            oprcode = json.\("oprcode").as[String],
-            oprrest = json.\("oprrest").as[String],
-            oprjoin = json.\("oprjoin").as[String]
+            oprcode = json.\("oprcode").as[PGobject],
+            oprrest = json.\("oprrest").as[PGobject],
+            oprjoin = json.\("oprjoin").as[PGobject]
           )
         )
       )

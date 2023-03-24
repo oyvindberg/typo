@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,8 +21,8 @@ case class PgTransformRow(
   oid: PgTransformId,
   trftype: Long,
   trflang: Long,
-  trffromsql: String,
-  trftosql: String
+  trffromsql: PGobject,
+  trftosql: PGobject
 )
 
 object PgTransformRow {
@@ -31,8 +32,8 @@ object PgTransformRow {
         oid = row[PgTransformId]("oid"),
         trftype = row[Long]("trftype"),
         trflang = row[Long]("trflang"),
-        trffromsql = row[String]("trffromsql"),
-        trftosql = row[String]("trftosql")
+        trffromsql = row[PGobject]("trffromsql"),
+        trftosql = row[PGobject]("trftosql")
       )
     )
   }
@@ -54,8 +55,8 @@ object PgTransformRow {
             oid = json.\("oid").as[PgTransformId],
             trftype = json.\("trftype").as[Long],
             trflang = json.\("trflang").as[Long],
-            trffromsql = json.\("trffromsql").as[String],
-            trftosql = json.\("trftosql").as[String]
+            trffromsql = json.\("trffromsql").as[PGobject],
+            trftosql = json.\("trftosql").as[PGobject]
           )
         )
       )

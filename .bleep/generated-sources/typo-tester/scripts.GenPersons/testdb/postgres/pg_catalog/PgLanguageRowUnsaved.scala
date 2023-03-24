@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,7 +23,7 @@ case class PgLanguageRowUnsaved(
   lanplcallfoid: Long,
   laninline: Long,
   lanvalidator: Long,
-  lanacl: Option[Array[String]]
+  lanacl: Option[Array[PGobject]]
 )
 object PgLanguageRowUnsaved {
   implicit val oFormat: OFormat[PgLanguageRowUnsaved] = new OFormat[PgLanguageRowUnsaved]{
@@ -49,7 +50,7 @@ object PgLanguageRowUnsaved {
             lanplcallfoid = json.\("lanplcallfoid").as[Long],
             laninline = json.\("laninline").as[Long],
             lanvalidator = json.\("lanvalidator").as[Long],
-            lanacl = json.\("lanacl").toOption.map(_.as[Array[String]])
+            lanacl = json.\("lanacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

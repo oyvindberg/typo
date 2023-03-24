@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,7 +24,7 @@ case class PgConversionRow(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: String,
+  conproc: PGobject,
   condefault: Boolean
 )
 
@@ -37,7 +38,7 @@ object PgConversionRow {
         conowner = row[Long]("conowner"),
         conforencoding = row[Int]("conforencoding"),
         contoencoding = row[Int]("contoencoding"),
-        conproc = row[String]("conproc"),
+        conproc = row[PGobject]("conproc"),
         condefault = row[Boolean]("condefault")
       )
     )
@@ -66,7 +67,7 @@ object PgConversionRow {
             conowner = json.\("conowner").as[Long],
             conforencoding = json.\("conforencoding").as[Int],
             contoencoding = json.\("contoencoding").as[Int],
-            conproc = json.\("conproc").as[String],
+            conproc = json.\("conproc").as[PGobject],
             condefault = json.\("condefault").as[Boolean]
           )
         )

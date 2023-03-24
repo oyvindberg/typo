@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgForeignDataWrapperRow(
   oid: PgForeignDataWrapperId,
@@ -18,7 +19,7 @@ case class PgForeignDataWrapperRow(
   fdwowner: Long,
   fdwhandler: Long,
   fdwvalidator: Long,
-  fdwacl: Option[Array[String]],
+  fdwacl: Option[Array[PGobject]],
   fdwoptions: Option[Array[String]]
 )
 
@@ -31,7 +32,7 @@ object PgForeignDataWrapperRow {
         fdwowner = row[Long]("fdwowner"),
         fdwhandler = row[Long]("fdwhandler"),
         fdwvalidator = row[Long]("fdwvalidator"),
-        fdwacl = row[Option[Array[String]]]("fdwacl"),
+        fdwacl = row[Option[Array[PGobject]]]("fdwacl"),
         fdwoptions = row[Option[Array[String]]]("fdwoptions")
       )
     )

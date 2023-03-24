@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +21,7 @@ case class PgTablespaceRow(
   oid: PgTablespaceId,
   spcname: String,
   spcowner: Long,
-  spcacl: Option[Array[String]],
+  spcacl: Option[Array[PGobject]],
   spcoptions: Option[Array[String]]
 )
 
@@ -31,7 +32,7 @@ object PgTablespaceRow {
         oid = row[PgTablespaceId]("oid"),
         spcname = row[String]("spcname"),
         spcowner = row[Long]("spcowner"),
-        spcacl = row[Option[Array[String]]]("spcacl"),
+        spcacl = row[Option[Array[PGobject]]]("spcacl"),
         spcoptions = row[Option[Array[String]]]("spcoptions")
       )
     )
@@ -54,7 +55,7 @@ object PgTablespaceRow {
             oid = json.\("oid").as[PgTablespaceId],
             spcname = json.\("spcname").as[String],
             spcowner = json.\("spcowner").as[Long],
-            spcacl = json.\("spcacl").toOption.map(_.as[Array[String]]),
+            spcacl = json.\("spcacl").toOption.map(_.as[Array[PGobject]]),
             spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
           )
         )

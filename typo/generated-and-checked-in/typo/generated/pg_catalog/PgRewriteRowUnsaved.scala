@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgRewriteRowUnsaved(
   rulename: String,
@@ -17,8 +17,8 @@ case class PgRewriteRowUnsaved(
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: String,
-  evAction: String
+  evQual: PGobject,
+  evAction: PGobject
 )
 object PgRewriteRowUnsaved {
   

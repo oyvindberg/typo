@@ -11,13 +11,14 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgDefaultAclRow(
   oid: PgDefaultAclId,
   defaclrole: Long,
   defaclnamespace: Long,
   defaclobjtype: String,
-  defaclacl: Array[String]
+  defaclacl: Array[PGobject]
 )
 
 object PgDefaultAclRow {
@@ -28,7 +29,7 @@ object PgDefaultAclRow {
         defaclrole = row[Long]("defaclrole"),
         defaclnamespace = row[Long]("defaclnamespace"),
         defaclobjtype = row[String]("defaclobjtype"),
-        defaclacl = row[Array[String]]("defaclacl")
+        defaclacl = row[Array[PGobject]]("defaclacl")
       )
     )
   }

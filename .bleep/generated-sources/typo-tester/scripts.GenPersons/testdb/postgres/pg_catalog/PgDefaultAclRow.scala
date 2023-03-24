@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,7 +22,7 @@ case class PgDefaultAclRow(
   defaclrole: Long,
   defaclnamespace: Long,
   defaclobjtype: String,
-  defaclacl: Array[String]
+  defaclacl: Array[PGobject]
 )
 
 object PgDefaultAclRow {
@@ -32,7 +33,7 @@ object PgDefaultAclRow {
         defaclrole = row[Long]("defaclrole"),
         defaclnamespace = row[Long]("defaclnamespace"),
         defaclobjtype = row[String]("defaclobjtype"),
-        defaclacl = row[Array[String]]("defaclacl")
+        defaclacl = row[Array[PGobject]]("defaclacl")
       )
     )
   }
@@ -55,7 +56,7 @@ object PgDefaultAclRow {
             defaclrole = json.\("defaclrole").as[Long],
             defaclnamespace = json.\("defaclnamespace").as[Long],
             defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[String]]
+            defaclacl = json.\("defaclacl").as[Array[PGobject]]
           )
         )
       )

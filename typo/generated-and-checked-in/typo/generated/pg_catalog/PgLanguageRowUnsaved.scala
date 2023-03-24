@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgLanguageRowUnsaved(
   lanname: String,
@@ -19,7 +19,7 @@ case class PgLanguageRowUnsaved(
   lanplcallfoid: Long,
   laninline: Long,
   lanvalidator: Long,
-  lanacl: Option[Array[String]]
+  lanacl: Option[Array[PGobject]]
 )
 object PgLanguageRowUnsaved {
   

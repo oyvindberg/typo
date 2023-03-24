@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgForeignServerRow(
   oid: PgForeignServerId,
@@ -19,7 +20,7 @@ case class PgForeignServerRow(
   srvfdw: Long,
   srvtype: Option[String],
   srvversion: Option[String],
-  srvacl: Option[Array[String]],
+  srvacl: Option[Array[PGobject]],
   srvoptions: Option[Array[String]]
 )
 
@@ -33,7 +34,7 @@ object PgForeignServerRow {
         srvfdw = row[Long]("srvfdw"),
         srvtype = row[Option[String]]("srvtype"),
         srvversion = row[Option[String]]("srvversion"),
-        srvacl = row[Option[Array[String]]]("srvacl"),
+        srvacl = row[Option[Array[PGobject]]]("srvacl"),
         srvoptions = row[Option[Array[String]]]("srvoptions")
       )
     )

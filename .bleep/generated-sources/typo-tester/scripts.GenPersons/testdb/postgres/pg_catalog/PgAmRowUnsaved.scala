@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -16,7 +17,7 @@ import scala.util.Try
 
 case class PgAmRowUnsaved(
   amname: String,
-  amhandler: String,
+  amhandler: PGobject,
   amtype: String
 )
 object PgAmRowUnsaved {
@@ -33,7 +34,7 @@ object PgAmRowUnsaved {
         Try(
           PgAmRowUnsaved(
             amname = json.\("amname").as[String],
-            amhandler = json.\("amhandler").as[String],
+            amhandler = json.\("amhandler").as[PGobject],
             amtype = json.\("amtype").as[String]
           )
         )

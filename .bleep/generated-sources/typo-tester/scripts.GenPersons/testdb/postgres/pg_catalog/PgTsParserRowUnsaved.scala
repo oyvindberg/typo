@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,11 +18,11 @@ import scala.util.Try
 case class PgTsParserRowUnsaved(
   prsname: String,
   prsnamespace: Long,
-  prsstart: String,
-  prstoken: String,
-  prsend: String,
-  prsheadline: String,
-  prslextype: String
+  prsstart: PGobject,
+  prstoken: PGobject,
+  prsend: PGobject,
+  prsheadline: PGobject,
+  prslextype: PGobject
 )
 object PgTsParserRowUnsaved {
   implicit val oFormat: OFormat[PgTsParserRowUnsaved] = new OFormat[PgTsParserRowUnsaved]{
@@ -42,11 +43,11 @@ object PgTsParserRowUnsaved {
           PgTsParserRowUnsaved(
             prsname = json.\("prsname").as[String],
             prsnamespace = json.\("prsnamespace").as[Long],
-            prsstart = json.\("prsstart").as[String],
-            prstoken = json.\("prstoken").as[String],
-            prsend = json.\("prsend").as[String],
-            prsheadline = json.\("prsheadline").as[String],
-            prslextype = json.\("prslextype").as[String]
+            prsstart = json.\("prsstart").as[PGobject],
+            prstoken = json.\("prstoken").as[PGobject],
+            prsend = json.\("prsend").as[PGobject],
+            prsheadline = json.\("prsheadline").as[PGobject],
+            prslextype = json.\("prslextype").as[PGobject]
           )
         )
       )

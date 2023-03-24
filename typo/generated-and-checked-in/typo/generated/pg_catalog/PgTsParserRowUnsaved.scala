@@ -9,16 +9,16 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgTsParserRowUnsaved(
   prsname: String,
   prsnamespace: Long,
-  prsstart: Long,
-  prstoken: Long,
-  prsend: Long,
-  prsheadline: Long,
-  prslextype: Long
+  prsstart: PGobject,
+  prstoken: PGobject,
+  prsend: PGobject,
+  prsheadline: PGobject,
+  prslextype: PGobject
 )
 object PgTsParserRowUnsaved {
   

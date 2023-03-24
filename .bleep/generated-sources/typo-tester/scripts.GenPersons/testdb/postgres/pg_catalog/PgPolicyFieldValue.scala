@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 sealed abstract class PgPolicyFieldValue[T](val name: String, val value: T)
 
@@ -18,6 +18,6 @@ object PgPolicyFieldValue {
   case class polcmd(override val value: String) extends PgPolicyFieldValue("polcmd", value)
   case class polpermissive(override val value: Boolean) extends PgPolicyFieldValue("polpermissive", value)
   case class polroles(override val value: Array[Long]) extends PgPolicyFieldValue("polroles", value)
-  case class polqual(override val value: Option[String]) extends PgPolicyFieldValue("polqual", value)
-  case class polwithcheck(override val value: Option[String]) extends PgPolicyFieldValue("polwithcheck", value)
+  case class polqual(override val value: Option[PGobject]) extends PgPolicyFieldValue("polqual", value)
+  case class polwithcheck(override val value: Option[PGobject]) extends PgPolicyFieldValue("polwithcheck", value)
 }

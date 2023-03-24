@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -27,10 +28,10 @@ case class PgDatabaseRow(
   datallowconn: Boolean,
   datconnlimit: Int,
   datlastsysoid: Long,
-  datfrozenxid: String,
-  datminmxid: String,
+  datfrozenxid: Int,
+  datminmxid: Int,
   dattablespace: Long,
-  datacl: Option[Array[String]]
+  datacl: Option[Array[PGobject]]
 )
 
 object PgDatabaseRow {
@@ -47,10 +48,10 @@ object PgDatabaseRow {
         datallowconn = row[Boolean]("datallowconn"),
         datconnlimit = row[Int]("datconnlimit"),
         datlastsysoid = row[Long]("datlastsysoid"),
-        datfrozenxid = row[String]("datfrozenxid"),
-        datminmxid = row[String]("datminmxid"),
+        datfrozenxid = row[Int]("datfrozenxid"),
+        datminmxid = row[Int]("datminmxid"),
         dattablespace = row[Long]("dattablespace"),
-        datacl = row[Option[Array[String]]]("datacl")
+        datacl = row[Option[Array[PGobject]]]("datacl")
       )
     )
   }
@@ -88,10 +89,10 @@ object PgDatabaseRow {
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
             datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[String],
-            datminmxid = json.\("datminmxid").as[String],
+            datfrozenxid = json.\("datfrozenxid").as[Int],
+            datminmxid = json.\("datminmxid").as[Int],
             dattablespace = json.\("dattablespace").as[Long],
-            datacl = json.\("datacl").toOption.map(_.as[Array[String]])
+            datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
           )
         )
       )

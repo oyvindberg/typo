@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgAttributeId(attrelid: Long, attnum: Short)
+case class PgAttributeId(attrelid: Long, attnum: Int)
 object PgAttributeId {
   implicit val ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
   implicit val oFormat: OFormat[PgAttributeId] = new OFormat[PgAttributeId]{
@@ -31,7 +31,7 @@ object PgAttributeId {
         Try(
           PgAttributeId(
             attrelid = json.\("attrelid").as[Long],
-            attnum = json.\("attnum").as[Short]
+            attnum = json.\("attnum").as[Int]
           )
         )
       )
@@ -41,7 +41,7 @@ object PgAttributeId {
     Success(
       PgAttributeId(
         attrelid = row[Long]("attrelid"),
-        attnum = row[Short]("attnum")
+        attnum = row[Int]("attnum")
       )
     )
   }

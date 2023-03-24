@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,7 +23,7 @@ case class PgTriggerRow(
   tgparentid: Long,
   tgname: String,
   tgfoid: Long,
-  tgtype: Short,
+  tgtype: Int,
   tgenabled: String,
   tgisinternal: Boolean,
   tgconstrrelid: Long,
@@ -30,10 +31,10 @@ case class PgTriggerRow(
   tgconstraint: Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
-  tgnargs: Short,
-  tgattr: String,
+  tgnargs: Int,
+  tgattr: Array[Int],
   tgargs: String,
-  tgqual: Option[String],
+  tgqual: Option[PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )
@@ -47,7 +48,7 @@ object PgTriggerRow {
         tgparentid = row[Long]("tgparentid"),
         tgname = row[String]("tgname"),
         tgfoid = row[Long]("tgfoid"),
-        tgtype = row[Short]("tgtype"),
+        tgtype = row[Int]("tgtype"),
         tgenabled = row[String]("tgenabled"),
         tgisinternal = row[Boolean]("tgisinternal"),
         tgconstrrelid = row[Long]("tgconstrrelid"),
@@ -55,10 +56,10 @@ object PgTriggerRow {
         tgconstraint = row[Long]("tgconstraint"),
         tgdeferrable = row[Boolean]("tgdeferrable"),
         tginitdeferred = row[Boolean]("tginitdeferred"),
-        tgnargs = row[Short]("tgnargs"),
-        tgattr = row[String]("tgattr"),
+        tgnargs = row[Int]("tgnargs"),
+        tgattr = row[Array[Int]]("tgattr"),
         tgargs = row[String]("tgargs"),
-        tgqual = row[Option[String]]("tgqual"),
+        tgqual = row[Option[PGobject]]("tgqual"),
         tgoldtable = row[Option[String]]("tgoldtable"),
         tgnewtable = row[Option[String]]("tgnewtable")
       )
@@ -98,7 +99,7 @@ object PgTriggerRow {
             tgparentid = json.\("tgparentid").as[Long],
             tgname = json.\("tgname").as[String],
             tgfoid = json.\("tgfoid").as[Long],
-            tgtype = json.\("tgtype").as[Short],
+            tgtype = json.\("tgtype").as[Int],
             tgenabled = json.\("tgenabled").as[String],
             tgisinternal = json.\("tgisinternal").as[Boolean],
             tgconstrrelid = json.\("tgconstrrelid").as[Long],
@@ -106,10 +107,10 @@ object PgTriggerRow {
             tgconstraint = json.\("tgconstraint").as[Long],
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
-            tgnargs = json.\("tgnargs").as[Short],
-            tgattr = json.\("tgattr").as[String],
+            tgnargs = json.\("tgnargs").as[Int],
+            tgattr = json.\("tgattr").as[Array[Int]],
             tgargs = json.\("tgargs").as[String],
-            tgqual = json.\("tgqual").toOption.map(_.as[String]),
+            tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
           )

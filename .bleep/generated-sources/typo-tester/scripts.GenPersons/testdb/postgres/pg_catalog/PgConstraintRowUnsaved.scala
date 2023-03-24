@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -32,13 +33,13 @@ case class PgConstraintRowUnsaved(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Short]],
-  confkey: Option[Array[Short]],
+  conkey: Option[Array[Int]],
+  confkey: Option[Array[Int]],
   conpfeqop: Option[Array[Long]],
   conppeqop: Option[Array[Long]],
   conffeqop: Option[Array[Long]],
   conexclop: Option[Array[Long]],
-  conbin: Option[String]
+  conbin: Option[PGobject]
 )
 object PgConstraintRowUnsaved {
   implicit val oFormat: OFormat[PgConstraintRowUnsaved] = new OFormat[PgConstraintRowUnsaved]{
@@ -91,13 +92,13 @@ object PgConstraintRowUnsaved {
             conislocal = json.\("conislocal").as[Boolean],
             coninhcount = json.\("coninhcount").as[Int],
             connoinherit = json.\("connoinherit").as[Boolean],
-            conkey = json.\("conkey").toOption.map(_.as[Array[Short]]),
-            confkey = json.\("confkey").toOption.map(_.as[Array[Short]]),
+            conkey = json.\("conkey").toOption.map(_.as[Array[Int]]),
+            confkey = json.\("confkey").toOption.map(_.as[Array[Int]]),
             conpfeqop = json.\("conpfeqop").toOption.map(_.as[Array[Long]]),
             conppeqop = json.\("conppeqop").toOption.map(_.as[Array[Long]]),
             conffeqop = json.\("conffeqop").toOption.map(_.as[Array[Long]]),
             conexclop = json.\("conexclop").toOption.map(_.as[Array[Long]]),
-            conbin = json.\("conbin").toOption.map(_.as[String])
+            conbin = json.\("conbin").toOption.map(_.as[PGobject])
           )
         )
       )

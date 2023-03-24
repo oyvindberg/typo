@@ -9,19 +9,19 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgAggregateRowUnsaved(
   aggkind: String,
-  aggnumdirectargs: Short,
-  aggtransfn: Long,
-  aggfinalfn: Long,
-  aggcombinefn: Long,
-  aggserialfn: Long,
-  aggdeserialfn: Long,
-  aggmtransfn: Long,
-  aggminvtransfn: Long,
-  aggmfinalfn: Long,
+  aggnumdirectargs: Int,
+  aggtransfn: PGobject,
+  aggfinalfn: PGobject,
+  aggcombinefn: PGobject,
+  aggserialfn: PGobject,
+  aggdeserialfn: PGobject,
+  aggmtransfn: PGobject,
+  aggminvtransfn: PGobject,
+  aggmfinalfn: PGobject,
   aggfinalextra: Boolean,
   aggmfinalextra: Boolean,
   aggfinalmodify: String,

@@ -81,7 +81,7 @@ object Gen {
     sc.File(EnumType, str)
   }
 
-  def packageObject(options: Options) = {
+  def packageObject(options: Options): sc.File = {
     val parentPkg = options.pkg.idents.dropRight(1)
     val content =
       code"""|package ${parentPkg.map(_.code).mkCode(".")}
@@ -89,6 +89,8 @@ object Gen {
              |package object ${options.pkg.name} {
              |  ${options.dbLib.missingInstances.mkCode("\n  ")}
              |  ${options.jsonLib.missingInstances.mkCode("\n  ")}
+             |  implicit val pgObjectOrdering: ${sc.Type.Ordering.of(sc.Type.PGobject)} =
+             |    ${sc.Type.Ordering}.by(x => (x.getType, x.getValue))
              |}
              |""".stripMargin
 

@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,8 +21,8 @@ case class PgTsTemplateRow(
   oid: PgTsTemplateId,
   tmplname: String,
   tmplnamespace: Long,
-  tmplinit: String,
-  tmpllexize: String
+  tmplinit: PGobject,
+  tmpllexize: PGobject
 )
 
 object PgTsTemplateRow {
@@ -31,8 +32,8 @@ object PgTsTemplateRow {
         oid = row[PgTsTemplateId]("oid"),
         tmplname = row[String]("tmplname"),
         tmplnamespace = row[Long]("tmplnamespace"),
-        tmplinit = row[String]("tmplinit"),
-        tmpllexize = row[String]("tmpllexize")
+        tmplinit = row[PGobject]("tmplinit"),
+        tmpllexize = row[PGobject]("tmpllexize")
       )
     )
   }
@@ -54,8 +55,8 @@ object PgTsTemplateRow {
             oid = json.\("oid").as[PgTsTemplateId],
             tmplname = json.\("tmplname").as[String],
             tmplnamespace = json.\("tmplnamespace").as[Long],
-            tmplinit = json.\("tmplinit").as[String],
-            tmpllexize = json.\("tmpllexize").as[String]
+            tmplinit = json.\("tmplinit").as[PGobject],
+            tmpllexize = json.\("tmpllexize").as[PGobject]
           )
         )
       )

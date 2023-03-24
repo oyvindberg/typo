@@ -9,17 +9,17 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgStatisticRowUnsaved(
   stanullfrac: Float,
   stawidth: Int,
   stadistinct: Float,
-  stakind1: Short,
-  stakind2: Short,
-  stakind3: Short,
-  stakind4: Short,
-  stakind5: Short,
+  stakind1: Int,
+  stakind2: Int,
+  stakind3: Int,
+  stakind4: Int,
+  stakind5: Int,
   staop1: Long,
   staop2: Long,
   staop3: Long,
@@ -35,11 +35,11 @@ case class PgStatisticRowUnsaved(
   stanumbers3: Option[Array[Float]],
   stanumbers4: Option[Array[Float]],
   stanumbers5: Option[Array[Float]],
-  stavalues1: Option[String],
-  stavalues2: Option[String],
-  stavalues3: Option[String],
-  stavalues4: Option[String],
-  stavalues5: Option[String]
+  stavalues1: Option[PGobject],
+  stavalues2: Option[PGobject],
+  stavalues3: Option[PGobject],
+  stavalues4: Option[PGobject],
+  stavalues5: Option[PGobject]
 )
 object PgStatisticRowUnsaved {
   

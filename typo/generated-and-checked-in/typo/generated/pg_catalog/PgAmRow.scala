@@ -11,11 +11,12 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgAmRow(
   oid: PgAmId,
   amname: String,
-  amhandler: Long,
+  amhandler: PGobject,
   amtype: String
 )
 
@@ -25,7 +26,7 @@ object PgAmRow {
       PgAmRow(
         oid = row[PgAmId]("oid"),
         amname = row[String]("amname"),
-        amhandler = row[Long]("amhandler"),
+        amhandler = row[PGobject]("amhandler"),
         amtype = row[String]("amtype")
       )
     )

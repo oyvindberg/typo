@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,8 +20,8 @@ import scala.util.Try
 case class PgIndexRow(
   indexrelid: PgIndexId,
   indrelid: Long,
-  indnatts: Short,
-  indnkeyatts: Short,
+  indnatts: Int,
+  indnkeyatts: Int,
   indisunique: Boolean,
   indisprimary: Boolean,
   indisexclusion: Boolean,
@@ -31,12 +32,12 @@ case class PgIndexRow(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: String,
-  indcollation: String,
-  indclass: String,
-  indoption: String,
-  indexprs: Option[String],
-  indpred: Option[String]
+  indkey: Array[Int],
+  indcollation: Array[Long],
+  indclass: Array[Long],
+  indoption: Array[Int],
+  indexprs: Option[PGobject],
+  indpred: Option[PGobject]
 )
 
 object PgIndexRow {
@@ -45,8 +46,8 @@ object PgIndexRow {
       PgIndexRow(
         indexrelid = row[PgIndexId]("indexrelid"),
         indrelid = row[Long]("indrelid"),
-        indnatts = row[Short]("indnatts"),
-        indnkeyatts = row[Short]("indnkeyatts"),
+        indnatts = row[Int]("indnatts"),
+        indnkeyatts = row[Int]("indnkeyatts"),
         indisunique = row[Boolean]("indisunique"),
         indisprimary = row[Boolean]("indisprimary"),
         indisexclusion = row[Boolean]("indisexclusion"),
@@ -57,12 +58,12 @@ object PgIndexRow {
         indisready = row[Boolean]("indisready"),
         indislive = row[Boolean]("indislive"),
         indisreplident = row[Boolean]("indisreplident"),
-        indkey = row[String]("indkey"),
-        indcollation = row[String]("indcollation"),
-        indclass = row[String]("indclass"),
-        indoption = row[String]("indoption"),
-        indexprs = row[Option[String]]("indexprs"),
-        indpred = row[Option[String]]("indpred")
+        indkey = row[Array[Int]]("indkey"),
+        indcollation = row[Array[Long]]("indcollation"),
+        indclass = row[Array[Long]]("indclass"),
+        indoption = row[Array[Int]]("indoption"),
+        indexprs = row[Option[PGobject]]("indexprs"),
+        indpred = row[Option[PGobject]]("indpred")
       )
     )
   }
@@ -98,8 +99,8 @@ object PgIndexRow {
           PgIndexRow(
             indexrelid = json.\("indexrelid").as[PgIndexId],
             indrelid = json.\("indrelid").as[Long],
-            indnatts = json.\("indnatts").as[Short],
-            indnkeyatts = json.\("indnkeyatts").as[Short],
+            indnatts = json.\("indnatts").as[Int],
+            indnkeyatts = json.\("indnkeyatts").as[Int],
             indisunique = json.\("indisunique").as[Boolean],
             indisprimary = json.\("indisprimary").as[Boolean],
             indisexclusion = json.\("indisexclusion").as[Boolean],
@@ -110,12 +111,12 @@ object PgIndexRow {
             indisready = json.\("indisready").as[Boolean],
             indislive = json.\("indislive").as[Boolean],
             indisreplident = json.\("indisreplident").as[Boolean],
-            indkey = json.\("indkey").as[String],
-            indcollation = json.\("indcollation").as[String],
-            indclass = json.\("indclass").as[String],
-            indoption = json.\("indoption").as[String],
-            indexprs = json.\("indexprs").toOption.map(_.as[String]),
-            indpred = json.\("indpred").toOption.map(_.as[String])
+            indkey = json.\("indkey").as[Array[Int]],
+            indcollation = json.\("indcollation").as[Array[Long]],
+            indclass = json.\("indclass").as[Array[Long]],
+            indoption = json.\("indoption").as[Array[Int]],
+            indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
+            indpred = json.\("indpred").toOption.map(_.as[PGobject])
           )
         )
       )

@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,8 +19,8 @@ case class PgAmprocRowUnsaved(
   amprocfamily: Long,
   amproclefttype: Long,
   amprocrighttype: Long,
-  amprocnum: Short,
-  amproc: String
+  amprocnum: Int,
+  amproc: PGobject
 )
 object PgAmprocRowUnsaved {
   implicit val oFormat: OFormat[PgAmprocRowUnsaved] = new OFormat[PgAmprocRowUnsaved]{
@@ -39,8 +40,8 @@ object PgAmprocRowUnsaved {
             amprocfamily = json.\("amprocfamily").as[Long],
             amproclefttype = json.\("amproclefttype").as[Long],
             amprocrighttype = json.\("amprocrighttype").as[Long],
-            amprocnum = json.\("amprocnum").as[Short],
-            amproc = json.\("amproc").as[String]
+            amprocnum = json.\("amprocnum").as[Int],
+            amproc = json.\("amproc").as[PGobject]
           )
         )
       )

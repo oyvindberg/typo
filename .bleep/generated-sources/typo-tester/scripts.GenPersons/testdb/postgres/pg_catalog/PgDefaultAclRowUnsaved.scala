@@ -7,6 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,7 +19,7 @@ case class PgDefaultAclRowUnsaved(
   defaclrole: Long,
   defaclnamespace: Long,
   defaclobjtype: String,
-  defaclacl: Array[String]
+  defaclacl: Array[PGobject]
 )
 object PgDefaultAclRowUnsaved {
   implicit val oFormat: OFormat[PgDefaultAclRowUnsaved] = new OFormat[PgDefaultAclRowUnsaved]{
@@ -37,7 +38,7 @@ object PgDefaultAclRowUnsaved {
             defaclrole = json.\("defaclrole").as[Long],
             defaclnamespace = json.\("defaclnamespace").as[Long],
             defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[String]]
+            defaclacl = json.\("defaclacl").as[Array[PGobject]]
           )
         )
       )

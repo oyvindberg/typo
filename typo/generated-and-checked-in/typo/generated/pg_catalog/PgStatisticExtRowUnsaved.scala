@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgStatisticExtRowUnsaved(
   stxrelid: Long,
@@ -17,9 +17,9 @@ case class PgStatisticExtRowUnsaved(
   stxnamespace: Long,
   stxowner: Long,
   stxstattarget: Int,
-  stxkeys: Array[Short],
+  stxkeys: Array[Int],
   stxkind: Array[String],
-  stxexprs: Option[String]
+  stxexprs: Option[PGobject]
 )
 object PgStatisticExtRowUnsaved {
   

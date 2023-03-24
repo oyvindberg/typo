@@ -11,16 +11,17 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTsParserRow(
   oid: PgTsParserId,
   prsname: String,
   prsnamespace: Long,
-  prsstart: Long,
-  prstoken: Long,
-  prsend: Long,
-  prsheadline: Long,
-  prslextype: Long
+  prsstart: PGobject,
+  prstoken: PGobject,
+  prsend: PGobject,
+  prsheadline: PGobject,
+  prslextype: PGobject
 )
 
 object PgTsParserRow {
@@ -30,11 +31,11 @@ object PgTsParserRow {
         oid = row[PgTsParserId]("oid"),
         prsname = row[String]("prsname"),
         prsnamespace = row[Long]("prsnamespace"),
-        prsstart = row[Long]("prsstart"),
-        prstoken = row[Long]("prstoken"),
-        prsend = row[Long]("prsend"),
-        prsheadline = row[Long]("prsheadline"),
-        prslextype = row[Long]("prslextype")
+        prsstart = row[PGobject]("prsstart"),
+        prstoken = row[PGobject]("prstoken"),
+        prsend = row[PGobject]("prsend"),
+        prsheadline = row[PGobject]("prsheadline"),
+        prslextype = row[PGobject]("prslextype")
       )
     )
   }

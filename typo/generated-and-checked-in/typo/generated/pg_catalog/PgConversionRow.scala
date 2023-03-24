@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgConversionRow(
   oid: PgConversionId,
@@ -19,7 +20,7 @@ case class PgConversionRow(
   conowner: Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: Long,
+  conproc: PGobject,
   condefault: Boolean
 )
 
@@ -33,7 +34,7 @@ object PgConversionRow {
         conowner = row[Long]("conowner"),
         conforencoding = row[Int]("conforencoding"),
         contoencoding = row[Int]("contoencoding"),
-        conproc = row[Long]("conproc"),
+        conproc = row[PGobject]("conproc"),
         condefault = row[Boolean]("condefault")
       )
     )

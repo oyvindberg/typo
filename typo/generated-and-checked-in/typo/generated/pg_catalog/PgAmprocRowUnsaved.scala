@@ -9,14 +9,14 @@ package typo
 package generated
 package pg_catalog
 
-
+import org.postgresql.util.PGobject
 
 case class PgAmprocRowUnsaved(
   amprocfamily: Long,
   amproclefttype: Long,
   amprocrighttype: Long,
-  amprocnum: Short,
-  amproc: Long
+  amprocnum: Int,
+  amproc: PGobject
 )
 object PgAmprocRowUnsaved {
   

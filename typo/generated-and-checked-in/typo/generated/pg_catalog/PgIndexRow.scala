@@ -11,12 +11,13 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgIndexRow(
   indexrelid: PgIndexId,
   indrelid: Long,
-  indnatts: Short,
-  indnkeyatts: Short,
+  indnatts: Int,
+  indnkeyatts: Int,
   indisunique: Boolean,
   indisprimary: Boolean,
   indisexclusion: Boolean,
@@ -27,12 +28,12 @@ case class PgIndexRow(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: Array[Short],
+  indkey: Array[Int],
   indcollation: Array[Long],
   indclass: Array[Long],
-  indoption: Array[Short],
-  indexprs: Option[String],
-  indpred: Option[String]
+  indoption: Array[Int],
+  indexprs: Option[PGobject],
+  indpred: Option[PGobject]
 )
 
 object PgIndexRow {
@@ -41,8 +42,8 @@ object PgIndexRow {
       PgIndexRow(
         indexrelid = row[PgIndexId]("indexrelid"),
         indrelid = row[Long]("indrelid"),
-        indnatts = row[Short]("indnatts"),
-        indnkeyatts = row[Short]("indnkeyatts"),
+        indnatts = row[Int]("indnatts"),
+        indnkeyatts = row[Int]("indnkeyatts"),
         indisunique = row[Boolean]("indisunique"),
         indisprimary = row[Boolean]("indisprimary"),
         indisexclusion = row[Boolean]("indisexclusion"),
@@ -53,12 +54,12 @@ object PgIndexRow {
         indisready = row[Boolean]("indisready"),
         indislive = row[Boolean]("indislive"),
         indisreplident = row[Boolean]("indisreplident"),
-        indkey = row[Array[Short]]("indkey"),
+        indkey = row[Array[Int]]("indkey"),
         indcollation = row[Array[Long]]("indcollation"),
         indclass = row[Array[Long]]("indclass"),
-        indoption = row[Array[Short]]("indoption"),
-        indexprs = row[Option[String]]("indexprs"),
-        indpred = row[Option[String]]("indpred")
+        indoption = row[Array[Int]]("indoption"),
+        indexprs = row[Option[PGobject]]("indexprs"),
+        indpred = row[Option[PGobject]]("indpred")
       )
     )
   }

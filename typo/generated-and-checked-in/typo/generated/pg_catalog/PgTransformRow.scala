@@ -11,13 +11,14 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 
 case class PgTransformRow(
   oid: PgTransformId,
   trftype: Long,
   trflang: Long,
-  trffromsql: Long,
-  trftosql: Long
+  trffromsql: PGobject,
+  trftosql: PGobject
 )
 
 object PgTransformRow {
@@ -27,8 +28,8 @@ object PgTransformRow {
         oid = row[PgTransformId]("oid"),
         trftype = row[Long]("trftype"),
         trflang = row[Long]("trflang"),
-        trffromsql = row[Long]("trffromsql"),
-        trftosql = row[Long]("trftosql")
+        trffromsql = row[PGobject]("trffromsql"),
+        trftosql = row[PGobject]("trftosql")
       )
     )
   }
