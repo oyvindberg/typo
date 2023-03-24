@@ -11,14 +11,20 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ViewTableUsageRow(
-  viewCatalog: /* unknown nullability */ Option[String],
-  viewSchema: /* unknown nullability */ Option[String],
-  viewName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String]
+  viewCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_catalog","columnName":"view_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  viewSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_schema","columnName":"view_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  viewName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_name","columnName":"view_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_catalog","columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object ViewTableUsageRow {
@@ -35,5 +41,30 @@ object ViewTableUsageRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ViewTableUsageRow] = new OFormat[ViewTableUsageRow]{
+    override def writes(o: ViewTableUsageRow): JsObject =
+      Json.obj(
+        "view_catalog" -> o.viewCatalog,
+      "view_schema" -> o.viewSchema,
+      "view_name" -> o.viewName,
+      "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName
+      )
+
+    override def reads(json: JsValue): JsResult[ViewTableUsageRow] = {
+      JsResult.fromTry(
+        Try(
+          ViewTableUsageRow(
+            viewCatalog = json.\("view_catalog").toOption.map(_.as[String]),
+            viewSchema = json.\("view_schema").toOption.map(_.as[String]),
+            viewName = json.\("view_name").toOption.map(_.as[String]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,22 +11,28 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatioAllTablesRow(
   /** Points to [[PgClassRow.oid]] */
-  relid: Long,
+  relid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  heapBlksRead: /* unknown nullability */ Option[Long],
-  heapBlksHit: /* unknown nullability */ Option[Long],
-  idxBlksRead: /* unknown nullability */ Option[Long],
-  idxBlksHit: /* unknown nullability */ Option[Long],
-  toastBlksRead: /* unknown nullability */ Option[Long],
-  toastBlksHit: /* unknown nullability */ Option[Long],
-  tidxBlksRead: /* unknown nullability */ Option[Long],
-  tidxBlksHit: /* unknown nullability */ Option[Long]
+  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  heapBlksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"heap_blks_read","columnName":"heap_blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  heapBlksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"heap_blks_hit","columnName":"heap_blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxBlksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_blks_read","columnName":"idx_blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxBlksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_blks_hit","columnName":"idx_blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  toastBlksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"toast_blks_read","columnName":"toast_blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  toastBlksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"toast_blks_hit","columnName":"toast_blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tidxBlksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tidx_blks_read","columnName":"tidx_blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tidxBlksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tidx_blks_hit","columnName":"tidx_blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatioAllTablesRow {
@@ -48,5 +54,40 @@ object PgStatioAllTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatioAllTablesRow] = new OFormat[PgStatioAllTablesRow]{
+    override def writes(o: PgStatioAllTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "heap_blks_read" -> o.heapBlksRead,
+      "heap_blks_hit" -> o.heapBlksHit,
+      "idx_blks_read" -> o.idxBlksRead,
+      "idx_blks_hit" -> o.idxBlksHit,
+      "toast_blks_read" -> o.toastBlksRead,
+      "toast_blks_hit" -> o.toastBlksHit,
+      "tidx_blks_read" -> o.tidxBlksRead,
+      "tidx_blks_hit" -> o.tidxBlksHit
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatioAllTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatioAllTablesRow(
+            relid = json.\("relid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            heapBlksRead = json.\("heap_blks_read").toOption.map(_.as[Long]),
+            heapBlksHit = json.\("heap_blks_hit").toOption.map(_.as[Long]),
+            idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
+            idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long]),
+            toastBlksRead = json.\("toast_blks_read").toOption.map(_.as[Long]),
+            toastBlksHit = json.\("toast_blks_hit").toOption.map(_.as[Long]),
+            tidxBlksRead = json.\("tidx_blks_read").toOption.map(_.as[Long]),
+            tidxBlksHit = json.\("tidx_blks_hit").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

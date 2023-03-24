@@ -12,11 +12,17 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGInterval
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTimezoneAbbrevsRow(
-  abbrev: /* unknown nullability */ Option[String],
-  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval],
-  isDst: /* unknown nullability */ Option[Boolean]
+  abbrev: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"abbrev","columnName":"abbrev","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"utc_offset","columnName":"utc_offset","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
+  isDst: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_dst","columnName":"is_dst","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
 )
 
 object PgTimezoneAbbrevsRow {
@@ -30,5 +36,24 @@ object PgTimezoneAbbrevsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTimezoneAbbrevsRow] = new OFormat[PgTimezoneAbbrevsRow]{
+    override def writes(o: PgTimezoneAbbrevsRow): JsObject =
+      Json.obj(
+        "abbrev" -> o.abbrev,
+      "utc_offset" -> o.utcOffset,
+      "is_dst" -> o.isDst
+      )
+
+    override def reads(json: JsValue): JsResult[PgTimezoneAbbrevsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTimezoneAbbrevsRow(
+            abbrev = json.\("abbrev").toOption.map(_.as[String]),
+            utcOffset = json.\("utc_offset").toOption.map(_.as[/* interval */ PGInterval]),
+            isDst = json.\("is_dst").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

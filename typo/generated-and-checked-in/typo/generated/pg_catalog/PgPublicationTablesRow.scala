@@ -11,14 +11,20 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPublicationTablesRow(
   /** Points to [[PgPublicationRow.pubname]] */
-  pubname: String,
+  pubname: String /* {"baseColumnName":"pubname","baseRelationName":"pg_catalog.pg_publication","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"pubname","columnName":"pubname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_publication"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */
 )
 
 object PgPublicationTablesRow {
@@ -32,5 +38,24 @@ object PgPublicationTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPublicationTablesRow] = new OFormat[PgPublicationTablesRow]{
+    override def writes(o: PgPublicationTablesRow): JsObject =
+      Json.obj(
+        "pubname" -> o.pubname,
+      "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename
+      )
+
+    override def reads(json: JsValue): JsResult[PgPublicationTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPublicationTablesRow(
+            pubname = json.\("pubname").as[String],
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String]
+          )
+        )
+      )
+    }
+  }
 }

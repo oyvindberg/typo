@@ -13,6 +13,7 @@ projects:
     dependencies:
       - org.postgresql:postgresql:42.5.4
       - org.playframework.anorm::anorm:2.7.0
+      - com.typesafe.play::play-json:2.10.0-RC7
     platform:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in

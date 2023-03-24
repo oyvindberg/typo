@@ -11,13 +11,19 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class DataTypePrivilegesRow(
-  objectCatalog: /* unknown nullability */ Option[String],
-  objectSchema: /* unknown nullability */ Option[String],
-  objectName: /* unknown nullability */ Option[String],
-  objectType: /* unknown nullability */ Option[String],
-  dtdIdentifier: /* unknown nullability */ Option[String]
+  objectCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_catalog","columnName":"object_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  objectSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_schema","columnName":"object_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  objectName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_name","columnName":"object_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  objectType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_type","columnName":"object_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  dtdIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"dtd_identifier","columnName":"dtd_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object DataTypePrivilegesRow {
@@ -33,5 +39,28 @@ object DataTypePrivilegesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[DataTypePrivilegesRow] = new OFormat[DataTypePrivilegesRow]{
+    override def writes(o: DataTypePrivilegesRow): JsObject =
+      Json.obj(
+        "object_catalog" -> o.objectCatalog,
+      "object_schema" -> o.objectSchema,
+      "object_name" -> o.objectName,
+      "object_type" -> o.objectType,
+      "dtd_identifier" -> o.dtdIdentifier
+      )
+
+    override def reads(json: JsValue): JsResult[DataTypePrivilegesRow] = {
+      JsResult.fromTry(
+        Try(
+          DataTypePrivilegesRow(
+            objectCatalog = json.\("object_catalog").toOption.map(_.as[String]),
+            objectSchema = json.\("object_schema").toOption.map(_.as[String]),
+            objectName = json.\("object_name").toOption.map(_.as[String]),
+            objectType = json.\("object_type").toOption.map(_.as[String]),
+            dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

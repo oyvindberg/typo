@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatUserFunctionsRow(
   /** Points to [[PgProcRow.oid]] */
-  funcid: Long,
+  funcid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_proc","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"funcid","columnName":"funcid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_proc"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgProcRow.proname]] */
-  funcname: String,
-  calls: /* unknown nullability */ Option[Long],
-  totalTime: /* unknown nullability */ Option[Double],
-  selfTime: /* unknown nullability */ Option[Double]
+  funcname: String /* {"baseColumnName":"proname","baseRelationName":"pg_catalog.pg_proc","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"funcname","columnName":"funcname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_proc"} */,
+  calls: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"calls","columnName":"calls","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  totalTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"total_time","columnName":"total_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  selfTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"self_time","columnName":"self_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */
 )
 
 object PgStatUserFunctionsRow {
@@ -38,5 +44,30 @@ object PgStatUserFunctionsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatUserFunctionsRow] = new OFormat[PgStatUserFunctionsRow]{
+    override def writes(o: PgStatUserFunctionsRow): JsObject =
+      Json.obj(
+        "funcid" -> o.funcid,
+      "schemaname" -> o.schemaname,
+      "funcname" -> o.funcname,
+      "calls" -> o.calls,
+      "total_time" -> o.totalTime,
+      "self_time" -> o.selfTime
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatUserFunctionsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatUserFunctionsRow(
+            funcid = json.\("funcid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            funcname = json.\("funcname").as[String],
+            calls = json.\("calls").toOption.map(_.as[Long]),
+            totalTime = json.\("total_time").toOption.map(_.as[Double]),
+            selfTime = json.\("self_time").toOption.map(_.as[Double])
+          )
+        )
+      )
+    }
+  }
 }

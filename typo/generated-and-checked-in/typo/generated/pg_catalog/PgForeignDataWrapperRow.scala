@@ -12,15 +12,21 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgForeignDataWrapperRow(
-  oid: PgForeignDataWrapperId,
-  fdwname: String,
-  fdwowner: Long,
-  fdwhandler: Long,
-  fdwvalidator: Long,
-  fdwacl: Option[Array[PGobject]],
-  fdwoptions: Option[Array[String]]
+  oid: PgForeignDataWrapperId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwowner","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwhandler: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwhandler","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwvalidator: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwvalidator","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwacl","ordinal_position":6,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  fdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_foreign_data_wrapper","column_name":"fdwoptions","ordinal_position":7,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgForeignDataWrapperRow {
@@ -38,5 +44,32 @@ object PgForeignDataWrapperRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgForeignDataWrapperRow] = new OFormat[PgForeignDataWrapperRow]{
+    override def writes(o: PgForeignDataWrapperRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "fdwname" -> o.fdwname,
+      "fdwowner" -> o.fdwowner,
+      "fdwhandler" -> o.fdwhandler,
+      "fdwvalidator" -> o.fdwvalidator,
+      "fdwacl" -> o.fdwacl,
+      "fdwoptions" -> o.fdwoptions
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignDataWrapperRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignDataWrapperRow(
+            oid = json.\("oid").as[PgForeignDataWrapperId],
+            fdwname = json.\("fdwname").as[String],
+            fdwowner = json.\("fdwowner").as[Long],
+            fdwhandler = json.\("fdwhandler").as[Long],
+            fdwvalidator = json.\("fdwvalidator").as[Long],
+            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[PGobject]]),
+            fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

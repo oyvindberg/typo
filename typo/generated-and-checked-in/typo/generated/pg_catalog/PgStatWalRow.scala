@@ -12,18 +12,24 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 import scala.math.BigDecimal
+import scala.util.Try
 
 case class PgStatWalRow(
-  walRecords: /* unknown nullability */ Option[Long],
-  walFpi: /* unknown nullability */ Option[Long],
-  walBytes: /* unknown nullability */ Option[BigDecimal],
-  walBuffersFull: /* unknown nullability */ Option[Long],
-  walWrite: /* unknown nullability */ Option[Long],
-  walSync: /* unknown nullability */ Option[Long],
-  walWriteTime: /* unknown nullability */ Option[Double],
-  walSyncTime: /* unknown nullability */ Option[Double],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  walRecords: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_records","columnName":"wal_records","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  walFpi: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_fpi","columnName":"wal_fpi","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  walBytes: /* unknown nullability */ Option[BigDecimal] /* {"columnClassName":"java.math.BigDecimal","columnDisplaySize":131089,"columnLabel":"wal_bytes","columnName":"wal_bytes","columnType":"Numeric","columnTypeName":"numeric","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":0,"scale":0} */,
+  walBuffersFull: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_buffers_full","columnName":"wal_buffers_full","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  walWrite: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_write","columnName":"wal_write","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  walSync: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_sync","columnName":"wal_sync","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  walWriteTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"wal_write_time","columnName":"wal_write_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  walSyncTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"wal_sync_time","columnName":"wal_sync_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatWalRow {
@@ -43,5 +49,36 @@ object PgStatWalRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatWalRow] = new OFormat[PgStatWalRow]{
+    override def writes(o: PgStatWalRow): JsObject =
+      Json.obj(
+        "wal_records" -> o.walRecords,
+      "wal_fpi" -> o.walFpi,
+      "wal_bytes" -> o.walBytes,
+      "wal_buffers_full" -> o.walBuffersFull,
+      "wal_write" -> o.walWrite,
+      "wal_sync" -> o.walSync,
+      "wal_write_time" -> o.walWriteTime,
+      "wal_sync_time" -> o.walSyncTime,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatWalRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatWalRow(
+            walRecords = json.\("wal_records").toOption.map(_.as[Long]),
+            walFpi = json.\("wal_fpi").toOption.map(_.as[Long]),
+            walBytes = json.\("wal_bytes").toOption.map(_.as[BigDecimal]),
+            walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as[Long]),
+            walWrite = json.\("wal_write").toOption.map(_.as[Long]),
+            walSync = json.\("wal_sync").toOption.map(_.as[Long]),
+            walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
+            walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

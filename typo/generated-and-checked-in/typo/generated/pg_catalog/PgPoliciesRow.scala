@@ -11,19 +11,25 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPoliciesRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String,
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgPolicyRow.polname]] */
-  policyname: String,
-  permissive: /* unknown nullability */ Option[String],
-  roles: /* unknown nullability */ Option[Array[String]],
-  cmd: /* unknown nullability */ Option[String],
-  qual: /* unknown nullability */ Option[String],
-  withCheck: /* unknown nullability */ Option[String]
+  policyname: String /* {"baseColumnName":"polname","baseRelationName":"pg_catalog.pg_policy","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"policyname","columnName":"policyname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_policy"} */,
+  permissive: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"permissive","columnName":"permissive","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  roles: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"roles","columnName":"roles","columnType":"Array","columnTypeName":"_name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  cmd: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"cmd","columnName":"cmd","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  qual: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"qual","columnName":"qual","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  withCheck: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"with_check","columnName":"with_check","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgPoliciesRow {
@@ -42,5 +48,34 @@ object PgPoliciesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPoliciesRow] = new OFormat[PgPoliciesRow]{
+    override def writes(o: PgPoliciesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "policyname" -> o.policyname,
+      "permissive" -> o.permissive,
+      "roles" -> o.roles,
+      "cmd" -> o.cmd,
+      "qual" -> o.qual,
+      "with_check" -> o.withCheck
+      )
+
+    override def reads(json: JsValue): JsResult[PgPoliciesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPoliciesRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            policyname = json.\("policyname").as[String],
+            permissive = json.\("permissive").toOption.map(_.as[String]),
+            roles = json.\("roles").toOption.map(_.as[Array[String]]),
+            cmd = json.\("cmd").toOption.map(_.as[String]),
+            qual = json.\("qual").toOption.map(_.as[String]),
+            withCheck = json.\("with_check").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

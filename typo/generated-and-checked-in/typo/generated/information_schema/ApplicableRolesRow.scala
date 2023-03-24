@@ -11,11 +11,17 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ApplicableRolesRow(
-  grantee: /* unknown nullability */ Option[String],
-  roleName: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String]
+  grantee: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantee","columnName":"grantee","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  roleName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"role_name","columnName":"role_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isGrantable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_grantable","columnName":"is_grantable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
 )
 
 object ApplicableRolesRow {
@@ -29,5 +35,24 @@ object ApplicableRolesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ApplicableRolesRow] = new OFormat[ApplicableRolesRow]{
+    override def writes(o: ApplicableRolesRow): JsObject =
+      Json.obj(
+        "grantee" -> o.grantee,
+      "role_name" -> o.roleName,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[ApplicableRolesRow] = {
+      JsResult.fromTry(
+        Try(
+          ApplicableRolesRow(
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            roleName = json.\("role_name").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

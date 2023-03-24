@@ -11,24 +11,30 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoleColumnGrantsRow(
   /** Points to [[ColumnPrivilegesRow.grantor]] */
-  grantor: Option[String],
+  grantor: Option[String] /* {"baseColumnName":"grantor","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantor","columnName":"grantor","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.grantee]] */
-  grantee: Option[String],
+  grantee: Option[String] /* {"baseColumnName":"grantee","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantee","columnName":"grantee","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.tableCatalog]] */
-  tableCatalog: Option[String],
+  tableCatalog: Option[String] /* {"baseColumnName":"table_catalog","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_catalog","columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.tableSchema]] */
-  tableSchema: Option[String],
+  tableSchema: Option[String] /* {"baseColumnName":"table_schema","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.tableName]] */
-  tableName: Option[String],
+  tableName: Option[String] /* {"baseColumnName":"table_name","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.columnName]] */
-  columnName: Option[String],
+  columnName: Option[String] /* {"baseColumnName":"column_name","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"column_name","columnName":"column_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.privilegeType]] */
-  privilegeType: Option[String],
+  privilegeType: Option[String] /* {"baseColumnName":"privilege_type","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"privilege_type","columnName":"privilege_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"column_privileges"} */,
   /** Points to [[ColumnPrivilegesRow.isGrantable]] */
-  isGrantable: Option[String]
+  isGrantable: Option[String] /* {"baseColumnName":"is_grantable","baseRelationName":"information_schema.column_privileges","columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_grantable","columnName":"is_grantable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0,"tableName":"column_privileges"} */
 )
 
 object RoleColumnGrantsRow {
@@ -47,5 +53,34 @@ object RoleColumnGrantsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[RoleColumnGrantsRow] = new OFormat[RoleColumnGrantsRow]{
+    override def writes(o: RoleColumnGrantsRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "column_name" -> o.columnName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[RoleColumnGrantsRow] = {
+      JsResult.fromTry(
+        Try(
+          RoleColumnGrantsRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            columnName = json.\("column_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

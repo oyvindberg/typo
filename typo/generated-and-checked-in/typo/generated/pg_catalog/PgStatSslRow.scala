@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 import scala.math.BigDecimal
+import scala.util.Try
 
 case class PgStatSslRow(
-  pid: /* unknown nullability */ Option[Int],
-  ssl: /* unknown nullability */ Option[Boolean],
-  version: /* unknown nullability */ Option[String],
-  cipher: /* unknown nullability */ Option[String],
-  bits: /* unknown nullability */ Option[Int],
-  clientDn: /* unknown nullability */ Option[String],
-  clientSerial: /* unknown nullability */ Option[BigDecimal],
-  issuerDn: /* unknown nullability */ Option[String]
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  ssl: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"ssl","columnName":"ssl","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  version: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"version","columnName":"version","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  cipher: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"cipher","columnName":"cipher","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  bits: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"bits","columnName":"bits","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  clientDn: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"client_dn","columnName":"client_dn","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  clientSerial: /* unknown nullability */ Option[BigDecimal] /* {"columnClassName":"java.math.BigDecimal","columnDisplaySize":131089,"columnLabel":"client_serial","columnName":"client_serial","columnType":"Numeric","columnTypeName":"numeric","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":0,"scale":0} */,
+  issuerDn: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"issuer_dn","columnName":"issuer_dn","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgStatSslRow {
@@ -40,5 +46,34 @@ object PgStatSslRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatSslRow] = new OFormat[PgStatSslRow]{
+    override def writes(o: PgStatSslRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "ssl" -> o.ssl,
+      "version" -> o.version,
+      "cipher" -> o.cipher,
+      "bits" -> o.bits,
+      "client_dn" -> o.clientDn,
+      "client_serial" -> o.clientSerial,
+      "issuer_dn" -> o.issuerDn
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatSslRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatSslRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            ssl = json.\("ssl").toOption.map(_.as[Boolean]),
+            version = json.\("version").toOption.map(_.as[String]),
+            cipher = json.\("cipher").toOption.map(_.as[String]),
+            bits = json.\("bits").toOption.map(_.as[Int]),
+            clientDn = json.\("client_dn").toOption.map(_.as[String]),
+            clientSerial = json.\("client_serial").toOption.map(_.as[BigDecimal]),
+            issuerDn = json.\("issuer_dn").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

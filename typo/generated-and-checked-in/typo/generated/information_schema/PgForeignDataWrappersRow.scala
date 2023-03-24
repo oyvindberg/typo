@@ -11,19 +11,25 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 import typo.generated.pg_catalog.PgForeignDataWrapperRow
 
 case class PgForeignDataWrappersRow(
   /** Points to [[PgForeignDataWrapperRow.oid]] */
-  oid: Long,
+  oid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"oid","columnName":"oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
   /** Points to [[PgForeignDataWrapperRow.fdwowner]] */
-  fdwowner: Long,
+  fdwowner: Long /* {"baseColumnName":"fdwowner","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"fdwowner","columnName":"fdwowner","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
   /** Points to [[PgForeignDataWrapperRow.fdwoptions]] */
-  fdwoptions: Option[Array[String]],
-  foreignDataWrapperCatalog: /* unknown nullability */ Option[String],
-  foreignDataWrapperName: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String],
-  foreignDataWrapperLanguage: /* unknown nullability */ Option[String]
+  fdwoptions: Option[Array[String]] /* {"baseColumnName":"fdwoptions","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"fdwoptions","columnName":"fdwoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
+  foreignDataWrapperCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_catalog","columnName":"foreign_data_wrapper_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignDataWrapperName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_name","columnName":"foreign_data_wrapper_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  authorizationIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignDataWrapperLanguage: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_language","columnName":"foreign_data_wrapper_language","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgForeignDataWrappersRow {
@@ -41,5 +47,32 @@ object PgForeignDataWrappersRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgForeignDataWrappersRow] = new OFormat[PgForeignDataWrappersRow]{
+    override def writes(o: PgForeignDataWrappersRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "fdwowner" -> o.fdwowner,
+      "fdwoptions" -> o.fdwoptions,
+      "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
+      "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
+      "authorization_identifier" -> o.authorizationIdentifier,
+      "foreign_data_wrapper_language" -> o.foreignDataWrapperLanguage
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignDataWrappersRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignDataWrappersRow(
+            oid = json.\("oid").as[Long],
+            fdwowner = json.\("fdwowner").as[Long],
+            fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
+            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
+            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
+            foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

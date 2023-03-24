@@ -11,21 +11,27 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatAllIndexesRow(
   /** Points to [[PgClassRow.oid]] */
-  relid: Long,
+  relid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.oid]] */
-  indexrelid: Long,
+  indexrelid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"indexrelid","columnName":"indexrelid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  relname: String,
+  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.relname]] */
-  indexrelname: String,
-  idxScan: /* unknown nullability */ Option[Long],
-  idxTupRead: /* unknown nullability */ Option[Long],
-  idxTupFetch: /* unknown nullability */ Option[Long]
+  indexrelname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexrelname","columnName":"indexrelname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  idxScan: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_scan","columnName":"idx_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxTupRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_read","columnName":"idx_tup_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxTupFetch: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_fetch","columnName":"idx_tup_fetch","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatAllIndexesRow {
@@ -44,5 +50,34 @@ object PgStatAllIndexesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatAllIndexesRow] = new OFormat[PgStatAllIndexesRow]{
+    override def writes(o: PgStatAllIndexesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "indexrelid" -> o.indexrelid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "indexrelname" -> o.indexrelname,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_read" -> o.idxTupRead,
+      "idx_tup_fetch" -> o.idxTupFetch
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatAllIndexesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatAllIndexesRow(
+            relid = json.\("relid").as[Long],
+            indexrelid = json.\("indexrelid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            indexrelname = json.\("indexrelname").as[String],
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupRead = json.\("idx_tup_read").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

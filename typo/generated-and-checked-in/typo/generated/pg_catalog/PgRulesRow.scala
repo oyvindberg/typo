@@ -11,15 +11,21 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgRulesRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String,
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgRewriteRow.rulename]] */
-  rulename: String,
-  definition: /* unknown nullability */ Option[String]
+  rulename: String /* {"baseColumnName":"rulename","baseRelationName":"pg_catalog.pg_rewrite","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"rulename","columnName":"rulename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_rewrite"} */,
+  definition: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"definition","columnName":"definition","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgRulesRow {
@@ -34,5 +40,26 @@ object PgRulesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgRulesRow] = new OFormat[PgRulesRow]{
+    override def writes(o: PgRulesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "rulename" -> o.rulename,
+      "definition" -> o.definition
+      )
+
+    override def reads(json: JsValue): JsResult[PgRulesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgRulesRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            rulename = json.\("rulename").as[String],
+            definition = json.\("definition").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

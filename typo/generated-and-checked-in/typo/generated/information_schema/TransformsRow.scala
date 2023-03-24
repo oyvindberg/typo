@@ -11,16 +11,22 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TransformsRow(
-  udtCatalog: /* unknown nullability */ Option[String],
-  udtSchema: /* unknown nullability */ Option[String],
-  udtName: /* unknown nullability */ Option[String],
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String],
-  groupName: /* unknown nullability */ Option[String],
-  transformType: /* unknown nullability */ Option[String]
+  udtCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_catalog","columnName":"udt_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  udtSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_schema","columnName":"udt_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  udtName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_name","columnName":"udt_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  specificCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"specific_catalog","columnName":"specific_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  specificSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"specific_schema","columnName":"specific_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  specificName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"specific_name","columnName":"specific_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  groupName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"group_name","columnName":"group_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  transformType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"transform_type","columnName":"transform_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object TransformsRow {
@@ -39,5 +45,34 @@ object TransformsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[TransformsRow] = new OFormat[TransformsRow]{
+    override def writes(o: TransformsRow): JsObject =
+      Json.obj(
+        "udt_catalog" -> o.udtCatalog,
+      "udt_schema" -> o.udtSchema,
+      "udt_name" -> o.udtName,
+      "specific_catalog" -> o.specificCatalog,
+      "specific_schema" -> o.specificSchema,
+      "specific_name" -> o.specificName,
+      "group_name" -> o.groupName,
+      "transform_type" -> o.transformType
+      )
+
+    override def reads(json: JsValue): JsResult[TransformsRow] = {
+      JsResult.fromTry(
+        Try(
+          TransformsRow(
+            udtCatalog = json.\("udt_catalog").toOption.map(_.as[String]),
+            udtSchema = json.\("udt_schema").toOption.map(_.as[String]),
+            udtName = json.\("udt_name").toOption.map(_.as[String]),
+            specificCatalog = json.\("specific_catalog").toOption.map(_.as[String]),
+            specificSchema = json.\("specific_schema").toOption.map(_.as[String]),
+            specificName = json.\("specific_name").toOption.map(_.as[String]),
+            groupName = json.\("group_name").toOption.map(_.as[String]),
+            transformType = json.\("transform_type").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

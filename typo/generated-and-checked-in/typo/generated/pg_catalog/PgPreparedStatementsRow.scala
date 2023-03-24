@@ -12,15 +12,21 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPreparedStatementsRow(
-  name: /* unknown nullability */ Option[String],
-  statement: /* unknown nullability */ Option[String],
-  prepareTime: /* unknown nullability */ Option[LocalDateTime],
-  parameterTypes: /* unknown nullability */ Option[Array[String]],
-  fromSql: /* unknown nullability */ Option[Boolean],
-  genericPlans: /* unknown nullability */ Option[Long],
-  customPlans: /* unknown nullability */ Option[Long]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  statement: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statement","columnName":"statement","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  prepareTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"prepare_time","columnName":"prepare_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  parameterTypes: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"parameter_types","columnName":"parameter_types","columnType":"Array","columnTypeName":"_regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  fromSql: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"from_sql","columnName":"from_sql","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  genericPlans: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"generic_plans","columnName":"generic_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  customPlans: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"custom_plans","columnName":"custom_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgPreparedStatementsRow {
@@ -38,5 +44,32 @@ object PgPreparedStatementsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPreparedStatementsRow] = new OFormat[PgPreparedStatementsRow]{
+    override def writes(o: PgPreparedStatementsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "statement" -> o.statement,
+      "prepare_time" -> o.prepareTime,
+      "parameter_types" -> o.parameterTypes,
+      "from_sql" -> o.fromSql,
+      "generic_plans" -> o.genericPlans,
+      "custom_plans" -> o.customPlans
+      )
+
+    override def reads(json: JsValue): JsResult[PgPreparedStatementsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPreparedStatementsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            statement = json.\("statement").toOption.map(_.as[String]),
+            prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[String]]),
+            fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
+            genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
+            customPlans = json.\("custom_plans").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

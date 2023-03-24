@@ -12,40 +12,46 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTypeRow(
-  oid: PgTypeId,
-  typname: String,
-  typnamespace: Long,
-  typowner: Long,
-  typlen: Int,
-  typbyval: Boolean,
-  typtype: String,
-  typcategory: String,
-  typispreferred: Boolean,
-  typisdefined: Boolean,
-  typdelim: String,
-  typrelid: Long,
-  typsubscript: PGobject,
-  typelem: Long,
-  typarray: Long,
-  typinput: PGobject,
-  typoutput: PGobject,
-  typreceive: PGobject,
-  typsend: PGobject,
-  typmodin: PGobject,
-  typmodout: PGobject,
-  typanalyze: PGobject,
-  typalign: String,
-  typstorage: String,
-  typnotnull: Boolean,
-  typbasetype: Long,
-  typtypmod: Int,
-  typndims: Int,
-  typcollation: Long,
-  typdefaultbin: Option[PGobject],
-  typdefault: Option[String],
-  typacl: Option[Array[PGobject]]
+  oid: PgTypeId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typlen: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typlen","ordinal_position":5,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typbyval: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typbyval","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typtype: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typtype","ordinal_position":7,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typcategory: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typcategory","ordinal_position":8,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typispreferred: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typispreferred","ordinal_position":9,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typisdefined: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typisdefined","ordinal_position":10,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typdelim: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typdelim","ordinal_position":11,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typrelid","ordinal_position":12,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typsubscript: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typsubscript","ordinal_position":13,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typelem: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typelem","ordinal_position":14,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typarray: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typarray","ordinal_position":15,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typinput: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typinput","ordinal_position":16,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typoutput: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typoutput","ordinal_position":17,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typreceive: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typreceive","ordinal_position":18,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typsend: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typsend","ordinal_position":19,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typmodin: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typmodin","ordinal_position":20,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typmodout: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typmodout","ordinal_position":21,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typanalyze: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typanalyze","ordinal_position":22,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typalign: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typalign","ordinal_position":23,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typstorage: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typstorage","ordinal_position":24,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typnotnull: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typnotnull","ordinal_position":25,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typbasetype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typbasetype","ordinal_position":26,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typtypmod: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typtypmod","ordinal_position":27,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typndims: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typndims","ordinal_position":28,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typcollation: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typcollation","ordinal_position":29,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typdefaultbin: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typdefaultbin","ordinal_position":30,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typdefault: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typdefault","ordinal_position":31,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"31","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  typacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_type","column_name":"typacl","ordinal_position":32,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"32","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgTypeRow {
@@ -88,5 +94,82 @@ object PgTypeRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTypeRow] = new OFormat[PgTypeRow]{
+    override def writes(o: PgTypeRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "typname" -> o.typname,
+      "typnamespace" -> o.typnamespace,
+      "typowner" -> o.typowner,
+      "typlen" -> o.typlen,
+      "typbyval" -> o.typbyval,
+      "typtype" -> o.typtype,
+      "typcategory" -> o.typcategory,
+      "typispreferred" -> o.typispreferred,
+      "typisdefined" -> o.typisdefined,
+      "typdelim" -> o.typdelim,
+      "typrelid" -> o.typrelid,
+      "typsubscript" -> o.typsubscript,
+      "typelem" -> o.typelem,
+      "typarray" -> o.typarray,
+      "typinput" -> o.typinput,
+      "typoutput" -> o.typoutput,
+      "typreceive" -> o.typreceive,
+      "typsend" -> o.typsend,
+      "typmodin" -> o.typmodin,
+      "typmodout" -> o.typmodout,
+      "typanalyze" -> o.typanalyze,
+      "typalign" -> o.typalign,
+      "typstorage" -> o.typstorage,
+      "typnotnull" -> o.typnotnull,
+      "typbasetype" -> o.typbasetype,
+      "typtypmod" -> o.typtypmod,
+      "typndims" -> o.typndims,
+      "typcollation" -> o.typcollation,
+      "typdefaultbin" -> o.typdefaultbin,
+      "typdefault" -> o.typdefault,
+      "typacl" -> o.typacl
+      )
+
+    override def reads(json: JsValue): JsResult[PgTypeRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTypeRow(
+            oid = json.\("oid").as[PgTypeId],
+            typname = json.\("typname").as[String],
+            typnamespace = json.\("typnamespace").as[Long],
+            typowner = json.\("typowner").as[Long],
+            typlen = json.\("typlen").as[Int],
+            typbyval = json.\("typbyval").as[Boolean],
+            typtype = json.\("typtype").as[String],
+            typcategory = json.\("typcategory").as[String],
+            typispreferred = json.\("typispreferred").as[Boolean],
+            typisdefined = json.\("typisdefined").as[Boolean],
+            typdelim = json.\("typdelim").as[String],
+            typrelid = json.\("typrelid").as[Long],
+            typsubscript = json.\("typsubscript").as[PGobject],
+            typelem = json.\("typelem").as[Long],
+            typarray = json.\("typarray").as[Long],
+            typinput = json.\("typinput").as[PGobject],
+            typoutput = json.\("typoutput").as[PGobject],
+            typreceive = json.\("typreceive").as[PGobject],
+            typsend = json.\("typsend").as[PGobject],
+            typmodin = json.\("typmodin").as[PGobject],
+            typmodout = json.\("typmodout").as[PGobject],
+            typanalyze = json.\("typanalyze").as[PGobject],
+            typalign = json.\("typalign").as[String],
+            typstorage = json.\("typstorage").as[String],
+            typnotnull = json.\("typnotnull").as[Boolean],
+            typbasetype = json.\("typbasetype").as[Long],
+            typtypmod = json.\("typtypmod").as[Int],
+            typndims = json.\("typndims").as[Int],
+            typcollation = json.\("typcollation").as[Long],
+            typdefaultbin = json.\("typdefaultbin").toOption.map(_.as[PGobject]),
+            typdefault = json.\("typdefault").toOption.map(_.as[String]),
+            typacl = json.\("typacl").toOption.map(_.as[Array[PGobject]])
+          )
+        )
+      )
+    }
+  }
 }

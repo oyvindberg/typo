@@ -11,12 +11,18 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class SqlSizingRow(
-  sizingId: Option[Int],
-  sizingName: Option[String],
-  supportedValue: Option[Int],
-  comments: Option[String]
+  sizingId: Option[Int] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"sql_sizing","column_name":"sizing_id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  sizingName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"sql_sizing","column_name":"sizing_name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  supportedValue: Option[Int] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"sql_sizing","column_name":"supported_value","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  comments: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"sql_sizing","column_name":"comments","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object SqlSizingRow {
@@ -31,5 +37,26 @@ object SqlSizingRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[SqlSizingRow] = new OFormat[SqlSizingRow]{
+    override def writes(o: SqlSizingRow): JsObject =
+      Json.obj(
+        "sizing_id" -> o.sizingId,
+      "sizing_name" -> o.sizingName,
+      "supported_value" -> o.supportedValue,
+      "comments" -> o.comments
+      )
+
+    override def reads(json: JsValue): JsResult[SqlSizingRow] = {
+      JsResult.fromTry(
+        Try(
+          SqlSizingRow(
+            sizingId = json.\("sizing_id").toOption.map(_.as[Int]),
+            sizingName = json.\("sizing_name").toOption.map(_.as[String]),
+            supportedValue = json.\("supported_value").toOption.map(_.as[Int]),
+            comments = json.\("comments").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

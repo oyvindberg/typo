@@ -11,19 +11,25 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 import typo.generated.pg_catalog.PgAttributeRow
 import typo.generated.pg_catalog.PgClassRow
 import typo.generated.pg_catalog.PgNamespaceRow
 
 case class PgForeignTableColumnsRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  nspname: String,
+  nspname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"nspname","columnName":"nspname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  relname: String,
+  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgAttributeRow.attname]] */
-  attname: String,
+  attname: String /* {"baseColumnName":"attname","baseRelationName":"pg_catalog.pg_attribute","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"attname","columnName":"attname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_attribute"} */,
   /** Points to [[PgAttributeRow.attfdwoptions]] */
-  attfdwoptions: Option[Array[String]]
+  attfdwoptions: Option[Array[String]] /* {"baseColumnName":"attfdwoptions","baseRelationName":"pg_catalog.pg_attribute","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"attfdwoptions","columnName":"attfdwoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_attribute"} */
 )
 
 object PgForeignTableColumnsRow {
@@ -38,5 +44,26 @@ object PgForeignTableColumnsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgForeignTableColumnsRow] = new OFormat[PgForeignTableColumnsRow]{
+    override def writes(o: PgForeignTableColumnsRow): JsObject =
+      Json.obj(
+        "nspname" -> o.nspname,
+      "relname" -> o.relname,
+      "attname" -> o.attname,
+      "attfdwoptions" -> o.attfdwoptions
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignTableColumnsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignTableColumnsRow(
+            nspname = json.\("nspname").as[String],
+            relname = json.\("relname").as[String],
+            attname = json.\("attname").as[String],
+            attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

@@ -12,14 +12,20 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgCursorsRow(
-  name: /* unknown nullability */ Option[String],
-  statement: /* unknown nullability */ Option[String],
-  isHoldable: /* unknown nullability */ Option[Boolean],
-  isBinary: /* unknown nullability */ Option[Boolean],
-  isScrollable: /* unknown nullability */ Option[Boolean],
-  creationTime: /* unknown nullability */ Option[LocalDateTime]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  statement: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statement","columnName":"statement","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isHoldable: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_holdable","columnName":"is_holdable","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  isBinary: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_binary","columnName":"is_binary","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  isScrollable: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_scrollable","columnName":"is_scrollable","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  creationTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"creation_time","columnName":"creation_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgCursorsRow {
@@ -36,5 +42,30 @@ object PgCursorsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgCursorsRow] = new OFormat[PgCursorsRow]{
+    override def writes(o: PgCursorsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "statement" -> o.statement,
+      "is_holdable" -> o.isHoldable,
+      "is_binary" -> o.isBinary,
+      "is_scrollable" -> o.isScrollable,
+      "creation_time" -> o.creationTime
+      )
+
+    override def reads(json: JsValue): JsResult[PgCursorsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgCursorsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            statement = json.\("statement").toOption.map(_.as[String]),
+            isHoldable = json.\("is_holdable").toOption.map(_.as[Boolean]),
+            isBinary = json.\("is_binary").toOption.map(_.as[Boolean]),
+            isScrollable = json.\("is_scrollable").toOption.map(_.as[Boolean]),
+            creationTime = json.\("creation_time").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

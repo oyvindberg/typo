@@ -11,16 +11,22 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class DomainConstraintsRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  domainCatalog: /* unknown nullability */ Option[String],
-  domainSchema: /* unknown nullability */ Option[String],
-  domainName: /* unknown nullability */ Option[String],
-  isDeferrable: /* unknown nullability */ Option[String],
-  initiallyDeferred: /* unknown nullability */ Option[String]
+  constraintCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_catalog","columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_schema","columnName":"constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_name","columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  domainCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"domain_catalog","columnName":"domain_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  domainSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"domain_schema","columnName":"domain_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  domainName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"domain_name","columnName":"domain_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isDeferrable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_deferrable","columnName":"is_deferrable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  initiallyDeferred: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"initially_deferred","columnName":"initially_deferred","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
 )
 
 object DomainConstraintsRow {
@@ -39,5 +45,34 @@ object DomainConstraintsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[DomainConstraintsRow] = new OFormat[DomainConstraintsRow]{
+    override def writes(o: DomainConstraintsRow): JsObject =
+      Json.obj(
+        "constraint_catalog" -> o.constraintCatalog,
+      "constraint_schema" -> o.constraintSchema,
+      "constraint_name" -> o.constraintName,
+      "domain_catalog" -> o.domainCatalog,
+      "domain_schema" -> o.domainSchema,
+      "domain_name" -> o.domainName,
+      "is_deferrable" -> o.isDeferrable,
+      "initially_deferred" -> o.initiallyDeferred
+      )
+
+    override def reads(json: JsValue): JsResult[DomainConstraintsRow] = {
+      JsResult.fromTry(
+        Try(
+          DomainConstraintsRow(
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[String]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[String]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[String]),
+            domainCatalog = json.\("domain_catalog").toOption.map(_.as[String]),
+            domainSchema = json.\("domain_schema").toOption.map(_.as[String]),
+            domainName = json.\("domain_name").toOption.map(_.as[String]),
+            isDeferrable = json.\("is_deferrable").toOption.map(_.as[String]),
+            initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

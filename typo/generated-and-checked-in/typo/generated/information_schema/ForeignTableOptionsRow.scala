@@ -11,16 +11,22 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ForeignTableOptionsRow(
   /** Points to [[PgForeignTablesRow.foreignTableCatalog]] */
-  foreignTableCatalog: Option[String],
+  foreignTableCatalog: Option[String] /* {"baseColumnName":"foreign_table_catalog","baseRelationName":"information_schema._pg_foreign_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_catalog","columnName":"foreign_table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_tables"} */,
   /** Points to [[PgForeignTablesRow.foreignTableSchema]] */
-  foreignTableSchema: Option[String],
+  foreignTableSchema: Option[String] /* {"baseColumnName":"foreign_table_schema","baseRelationName":"information_schema._pg_foreign_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_schema","columnName":"foreign_table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_tables"} */,
   /** Points to [[PgForeignTablesRow.foreignTableName]] */
-  foreignTableName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  foreignTableName: Option[String] /* {"baseColumnName":"foreign_table_name","baseRelationName":"information_schema._pg_foreign_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_name","columnName":"foreign_table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_tables"} */,
+  optionName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_name","columnName":"option_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  optionValue: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_value","columnName":"option_value","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object ForeignTableOptionsRow {
@@ -36,5 +42,28 @@ object ForeignTableOptionsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ForeignTableOptionsRow] = new OFormat[ForeignTableOptionsRow]{
+    override def writes(o: ForeignTableOptionsRow): JsObject =
+      Json.obj(
+        "foreign_table_catalog" -> o.foreignTableCatalog,
+      "foreign_table_schema" -> o.foreignTableSchema,
+      "foreign_table_name" -> o.foreignTableName,
+      "option_name" -> o.optionName,
+      "option_value" -> o.optionValue
+      )
+
+    override def reads(json: JsValue): JsResult[ForeignTableOptionsRow] = {
+      JsResult.fromTry(
+        Try(
+          ForeignTableOptionsRow(
+            foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as[String]),
+            foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as[String]),
+            foreignTableName = json.\("foreign_table_name").toOption.map(_.as[String]),
+            optionName = json.\("option_name").toOption.map(_.as[String]),
+            optionValue = json.\("option_value").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

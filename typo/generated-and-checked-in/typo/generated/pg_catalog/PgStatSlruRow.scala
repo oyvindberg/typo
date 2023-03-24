@@ -12,17 +12,23 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatSlruRow(
-  name: /* unknown nullability */ Option[String],
-  blksZeroed: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long],
-  blksRead: /* unknown nullability */ Option[Long],
-  blksWritten: /* unknown nullability */ Option[Long],
-  blksExists: /* unknown nullability */ Option[Long],
-  flushes: /* unknown nullability */ Option[Long],
-  truncates: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  blksZeroed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_zeroed","columnName":"blks_zeroed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_hit","columnName":"blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_read","columnName":"blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksWritten: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_written","columnName":"blks_written","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksExists: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_exists","columnName":"blks_exists","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  flushes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"flushes","columnName":"flushes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  truncates: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"truncates","columnName":"truncates","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatSlruRow {
@@ -42,5 +48,36 @@ object PgStatSlruRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatSlruRow] = new OFormat[PgStatSlruRow]{
+    override def writes(o: PgStatSlruRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "blks_zeroed" -> o.blksZeroed,
+      "blks_hit" -> o.blksHit,
+      "blks_read" -> o.blksRead,
+      "blks_written" -> o.blksWritten,
+      "blks_exists" -> o.blksExists,
+      "flushes" -> o.flushes,
+      "truncates" -> o.truncates,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatSlruRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatSlruRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            blksZeroed = json.\("blks_zeroed").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksWritten = json.\("blks_written").toOption.map(_.as[Long]),
+            blksExists = json.\("blks_exists").toOption.map(_.as[Long]),
+            flushes = json.\("flushes").toOption.map(_.as[Long]),
+            truncates = json.\("truncates").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

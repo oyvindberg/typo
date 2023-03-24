@@ -11,30 +11,36 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatXactUserTablesRow(
   /** Points to [[PgStatXactAllTablesRow.relid]] */
-  relid: Option[Long],
+  relid: Option[Long] /* {"baseColumnName":"relid","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: Option[String] /* {"baseColumnName":"schemaname","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.relname]] */
-  relname: Option[String],
+  relname: Option[String] /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.seqScan]] */
-  seqScan: Option[Long],
+  seqScan: Option[Long] /* {"baseColumnName":"seq_scan","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_scan","columnName":"seq_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.seqTupRead]] */
-  seqTupRead: Option[Long],
+  seqTupRead: Option[Long] /* {"baseColumnName":"seq_tup_read","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_tup_read","columnName":"seq_tup_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.idxScan]] */
-  idxScan: Option[Long],
+  idxScan: Option[Long] /* {"baseColumnName":"idx_scan","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_scan","columnName":"idx_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.idxTupFetch]] */
-  idxTupFetch: Option[Long],
+  idxTupFetch: Option[Long] /* {"baseColumnName":"idx_tup_fetch","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_fetch","columnName":"idx_tup_fetch","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.nTupIns]] */
-  nTupIns: Option[Long],
+  nTupIns: Option[Long] /* {"baseColumnName":"n_tup_ins","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_ins","columnName":"n_tup_ins","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.nTupUpd]] */
-  nTupUpd: Option[Long],
+  nTupUpd: Option[Long] /* {"baseColumnName":"n_tup_upd","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_upd","columnName":"n_tup_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.nTupDel]] */
-  nTupDel: Option[Long],
+  nTupDel: Option[Long] /* {"baseColumnName":"n_tup_del","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_del","columnName":"n_tup_del","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */,
   /** Points to [[PgStatXactAllTablesRow.nTupHotUpd]] */
-  nTupHotUpd: Option[Long]
+  nTupHotUpd: Option[Long] /* {"baseColumnName":"n_tup_hot_upd","baseRelationName":"pg_catalog.pg_stat_xact_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_hot_upd","columnName":"n_tup_hot_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_xact_all_tables"} */
 )
 
 object PgStatXactUserTablesRow {
@@ -56,5 +62,40 @@ object PgStatXactUserTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatXactUserTablesRow] = new OFormat[PgStatXactUserTablesRow]{
+    override def writes(o: PgStatXactUserTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "seq_scan" -> o.seqScan,
+      "seq_tup_read" -> o.seqTupRead,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_fetch" -> o.idxTupFetch,
+      "n_tup_ins" -> o.nTupIns,
+      "n_tup_upd" -> o.nTupUpd,
+      "n_tup_del" -> o.nTupDel,
+      "n_tup_hot_upd" -> o.nTupHotUpd
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatXactUserTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatXactUserTablesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

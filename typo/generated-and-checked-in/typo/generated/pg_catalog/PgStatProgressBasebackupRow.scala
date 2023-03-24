@@ -11,14 +11,20 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressBasebackupRow(
-  pid: /* unknown nullability */ Option[Int],
-  phase: /* unknown nullability */ Option[String],
-  backupTotal: /* unknown nullability */ Option[Long],
-  backupStreamed: /* unknown nullability */ Option[Long],
-  tablespacesTotal: /* unknown nullability */ Option[Long],
-  tablespacesStreamed: /* unknown nullability */ Option[Long]
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  phase: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"phase","columnName":"phase","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  backupTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"backup_total","columnName":"backup_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  backupStreamed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"backup_streamed","columnName":"backup_streamed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tablespacesTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tablespaces_total","columnName":"tablespaces_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tablespacesStreamed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tablespaces_streamed","columnName":"tablespaces_streamed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatProgressBasebackupRow {
@@ -35,5 +41,30 @@ object PgStatProgressBasebackupRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatProgressBasebackupRow] = new OFormat[PgStatProgressBasebackupRow]{
+    override def writes(o: PgStatProgressBasebackupRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "phase" -> o.phase,
+      "backup_total" -> o.backupTotal,
+      "backup_streamed" -> o.backupStreamed,
+      "tablespaces_total" -> o.tablespacesTotal,
+      "tablespaces_streamed" -> o.tablespacesStreamed
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressBasebackupRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressBasebackupRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            backupTotal = json.\("backup_total").toOption.map(_.as[Long]),
+            backupStreamed = json.\("backup_streamed").toOption.map(_.as[Long]),
+            tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as[Long]),
+            tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

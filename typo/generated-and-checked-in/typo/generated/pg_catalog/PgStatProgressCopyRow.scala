@@ -11,19 +11,25 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressCopyRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  datid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datid","columnName":"datid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
   /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  command: /* unknown nullability */ Option[String],
-  `type`: /* unknown nullability */ Option[String],
-  bytesProcessed: /* unknown nullability */ Option[Long],
-  bytesTotal: /* unknown nullability */ Option[Long],
-  tuplesProcessed: /* unknown nullability */ Option[Long],
-  tuplesExcluded: /* unknown nullability */ Option[Long]
+  datname: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"datname","columnName":"datname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */,
+  relid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  command: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"command","columnName":"command","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  `type`: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"type","columnName":"type","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  bytesProcessed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"bytes_processed","columnName":"bytes_processed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  bytesTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"bytes_total","columnName":"bytes_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tuplesProcessed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tuples_processed","columnName":"tuples_processed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tuplesExcluded: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tuples_excluded","columnName":"tuples_excluded","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatProgressCopyRow {
@@ -44,5 +50,38 @@ object PgStatProgressCopyRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatProgressCopyRow] = new OFormat[PgStatProgressCopyRow]{
+    override def writes(o: PgStatProgressCopyRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "command" -> o.command,
+      "type" -> o.`type`,
+      "bytes_processed" -> o.bytesProcessed,
+      "bytes_total" -> o.bytesTotal,
+      "tuples_processed" -> o.tuplesProcessed,
+      "tuples_excluded" -> o.tuplesExcluded
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressCopyRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressCopyRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            command = json.\("command").toOption.map(_.as[String]),
+            `type` = json.\("type").toOption.map(_.as[String]),
+            bytesProcessed = json.\("bytes_processed").toOption.map(_.as[Long]),
+            bytesTotal = json.\("bytes_total").toOption.map(_.as[Long]),
+            tuplesProcessed = json.\("tuples_processed").toOption.map(_.as[Long]),
+            tuplesExcluded = json.\("tuples_excluded").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

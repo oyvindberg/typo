@@ -11,18 +11,24 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TableConstraintsRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  constraintType: /* unknown nullability */ Option[String],
-  isDeferrable: /* unknown nullability */ Option[String],
-  initiallyDeferred: /* unknown nullability */ Option[String],
-  enforced: /* unknown nullability */ Option[String]
+  constraintCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_catalog","columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_schema","columnName":"constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_name","columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_catalog","columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_type","columnName":"constraint_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isDeferrable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_deferrable","columnName":"is_deferrable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  initiallyDeferred: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"initially_deferred","columnName":"initially_deferred","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  enforced: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"enforced","columnName":"enforced","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
 )
 
 object TableConstraintsRow {
@@ -43,5 +49,38 @@ object TableConstraintsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[TableConstraintsRow] = new OFormat[TableConstraintsRow]{
+    override def writes(o: TableConstraintsRow): JsObject =
+      Json.obj(
+        "constraint_catalog" -> o.constraintCatalog,
+      "constraint_schema" -> o.constraintSchema,
+      "constraint_name" -> o.constraintName,
+      "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "constraint_type" -> o.constraintType,
+      "is_deferrable" -> o.isDeferrable,
+      "initially_deferred" -> o.initiallyDeferred,
+      "enforced" -> o.enforced
+      )
+
+    override def reads(json: JsValue): JsResult[TableConstraintsRow] = {
+      JsResult.fromTry(
+        Try(
+          TableConstraintsRow(
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[String]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[String]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[String]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            constraintType = json.\("constraint_type").toOption.map(_.as[String]),
+            isDeferrable = json.\("is_deferrable").toOption.map(_.as[String]),
+            initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[String]),
+            enforced = json.\("enforced").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,11 +11,17 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPublicationRelRow(
-  oid: PgPublicationRelId,
-  prpubid: Long,
-  prrelid: Long
+  oid: PgPublicationRelId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_rel","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prpubid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_rel","column_name":"prpubid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_rel","column_name":"prrelid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgPublicationRelRow {
@@ -29,5 +35,24 @@ object PgPublicationRelRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPublicationRelRow] = new OFormat[PgPublicationRelRow]{
+    override def writes(o: PgPublicationRelRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "prpubid" -> o.prpubid,
+      "prrelid" -> o.prrelid
+      )
+
+    override def reads(json: JsValue): JsResult[PgPublicationRelRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPublicationRelRow(
+            oid = json.\("oid").as[PgPublicationRelId],
+            prpubid = json.\("prpubid").as[Long],
+            prrelid = json.\("prrelid").as[Long]
+          )
+        )
+      )
+    }
+  }
 }

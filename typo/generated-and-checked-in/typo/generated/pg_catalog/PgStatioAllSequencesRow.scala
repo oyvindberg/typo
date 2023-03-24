@@ -11,16 +11,22 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatioAllSequencesRow(
   /** Points to [[PgClassRow.oid]] */
-  relid: Long,
+  relid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  blksRead: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long]
+  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  blksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_read","columnName":"blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_hit","columnName":"blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatioAllSequencesRow {
@@ -36,5 +42,28 @@ object PgStatioAllSequencesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatioAllSequencesRow] = new OFormat[PgStatioAllSequencesRow]{
+    override def writes(o: PgStatioAllSequencesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "blks_read" -> o.blksRead,
+      "blks_hit" -> o.blksHit
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatioAllSequencesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatioAllSequencesRow(
+            relid = json.\("relid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

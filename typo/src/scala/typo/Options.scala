@@ -4,5 +4,6 @@ case class Options(
     pkg: sc.QIdent,
     jsonLib: JsonLib,
     dbLib: DbLib,
-    header: sc.Code
+    header: sc.Code,
+    debugTypes: Boolean
 )

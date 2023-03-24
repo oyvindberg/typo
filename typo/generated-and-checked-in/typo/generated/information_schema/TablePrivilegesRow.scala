@@ -11,16 +11,22 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TablePrivilegesRow(
-  grantor: /* unknown nullability */ Option[String],
-  grantee: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  privilegeType: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String],
-  withHierarchy: /* unknown nullability */ Option[String]
+  grantor: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantor","columnName":"grantor","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  grantee: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantee","columnName":"grantee","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_catalog","columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  privilegeType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"privilege_type","columnName":"privilege_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isGrantable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_grantable","columnName":"is_grantable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  withHierarchy: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"with_hierarchy","columnName":"with_hierarchy","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
 )
 
 object TablePrivilegesRow {
@@ -39,5 +45,34 @@ object TablePrivilegesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[TablePrivilegesRow] = new OFormat[TablePrivilegesRow]{
+    override def writes(o: TablePrivilegesRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable,
+      "with_hierarchy" -> o.withHierarchy
+      )
+
+    override def reads(json: JsValue): JsResult[TablePrivilegesRow] = {
+      JsResult.fromTry(
+        Try(
+          TablePrivilegesRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String]),
+            withHierarchy = json.\("with_hierarchy").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

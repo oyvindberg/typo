@@ -12,15 +12,21 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgRangeRow(
-  rngtypid: PgRangeId,
-  rngsubtype: Long,
-  rngmultitypid: Long,
-  rngcollation: Long,
-  rngsubopc: Long,
-  rngcanonical: PGobject,
-  rngsubdiff: PGobject
+  rngtypid: PgRangeId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngtypid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngsubtype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubtype","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngmultitypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngmultitypid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngcollation: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcollation","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngsubopc: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubopc","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngcanonical: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcanonical","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngsubdiff: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubdiff","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgRangeRow {
@@ -38,5 +44,32 @@ object PgRangeRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgRangeRow] = new OFormat[PgRangeRow]{
+    override def writes(o: PgRangeRow): JsObject =
+      Json.obj(
+        "rngtypid" -> o.rngtypid,
+      "rngsubtype" -> o.rngsubtype,
+      "rngmultitypid" -> o.rngmultitypid,
+      "rngcollation" -> o.rngcollation,
+      "rngsubopc" -> o.rngsubopc,
+      "rngcanonical" -> o.rngcanonical,
+      "rngsubdiff" -> o.rngsubdiff
+      )
+
+    override def reads(json: JsValue): JsResult[PgRangeRow] = {
+      JsResult.fromTry(
+        Try(
+          PgRangeRow(
+            rngtypid = json.\("rngtypid").as[PgRangeId],
+            rngsubtype = json.\("rngsubtype").as[Long],
+            rngmultitypid = json.\("rngmultitypid").as[Long],
+            rngcollation = json.\("rngcollation").as[Long],
+            rngsubopc = json.\("rngsubopc").as[Long],
+            rngcanonical = json.\("rngcanonical").as[PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[PGobject]
+          )
+        )
+      )
+    }
+  }
 }

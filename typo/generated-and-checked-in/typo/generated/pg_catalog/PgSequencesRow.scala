@@ -11,27 +11,33 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSequencesRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  sequencename: String,
-  sequenceowner: /* unknown nullability */ Option[String],
-  dataType: /* unknown nullability */ Option[/* regtype */ String],
+  sequencename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequencename","columnName":"sequencename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  sequenceowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequenceowner","columnName":"sequenceowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  dataType: /* unknown nullability */ Option[/* regtype */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"data_type","columnName":"data_type","columnType":"Other","columnTypeName":"regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgSequenceRow.seqstart]] */
-  startValue: Long,
+  startValue: Long /* {"baseColumnName":"seqstart","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"start_value","columnName":"start_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqmin]] */
-  minValue: Long,
+  minValue: Long /* {"baseColumnName":"seqmin","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"min_value","columnName":"min_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqmax]] */
-  maxValue: Long,
+  maxValue: Long /* {"baseColumnName":"seqmax","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"max_value","columnName":"max_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqincrement]] */
-  incrementBy: Long,
+  incrementBy: Long /* {"baseColumnName":"seqincrement","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"increment_by","columnName":"increment_by","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqcycle]] */
-  cycle: Boolean,
+  cycle: Boolean /* {"baseColumnName":"seqcycle","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"cycle","columnName":"cycle","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_sequence"} */,
   /** Points to [[PgSequenceRow.seqcache]] */
-  cacheSize: Long,
-  lastValue: /* unknown nullability */ Option[Long]
+  cacheSize: Long /* {"baseColumnName":"seqcache","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"cache_size","columnName":"cache_size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
+  lastValue: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"last_value","columnName":"last_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgSequencesRow {
@@ -53,5 +59,40 @@ object PgSequencesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgSequencesRow] = new OFormat[PgSequencesRow]{
+    override def writes(o: PgSequencesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "sequencename" -> o.sequencename,
+      "sequenceowner" -> o.sequenceowner,
+      "data_type" -> o.dataType,
+      "start_value" -> o.startValue,
+      "min_value" -> o.minValue,
+      "max_value" -> o.maxValue,
+      "increment_by" -> o.incrementBy,
+      "cycle" -> o.cycle,
+      "cache_size" -> o.cacheSize,
+      "last_value" -> o.lastValue
+      )
+
+    override def reads(json: JsValue): JsResult[PgSequencesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSequencesRow(
+            schemaname = json.\("schemaname").as[String],
+            sequencename = json.\("sequencename").as[String],
+            sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
+            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ String]),
+            startValue = json.\("start_value").as[Long],
+            minValue = json.\("min_value").as[Long],
+            maxValue = json.\("max_value").as[Long],
+            incrementBy = json.\("increment_by").as[Long],
+            cycle = json.\("cycle").as[Boolean],
+            cacheSize = json.\("cache_size").as[Long],
+            lastValue = json.\("last_value").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

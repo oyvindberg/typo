@@ -11,24 +11,30 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatUserIndexesRow(
   /** Points to [[PgStatAllIndexesRow.relid]] */
-  relid: Option[Long],
+  relid: Option[Long] /* {"baseColumnName":"relid","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.indexrelid]] */
-  indexrelid: Option[Long],
+  indexrelid: Option[Long] /* {"baseColumnName":"indexrelid","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"indexrelid","columnName":"indexrelid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: Option[String] /* {"baseColumnName":"schemaname","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.relname]] */
-  relname: Option[String],
+  relname: Option[String] /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.indexrelname]] */
-  indexrelname: Option[String],
+  indexrelname: Option[String] /* {"baseColumnName":"indexrelname","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexrelname","columnName":"indexrelname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.idxScan]] */
-  idxScan: Option[Long],
+  idxScan: Option[Long] /* {"baseColumnName":"idx_scan","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_scan","columnName":"idx_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.idxTupRead]] */
-  idxTupRead: Option[Long],
+  idxTupRead: Option[Long] /* {"baseColumnName":"idx_tup_read","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_read","columnName":"idx_tup_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_indexes"} */,
   /** Points to [[PgStatAllIndexesRow.idxTupFetch]] */
-  idxTupFetch: Option[Long]
+  idxTupFetch: Option[Long] /* {"baseColumnName":"idx_tup_fetch","baseRelationName":"pg_catalog.pg_stat_all_indexes","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_fetch","columnName":"idx_tup_fetch","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_indexes"} */
 )
 
 object PgStatUserIndexesRow {
@@ -47,5 +53,34 @@ object PgStatUserIndexesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatUserIndexesRow] = new OFormat[PgStatUserIndexesRow]{
+    override def writes(o: PgStatUserIndexesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "indexrelid" -> o.indexrelid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "indexrelname" -> o.indexrelname,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_read" -> o.idxTupRead,
+      "idx_tup_fetch" -> o.idxTupFetch
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatUserIndexesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatUserIndexesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            indexrelid = json.\("indexrelid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupRead = json.\("idx_tup_read").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

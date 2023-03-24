@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgHbaFileRulesRow(
-  lineNumber: /* unknown nullability */ Option[Int],
-  `type`: /* unknown nullability */ Option[String],
-  database: /* unknown nullability */ Option[Array[String]],
-  userName: /* unknown nullability */ Option[Array[String]],
-  address: /* unknown nullability */ Option[String],
-  netmask: /* unknown nullability */ Option[String],
-  authMethod: /* unknown nullability */ Option[String],
-  options: /* unknown nullability */ Option[Array[String]],
-  error: /* unknown nullability */ Option[String]
+  lineNumber: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"line_number","columnName":"line_number","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  `type`: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"type","columnName":"type","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  database: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"database","columnName":"database","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  userName: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"user_name","columnName":"user_name","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  address: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"address","columnName":"address","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  netmask: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"netmask","columnName":"netmask","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  authMethod: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"auth_method","columnName":"auth_method","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  options: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"options","columnName":"options","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  error: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"error","columnName":"error","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgHbaFileRulesRow {
@@ -41,5 +47,36 @@ object PgHbaFileRulesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgHbaFileRulesRow] = new OFormat[PgHbaFileRulesRow]{
+    override def writes(o: PgHbaFileRulesRow): JsObject =
+      Json.obj(
+        "line_number" -> o.lineNumber,
+      "type" -> o.`type`,
+      "database" -> o.database,
+      "user_name" -> o.userName,
+      "address" -> o.address,
+      "netmask" -> o.netmask,
+      "auth_method" -> o.authMethod,
+      "options" -> o.options,
+      "error" -> o.error
+      )
+
+    override def reads(json: JsValue): JsResult[PgHbaFileRulesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgHbaFileRulesRow(
+            lineNumber = json.\("line_number").toOption.map(_.as[Int]),
+            `type` = json.\("type").toOption.map(_.as[String]),
+            database = json.\("database").toOption.map(_.as[Array[String]]),
+            userName = json.\("user_name").toOption.map(_.as[Array[String]]),
+            address = json.\("address").toOption.map(_.as[String]),
+            netmask = json.\("netmask").toOption.map(_.as[String]),
+            authMethod = json.\("auth_method").toOption.map(_.as[String]),
+            options = json.\("options").toOption.map(_.as[Array[String]]),
+            error = json.\("error").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

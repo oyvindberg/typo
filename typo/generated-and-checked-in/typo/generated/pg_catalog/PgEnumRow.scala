@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgEnumRow(
-  oid: PgEnumId,
-  enumtypid: Long,
-  enumsortorder: Float,
-  enumlabel: String
+  oid: PgEnumId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_enum","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  enumtypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_enum","column_name":"enumtypid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  enumsortorder: Float /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_enum","column_name":"enumsortorder","ordinal_position":3,"is_nullable":"NO","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  enumlabel: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_enum","column_name":"enumlabel","ordinal_position":4,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgEnumRow {
@@ -31,5 +37,26 @@ object PgEnumRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgEnumRow] = new OFormat[PgEnumRow]{
+    override def writes(o: PgEnumRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "enumtypid" -> o.enumtypid,
+      "enumsortorder" -> o.enumsortorder,
+      "enumlabel" -> o.enumlabel
+      )
+
+    override def reads(json: JsValue): JsResult[PgEnumRow] = {
+      JsResult.fromTry(
+        Try(
+          PgEnumRow(
+            oid = json.\("oid").as[PgEnumId],
+            enumtypid = json.\("enumtypid").as[Long],
+            enumsortorder = json.\("enumsortorder").as[Float],
+            enumlabel = json.\("enumlabel").as[String]
+          )
+        )
+      )
+    }
+  }
 }

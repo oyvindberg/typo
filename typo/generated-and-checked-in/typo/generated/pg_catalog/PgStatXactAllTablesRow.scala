@@ -11,22 +11,28 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatXactAllTablesRow(
   /** Points to [[PgClassRow.oid]] */
-  relid: Long,
+  relid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  seqScan: /* unknown nullability */ Option[Long],
-  seqTupRead: /* unknown nullability */ Option[Long],
-  idxScan: /* unknown nullability */ Option[Long],
-  idxTupFetch: /* unknown nullability */ Option[Long],
-  nTupIns: /* unknown nullability */ Option[Long],
-  nTupUpd: /* unknown nullability */ Option[Long],
-  nTupDel: /* unknown nullability */ Option[Long],
-  nTupHotUpd: /* unknown nullability */ Option[Long]
+  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  seqScan: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_scan","columnName":"seq_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  seqTupRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_tup_read","columnName":"seq_tup_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxScan: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_scan","columnName":"idx_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  idxTupFetch: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_fetch","columnName":"idx_tup_fetch","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  nTupIns: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_ins","columnName":"n_tup_ins","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  nTupUpd: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_upd","columnName":"n_tup_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  nTupDel: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_del","columnName":"n_tup_del","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  nTupHotUpd: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_hot_upd","columnName":"n_tup_hot_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatXactAllTablesRow {
@@ -48,5 +54,40 @@ object PgStatXactAllTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatXactAllTablesRow] = new OFormat[PgStatXactAllTablesRow]{
+    override def writes(o: PgStatXactAllTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "seq_scan" -> o.seqScan,
+      "seq_tup_read" -> o.seqTupRead,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_fetch" -> o.idxTupFetch,
+      "n_tup_ins" -> o.nTupIns,
+      "n_tup_upd" -> o.nTupUpd,
+      "n_tup_del" -> o.nTupDel,
+      "n_tup_hot_upd" -> o.nTupHotUpd
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatXactAllTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatXactAllTablesRow(
+            relid = json.\("relid").as[Long],
+            schemaname = json.\("schemaname").as[String],
+            relname = json.\("relname").as[String],
+            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

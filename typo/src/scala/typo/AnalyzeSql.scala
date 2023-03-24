@@ -1,5 +1,7 @@
 package typo
 
+import play.api.libs.json.{JsString, Json, Writes}
+
 import java.sql.{Connection, PreparedStatement}
 
 object AnalyzeSql {
@@ -29,6 +31,34 @@ object AnalyzeSql {
       tableName: Option[String]
   ) {
     def name = columnLabel
+  }
+  object Column {
+    implicit val oformat: Writes[Column] = (x: Column) =>
+      Json.obj(
+        "baseColumnName" -> x.baseColumnName.map(_.value),
+        "baseRelationName" -> x.baseRelationName.map(x => s"${x.schema}.${x.name}"),
+        "catalogName" -> x.catalogName,
+        "columnClassName" -> x.columnClassName,
+        "columnDisplaySize" -> x.columnDisplaySize,
+        "columnLabel" -> x.columnLabel.value,
+        "columnName" -> x.columnName.value,
+        "columnType" -> x.columnType.toString,
+        "columnTypeName" -> x.columnTypeName,
+        "format" -> x.format,
+        "isAutoIncrement" -> x.isAutoIncrement,
+        "isCaseSensitive" -> x.isCaseSensitive,
+        "isCurrency" -> x.isCurrency,
+        "isDefinitelyWritable" -> x.isDefinitelyWritable,
+        "isNullable" -> x.isNullable.toString,
+        "isReadOnly" -> x.isReadOnly,
+        "isSearchable" -> x.isSearchable,
+        "isSigned" -> x.isSigned,
+        "isWritable" -> x.isWritable,
+        "precision" -> x.precision,
+        "scale" -> x.scale,
+        "schemaName" -> x.schemaName,
+        "tableName" -> x.tableName
+      )
   }
 
   case class ParameterColumn(

@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgUserMappingRow(
-  oid: PgUserMappingId,
-  umuser: Long,
-  umserver: Long,
-  umoptions: Option[Array[String]]
+  oid: PgUserMappingId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mapping","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  umuser: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mapping","column_name":"umuser","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  umserver: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mapping","column_name":"umserver","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  umoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mapping","column_name":"umoptions","ordinal_position":4,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgUserMappingRow {
@@ -31,5 +37,26 @@ object PgUserMappingRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgUserMappingRow] = new OFormat[PgUserMappingRow]{
+    override def writes(o: PgUserMappingRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "umuser" -> o.umuser,
+      "umserver" -> o.umserver,
+      "umoptions" -> o.umoptions
+      )
+
+    override def reads(json: JsValue): JsResult[PgUserMappingRow] = {
+      JsResult.fromTry(
+        Try(
+          PgUserMappingRow(
+            oid = json.\("oid").as[PgUserMappingId],
+            umuser = json.\("umuser").as[Long],
+            umserver = json.\("umserver").as[Long],
+            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

@@ -12,19 +12,25 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatBgwriterRow(
-  checkpointsTimed: /* unknown nullability */ Option[Long],
-  checkpointsReq: /* unknown nullability */ Option[Long],
-  checkpointWriteTime: /* unknown nullability */ Option[Double],
-  checkpointSyncTime: /* unknown nullability */ Option[Double],
-  buffersCheckpoint: /* unknown nullability */ Option[Long],
-  buffersClean: /* unknown nullability */ Option[Long],
-  maxwrittenClean: /* unknown nullability */ Option[Long],
-  buffersBackend: /* unknown nullability */ Option[Long],
-  buffersBackendFsync: /* unknown nullability */ Option[Long],
-  buffersAlloc: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  checkpointsTimed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"checkpoints_timed","columnName":"checkpoints_timed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  checkpointsReq: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"checkpoints_req","columnName":"checkpoints_req","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  checkpointWriteTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"checkpoint_write_time","columnName":"checkpoint_write_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  checkpointSyncTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"checkpoint_sync_time","columnName":"checkpoint_sync_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  buffersCheckpoint: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"buffers_checkpoint","columnName":"buffers_checkpoint","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  buffersClean: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"buffers_clean","columnName":"buffers_clean","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  maxwrittenClean: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"maxwritten_clean","columnName":"maxwritten_clean","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  buffersBackend: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"buffers_backend","columnName":"buffers_backend","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  buffersBackendFsync: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"buffers_backend_fsync","columnName":"buffers_backend_fsync","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  buffersAlloc: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"buffers_alloc","columnName":"buffers_alloc","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatBgwriterRow {
@@ -46,5 +52,40 @@ object PgStatBgwriterRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatBgwriterRow] = new OFormat[PgStatBgwriterRow]{
+    override def writes(o: PgStatBgwriterRow): JsObject =
+      Json.obj(
+        "checkpoints_timed" -> o.checkpointsTimed,
+      "checkpoints_req" -> o.checkpointsReq,
+      "checkpoint_write_time" -> o.checkpointWriteTime,
+      "checkpoint_sync_time" -> o.checkpointSyncTime,
+      "buffers_checkpoint" -> o.buffersCheckpoint,
+      "buffers_clean" -> o.buffersClean,
+      "maxwritten_clean" -> o.maxwrittenClean,
+      "buffers_backend" -> o.buffersBackend,
+      "buffers_backend_fsync" -> o.buffersBackendFsync,
+      "buffers_alloc" -> o.buffersAlloc,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatBgwriterRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatBgwriterRow(
+            checkpointsTimed = json.\("checkpoints_timed").toOption.map(_.as[Long]),
+            checkpointsReq = json.\("checkpoints_req").toOption.map(_.as[Long]),
+            checkpointWriteTime = json.\("checkpoint_write_time").toOption.map(_.as[Double]),
+            checkpointSyncTime = json.\("checkpoint_sync_time").toOption.map(_.as[Double]),
+            buffersCheckpoint = json.\("buffers_checkpoint").toOption.map(_.as[Long]),
+            buffersClean = json.\("buffers_clean").toOption.map(_.as[Long]),
+            maxwrittenClean = json.\("maxwritten_clean").toOption.map(_.as[Long]),
+            buffersBackend = json.\("buffers_backend").toOption.map(_.as[Long]),
+            buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as[Long]),
+            buffersAlloc = json.\("buffers_alloc").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

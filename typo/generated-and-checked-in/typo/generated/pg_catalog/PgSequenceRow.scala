@@ -11,16 +11,22 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSequenceRow(
-  seqrelid: PgSequenceId,
-  seqtypid: Long,
-  seqstart: Long,
-  seqincrement: Long,
-  seqmax: Long,
-  seqmin: Long,
-  seqcache: Long,
-  seqcycle: Boolean
+  seqrelid: PgSequenceId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqtypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqtypid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqstart: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqstart","ordinal_position":3,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqincrement: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqincrement","ordinal_position":4,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqmax: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqmax","ordinal_position":5,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqmin: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqmin","ordinal_position":6,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqcache: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqcache","ordinal_position":7,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqcycle: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqcycle","ordinal_position":8,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgSequenceRow {
@@ -39,5 +45,34 @@ object PgSequenceRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgSequenceRow] = new OFormat[PgSequenceRow]{
+    override def writes(o: PgSequenceRow): JsObject =
+      Json.obj(
+        "seqrelid" -> o.seqrelid,
+      "seqtypid" -> o.seqtypid,
+      "seqstart" -> o.seqstart,
+      "seqincrement" -> o.seqincrement,
+      "seqmax" -> o.seqmax,
+      "seqmin" -> o.seqmin,
+      "seqcache" -> o.seqcache,
+      "seqcycle" -> o.seqcycle
+      )
+
+    override def reads(json: JsValue): JsResult[PgSequenceRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSequenceRow(
+            seqrelid = json.\("seqrelid").as[PgSequenceId],
+            seqtypid = json.\("seqtypid").as[Long],
+            seqstart = json.\("seqstart").as[Long],
+            seqincrement = json.\("seqincrement").as[Long],
+            seqmax = json.\("seqmax").as[Long],
+            seqmin = json.\("seqmin").as[Long],
+            seqcache = json.\("seqcache").as[Long],
+            seqcycle = json.\("seqcycle").as[Boolean]
+          )
+        )
+      )
+    }
+  }
 }

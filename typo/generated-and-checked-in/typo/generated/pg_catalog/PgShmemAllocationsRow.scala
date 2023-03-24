@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgShmemAllocationsRow(
-  name: /* unknown nullability */ Option[String],
-  off: /* unknown nullability */ Option[Long],
-  size: /* unknown nullability */ Option[Long],
-  allocatedSize: /* unknown nullability */ Option[Long]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  off: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"off","columnName":"off","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  size: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"size","columnName":"size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  allocatedSize: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"allocated_size","columnName":"allocated_size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgShmemAllocationsRow {
@@ -31,5 +37,26 @@ object PgShmemAllocationsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgShmemAllocationsRow] = new OFormat[PgShmemAllocationsRow]{
+    override def writes(o: PgShmemAllocationsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "off" -> o.off,
+      "size" -> o.size,
+      "allocated_size" -> o.allocatedSize
+      )
+
+    override def reads(json: JsValue): JsResult[PgShmemAllocationsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgShmemAllocationsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            off = json.\("off").toOption.map(_.as[Long]),
+            size = json.\("size").toOption.map(_.as[Long]),
+            allocatedSize = json.\("allocated_size").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,12 +11,18 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CheckConstraintsRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  checkClause: /* unknown nullability */ Option[String]
+  constraintCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_catalog","columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_schema","columnName":"constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  constraintName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"constraint_name","columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  checkClause: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"check_clause","columnName":"check_clause","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object CheckConstraintsRow {
@@ -31,5 +37,26 @@ object CheckConstraintsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[CheckConstraintsRow] = new OFormat[CheckConstraintsRow]{
+    override def writes(o: CheckConstraintsRow): JsObject =
+      Json.obj(
+        "constraint_catalog" -> o.constraintCatalog,
+      "constraint_schema" -> o.constraintSchema,
+      "constraint_name" -> o.constraintName,
+      "check_clause" -> o.checkClause
+      )
+
+    override def reads(json: JsValue): JsResult[CheckConstraintsRow] = {
+      JsResult.fromTry(
+        Try(
+          CheckConstraintsRow(
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[String]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[String]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[String]),
+            checkClause = json.\("check_clause").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

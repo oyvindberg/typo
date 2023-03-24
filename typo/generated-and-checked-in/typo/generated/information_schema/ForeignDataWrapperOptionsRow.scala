@@ -11,14 +11,20 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ForeignDataWrapperOptionsRow(
   /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[String],
+  foreignDataWrapperCatalog: Option[String] /* {"baseColumnName":"foreign_data_wrapper_catalog","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_catalog","columnName":"foreign_data_wrapper_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */,
   /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  foreignDataWrapperName: Option[String] /* {"baseColumnName":"foreign_data_wrapper_name","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_name","columnName":"foreign_data_wrapper_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */,
+  optionName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_name","columnName":"option_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  optionValue: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_value","columnName":"option_value","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object ForeignDataWrapperOptionsRow {
@@ -33,5 +39,26 @@ object ForeignDataWrapperOptionsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ForeignDataWrapperOptionsRow] = new OFormat[ForeignDataWrapperOptionsRow]{
+    override def writes(o: ForeignDataWrapperOptionsRow): JsObject =
+      Json.obj(
+        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
+      "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
+      "option_name" -> o.optionName,
+      "option_value" -> o.optionValue
+      )
+
+    override def reads(json: JsValue): JsResult[ForeignDataWrapperOptionsRow] = {
+      JsResult.fromTry(
+        Try(
+          ForeignDataWrapperOptionsRow(
+            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
+            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),
+            optionName = json.\("option_name").toOption.map(_.as[String]),
+            optionValue = json.\("option_value").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

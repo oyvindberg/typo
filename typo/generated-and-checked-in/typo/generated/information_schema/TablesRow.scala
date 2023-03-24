@@ -11,20 +11,26 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TablesRow(
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  tableType: /* unknown nullability */ Option[String],
-  selfReferencingColumnName: /* unknown nullability */ Option[String],
-  referenceGeneration: /* unknown nullability */ Option[String],
-  userDefinedTypeCatalog: /* unknown nullability */ Option[String],
-  userDefinedTypeSchema: /* unknown nullability */ Option[String],
-  userDefinedTypeName: /* unknown nullability */ Option[String],
-  isInsertableInto: /* unknown nullability */ Option[String],
-  isTyped: /* unknown nullability */ Option[String],
-  commitAction: /* unknown nullability */ Option[String]
+  tableCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_catalog","columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  tableType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_type","columnName":"table_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  selfReferencingColumnName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"self_referencing_column_name","columnName":"self_referencing_column_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  referenceGeneration: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"reference_generation","columnName":"reference_generation","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  userDefinedTypeCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"user_defined_type_catalog","columnName":"user_defined_type_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  userDefinedTypeSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"user_defined_type_schema","columnName":"user_defined_type_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  userDefinedTypeName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"user_defined_type_name","columnName":"user_defined_type_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  isInsertableInto: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_insertable_into","columnName":"is_insertable_into","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  isTyped: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_typed","columnName":"is_typed","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */,
+  commitAction: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"commit_action","columnName":"commit_action","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object TablesRow {
@@ -47,5 +53,42 @@ object TablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[TablesRow] = new OFormat[TablesRow]{
+    override def writes(o: TablesRow): JsObject =
+      Json.obj(
+        "table_catalog" -> o.tableCatalog,
+      "table_schema" -> o.tableSchema,
+      "table_name" -> o.tableName,
+      "table_type" -> o.tableType,
+      "self_referencing_column_name" -> o.selfReferencingColumnName,
+      "reference_generation" -> o.referenceGeneration,
+      "user_defined_type_catalog" -> o.userDefinedTypeCatalog,
+      "user_defined_type_schema" -> o.userDefinedTypeSchema,
+      "user_defined_type_name" -> o.userDefinedTypeName,
+      "is_insertable_into" -> o.isInsertableInto,
+      "is_typed" -> o.isTyped,
+      "commit_action" -> o.commitAction
+      )
+
+    override def reads(json: JsValue): JsResult[TablesRow] = {
+      JsResult.fromTry(
+        Try(
+          TablesRow(
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[String]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
+            tableName = json.\("table_name").toOption.map(_.as[String]),
+            tableType = json.\("table_type").toOption.map(_.as[String]),
+            selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as[String]),
+            referenceGeneration = json.\("reference_generation").toOption.map(_.as[String]),
+            userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as[String]),
+            userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as[String]),
+            userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as[String]),
+            isInsertableInto = json.\("is_insertable_into").toOption.map(_.as[String]),
+            isTyped = json.\("is_typed").toOption.map(_.as[String]),
+            commitAction = json.\("commit_action").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

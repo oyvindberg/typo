@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAuthMembersRow(
-  roleid: Long,
-  member: Long,
-  grantor: Long,
-  adminOption: Boolean
+  roleid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_auth_members","column_name":"roleid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  member: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_auth_members","column_name":"member","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  grantor: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_auth_members","column_name":"grantor","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  adminOption: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_auth_members","column_name":"admin_option","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgAuthMembersId = PgAuthMembersId(roleid, member)
 }
@@ -33,5 +39,26 @@ object PgAuthMembersRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgAuthMembersRow] = new OFormat[PgAuthMembersRow]{
+    override def writes(o: PgAuthMembersRow): JsObject =
+      Json.obj(
+        "roleid" -> o.roleid,
+      "member" -> o.member,
+      "grantor" -> o.grantor,
+      "admin_option" -> o.adminOption
+      )
+
+    override def reads(json: JsValue): JsResult[PgAuthMembersRow] = {
+      JsResult.fromTry(
+        Try(
+          PgAuthMembersRow(
+            roleid = json.\("roleid").as[Long],
+            member = json.\("member").as[Long],
+            grantor = json.\("grantor").as[Long],
+            adminOption = json.\("admin_option").as[Boolean]
+          )
+        )
+      )
+    }
+  }
 }

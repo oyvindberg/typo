@@ -12,36 +12,42 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatDatabaseRow(
-  datid: /* unknown nullability */ Option[Long],
-  datname: /* unknown nullability */ Option[String],
-  numbackends: /* unknown nullability */ Option[Int],
-  xactCommit: /* unknown nullability */ Option[Long],
-  xactRollback: /* unknown nullability */ Option[Long],
-  blksRead: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long],
-  tupReturned: /* unknown nullability */ Option[Long],
-  tupFetched: /* unknown nullability */ Option[Long],
-  tupInserted: /* unknown nullability */ Option[Long],
-  tupUpdated: /* unknown nullability */ Option[Long],
-  tupDeleted: /* unknown nullability */ Option[Long],
-  conflicts: /* unknown nullability */ Option[Long],
-  tempFiles: /* unknown nullability */ Option[Long],
-  tempBytes: /* unknown nullability */ Option[Long],
-  deadlocks: /* unknown nullability */ Option[Long],
-  checksumFailures: /* unknown nullability */ Option[Long],
-  checksumLastFailure: /* unknown nullability */ Option[LocalDateTime],
-  blkReadTime: /* unknown nullability */ Option[Double],
-  blkWriteTime: /* unknown nullability */ Option[Double],
-  sessionTime: /* unknown nullability */ Option[Double],
-  activeTime: /* unknown nullability */ Option[Double],
-  idleInTransactionTime: /* unknown nullability */ Option[Double],
-  sessions: /* unknown nullability */ Option[Long],
-  sessionsAbandoned: /* unknown nullability */ Option[Long],
-  sessionsFatal: /* unknown nullability */ Option[Long],
-  sessionsKilled: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  datid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datid","columnName":"datid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  datname: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"datname","columnName":"datname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  numbackends: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"numbackends","columnName":"numbackends","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  xactCommit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"xact_commit","columnName":"xact_commit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  xactRollback: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"xact_rollback","columnName":"xact_rollback","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksRead: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_read","columnName":"blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  blksHit: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_hit","columnName":"blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tupReturned: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tup_returned","columnName":"tup_returned","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tupFetched: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tup_fetched","columnName":"tup_fetched","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tupInserted: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tup_inserted","columnName":"tup_inserted","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tupUpdated: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tup_updated","columnName":"tup_updated","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tupDeleted: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"tup_deleted","columnName":"tup_deleted","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  conflicts: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"conflicts","columnName":"conflicts","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tempFiles: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"temp_files","columnName":"temp_files","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  tempBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"temp_bytes","columnName":"temp_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  deadlocks: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"deadlocks","columnName":"deadlocks","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  checksumFailures: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"checksum_failures","columnName":"checksum_failures","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  checksumLastFailure: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"checksum_last_failure","columnName":"checksum_last_failure","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  blkReadTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"blk_read_time","columnName":"blk_read_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  blkWriteTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"blk_write_time","columnName":"blk_write_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  sessionTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"session_time","columnName":"session_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  activeTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"active_time","columnName":"active_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  idleInTransactionTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"idle_in_transaction_time","columnName":"idle_in_transaction_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  sessions: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sessions","columnName":"sessions","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  sessionsAbandoned: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sessions_abandoned","columnName":"sessions_abandoned","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  sessionsFatal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sessions_fatal","columnName":"sessions_fatal","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  sessionsKilled: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sessions_killed","columnName":"sessions_killed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatDatabaseRow {
@@ -80,5 +86,74 @@ object PgStatDatabaseRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatDatabaseRow] = new OFormat[PgStatDatabaseRow]{
+    override def writes(o: PgStatDatabaseRow): JsObject =
+      Json.obj(
+        "datid" -> o.datid,
+      "datname" -> o.datname,
+      "numbackends" -> o.numbackends,
+      "xact_commit" -> o.xactCommit,
+      "xact_rollback" -> o.xactRollback,
+      "blks_read" -> o.blksRead,
+      "blks_hit" -> o.blksHit,
+      "tup_returned" -> o.tupReturned,
+      "tup_fetched" -> o.tupFetched,
+      "tup_inserted" -> o.tupInserted,
+      "tup_updated" -> o.tupUpdated,
+      "tup_deleted" -> o.tupDeleted,
+      "conflicts" -> o.conflicts,
+      "temp_files" -> o.tempFiles,
+      "temp_bytes" -> o.tempBytes,
+      "deadlocks" -> o.deadlocks,
+      "checksum_failures" -> o.checksumFailures,
+      "checksum_last_failure" -> o.checksumLastFailure,
+      "blk_read_time" -> o.blkReadTime,
+      "blk_write_time" -> o.blkWriteTime,
+      "session_time" -> o.sessionTime,
+      "active_time" -> o.activeTime,
+      "idle_in_transaction_time" -> o.idleInTransactionTime,
+      "sessions" -> o.sessions,
+      "sessions_abandoned" -> o.sessionsAbandoned,
+      "sessions_fatal" -> o.sessionsFatal,
+      "sessions_killed" -> o.sessionsKilled,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatDatabaseRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatDatabaseRow(
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").toOption.map(_.as[String]),
+            numbackends = json.\("numbackends").toOption.map(_.as[Int]),
+            xactCommit = json.\("xact_commit").toOption.map(_.as[Long]),
+            xactRollback = json.\("xact_rollback").toOption.map(_.as[Long]),
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
+            tupReturned = json.\("tup_returned").toOption.map(_.as[Long]),
+            tupFetched = json.\("tup_fetched").toOption.map(_.as[Long]),
+            tupInserted = json.\("tup_inserted").toOption.map(_.as[Long]),
+            tupUpdated = json.\("tup_updated").toOption.map(_.as[Long]),
+            tupDeleted = json.\("tup_deleted").toOption.map(_.as[Long]),
+            conflicts = json.\("conflicts").toOption.map(_.as[Long]),
+            tempFiles = json.\("temp_files").toOption.map(_.as[Long]),
+            tempBytes = json.\("temp_bytes").toOption.map(_.as[Long]),
+            deadlocks = json.\("deadlocks").toOption.map(_.as[Long]),
+            checksumFailures = json.\("checksum_failures").toOption.map(_.as[Long]),
+            checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as[LocalDateTime]),
+            blkReadTime = json.\("blk_read_time").toOption.map(_.as[Double]),
+            blkWriteTime = json.\("blk_write_time").toOption.map(_.as[Double]),
+            sessionTime = json.\("session_time").toOption.map(_.as[Double]),
+            activeTime = json.\("active_time").toOption.map(_.as[Double]),
+            idleInTransactionTime = json.\("idle_in_transaction_time").toOption.map(_.as[Double]),
+            sessions = json.\("sessions").toOption.map(_.as[Long]),
+            sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as[Long]),
+            sessionsFatal = json.\("sessions_fatal").toOption.map(_.as[Long]),
+            sessionsKilled = json.\("sessions_killed").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

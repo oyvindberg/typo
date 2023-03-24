@@ -11,25 +11,31 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSettingsRow(
-  name: /* unknown nullability */ Option[String],
-  setting: /* unknown nullability */ Option[String],
-  unit: /* unknown nullability */ Option[String],
-  category: /* unknown nullability */ Option[String],
-  shortDesc: /* unknown nullability */ Option[String],
-  extraDesc: /* unknown nullability */ Option[String],
-  context: /* unknown nullability */ Option[String],
-  vartype: /* unknown nullability */ Option[String],
-  source: /* unknown nullability */ Option[String],
-  minVal: /* unknown nullability */ Option[String],
-  maxVal: /* unknown nullability */ Option[String],
-  enumvals: /* unknown nullability */ Option[Array[String]],
-  bootVal: /* unknown nullability */ Option[String],
-  resetVal: /* unknown nullability */ Option[String],
-  sourcefile: /* unknown nullability */ Option[String],
-  sourceline: /* unknown nullability */ Option[Int],
-  pendingRestart: /* unknown nullability */ Option[Boolean]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  setting: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"setting","columnName":"setting","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  unit: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"unit","columnName":"unit","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  category: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"category","columnName":"category","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  shortDesc: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"short_desc","columnName":"short_desc","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  extraDesc: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"extra_desc","columnName":"extra_desc","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  context: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"context","columnName":"context","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  vartype: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"vartype","columnName":"vartype","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  source: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"source","columnName":"source","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  minVal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"min_val","columnName":"min_val","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  maxVal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"max_val","columnName":"max_val","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  enumvals: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"enumvals","columnName":"enumvals","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  bootVal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"boot_val","columnName":"boot_val","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  resetVal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"reset_val","columnName":"reset_val","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sourcefile: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sourcefile","columnName":"sourcefile","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sourceline: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"sourceline","columnName":"sourceline","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  pendingRestart: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"pending_restart","columnName":"pending_restart","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
 )
 
 object PgSettingsRow {
@@ -57,5 +63,52 @@ object PgSettingsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgSettingsRow] = new OFormat[PgSettingsRow]{
+    override def writes(o: PgSettingsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "setting" -> o.setting,
+      "unit" -> o.unit,
+      "category" -> o.category,
+      "short_desc" -> o.shortDesc,
+      "extra_desc" -> o.extraDesc,
+      "context" -> o.context,
+      "vartype" -> o.vartype,
+      "source" -> o.source,
+      "min_val" -> o.minVal,
+      "max_val" -> o.maxVal,
+      "enumvals" -> o.enumvals,
+      "boot_val" -> o.bootVal,
+      "reset_val" -> o.resetVal,
+      "sourcefile" -> o.sourcefile,
+      "sourceline" -> o.sourceline,
+      "pending_restart" -> o.pendingRestart
+      )
+
+    override def reads(json: JsValue): JsResult[PgSettingsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSettingsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            setting = json.\("setting").toOption.map(_.as[String]),
+            unit = json.\("unit").toOption.map(_.as[String]),
+            category = json.\("category").toOption.map(_.as[String]),
+            shortDesc = json.\("short_desc").toOption.map(_.as[String]),
+            extraDesc = json.\("extra_desc").toOption.map(_.as[String]),
+            context = json.\("context").toOption.map(_.as[String]),
+            vartype = json.\("vartype").toOption.map(_.as[String]),
+            source = json.\("source").toOption.map(_.as[String]),
+            minVal = json.\("min_val").toOption.map(_.as[String]),
+            maxVal = json.\("max_val").toOption.map(_.as[String]),
+            enumvals = json.\("enumvals").toOption.map(_.as[Array[String]]),
+            bootVal = json.\("boot_val").toOption.map(_.as[String]),
+            resetVal = json.\("reset_val").toOption.map(_.as[String]),
+            sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
+            sourceline = json.\("sourceline").toOption.map(_.as[Int]),
+            pendingRestart = json.\("pending_restart").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

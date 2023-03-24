@@ -160,7 +160,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
                    |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
@@ -187,7 +187,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
                    |        case ${default.UseDefault} => None
                    |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))

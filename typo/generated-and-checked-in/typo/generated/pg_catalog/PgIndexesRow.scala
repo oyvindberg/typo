@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgIndexesRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String,
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.relname]] */
-  indexname: String,
+  indexname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexname","columnName":"indexname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String,
-  indexdef: /* unknown nullability */ Option[String]
+  tablespace: String /* {"baseColumnName":"spcname","baseRelationName":"pg_catalog.pg_tablespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablespace","columnName":"tablespace","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_tablespace"} */,
+  indexdef: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexdef","columnName":"indexdef","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgIndexesRow {
@@ -37,5 +43,28 @@ object PgIndexesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgIndexesRow] = new OFormat[PgIndexesRow]{
+    override def writes(o: PgIndexesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "indexname" -> o.indexname,
+      "tablespace" -> o.tablespace,
+      "indexdef" -> o.indexdef
+      )
+
+    override def reads(json: JsValue): JsResult[PgIndexesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgIndexesRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            indexname = json.\("indexname").as[String],
+            tablespace = json.\("tablespace").as[String],
+            indexdef = json.\("indexdef").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

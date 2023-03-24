@@ -1,5 +1,6 @@
 package typo
 
+import play.api.libs.json.Json
 import typo.doobie.{ColumnNullable, JdbcType}
 
 case class ViewComputed(pkg: sc.QIdent, view: View) {
@@ -21,7 +22,7 @@ case class ViewComputed(pkg: sc.QIdent, view: View) {
         case _ =>
           None
       }
-      ColumnComputed(pointsTo, names.field(col.name), tpe, col.name, hasDefault = false)
+      ColumnComputed(pointsTo, names.field(col.name), tpe, col.name, hasDefault = false, Json.toJson(col))
     }
   }
   val relation = RelationComputed(pkg, view.name, cols, maybeId = None)

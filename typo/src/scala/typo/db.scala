@@ -1,5 +1,7 @@
 package typo
 
+import play.api.libs.json.JsValue
+
 /** Describes what tables look like in postgres
   */
 object db {
@@ -32,7 +34,7 @@ object db {
 
   case class StringEnum(name: db.RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
-  case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean)
+  case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean, jsonDescription: JsValue)
   case class RelationName(schema: String, name: String)
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName = RelationName("", "")) {

@@ -11,16 +11,22 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSeclabelsRow(
-  objoid: /* unknown nullability */ Option[Long],
-  classoid: /* unknown nullability */ Option[Long],
-  objsubid: /* unknown nullability */ Option[Int],
-  objtype: /* unknown nullability */ Option[String],
-  objnamespace: /* unknown nullability */ Option[Long],
-  objname: /* unknown nullability */ Option[String],
-  provider: /* unknown nullability */ Option[String],
-  label: /* unknown nullability */ Option[String]
+  objoid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"objoid","columnName":"objoid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  classoid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"classoid","columnName":"classoid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  objsubid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"objsubid","columnName":"objsubid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  objtype: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"objtype","columnName":"objtype","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  objnamespace: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"objnamespace","columnName":"objnamespace","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  objname: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"objname","columnName":"objname","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  provider: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"provider","columnName":"provider","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  label: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"label","columnName":"label","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgSeclabelsRow {
@@ -39,5 +45,34 @@ object PgSeclabelsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgSeclabelsRow] = new OFormat[PgSeclabelsRow]{
+    override def writes(o: PgSeclabelsRow): JsObject =
+      Json.obj(
+        "objoid" -> o.objoid,
+      "classoid" -> o.classoid,
+      "objsubid" -> o.objsubid,
+      "objtype" -> o.objtype,
+      "objnamespace" -> o.objnamespace,
+      "objname" -> o.objname,
+      "provider" -> o.provider,
+      "label" -> o.label
+      )
+
+    override def reads(json: JsValue): JsResult[PgSeclabelsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSeclabelsRow(
+            objoid = json.\("objoid").toOption.map(_.as[Long]),
+            classoid = json.\("classoid").toOption.map(_.as[Long]),
+            objsubid = json.\("objsubid").toOption.map(_.as[Int]),
+            objtype = json.\("objtype").toOption.map(_.as[String]),
+            objnamespace = json.\("objnamespace").toOption.map(_.as[Long]),
+            objname = json.\("objname").toOption.map(_.as[String]),
+            provider = json.\("provider").toOption.map(_.as[String]),
+            label = json.\("label").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

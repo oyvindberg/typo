@@ -11,17 +11,23 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ForeignDataWrappersRow(
   /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[String],
+  foreignDataWrapperCatalog: Option[String] /* {"baseColumnName":"foreign_data_wrapper_catalog","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_catalog","columnName":"foreign_data_wrapper_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */,
   /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[String],
+  foreignDataWrapperName: Option[String] /* {"baseColumnName":"foreign_data_wrapper_name","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_name","columnName":"foreign_data_wrapper_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */,
   /** Points to [[PgForeignDataWrappersRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[String],
-  libraryName: /* unknown nullability */ Option[String],
+  authorizationIdentifier: Option[String] /* {"baseColumnName":"authorization_identifier","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */,
+  libraryName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"library_name","columnName":"library_name","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperLanguage]] */
-  foreignDataWrapperLanguage: Option[String]
+  foreignDataWrapperLanguage: Option[String] /* {"baseColumnName":"foreign_data_wrapper_language","baseRelationName":"information_schema._pg_foreign_data_wrappers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_language","columnName":"foreign_data_wrapper_language","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_data_wrappers"} */
 )
 
 object ForeignDataWrappersRow {
@@ -37,5 +43,28 @@ object ForeignDataWrappersRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ForeignDataWrappersRow] = new OFormat[ForeignDataWrappersRow]{
+    override def writes(o: ForeignDataWrappersRow): JsObject =
+      Json.obj(
+        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
+      "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
+      "authorization_identifier" -> o.authorizationIdentifier,
+      "library_name" -> o.libraryName,
+      "foreign_data_wrapper_language" -> o.foreignDataWrapperLanguage
+      )
+
+    override def reads(json: JsValue): JsResult[ForeignDataWrappersRow] = {
+      JsResult.fromTry(
+        Try(
+          ForeignDataWrappersRow(
+            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
+            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
+            libraryName = json.\("library_name").toOption.map(_.as[String]),
+            foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,14 +11,20 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class ForeignServerOptionsRow(
   /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[String],
+  foreignServerCatalog: Option[String] /* {"baseColumnName":"foreign_server_catalog","baseRelationName":"information_schema._pg_foreign_servers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_catalog","columnName":"foreign_server_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_servers"} */,
   /** Points to [[PgForeignServersRow.foreignServerName]] */
-  foreignServerName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  foreignServerName: Option[String] /* {"baseColumnName":"foreign_server_name","baseRelationName":"information_schema._pg_foreign_servers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_name","columnName":"foreign_server_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_servers"} */,
+  optionName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_name","columnName":"option_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  optionValue: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"option_value","columnName":"option_value","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object ForeignServerOptionsRow {
@@ -33,5 +39,26 @@ object ForeignServerOptionsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[ForeignServerOptionsRow] = new OFormat[ForeignServerOptionsRow]{
+    override def writes(o: ForeignServerOptionsRow): JsObject =
+      Json.obj(
+        "foreign_server_catalog" -> o.foreignServerCatalog,
+      "foreign_server_name" -> o.foreignServerName,
+      "option_name" -> o.optionName,
+      "option_value" -> o.optionValue
+      )
+
+    override def reads(json: JsValue): JsResult[ForeignServerOptionsRow] = {
+      JsResult.fromTry(
+        Try(
+          ForeignServerOptionsRow(
+            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
+            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),
+            optionName = json.\("option_name").toOption.map(_.as[String]),
+            optionValue = json.\("option_value").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

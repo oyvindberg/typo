@@ -11,15 +11,21 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgDependRow(
-  classid: Long,
-  objid: Long,
-  objsubid: Int,
-  refclassid: Long,
-  refobjid: Long,
-  refobjsubid: Int,
-  deptype: String
+  classid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"classid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  objid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"objid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  objsubid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"objsubid","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  refclassid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"refclassid","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  refobjid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"refobjid","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  refobjsubid: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"refobjsubid","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  deptype: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_depend","column_name":"deptype","ordinal_position":7,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgDependRow {
@@ -37,5 +43,32 @@ object PgDependRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgDependRow] = new OFormat[PgDependRow]{
+    override def writes(o: PgDependRow): JsObject =
+      Json.obj(
+        "classid" -> o.classid,
+      "objid" -> o.objid,
+      "objsubid" -> o.objsubid,
+      "refclassid" -> o.refclassid,
+      "refobjid" -> o.refobjid,
+      "refobjsubid" -> o.refobjsubid,
+      "deptype" -> o.deptype
+      )
+
+    override def reads(json: JsValue): JsResult[PgDependRow] = {
+      JsResult.fromTry(
+        Try(
+          PgDependRow(
+            classid = json.\("classid").as[Long],
+            objid = json.\("objid").as[Long],
+            objsubid = json.\("objsubid").as[Int],
+            refclassid = json.\("refclassid").as[Long],
+            refobjid = json.\("refobjid").as[Long],
+            refobjsubid = json.\("refobjsubid").as[Int],
+            deptype = json.\("deptype").as[String]
+          )
+        )
+      )
+    }
+  }
 }

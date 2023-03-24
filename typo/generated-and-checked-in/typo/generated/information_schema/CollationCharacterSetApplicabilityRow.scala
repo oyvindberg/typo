@@ -11,14 +11,20 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CollationCharacterSetApplicabilityRow(
-  collationCatalog: /* unknown nullability */ Option[String],
-  collationSchema: /* unknown nullability */ Option[String],
-  collationName: /* unknown nullability */ Option[String],
-  characterSetCatalog: /* unknown nullability */ Option[String],
-  characterSetSchema: /* unknown nullability */ Option[String],
-  characterSetName: /* unknown nullability */ Option[String]
+  collationCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_catalog","columnName":"collation_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  collationSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_schema","columnName":"collation_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  collationName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_name","columnName":"collation_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterSetCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_catalog","columnName":"character_set_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterSetSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_schema","columnName":"character_set_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterSetName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_name","columnName":"character_set_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object CollationCharacterSetApplicabilityRow {
@@ -35,5 +41,30 @@ object CollationCharacterSetApplicabilityRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[CollationCharacterSetApplicabilityRow] = new OFormat[CollationCharacterSetApplicabilityRow]{
+    override def writes(o: CollationCharacterSetApplicabilityRow): JsObject =
+      Json.obj(
+        "collation_catalog" -> o.collationCatalog,
+      "collation_schema" -> o.collationSchema,
+      "collation_name" -> o.collationName,
+      "character_set_catalog" -> o.characterSetCatalog,
+      "character_set_schema" -> o.characterSetSchema,
+      "character_set_name" -> o.characterSetName
+      )
+
+    override def reads(json: JsValue): JsResult[CollationCharacterSetApplicabilityRow] = {
+      JsResult.fromTry(
+        Try(
+          CollationCharacterSetApplicabilityRow(
+            collationCatalog = json.\("collation_catalog").toOption.map(_.as[String]),
+            collationSchema = json.\("collation_schema").toOption.map(_.as[String]),
+            collationName = json.\("collation_name").toOption.map(_.as[String]),
+            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[String]),
+            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[String]),
+            characterSetName = json.\("character_set_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

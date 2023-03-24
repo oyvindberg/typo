@@ -11,18 +11,24 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgUserMappingsRow(
   /** Points to [[PgUserMappingRow.oid]] */
-  umid: Long,
+  umid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"umid","columnName":"umid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
   /** Points to [[PgForeignServerRow.oid]] */
-  srvid: Long,
+  srvid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"srvid","columnName":"srvid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_server"} */,
   /** Points to [[PgForeignServerRow.srvname]] */
-  srvname: String,
+  srvname: String /* {"baseColumnName":"srvname","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"srvname","columnName":"srvname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_server"} */,
   /** Points to [[PgUserMappingRow.umuser]] */
-  umuser: Long,
-  usename: /* unknown nullability */ Option[String],
-  umoptions: /* unknown nullability */ Option[Array[String]]
+  umuser: Long /* {"baseColumnName":"umuser","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"umuser","columnName":"umuser","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
+  usename: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"usename","columnName":"usename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  umoptions: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"umoptions","columnName":"umoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgUserMappingsRow {
@@ -39,5 +45,30 @@ object PgUserMappingsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgUserMappingsRow] = new OFormat[PgUserMappingsRow]{
+    override def writes(o: PgUserMappingsRow): JsObject =
+      Json.obj(
+        "umid" -> o.umid,
+      "srvid" -> o.srvid,
+      "srvname" -> o.srvname,
+      "umuser" -> o.umuser,
+      "usename" -> o.usename,
+      "umoptions" -> o.umoptions
+      )
+
+    override def reads(json: JsValue): JsResult[PgUserMappingsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgUserMappingsRow(
+            umid = json.\("umid").as[Long],
+            srvid = json.\("srvid").as[Long],
+            srvname = json.\("srvname").as[String],
+            umuser = json.\("umuser").as[Long],
+            usename = json.\("usename").toOption.map(_.as[String]),
+            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

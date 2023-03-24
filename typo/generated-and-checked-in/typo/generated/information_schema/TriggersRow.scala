@@ -12,25 +12,31 @@ package information_schema
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class TriggersRow(
-  triggerCatalog: /* unknown nullability */ Option[String],
-  triggerSchema: /* unknown nullability */ Option[String],
-  triggerName: /* unknown nullability */ Option[String],
-  eventManipulation: /* unknown nullability */ Option[String],
-  eventObjectCatalog: /* unknown nullability */ Option[String],
-  eventObjectSchema: /* unknown nullability */ Option[String],
-  eventObjectTable: /* unknown nullability */ Option[String],
-  actionOrder: /* unknown nullability */ Option[Int],
-  actionCondition: /* unknown nullability */ Option[String],
-  actionStatement: /* unknown nullability */ Option[String],
-  actionOrientation: /* unknown nullability */ Option[String],
-  actionTiming: /* unknown nullability */ Option[String],
-  actionReferenceOldTable: /* unknown nullability */ Option[String],
-  actionReferenceNewTable: /* unknown nullability */ Option[String],
-  actionReferenceOldRow: /* unknown nullability */ Option[String],
-  actionReferenceNewRow: /* unknown nullability */ Option[String],
-  created: /* unknown nullability */ Option[LocalDateTime]
+  triggerCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"trigger_catalog","columnName":"trigger_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  triggerSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"trigger_schema","columnName":"trigger_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  triggerName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"trigger_name","columnName":"trigger_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  eventManipulation: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"event_manipulation","columnName":"event_manipulation","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  eventObjectCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"event_object_catalog","columnName":"event_object_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  eventObjectSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"event_object_schema","columnName":"event_object_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  eventObjectTable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"event_object_table","columnName":"event_object_table","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionOrder: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"action_order","columnName":"action_order","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  actionCondition: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_condition","columnName":"action_condition","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionStatement: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_statement","columnName":"action_statement","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionOrientation: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_orientation","columnName":"action_orientation","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionTiming: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_timing","columnName":"action_timing","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionReferenceOldTable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_reference_old_table","columnName":"action_reference_old_table","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionReferenceNewTable: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_reference_new_table","columnName":"action_reference_new_table","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionReferenceOldRow: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_reference_old_row","columnName":"action_reference_old_row","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  actionReferenceNewRow: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"action_reference_new_row","columnName":"action_reference_new_row","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  created: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":31,"columnLabel":"created","columnName":"created","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":31,"scale":2} */
 )
 
 object TriggersRow {
@@ -58,5 +64,52 @@ object TriggersRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[TriggersRow] = new OFormat[TriggersRow]{
+    override def writes(o: TriggersRow): JsObject =
+      Json.obj(
+        "trigger_catalog" -> o.triggerCatalog,
+      "trigger_schema" -> o.triggerSchema,
+      "trigger_name" -> o.triggerName,
+      "event_manipulation" -> o.eventManipulation,
+      "event_object_catalog" -> o.eventObjectCatalog,
+      "event_object_schema" -> o.eventObjectSchema,
+      "event_object_table" -> o.eventObjectTable,
+      "action_order" -> o.actionOrder,
+      "action_condition" -> o.actionCondition,
+      "action_statement" -> o.actionStatement,
+      "action_orientation" -> o.actionOrientation,
+      "action_timing" -> o.actionTiming,
+      "action_reference_old_table" -> o.actionReferenceOldTable,
+      "action_reference_new_table" -> o.actionReferenceNewTable,
+      "action_reference_old_row" -> o.actionReferenceOldRow,
+      "action_reference_new_row" -> o.actionReferenceNewRow,
+      "created" -> o.created
+      )
+
+    override def reads(json: JsValue): JsResult[TriggersRow] = {
+      JsResult.fromTry(
+        Try(
+          TriggersRow(
+            triggerCatalog = json.\("trigger_catalog").toOption.map(_.as[String]),
+            triggerSchema = json.\("trigger_schema").toOption.map(_.as[String]),
+            triggerName = json.\("trigger_name").toOption.map(_.as[String]),
+            eventManipulation = json.\("event_manipulation").toOption.map(_.as[String]),
+            eventObjectCatalog = json.\("event_object_catalog").toOption.map(_.as[String]),
+            eventObjectSchema = json.\("event_object_schema").toOption.map(_.as[String]),
+            eventObjectTable = json.\("event_object_table").toOption.map(_.as[String]),
+            actionOrder = json.\("action_order").toOption.map(_.as[Int]),
+            actionCondition = json.\("action_condition").toOption.map(_.as[String]),
+            actionStatement = json.\("action_statement").toOption.map(_.as[String]),
+            actionOrientation = json.\("action_orientation").toOption.map(_.as[String]),
+            actionTiming = json.\("action_timing").toOption.map(_.as[String]),
+            actionReferenceOldTable = json.\("action_reference_old_table").toOption.map(_.as[String]),
+            actionReferenceNewTable = json.\("action_reference_new_table").toOption.map(_.as[String]),
+            actionReferenceOldRow = json.\("action_reference_old_row").toOption.map(_.as[String]),
+            actionReferenceNewRow = json.\("action_reference_new_row").toOption.map(_.as[String]),
+            created = json.\("created").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

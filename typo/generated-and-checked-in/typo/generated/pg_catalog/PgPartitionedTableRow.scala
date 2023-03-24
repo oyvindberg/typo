@@ -12,16 +12,22 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPartitionedTableRow(
-  partrelid: PgPartitionedTableId,
-  partstrat: String,
-  partnatts: Int,
-  partdefid: Long,
-  partattrs: Array[Int],
-  partclass: Array[Long],
-  partcollation: Array[Long],
-  partexprs: Option[PGobject]
+  partrelid: PgPartitionedTableId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partstrat: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partstrat","ordinal_position":2,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partnatts: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partnatts","ordinal_position":3,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partdefid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partdefid","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partattrs: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partattrs","ordinal_position":5,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partclass: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partclass","ordinal_position":6,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partcollation: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partcollation","ordinal_position":7,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  partexprs: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_partitioned_table","column_name":"partexprs","ordinal_position":8,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgPartitionedTableRow {
@@ -40,5 +46,34 @@ object PgPartitionedTableRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPartitionedTableRow] = new OFormat[PgPartitionedTableRow]{
+    override def writes(o: PgPartitionedTableRow): JsObject =
+      Json.obj(
+        "partrelid" -> o.partrelid,
+      "partstrat" -> o.partstrat,
+      "partnatts" -> o.partnatts,
+      "partdefid" -> o.partdefid,
+      "partattrs" -> o.partattrs,
+      "partclass" -> o.partclass,
+      "partcollation" -> o.partcollation,
+      "partexprs" -> o.partexprs
+      )
+
+    override def reads(json: JsValue): JsResult[PgPartitionedTableRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPartitionedTableRow(
+            partrelid = json.\("partrelid").as[PgPartitionedTableId],
+            partstrat = json.\("partstrat").as[String],
+            partnatts = json.\("partnatts").as[Int],
+            partdefid = json.\("partdefid").as[Long],
+            partattrs = json.\("partattrs").as[Array[Int]],
+            partclass = json.\("partclass").as[Array[Long]],
+            partcollation = json.\("partcollation").as[Array[Long]],
+            partexprs = json.\("partexprs").toOption.map(_.as[PGobject])
+          )
+        )
+      )
+    }
+  }
 }

@@ -12,23 +12,29 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatWalReceiverRow(
-  pid: /* unknown nullability */ Option[Int],
-  status: /* unknown nullability */ Option[String],
-  receiveStartLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  receiveStartTli: /* unknown nullability */ Option[Int],
-  writtenLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  flushedLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  receivedTli: /* unknown nullability */ Option[Int],
-  lastMsgSendTime: /* unknown nullability */ Option[LocalDateTime],
-  lastMsgReceiptTime: /* unknown nullability */ Option[LocalDateTime],
-  latestEndLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  latestEndTime: /* unknown nullability */ Option[LocalDateTime],
-  slotName: /* unknown nullability */ Option[String],
-  senderHost: /* unknown nullability */ Option[String],
-  senderPort: /* unknown nullability */ Option[Int],
-  conninfo: /* unknown nullability */ Option[String]
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  status: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"status","columnName":"status","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  receiveStartLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"receive_start_lsn","columnName":"receive_start_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  receiveStartTli: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"receive_start_tli","columnName":"receive_start_tli","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  writtenLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"written_lsn","columnName":"written_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  flushedLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"flushed_lsn","columnName":"flushed_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  receivedTli: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"received_tli","columnName":"received_tli","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  lastMsgSendTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_msg_send_time","columnName":"last_msg_send_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  lastMsgReceiptTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_msg_receipt_time","columnName":"last_msg_receipt_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  latestEndLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"latest_end_lsn","columnName":"latest_end_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  latestEndTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"latest_end_time","columnName":"latest_end_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  slotName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"slot_name","columnName":"slot_name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  senderHost: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sender_host","columnName":"sender_host","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  senderPort: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"sender_port","columnName":"sender_port","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  conninfo: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"conninfo","columnName":"conninfo","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgStatWalReceiverRow {
@@ -54,5 +60,48 @@ object PgStatWalReceiverRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatWalReceiverRow] = new OFormat[PgStatWalReceiverRow]{
+    override def writes(o: PgStatWalReceiverRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "status" -> o.status,
+      "receive_start_lsn" -> o.receiveStartLsn,
+      "receive_start_tli" -> o.receiveStartTli,
+      "written_lsn" -> o.writtenLsn,
+      "flushed_lsn" -> o.flushedLsn,
+      "received_tli" -> o.receivedTli,
+      "last_msg_send_time" -> o.lastMsgSendTime,
+      "last_msg_receipt_time" -> o.lastMsgReceiptTime,
+      "latest_end_lsn" -> o.latestEndLsn,
+      "latest_end_time" -> o.latestEndTime,
+      "slot_name" -> o.slotName,
+      "sender_host" -> o.senderHost,
+      "sender_port" -> o.senderPort,
+      "conninfo" -> o.conninfo
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatWalReceiverRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatWalReceiverRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            status = json.\("status").toOption.map(_.as[String]),
+            receiveStartLsn = json.\("receive_start_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            receiveStartTli = json.\("receive_start_tli").toOption.map(_.as[Int]),
+            writtenLsn = json.\("written_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            flushedLsn = json.\("flushed_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            receivedTli = json.\("received_tli").toOption.map(_.as[Int]),
+            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[LocalDateTime]),
+            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[LocalDateTime]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            latestEndTime = json.\("latest_end_time").toOption.map(_.as[LocalDateTime]),
+            slotName = json.\("slot_name").toOption.map(_.as[String]),
+            senderHost = json.\("sender_host").toOption.map(_.as[String]),
+            senderPort = json.\("sender_port").toOption.map(_.as[Int]),
+            conninfo = json.\("conninfo").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

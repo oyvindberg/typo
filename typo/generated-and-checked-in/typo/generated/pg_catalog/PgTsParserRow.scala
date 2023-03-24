@@ -12,16 +12,22 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTsParserRow(
-  oid: PgTsParserId,
-  prsname: String,
-  prsnamespace: Long,
-  prsstart: PGobject,
-  prstoken: PGobject,
-  prsend: PGobject,
-  prsheadline: PGobject,
-  prslextype: PGobject
+  oid: PgTsParserId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prsname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prsname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prsnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prsnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prsstart: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prsstart","ordinal_position":4,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prstoken: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prstoken","ordinal_position":5,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prsend: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prsend","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prsheadline: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prsheadline","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prslextype: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_parser","column_name":"prslextype","ordinal_position":8,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgTsParserRow {
@@ -40,5 +46,34 @@ object PgTsParserRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTsParserRow] = new OFormat[PgTsParserRow]{
+    override def writes(o: PgTsParserRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "prsname" -> o.prsname,
+      "prsnamespace" -> o.prsnamespace,
+      "prsstart" -> o.prsstart,
+      "prstoken" -> o.prstoken,
+      "prsend" -> o.prsend,
+      "prsheadline" -> o.prsheadline,
+      "prslextype" -> o.prslextype
+      )
+
+    override def reads(json: JsValue): JsResult[PgTsParserRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTsParserRow(
+            oid = json.\("oid").as[PgTsParserId],
+            prsname = json.\("prsname").as[String],
+            prsnamespace = json.\("prsnamespace").as[Long],
+            prsstart = json.\("prsstart").as[PGobject],
+            prstoken = json.\("prstoken").as[PGobject],
+            prsend = json.\("prsend").as[PGobject],
+            prsheadline = json.\("prsheadline").as[PGobject],
+            prslextype = json.\("prslextype").as[PGobject]
+          )
+        )
+      )
+    }
+  }
 }

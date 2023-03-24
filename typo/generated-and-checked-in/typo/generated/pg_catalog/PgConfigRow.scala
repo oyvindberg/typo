@@ -11,10 +11,16 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgConfigRow(
-  name: /* unknown nullability */ Option[String],
-  setting: /* unknown nullability */ Option[String]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  setting: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"setting","columnName":"setting","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgConfigRow {
@@ -27,5 +33,22 @@ object PgConfigRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgConfigRow] = new OFormat[PgConfigRow]{
+    override def writes(o: PgConfigRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "setting" -> o.setting
+      )
+
+    override def reads(json: JsValue): JsResult[PgConfigRow] = {
+      JsResult.fromTry(
+        Try(
+          PgConfigRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            setting = json.\("setting").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

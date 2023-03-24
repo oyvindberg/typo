@@ -11,17 +11,23 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 import typo.generated.pg_catalog.PgForeignTableRow
 
 case class PgForeignTablesRow(
-  foreignTableCatalog: /* unknown nullability */ Option[String],
-  foreignTableSchema: /* unknown nullability */ Option[String],
-  foreignTableName: /* unknown nullability */ Option[String],
+  foreignTableCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_catalog","columnName":"foreign_table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignTableSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_schema","columnName":"foreign_table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignTableName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_table_name","columnName":"foreign_table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgForeignTableRow.ftoptions]] */
-  ftoptions: Option[Array[String]],
-  foreignServerCatalog: /* unknown nullability */ Option[String],
-  foreignServerName: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String]
+  ftoptions: Option[Array[String]] /* {"baseColumnName":"ftoptions","baseRelationName":"pg_catalog.pg_foreign_table","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"ftoptions","columnName":"ftoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_table"} */,
+  foreignServerCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_catalog","columnName":"foreign_server_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignServerName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_name","columnName":"foreign_server_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  authorizationIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgForeignTablesRow {
@@ -39,5 +45,32 @@ object PgForeignTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgForeignTablesRow] = new OFormat[PgForeignTablesRow]{
+    override def writes(o: PgForeignTablesRow): JsObject =
+      Json.obj(
+        "foreign_table_catalog" -> o.foreignTableCatalog,
+      "foreign_table_schema" -> o.foreignTableSchema,
+      "foreign_table_name" -> o.foreignTableName,
+      "ftoptions" -> o.ftoptions,
+      "foreign_server_catalog" -> o.foreignServerCatalog,
+      "foreign_server_name" -> o.foreignServerName,
+      "authorization_identifier" -> o.authorizationIdentifier
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignTablesRow(
+            foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as[String]),
+            foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as[String]),
+            foreignTableName = json.\("foreign_table_name").toOption.map(_.as[String]),
+            ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]]),
+            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
+            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -12,15 +12,21 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgPreparedXactsRow(
-  transaction: /* unknown nullability */ Option[/* xid */ String],
-  gid: /* unknown nullability */ Option[String],
-  prepared: /* unknown nullability */ Option[LocalDateTime],
+  transaction: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"transaction","columnName":"transaction","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  gid: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"gid","columnName":"gid","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  prepared: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"prepared","columnName":"prepared","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
   /** Points to [[PgAuthidRow.rolname]] */
-  owner: String,
+  owner: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"owner","columnName":"owner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
   /** Points to [[PgDatabaseRow.datname]] */
-  database: String
+  database: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"database","columnName":"database","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */
 )
 
 object PgPreparedXactsRow {
@@ -36,5 +42,28 @@ object PgPreparedXactsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgPreparedXactsRow] = new OFormat[PgPreparedXactsRow]{
+    override def writes(o: PgPreparedXactsRow): JsObject =
+      Json.obj(
+        "transaction" -> o.transaction,
+      "gid" -> o.gid,
+      "prepared" -> o.prepared,
+      "owner" -> o.owner,
+      "database" -> o.database
+      )
+
+    override def reads(json: JsValue): JsResult[PgPreparedXactsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgPreparedXactsRow(
+            transaction = json.\("transaction").toOption.map(_.as[/* xid */ String]),
+            gid = json.\("gid").toOption.map(_.as[String]),
+            prepared = json.\("prepared").toOption.map(_.as[LocalDateTime]),
+            owner = json.\("owner").as[String],
+            database = json.\("database").as[String]
+          )
+        )
+      )
+    }
+  }
 }

@@ -145,7 +145,37 @@ package object generated {
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGobject] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGobject])
   }
 
-  
+  implicit val PGboxFormat: play.api.libs.json.Format[org.postgresql.geometric.PGbox] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGbox](new org.postgresql.geometric.PGbox(_), _.getValue)
+  implicit val PGcircleFormat: play.api.libs.json.Format[org.postgresql.geometric.PGcircle] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGcircle](new org.postgresql.geometric.PGcircle(_), _.getValue)
+  implicit val PGlineFormat: play.api.libs.json.Format[org.postgresql.geometric.PGline] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGline](new org.postgresql.geometric.PGline(_), _.getValue)
+  implicit val PGlsegFormat: play.api.libs.json.Format[org.postgresql.geometric.PGlseg] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGlseg](new org.postgresql.geometric.PGlseg(_), _.getValue)
+  implicit val PGpathFormat: play.api.libs.json.Format[org.postgresql.geometric.PGpath] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGpath](new org.postgresql.geometric.PGpath(_), _.getValue)
+  implicit val PGpointFormat: play.api.libs.json.Format[org.postgresql.geometric.PGpoint] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGpoint](new org.postgresql.geometric.PGpoint(_), _.getValue)
+  implicit val PGpolygonFormat: play.api.libs.json.Format[org.postgresql.geometric.PGpolygon] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGpolygon](new org.postgresql.geometric.PGpolygon(_), _.getValue)
+  implicit val PGIntervalFormat: play.api.libs.json.Format[org.postgresql.util.PGInterval] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGInterval](new org.postgresql.util.PGInterval(_), _.getValue)
+  implicit val PGmoneyFormat: play.api.libs.json.Format[org.postgresql.util.PGmoney] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGmoney](new org.postgresql.util.PGmoney(_), _.getValue)
+  implicit val hstoreFormat: play.api.libs.json.Format[java.util.Map[java.lang.String, java.lang.String]] = implicitly[play.api.libs.json.Format[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].bimap(x => scala.jdk.CollectionConverters.MapHasAsJava(x).asJava, x => scala.jdk.CollectionConverters.MapHasAsScala(x).asScala.toMap)
+  implicit val pgObjectFormat: play.api.libs.json.OFormat[org.postgresql.util.PGobject] =
+    new play.api.libs.json.OFormat[org.postgresql.util.PGobject] {
+      override def writes(o: org.postgresql.util.PGobject): play.api.libs.json.JsObject =
+        play.api.libs.json.JsObject(scala.collection.immutable.Map("type" -> play.api.libs.json.JsString(o.getType), "value" -> play.api.libs.json.JsString(o.getValue)))
+
+      override def reads(json: play.api.libs.json.JsValue): play.api.libs.json.JsResult[org.postgresql.util.PGobject] = json match {
+        case play.api.libs.json.JsObject(fields) =>
+          val t = fields.get("type").map(_.as[String])
+          val v = fields.get("value").map(_.as[String])
+          (t, v) match {
+            case (scala.Some(t), scala.Some(v)) =>
+              val o = new org.postgresql.util.PGobject()
+              o.setType(t)
+              o.setValue(v)
+              play.api.libs.json.JsSuccess(o)
+            case _ => play.api.libs.json.JsError("Invalid PGobject")
+          }
+        case _ => play.api.libs.json.JsError("Invalid PGobject")
+      }
+    }
+
   implicit val pgObjectOrdering: scala.math.Ordering[org.postgresql.util.PGobject] =
     scala.math.Ordering.by(x => (x.getType, x.getValue))
 }

@@ -12,12 +12,18 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAmRow(
-  oid: PgAmId,
-  amname: String,
-  amhandler: PGobject,
-  amtype: String
+  oid: PgAmId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_am","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_am","column_name":"amname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amhandler: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_am","column_name":"amhandler","ordinal_position":3,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amtype: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_am","column_name":"amtype","ordinal_position":4,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgAmRow {
@@ -32,5 +38,26 @@ object PgAmRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgAmRow] = new OFormat[PgAmRow]{
+    override def writes(o: PgAmRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "amname" -> o.amname,
+      "amhandler" -> o.amhandler,
+      "amtype" -> o.amtype
+      )
+
+    override def reads(json: JsValue): JsResult[PgAmRow] = {
+      JsResult.fromTry(
+        Try(
+          PgAmRow(
+            oid = json.\("oid").as[PgAmId],
+            amname = json.\("amname").as[String],
+            amhandler = json.\("amhandler").as[PGobject],
+            amtype = json.\("amtype").as[String]
+          )
+        )
+      )
+    }
+  }
 }

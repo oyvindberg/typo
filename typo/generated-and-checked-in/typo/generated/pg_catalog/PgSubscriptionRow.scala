@@ -11,19 +11,25 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgSubscriptionRow(
-  oid: PgSubscriptionId,
-  subdbid: Long,
-  subname: String,
-  subowner: Long,
-  subenabled: Boolean,
-  subbinary: Boolean,
-  substream: Boolean,
-  subconninfo: String,
-  subslotname: Option[String],
-  subsynccommit: String,
-  subpublications: Array[String]
+  oid: PgSubscriptionId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subdbid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subdbid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subname","ordinal_position":3,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subenabled: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subenabled","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subbinary: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subbinary","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  substream: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"substream","ordinal_position":7,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subconninfo: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subconninfo","ordinal_position":8,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subslotname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subslotname","ordinal_position":9,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subsynccommit: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subsynccommit","ordinal_position":10,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subpublications: Array[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subpublications","ordinal_position":11,"is_nullable":"NO","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgSubscriptionRow {
@@ -45,5 +51,40 @@ object PgSubscriptionRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgSubscriptionRow] = new OFormat[PgSubscriptionRow]{
+    override def writes(o: PgSubscriptionRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "subdbid" -> o.subdbid,
+      "subname" -> o.subname,
+      "subowner" -> o.subowner,
+      "subenabled" -> o.subenabled,
+      "subbinary" -> o.subbinary,
+      "substream" -> o.substream,
+      "subconninfo" -> o.subconninfo,
+      "subslotname" -> o.subslotname,
+      "subsynccommit" -> o.subsynccommit,
+      "subpublications" -> o.subpublications
+      )
+
+    override def reads(json: JsValue): JsResult[PgSubscriptionRow] = {
+      JsResult.fromTry(
+        Try(
+          PgSubscriptionRow(
+            oid = json.\("oid").as[PgSubscriptionId],
+            subdbid = json.\("subdbid").as[Long],
+            subname = json.\("subname").as[String],
+            subowner = json.\("subowner").as[Long],
+            subenabled = json.\("subenabled").as[Boolean],
+            subbinary = json.\("subbinary").as[Boolean],
+            substream = json.\("substream").as[Boolean],
+            subconninfo = json.\("subconninfo").as[String],
+            subslotname = json.\("subslotname").toOption.map(_.as[String]),
+            subsynccommit = json.\("subsynccommit").as[String],
+            subpublications = json.\("subpublications").as[Array[String]]
+          )
+        )
+      )
+    }
+  }
 }

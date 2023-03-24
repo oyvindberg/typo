@@ -10,6 +10,12 @@ package generated
 package pg_catalog
 
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAggregateRowUnsaved(
   aggkind: String,
@@ -35,5 +41,60 @@ case class PgAggregateRowUnsaved(
   aggminitval: Option[String]
 )
 object PgAggregateRowUnsaved {
-  
+  implicit val oFormat: OFormat[PgAggregateRowUnsaved] = new OFormat[PgAggregateRowUnsaved]{
+    override def writes(o: PgAggregateRowUnsaved): JsObject =
+      Json.obj(
+        "aggkind" -> o.aggkind,
+      "aggnumdirectargs" -> o.aggnumdirectargs,
+      "aggtransfn" -> o.aggtransfn,
+      "aggfinalfn" -> o.aggfinalfn,
+      "aggcombinefn" -> o.aggcombinefn,
+      "aggserialfn" -> o.aggserialfn,
+      "aggdeserialfn" -> o.aggdeserialfn,
+      "aggmtransfn" -> o.aggmtransfn,
+      "aggminvtransfn" -> o.aggminvtransfn,
+      "aggmfinalfn" -> o.aggmfinalfn,
+      "aggfinalextra" -> o.aggfinalextra,
+      "aggmfinalextra" -> o.aggmfinalextra,
+      "aggfinalmodify" -> o.aggfinalmodify,
+      "aggmfinalmodify" -> o.aggmfinalmodify,
+      "aggsortop" -> o.aggsortop,
+      "aggtranstype" -> o.aggtranstype,
+      "aggtransspace" -> o.aggtransspace,
+      "aggmtranstype" -> o.aggmtranstype,
+      "aggmtransspace" -> o.aggmtransspace,
+      "agginitval" -> o.agginitval,
+      "aggminitval" -> o.aggminitval
+      )
+
+    override def reads(json: JsValue): JsResult[PgAggregateRowUnsaved] = {
+      JsResult.fromTry(
+        Try(
+          PgAggregateRowUnsaved(
+            aggkind = json.\("aggkind").as[String],
+            aggnumdirectargs = json.\("aggnumdirectargs").as[Int],
+            aggtransfn = json.\("aggtransfn").as[PGobject],
+            aggfinalfn = json.\("aggfinalfn").as[PGobject],
+            aggcombinefn = json.\("aggcombinefn").as[PGobject],
+            aggserialfn = json.\("aggserialfn").as[PGobject],
+            aggdeserialfn = json.\("aggdeserialfn").as[PGobject],
+            aggmtransfn = json.\("aggmtransfn").as[PGobject],
+            aggminvtransfn = json.\("aggminvtransfn").as[PGobject],
+            aggmfinalfn = json.\("aggmfinalfn").as[PGobject],
+            aggfinalextra = json.\("aggfinalextra").as[Boolean],
+            aggmfinalextra = json.\("aggmfinalextra").as[Boolean],
+            aggfinalmodify = json.\("aggfinalmodify").as[String],
+            aggmfinalmodify = json.\("aggmfinalmodify").as[String],
+            aggsortop = json.\("aggsortop").as[Long],
+            aggtranstype = json.\("aggtranstype").as[Long],
+            aggtransspace = json.\("aggtransspace").as[Int],
+            aggmtranstype = json.\("aggmtranstype").as[Long],
+            aggmtransspace = json.\("aggmtransspace").as[Int],
+            agginitval = json.\("agginitval").toOption.map(_.as[String]),
+            aggminitval = json.\("aggminitval").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,16 +11,22 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CharacterSetsRow(
-  characterSetCatalog: /* unknown nullability */ Option[String],
-  characterSetSchema: /* unknown nullability */ Option[String],
-  characterSetName: /* unknown nullability */ Option[String],
-  characterRepertoire: /* unknown nullability */ Option[String],
-  formOfUse: /* unknown nullability */ Option[String],
-  defaultCollateCatalog: /* unknown nullability */ Option[String],
-  defaultCollateSchema: /* unknown nullability */ Option[String],
-  defaultCollateName: /* unknown nullability */ Option[String]
+  characterSetCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_catalog","columnName":"character_set_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterSetSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_schema","columnName":"character_set_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterSetName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_set_name","columnName":"character_set_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  characterRepertoire: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"character_repertoire","columnName":"character_repertoire","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  formOfUse: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"form_of_use","columnName":"form_of_use","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCollateCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_collate_catalog","columnName":"default_collate_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCollateSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_collate_schema","columnName":"default_collate_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCollateName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_collate_name","columnName":"default_collate_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object CharacterSetsRow {
@@ -39,5 +45,34 @@ object CharacterSetsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[CharacterSetsRow] = new OFormat[CharacterSetsRow]{
+    override def writes(o: CharacterSetsRow): JsObject =
+      Json.obj(
+        "character_set_catalog" -> o.characterSetCatalog,
+      "character_set_schema" -> o.characterSetSchema,
+      "character_set_name" -> o.characterSetName,
+      "character_repertoire" -> o.characterRepertoire,
+      "form_of_use" -> o.formOfUse,
+      "default_collate_catalog" -> o.defaultCollateCatalog,
+      "default_collate_schema" -> o.defaultCollateSchema,
+      "default_collate_name" -> o.defaultCollateName
+      )
+
+    override def reads(json: JsValue): JsResult[CharacterSetsRow] = {
+      JsResult.fromTry(
+        Try(
+          CharacterSetsRow(
+            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[String]),
+            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[String]),
+            characterSetName = json.\("character_set_name").toOption.map(_.as[String]),
+            characterRepertoire = json.\("character_repertoire").toOption.map(_.as[String]),
+            formOfUse = json.\("form_of_use").toOption.map(_.as[String]),
+            defaultCollateCatalog = json.\("default_collate_catalog").toOption.map(_.as[String]),
+            defaultCollateSchema = json.\("default_collate_schema").toOption.map(_.as[String]),
+            defaultCollateName = json.\("default_collate_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

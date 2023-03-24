@@ -12,28 +12,34 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgIndexRow(
-  indexrelid: PgIndexId,
-  indrelid: Long,
-  indnatts: Int,
-  indnkeyatts: Int,
-  indisunique: Boolean,
-  indisprimary: Boolean,
-  indisexclusion: Boolean,
-  indimmediate: Boolean,
-  indisclustered: Boolean,
-  indisvalid: Boolean,
-  indcheckxmin: Boolean,
-  indisready: Boolean,
-  indislive: Boolean,
-  indisreplident: Boolean,
-  indkey: Array[Int],
-  indcollation: Array[Long],
-  indclass: Array[Long],
-  indoption: Array[Int],
-  indexprs: Option[PGobject],
-  indpred: Option[PGobject]
+  indexrelid: PgIndexId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indexrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indrelid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indnatts: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indnatts","ordinal_position":3,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indnkeyatts: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indnkeyatts","ordinal_position":4,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisunique: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisunique","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisprimary: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisprimary","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisexclusion: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisexclusion","ordinal_position":7,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indimmediate: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indimmediate","ordinal_position":8,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisclustered: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisclustered","ordinal_position":9,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisvalid: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisvalid","ordinal_position":10,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indcheckxmin: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indcheckxmin","ordinal_position":11,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisready: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisready","ordinal_position":12,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indislive: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indislive","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indisreplident: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indisreplident","ordinal_position":14,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indkey: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indkey","ordinal_position":15,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indcollation: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indcollation","ordinal_position":16,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indclass: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indclass","ordinal_position":17,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indoption: Array[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indoption","ordinal_position":18,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2vector","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indexprs: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indexprs","ordinal_position":19,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  indpred: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_index","column_name":"indpred","ordinal_position":20,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgIndexRow {
@@ -64,5 +70,58 @@ object PgIndexRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgIndexRow] = new OFormat[PgIndexRow]{
+    override def writes(o: PgIndexRow): JsObject =
+      Json.obj(
+        "indexrelid" -> o.indexrelid,
+      "indrelid" -> o.indrelid,
+      "indnatts" -> o.indnatts,
+      "indnkeyatts" -> o.indnkeyatts,
+      "indisunique" -> o.indisunique,
+      "indisprimary" -> o.indisprimary,
+      "indisexclusion" -> o.indisexclusion,
+      "indimmediate" -> o.indimmediate,
+      "indisclustered" -> o.indisclustered,
+      "indisvalid" -> o.indisvalid,
+      "indcheckxmin" -> o.indcheckxmin,
+      "indisready" -> o.indisready,
+      "indislive" -> o.indislive,
+      "indisreplident" -> o.indisreplident,
+      "indkey" -> o.indkey,
+      "indcollation" -> o.indcollation,
+      "indclass" -> o.indclass,
+      "indoption" -> o.indoption,
+      "indexprs" -> o.indexprs,
+      "indpred" -> o.indpred
+      )
+
+    override def reads(json: JsValue): JsResult[PgIndexRow] = {
+      JsResult.fromTry(
+        Try(
+          PgIndexRow(
+            indexrelid = json.\("indexrelid").as[PgIndexId],
+            indrelid = json.\("indrelid").as[Long],
+            indnatts = json.\("indnatts").as[Int],
+            indnkeyatts = json.\("indnkeyatts").as[Int],
+            indisunique = json.\("indisunique").as[Boolean],
+            indisprimary = json.\("indisprimary").as[Boolean],
+            indisexclusion = json.\("indisexclusion").as[Boolean],
+            indimmediate = json.\("indimmediate").as[Boolean],
+            indisclustered = json.\("indisclustered").as[Boolean],
+            indisvalid = json.\("indisvalid").as[Boolean],
+            indcheckxmin = json.\("indcheckxmin").as[Boolean],
+            indisready = json.\("indisready").as[Boolean],
+            indislive = json.\("indislive").as[Boolean],
+            indisreplident = json.\("indisreplident").as[Boolean],
+            indkey = json.\("indkey").as[Array[Int]],
+            indcollation = json.\("indcollation").as[Array[Long]],
+            indclass = json.\("indclass").as[Array[Long]],
+            indoption = json.\("indoption").as[Array[Int]],
+            indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
+            indpred = json.\("indpred").toOption.map(_.as[PGobject])
+          )
+        )
+      )
+    }
+  }
 }

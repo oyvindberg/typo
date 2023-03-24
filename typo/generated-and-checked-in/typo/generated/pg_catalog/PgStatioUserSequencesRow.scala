@@ -11,18 +11,24 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatioUserSequencesRow(
   /** Points to [[PgStatioAllSequencesRow.relid]] */
-  relid: Option[Long],
+  relid: Option[Long] /* {"baseColumnName":"relid","baseRelationName":"pg_catalog.pg_statio_all_sequences","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_statio_all_sequences"} */,
   /** Points to [[PgStatioAllSequencesRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: Option[String] /* {"baseColumnName":"schemaname","baseRelationName":"pg_catalog.pg_statio_all_sequences","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statio_all_sequences"} */,
   /** Points to [[PgStatioAllSequencesRow.relname]] */
-  relname: Option[String],
+  relname: Option[String] /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_statio_all_sequences","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statio_all_sequences"} */,
   /** Points to [[PgStatioAllSequencesRow.blksRead]] */
-  blksRead: Option[Long],
+  blksRead: Option[Long] /* {"baseColumnName":"blks_read","baseRelationName":"pg_catalog.pg_statio_all_sequences","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_read","columnName":"blks_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_statio_all_sequences"} */,
   /** Points to [[PgStatioAllSequencesRow.blksHit]] */
-  blksHit: Option[Long]
+  blksHit: Option[Long] /* {"baseColumnName":"blks_hit","baseRelationName":"pg_catalog.pg_statio_all_sequences","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"blks_hit","columnName":"blks_hit","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_statio_all_sequences"} */
 )
 
 object PgStatioUserSequencesRow {
@@ -38,5 +44,28 @@ object PgStatioUserSequencesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatioUserSequencesRow] = new OFormat[PgStatioUserSequencesRow]{
+    override def writes(o: PgStatioUserSequencesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "blks_read" -> o.blksRead,
+      "blks_hit" -> o.blksHit
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatioUserSequencesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatioUserSequencesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+            blksHit = json.\("blks_hit").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

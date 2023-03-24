@@ -12,12 +12,18 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGInterval
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTimezoneNamesRow(
-  name: /* unknown nullability */ Option[String],
-  abbrev: /* unknown nullability */ Option[String],
-  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval],
-  isDst: /* unknown nullability */ Option[Boolean]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  abbrev: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"abbrev","columnName":"abbrev","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"utc_offset","columnName":"utc_offset","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
+  isDst: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_dst","columnName":"is_dst","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
 )
 
 object PgTimezoneNamesRow {
@@ -32,5 +38,26 @@ object PgTimezoneNamesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTimezoneNamesRow] = new OFormat[PgTimezoneNamesRow]{
+    override def writes(o: PgTimezoneNamesRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "abbrev" -> o.abbrev,
+      "utc_offset" -> o.utcOffset,
+      "is_dst" -> o.isDst
+      )
+
+    override def reads(json: JsValue): JsResult[PgTimezoneNamesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTimezoneNamesRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            abbrev = json.\("abbrev").toOption.map(_.as[String]),
+            utcOffset = json.\("utc_offset").toOption.map(_.as[/* interval */ PGInterval]),
+            isDst = json.\("is_dst").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

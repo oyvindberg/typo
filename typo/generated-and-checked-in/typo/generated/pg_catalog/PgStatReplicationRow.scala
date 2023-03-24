@@ -13,29 +13,35 @@ import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
 import org.postgresql.util.PGInterval
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatReplicationRow(
-  pid: /* unknown nullability */ Option[Int],
-  usesysid: /* unknown nullability */ Option[Long],
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  usesysid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"usesysid","columnName":"usesysid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
   /** Points to [[PgAuthidRow.rolname]] */
-  usename: String,
-  applicationName: /* unknown nullability */ Option[String],
-  clientAddr: /* unknown nullability */ Option[/* inet */ String],
-  clientHostname: /* unknown nullability */ Option[String],
-  clientPort: /* unknown nullability */ Option[Int],
-  backendStart: /* unknown nullability */ Option[LocalDateTime],
-  backendXmin: /* unknown nullability */ Option[/* xid */ String],
-  state: /* unknown nullability */ Option[String],
-  sentLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  writeLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  flushLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  replayLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  writeLag: /* unknown nullability */ Option[/* interval */ PGInterval],
-  flushLag: /* unknown nullability */ Option[/* interval */ PGInterval],
-  replayLag: /* unknown nullability */ Option[/* interval */ PGInterval],
-  syncPriority: /* unknown nullability */ Option[Int],
-  syncState: /* unknown nullability */ Option[String],
-  replyTime: /* unknown nullability */ Option[LocalDateTime]
+  usename: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"usename","columnName":"usename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
+  applicationName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"application_name","columnName":"application_name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  clientAddr: /* unknown nullability */ Option[/* inet */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"client_addr","columnName":"client_addr","columnType":"Other","columnTypeName":"inet","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  clientHostname: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"client_hostname","columnName":"client_hostname","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  clientPort: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"client_port","columnName":"client_port","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  backendStart: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"backend_start","columnName":"backend_start","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  backendXmin: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"backend_xmin","columnName":"backend_xmin","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  state: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"state","columnName":"state","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sentLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sent_lsn","columnName":"sent_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  writeLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"write_lsn","columnName":"write_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  flushLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"flush_lsn","columnName":"flush_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  replayLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"replay_lsn","columnName":"replay_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  writeLag: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"write_lag","columnName":"write_lag","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
+  flushLag: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"flush_lag","columnName":"flush_lag","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
+  replayLag: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"replay_lag","columnName":"replay_lag","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
+  syncPriority: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"sync_priority","columnName":"sync_priority","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  syncState: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sync_state","columnName":"sync_state","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  replyTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"reply_time","columnName":"reply_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatReplicationRow {
@@ -66,5 +72,58 @@ object PgStatReplicationRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatReplicationRow] = new OFormat[PgStatReplicationRow]{
+    override def writes(o: PgStatReplicationRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "usesysid" -> o.usesysid,
+      "usename" -> o.usename,
+      "application_name" -> o.applicationName,
+      "client_addr" -> o.clientAddr,
+      "client_hostname" -> o.clientHostname,
+      "client_port" -> o.clientPort,
+      "backend_start" -> o.backendStart,
+      "backend_xmin" -> o.backendXmin,
+      "state" -> o.state,
+      "sent_lsn" -> o.sentLsn,
+      "write_lsn" -> o.writeLsn,
+      "flush_lsn" -> o.flushLsn,
+      "replay_lsn" -> o.replayLsn,
+      "write_lag" -> o.writeLag,
+      "flush_lag" -> o.flushLag,
+      "replay_lag" -> o.replayLag,
+      "sync_priority" -> o.syncPriority,
+      "sync_state" -> o.syncState,
+      "reply_time" -> o.replyTime
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatReplicationRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatReplicationRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usename = json.\("usename").as[String],
+            applicationName = json.\("application_name").toOption.map(_.as[String]),
+            clientAddr = json.\("client_addr").toOption.map(_.as[/* inet */ String]),
+            clientHostname = json.\("client_hostname").toOption.map(_.as[String]),
+            clientPort = json.\("client_port").toOption.map(_.as[Int]),
+            backendStart = json.\("backend_start").toOption.map(_.as[LocalDateTime]),
+            backendXmin = json.\("backend_xmin").toOption.map(_.as[/* xid */ String]),
+            state = json.\("state").toOption.map(_.as[String]),
+            sentLsn = json.\("sent_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            writeLsn = json.\("write_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            flushLsn = json.\("flush_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            replayLsn = json.\("replay_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            writeLag = json.\("write_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            flushLag = json.\("flush_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            replayLag = json.\("replay_lag").toOption.map(_.as[/* interval */ PGInterval]),
+            syncPriority = json.\("sync_priority").toOption.map(_.as[Int]),
+            syncState = json.\("sync_state").toOption.map(_.as[String]),
+            replyTime = json.\("reply_time").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

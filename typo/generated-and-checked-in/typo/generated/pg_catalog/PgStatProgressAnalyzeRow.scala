@@ -11,21 +11,27 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressAnalyzeRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  datid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datid","columnName":"datid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
   /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  phase: /* unknown nullability */ Option[String],
-  sampleBlksTotal: /* unknown nullability */ Option[Long],
-  sampleBlksScanned: /* unknown nullability */ Option[Long],
-  extStatsTotal: /* unknown nullability */ Option[Long],
-  extStatsComputed: /* unknown nullability */ Option[Long],
-  childTablesTotal: /* unknown nullability */ Option[Long],
-  childTablesDone: /* unknown nullability */ Option[Long],
-  currentChildTableRelid: /* unknown nullability */ Option[Long]
+  datname: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"datname","columnName":"datname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */,
+  relid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  phase: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"phase","columnName":"phase","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sampleBlksTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sample_blks_total","columnName":"sample_blks_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  sampleBlksScanned: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"sample_blks_scanned","columnName":"sample_blks_scanned","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  extStatsTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"ext_stats_total","columnName":"ext_stats_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  extStatsComputed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"ext_stats_computed","columnName":"ext_stats_computed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  childTablesTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"child_tables_total","columnName":"child_tables_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  childTablesDone: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"child_tables_done","columnName":"child_tables_done","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  currentChildTableRelid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"current_child_table_relid","columnName":"current_child_table_relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */
 )
 
 object PgStatProgressAnalyzeRow {
@@ -48,5 +54,42 @@ object PgStatProgressAnalyzeRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatProgressAnalyzeRow] = new OFormat[PgStatProgressAnalyzeRow]{
+    override def writes(o: PgStatProgressAnalyzeRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "phase" -> o.phase,
+      "sample_blks_total" -> o.sampleBlksTotal,
+      "sample_blks_scanned" -> o.sampleBlksScanned,
+      "ext_stats_total" -> o.extStatsTotal,
+      "ext_stats_computed" -> o.extStatsComputed,
+      "child_tables_total" -> o.childTablesTotal,
+      "child_tables_done" -> o.childTablesDone,
+      "current_child_table_relid" -> o.currentChildTableRelid
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressAnalyzeRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressAnalyzeRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as[Long]),
+            sampleBlksScanned = json.\("sample_blks_scanned").toOption.map(_.as[Long]),
+            extStatsTotal = json.\("ext_stats_total").toOption.map(_.as[Long]),
+            extStatsComputed = json.\("ext_stats_computed").toOption.map(_.as[Long]),
+            childTablesTotal = json.\("child_tables_total").toOption.map(_.as[Long]),
+            childTablesDone = json.\("child_tables_done").toOption.map(_.as[Long]),
+            currentChildTableRelid = json.\("current_child_table_relid").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

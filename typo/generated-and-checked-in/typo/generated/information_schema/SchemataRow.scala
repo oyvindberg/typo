@@ -11,15 +11,21 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class SchemataRow(
-  catalogName: /* unknown nullability */ Option[String],
-  schemaName: /* unknown nullability */ Option[String],
-  schemaOwner: /* unknown nullability */ Option[String],
-  defaultCharacterSetCatalog: /* unknown nullability */ Option[String],
-  defaultCharacterSetSchema: /* unknown nullability */ Option[String],
-  defaultCharacterSetName: /* unknown nullability */ Option[String],
-  sqlPath: /* unknown nullability */ Option[String]
+  catalogName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"catalog_name","columnName":"catalog_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  schemaName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schema_name","columnName":"schema_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  schemaOwner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schema_owner","columnName":"schema_owner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCharacterSetCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_character_set_catalog","columnName":"default_character_set_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCharacterSetSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_character_set_schema","columnName":"default_character_set_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  defaultCharacterSetName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"default_character_set_name","columnName":"default_character_set_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sqlPath: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sql_path","columnName":"sql_path","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object SchemataRow {
@@ -37,5 +43,32 @@ object SchemataRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[SchemataRow] = new OFormat[SchemataRow]{
+    override def writes(o: SchemataRow): JsObject =
+      Json.obj(
+        "catalog_name" -> o.catalogName,
+      "schema_name" -> o.schemaName,
+      "schema_owner" -> o.schemaOwner,
+      "default_character_set_catalog" -> o.defaultCharacterSetCatalog,
+      "default_character_set_schema" -> o.defaultCharacterSetSchema,
+      "default_character_set_name" -> o.defaultCharacterSetName,
+      "sql_path" -> o.sqlPath
+      )
+
+    override def reads(json: JsValue): JsResult[SchemataRow] = {
+      JsResult.fromTry(
+        Try(
+          SchemataRow(
+            catalogName = json.\("catalog_name").toOption.map(_.as[String]),
+            schemaName = json.\("schema_name").toOption.map(_.as[String]),
+            schemaOwner = json.\("schema_owner").toOption.map(_.as[String]),
+            defaultCharacterSetCatalog = json.\("default_character_set_catalog").toOption.map(_.as[String]),
+            defaultCharacterSetSchema = json.\("default_character_set_schema").toOption.map(_.as[String]),
+            defaultCharacterSetName = json.\("default_character_set_name").toOption.map(_.as[String]),
+            sqlPath = json.\("sql_path").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

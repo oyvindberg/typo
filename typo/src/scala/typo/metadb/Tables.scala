@@ -1,6 +1,7 @@
 package typo
 package metadb
 
+import play.api.libs.json.Json
 import typo.generated.information_schema.{ColumnsRow, TablesRow}
 
 class Tables(
@@ -23,7 +24,8 @@ class Tables(
               name = db.ColName(c.columnName.get),
               hasDefault = c.columnDefault.isDefined,
               isNotNull = c.isNullable.contains("NO"),
-              tpe = typeFromUdtName(c.udtName.get, c.characterMaximumLength)
+              tpe = typeFromUdtName(c.udtName.get, c.characterMaximumLength),
+              jsonDescription = Json.toJson(c)
             )
           }
 

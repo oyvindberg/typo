@@ -12,18 +12,24 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatReplicationSlotsRow(
-  slotName: /* unknown nullability */ Option[String],
-  spillTxns: /* unknown nullability */ Option[Long],
-  spillCount: /* unknown nullability */ Option[Long],
-  spillBytes: /* unknown nullability */ Option[Long],
-  streamTxns: /* unknown nullability */ Option[Long],
-  streamCount: /* unknown nullability */ Option[Long],
-  streamBytes: /* unknown nullability */ Option[Long],
-  totalTxns: /* unknown nullability */ Option[Long],
-  totalBytes: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  slotName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"slot_name","columnName":"slot_name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  spillTxns: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"spill_txns","columnName":"spill_txns","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  spillCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"spill_count","columnName":"spill_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  spillBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"spill_bytes","columnName":"spill_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  streamTxns: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"stream_txns","columnName":"stream_txns","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  streamCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"stream_count","columnName":"stream_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  streamBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"stream_bytes","columnName":"stream_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  totalTxns: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"total_txns","columnName":"total_txns","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  totalBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"total_bytes","columnName":"total_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatReplicationSlotsRow {
@@ -44,5 +50,38 @@ object PgStatReplicationSlotsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatReplicationSlotsRow] = new OFormat[PgStatReplicationSlotsRow]{
+    override def writes(o: PgStatReplicationSlotsRow): JsObject =
+      Json.obj(
+        "slot_name" -> o.slotName,
+      "spill_txns" -> o.spillTxns,
+      "spill_count" -> o.spillCount,
+      "spill_bytes" -> o.spillBytes,
+      "stream_txns" -> o.streamTxns,
+      "stream_count" -> o.streamCount,
+      "stream_bytes" -> o.streamBytes,
+      "total_txns" -> o.totalTxns,
+      "total_bytes" -> o.totalBytes,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatReplicationSlotsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatReplicationSlotsRow(
+            slotName = json.\("slot_name").toOption.map(_.as[String]),
+            spillTxns = json.\("spill_txns").toOption.map(_.as[Long]),
+            spillCount = json.\("spill_count").toOption.map(_.as[Long]),
+            spillBytes = json.\("spill_bytes").toOption.map(_.as[Long]),
+            streamTxns = json.\("stream_txns").toOption.map(_.as[Long]),
+            streamCount = json.\("stream_count").toOption.map(_.as[Long]),
+            streamBytes = json.\("stream_bytes").toOption.map(_.as[Long]),
+            totalTxns = json.\("total_txns").toOption.map(_.as[Long]),
+            totalBytes = json.\("total_bytes").toOption.map(_.as[Long]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

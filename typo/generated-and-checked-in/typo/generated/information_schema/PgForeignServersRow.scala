@@ -11,20 +11,26 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 import typo.generated.pg_catalog.PgForeignServerRow
 
 case class PgForeignServersRow(
   /** Points to [[PgForeignServerRow.oid]] */
-  oid: Long,
+  oid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"oid","columnName":"oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_server"} */,
   /** Points to [[PgForeignServerRow.srvoptions]] */
-  srvoptions: Option[Array[String]],
-  foreignServerCatalog: /* unknown nullability */ Option[String],
-  foreignServerName: /* unknown nullability */ Option[String],
-  foreignDataWrapperCatalog: /* unknown nullability */ Option[String],
-  foreignDataWrapperName: /* unknown nullability */ Option[String],
-  foreignServerType: /* unknown nullability */ Option[String],
-  foreignServerVersion: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String]
+  srvoptions: Option[Array[String]] /* {"baseColumnName":"srvoptions","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"srvoptions","columnName":"srvoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_server"} */,
+  foreignServerCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_catalog","columnName":"foreign_server_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignServerName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_name","columnName":"foreign_server_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignDataWrapperCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_catalog","columnName":"foreign_data_wrapper_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignDataWrapperName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_name","columnName":"foreign_data_wrapper_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignServerType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_type","columnName":"foreign_server_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  foreignServerVersion: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_version","columnName":"foreign_server_version","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  authorizationIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgForeignServersRow {
@@ -44,5 +50,36 @@ object PgForeignServersRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgForeignServersRow] = new OFormat[PgForeignServersRow]{
+    override def writes(o: PgForeignServersRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "srvoptions" -> o.srvoptions,
+      "foreign_server_catalog" -> o.foreignServerCatalog,
+      "foreign_server_name" -> o.foreignServerName,
+      "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
+      "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
+      "foreign_server_type" -> o.foreignServerType,
+      "foreign_server_version" -> o.foreignServerVersion,
+      "authorization_identifier" -> o.authorizationIdentifier
+      )
+
+    override def reads(json: JsValue): JsResult[PgForeignServersRow] = {
+      JsResult.fromTry(
+        Try(
+          PgForeignServersRow(
+            oid = json.\("oid").as[Long],
+            srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]]),
+            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
+            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),
+            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
+            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),
+            foreignServerType = json.\("foreign_server_type").toOption.map(_.as[String]),
+            foreignServerVersion = json.\("foreign_server_version").toOption.map(_.as[String]),
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

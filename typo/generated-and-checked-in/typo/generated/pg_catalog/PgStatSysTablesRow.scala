@@ -12,54 +12,60 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatSysTablesRow(
   /** Points to [[PgStatAllTablesRow.relid]] */
-  relid: Option[Long],
+  relid: Option[Long] /* {"baseColumnName":"relid","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: Option[String] /* {"baseColumnName":"schemaname","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.relname]] */
-  relname: Option[String],
+  relname: Option[String] /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.seqScan]] */
-  seqScan: Option[Long],
+  seqScan: Option[Long] /* {"baseColumnName":"seq_scan","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_scan","columnName":"seq_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.seqTupRead]] */
-  seqTupRead: Option[Long],
+  seqTupRead: Option[Long] /* {"baseColumnName":"seq_tup_read","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"seq_tup_read","columnName":"seq_tup_read","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.idxScan]] */
-  idxScan: Option[Long],
+  idxScan: Option[Long] /* {"baseColumnName":"idx_scan","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_scan","columnName":"idx_scan","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.idxTupFetch]] */
-  idxTupFetch: Option[Long],
+  idxTupFetch: Option[Long] /* {"baseColumnName":"idx_tup_fetch","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"idx_tup_fetch","columnName":"idx_tup_fetch","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nTupIns]] */
-  nTupIns: Option[Long],
+  nTupIns: Option[Long] /* {"baseColumnName":"n_tup_ins","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_ins","columnName":"n_tup_ins","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nTupUpd]] */
-  nTupUpd: Option[Long],
+  nTupUpd: Option[Long] /* {"baseColumnName":"n_tup_upd","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_upd","columnName":"n_tup_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nTupDel]] */
-  nTupDel: Option[Long],
+  nTupDel: Option[Long] /* {"baseColumnName":"n_tup_del","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_del","columnName":"n_tup_del","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nTupHotUpd]] */
-  nTupHotUpd: Option[Long],
+  nTupHotUpd: Option[Long] /* {"baseColumnName":"n_tup_hot_upd","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_tup_hot_upd","columnName":"n_tup_hot_upd","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nLiveTup]] */
-  nLiveTup: Option[Long],
+  nLiveTup: Option[Long] /* {"baseColumnName":"n_live_tup","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_live_tup","columnName":"n_live_tup","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nDeadTup]] */
-  nDeadTup: Option[Long],
+  nDeadTup: Option[Long] /* {"baseColumnName":"n_dead_tup","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_dead_tup","columnName":"n_dead_tup","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nModSinceAnalyze]] */
-  nModSinceAnalyze: Option[Long],
+  nModSinceAnalyze: Option[Long] /* {"baseColumnName":"n_mod_since_analyze","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_mod_since_analyze","columnName":"n_mod_since_analyze","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.nInsSinceVacuum]] */
-  nInsSinceVacuum: Option[Long],
+  nInsSinceVacuum: Option[Long] /* {"baseColumnName":"n_ins_since_vacuum","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"n_ins_since_vacuum","columnName":"n_ins_since_vacuum","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.lastVacuum]] */
-  lastVacuum: Option[LocalDateTime],
+  lastVacuum: Option[LocalDateTime] /* {"baseColumnName":"last_vacuum","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_vacuum","columnName":"last_vacuum","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.lastAutovacuum]] */
-  lastAutovacuum: Option[LocalDateTime],
+  lastAutovacuum: Option[LocalDateTime] /* {"baseColumnName":"last_autovacuum","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_autovacuum","columnName":"last_autovacuum","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.lastAnalyze]] */
-  lastAnalyze: Option[LocalDateTime],
+  lastAnalyze: Option[LocalDateTime] /* {"baseColumnName":"last_analyze","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_analyze","columnName":"last_analyze","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[LocalDateTime],
+  lastAutoanalyze: Option[LocalDateTime] /* {"baseColumnName":"last_autoanalyze","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_autoanalyze","columnName":"last_autoanalyze","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.vacuumCount]] */
-  vacuumCount: Option[Long],
+  vacuumCount: Option[Long] /* {"baseColumnName":"vacuum_count","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"vacuum_count","columnName":"vacuum_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.autovacuumCount]] */
-  autovacuumCount: Option[Long],
+  autovacuumCount: Option[Long] /* {"baseColumnName":"autovacuum_count","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"autovacuum_count","columnName":"autovacuum_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.analyzeCount]] */
-  analyzeCount: Option[Long],
+  analyzeCount: Option[Long] /* {"baseColumnName":"analyze_count","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"analyze_count","columnName":"analyze_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */,
   /** Points to [[PgStatAllTablesRow.autoanalyzeCount]] */
-  autoanalyzeCount: Option[Long]
+  autoanalyzeCount: Option[Long] /* {"baseColumnName":"autoanalyze_count","baseRelationName":"pg_catalog.pg_stat_all_tables","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"autoanalyze_count","columnName":"autoanalyze_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_stat_all_tables"} */
 )
 
 object PgStatSysTablesRow {
@@ -93,5 +99,64 @@ object PgStatSysTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatSysTablesRow] = new OFormat[PgStatSysTablesRow]{
+    override def writes(o: PgStatSysTablesRow): JsObject =
+      Json.obj(
+        "relid" -> o.relid,
+      "schemaname" -> o.schemaname,
+      "relname" -> o.relname,
+      "seq_scan" -> o.seqScan,
+      "seq_tup_read" -> o.seqTupRead,
+      "idx_scan" -> o.idxScan,
+      "idx_tup_fetch" -> o.idxTupFetch,
+      "n_tup_ins" -> o.nTupIns,
+      "n_tup_upd" -> o.nTupUpd,
+      "n_tup_del" -> o.nTupDel,
+      "n_tup_hot_upd" -> o.nTupHotUpd,
+      "n_live_tup" -> o.nLiveTup,
+      "n_dead_tup" -> o.nDeadTup,
+      "n_mod_since_analyze" -> o.nModSinceAnalyze,
+      "n_ins_since_vacuum" -> o.nInsSinceVacuum,
+      "last_vacuum" -> o.lastVacuum,
+      "last_autovacuum" -> o.lastAutovacuum,
+      "last_analyze" -> o.lastAnalyze,
+      "last_autoanalyze" -> o.lastAutoanalyze,
+      "vacuum_count" -> o.vacuumCount,
+      "autovacuum_count" -> o.autovacuumCount,
+      "analyze_count" -> o.analyzeCount,
+      "autoanalyze_count" -> o.autoanalyzeCount
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatSysTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatSysTablesRow(
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long]),
+            nLiveTup = json.\("n_live_tup").toOption.map(_.as[Long]),
+            nDeadTup = json.\("n_dead_tup").toOption.map(_.as[Long]),
+            nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as[Long]),
+            nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as[Long]),
+            lastVacuum = json.\("last_vacuum").toOption.map(_.as[LocalDateTime]),
+            lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as[LocalDateTime]),
+            lastAnalyze = json.\("last_analyze").toOption.map(_.as[LocalDateTime]),
+            lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as[LocalDateTime]),
+            vacuumCount = json.\("vacuum_count").toOption.map(_.as[Long]),
+            autovacuumCount = json.\("autovacuum_count").toOption.map(_.as[Long]),
+            analyzeCount = json.\("analyze_count").toOption.map(_.as[Long]),
+            autoanalyzeCount = json.\("autoanalyze_count").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

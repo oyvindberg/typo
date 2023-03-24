@@ -11,11 +11,17 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgShdescriptionRow(
-  objoid: Long,
-  classoid: Long,
-  description: String
+  objoid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"objoid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  classoid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"classoid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  description: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"description","ordinal_position":3,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgShdescriptionId = PgShdescriptionId(objoid, classoid)
 }
@@ -31,5 +37,24 @@ object PgShdescriptionRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgShdescriptionRow] = new OFormat[PgShdescriptionRow]{
+    override def writes(o: PgShdescriptionRow): JsObject =
+      Json.obj(
+        "objoid" -> o.objoid,
+      "classoid" -> o.classoid,
+      "description" -> o.description
+      )
+
+    override def reads(json: JsValue): JsResult[PgShdescriptionRow] = {
+      JsResult.fromTry(
+        Try(
+          PgShdescriptionRow(
+            objoid = json.\("objoid").as[Long],
+            classoid = json.\("classoid").as[Long],
+            description = json.\("description").as[String]
+          )
+        )
+      )
+    }
+  }
 }

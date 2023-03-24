@@ -11,20 +11,26 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatProgressVacuumRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  datid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datid","columnName":"datid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
   /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  phase: /* unknown nullability */ Option[String],
-  heapBlksTotal: /* unknown nullability */ Option[Long],
-  heapBlksScanned: /* unknown nullability */ Option[Long],
-  heapBlksVacuumed: /* unknown nullability */ Option[Long],
-  indexVacuumCount: /* unknown nullability */ Option[Long],
-  maxDeadTuples: /* unknown nullability */ Option[Long],
-  numDeadTuples: /* unknown nullability */ Option[Long]
+  datname: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"datname","columnName":"datname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */,
+  relid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  phase: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"phase","columnName":"phase","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  heapBlksTotal: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"heap_blks_total","columnName":"heap_blks_total","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  heapBlksScanned: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"heap_blks_scanned","columnName":"heap_blks_scanned","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  heapBlksVacuumed: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"heap_blks_vacuumed","columnName":"heap_blks_vacuumed","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  indexVacuumCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"index_vacuum_count","columnName":"index_vacuum_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  maxDeadTuples: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"max_dead_tuples","columnName":"max_dead_tuples","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  numDeadTuples: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"num_dead_tuples","columnName":"num_dead_tuples","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatProgressVacuumRow {
@@ -46,5 +52,40 @@ object PgStatProgressVacuumRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatProgressVacuumRow] = new OFormat[PgStatProgressVacuumRow]{
+    override def writes(o: PgStatProgressVacuumRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "datid" -> o.datid,
+      "datname" -> o.datname,
+      "relid" -> o.relid,
+      "phase" -> o.phase,
+      "heap_blks_total" -> o.heapBlksTotal,
+      "heap_blks_scanned" -> o.heapBlksScanned,
+      "heap_blks_vacuumed" -> o.heapBlksVacuumed,
+      "index_vacuum_count" -> o.indexVacuumCount,
+      "max_dead_tuples" -> o.maxDeadTuples,
+      "num_dead_tuples" -> o.numDeadTuples
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatProgressVacuumRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatProgressVacuumRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            phase = json.\("phase").toOption.map(_.as[String]),
+            heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
+            heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),
+            heapBlksVacuumed = json.\("heap_blks_vacuumed").toOption.map(_.as[Long]),
+            indexVacuumCount = json.\("index_vacuum_count").toOption.map(_.as[Long]),
+            maxDeadTuples = json.\("max_dead_tuples").toOption.map(_.as[Long]),
+            numDeadTuples = json.\("num_dead_tuples").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

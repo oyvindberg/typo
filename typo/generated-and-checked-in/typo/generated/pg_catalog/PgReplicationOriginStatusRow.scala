@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgReplicationOriginStatusRow(
-  localId: /* unknown nullability */ Option[Long],
-  externalId: /* unknown nullability */ Option[String],
-  remoteLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  localLsn: /* unknown nullability */ Option[/* pg_lsn */ String]
+  localId: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"local_id","columnName":"local_id","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  externalId: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"external_id","columnName":"external_id","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  remoteLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"remote_lsn","columnName":"remote_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  localLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"local_lsn","columnName":"local_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgReplicationOriginStatusRow {
@@ -31,5 +37,26 @@ object PgReplicationOriginStatusRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgReplicationOriginStatusRow] = new OFormat[PgReplicationOriginStatusRow]{
+    override def writes(o: PgReplicationOriginStatusRow): JsObject =
+      Json.obj(
+        "local_id" -> o.localId,
+      "external_id" -> o.externalId,
+      "remote_lsn" -> o.remoteLsn,
+      "local_lsn" -> o.localLsn
+      )
+
+    override def reads(json: JsValue): JsResult[PgReplicationOriginStatusRow] = {
+      JsResult.fromTry(
+        Try(
+          PgReplicationOriginStatusRow(
+            localId = json.\("local_id").toOption.map(_.as[Long]),
+            externalId = json.\("external_id").toOption.map(_.as[String]),
+            remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ String])
+          )
+        )
+      )
+    }
+  }
 }

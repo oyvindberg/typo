@@ -11,13 +11,19 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgGroupRow(
   /** Points to [[PgAuthidRow.rolname]] */
-  groname: String,
+  groname: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"groname","columnName":"groname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
   /** Points to [[PgAuthidRow.oid]] */
-  grosysid: Long,
-  grolist: /* unknown nullability */ Option[Array[Long]]
+  grosysid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"grosysid","columnName":"grosysid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_authid"} */,
+  grolist: /* unknown nullability */ Option[Array[Long]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":10,"columnLabel":"grolist","columnName":"grolist","columnType":"Array","columnTypeName":"_oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */
 )
 
 object PgGroupRow {
@@ -31,5 +37,24 @@ object PgGroupRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgGroupRow] = new OFormat[PgGroupRow]{
+    override def writes(o: PgGroupRow): JsObject =
+      Json.obj(
+        "groname" -> o.groname,
+      "grosysid" -> o.grosysid,
+      "grolist" -> o.grolist
+      )
+
+    override def reads(json: JsValue): JsResult[PgGroupRow] = {
+      JsResult.fromTry(
+        Try(
+          PgGroupRow(
+            groname = json.\("groname").as[String],
+            grosysid = json.\("grosysid").as[Long],
+            grolist = json.\("grolist").toOption.map(_.as[Array[Long]])
+          )
+        )
+      )
+    }
+  }
 }

@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgInheritsRow(
-  inhrelid: Long,
-  inhparent: Long,
-  inhseqno: Int,
-  inhdetachpending: Boolean
+  inhrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  inhparent: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhparent","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  inhseqno: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhseqno","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  inhdetachpending: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhdetachpending","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgInheritsId = PgInheritsId(inhrelid, inhseqno)
 }
@@ -33,5 +39,26 @@ object PgInheritsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgInheritsRow] = new OFormat[PgInheritsRow]{
+    override def writes(o: PgInheritsRow): JsObject =
+      Json.obj(
+        "inhrelid" -> o.inhrelid,
+      "inhparent" -> o.inhparent,
+      "inhseqno" -> o.inhseqno,
+      "inhdetachpending" -> o.inhdetachpending
+      )
+
+    override def reads(json: JsValue): JsResult[PgInheritsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgInheritsRow(
+            inhrelid = json.\("inhrelid").as[Long],
+            inhparent = json.\("inhparent").as[Long],
+            inhseqno = json.\("inhseqno").as[Int],
+            inhdetachpending = json.\("inhdetachpending").as[Boolean]
+          )
+        )
+      )
+    }
+  }
 }

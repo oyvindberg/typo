@@ -11,13 +11,19 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgOpfamilyRow(
-  oid: PgOpfamilyId,
-  opfmethod: Long,
-  opfname: String,
-  opfnamespace: Long,
-  opfowner: Long
+  oid: PgOpfamilyId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_opfamily","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  opfmethod: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_opfamily","column_name":"opfmethod","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  opfname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_opfamily","column_name":"opfname","ordinal_position":3,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  opfnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_opfamily","column_name":"opfnamespace","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  opfowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_opfamily","column_name":"opfowner","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgOpfamilyRow {
@@ -33,5 +39,28 @@ object PgOpfamilyRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgOpfamilyRow] = new OFormat[PgOpfamilyRow]{
+    override def writes(o: PgOpfamilyRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "opfmethod" -> o.opfmethod,
+      "opfname" -> o.opfname,
+      "opfnamespace" -> o.opfnamespace,
+      "opfowner" -> o.opfowner
+      )
+
+    override def reads(json: JsValue): JsResult[PgOpfamilyRow] = {
+      JsResult.fromTry(
+        Try(
+          PgOpfamilyRow(
+            oid = json.\("oid").as[PgOpfamilyId],
+            opfmethod = json.\("opfmethod").as[Long],
+            opfname = json.\("opfname").as[String],
+            opfnamespace = json.\("opfnamespace").as[Long],
+            opfowner = json.\("opfowner").as[Long]
+          )
+        )
+      )
+    }
+  }
 }

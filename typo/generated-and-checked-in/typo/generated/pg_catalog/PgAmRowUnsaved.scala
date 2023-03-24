@@ -10,6 +10,12 @@ package generated
 package pg_catalog
 
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAmRowUnsaved(
   amname: String,
@@ -17,5 +23,24 @@ case class PgAmRowUnsaved(
   amtype: String
 )
 object PgAmRowUnsaved {
-  
+  implicit val oFormat: OFormat[PgAmRowUnsaved] = new OFormat[PgAmRowUnsaved]{
+    override def writes(o: PgAmRowUnsaved): JsObject =
+      Json.obj(
+        "amname" -> o.amname,
+      "amhandler" -> o.amhandler,
+      "amtype" -> o.amtype
+      )
+
+    override def reads(json: JsValue): JsResult[PgAmRowUnsaved] = {
+      JsResult.fromTry(
+        Try(
+          PgAmRowUnsaved(
+            amname = json.\("amname").as[String],
+            amhandler = json.\("amhandler").as[PGobject],
+            amtype = json.\("amtype").as[String]
+          )
+        )
+      )
+    }
+  }
 }

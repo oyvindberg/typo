@@ -12,38 +12,44 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgProcRow(
-  oid: PgProcId,
-  proname: String,
-  pronamespace: Long,
-  proowner: Long,
-  prolang: Long,
-  procost: Float,
-  prorows: Float,
-  provariadic: Long,
-  prosupport: PGobject,
-  prokind: String,
-  prosecdef: Boolean,
-  proleakproof: Boolean,
-  proisstrict: Boolean,
-  proretset: Boolean,
-  provolatile: String,
-  proparallel: String,
-  pronargs: Int,
-  pronargdefaults: Int,
-  prorettype: Long,
-  proargtypes: Array[Long],
-  proallargtypes: Option[Array[Long]],
-  proargmodes: Option[Array[String]],
-  proargnames: Option[Array[String]],
-  proargdefaults: Option[PGobject],
-  protrftypes: Option[Array[Long]],
-  prosrc: String,
-  probin: Option[String],
-  prosqlbody: Option[PGobject],
-  proconfig: Option[Array[String]],
-  proacl: Option[Array[PGobject]]
+  oid: PgProcId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  pronamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"pronamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prolang: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prolang","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  procost: Float /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"procost","ordinal_position":6,"is_nullable":"NO","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prorows: Float /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prorows","ordinal_position":7,"is_nullable":"NO","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  provariadic: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"provariadic","ordinal_position":8,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prosupport: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prosupport","ordinal_position":9,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prokind: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prokind","ordinal_position":10,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prosecdef: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prosecdef","ordinal_position":11,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proleakproof: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proleakproof","ordinal_position":12,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proisstrict: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proisstrict","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proretset: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proretset","ordinal_position":14,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  provolatile: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"provolatile","ordinal_position":15,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proparallel: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proparallel","ordinal_position":16,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  pronargs: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"pronargs","ordinal_position":17,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  pronargdefaults: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"pronargdefaults","ordinal_position":18,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prorettype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prorettype","ordinal_position":19,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proargtypes: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proargtypes","ordinal_position":20,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oidvector","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proallargtypes: Option[Array[Long]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proallargtypes","ordinal_position":21,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_oid","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proargmodes: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proargmodes","ordinal_position":22,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_char","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proargnames: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proargnames","ordinal_position":23,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proargdefaults: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proargdefaults","ordinal_position":24,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  protrftypes: Option[Array[Long]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"protrftypes","ordinal_position":25,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_oid","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prosrc: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prosrc","ordinal_position":26,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  probin: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"probin","ordinal_position":27,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  prosqlbody: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"prosqlbody","ordinal_position":28,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proconfig: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proconfig","ordinal_position":29,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  proacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_proc","column_name":"proacl","ordinal_position":30,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgProcRow {
@@ -84,5 +90,78 @@ object PgProcRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgProcRow] = new OFormat[PgProcRow]{
+    override def writes(o: PgProcRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "proname" -> o.proname,
+      "pronamespace" -> o.pronamespace,
+      "proowner" -> o.proowner,
+      "prolang" -> o.prolang,
+      "procost" -> o.procost,
+      "prorows" -> o.prorows,
+      "provariadic" -> o.provariadic,
+      "prosupport" -> o.prosupport,
+      "prokind" -> o.prokind,
+      "prosecdef" -> o.prosecdef,
+      "proleakproof" -> o.proleakproof,
+      "proisstrict" -> o.proisstrict,
+      "proretset" -> o.proretset,
+      "provolatile" -> o.provolatile,
+      "proparallel" -> o.proparallel,
+      "pronargs" -> o.pronargs,
+      "pronargdefaults" -> o.pronargdefaults,
+      "prorettype" -> o.prorettype,
+      "proargtypes" -> o.proargtypes,
+      "proallargtypes" -> o.proallargtypes,
+      "proargmodes" -> o.proargmodes,
+      "proargnames" -> o.proargnames,
+      "proargdefaults" -> o.proargdefaults,
+      "protrftypes" -> o.protrftypes,
+      "prosrc" -> o.prosrc,
+      "probin" -> o.probin,
+      "prosqlbody" -> o.prosqlbody,
+      "proconfig" -> o.proconfig,
+      "proacl" -> o.proacl
+      )
+
+    override def reads(json: JsValue): JsResult[PgProcRow] = {
+      JsResult.fromTry(
+        Try(
+          PgProcRow(
+            oid = json.\("oid").as[PgProcId],
+            proname = json.\("proname").as[String],
+            pronamespace = json.\("pronamespace").as[Long],
+            proowner = json.\("proowner").as[Long],
+            prolang = json.\("prolang").as[Long],
+            procost = json.\("procost").as[Float],
+            prorows = json.\("prorows").as[Float],
+            provariadic = json.\("provariadic").as[Long],
+            prosupport = json.\("prosupport").as[PGobject],
+            prokind = json.\("prokind").as[String],
+            prosecdef = json.\("prosecdef").as[Boolean],
+            proleakproof = json.\("proleakproof").as[Boolean],
+            proisstrict = json.\("proisstrict").as[Boolean],
+            proretset = json.\("proretset").as[Boolean],
+            provolatile = json.\("provolatile").as[String],
+            proparallel = json.\("proparallel").as[String],
+            pronargs = json.\("pronargs").as[Int],
+            pronargdefaults = json.\("pronargdefaults").as[Int],
+            prorettype = json.\("prorettype").as[Long],
+            proargtypes = json.\("proargtypes").as[Array[Long]],
+            proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[Long]]),
+            proargmodes = json.\("proargmodes").toOption.map(_.as[Array[String]]),
+            proargnames = json.\("proargnames").toOption.map(_.as[Array[String]]),
+            proargdefaults = json.\("proargdefaults").toOption.map(_.as[PGobject]),
+            protrftypes = json.\("protrftypes").toOption.map(_.as[Array[Long]]),
+            prosrc = json.\("prosrc").as[String],
+            probin = json.\("probin").toOption.map(_.as[String]),
+            prosqlbody = json.\("prosqlbody").toOption.map(_.as[PGobject]),
+            proconfig = json.\("proconfig").toOption.map(_.as[Array[String]]),
+            proacl = json.\("proacl").toOption.map(_.as[Array[PGobject]])
+          )
+        )
+      )
+    }
+  }
 }

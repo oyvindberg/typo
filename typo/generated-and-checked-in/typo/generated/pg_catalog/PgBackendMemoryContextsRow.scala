@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgBackendMemoryContextsRow(
-  name: /* unknown nullability */ Option[String],
-  ident: /* unknown nullability */ Option[String],
-  parent: /* unknown nullability */ Option[String],
-  level: /* unknown nullability */ Option[Int],
-  totalBytes: /* unknown nullability */ Option[Long],
-  totalNblocks: /* unknown nullability */ Option[Long],
-  freeBytes: /* unknown nullability */ Option[Long],
-  freeChunks: /* unknown nullability */ Option[Long],
-  usedBytes: /* unknown nullability */ Option[Long]
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  ident: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"ident","columnName":"ident","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  parent: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"parent","columnName":"parent","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  level: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"level","columnName":"level","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  totalBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"total_bytes","columnName":"total_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  totalNblocks: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"total_nblocks","columnName":"total_nblocks","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  freeBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"free_bytes","columnName":"free_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  freeChunks: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"free_chunks","columnName":"free_chunks","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  usedBytes: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"used_bytes","columnName":"used_bytes","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgBackendMemoryContextsRow {
@@ -41,5 +47,36 @@ object PgBackendMemoryContextsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgBackendMemoryContextsRow] = new OFormat[PgBackendMemoryContextsRow]{
+    override def writes(o: PgBackendMemoryContextsRow): JsObject =
+      Json.obj(
+        "name" -> o.name,
+      "ident" -> o.ident,
+      "parent" -> o.parent,
+      "level" -> o.level,
+      "total_bytes" -> o.totalBytes,
+      "total_nblocks" -> o.totalNblocks,
+      "free_bytes" -> o.freeBytes,
+      "free_chunks" -> o.freeChunks,
+      "used_bytes" -> o.usedBytes
+      )
+
+    override def reads(json: JsValue): JsResult[PgBackendMemoryContextsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgBackendMemoryContextsRow(
+            name = json.\("name").toOption.map(_.as[String]),
+            ident = json.\("ident").toOption.map(_.as[String]),
+            parent = json.\("parent").toOption.map(_.as[String]),
+            level = json.\("level").toOption.map(_.as[Int]),
+            totalBytes = json.\("total_bytes").toOption.map(_.as[Long]),
+            totalNblocks = json.\("total_nblocks").toOption.map(_.as[Long]),
+            freeBytes = json.\("free_bytes").toOption.map(_.as[Long]),
+            freeChunks = json.\("free_chunks").toOption.map(_.as[Long]),
+            usedBytes = json.\("used_bytes").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

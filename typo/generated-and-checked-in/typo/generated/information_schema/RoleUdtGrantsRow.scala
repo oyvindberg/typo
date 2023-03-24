@@ -11,22 +11,28 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoleUdtGrantsRow(
   /** Points to [[UdtPrivilegesRow.grantor]] */
-  grantor: Option[String],
+  grantor: Option[String] /* {"baseColumnName":"grantor","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantor","columnName":"grantor","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.grantee]] */
-  grantee: Option[String],
+  grantee: Option[String] /* {"baseColumnName":"grantee","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantee","columnName":"grantee","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.udtCatalog]] */
-  udtCatalog: Option[String],
+  udtCatalog: Option[String] /* {"baseColumnName":"udt_catalog","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_catalog","columnName":"udt_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.udtSchema]] */
-  udtSchema: Option[String],
+  udtSchema: Option[String] /* {"baseColumnName":"udt_schema","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_schema","columnName":"udt_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.udtName]] */
-  udtName: Option[String],
+  udtName: Option[String] /* {"baseColumnName":"udt_name","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"udt_name","columnName":"udt_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.privilegeType]] */
-  privilegeType: Option[String],
+  privilegeType: Option[String] /* {"baseColumnName":"privilege_type","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"privilege_type","columnName":"privilege_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"udt_privileges"} */,
   /** Points to [[UdtPrivilegesRow.isGrantable]] */
-  isGrantable: Option[String]
+  isGrantable: Option[String] /* {"baseColumnName":"is_grantable","baseRelationName":"information_schema.udt_privileges","columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_grantable","columnName":"is_grantable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0,"tableName":"udt_privileges"} */
 )
 
 object RoleUdtGrantsRow {
@@ -44,5 +50,32 @@ object RoleUdtGrantsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[RoleUdtGrantsRow] = new OFormat[RoleUdtGrantsRow]{
+    override def writes(o: RoleUdtGrantsRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "udt_catalog" -> o.udtCatalog,
+      "udt_schema" -> o.udtSchema,
+      "udt_name" -> o.udtName,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[RoleUdtGrantsRow] = {
+      JsResult.fromTry(
+        Try(
+          RoleUdtGrantsRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            udtCatalog = json.\("udt_catalog").toOption.map(_.as[String]),
+            udtSchema = json.\("udt_schema").toOption.map(_.as[String]),
+            udtName = json.\("udt_name").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

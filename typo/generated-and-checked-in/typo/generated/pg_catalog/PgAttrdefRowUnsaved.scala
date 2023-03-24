@@ -10,6 +10,12 @@ package generated
 package pg_catalog
 
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgAttrdefRowUnsaved(
   adrelid: Long,
@@ -17,5 +23,24 @@ case class PgAttrdefRowUnsaved(
   adbin: PGobject
 )
 object PgAttrdefRowUnsaved {
-  
+  implicit val oFormat: OFormat[PgAttrdefRowUnsaved] = new OFormat[PgAttrdefRowUnsaved]{
+    override def writes(o: PgAttrdefRowUnsaved): JsObject =
+      Json.obj(
+        "adrelid" -> o.adrelid,
+      "adnum" -> o.adnum,
+      "adbin" -> o.adbin
+      )
+
+    override def reads(json: JsValue): JsResult[PgAttrdefRowUnsaved] = {
+      JsResult.fromTry(
+        Try(
+          PgAttrdefRowUnsaved(
+            adrelid = json.\("adrelid").as[Long],
+            adnum = json.\("adnum").as[Int],
+            adbin = json.\("adbin").as[PGobject]
+          )
+        )
+      )
+    }
+  }
 }

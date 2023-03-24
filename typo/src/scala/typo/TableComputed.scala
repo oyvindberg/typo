@@ -48,7 +48,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         case Nil => None
         case colName :: Nil =>
           val dbCol = dbColsByName(colName)
-          val col = ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), scalaType(options.pkg, dbCol), dbCol.name, dbCol.hasDefault)
+          val col = ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), scalaType(options.pkg, dbCol), dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
           Some(IdComputed.Unary(col, qident))
 
         case colNames =>
@@ -56,7 +56,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
             val fieldName = names.field(colName)
             val dbCol = dbColsByName(colName)
             val underlying = scalaType(options.pkg, dbCol)
-            ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault)
+            ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
           }
           val paramName = sc.Ident("compositeId")
           Some(IdComputed.Composite(cols, qident, paramName))
@@ -65,15 +65,15 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
 
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     dbTable.cols.map {
-      case dbCol @ db.Col(colName, _, isNotNull, _) if dbTable.primaryKey.exists(_.colNames == List(colName)) =>
+      case dbCol @ db.Col(colName, _, isNotNull, _, _) if dbTable.primaryKey.exists(_.colNames == List(colName)) =>
         if (!isNotNull) {
           sys.error(s"assumption: id column in ${dbTable.name} should be not null")
         }
-        dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault)
+        dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
       case dbCol =>
         val finalType: sc.Type = scalaType(options.pkg, dbCol)
 
-        dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault)
+        dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
   }
 

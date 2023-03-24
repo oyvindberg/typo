@@ -11,24 +11,30 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class RoleUsageGrantsRow(
   /** Points to [[UsagePrivilegesRow.grantor]] */
-  grantor: Option[String],
+  grantor: Option[String] /* {"baseColumnName":"grantor","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantor","columnName":"grantor","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.grantee]] */
-  grantee: Option[String],
+  grantee: Option[String] /* {"baseColumnName":"grantee","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"grantee","columnName":"grantee","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.objectCatalog]] */
-  objectCatalog: Option[String],
+  objectCatalog: Option[String] /* {"baseColumnName":"object_catalog","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_catalog","columnName":"object_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.objectSchema]] */
-  objectSchema: Option[String],
+  objectSchema: Option[String] /* {"baseColumnName":"object_schema","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_schema","columnName":"object_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.objectName]] */
-  objectName: Option[String],
+  objectName: Option[String] /* {"baseColumnName":"object_name","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_name","columnName":"object_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.objectType]] */
-  objectType: Option[String],
+  objectType: Option[String] /* {"baseColumnName":"object_type","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"object_type","columnName":"object_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.privilegeType]] */
-  privilegeType: Option[String],
+  privilegeType: Option[String] /* {"baseColumnName":"privilege_type","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"privilege_type","columnName":"privilege_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"usage_privileges"} */,
   /** Points to [[UsagePrivilegesRow.isGrantable]] */
-  isGrantable: Option[String]
+  isGrantable: Option[String] /* {"baseColumnName":"is_grantable","baseRelationName":"information_schema.usage_privileges","columnClassName":"java.lang.String","columnDisplaySize":3,"columnLabel":"is_grantable","columnName":"is_grantable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0,"tableName":"usage_privileges"} */
 )
 
 object RoleUsageGrantsRow {
@@ -47,5 +53,34 @@ object RoleUsageGrantsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[RoleUsageGrantsRow] = new OFormat[RoleUsageGrantsRow]{
+    override def writes(o: RoleUsageGrantsRow): JsObject =
+      Json.obj(
+        "grantor" -> o.grantor,
+      "grantee" -> o.grantee,
+      "object_catalog" -> o.objectCatalog,
+      "object_schema" -> o.objectSchema,
+      "object_name" -> o.objectName,
+      "object_type" -> o.objectType,
+      "privilege_type" -> o.privilegeType,
+      "is_grantable" -> o.isGrantable
+      )
+
+    override def reads(json: JsValue): JsResult[RoleUsageGrantsRow] = {
+      JsResult.fromTry(
+        Try(
+          RoleUsageGrantsRow(
+            grantor = json.\("grantor").toOption.map(_.as[String]),
+            grantee = json.\("grantee").toOption.map(_.as[String]),
+            objectCatalog = json.\("object_catalog").toOption.map(_.as[String]),
+            objectSchema = json.\("object_schema").toOption.map(_.as[String]),
+            objectName = json.\("object_name").toOption.map(_.as[String]),
+            objectType = json.\("object_type").toOption.map(_.as[String]),
+            privilegeType = json.\("privilege_type").toOption.map(_.as[String]),
+            isGrantable = json.\("is_grantable").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

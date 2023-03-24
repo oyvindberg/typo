@@ -12,24 +12,30 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgLocksRow(
-  locktype: /* unknown nullability */ Option[String],
-  database: /* unknown nullability */ Option[Long],
-  relation: /* unknown nullability */ Option[Long],
-  page: /* unknown nullability */ Option[Int],
-  tuple: /* unknown nullability */ Option[Int],
-  virtualxid: /* unknown nullability */ Option[String],
-  transactionid: /* unknown nullability */ Option[/* xid */ String],
-  classid: /* unknown nullability */ Option[Long],
-  objid: /* unknown nullability */ Option[Long],
-  objsubid: /* unknown nullability */ Option[Int],
-  virtualtransaction: /* unknown nullability */ Option[String],
-  pid: /* unknown nullability */ Option[Int],
-  mode: /* unknown nullability */ Option[String],
-  granted: /* unknown nullability */ Option[Boolean],
-  fastpath: /* unknown nullability */ Option[Boolean],
-  waitstart: /* unknown nullability */ Option[LocalDateTime]
+  locktype: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"locktype","columnName":"locktype","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  database: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"database","columnName":"database","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  relation: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relation","columnName":"relation","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  page: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"page","columnName":"page","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  tuple: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":6,"columnLabel":"tuple","columnName":"tuple","columnType":"SmallInt","columnTypeName":"int2","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":5,"scale":0} */,
+  virtualxid: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"virtualxid","columnName":"virtualxid","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  transactionid: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"transactionid","columnName":"transactionid","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  classid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"classid","columnName":"classid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  objid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"objid","columnName":"objid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
+  objsubid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":6,"columnLabel":"objsubid","columnName":"objsubid","columnType":"SmallInt","columnTypeName":"int2","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":5,"scale":0} */,
+  virtualtransaction: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"virtualtransaction","columnName":"virtualtransaction","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  mode: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"mode","columnName":"mode","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  granted: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"granted","columnName":"granted","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  fastpath: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"fastpath","columnName":"fastpath","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  waitstart: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"waitstart","columnName":"waitstart","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgLocksRow {
@@ -56,5 +62,50 @@ object PgLocksRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgLocksRow] = new OFormat[PgLocksRow]{
+    override def writes(o: PgLocksRow): JsObject =
+      Json.obj(
+        "locktype" -> o.locktype,
+      "database" -> o.database,
+      "relation" -> o.relation,
+      "page" -> o.page,
+      "tuple" -> o.tuple,
+      "virtualxid" -> o.virtualxid,
+      "transactionid" -> o.transactionid,
+      "classid" -> o.classid,
+      "objid" -> o.objid,
+      "objsubid" -> o.objsubid,
+      "virtualtransaction" -> o.virtualtransaction,
+      "pid" -> o.pid,
+      "mode" -> o.mode,
+      "granted" -> o.granted,
+      "fastpath" -> o.fastpath,
+      "waitstart" -> o.waitstart
+      )
+
+    override def reads(json: JsValue): JsResult[PgLocksRow] = {
+      JsResult.fromTry(
+        Try(
+          PgLocksRow(
+            locktype = json.\("locktype").toOption.map(_.as[String]),
+            database = json.\("database").toOption.map(_.as[Long]),
+            relation = json.\("relation").toOption.map(_.as[Long]),
+            page = json.\("page").toOption.map(_.as[Int]),
+            tuple = json.\("tuple").toOption.map(_.as[Int]),
+            virtualxid = json.\("virtualxid").toOption.map(_.as[String]),
+            transactionid = json.\("transactionid").toOption.map(_.as[/* xid */ String]),
+            classid = json.\("classid").toOption.map(_.as[Long]),
+            objid = json.\("objid").toOption.map(_.as[Long]),
+            objsubid = json.\("objsubid").toOption.map(_.as[Int]),
+            virtualtransaction = json.\("virtualtransaction").toOption.map(_.as[String]),
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            mode = json.\("mode").toOption.map(_.as[String]),
+            granted = json.\("granted").toOption.map(_.as[Boolean]),
+            fastpath = json.\("fastpath").toOption.map(_.as[Boolean]),
+            waitstart = json.\("waitstart").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

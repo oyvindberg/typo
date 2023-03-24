@@ -11,23 +11,29 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTablesRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  tableowner: /* unknown nullability */ Option[String],
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  tableowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tableowner","columnName":"tableowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String,
+  tablespace: String /* {"baseColumnName":"spcname","baseRelationName":"pg_catalog.pg_tablespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablespace","columnName":"tablespace","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_tablespace"} */,
   /** Points to [[PgClassRow.relhasindex]] */
-  hasindexes: Boolean,
+  hasindexes: Boolean /* {"baseColumnName":"relhasindex","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"hasindexes","columnName":"hasindexes","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.relhasrules]] */
-  hasrules: Boolean,
+  hasrules: Boolean /* {"baseColumnName":"relhasrules","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"hasrules","columnName":"hasrules","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.relhastriggers]] */
-  hastriggers: Boolean,
+  hastriggers: Boolean /* {"baseColumnName":"relhastriggers","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"hastriggers","columnName":"hastriggers","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgClassRow.relrowsecurity]] */
-  rowsecurity: Boolean
+  rowsecurity: Boolean /* {"baseColumnName":"relrowsecurity","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rowsecurity","columnName":"rowsecurity","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */
 )
 
 object PgTablesRow {
@@ -46,5 +52,34 @@ object PgTablesRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTablesRow] = new OFormat[PgTablesRow]{
+    override def writes(o: PgTablesRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "tableowner" -> o.tableowner,
+      "tablespace" -> o.tablespace,
+      "hasindexes" -> o.hasindexes,
+      "hasrules" -> o.hasrules,
+      "hastriggers" -> o.hastriggers,
+      "rowsecurity" -> o.rowsecurity
+      )
+
+    override def reads(json: JsValue): JsResult[PgTablesRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTablesRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            tableowner = json.\("tableowner").toOption.map(_.as[String]),
+            tablespace = json.\("tablespace").as[String],
+            hasindexes = json.\("hasindexes").as[Boolean],
+            hasrules = json.\("hasrules").as[Boolean],
+            hastriggers = json.\("hastriggers").as[Boolean],
+            rowsecurity = json.\("rowsecurity").as[Boolean]
+          )
+        )
+      )
+    }
+  }
 }

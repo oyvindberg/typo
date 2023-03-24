@@ -11,17 +11,23 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatDatabaseConflictsRow(
   /** Points to [[PgDatabaseRow.oid]] */
-  datid: Long,
+  datid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datid","columnName":"datid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_database"} */,
   /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  conflTablespace: /* unknown nullability */ Option[Long],
-  conflLock: /* unknown nullability */ Option[Long],
-  conflSnapshot: /* unknown nullability */ Option[Long],
-  conflBufferpin: /* unknown nullability */ Option[Long],
-  conflDeadlock: /* unknown nullability */ Option[Long]
+  datname: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"datname","columnName":"datname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */,
+  conflTablespace: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"confl_tablespace","columnName":"confl_tablespace","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  conflLock: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"confl_lock","columnName":"confl_lock","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  conflSnapshot: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"confl_snapshot","columnName":"confl_snapshot","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  conflBufferpin: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"confl_bufferpin","columnName":"confl_bufferpin","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  conflDeadlock: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"confl_deadlock","columnName":"confl_deadlock","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
 )
 
 object PgStatDatabaseConflictsRow {
@@ -39,5 +45,32 @@ object PgStatDatabaseConflictsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatDatabaseConflictsRow] = new OFormat[PgStatDatabaseConflictsRow]{
+    override def writes(o: PgStatDatabaseConflictsRow): JsObject =
+      Json.obj(
+        "datid" -> o.datid,
+      "datname" -> o.datname,
+      "confl_tablespace" -> o.conflTablespace,
+      "confl_lock" -> o.conflLock,
+      "confl_snapshot" -> o.conflSnapshot,
+      "confl_bufferpin" -> o.conflBufferpin,
+      "confl_deadlock" -> o.conflDeadlock
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatDatabaseConflictsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatDatabaseConflictsRow(
+            datid = json.\("datid").as[Long],
+            datname = json.\("datname").as[String],
+            conflTablespace = json.\("confl_tablespace").toOption.map(_.as[Long]),
+            conflLock = json.\("confl_lock").toOption.map(_.as[Long]),
+            conflSnapshot = json.\("confl_snapshot").toOption.map(_.as[Long]),
+            conflBufferpin = json.\("confl_bufferpin").toOption.map(_.as[Long]),
+            conflDeadlock = json.\("confl_deadlock").toOption.map(_.as[Long])
+          )
+        )
+      )
+    }
+  }
 }

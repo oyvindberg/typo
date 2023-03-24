@@ -11,14 +11,20 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgViewsRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  viewname: String,
-  viewowner: /* unknown nullability */ Option[String],
-  definition: /* unknown nullability */ Option[String]
+  viewname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"viewname","columnName":"viewname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
+  viewowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"viewowner","columnName":"viewowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  definition: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"definition","columnName":"definition","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgViewsRow {
@@ -33,5 +39,26 @@ object PgViewsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgViewsRow] = new OFormat[PgViewsRow]{
+    override def writes(o: PgViewsRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "viewname" -> o.viewname,
+      "viewowner" -> o.viewowner,
+      "definition" -> o.definition
+      )
+
+    override def reads(json: JsValue): JsResult[PgViewsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgViewsRow(
+            schemaname = json.\("schemaname").as[String],
+            viewname = json.\("viewname").as[String],
+            viewowner = json.\("viewowner").toOption.map(_.as[String]),
+            definition = json.\("definition").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

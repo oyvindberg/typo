@@ -11,29 +11,35 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatsExtRow(
   /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
+  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgClassRow.relname]] */
-  tablename: String,
+  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
   /** Points to [[PgNamespaceRow.nspname]] */
-  statisticsSchemaname: String,
+  statisticsSchemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_schemaname","columnName":"statistics_schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
   /** Points to [[PgStatisticExtRow.stxname]] */
-  statisticsName: String,
-  statisticsOwner: /* unknown nullability */ Option[String],
-  attnames: /* unknown nullability */ Option[Array[String]],
-  exprs: /* unknown nullability */ Option[Array[String]],
+  statisticsName: String /* {"baseColumnName":"stxname","baseRelationName":"pg_catalog.pg_statistic_ext","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_name","columnName":"statistics_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statistic_ext"} */,
+  statisticsOwner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_owner","columnName":"statistics_owner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  attnames: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"attnames","columnName":"attnames","columnType":"Array","columnTypeName":"_name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  exprs: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"exprs","columnName":"exprs","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgStatisticExtRow.stxkind]] */
-  kinds: Array[String],
+  kinds: Array[String] /* {"baseColumnName":"stxkind","baseRelationName":"pg_catalog.pg_statistic_ext","columnClassName":"java.sql.Array","columnDisplaySize":1,"columnLabel":"kinds","columnName":"kinds","columnType":"Array","columnTypeName":"_char","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_statistic_ext"} */,
   /** Points to [[PgStatisticExtDataRow.stxdndistinct]] */
-  nDistinct: Option[/* pg_ndistinct */ String],
+  nDistinct: Option[/* pg_ndistinct */ String] /* {"baseColumnName":"stxdndistinct","baseRelationName":"pg_catalog.pg_statistic_ext_data","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"n_distinct","columnName":"n_distinct","columnType":"Other","columnTypeName":"pg_ndistinct","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statistic_ext_data"} */,
   /** Points to [[PgStatisticExtDataRow.stxddependencies]] */
-  dependencies: Option[/* pg_dependencies */ String],
-  mostCommonVals: /* unknown nullability */ Option[Array[String]],
-  mostCommonValNulls: /* unknown nullability */ Option[Array[Boolean]],
-  mostCommonFreqs: /* unknown nullability */ Option[Array[Double]],
-  mostCommonBaseFreqs: /* unknown nullability */ Option[Array[Double]]
+  dependencies: Option[/* pg_dependencies */ String] /* {"baseColumnName":"stxddependencies","baseRelationName":"pg_catalog.pg_statistic_ext_data","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"dependencies","columnName":"dependencies","columnType":"Other","columnTypeName":"pg_dependencies","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statistic_ext_data"} */,
+  mostCommonVals: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"most_common_vals","columnName":"most_common_vals","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  mostCommonValNulls: /* unknown nullability */ Option[Array[Boolean]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":1,"columnLabel":"most_common_val_nulls","columnName":"most_common_val_nulls","columnType":"Array","columnTypeName":"_bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  mostCommonFreqs: /* unknown nullability */ Option[Array[Double]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":25,"columnLabel":"most_common_freqs","columnName":"most_common_freqs","columnType":"Array","columnTypeName":"_float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
+  mostCommonBaseFreqs: /* unknown nullability */ Option[Array[Double]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":25,"columnLabel":"most_common_base_freqs","columnName":"most_common_base_freqs","columnType":"Array","columnTypeName":"_float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */
 )
 
 object PgStatsExtRow {
@@ -58,5 +64,46 @@ object PgStatsExtRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatsExtRow] = new OFormat[PgStatsExtRow]{
+    override def writes(o: PgStatsExtRow): JsObject =
+      Json.obj(
+        "schemaname" -> o.schemaname,
+      "tablename" -> o.tablename,
+      "statistics_schemaname" -> o.statisticsSchemaname,
+      "statistics_name" -> o.statisticsName,
+      "statistics_owner" -> o.statisticsOwner,
+      "attnames" -> o.attnames,
+      "exprs" -> o.exprs,
+      "kinds" -> o.kinds,
+      "n_distinct" -> o.nDistinct,
+      "dependencies" -> o.dependencies,
+      "most_common_vals" -> o.mostCommonVals,
+      "most_common_val_nulls" -> o.mostCommonValNulls,
+      "most_common_freqs" -> o.mostCommonFreqs,
+      "most_common_base_freqs" -> o.mostCommonBaseFreqs
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatsExtRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatsExtRow(
+            schemaname = json.\("schemaname").as[String],
+            tablename = json.\("tablename").as[String],
+            statisticsSchemaname = json.\("statistics_schemaname").as[String],
+            statisticsName = json.\("statistics_name").as[String],
+            statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
+            attnames = json.\("attnames").toOption.map(_.as[Array[String]]),
+            exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
+            kinds = json.\("kinds").as[Array[String]],
+            nDistinct = json.\("n_distinct").toOption.map(_.as[/* pg_ndistinct */ String]),
+            dependencies = json.\("dependencies").toOption.map(_.as[/* pg_dependencies */ String]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
+            mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as[Array[Boolean]]),
+            mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),
+            mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as[Array[Double]])
+          )
+        )
+      )
+    }
+  }
 }

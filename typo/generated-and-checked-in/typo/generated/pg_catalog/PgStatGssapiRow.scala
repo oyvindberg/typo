@@ -11,12 +11,18 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatGssapiRow(
-  pid: /* unknown nullability */ Option[Int],
-  gssAuthenticated: /* unknown nullability */ Option[Boolean],
-  principal: /* unknown nullability */ Option[String],
-  encrypted: /* unknown nullability */ Option[Boolean]
+  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  gssAuthenticated: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"gss_authenticated","columnName":"gss_authenticated","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  principal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"principal","columnName":"principal","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  encrypted: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"encrypted","columnName":"encrypted","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
 )
 
 object PgStatGssapiRow {
@@ -31,5 +37,26 @@ object PgStatGssapiRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatGssapiRow] = new OFormat[PgStatGssapiRow]{
+    override def writes(o: PgStatGssapiRow): JsObject =
+      Json.obj(
+        "pid" -> o.pid,
+      "gss_authenticated" -> o.gssAuthenticated,
+      "principal" -> o.principal,
+      "encrypted" -> o.encrypted
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatGssapiRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatGssapiRow(
+            pid = json.\("pid").toOption.map(_.as[Int]),
+            gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as[Boolean]),
+            principal = json.\("principal").toOption.map(_.as[String]),
+            encrypted = json.\("encrypted").toOption.map(_.as[Boolean])
+          )
+        )
+      )
+    }
+  }
 }

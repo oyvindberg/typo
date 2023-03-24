@@ -11,14 +11,20 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class UserMappingsRow(
   /** Points to [[PgUserMappingsRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[String],
+  authorizationIdentifier: Option[String] /* {"baseColumnName":"authorization_identifier","baseRelationName":"information_schema._pg_user_mappings","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_user_mappings"} */,
   /** Points to [[PgUserMappingsRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[String],
+  foreignServerCatalog: Option[String] /* {"baseColumnName":"foreign_server_catalog","baseRelationName":"information_schema._pg_user_mappings","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_catalog","columnName":"foreign_server_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_user_mappings"} */,
   /** Points to [[PgUserMappingsRow.foreignServerName]] */
-  foreignServerName: Option[String]
+  foreignServerName: Option[String] /* {"baseColumnName":"foreign_server_name","baseRelationName":"information_schema._pg_user_mappings","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_name","columnName":"foreign_server_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_user_mappings"} */
 )
 
 object UserMappingsRow {
@@ -32,5 +38,24 @@ object UserMappingsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[UserMappingsRow] = new OFormat[UserMappingsRow]{
+    override def writes(o: UserMappingsRow): JsObject =
+      Json.obj(
+        "authorization_identifier" -> o.authorizationIdentifier,
+      "foreign_server_catalog" -> o.foreignServerCatalog,
+      "foreign_server_name" -> o.foreignServerName
+      )
+
+    override def reads(json: JsValue): JsResult[UserMappingsRow] = {
+      JsResult.fromTry(
+        Try(
+          UserMappingsRow(
+            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
+            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
+            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

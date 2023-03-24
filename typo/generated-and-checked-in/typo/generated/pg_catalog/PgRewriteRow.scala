@@ -12,16 +12,22 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGobject
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgRewriteRow(
-  oid: PgRewriteId,
-  rulename: String,
-  evClass: Long,
-  evType: String,
-  evEnabled: String,
-  isInstead: Boolean,
-  evQual: PGobject,
-  evAction: PGobject
+  oid: PgRewriteId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rulename: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"rulename","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  evClass: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"ev_class","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  evType: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"ev_type","ordinal_position":4,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  evEnabled: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"ev_enabled","ordinal_position":5,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  isInstead: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"is_instead","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  evQual: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"ev_qual","ordinal_position":7,"is_nullable":"NO","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  evAction: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_rewrite","column_name":"ev_action","ordinal_position":8,"is_nullable":"NO","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgRewriteRow {
@@ -40,5 +46,34 @@ object PgRewriteRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgRewriteRow] = new OFormat[PgRewriteRow]{
+    override def writes(o: PgRewriteRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "rulename" -> o.rulename,
+      "ev_class" -> o.evClass,
+      "ev_type" -> o.evType,
+      "ev_enabled" -> o.evEnabled,
+      "is_instead" -> o.isInstead,
+      "ev_qual" -> o.evQual,
+      "ev_action" -> o.evAction
+      )
+
+    override def reads(json: JsValue): JsResult[PgRewriteRow] = {
+      JsResult.fromTry(
+        Try(
+          PgRewriteRow(
+            oid = json.\("oid").as[PgRewriteId],
+            rulename = json.\("rulename").as[String],
+            evClass = json.\("ev_class").as[Long],
+            evType = json.\("ev_type").as[String],
+            evEnabled = json.\("ev_enabled").as[String],
+            isInstead = json.\("is_instead").as[Boolean],
+            evQual = json.\("ev_qual").as[PGobject],
+            evAction = json.\("ev_action").as[PGobject]
+          )
+        )
+      )
+    }
+  }
 }

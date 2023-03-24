@@ -1,5 +1,6 @@
 package typo
 
+import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import typo.sc.syntax._
 
 case class RelationFiles(relation: RelationComputed, options: Options) {
@@ -15,12 +16,22 @@ case class RelationFiles(relation: RelationComputed, options: Options) {
     }
 
     val formattedCols = relation.cols.map { col =>
+      val originComment = col.jsonDescription match {
+        case JsNull => ""
+        case other =>
+          def removeNullsFromJson(json: JsValue): JsValue = json match {
+            case x: JsObject => JsObject(x.fields.collect { case (k, v) if v != JsNull => k -> removeNullsFromJson(v) })
+            case other       => other
+          }
+          if (options.debugTypes) s" /* ${Json.stringify(removeNullsFromJson(other))} */" else ""
+      }
+
       col.pointsTo match {
         case Some((relationName, columnName)) =>
           val row = names.titleCase(relation.pkg, relationName, "Row")
           code"""/** Points to [[$row.${names.field(columnName)}]] */
-                |  ${col.param}""".stripMargin
-        case None => col.param.code
+                |  ${col.param}$originComment""".stripMargin
+        case None => code"${col.param.code}$originComment"
       }
     }
     val str =

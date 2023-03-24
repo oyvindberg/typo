@@ -12,15 +12,21 @@ package pg_catalog
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatArchiverRow(
-  archivedCount: /* unknown nullability */ Option[Long],
-  lastArchivedWal: /* unknown nullability */ Option[String],
-  lastArchivedTime: /* unknown nullability */ Option[LocalDateTime],
-  failedCount: /* unknown nullability */ Option[Long],
-  lastFailedWal: /* unknown nullability */ Option[String],
-  lastFailedTime: /* unknown nullability */ Option[LocalDateTime],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  archivedCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"archived_count","columnName":"archived_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  lastArchivedWal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"last_archived_wal","columnName":"last_archived_wal","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  lastArchivedTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_archived_time","columnName":"last_archived_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  failedCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"failed_count","columnName":"failed_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
+  lastFailedWal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"last_failed_wal","columnName":"last_failed_wal","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  lastFailedTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_failed_time","columnName":"last_failed_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
+  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
 )
 
 object PgStatArchiverRow {
@@ -38,5 +44,32 @@ object PgStatArchiverRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatArchiverRow] = new OFormat[PgStatArchiverRow]{
+    override def writes(o: PgStatArchiverRow): JsObject =
+      Json.obj(
+        "archived_count" -> o.archivedCount,
+      "last_archived_wal" -> o.lastArchivedWal,
+      "last_archived_time" -> o.lastArchivedTime,
+      "failed_count" -> o.failedCount,
+      "last_failed_wal" -> o.lastFailedWal,
+      "last_failed_time" -> o.lastFailedTime,
+      "stats_reset" -> o.statsReset
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatArchiverRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatArchiverRow(
+            archivedCount = json.\("archived_count").toOption.map(_.as[Long]),
+            lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as[String]),
+            lastArchivedTime = json.\("last_archived_time").toOption.map(_.as[LocalDateTime]),
+            failedCount = json.\("failed_count").toOption.map(_.as[Long]),
+            lastFailedWal = json.\("last_failed_wal").toOption.map(_.as[String]),
+            lastFailedTime = json.\("last_failed_time").toOption.map(_.as[LocalDateTime]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+          )
+        )
+      )
+    }
+  }
 }

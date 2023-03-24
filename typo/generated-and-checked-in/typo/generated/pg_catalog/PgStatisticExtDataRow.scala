@@ -11,13 +11,19 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgStatisticExtDataRow(
-  stxoid: PgStatisticExtDataId,
-  stxdndistinct: Option[String],
-  stxddependencies: Option[String],
-  stxdmcv: Option[String],
-  stxdexpr: Option[Array[String]]
+  stxoid: PgStatisticExtDataId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxoid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stxdndistinct: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdndistinct","ordinal_position":2,"is_nullable":"YES","data_type":"pg_ndistinct","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_ndistinct","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stxddependencies: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxddependencies","ordinal_position":3,"is_nullable":"YES","data_type":"pg_dependencies","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_dependencies","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stxdmcv: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdmcv","ordinal_position":4,"is_nullable":"YES","data_type":"pg_mcv_list","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_mcv_list","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stxdexpr: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdexpr","ordinal_position":5,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_pg_statistic","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgStatisticExtDataRow {
@@ -33,5 +39,28 @@ object PgStatisticExtDataRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgStatisticExtDataRow] = new OFormat[PgStatisticExtDataRow]{
+    override def writes(o: PgStatisticExtDataRow): JsObject =
+      Json.obj(
+        "stxoid" -> o.stxoid,
+      "stxdndistinct" -> o.stxdndistinct,
+      "stxddependencies" -> o.stxddependencies,
+      "stxdmcv" -> o.stxdmcv,
+      "stxdexpr" -> o.stxdexpr
+      )
+
+    override def reads(json: JsValue): JsResult[PgStatisticExtDataRow] = {
+      JsResult.fromTry(
+        Try(
+          PgStatisticExtDataRow(
+            stxoid = json.\("stxoid").as[PgStatisticExtDataId],
+            stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
+            stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
+            stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
+            stxdexpr = json.\("stxdexpr").toOption.map(_.as[Array[String]])
+          )
+        )
+      )
+    }
+  }
 }

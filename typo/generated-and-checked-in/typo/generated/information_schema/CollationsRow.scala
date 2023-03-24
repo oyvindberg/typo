@@ -11,12 +11,18 @@ package information_schema
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class CollationsRow(
-  collationCatalog: /* unknown nullability */ Option[String],
-  collationSchema: /* unknown nullability */ Option[String],
-  collationName: /* unknown nullability */ Option[String],
-  padAttribute: /* unknown nullability */ Option[String]
+  collationCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_catalog","columnName":"collation_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  collationSchema: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_schema","columnName":"collation_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  collationName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"collation_name","columnName":"collation_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  padAttribute: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"pad_attribute","columnName":"pad_attribute","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object CollationsRow {
@@ -31,5 +37,26 @@ object CollationsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[CollationsRow] = new OFormat[CollationsRow]{
+    override def writes(o: CollationsRow): JsObject =
+      Json.obj(
+        "collation_catalog" -> o.collationCatalog,
+      "collation_schema" -> o.collationSchema,
+      "collation_name" -> o.collationName,
+      "pad_attribute" -> o.padAttribute
+      )
+
+    override def reads(json: JsValue): JsResult[CollationsRow] = {
+      JsResult.fromTry(
+        Try(
+          CollationsRow(
+            collationCatalog = json.\("collation_catalog").toOption.map(_.as[String]),
+            collationSchema = json.\("collation_schema").toOption.map(_.as[String]),
+            collationName = json.\("collation_name").toOption.map(_.as[String]),
+            padAttribute = json.\("pad_attribute").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }

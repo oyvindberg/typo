@@ -11,13 +11,19 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgTsConfigRow(
-  oid: PgTsConfigId,
-  cfgname: String,
-  cfgnamespace: Long,
-  cfgowner: Long,
-  cfgparser: Long
+  oid: PgTsConfigId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgparser: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgparser","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgTsConfigRow {
@@ -33,5 +39,28 @@ object PgTsConfigRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgTsConfigRow] = new OFormat[PgTsConfigRow]{
+    override def writes(o: PgTsConfigRow): JsObject =
+      Json.obj(
+        "oid" -> o.oid,
+      "cfgname" -> o.cfgname,
+      "cfgnamespace" -> o.cfgnamespace,
+      "cfgowner" -> o.cfgowner,
+      "cfgparser" -> o.cfgparser
+      )
+
+    override def reads(json: JsValue): JsResult[PgTsConfigRow] = {
+      JsResult.fromTry(
+        Try(
+          PgTsConfigRow(
+            oid = json.\("oid").as[PgTsConfigId],
+            cfgname = json.\("cfgname").as[String],
+            cfgnamespace = json.\("cfgnamespace").as[Long],
+            cfgowner = json.\("cfgowner").as[Long],
+            cfgparser = json.\("cfgparser").as[Long]
+          )
+        )
+      )
+    }
+  }
 }

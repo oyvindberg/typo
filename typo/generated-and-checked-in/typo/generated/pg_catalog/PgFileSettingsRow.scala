@@ -11,15 +11,21 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsResult
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import scala.util.Try
 
 case class PgFileSettingsRow(
-  sourcefile: /* unknown nullability */ Option[String],
-  sourceline: /* unknown nullability */ Option[Int],
-  seqno: /* unknown nullability */ Option[Int],
-  name: /* unknown nullability */ Option[String],
-  setting: /* unknown nullability */ Option[String],
-  applied: /* unknown nullability */ Option[Boolean],
-  error: /* unknown nullability */ Option[String]
+  sourcefile: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sourcefile","columnName":"sourcefile","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  sourceline: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"sourceline","columnName":"sourceline","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  seqno: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"seqno","columnName":"seqno","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
+  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  setting: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"setting","columnName":"setting","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
+  applied: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"applied","columnName":"applied","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
+  error: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"error","columnName":"error","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
 object PgFileSettingsRow {
@@ -37,5 +43,32 @@ object PgFileSettingsRow {
     )
   }
 
-  
+  implicit val oFormat: OFormat[PgFileSettingsRow] = new OFormat[PgFileSettingsRow]{
+    override def writes(o: PgFileSettingsRow): JsObject =
+      Json.obj(
+        "sourcefile" -> o.sourcefile,
+      "sourceline" -> o.sourceline,
+      "seqno" -> o.seqno,
+      "name" -> o.name,
+      "setting" -> o.setting,
+      "applied" -> o.applied,
+      "error" -> o.error
+      )
+
+    override def reads(json: JsValue): JsResult[PgFileSettingsRow] = {
+      JsResult.fromTry(
+        Try(
+          PgFileSettingsRow(
+            sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
+            sourceline = json.\("sourceline").toOption.map(_.as[Int]),
+            seqno = json.\("seqno").toOption.map(_.as[Int]),
+            name = json.\("name").toOption.map(_.as[String]),
+            setting = json.\("setting").toOption.map(_.as[String]),
+            applied = json.\("applied").toOption.map(_.as[Boolean]),
+            error = json.\("error").toOption.map(_.as[String])
+          )
+        )
+      )
+    }
+  }
 }
