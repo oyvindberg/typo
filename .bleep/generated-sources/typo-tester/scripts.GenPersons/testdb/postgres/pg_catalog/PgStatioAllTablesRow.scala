@@ -17,37 +17,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioAllTablesRow(
-  /** Points to [[PgClassRow.oid]] */
-  relid: Long,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  heapBlksRead: /* unknown nullability */ Option[Long],
-  heapBlksHit: /* unknown nullability */ Option[Long],
-  idxBlksRead: /* unknown nullability */ Option[Long],
-  idxBlksHit: /* unknown nullability */ Option[Long],
-  toastBlksRead: /* unknown nullability */ Option[Long],
-  toastBlksHit: /* unknown nullability */ Option[Long],
-  tidxBlksRead: /* unknown nullability */ Option[Long],
-  tidxBlksHit: /* unknown nullability */ Option[Long]
+  relid: Option[Long],
+  schemaname: Option[String],
+  relname: Option[String],
+  heapBlksRead: Option[Long],
+  heapBlksHit: Option[Long],
+  idxBlksRead: Option[Long],
+  idxBlksHit: Option[Long],
+  toastBlksRead: Option[Long],
+  toastBlksHit: Option[Long],
+  tidxBlksRead: Option[Long],
+  tidxBlksHit: Option[Long]
 )
 
 object PgStatioAllTablesRow {
   implicit val rowParser: RowParser[PgStatioAllTablesRow] = { row =>
     Success(
       PgStatioAllTablesRow(
-        relid = row[Long]("relid"),
-        schemaname = row[String]("schemaname"),
-        relname = row[String]("relname"),
-        heapBlksRead = row[/* unknown nullability */ Option[Long]]("heap_blks_read"),
-        heapBlksHit = row[/* unknown nullability */ Option[Long]]("heap_blks_hit"),
-        idxBlksRead = row[/* unknown nullability */ Option[Long]]("idx_blks_read"),
-        idxBlksHit = row[/* unknown nullability */ Option[Long]]("idx_blks_hit"),
-        toastBlksRead = row[/* unknown nullability */ Option[Long]]("toast_blks_read"),
-        toastBlksHit = row[/* unknown nullability */ Option[Long]]("toast_blks_hit"),
-        tidxBlksRead = row[/* unknown nullability */ Option[Long]]("tidx_blks_read"),
-        tidxBlksHit = row[/* unknown nullability */ Option[Long]]("tidx_blks_hit")
+        relid = row[Option[Long]]("relid"),
+        schemaname = row[Option[String]]("schemaname"),
+        relname = row[Option[String]]("relname"),
+        heapBlksRead = row[Option[Long]]("heap_blks_read"),
+        heapBlksHit = row[Option[Long]]("heap_blks_hit"),
+        idxBlksRead = row[Option[Long]]("idx_blks_read"),
+        idxBlksHit = row[Option[Long]]("idx_blks_hit"),
+        toastBlksRead = row[Option[Long]]("toast_blks_read"),
+        toastBlksHit = row[Option[Long]]("toast_blks_hit"),
+        tidxBlksRead = row[Option[Long]]("tidx_blks_read"),
+        tidxBlksHit = row[Option[Long]]("tidx_blks_hit")
       )
     )
   }
@@ -72,9 +69,9 @@ object PgStatioAllTablesRow {
       JsResult.fromTry(
         Try(
           PgStatioAllTablesRow(
-            relid = json.\("relid").as[Long],
-            schemaname = json.\("schemaname").as[String],
-            relname = json.\("relname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
             heapBlksRead = json.\("heap_blks_read").toOption.map(_.as[Long]),
             heapBlksHit = json.\("heap_blks_hit").toOption.map(_.as[Long]),
             idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),

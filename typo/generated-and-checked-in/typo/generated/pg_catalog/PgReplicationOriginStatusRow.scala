@@ -19,20 +19,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgReplicationOriginStatusRow(
-  localId: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"local_id","columnName":"local_id","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  externalId: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"external_id","columnName":"external_id","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  remoteLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"remote_lsn","columnName":"remote_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  localLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"local_lsn","columnName":"local_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  localId: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_origin_status","column_name":"local_id","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  externalId: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_origin_status","column_name":"external_id","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  remoteLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_origin_status","column_name":"remote_lsn","ordinal_position":3,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  localLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_origin_status","column_name":"local_lsn","ordinal_position":4,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgReplicationOriginStatusRow {
   implicit val rowParser: RowParser[PgReplicationOriginStatusRow] = { row =>
     Success(
       PgReplicationOriginStatusRow(
-        localId = row[/* unknown nullability */ Option[Long]]("local_id"),
-        externalId = row[/* unknown nullability */ Option[String]]("external_id"),
-        remoteLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("remote_lsn"),
-        localLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("local_lsn")
+        localId = row[Option[Long]]("local_id"),
+        externalId = row[Option[String]]("external_id"),
+        remoteLsn = row[Option[String]]("remote_lsn"),
+        localLsn = row[Option[String]]("local_lsn")
       )
     )
   }
@@ -52,8 +52,8 @@ object PgReplicationOriginStatusRow {
           PgReplicationOriginStatusRow(
             localId = json.\("local_id").toOption.map(_.as[Long]),
             externalId = json.\("external_id").toOption.map(_.as[String]),
-            remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ String])
+            remoteLsn = json.\("remote_lsn").toOption.map(_.as[String]),
+            localLsn = json.\("local_lsn").toOption.map(_.as[String])
           )
         )
       )

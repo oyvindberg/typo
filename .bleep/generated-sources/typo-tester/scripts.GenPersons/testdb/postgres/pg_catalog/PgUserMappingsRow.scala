@@ -17,28 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingsRow(
-  /** Points to [[PgUserMappingRow.oid]] */
-  umid: Long,
-  /** Points to [[PgForeignServerRow.oid]] */
-  srvid: Long,
-  /** Points to [[PgForeignServerRow.srvname]] */
-  srvname: String,
-  /** Points to [[PgUserMappingRow.umuser]] */
-  umuser: Long,
-  usename: /* unknown nullability */ Option[String],
-  umoptions: /* unknown nullability */ Option[Array[String]]
+  umid: Option[Long],
+  srvid: Option[Long],
+  srvname: Option[String],
+  umuser: Option[Long],
+  usename: Option[String],
+  umoptions: Option[Array[String]]
 )
 
 object PgUserMappingsRow {
   implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        umid = row[Long]("umid"),
-        srvid = row[Long]("srvid"),
-        srvname = row[String]("srvname"),
-        umuser = row[Long]("umuser"),
-        usename = row[/* unknown nullability */ Option[String]]("usename"),
-        umoptions = row[/* unknown nullability */ Option[Array[String]]]("umoptions")
+        umid = row[Option[Long]]("umid"),
+        srvid = row[Option[Long]]("srvid"),
+        srvname = row[Option[String]]("srvname"),
+        umuser = row[Option[Long]]("umuser"),
+        usename = row[Option[String]]("usename"),
+        umoptions = row[Option[Array[String]]]("umoptions")
       )
     )
   }
@@ -58,10 +54,10 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            umid = json.\("umid").as[Long],
-            srvid = json.\("srvid").as[Long],
-            srvname = json.\("srvname").as[String],
-            umuser = json.\("umuser").as[Long],
+            umid = json.\("umid").toOption.map(_.as[Long]),
+            srvid = json.\("srvid").toOption.map(_.as[Long]),
+            srvname = json.\("srvname").toOption.map(_.as[String]),
+            umuser = json.\("umuser").toOption.map(_.as[Long]),
             usename = json.\("usename").toOption.map(_.as[String]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
           )

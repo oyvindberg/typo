@@ -14,6 +14,6 @@ package pg_catalog
 sealed abstract class PgConfigFieldValue[T](val name: String, val value: T)
 
 object PgConfigFieldValue {
-  case class name(override val value: /* unknown nullability */ Option[String]) extends PgConfigFieldValue("name", value)
-  case class setting(override val value: /* unknown nullability */ Option[String]) extends PgConfigFieldValue("setting", value)
+  case class name(override val value: Option[String]) extends PgConfigFieldValue("name", value)
+  case class setting(override val value: Option[String]) extends PgConfigFieldValue("setting", value)
 }

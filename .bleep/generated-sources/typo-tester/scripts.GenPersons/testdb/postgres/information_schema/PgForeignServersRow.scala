@@ -15,35 +15,32 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.postgres.pg_catalog.PgForeignServerRow
 
 case class PgForeignServersRow(
-  /** Points to [[PgForeignServerRow.oid]] */
-  oid: Long,
-  /** Points to [[PgForeignServerRow.srvoptions]] */
+  oid: Option[Long],
   srvoptions: Option[Array[String]],
-  foreignServerCatalog: /* unknown nullability */ Option[String],
-  foreignServerName: /* unknown nullability */ Option[String],
-  foreignDataWrapperCatalog: /* unknown nullability */ Option[String],
-  foreignDataWrapperName: /* unknown nullability */ Option[String],
-  foreignServerType: /* unknown nullability */ Option[String],
-  foreignServerVersion: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String]
+  foreignServerCatalog: Option[String],
+  foreignServerName: Option[String],
+  foreignDataWrapperCatalog: Option[String],
+  foreignDataWrapperName: Option[String],
+  foreignServerType: Option[String],
+  foreignServerVersion: Option[String],
+  authorizationIdentifier: Option[String]
 )
 
 object PgForeignServersRow {
   implicit val rowParser: RowParser[PgForeignServersRow] = { row =>
     Success(
       PgForeignServersRow(
-        oid = row[Long]("oid"),
+        oid = row[Option[Long]]("oid"),
         srvoptions = row[Option[Array[String]]]("srvoptions"),
-        foreignServerCatalog = row[/* unknown nullability */ Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[/* unknown nullability */ Option[String]]("foreign_server_name"),
-        foreignDataWrapperCatalog = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_name"),
-        foreignServerType = row[/* unknown nullability */ Option[String]]("foreign_server_type"),
-        foreignServerVersion = row[/* unknown nullability */ Option[String]]("foreign_server_version"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier")
+        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
+        foreignServerName = row[Option[String]]("foreign_server_name"),
+        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
+        foreignServerType = row[Option[String]]("foreign_server_type"),
+        foreignServerVersion = row[Option[String]]("foreign_server_version"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier")
       )
     )
   }
@@ -66,7 +63,7 @@ object PgForeignServersRow {
       JsResult.fromTry(
         Try(
           PgForeignServersRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").toOption.map(_.as[Long]),
             srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

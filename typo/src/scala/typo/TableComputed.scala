@@ -1,6 +1,6 @@
 package typo
 
-import typo.db.Type
+import typo.doobie.Nullability
 
 case class TableComputed(options: Options, default: DefaultComputed, dbTable: db.Table) {
   val allKeyNames: Set[db.ColName] =
@@ -9,37 +9,6 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
     dbTable.foreignKeys.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (fk.otherTable, cn)))).toMap
   val dbColsByName: Map[db.ColName, db.Col] =
     dbTable.cols.map(col => (col.name, col)).toMap
-
-  def scalaType(pkg: sc.QIdent, col: db.Col): sc.Type = {
-    def go(tpe: db.Type): sc.Type = tpe match {
-      case Type.PgObject         => sc.Type.PGobject
-      case Type.BigInt           => sc.Type.Long
-      case Type.Text             => sc.Type.String
-      case Type.AnyArray         => sc.Type.PGobject
-      case Type.Boolean          => sc.Type.Boolean
-      case Type.Char             => sc.Type.String
-      case Type.Name             => sc.Type.String
-      case Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
-      case Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
-      case Type.Inet             => sc.Type.String // wip
-      case Type.Oid              => sc.Type.Long // wip
-      case Type.VarChar(_)       => sc.Type.String
-      case Type.Float4           => sc.Type.Float
-      case Type.Float8           => sc.Type.Double
-      case Type.Bytea            => sc.Type.Array.of(sc.Type.Byte)
-      case Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead of floats
-      case Type.Int4             => sc.Type.Int
-      case Type.Int8             => sc.Type.Long
-      case Type.Json             => sc.Type.String // wip
-      case Type.Numeric          => sc.Type.BigDecimal
-      case Type.Timestamp        => sc.Type.LocalDateTime
-      case Type.TimestampTz      => sc.Type.ZonedDateTime
-      case Type.Array(tpe)       => sc.Type.Array.of(go(tpe))
-    }
-    val baseTpe = go(col.tpe)
-
-    if (col.isNotNull) baseTpe else sc.Type.Option.of(baseTpe)
-  }
 
   val maybeId: Option[IdComputed] =
     dbTable.primaryKey.flatMap { pk =>
@@ -51,7 +20,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           val col = ColumnComputed(
             pointsTo.get(dbCol.name),
             names.field(dbCol.name),
-            scalaType(options.pkg, dbCol),
+            typeMapper(options.pkg, dbCol),
             dbCol.name,
             dbCol.hasDefault,
             dbCol.jsonDescription
@@ -62,7 +31,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           val cols: List[ColumnComputed] = colNames.map { colName =>
             val fieldName = names.field(colName)
             val dbCol = dbColsByName(colName)
-            val underlying = scalaType(options.pkg, dbCol)
+            val underlying = typeMapper(options.pkg, dbCol)
             ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
           }
           val paramName = sc.Ident("compositeId")
@@ -72,13 +41,16 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
 
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     dbTable.cols.map {
-      case dbCol @ db.Col(colName, _, isNotNull, _, _) if dbTable.primaryKey.exists(_.colNames == List(colName)) =>
-        if (!isNotNull) {
-          sys.error(s"assumption: id column in ${dbTable.name} should be not null")
+      case dbCol @ db.Col(colName, _, nullability, _, _) if dbTable.primaryKey.exists(_.colNames == List(colName)) =>
+        nullability match {
+          case Nullability.NoNulls =>
+            ()
+          case other =>
+            sys.error(s"assumption: id column in ${dbTable.name} should be `NoNulls`, got $other")
         }
         dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
       case dbCol =>
-        val finalType: sc.Type = scalaType(options.pkg, dbCol)
+        val finalType: sc.Type = typeMapper(options.pkg, dbCol)
 
         dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
@@ -110,7 +82,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
       sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
     )
 
-    val foo = List(
+    val maybeMethods = List(
       maybeId match {
         case Some(id) =>
           val updateMethod = RowUnsavedName.zip(colsUnsaved).map { case (unsaved, colsUnsaved) =>
@@ -143,10 +115,10 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           )
       },
       dbTable.uniqueKeys.map { uk =>
-        val params = uk.cols.map(colName => sc.Param(names.field(colName), scalaType(options.pkg, dbColsByName(colName))))
+        val params = uk.cols.map(colName => sc.Param(names.field(colName), typeMapper(options.pkg, dbColsByName(colName))))
         RepoMethod.SelectByUnique(params, RowType)
       }
     )
-    Some(foo.flatten).filter(_.nonEmpty)
+    Some(maybeMethods.flatten).filter(_.nonEmpty)
   }
 }

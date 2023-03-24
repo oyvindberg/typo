@@ -17,23 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRulesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  /** Points to [[PgRewriteRow.rulename]] */
-  rulename: String,
-  definition: /* unknown nullability */ Option[String]
+  schemaname: Option[String],
+  tablename: Option[String],
+  rulename: Option[String],
+  definition: Option[String]
 )
 
 object PgRulesRow {
   implicit val rowParser: RowParser[PgRulesRow] = { row =>
     Success(
       PgRulesRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        rulename = row[String]("rulename"),
-        definition = row[/* unknown nullability */ Option[String]]("definition")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        rulename = row[Option[String]]("rulename"),
+        definition = row[Option[String]]("definition")
       )
     )
   }
@@ -51,9 +48,9 @@ object PgRulesRow {
       JsResult.fromTry(
         Try(
           PgRulesRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            rulename = json.\("rulename").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            rulename = json.\("rulename").toOption.map(_.as[String]),
             definition = json.\("definition").toOption.map(_.as[String])
           )
         )

@@ -17,15 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignTablesRow(
-  /** Points to [[PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignServerName]] */
   foreignServerName: Option[String]
 )
 

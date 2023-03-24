@@ -19,20 +19,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgShmemAllocationsRow(
-  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  off: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"off","columnName":"off","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  size: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"size","columnName":"size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  allocatedSize: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"allocated_size","columnName":"allocated_size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
+  name: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shmem_allocations","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  off: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shmem_allocations","column_name":"off","ordinal_position":2,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  size: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shmem_allocations","column_name":"size","ordinal_position":3,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  allocatedSize: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shmem_allocations","column_name":"allocated_size","ordinal_position":4,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgShmemAllocationsRow {
   implicit val rowParser: RowParser[PgShmemAllocationsRow] = { row =>
     Success(
       PgShmemAllocationsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        off = row[/* unknown nullability */ Option[Long]]("off"),
-        size = row[/* unknown nullability */ Option[Long]]("size"),
-        allocatedSize = row[/* unknown nullability */ Option[Long]]("allocated_size")
+        name = row[Option[String]]("name"),
+        off = row[Option[Long]]("off"),
+        size = row[Option[Long]]("size"),
+        allocatedSize = row[Option[Long]]("allocated_size")
       )
     )
   }

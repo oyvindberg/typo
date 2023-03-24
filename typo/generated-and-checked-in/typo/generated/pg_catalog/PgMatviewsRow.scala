@@ -19,31 +19,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgMatviewsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  matviewname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"matviewname","columnName":"matviewname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  matviewowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"matviewowner","columnName":"matviewowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String /* {"baseColumnName":"spcname","baseRelationName":"pg_catalog.pg_tablespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablespace","columnName":"tablespace","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_tablespace"} */,
-  /** Points to [[PgClassRow.relhasindex]] */
-  hasindexes: Boolean /* {"baseColumnName":"relhasindex","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"hasindexes","columnName":"hasindexes","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgClassRow.relispopulated]] */
-  ispopulated: Boolean /* {"baseColumnName":"relispopulated","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"ispopulated","columnName":"ispopulated","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
-  definition: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"definition","columnName":"definition","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"schemaname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  matviewname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"matviewname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  matviewowner: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"matviewowner","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablespace: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"tablespace","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  hasindexes: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"hasindexes","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  ispopulated: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"ispopulated","ordinal_position":6,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  definition: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_matviews","column_name":"definition","ordinal_position":7,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgMatviewsRow {
   implicit val rowParser: RowParser[PgMatviewsRow] = { row =>
     Success(
       PgMatviewsRow(
-        schemaname = row[String]("schemaname"),
-        matviewname = row[String]("matviewname"),
-        matviewowner = row[/* unknown nullability */ Option[String]]("matviewowner"),
-        tablespace = row[String]("tablespace"),
-        hasindexes = row[Boolean]("hasindexes"),
-        ispopulated = row[Boolean]("ispopulated"),
-        definition = row[/* unknown nullability */ Option[String]]("definition")
+        schemaname = row[Option[String]]("schemaname"),
+        matviewname = row[Option[String]]("matviewname"),
+        matviewowner = row[Option[String]]("matviewowner"),
+        tablespace = row[Option[String]]("tablespace"),
+        hasindexes = row[Option[Boolean]]("hasindexes"),
+        ispopulated = row[Option[Boolean]]("ispopulated"),
+        definition = row[Option[String]]("definition")
       )
     )
   }
@@ -64,12 +59,12 @@ object PgMatviewsRow {
       JsResult.fromTry(
         Try(
           PgMatviewsRow(
-            schemaname = json.\("schemaname").as[String],
-            matviewname = json.\("matviewname").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            matviewname = json.\("matviewname").toOption.map(_.as[String]),
             matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
-            tablespace = json.\("tablespace").as[String],
-            hasindexes = json.\("hasindexes").as[Boolean],
-            ispopulated = json.\("ispopulated").as[Boolean],
+            tablespace = json.\("tablespace").toOption.map(_.as[String]),
+            hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
+            ispopulated = json.\("ispopulated").toOption.map(_.as[Boolean]),
             definition = json.\("definition").toOption.map(_.as[String])
           )
         )

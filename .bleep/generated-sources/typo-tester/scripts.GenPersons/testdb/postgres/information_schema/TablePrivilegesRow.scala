@@ -17,28 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class TablePrivilegesRow(
-  grantor: /* unknown nullability */ Option[String],
-  grantee: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  privilegeType: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String],
-  withHierarchy: /* unknown nullability */ Option[String]
+  grantor: Option[String],
+  grantee: Option[String],
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  privilegeType: Option[String],
+  isGrantable: Option[String],
+  withHierarchy: Option[String]
 )
 
 object TablePrivilegesRow {
   implicit val rowParser: RowParser[TablePrivilegesRow] = { row =>
     Success(
       TablePrivilegesRow(
-        grantor = row[/* unknown nullability */ Option[String]]("grantor"),
-        grantee = row[/* unknown nullability */ Option[String]]("grantee"),
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        privilegeType = row[/* unknown nullability */ Option[String]]("privilege_type"),
-        isGrantable = row[/* unknown nullability */ Option[String]]("is_grantable"),
-        withHierarchy = row[/* unknown nullability */ Option[String]]("with_hierarchy")
+        grantor = row[Option[String]]("grantor"),
+        grantee = row[Option[String]]("grantee"),
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        privilegeType = row[Option[String]]("privilege_type"),
+        isGrantable = row[Option[String]]("is_grantable"),
+        withHierarchy = row[Option[String]]("with_hierarchy")
       )
     )
   }

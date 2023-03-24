@@ -17,37 +17,36 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatProgressAnalyzeRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
-  /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  phase: /* unknown nullability */ Option[String],
-  sampleBlksTotal: /* unknown nullability */ Option[Long],
-  sampleBlksScanned: /* unknown nullability */ Option[Long],
-  extStatsTotal: /* unknown nullability */ Option[Long],
-  extStatsComputed: /* unknown nullability */ Option[Long],
-  childTablesTotal: /* unknown nullability */ Option[Long],
-  childTablesDone: /* unknown nullability */ Option[Long],
-  currentChildTableRelid: /* unknown nullability */ Option[Long]
+  pid: Option[Int],
+  datid: Option[Long],
+  datname: Option[String],
+  relid: Option[Long],
+  phase: Option[String],
+  sampleBlksTotal: Option[Long],
+  sampleBlksScanned: Option[Long],
+  extStatsTotal: Option[Long],
+  extStatsComputed: Option[Long],
+  childTablesTotal: Option[Long],
+  childTablesDone: Option[Long],
+  currentChildTableRelid: Option[Long]
 )
 
 object PgStatProgressAnalyzeRow {
   implicit val rowParser: RowParser[PgStatProgressAnalyzeRow] = { row =>
     Success(
       PgStatProgressAnalyzeRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        datid = row[/* unknown nullability */ Option[Long]]("datid"),
-        datname = row[String]("datname"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        phase = row[/* unknown nullability */ Option[String]]("phase"),
-        sampleBlksTotal = row[/* unknown nullability */ Option[Long]]("sample_blks_total"),
-        sampleBlksScanned = row[/* unknown nullability */ Option[Long]]("sample_blks_scanned"),
-        extStatsTotal = row[/* unknown nullability */ Option[Long]]("ext_stats_total"),
-        extStatsComputed = row[/* unknown nullability */ Option[Long]]("ext_stats_computed"),
-        childTablesTotal = row[/* unknown nullability */ Option[Long]]("child_tables_total"),
-        childTablesDone = row[/* unknown nullability */ Option[Long]]("child_tables_done"),
-        currentChildTableRelid = row[/* unknown nullability */ Option[Long]]("current_child_table_relid")
+        pid = row[Option[Int]]("pid"),
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        relid = row[Option[Long]]("relid"),
+        phase = row[Option[String]]("phase"),
+        sampleBlksTotal = row[Option[Long]]("sample_blks_total"),
+        sampleBlksScanned = row[Option[Long]]("sample_blks_scanned"),
+        extStatsTotal = row[Option[Long]]("ext_stats_total"),
+        extStatsComputed = row[Option[Long]]("ext_stats_computed"),
+        childTablesTotal = row[Option[Long]]("child_tables_total"),
+        childTablesDone = row[Option[Long]]("child_tables_done"),
+        currentChildTableRelid = row[Option[Long]]("current_child_table_relid")
       )
     )
   }
@@ -75,7 +74,7 @@ object PgStatProgressAnalyzeRow {
           PgStatProgressAnalyzeRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
             datid = json.\("datid").toOption.map(_.as[Long]),
-            datname = json.\("datname").as[String],
+            datname = json.\("datname").toOption.map(_.as[String]),
             relid = json.\("relid").toOption.map(_.as[Long]),
             phase = json.\("phase").toOption.map(_.as[String]),
             sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as[Long]),

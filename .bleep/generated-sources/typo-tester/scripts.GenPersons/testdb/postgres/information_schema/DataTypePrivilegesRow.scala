@@ -17,22 +17,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class DataTypePrivilegesRow(
-  objectCatalog: /* unknown nullability */ Option[String],
-  objectSchema: /* unknown nullability */ Option[String],
-  objectName: /* unknown nullability */ Option[String],
-  objectType: /* unknown nullability */ Option[String],
-  dtdIdentifier: /* unknown nullability */ Option[String]
+  objectCatalog: Option[String],
+  objectSchema: Option[String],
+  objectName: Option[String],
+  objectType: Option[String],
+  dtdIdentifier: Option[String]
 )
 
 object DataTypePrivilegesRow {
   implicit val rowParser: RowParser[DataTypePrivilegesRow] = { row =>
     Success(
       DataTypePrivilegesRow(
-        objectCatalog = row[/* unknown nullability */ Option[String]]("object_catalog"),
-        objectSchema = row[/* unknown nullability */ Option[String]]("object_schema"),
-        objectName = row[/* unknown nullability */ Option[String]]("object_name"),
-        objectType = row[/* unknown nullability */ Option[String]]("object_type"),
-        dtdIdentifier = row[/* unknown nullability */ Option[String]]("dtd_identifier")
+        objectCatalog = row[Option[String]]("object_catalog"),
+        objectSchema = row[Option[String]]("object_schema"),
+        objectName = row[Option[String]]("object_name"),
+        objectType = row[Option[String]]("object_type"),
+        dtdIdentifier = row[Option[String]]("dtd_identifier")
       )
     )
   }

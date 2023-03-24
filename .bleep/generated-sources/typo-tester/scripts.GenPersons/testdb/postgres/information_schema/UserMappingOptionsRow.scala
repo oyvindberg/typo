@@ -17,14 +17,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UserMappingOptionsRow(
-  /** Points to [[PgUserMappingsRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String],
-  /** Points to [[PgUserMappingsRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
-  /** Points to [[PgUserMappingsRow.foreignServerName]] */
   foreignServerName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  optionName: Option[String],
+  optionValue: Option[String]
 )
 
 object UserMappingOptionsRow {
@@ -34,8 +31,8 @@ object UserMappingOptionsRow {
         authorizationIdentifier = row[Option[String]]("authorization_identifier"),
         foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
         foreignServerName = row[Option[String]]("foreign_server_name"),
-        optionName = row[/* unknown nullability */ Option[String]]("option_name"),
-        optionValue = row[/* unknown nullability */ Option[String]]("option_value")
+        optionName = row[Option[String]]("option_name"),
+        optionValue = row[Option[String]]("option_value")
       )
     )
   }

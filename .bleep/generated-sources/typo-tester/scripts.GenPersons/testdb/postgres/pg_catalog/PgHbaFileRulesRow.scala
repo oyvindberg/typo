@@ -17,30 +17,30 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgHbaFileRulesRow(
-  lineNumber: /* unknown nullability */ Option[Int],
-  `type`: /* unknown nullability */ Option[String],
-  database: /* unknown nullability */ Option[Array[String]],
-  userName: /* unknown nullability */ Option[Array[String]],
-  address: /* unknown nullability */ Option[String],
-  netmask: /* unknown nullability */ Option[String],
-  authMethod: /* unknown nullability */ Option[String],
-  options: /* unknown nullability */ Option[Array[String]],
-  error: /* unknown nullability */ Option[String]
+  lineNumber: Option[Int],
+  `type`: Option[String],
+  database: Option[Array[String]],
+  userName: Option[Array[String]],
+  address: Option[String],
+  netmask: Option[String],
+  authMethod: Option[String],
+  options: Option[Array[String]],
+  error: Option[String]
 )
 
 object PgHbaFileRulesRow {
   implicit val rowParser: RowParser[PgHbaFileRulesRow] = { row =>
     Success(
       PgHbaFileRulesRow(
-        lineNumber = row[/* unknown nullability */ Option[Int]]("line_number"),
-        `type` = row[/* unknown nullability */ Option[String]]("type"),
-        database = row[/* unknown nullability */ Option[Array[String]]]("database"),
-        userName = row[/* unknown nullability */ Option[Array[String]]]("user_name"),
-        address = row[/* unknown nullability */ Option[String]]("address"),
-        netmask = row[/* unknown nullability */ Option[String]]("netmask"),
-        authMethod = row[/* unknown nullability */ Option[String]]("auth_method"),
-        options = row[/* unknown nullability */ Option[Array[String]]]("options"),
-        error = row[/* unknown nullability */ Option[String]]("error")
+        lineNumber = row[Option[Int]]("line_number"),
+        `type` = row[Option[String]]("type"),
+        database = row[Option[Array[String]]]("database"),
+        userName = row[Option[Array[String]]]("user_name"),
+        address = row[Option[String]]("address"),
+        netmask = row[Option[String]]("netmask"),
+        authMethod = row[Option[String]]("auth_method"),
+        options = row[Option[Array[String]]]("options"),
+        error = row[Option[String]]("error")
       )
     )
   }

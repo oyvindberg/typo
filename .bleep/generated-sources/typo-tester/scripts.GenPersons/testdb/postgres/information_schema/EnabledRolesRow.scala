@@ -17,14 +17,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class EnabledRolesRow(
-  roleName: /* unknown nullability */ Option[String]
+  roleName: Option[String]
 )
 
 object EnabledRolesRow {
   implicit val rowParser: RowParser[EnabledRolesRow] = { row =>
     Success(
       EnabledRolesRow(
-        roleName = row[/* unknown nullability */ Option[String]]("role_name")
+        roleName = row[Option[String]]("role_name")
       )
     )
   }

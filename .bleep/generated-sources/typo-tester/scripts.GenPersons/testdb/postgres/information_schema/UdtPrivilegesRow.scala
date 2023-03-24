@@ -17,26 +17,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UdtPrivilegesRow(
-  grantor: /* unknown nullability */ Option[String],
-  grantee: /* unknown nullability */ Option[String],
-  udtCatalog: /* unknown nullability */ Option[String],
-  udtSchema: /* unknown nullability */ Option[String],
-  udtName: /* unknown nullability */ Option[String],
-  privilegeType: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String]
+  grantor: Option[String],
+  grantee: Option[String],
+  udtCatalog: Option[String],
+  udtSchema: Option[String],
+  udtName: Option[String],
+  privilegeType: Option[String],
+  isGrantable: Option[String]
 )
 
 object UdtPrivilegesRow {
   implicit val rowParser: RowParser[UdtPrivilegesRow] = { row =>
     Success(
       UdtPrivilegesRow(
-        grantor = row[/* unknown nullability */ Option[String]]("grantor"),
-        grantee = row[/* unknown nullability */ Option[String]]("grantee"),
-        udtCatalog = row[/* unknown nullability */ Option[String]]("udt_catalog"),
-        udtSchema = row[/* unknown nullability */ Option[String]]("udt_schema"),
-        udtName = row[/* unknown nullability */ Option[String]]("udt_name"),
-        privilegeType = row[/* unknown nullability */ Option[String]]("privilege_type"),
-        isGrantable = row[/* unknown nullability */ Option[String]]("is_grantable")
+        grantor = row[Option[String]]("grantor"),
+        grantee = row[Option[String]]("grantee"),
+        udtCatalog = row[Option[String]]("udt_catalog"),
+        udtSchema = row[Option[String]]("udt_schema"),
+        udtName = row[Option[String]]("udt_name"),
+        privilegeType = row[Option[String]]("privilege_type"),
+        isGrantable = row[Option[String]]("is_grantable")
       )
     )
   }

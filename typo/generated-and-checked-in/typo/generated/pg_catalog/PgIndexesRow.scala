@@ -19,26 +19,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgIndexesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgClassRow.relname]] */
-  indexname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexname","columnName":"indexname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String /* {"baseColumnName":"spcname","baseRelationName":"pg_catalog.pg_tablespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablespace","columnName":"tablespace","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_tablespace"} */,
-  indexdef: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"indexdef","columnName":"indexdef","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_indexes","column_name":"schemaname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_indexes","column_name":"tablename","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  indexname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_indexes","column_name":"indexname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablespace: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_indexes","column_name":"tablespace","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  indexdef: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_indexes","column_name":"indexdef","ordinal_position":5,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgIndexesRow {
   implicit val rowParser: RowParser[PgIndexesRow] = { row =>
     Success(
       PgIndexesRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        indexname = row[String]("indexname"),
-        tablespace = row[String]("tablespace"),
-        indexdef = row[/* unknown nullability */ Option[String]]("indexdef")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        indexname = row[Option[String]]("indexname"),
+        tablespace = row[Option[String]]("tablespace"),
+        indexdef = row[Option[String]]("indexdef")
       )
     )
   }
@@ -57,10 +53,10 @@ object PgIndexesRow {
       JsResult.fromTry(
         Try(
           PgIndexesRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            indexname = json.\("indexname").as[String],
-            tablespace = json.\("tablespace").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            indexname = json.\("indexname").toOption.map(_.as[String]),
+            tablespace = json.\("tablespace").toOption.map(_.as[String]),
             indexdef = json.\("indexdef").toOption.map(_.as[String])
           )
         )

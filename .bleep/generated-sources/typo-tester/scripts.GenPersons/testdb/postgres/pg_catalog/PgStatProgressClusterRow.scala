@@ -17,37 +17,36 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatProgressClusterRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
-  /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  command: /* unknown nullability */ Option[String],
-  phase: /* unknown nullability */ Option[String],
-  clusterIndexRelid: /* unknown nullability */ Option[Long],
-  heapTuplesScanned: /* unknown nullability */ Option[Long],
-  heapTuplesWritten: /* unknown nullability */ Option[Long],
-  heapBlksTotal: /* unknown nullability */ Option[Long],
-  heapBlksScanned: /* unknown nullability */ Option[Long],
-  indexRebuildCount: /* unknown nullability */ Option[Long]
+  pid: Option[Int],
+  datid: Option[Long],
+  datname: Option[String],
+  relid: Option[Long],
+  command: Option[String],
+  phase: Option[String],
+  clusterIndexRelid: Option[Long],
+  heapTuplesScanned: Option[Long],
+  heapTuplesWritten: Option[Long],
+  heapBlksTotal: Option[Long],
+  heapBlksScanned: Option[Long],
+  indexRebuildCount: Option[Long]
 )
 
 object PgStatProgressClusterRow {
   implicit val rowParser: RowParser[PgStatProgressClusterRow] = { row =>
     Success(
       PgStatProgressClusterRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        datid = row[/* unknown nullability */ Option[Long]]("datid"),
-        datname = row[String]("datname"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        command = row[/* unknown nullability */ Option[String]]("command"),
-        phase = row[/* unknown nullability */ Option[String]]("phase"),
-        clusterIndexRelid = row[/* unknown nullability */ Option[Long]]("cluster_index_relid"),
-        heapTuplesScanned = row[/* unknown nullability */ Option[Long]]("heap_tuples_scanned"),
-        heapTuplesWritten = row[/* unknown nullability */ Option[Long]]("heap_tuples_written"),
-        heapBlksTotal = row[/* unknown nullability */ Option[Long]]("heap_blks_total"),
-        heapBlksScanned = row[/* unknown nullability */ Option[Long]]("heap_blks_scanned"),
-        indexRebuildCount = row[/* unknown nullability */ Option[Long]]("index_rebuild_count")
+        pid = row[Option[Int]]("pid"),
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        relid = row[Option[Long]]("relid"),
+        command = row[Option[String]]("command"),
+        phase = row[Option[String]]("phase"),
+        clusterIndexRelid = row[Option[Long]]("cluster_index_relid"),
+        heapTuplesScanned = row[Option[Long]]("heap_tuples_scanned"),
+        heapTuplesWritten = row[Option[Long]]("heap_tuples_written"),
+        heapBlksTotal = row[Option[Long]]("heap_blks_total"),
+        heapBlksScanned = row[Option[Long]]("heap_blks_scanned"),
+        indexRebuildCount = row[Option[Long]]("index_rebuild_count")
       )
     )
   }
@@ -75,7 +74,7 @@ object PgStatProgressClusterRow {
           PgStatProgressClusterRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
             datid = json.\("datid").toOption.map(_.as[Long]),
-            datname = json.\("datname").as[String],
+            datname = json.\("datname").toOption.map(_.as[String]),
             relid = json.\("relid").toOption.map(_.as[Long]),
             command = json.\("command").toOption.map(_.as[String]),
             phase = json.\("phase").toOption.map(_.as[String]),

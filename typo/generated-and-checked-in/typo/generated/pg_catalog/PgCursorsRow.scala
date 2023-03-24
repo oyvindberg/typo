@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,24 +20,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgCursorsRow(
-  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  statement: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statement","columnName":"statement","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  isHoldable: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_holdable","columnName":"is_holdable","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  isBinary: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_binary","columnName":"is_binary","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  isScrollable: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_scrollable","columnName":"is_scrollable","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  creationTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"creation_time","columnName":"creation_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  name: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statement: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"statement","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  isHoldable: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"is_holdable","ordinal_position":3,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  isBinary: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"is_binary","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  isScrollable: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"is_scrollable","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  creationTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cursors","column_name":"creation_time","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgCursorsRow {
   implicit val rowParser: RowParser[PgCursorsRow] = { row =>
     Success(
       PgCursorsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        statement = row[/* unknown nullability */ Option[String]]("statement"),
-        isHoldable = row[/* unknown nullability */ Option[Boolean]]("is_holdable"),
-        isBinary = row[/* unknown nullability */ Option[Boolean]]("is_binary"),
-        isScrollable = row[/* unknown nullability */ Option[Boolean]]("is_scrollable"),
-        creationTime = row[/* unknown nullability */ Option[LocalDateTime]]("creation_time")
+        name = row[Option[String]]("name"),
+        statement = row[Option[String]]("statement"),
+        isHoldable = row[Option[Boolean]]("is_holdable"),
+        isBinary = row[Option[Boolean]]("is_binary"),
+        isScrollable = row[Option[Boolean]]("is_scrollable"),
+        creationTime = row[Option[ZonedDateTime]]("creation_time")
       )
     )
   }
@@ -62,7 +62,7 @@ object PgCursorsRow {
             isHoldable = json.\("is_holdable").toOption.map(_.as[Boolean]),
             isBinary = json.\("is_binary").toOption.map(_.as[Boolean]),
             isScrollable = json.\("is_scrollable").toOption.map(_.as[Boolean]),
-            creationTime = json.\("creation_time").toOption.map(_.as[LocalDateTime])
+            creationTime = json.\("creation_time").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

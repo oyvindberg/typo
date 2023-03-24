@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,32 +18,30 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSubscriptionRow(
-  /** Points to [[PgSubscriptionRow.oid]] */
-  subid: Long,
-  /** Points to [[PgSubscriptionRow.subname]] */
-  subname: String,
-  pid: /* unknown nullability */ Option[Int],
-  relid: /* unknown nullability */ Option[Long],
-  receivedLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  lastMsgSendTime: /* unknown nullability */ Option[LocalDateTime],
-  lastMsgReceiptTime: /* unknown nullability */ Option[LocalDateTime],
-  latestEndLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  latestEndTime: /* unknown nullability */ Option[LocalDateTime]
+  subid: Option[Long],
+  subname: Option[String],
+  pid: Option[Int],
+  relid: Option[Long],
+  receivedLsn: Option[String],
+  lastMsgSendTime: Option[ZonedDateTime],
+  lastMsgReceiptTime: Option[ZonedDateTime],
+  latestEndLsn: Option[String],
+  latestEndTime: Option[ZonedDateTime]
 )
 
 object PgStatSubscriptionRow {
   implicit val rowParser: RowParser[PgStatSubscriptionRow] = { row =>
     Success(
       PgStatSubscriptionRow(
-        subid = row[Long]("subid"),
-        subname = row[String]("subname"),
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        receivedLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("received_lsn"),
-        lastMsgSendTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_msg_send_time"),
-        lastMsgReceiptTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_msg_receipt_time"),
-        latestEndLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("latest_end_lsn"),
-        latestEndTime = row[/* unknown nullability */ Option[LocalDateTime]]("latest_end_time")
+        subid = row[Option[Long]]("subid"),
+        subname = row[Option[String]]("subname"),
+        pid = row[Option[Int]]("pid"),
+        relid = row[Option[Long]]("relid"),
+        receivedLsn = row[Option[String]]("received_lsn"),
+        lastMsgSendTime = row[Option[ZonedDateTime]]("last_msg_send_time"),
+        lastMsgReceiptTime = row[Option[ZonedDateTime]]("last_msg_receipt_time"),
+        latestEndLsn = row[Option[String]]("latest_end_lsn"),
+        latestEndTime = row[Option[ZonedDateTime]]("latest_end_time")
       )
     )
   }
@@ -66,15 +64,15 @@ object PgStatSubscriptionRow {
       JsResult.fromTry(
         Try(
           PgStatSubscriptionRow(
-            subid = json.\("subid").as[Long],
-            subname = json.\("subname").as[String],
+            subid = json.\("subid").toOption.map(_.as[Long]),
+            subname = json.\("subname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             relid = json.\("relid").toOption.map(_.as[Long]),
-            receivedLsn = json.\("received_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[LocalDateTime]),
-            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[LocalDateTime]),
-            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            latestEndTime = json.\("latest_end_time").toOption.map(_.as[LocalDateTime])
+            receivedLsn = json.\("received_lsn").toOption.map(_.as[String]),
+            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[ZonedDateTime]),
+            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[ZonedDateTime]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[String]),
+            latestEndTime = json.\("latest_end_time").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

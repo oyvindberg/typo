@@ -9,7 +9,8 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,24 +19,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPreparedXactsRow(
-  transaction: /* unknown nullability */ Option[/* xid */ String],
-  gid: /* unknown nullability */ Option[String],
-  prepared: /* unknown nullability */ Option[LocalDateTime],
-  /** Points to [[PgAuthidRow.rolname]] */
-  owner: String,
-  /** Points to [[PgDatabaseRow.datname]] */
-  database: String
+  transaction: Option[PGobject],
+  gid: Option[String],
+  prepared: Option[ZonedDateTime],
+  owner: Option[String],
+  database: Option[String]
 )
 
 object PgPreparedXactsRow {
   implicit val rowParser: RowParser[PgPreparedXactsRow] = { row =>
     Success(
       PgPreparedXactsRow(
-        transaction = row[/* unknown nullability */ Option[/* xid */ String]]("transaction"),
-        gid = row[/* unknown nullability */ Option[String]]("gid"),
-        prepared = row[/* unknown nullability */ Option[LocalDateTime]]("prepared"),
-        owner = row[String]("owner"),
-        database = row[String]("database")
+        transaction = row[Option[PGobject]]("transaction"),
+        gid = row[Option[String]]("gid"),
+        prepared = row[Option[ZonedDateTime]]("prepared"),
+        owner = row[Option[String]]("owner"),
+        database = row[Option[String]]("database")
       )
     )
   }
@@ -54,11 +53,11 @@ object PgPreparedXactsRow {
       JsResult.fromTry(
         Try(
           PgPreparedXactsRow(
-            transaction = json.\("transaction").toOption.map(_.as[/* xid */ String]),
+            transaction = json.\("transaction").toOption.map(_.as[PGobject]),
             gid = json.\("gid").toOption.map(_.as[String]),
-            prepared = json.\("prepared").toOption.map(_.as[LocalDateTime]),
-            owner = json.\("owner").as[String],
-            database = json.\("database").as[String]
+            prepared = json.\("prepared").toOption.map(_.as[ZonedDateTime]),
+            owner = json.\("owner").toOption.map(_.as[String]),
+            database = json.\("database").toOption.map(_.as[String])
           )
         )
       )

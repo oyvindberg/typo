@@ -17,20 +17,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgGroupRow(
-  /** Points to [[PgAuthidRow.rolname]] */
-  groname: String,
-  /** Points to [[PgAuthidRow.oid]] */
-  grosysid: Long,
-  grolist: /* unknown nullability */ Option[Array[Long]]
+  groname: Option[String],
+  grosysid: Option[Long],
+  grolist: Option[Array[Long]]
 )
 
 object PgGroupRow {
   implicit val rowParser: RowParser[PgGroupRow] = { row =>
     Success(
       PgGroupRow(
-        groname = row[String]("groname"),
-        grosysid = row[Long]("grosysid"),
-        grolist = row[/* unknown nullability */ Option[Array[Long]]]("grolist")
+        groname = row[Option[String]]("groname"),
+        grosysid = row[Option[Long]]("grosysid"),
+        grolist = row[Option[Array[Long]]]("grolist")
       )
     )
   }
@@ -47,8 +45,8 @@ object PgGroupRow {
       JsResult.fromTry(
         Try(
           PgGroupRow(
-            groname = json.\("groname").as[String],
-            grosysid = json.\("grosysid").as[Long],
+            groname = json.\("groname").toOption.map(_.as[String]),
+            grosysid = json.\("grosysid").toOption.map(_.as[Long]),
             grolist = json.\("grolist").toOption.map(_.as[Array[Long]])
           )
         )

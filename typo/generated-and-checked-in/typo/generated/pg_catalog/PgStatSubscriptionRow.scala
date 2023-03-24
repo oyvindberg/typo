@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,32 +20,30 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSubscriptionRow(
-  /** Points to [[PgSubscriptionRow.oid]] */
-  subid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_subscription","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"subid","columnName":"subid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_subscription"} */,
-  /** Points to [[PgSubscriptionRow.subname]] */
-  subname: String /* {"baseColumnName":"subname","baseRelationName":"pg_catalog.pg_subscription","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"subname","columnName":"subname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_subscription"} */,
-  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
-  relid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relid","columnName":"relid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  receivedLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"received_lsn","columnName":"received_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  lastMsgSendTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_msg_send_time","columnName":"last_msg_send_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  lastMsgReceiptTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_msg_receipt_time","columnName":"last_msg_receipt_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  latestEndLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"latest_end_lsn","columnName":"latest_end_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  latestEndTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"latest_end_time","columnName":"latest_end_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  subid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"subid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  subname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"subname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  pid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"pid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  relid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"relid","ordinal_position":4,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  receivedLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"received_lsn","ordinal_position":5,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastMsgSendTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"last_msg_send_time","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastMsgReceiptTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"last_msg_receipt_time","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  latestEndLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"latest_end_lsn","ordinal_position":8,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  latestEndTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"latest_end_time","ordinal_position":9,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgStatSubscriptionRow {
   implicit val rowParser: RowParser[PgStatSubscriptionRow] = { row =>
     Success(
       PgStatSubscriptionRow(
-        subid = row[Long]("subid"),
-        subname = row[String]("subname"),
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        receivedLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("received_lsn"),
-        lastMsgSendTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_msg_send_time"),
-        lastMsgReceiptTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_msg_receipt_time"),
-        latestEndLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("latest_end_lsn"),
-        latestEndTime = row[/* unknown nullability */ Option[LocalDateTime]]("latest_end_time")
+        subid = row[Option[Long]]("subid"),
+        subname = row[Option[String]]("subname"),
+        pid = row[Option[Int]]("pid"),
+        relid = row[Option[Long]]("relid"),
+        receivedLsn = row[Option[String]]("received_lsn"),
+        lastMsgSendTime = row[Option[ZonedDateTime]]("last_msg_send_time"),
+        lastMsgReceiptTime = row[Option[ZonedDateTime]]("last_msg_receipt_time"),
+        latestEndLsn = row[Option[String]]("latest_end_lsn"),
+        latestEndTime = row[Option[ZonedDateTime]]("latest_end_time")
       )
     )
   }
@@ -68,15 +66,15 @@ object PgStatSubscriptionRow {
       JsResult.fromTry(
         Try(
           PgStatSubscriptionRow(
-            subid = json.\("subid").as[Long],
-            subname = json.\("subname").as[String],
+            subid = json.\("subid").toOption.map(_.as[Long]),
+            subname = json.\("subname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             relid = json.\("relid").toOption.map(_.as[Long]),
-            receivedLsn = json.\("received_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[LocalDateTime]),
-            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[LocalDateTime]),
-            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            latestEndTime = json.\("latest_end_time").toOption.map(_.as[LocalDateTime])
+            receivedLsn = json.\("received_lsn").toOption.map(_.as[String]),
+            lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[ZonedDateTime]),
+            lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[ZonedDateTime]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[String]),
+            latestEndTime = json.\("latest_end_time").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

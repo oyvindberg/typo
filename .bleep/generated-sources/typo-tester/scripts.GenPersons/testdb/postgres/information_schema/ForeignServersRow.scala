@@ -17,19 +17,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignServersRow(
-  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
-  /** Points to [[PgForeignServersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
-  /** Points to [[PgForeignServersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerType]] */
   foreignServerType: Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerVersion]] */
   foreignServerVersion: Option[String],
-  /** Points to [[PgForeignServersRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String]
 )
 

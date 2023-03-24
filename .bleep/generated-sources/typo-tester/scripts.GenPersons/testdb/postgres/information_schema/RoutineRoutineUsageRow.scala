@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class RoutineRoutineUsageRow(
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String],
-  routineCatalog: /* unknown nullability */ Option[String],
-  routineSchema: /* unknown nullability */ Option[String],
-  routineName: /* unknown nullability */ Option[String]
+  specificCatalog: Option[String],
+  specificSchema: Option[String],
+  specificName: Option[String],
+  routineCatalog: Option[String],
+  routineSchema: Option[String],
+  routineName: Option[String]
 )
 
 object RoutineRoutineUsageRow {
   implicit val rowParser: RowParser[RoutineRoutineUsageRow] = { row =>
     Success(
       RoutineRoutineUsageRow(
-        specificCatalog = row[/* unknown nullability */ Option[String]]("specific_catalog"),
-        specificSchema = row[/* unknown nullability */ Option[String]]("specific_schema"),
-        specificName = row[/* unknown nullability */ Option[String]]("specific_name"),
-        routineCatalog = row[/* unknown nullability */ Option[String]]("routine_catalog"),
-        routineSchema = row[/* unknown nullability */ Option[String]]("routine_schema"),
-        routineName = row[/* unknown nullability */ Option[String]]("routine_name")
+        specificCatalog = row[Option[String]]("specific_catalog"),
+        specificSchema = row[Option[String]]("specific_schema"),
+        specificName = row[Option[String]]("specific_name"),
+        routineCatalog = row[Option[String]]("routine_catalog"),
+        routineSchema = row[Option[String]]("routine_schema"),
+        routineName = row[Option[String]]("routine_name")
       )
     )
   }

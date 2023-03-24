@@ -17,32 +17,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class RoutineColumnUsageRow(
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String],
-  routineCatalog: /* unknown nullability */ Option[String],
-  routineSchema: /* unknown nullability */ Option[String],
-  routineName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  columnName: /* unknown nullability */ Option[String]
+  specificCatalog: Option[String],
+  specificSchema: Option[String],
+  specificName: Option[String],
+  routineCatalog: Option[String],
+  routineSchema: Option[String],
+  routineName: Option[String],
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  columnName: Option[String]
 )
 
 object RoutineColumnUsageRow {
   implicit val rowParser: RowParser[RoutineColumnUsageRow] = { row =>
     Success(
       RoutineColumnUsageRow(
-        specificCatalog = row[/* unknown nullability */ Option[String]]("specific_catalog"),
-        specificSchema = row[/* unknown nullability */ Option[String]]("specific_schema"),
-        specificName = row[/* unknown nullability */ Option[String]]("specific_name"),
-        routineCatalog = row[/* unknown nullability */ Option[String]]("routine_catalog"),
-        routineSchema = row[/* unknown nullability */ Option[String]]("routine_schema"),
-        routineName = row[/* unknown nullability */ Option[String]]("routine_name"),
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        columnName = row[/* unknown nullability */ Option[String]]("column_name")
+        specificCatalog = row[Option[String]]("specific_catalog"),
+        specificSchema = row[Option[String]]("specific_schema"),
+        specificName = row[Option[String]]("specific_name"),
+        routineCatalog = row[Option[String]]("routine_catalog"),
+        routineSchema = row[Option[String]]("routine_schema"),
+        routineName = row[Option[String]]("routine_name"),
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        columnName = row[Option[String]]("column_name")
       )
     )
   }

@@ -19,21 +19,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPublicationTablesRow(
-  /** Points to [[PgPublicationRow.pubname]] */
-  pubname: String /* {"baseColumnName":"pubname","baseRelationName":"pg_catalog.pg_publication","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"pubname","columnName":"pubname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_publication"} */,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */
+  pubname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_tables","column_name":"pubname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_tables","column_name":"schemaname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_publication_tables","column_name":"tablename","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgPublicationTablesRow {
   implicit val rowParser: RowParser[PgPublicationTablesRow] = { row =>
     Success(
       PgPublicationTablesRow(
-        pubname = row[String]("pubname"),
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename")
+        pubname = row[Option[String]]("pubname"),
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename")
       )
     )
   }
@@ -50,9 +47,9 @@ object PgPublicationTablesRow {
       JsResult.fromTry(
         Try(
           PgPublicationTablesRow(
-            pubname = json.\("pubname").as[String],
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String]
+            pubname = json.\("pubname").toOption.map(_.as[String]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String])
           )
         )
       )

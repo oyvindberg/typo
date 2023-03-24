@@ -17,14 +17,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignTableOptionsRow(
-  /** Points to [[PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String],
-  /** Points to [[PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  optionName: Option[String],
+  optionValue: Option[String]
 )
 
 object ForeignTableOptionsRow {
@@ -34,8 +31,8 @@ object ForeignTableOptionsRow {
         foreignTableCatalog = row[Option[String]]("foreign_table_catalog"),
         foreignTableSchema = row[Option[String]]("foreign_table_schema"),
         foreignTableName = row[Option[String]]("foreign_table_name"),
-        optionName = row[/* unknown nullability */ Option[String]]("option_name"),
-        optionValue = row[/* unknown nullability */ Option[String]]("option_value")
+        optionName = row[Option[String]]("option_name"),
+        optionValue = row[Option[String]]("option_value")
       )
     )
   }

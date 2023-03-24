@@ -19,31 +19,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPoliciesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgPolicyRow.polname]] */
-  policyname: String /* {"baseColumnName":"polname","baseRelationName":"pg_catalog.pg_policy","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"policyname","columnName":"policyname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_policy"} */,
-  permissive: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"permissive","columnName":"permissive","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  roles: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"roles","columnName":"roles","columnType":"Array","columnTypeName":"_name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  cmd: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"cmd","columnName":"cmd","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  qual: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"qual","columnName":"qual","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  withCheck: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"with_check","columnName":"with_check","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"schemaname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"tablename","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  policyname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"policyname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  permissive: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"permissive","ordinal_position":4,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  roles: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"roles","ordinal_position":5,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  cmd: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"cmd","ordinal_position":6,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  qual: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"qual","ordinal_position":7,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  withCheck: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policies","column_name":"with_check","ordinal_position":8,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgPoliciesRow {
   implicit val rowParser: RowParser[PgPoliciesRow] = { row =>
     Success(
       PgPoliciesRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        policyname = row[String]("policyname"),
-        permissive = row[/* unknown nullability */ Option[String]]("permissive"),
-        roles = row[/* unknown nullability */ Option[Array[String]]]("roles"),
-        cmd = row[/* unknown nullability */ Option[String]]("cmd"),
-        qual = row[/* unknown nullability */ Option[String]]("qual"),
-        withCheck = row[/* unknown nullability */ Option[String]]("with_check")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        policyname = row[Option[String]]("policyname"),
+        permissive = row[Option[String]]("permissive"),
+        roles = row[Option[Array[String]]]("roles"),
+        cmd = row[Option[String]]("cmd"),
+        qual = row[Option[String]]("qual"),
+        withCheck = row[Option[String]]("with_check")
       )
     )
   }
@@ -65,9 +62,9 @@ object PgPoliciesRow {
       JsResult.fromTry(
         Try(
           PgPoliciesRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            policyname = json.\("policyname").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            policyname = json.\("policyname").toOption.map(_.as[String]),
             permissive = json.\("permissive").toOption.map(_.as[String]),
             roles = json.\("roles").toOption.map(_.as[Array[String]]),
             cmd = json.\("cmd").toOption.map(_.as[String]),

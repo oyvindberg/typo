@@ -19,14 +19,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class InformationSchemaCatalogNameRow(
-  catalogName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"catalog_name","columnName":"catalog_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  catalogName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"information_schema_catalog_name","column_name":"catalog_name","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object InformationSchemaCatalogNameRow {
   implicit val rowParser: RowParser[InformationSchemaCatalogNameRow] = { row =>
     Success(
       InformationSchemaCatalogNameRow(
-        catalogName = row[/* unknown nullability */ Option[String]]("catalog_name")
+        catalogName = row[Option[String]]("catalog_name")
       )
     )
   }

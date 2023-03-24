@@ -89,7 +89,15 @@ object sc {
     val MapHasAsScala = Qualified("scala.jdk.CollectionConverters.MapHasAsScala")
     val StringContext = Qualified("java.StringContext")
     val PGobject = Qualified("org.postgresql.util.PGobject")
-
+    val PGbox = Qualified("org.postgresql.geometric.PGbox")
+    val PGcircle = Qualified("org.postgresql.geometric.PGcircle")
+    val PGline = Qualified("org.postgresql.geometric.PGline")
+    val PGlseg = Qualified("org.postgresql.geometric.PGlseg")
+    val PGpath = Qualified("org.postgresql.geometric.PGpath")
+    val PGpoint = Qualified("org.postgresql.geometric.PGpoint")
+    val PGpolygon = Qualified("org.postgresql.geometric.PGpolygon")
+    val PGInterval = Qualified("org.postgresql.util.PGInterval")
+    val PGmoney = Qualified("org.postgresql.util.PGmoney")
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
       Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right, StringContext)

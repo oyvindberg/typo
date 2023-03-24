@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,51 +18,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSysTablesRow(
-  /** Points to [[PgStatAllTablesRow.relid]] */
   relid: Option[Long],
-  /** Points to [[PgStatAllTablesRow.schemaname]] */
   schemaname: Option[String],
-  /** Points to [[PgStatAllTablesRow.relname]] */
   relname: Option[String],
-  /** Points to [[PgStatAllTablesRow.seqScan]] */
   seqScan: Option[Long],
-  /** Points to [[PgStatAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long],
-  /** Points to [[PgStatAllTablesRow.idxScan]] */
   idxScan: Option[Long],
-  /** Points to [[PgStatAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nTupIns]] */
   nTupIns: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nTupDel]] */
   nTupDel: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nLiveTup]] */
   nLiveTup: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nDeadTup]] */
   nDeadTup: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nModSinceAnalyze]] */
   nModSinceAnalyze: Option[Long],
-  /** Points to [[PgStatAllTablesRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long],
-  /** Points to [[PgStatAllTablesRow.lastVacuum]] */
-  lastVacuum: Option[LocalDateTime],
-  /** Points to [[PgStatAllTablesRow.lastAutovacuum]] */
-  lastAutovacuum: Option[LocalDateTime],
-  /** Points to [[PgStatAllTablesRow.lastAnalyze]] */
-  lastAnalyze: Option[LocalDateTime],
-  /** Points to [[PgStatAllTablesRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[LocalDateTime],
-  /** Points to [[PgStatAllTablesRow.vacuumCount]] */
+  lastVacuum: Option[ZonedDateTime],
+  lastAutovacuum: Option[ZonedDateTime],
+  lastAnalyze: Option[ZonedDateTime],
+  lastAutoanalyze: Option[ZonedDateTime],
   vacuumCount: Option[Long],
-  /** Points to [[PgStatAllTablesRow.autovacuumCount]] */
   autovacuumCount: Option[Long],
-  /** Points to [[PgStatAllTablesRow.analyzeCount]] */
   analyzeCount: Option[Long],
-  /** Points to [[PgStatAllTablesRow.autoanalyzeCount]] */
   autoanalyzeCount: Option[Long]
 )
 
@@ -85,10 +62,10 @@ object PgStatSysTablesRow {
         nDeadTup = row[Option[Long]]("n_dead_tup"),
         nModSinceAnalyze = row[Option[Long]]("n_mod_since_analyze"),
         nInsSinceVacuum = row[Option[Long]]("n_ins_since_vacuum"),
-        lastVacuum = row[Option[LocalDateTime]]("last_vacuum"),
-        lastAutovacuum = row[Option[LocalDateTime]]("last_autovacuum"),
-        lastAnalyze = row[Option[LocalDateTime]]("last_analyze"),
-        lastAutoanalyze = row[Option[LocalDateTime]]("last_autoanalyze"),
+        lastVacuum = row[Option[ZonedDateTime]]("last_vacuum"),
+        lastAutovacuum = row[Option[ZonedDateTime]]("last_autovacuum"),
+        lastAnalyze = row[Option[ZonedDateTime]]("last_analyze"),
+        lastAutoanalyze = row[Option[ZonedDateTime]]("last_autoanalyze"),
         vacuumCount = row[Option[Long]]("vacuum_count"),
         autovacuumCount = row[Option[Long]]("autovacuum_count"),
         analyzeCount = row[Option[Long]]("analyze_count"),
@@ -144,10 +121,10 @@ object PgStatSysTablesRow {
             nDeadTup = json.\("n_dead_tup").toOption.map(_.as[Long]),
             nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as[Long]),
             nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as[Long]),
-            lastVacuum = json.\("last_vacuum").toOption.map(_.as[LocalDateTime]),
-            lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as[LocalDateTime]),
-            lastAnalyze = json.\("last_analyze").toOption.map(_.as[LocalDateTime]),
-            lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as[LocalDateTime]),
+            lastVacuum = json.\("last_vacuum").toOption.map(_.as[ZonedDateTime]),
+            lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as[ZonedDateTime]),
+            lastAnalyze = json.\("last_analyze").toOption.map(_.as[ZonedDateTime]),
+            lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as[ZonedDateTime]),
             vacuumCount = json.\("vacuum_count").toOption.map(_.as[Long]),
             autovacuumCount = json.\("autovacuum_count").toOption.map(_.as[Long]),
             analyzeCount = json.\("analyze_count").toOption.map(_.as[Long]),

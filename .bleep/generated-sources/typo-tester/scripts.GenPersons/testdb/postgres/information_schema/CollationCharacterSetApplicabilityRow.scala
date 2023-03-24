@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CollationCharacterSetApplicabilityRow(
-  collationCatalog: /* unknown nullability */ Option[String],
-  collationSchema: /* unknown nullability */ Option[String],
-  collationName: /* unknown nullability */ Option[String],
-  characterSetCatalog: /* unknown nullability */ Option[String],
-  characterSetSchema: /* unknown nullability */ Option[String],
-  characterSetName: /* unknown nullability */ Option[String]
+  collationCatalog: Option[String],
+  collationSchema: Option[String],
+  collationName: Option[String],
+  characterSetCatalog: Option[String],
+  characterSetSchema: Option[String],
+  characterSetName: Option[String]
 )
 
 object CollationCharacterSetApplicabilityRow {
   implicit val rowParser: RowParser[CollationCharacterSetApplicabilityRow] = { row =>
     Success(
       CollationCharacterSetApplicabilityRow(
-        collationCatalog = row[/* unknown nullability */ Option[String]]("collation_catalog"),
-        collationSchema = row[/* unknown nullability */ Option[String]]("collation_schema"),
-        collationName = row[/* unknown nullability */ Option[String]]("collation_name"),
-        characterSetCatalog = row[/* unknown nullability */ Option[String]]("character_set_catalog"),
-        characterSetSchema = row[/* unknown nullability */ Option[String]]("character_set_schema"),
-        characterSetName = row[/* unknown nullability */ Option[String]]("character_set_name")
+        collationCatalog = row[Option[String]]("collation_catalog"),
+        collationSchema = row[Option[String]]("collation_schema"),
+        collationName = row[Option[String]]("collation_name"),
+        characterSetCatalog = row[Option[String]]("character_set_catalog"),
+        characterSetSchema = row[Option[String]]("character_set_schema"),
+        characterSetName = row[Option[String]]("character_set_name")
       )
     )
   }

@@ -17,20 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CollationsRow(
-  collationCatalog: /* unknown nullability */ Option[String],
-  collationSchema: /* unknown nullability */ Option[String],
-  collationName: /* unknown nullability */ Option[String],
-  padAttribute: /* unknown nullability */ Option[String]
+  collationCatalog: Option[String],
+  collationSchema: Option[String],
+  collationName: Option[String],
+  padAttribute: Option[String]
 )
 
 object CollationsRow {
   implicit val rowParser: RowParser[CollationsRow] = { row =>
     Success(
       CollationsRow(
-        collationCatalog = row[/* unknown nullability */ Option[String]]("collation_catalog"),
-        collationSchema = row[/* unknown nullability */ Option[String]]("collation_schema"),
-        collationName = row[/* unknown nullability */ Option[String]]("collation_name"),
-        padAttribute = row[/* unknown nullability */ Option[String]]("pad_attribute")
+        collationCatalog = row[Option[String]]("collation_catalog"),
+        collationSchema = row[Option[String]]("collation_schema"),
+        collationName = row[Option[String]]("collation_name"),
+        padAttribute = row[Option[String]]("pad_attribute")
       )
     )
   }

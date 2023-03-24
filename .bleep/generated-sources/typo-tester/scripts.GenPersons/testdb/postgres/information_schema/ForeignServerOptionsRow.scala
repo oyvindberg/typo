@@ -17,12 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignServerOptionsRow(
-  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  optionName: Option[String],
+  optionValue: Option[String]
 )
 
 object ForeignServerOptionsRow {
@@ -31,8 +29,8 @@ object ForeignServerOptionsRow {
       ForeignServerOptionsRow(
         foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
         foreignServerName = row[Option[String]]("foreign_server_name"),
-        optionName = row[/* unknown nullability */ Option[String]]("option_name"),
-        optionValue = row[/* unknown nullability */ Option[String]]("option_value")
+        optionName = row[Option[String]]("option_name"),
+        optionValue = row[Option[String]]("option_value")
       )
     )
   }

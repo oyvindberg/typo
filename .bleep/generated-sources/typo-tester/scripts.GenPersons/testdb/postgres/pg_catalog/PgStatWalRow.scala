@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,30 +19,30 @@ import scala.math.BigDecimal
 import scala.util.Try
 
 case class PgStatWalRow(
-  walRecords: /* unknown nullability */ Option[Long],
-  walFpi: /* unknown nullability */ Option[Long],
-  walBytes: /* unknown nullability */ Option[BigDecimal],
-  walBuffersFull: /* unknown nullability */ Option[Long],
-  walWrite: /* unknown nullability */ Option[Long],
-  walSync: /* unknown nullability */ Option[Long],
-  walWriteTime: /* unknown nullability */ Option[Double],
-  walSyncTime: /* unknown nullability */ Option[Double],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  walRecords: Option[Long],
+  walFpi: Option[Long],
+  walBytes: Option[BigDecimal],
+  walBuffersFull: Option[Long],
+  walWrite: Option[Long],
+  walSync: Option[Long],
+  walWriteTime: Option[Double],
+  walSyncTime: Option[Double],
+  statsReset: Option[ZonedDateTime]
 )
 
 object PgStatWalRow {
   implicit val rowParser: RowParser[PgStatWalRow] = { row =>
     Success(
       PgStatWalRow(
-        walRecords = row[/* unknown nullability */ Option[Long]]("wal_records"),
-        walFpi = row[/* unknown nullability */ Option[Long]]("wal_fpi"),
-        walBytes = row[/* unknown nullability */ Option[BigDecimal]]("wal_bytes"),
-        walBuffersFull = row[/* unknown nullability */ Option[Long]]("wal_buffers_full"),
-        walWrite = row[/* unknown nullability */ Option[Long]]("wal_write"),
-        walSync = row[/* unknown nullability */ Option[Long]]("wal_sync"),
-        walWriteTime = row[/* unknown nullability */ Option[Double]]("wal_write_time"),
-        walSyncTime = row[/* unknown nullability */ Option[Double]]("wal_sync_time"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        walRecords = row[Option[Long]]("wal_records"),
+        walFpi = row[Option[Long]]("wal_fpi"),
+        walBytes = row[Option[BigDecimal]]("wal_bytes"),
+        walBuffersFull = row[Option[Long]]("wal_buffers_full"),
+        walWrite = row[Option[Long]]("wal_write"),
+        walSync = row[Option[Long]]("wal_sync"),
+        walWriteTime = row[Option[Double]]("wal_write_time"),
+        walSyncTime = row[Option[Double]]("wal_sync_time"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -73,7 +73,7 @@ object PgStatWalRow {
             walSync = json.\("wal_sync").toOption.map(_.as[Long]),
             walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
             walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

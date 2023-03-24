@@ -17,20 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatGssapiRow(
-  pid: /* unknown nullability */ Option[Int],
-  gssAuthenticated: /* unknown nullability */ Option[Boolean],
-  principal: /* unknown nullability */ Option[String],
-  encrypted: /* unknown nullability */ Option[Boolean]
+  pid: Option[Int],
+  gssAuthenticated: Option[Boolean],
+  principal: Option[String],
+  encrypted: Option[Boolean]
 )
 
 object PgStatGssapiRow {
   implicit val rowParser: RowParser[PgStatGssapiRow] = { row =>
     Success(
       PgStatGssapiRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        gssAuthenticated = row[/* unknown nullability */ Option[Boolean]]("gss_authenticated"),
-        principal = row[/* unknown nullability */ Option[String]]("principal"),
-        encrypted = row[/* unknown nullability */ Option[Boolean]]("encrypted")
+        pid = row[Option[Int]]("pid"),
+        gssAuthenticated = row[Option[Boolean]]("gss_authenticated"),
+        principal = row[Option[String]]("principal"),
+        encrypted = row[Option[Boolean]]("encrypted")
       )
     )
   }

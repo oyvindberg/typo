@@ -11,6 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,43 +20,42 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgReplicationSlotsRow(
-  slotName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"slot_name","columnName":"slot_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  plugin: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"plugin","columnName":"plugin","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  slotType: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"slot_type","columnName":"slot_type","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  datoid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"datoid","columnName":"datoid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  /** Points to [[PgDatabaseRow.datname]] */
-  database: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"database","columnName":"database","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */,
-  temporary: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"temporary","columnName":"temporary","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  active: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"active","columnName":"active","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  activePid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"active_pid","columnName":"active_pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
-  xmin: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"xmin","columnName":"xmin","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  catalogXmin: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"catalog_xmin","columnName":"catalog_xmin","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  restartLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"restart_lsn","columnName":"restart_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  confirmedFlushLsn: /* unknown nullability */ Option[/* pg_lsn */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"confirmed_flush_lsn","columnName":"confirmed_flush_lsn","columnType":"Other","columnTypeName":"pg_lsn","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  walStatus: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"wal_status","columnName":"wal_status","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  safeWalSize: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"safe_wal_size","columnName":"safe_wal_size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  twoPhase: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"two_phase","columnName":"two_phase","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
+  slotName: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"slot_name","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  plugin: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"plugin","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  slotType: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"slot_type","ordinal_position":3,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  datoid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"datoid","ordinal_position":4,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  database: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"database","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  temporary: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"temporary","ordinal_position":6,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  active: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"active","ordinal_position":7,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  activePid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"active_pid","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  xmin: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"xmin","ordinal_position":9,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  catalogXmin: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"catalog_xmin","ordinal_position":10,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  restartLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"restart_lsn","ordinal_position":11,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  confirmedFlushLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"confirmed_flush_lsn","ordinal_position":12,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walStatus: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"wal_status","ordinal_position":13,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  safeWalSize: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"safe_wal_size","ordinal_position":14,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  twoPhase: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"two_phase","ordinal_position":15,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgReplicationSlotsRow {
   implicit val rowParser: RowParser[PgReplicationSlotsRow] = { row =>
     Success(
       PgReplicationSlotsRow(
-        slotName = row[/* unknown nullability */ Option[String]]("slot_name"),
-        plugin = row[/* unknown nullability */ Option[String]]("plugin"),
-        slotType = row[/* unknown nullability */ Option[String]]("slot_type"),
-        datoid = row[/* unknown nullability */ Option[Long]]("datoid"),
-        database = row[String]("database"),
-        temporary = row[/* unknown nullability */ Option[Boolean]]("temporary"),
-        active = row[/* unknown nullability */ Option[Boolean]]("active"),
-        activePid = row[/* unknown nullability */ Option[Int]]("active_pid"),
-        xmin = row[/* unknown nullability */ Option[/* xid */ String]]("xmin"),
-        catalogXmin = row[/* unknown nullability */ Option[/* xid */ String]]("catalog_xmin"),
-        restartLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("restart_lsn"),
-        confirmedFlushLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("confirmed_flush_lsn"),
-        walStatus = row[/* unknown nullability */ Option[String]]("wal_status"),
-        safeWalSize = row[/* unknown nullability */ Option[Long]]("safe_wal_size"),
-        twoPhase = row[/* unknown nullability */ Option[Boolean]]("two_phase")
+        slotName = row[Option[String]]("slot_name"),
+        plugin = row[Option[String]]("plugin"),
+        slotType = row[Option[String]]("slot_type"),
+        datoid = row[Option[Long]]("datoid"),
+        database = row[Option[String]]("database"),
+        temporary = row[Option[Boolean]]("temporary"),
+        active = row[Option[Boolean]]("active"),
+        activePid = row[Option[Int]]("active_pid"),
+        xmin = row[Option[PGobject]]("xmin"),
+        catalogXmin = row[Option[PGobject]]("catalog_xmin"),
+        restartLsn = row[Option[String]]("restart_lsn"),
+        confirmedFlushLsn = row[Option[String]]("confirmed_flush_lsn"),
+        walStatus = row[Option[String]]("wal_status"),
+        safeWalSize = row[Option[Long]]("safe_wal_size"),
+        twoPhase = row[Option[Boolean]]("two_phase")
       )
     )
   }
@@ -88,14 +88,14 @@ object PgReplicationSlotsRow {
             plugin = json.\("plugin").toOption.map(_.as[String]),
             slotType = json.\("slot_type").toOption.map(_.as[String]),
             datoid = json.\("datoid").toOption.map(_.as[Long]),
-            database = json.\("database").as[String],
+            database = json.\("database").toOption.map(_.as[String]),
             temporary = json.\("temporary").toOption.map(_.as[Boolean]),
             active = json.\("active").toOption.map(_.as[Boolean]),
             activePid = json.\("active_pid").toOption.map(_.as[Int]),
-            xmin = json.\("xmin").toOption.map(_.as[/* xid */ String]),
-            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[/* xid */ String]),
-            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            xmin = json.\("xmin").toOption.map(_.as[PGobject]),
+            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[PGobject]),
+            restartLsn = json.\("restart_lsn").toOption.map(_.as[String]),
+            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[String]),
             walStatus = json.\("wal_status").toOption.map(_.as[String]),
             safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
             twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])

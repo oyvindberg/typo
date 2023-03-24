@@ -15,18 +15,11 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.postgres.pg_catalog.PgAttributeRow
-import testdb.postgres.pg_catalog.PgClassRow
-import testdb.postgres.pg_catalog.PgNamespaceRow
 
 case class PgForeignTableColumnsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  nspname: String,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  /** Points to [[PgAttributeRow.attname]] */
-  attname: String,
-  /** Points to [[PgAttributeRow.attfdwoptions]] */
+  nspname: Option[String],
+  relname: Option[String],
+  attname: Option[String],
   attfdwoptions: Option[Array[String]]
 )
 
@@ -34,9 +27,9 @@ object PgForeignTableColumnsRow {
   implicit val rowParser: RowParser[PgForeignTableColumnsRow] = { row =>
     Success(
       PgForeignTableColumnsRow(
-        nspname = row[String]("nspname"),
-        relname = row[String]("relname"),
-        attname = row[String]("attname"),
+        nspname = row[Option[String]]("nspname"),
+        relname = row[Option[String]]("relname"),
+        attname = row[Option[String]]("attname"),
         attfdwoptions = row[Option[Array[String]]]("attfdwoptions")
       )
     )
@@ -55,9 +48,9 @@ object PgForeignTableColumnsRow {
       JsResult.fromTry(
         Try(
           PgForeignTableColumnsRow(
-            nspname = json.\("nspname").as[String],
-            relname = json.\("relname").as[String],
-            attname = json.\("attname").as[String],
+            nspname = json.\("nspname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            attname = json.\("attname").toOption.map(_.as[String]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]])
           )
         )

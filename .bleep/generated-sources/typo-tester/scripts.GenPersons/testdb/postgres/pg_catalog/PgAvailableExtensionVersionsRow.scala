@@ -17,30 +17,30 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAvailableExtensionVersionsRow(
-  name: /* unknown nullability */ Option[String],
-  version: /* unknown nullability */ Option[String],
-  installed: /* unknown nullability */ Option[Boolean],
-  superuser: /* unknown nullability */ Option[Boolean],
-  trusted: /* unknown nullability */ Option[Boolean],
-  relocatable: /* unknown nullability */ Option[Boolean],
-  schema: /* unknown nullability */ Option[String],
-  requires: /* unknown nullability */ Option[Array[String]],
-  comment: /* unknown nullability */ Option[String]
+  name: Option[String],
+  version: Option[String],
+  installed: Option[Boolean],
+  superuser: Option[Boolean],
+  trusted: Option[Boolean],
+  relocatable: Option[Boolean],
+  schema: Option[String],
+  requires: Option[Array[String]],
+  comment: Option[String]
 )
 
 object PgAvailableExtensionVersionsRow {
   implicit val rowParser: RowParser[PgAvailableExtensionVersionsRow] = { row =>
     Success(
       PgAvailableExtensionVersionsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        version = row[/* unknown nullability */ Option[String]]("version"),
-        installed = row[/* unknown nullability */ Option[Boolean]]("installed"),
-        superuser = row[/* unknown nullability */ Option[Boolean]]("superuser"),
-        trusted = row[/* unknown nullability */ Option[Boolean]]("trusted"),
-        relocatable = row[/* unknown nullability */ Option[Boolean]]("relocatable"),
-        schema = row[/* unknown nullability */ Option[String]]("schema"),
-        requires = row[/* unknown nullability */ Option[Array[String]]]("requires"),
-        comment = row[/* unknown nullability */ Option[String]]("comment")
+        name = row[Option[String]]("name"),
+        version = row[Option[String]]("version"),
+        installed = row[Option[Boolean]]("installed"),
+        superuser = row[Option[Boolean]]("superuser"),
+        trusted = row[Option[Boolean]]("trusted"),
+        relocatable = row[Option[Boolean]]("relocatable"),
+        schema = row[Option[String]]("schema"),
+        requires = row[Option[Array[String]]]("requires"),
+        comment = row[Option[String]]("comment")
       )
     )
   }

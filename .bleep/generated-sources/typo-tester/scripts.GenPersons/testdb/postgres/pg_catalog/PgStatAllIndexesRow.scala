@@ -17,33 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatAllIndexesRow(
-  /** Points to [[PgClassRow.oid]] */
-  relid: Long,
-  /** Points to [[PgClassRow.oid]] */
-  indexrelid: Long,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  /** Points to [[PgClassRow.relname]] */
-  indexrelname: String,
-  idxScan: /* unknown nullability */ Option[Long],
-  idxTupRead: /* unknown nullability */ Option[Long],
-  idxTupFetch: /* unknown nullability */ Option[Long]
+  relid: Option[Long],
+  indexrelid: Option[Long],
+  schemaname: Option[String],
+  relname: Option[String],
+  indexrelname: Option[String],
+  idxScan: Option[Long],
+  idxTupRead: Option[Long],
+  idxTupFetch: Option[Long]
 )
 
 object PgStatAllIndexesRow {
   implicit val rowParser: RowParser[PgStatAllIndexesRow] = { row =>
     Success(
       PgStatAllIndexesRow(
-        relid = row[Long]("relid"),
-        indexrelid = row[Long]("indexrelid"),
-        schemaname = row[String]("schemaname"),
-        relname = row[String]("relname"),
-        indexrelname = row[String]("indexrelname"),
-        idxScan = row[/* unknown nullability */ Option[Long]]("idx_scan"),
-        idxTupRead = row[/* unknown nullability */ Option[Long]]("idx_tup_read"),
-        idxTupFetch = row[/* unknown nullability */ Option[Long]]("idx_tup_fetch")
+        relid = row[Option[Long]]("relid"),
+        indexrelid = row[Option[Long]]("indexrelid"),
+        schemaname = row[Option[String]]("schemaname"),
+        relname = row[Option[String]]("relname"),
+        indexrelname = row[Option[String]]("indexrelname"),
+        idxScan = row[Option[Long]]("idx_scan"),
+        idxTupRead = row[Option[Long]]("idx_tup_read"),
+        idxTupFetch = row[Option[Long]]("idx_tup_fetch")
       )
     )
   }
@@ -65,11 +60,11 @@ object PgStatAllIndexesRow {
       JsResult.fromTry(
         Try(
           PgStatAllIndexesRow(
-            relid = json.\("relid").as[Long],
-            indexrelid = json.\("indexrelid").as[Long],
-            schemaname = json.\("schemaname").as[String],
-            relname = json.\("relname").as[String],
-            indexrelname = json.\("indexrelname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            indexrelid = json.\("indexrelid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
             idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
             idxTupRead = json.\("idx_tup_read").toOption.map(_.as[Long]),
             idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long])

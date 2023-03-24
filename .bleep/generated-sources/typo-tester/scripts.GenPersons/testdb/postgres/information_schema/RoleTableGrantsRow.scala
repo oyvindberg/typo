@@ -17,21 +17,13 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class RoleTableGrantsRow(
-  /** Points to [[TablePrivilegesRow.grantor]] */
   grantor: Option[String],
-  /** Points to [[TablePrivilegesRow.grantee]] */
   grantee: Option[String],
-  /** Points to [[TablePrivilegesRow.tableCatalog]] */
   tableCatalog: Option[String],
-  /** Points to [[TablePrivilegesRow.tableSchema]] */
   tableSchema: Option[String],
-  /** Points to [[TablePrivilegesRow.tableName]] */
   tableName: Option[String],
-  /** Points to [[TablePrivilegesRow.privilegeType]] */
   privilegeType: Option[String],
-  /** Points to [[TablePrivilegesRow.isGrantable]] */
   isGrantable: Option[String],
-  /** Points to [[TablePrivilegesRow.withHierarchy]] */
   withHierarchy: Option[String]
 )
 

@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 sealed abstract class PgStatUserTablesFieldValue[T](val name: String, val value: T)
 
@@ -27,10 +27,10 @@ object PgStatUserTablesFieldValue {
   case class nDeadTup(override val value: Option[Long]) extends PgStatUserTablesFieldValue("n_dead_tup", value)
   case class nModSinceAnalyze(override val value: Option[Long]) extends PgStatUserTablesFieldValue("n_mod_since_analyze", value)
   case class nInsSinceVacuum(override val value: Option[Long]) extends PgStatUserTablesFieldValue("n_ins_since_vacuum", value)
-  case class lastVacuum(override val value: Option[LocalDateTime]) extends PgStatUserTablesFieldValue("last_vacuum", value)
-  case class lastAutovacuum(override val value: Option[LocalDateTime]) extends PgStatUserTablesFieldValue("last_autovacuum", value)
-  case class lastAnalyze(override val value: Option[LocalDateTime]) extends PgStatUserTablesFieldValue("last_analyze", value)
-  case class lastAutoanalyze(override val value: Option[LocalDateTime]) extends PgStatUserTablesFieldValue("last_autoanalyze", value)
+  case class lastVacuum(override val value: Option[ZonedDateTime]) extends PgStatUserTablesFieldValue("last_vacuum", value)
+  case class lastAutovacuum(override val value: Option[ZonedDateTime]) extends PgStatUserTablesFieldValue("last_autovacuum", value)
+  case class lastAnalyze(override val value: Option[ZonedDateTime]) extends PgStatUserTablesFieldValue("last_analyze", value)
+  case class lastAutoanalyze(override val value: Option[ZonedDateTime]) extends PgStatUserTablesFieldValue("last_autoanalyze", value)
   case class vacuumCount(override val value: Option[Long]) extends PgStatUserTablesFieldValue("vacuum_count", value)
   case class autovacuumCount(override val value: Option[Long]) extends PgStatUserTablesFieldValue("autovacuum_count", value)
   case class analyzeCount(override val value: Option[Long]) extends PgStatUserTablesFieldValue("analyze_count", value)

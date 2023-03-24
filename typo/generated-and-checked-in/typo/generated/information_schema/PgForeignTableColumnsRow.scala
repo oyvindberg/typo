@@ -17,28 +17,21 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.PgAttributeRow
-import typo.generated.pg_catalog.PgClassRow
-import typo.generated.pg_catalog.PgNamespaceRow
 
 case class PgForeignTableColumnsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  nspname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"nspname","columnName":"nspname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"relname","columnName":"relname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgAttributeRow.attname]] */
-  attname: String /* {"baseColumnName":"attname","baseRelationName":"pg_catalog.pg_attribute","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"attname","columnName":"attname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_attribute"} */,
-  /** Points to [[PgAttributeRow.attfdwoptions]] */
-  attfdwoptions: Option[Array[String]] /* {"baseColumnName":"attfdwoptions","baseRelationName":"pg_catalog.pg_attribute","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"attfdwoptions","columnName":"attfdwoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_attribute"} */
+  nspname: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_table_columns","column_name":"nspname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  relname: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_table_columns","column_name":"relname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  attname: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_table_columns","column_name":"attname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  attfdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_table_columns","column_name":"attfdwoptions","ordinal_position":4,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgForeignTableColumnsRow {
   implicit val rowParser: RowParser[PgForeignTableColumnsRow] = { row =>
     Success(
       PgForeignTableColumnsRow(
-        nspname = row[String]("nspname"),
-        relname = row[String]("relname"),
-        attname = row[String]("attname"),
+        nspname = row[Option[String]]("nspname"),
+        relname = row[Option[String]]("relname"),
+        attname = row[Option[String]]("attname"),
         attfdwoptions = row[Option[Array[String]]]("attfdwoptions")
       )
     )
@@ -57,9 +50,9 @@ object PgForeignTableColumnsRow {
       JsResult.fromTry(
         Try(
           PgForeignTableColumnsRow(
-            nspname = json.\("nspname").as[String],
-            relname = json.\("relname").as[String],
-            attname = json.\("attname").as[String],
+            nspname = json.\("nspname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
+            attname = json.\("attname").toOption.map(_.as[String]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]])
           )
         )

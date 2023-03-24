@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,23 +20,15 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserRow(
-  /** Points to [[PgShadowRow.usename]] */
-  usename: Option[String] /* {"baseColumnName":"usename","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"usename","columnName":"usename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.usesysid]] */
-  usesysid: Option[Long] /* {"baseColumnName":"usesysid","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"usesysid","columnName":"usesysid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.usecreatedb]] */
-  usecreatedb: Option[Boolean] /* {"baseColumnName":"usecreatedb","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"usecreatedb","columnName":"usecreatedb","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.usesuper]] */
-  usesuper: Option[Boolean] /* {"baseColumnName":"usesuper","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"usesuper","columnName":"usesuper","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.userepl]] */
-  userepl: Option[Boolean] /* {"baseColumnName":"userepl","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"userepl","columnName":"userepl","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.usebypassrls]] */
-  usebypassrls: Option[Boolean] /* {"baseColumnName":"usebypassrls","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"usebypassrls","columnName":"usebypassrls","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_shadow"} */,
-  passwd: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"passwd","columnName":"passwd","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  /** Points to [[PgShadowRow.valuntil]] */
-  valuntil: Option[LocalDateTime] /* {"baseColumnName":"valuntil","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"valuntil","columnName":"valuntil","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_shadow"} */,
-  /** Points to [[PgShadowRow.useconfig]] */
-  useconfig: Option[Array[String]] /* {"baseColumnName":"useconfig","baseRelationName":"pg_catalog.pg_shadow","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"useconfig","columnName":"useconfig","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_shadow"} */
+  usename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usename","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usesysid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesysid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usecreatedb: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usecreatedb","ordinal_position":3,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usesuper: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesuper","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  userepl: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"userepl","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usebypassrls: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usebypassrls","ordinal_position":6,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  passwd: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"passwd","ordinal_position":7,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  valuntil: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"valuntil","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  useconfig: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"useconfig","ordinal_position":9,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgUserRow {
@@ -49,8 +41,8 @@ object PgUserRow {
         usesuper = row[Option[Boolean]]("usesuper"),
         userepl = row[Option[Boolean]]("userepl"),
         usebypassrls = row[Option[Boolean]]("usebypassrls"),
-        passwd = row[/* unknown nullability */ Option[String]]("passwd"),
-        valuntil = row[Option[LocalDateTime]]("valuntil"),
+        passwd = row[Option[String]]("passwd"),
+        valuntil = row[Option[ZonedDateTime]]("valuntil"),
         useconfig = row[Option[Array[String]]]("useconfig")
       )
     )
@@ -81,7 +73,7 @@ object PgUserRow {
             userepl = json.\("userepl").toOption.map(_.as[Boolean]),
             usebypassrls = json.\("usebypassrls").toOption.map(_.as[Boolean]),
             passwd = json.\("passwd").toOption.map(_.as[String]),
-            valuntil = json.\("valuntil").toOption.map(_.as[LocalDateTime]),
+            valuntil = json.\("valuntil").toOption.map(_.as[ZonedDateTime]),
             useconfig = json.\("useconfig").toOption.map(_.as[Array[String]])
           )
         )

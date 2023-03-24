@@ -17,7 +17,18 @@ object db {
     case object Hstore extends Type
     case object Inet extends Type
     case object Oid extends Type
+
     case object PgObject extends Type
+    case object PGbox extends Type
+    case object PGcircle extends Type
+    case object PGline extends Type
+    case object PGlseg extends Type
+    case object PGpath extends Type
+    case object PGpoint extends Type
+    case object PGpolygon extends Type
+    case object PGInterval extends Type
+    case object PGmoney extends Type
+
     case class VarChar(maxLength: Option[Int]) extends Type
     case object Float4 extends Type
     case object Float8 extends Type
@@ -34,18 +45,31 @@ object db {
 
   case class StringEnum(name: db.RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
-  case class Col(name: ColName, tpe: Type, isNotNull: Boolean, hasDefault: Boolean, jsonDescription: JsValue)
+  case class Col(name: ColName, tpe: Type, nullability: doobie.Nullability, hasDefault: Boolean, jsonDescription: JsValue)
   case class RelationName(schema: String, name: String)
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName = RelationName("", "")) {
     require(cols.size == otherCols.size)
   }
   case class UniqueKey(cols: List[ColName], constraintName: RelationName = RelationName("", ""))
+
+  sealed trait Relation {
+    def name: RelationName
+    def cols: List[Col]
+  }
+
   case class Table(
       name: RelationName,
       cols: List[Col],
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],
       foreignKeys: List[ForeignKey]
-  )
+  ) extends Relation
+
+  case class View(
+      name: db.RelationName,
+      cols: List[Col],
+      sql: String,
+      isMaterialized: Boolean
+  ) extends Relation
 }

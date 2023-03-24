@@ -17,26 +17,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ColumnUdtUsageRow(
-  udtCatalog: /* unknown nullability */ Option[String],
-  udtSchema: /* unknown nullability */ Option[String],
-  udtName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  columnName: /* unknown nullability */ Option[String]
+  udtCatalog: Option[String],
+  udtSchema: Option[String],
+  udtName: Option[String],
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  columnName: Option[String]
 )
 
 object ColumnUdtUsageRow {
   implicit val rowParser: RowParser[ColumnUdtUsageRow] = { row =>
     Success(
       ColumnUdtUsageRow(
-        udtCatalog = row[/* unknown nullability */ Option[String]]("udt_catalog"),
-        udtSchema = row[/* unknown nullability */ Option[String]]("udt_schema"),
-        udtName = row[/* unknown nullability */ Option[String]]("udt_name"),
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        columnName = row[/* unknown nullability */ Option[String]]("column_name")
+        udtCatalog = row[Option[String]]("udt_catalog"),
+        udtSchema = row[Option[String]]("udt_schema"),
+        udtName = row[Option[String]]("udt_name"),
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        columnName = row[Option[String]]("column_name")
       )
     )
   }

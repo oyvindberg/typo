@@ -17,20 +17,20 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val person = db.Table(
     name = db.RelationName("myschema", "person"),
     cols = List(
-      db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true, JsNull),
-      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), isNotNull = false, hasDefault = false, JsNull),
-      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), isNotNull = false, hasDefault = false, JsNull),
-      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("likes_pizza"), db.Type.Boolean, isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(Some(50)), isNotNull = true, hasDefault = true, JsNull),
-      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), isNotNull = false, hasDefault = false, JsNull),
+      db.Col(db.ColName("id"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = true, JsNull),
+      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), doobie.Nullability.Nullable, hasDefault = false, JsNull),
+      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), doobie.Nullability.Nullable, hasDefault = false, JsNull),
+      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("likes_pizza"), db.Type.Boolean, doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(Some(50)), doobie.Nullability.NoNulls, hasDefault = true, JsNull),
+      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), doobie.Nullability.Nullable, hasDefault = false, JsNull),
       db.Col(
         db.ColName("sector"),
         db.Type.StringEnum(db.RelationName("myschema", "sector")),
-        isNotNull = true,
+        doobie.Nullability.NoNulls,
         hasDefault = true,
         JsNull
       )
@@ -45,8 +45,8 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val football_club = db.Table(
     name = db.RelationName("myschema", "football_club"),
     cols = List(
-      db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), isNotNull = true, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), doobie.Nullability.NoNulls, hasDefault = false, JsNull)
     ),
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
@@ -55,7 +55,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val marital_status = db.Table(
     name = db.RelationName("myschema", "marital_status"),
     cols = List(
-      db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = false, JsNull)
     ),
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
@@ -65,9 +65,9 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val cpk_person = db.Table(
     name = db.RelationName("compositepk", "person"), // name clash to ensure we handle it
     cols = List(
-      db.Col(db.ColName("one"), db.Type.BigInt, isNotNull = true, hasDefault = true, JsNull),
-      db.Col(db.ColName("two"), db.Type.Text, isNotNull = false, hasDefault = true, JsNull),
-      db.Col(db.ColName("name"), db.Type.Text, isNotNull = false, hasDefault = false, JsNull)
+      db.Col(db.ColName("one"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = true, JsNull),
+      db.Col(db.ColName("two"), db.Type.Text, doobie.Nullability.Nullable, hasDefault = true, JsNull),
+      db.Col(db.ColName("name"), db.Type.Text, doobie.Nullability.Nullable, hasDefault = false, JsNull)
     ),
     Some(db.PrimaryKey(List(db.ColName("one"), db.ColName("two")))),
     Nil,
@@ -76,10 +76,10 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
   val cpk_bike = db.Table(
     name = db.RelationName("compositepk", "bike"),
     cols = List(
-      db.Col(db.ColName("id"), db.Type.BigInt, isNotNull = true, hasDefault = true, JsNull),
-      db.Col(db.ColName("owner_one"), db.Type.BigInt, isNotNull = true, hasDefault = false, JsNull),
-      db.Col(db.ColName("owner_two"), db.Type.Text, isNotNull = false, hasDefault = false, JsNull),
-      db.Col(db.ColName("bike_name"), db.Type.Text, isNotNull = true, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = true, JsNull),
+      db.Col(db.ColName("owner_one"), db.Type.BigInt, doobie.Nullability.NoNulls, hasDefault = false, JsNull),
+      db.Col(db.ColName("owner_two"), db.Type.Text, doobie.Nullability.Nullable, hasDefault = false, JsNull),
+      db.Col(db.ColName("bike_name"), db.Type.Text, doobie.Nullability.NoNulls, hasDefault = false, JsNull)
     ),
     Some(db.PrimaryKey(List(db.ColName("id")))),
     Nil,
@@ -106,7 +106,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val files1: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), JsonLibPlay, DbLibAnorm, header, debugTypes = false)
-      Gen(options, all, enums, views = Nil).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen(options, all, views = Nil, enums).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
         val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
         relpath -> content.render
       }.toMap
@@ -114,7 +114,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val files2: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("postgres"))), JsonLibPlay, DbLibAnorm, header, debugTypes = false)
-      Gen(options, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen.fromDb(options, Selector.OnlyPostgresInternal).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
         val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
         relpath -> content.render
       }.toMap

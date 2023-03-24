@@ -18,42 +18,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSequencesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  sequencename: String,
-  sequenceowner: /* unknown nullability */ Option[String],
-  dataType: /* unknown nullability */ Option[/* regtype */ PGobject],
-  /** Points to [[PgSequenceRow.seqstart]] */
-  startValue: Long,
-  /** Points to [[PgSequenceRow.seqmin]] */
-  minValue: Long,
-  /** Points to [[PgSequenceRow.seqmax]] */
-  maxValue: Long,
-  /** Points to [[PgSequenceRow.seqincrement]] */
-  incrementBy: Long,
-  /** Points to [[PgSequenceRow.seqcycle]] */
-  cycle: Boolean,
-  /** Points to [[PgSequenceRow.seqcache]] */
-  cacheSize: Long,
-  lastValue: /* unknown nullability */ Option[Long]
+  schemaname: Option[String],
+  sequencename: Option[String],
+  sequenceowner: Option[String],
+  dataType: Option[PGobject],
+  startValue: Option[Long],
+  minValue: Option[Long],
+  maxValue: Option[Long],
+  incrementBy: Option[Long],
+  cycle: Option[Boolean],
+  cacheSize: Option[Long],
+  lastValue: Option[Long]
 )
 
 object PgSequencesRow {
   implicit val rowParser: RowParser[PgSequencesRow] = { row =>
     Success(
       PgSequencesRow(
-        schemaname = row[String]("schemaname"),
-        sequencename = row[String]("sequencename"),
-        sequenceowner = row[/* unknown nullability */ Option[String]]("sequenceowner"),
-        dataType = row[/* unknown nullability */ Option[/* regtype */ PGobject]]("data_type"),
-        startValue = row[Long]("start_value"),
-        minValue = row[Long]("min_value"),
-        maxValue = row[Long]("max_value"),
-        incrementBy = row[Long]("increment_by"),
-        cycle = row[Boolean]("cycle"),
-        cacheSize = row[Long]("cache_size"),
-        lastValue = row[/* unknown nullability */ Option[Long]]("last_value")
+        schemaname = row[Option[String]]("schemaname"),
+        sequencename = row[Option[String]]("sequencename"),
+        sequenceowner = row[Option[String]]("sequenceowner"),
+        dataType = row[Option[PGobject]]("data_type"),
+        startValue = row[Option[Long]]("start_value"),
+        minValue = row[Option[Long]]("min_value"),
+        maxValue = row[Option[Long]]("max_value"),
+        incrementBy = row[Option[Long]]("increment_by"),
+        cycle = row[Option[Boolean]]("cycle"),
+        cacheSize = row[Option[Long]]("cache_size"),
+        lastValue = row[Option[Long]]("last_value")
       )
     )
   }
@@ -78,16 +70,16 @@ object PgSequencesRow {
       JsResult.fromTry(
         Try(
           PgSequencesRow(
-            schemaname = json.\("schemaname").as[String],
-            sequencename = json.\("sequencename").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            sequencename = json.\("sequencename").toOption.map(_.as[String]),
             sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
-            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ PGobject]),
-            startValue = json.\("start_value").as[Long],
-            minValue = json.\("min_value").as[Long],
-            maxValue = json.\("max_value").as[Long],
-            incrementBy = json.\("increment_by").as[Long],
-            cycle = json.\("cycle").as[Boolean],
-            cacheSize = json.\("cache_size").as[Long],
+            dataType = json.\("data_type").toOption.map(_.as[PGobject]),
+            startValue = json.\("start_value").toOption.map(_.as[Long]),
+            minValue = json.\("min_value").toOption.map(_.as[Long]),
+            maxValue = json.\("max_value").toOption.map(_.as[Long]),
+            incrementBy = json.\("increment_by").toOption.map(_.as[Long]),
+            cycle = json.\("cycle").toOption.map(_.as[Boolean]),
+            cacheSize = json.\("cache_size").toOption.map(_.as[Long]),
             lastValue = json.\("last_value").toOption.map(_.as[Long])
           )
         )

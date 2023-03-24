@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,26 +20,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatArchiverRow(
-  archivedCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"archived_count","columnName":"archived_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  lastArchivedWal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"last_archived_wal","columnName":"last_archived_wal","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  lastArchivedTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_archived_time","columnName":"last_archived_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  failedCount: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"failed_count","columnName":"failed_count","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  lastFailedWal: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"last_failed_wal","columnName":"last_failed_wal","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  lastFailedTime: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"last_failed_time","columnName":"last_failed_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  archivedCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"archived_count","ordinal_position":1,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastArchivedWal: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"last_archived_wal","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastArchivedTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"last_archived_time","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  failedCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"failed_count","ordinal_position":4,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastFailedWal: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"last_failed_wal","ordinal_position":5,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastFailedTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"last_failed_time","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statsReset: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_archiver","column_name":"stats_reset","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgStatArchiverRow {
   implicit val rowParser: RowParser[PgStatArchiverRow] = { row =>
     Success(
       PgStatArchiverRow(
-        archivedCount = row[/* unknown nullability */ Option[Long]]("archived_count"),
-        lastArchivedWal = row[/* unknown nullability */ Option[String]]("last_archived_wal"),
-        lastArchivedTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_archived_time"),
-        failedCount = row[/* unknown nullability */ Option[Long]]("failed_count"),
-        lastFailedWal = row[/* unknown nullability */ Option[String]]("last_failed_wal"),
-        lastFailedTime = row[/* unknown nullability */ Option[LocalDateTime]]("last_failed_time"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        archivedCount = row[Option[Long]]("archived_count"),
+        lastArchivedWal = row[Option[String]]("last_archived_wal"),
+        lastArchivedTime = row[Option[ZonedDateTime]]("last_archived_time"),
+        failedCount = row[Option[Long]]("failed_count"),
+        lastFailedWal = row[Option[String]]("last_failed_wal"),
+        lastFailedTime = row[Option[ZonedDateTime]]("last_failed_time"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -62,11 +62,11 @@ object PgStatArchiverRow {
           PgStatArchiverRow(
             archivedCount = json.\("archived_count").toOption.map(_.as[Long]),
             lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as[String]),
-            lastArchivedTime = json.\("last_archived_time").toOption.map(_.as[LocalDateTime]),
+            lastArchivedTime = json.\("last_archived_time").toOption.map(_.as[ZonedDateTime]),
             failedCount = json.\("failed_count").toOption.map(_.as[Long]),
             lastFailedWal = json.\("last_failed_wal").toOption.map(_.as[String]),
-            lastFailedTime = json.\("last_failed_time").toOption.map(_.as[LocalDateTime]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            lastFailedTime = json.\("last_failed_time").toOption.map(_.as[ZonedDateTime]),
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

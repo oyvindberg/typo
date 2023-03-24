@@ -17,31 +17,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgMatviewsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  matviewname: String,
-  matviewowner: /* unknown nullability */ Option[String],
-  /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String,
-  /** Points to [[PgClassRow.relhasindex]] */
-  hasindexes: Boolean,
-  /** Points to [[PgClassRow.relispopulated]] */
-  ispopulated: Boolean,
-  definition: /* unknown nullability */ Option[String]
+  schemaname: Option[String],
+  matviewname: Option[String],
+  matviewowner: Option[String],
+  tablespace: Option[String],
+  hasindexes: Option[Boolean],
+  ispopulated: Option[Boolean],
+  definition: Option[String]
 )
 
 object PgMatviewsRow {
   implicit val rowParser: RowParser[PgMatviewsRow] = { row =>
     Success(
       PgMatviewsRow(
-        schemaname = row[String]("schemaname"),
-        matviewname = row[String]("matviewname"),
-        matviewowner = row[/* unknown nullability */ Option[String]]("matviewowner"),
-        tablespace = row[String]("tablespace"),
-        hasindexes = row[Boolean]("hasindexes"),
-        ispopulated = row[Boolean]("ispopulated"),
-        definition = row[/* unknown nullability */ Option[String]]("definition")
+        schemaname = row[Option[String]]("schemaname"),
+        matviewname = row[Option[String]]("matviewname"),
+        matviewowner = row[Option[String]]("matviewowner"),
+        tablespace = row[Option[String]]("tablespace"),
+        hasindexes = row[Option[Boolean]]("hasindexes"),
+        ispopulated = row[Option[Boolean]]("ispopulated"),
+        definition = row[Option[String]]("definition")
       )
     )
   }
@@ -62,12 +57,12 @@ object PgMatviewsRow {
       JsResult.fromTry(
         Try(
           PgMatviewsRow(
-            schemaname = json.\("schemaname").as[String],
-            matviewname = json.\("matviewname").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            matviewname = json.\("matviewname").toOption.map(_.as[String]),
             matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
-            tablespace = json.\("tablespace").as[String],
-            hasindexes = json.\("hasindexes").as[Boolean],
-            ispopulated = json.\("ispopulated").as[Boolean],
+            tablespace = json.\("tablespace").toOption.map(_.as[String]),
+            hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
+            ispopulated = json.\("ispopulated").toOption.map(_.as[Boolean]),
             definition = json.\("definition").toOption.map(_.as[String])
           )
         )

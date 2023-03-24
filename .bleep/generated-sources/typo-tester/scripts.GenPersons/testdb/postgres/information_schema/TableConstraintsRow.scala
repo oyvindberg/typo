@@ -17,32 +17,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class TableConstraintsRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  constraintType: /* unknown nullability */ Option[String],
-  isDeferrable: /* unknown nullability */ Option[String],
-  initiallyDeferred: /* unknown nullability */ Option[String],
-  enforced: /* unknown nullability */ Option[String]
+  constraintCatalog: Option[String],
+  constraintSchema: Option[String],
+  constraintName: Option[String],
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  constraintType: Option[String],
+  isDeferrable: Option[String],
+  initiallyDeferred: Option[String],
+  enforced: Option[String]
 )
 
 object TableConstraintsRow {
   implicit val rowParser: RowParser[TableConstraintsRow] = { row =>
     Success(
       TableConstraintsRow(
-        constraintCatalog = row[/* unknown nullability */ Option[String]]("constraint_catalog"),
-        constraintSchema = row[/* unknown nullability */ Option[String]]("constraint_schema"),
-        constraintName = row[/* unknown nullability */ Option[String]]("constraint_name"),
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        constraintType = row[/* unknown nullability */ Option[String]]("constraint_type"),
-        isDeferrable = row[/* unknown nullability */ Option[String]]("is_deferrable"),
-        initiallyDeferred = row[/* unknown nullability */ Option[String]]("initially_deferred"),
-        enforced = row[/* unknown nullability */ Option[String]]("enforced")
+        constraintCatalog = row[Option[String]]("constraint_catalog"),
+        constraintSchema = row[Option[String]]("constraint_schema"),
+        constraintName = row[Option[String]]("constraint_name"),
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        constraintType = row[Option[String]]("constraint_type"),
+        isDeferrable = row[Option[String]]("is_deferrable"),
+        initiallyDeferred = row[Option[String]]("initially_deferred"),
+        enforced = row[Option[String]]("enforced")
       )
     )
   }

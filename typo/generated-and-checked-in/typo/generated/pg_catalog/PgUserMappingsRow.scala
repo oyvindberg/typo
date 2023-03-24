@@ -19,28 +19,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingsRow(
-  /** Points to [[PgUserMappingRow.oid]] */
-  umid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"umid","columnName":"umid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
-  /** Points to [[PgForeignServerRow.oid]] */
-  srvid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"srvid","columnName":"srvid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_server"} */,
-  /** Points to [[PgForeignServerRow.srvname]] */
-  srvname: String /* {"baseColumnName":"srvname","baseRelationName":"pg_catalog.pg_foreign_server","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"srvname","columnName":"srvname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_server"} */,
-  /** Points to [[PgUserMappingRow.umuser]] */
-  umuser: Long /* {"baseColumnName":"umuser","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"umuser","columnName":"umuser","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
-  usename: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"usename","columnName":"usename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  umoptions: /* unknown nullability */ Option[Array[String]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"umoptions","columnName":"umoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  umid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"umid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  srvid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"srvid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  srvname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"srvname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  umuser: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"umuser","ordinal_position":4,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"usename","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  umoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user_mappings","column_name":"umoptions","ordinal_position":6,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgUserMappingsRow {
   implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        umid = row[Long]("umid"),
-        srvid = row[Long]("srvid"),
-        srvname = row[String]("srvname"),
-        umuser = row[Long]("umuser"),
-        usename = row[/* unknown nullability */ Option[String]]("usename"),
-        umoptions = row[/* unknown nullability */ Option[Array[String]]]("umoptions")
+        umid = row[Option[Long]]("umid"),
+        srvid = row[Option[Long]]("srvid"),
+        srvname = row[Option[String]]("srvname"),
+        umuser = row[Option[Long]]("umuser"),
+        usename = row[Option[String]]("usename"),
+        umoptions = row[Option[Array[String]]]("umoptions")
       )
     )
   }
@@ -60,10 +56,10 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            umid = json.\("umid").as[Long],
-            srvid = json.\("srvid").as[Long],
-            srvname = json.\("srvname").as[String],
-            umuser = json.\("umuser").as[Long],
+            umid = json.\("umid").toOption.map(_.as[Long]),
+            srvid = json.\("srvid").toOption.map(_.as[Long]),
+            srvname = json.\("srvname").toOption.map(_.as[String]),
+            umuser = json.\("umuser").toOption.map(_.as[Long]),
             usename = json.\("usename").toOption.map(_.as[String]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
           )

@@ -17,20 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgReplicationOriginStatusRow(
-  localId: /* unknown nullability */ Option[Long],
-  externalId: /* unknown nullability */ Option[String],
-  remoteLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  localLsn: /* unknown nullability */ Option[/* pg_lsn */ String]
+  localId: Option[Long],
+  externalId: Option[String],
+  remoteLsn: Option[String],
+  localLsn: Option[String]
 )
 
 object PgReplicationOriginStatusRow {
   implicit val rowParser: RowParser[PgReplicationOriginStatusRow] = { row =>
     Success(
       PgReplicationOriginStatusRow(
-        localId = row[/* unknown nullability */ Option[Long]]("local_id"),
-        externalId = row[/* unknown nullability */ Option[String]]("external_id"),
-        remoteLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("remote_lsn"),
-        localLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("local_lsn")
+        localId = row[Option[Long]]("local_id"),
+        externalId = row[Option[String]]("external_id"),
+        remoteLsn = row[Option[String]]("remote_lsn"),
+        localLsn = row[Option[String]]("local_lsn")
       )
     )
   }
@@ -50,8 +50,8 @@ object PgReplicationOriginStatusRow {
           PgReplicationOriginStatusRow(
             localId = json.\("local_id").toOption.map(_.as[Long]),
             externalId = json.\("external_id").toOption.map(_.as[String]),
-            remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ String])
+            remoteLsn = json.\("remote_lsn").toOption.map(_.as[String]),
+            localLsn = json.\("local_lsn").toOption.map(_.as[String])
           )
         )
       )

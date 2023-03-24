@@ -11,7 +11,8 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,44 +21,44 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLocksRow(
-  locktype: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"locktype","columnName":"locktype","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  database: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"database","columnName":"database","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  relation: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"relation","columnName":"relation","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  page: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"page","columnName":"page","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
-  tuple: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":6,"columnLabel":"tuple","columnName":"tuple","columnType":"SmallInt","columnTypeName":"int2","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":5,"scale":0} */,
-  virtualxid: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"virtualxid","columnName":"virtualxid","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  transactionid: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"transactionid","columnName":"transactionid","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  classid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"classid","columnName":"classid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  objid: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"objid","columnName":"objid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */,
-  objsubid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":6,"columnLabel":"objsubid","columnName":"objsubid","columnType":"SmallInt","columnTypeName":"int2","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":5,"scale":0} */,
-  virtualtransaction: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"virtualtransaction","columnName":"virtualtransaction","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  pid: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"pid","columnName":"pid","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
-  mode: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"mode","columnName":"mode","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  granted: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"granted","columnName":"granted","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  fastpath: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"fastpath","columnName":"fastpath","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */,
-  waitstart: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"waitstart","columnName":"waitstart","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  locktype: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"locktype","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  database: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"database","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  relation: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"relation","ordinal_position":3,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  page: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"page","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tuple: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"tuple","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  virtualxid: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"virtualxid","ordinal_position":6,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  transactionid: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"transactionid","ordinal_position":7,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  classid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"classid","ordinal_position":8,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  objid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"objid","ordinal_position":9,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  objsubid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"objsubid","ordinal_position":10,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  virtualtransaction: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"virtualtransaction","ordinal_position":11,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  pid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"pid","ordinal_position":12,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  mode: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"mode","ordinal_position":13,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  granted: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"granted","ordinal_position":14,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  fastpath: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"fastpath","ordinal_position":15,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  waitstart: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_locks","column_name":"waitstart","ordinal_position":16,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgLocksRow {
   implicit val rowParser: RowParser[PgLocksRow] = { row =>
     Success(
       PgLocksRow(
-        locktype = row[/* unknown nullability */ Option[String]]("locktype"),
-        database = row[/* unknown nullability */ Option[Long]]("database"),
-        relation = row[/* unknown nullability */ Option[Long]]("relation"),
-        page = row[/* unknown nullability */ Option[Int]]("page"),
-        tuple = row[/* unknown nullability */ Option[Int]]("tuple"),
-        virtualxid = row[/* unknown nullability */ Option[String]]("virtualxid"),
-        transactionid = row[/* unknown nullability */ Option[/* xid */ String]]("transactionid"),
-        classid = row[/* unknown nullability */ Option[Long]]("classid"),
-        objid = row[/* unknown nullability */ Option[Long]]("objid"),
-        objsubid = row[/* unknown nullability */ Option[Int]]("objsubid"),
-        virtualtransaction = row[/* unknown nullability */ Option[String]]("virtualtransaction"),
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        mode = row[/* unknown nullability */ Option[String]]("mode"),
-        granted = row[/* unknown nullability */ Option[Boolean]]("granted"),
-        fastpath = row[/* unknown nullability */ Option[Boolean]]("fastpath"),
-        waitstart = row[/* unknown nullability */ Option[LocalDateTime]]("waitstart")
+        locktype = row[Option[String]]("locktype"),
+        database = row[Option[Long]]("database"),
+        relation = row[Option[Long]]("relation"),
+        page = row[Option[Int]]("page"),
+        tuple = row[Option[Int]]("tuple"),
+        virtualxid = row[Option[String]]("virtualxid"),
+        transactionid = row[Option[PGobject]]("transactionid"),
+        classid = row[Option[Long]]("classid"),
+        objid = row[Option[Long]]("objid"),
+        objsubid = row[Option[Int]]("objsubid"),
+        virtualtransaction = row[Option[String]]("virtualtransaction"),
+        pid = row[Option[Int]]("pid"),
+        mode = row[Option[String]]("mode"),
+        granted = row[Option[Boolean]]("granted"),
+        fastpath = row[Option[Boolean]]("fastpath"),
+        waitstart = row[Option[ZonedDateTime]]("waitstart")
       )
     )
   }
@@ -93,7 +94,7 @@ object PgLocksRow {
             page = json.\("page").toOption.map(_.as[Int]),
             tuple = json.\("tuple").toOption.map(_.as[Int]),
             virtualxid = json.\("virtualxid").toOption.map(_.as[String]),
-            transactionid = json.\("transactionid").toOption.map(_.as[/* xid */ String]),
+            transactionid = json.\("transactionid").toOption.map(_.as[PGobject]),
             classid = json.\("classid").toOption.map(_.as[Long]),
             objid = json.\("objid").toOption.map(_.as[Long]),
             objsubid = json.\("objsubid").toOption.map(_.as[Int]),
@@ -102,7 +103,7 @@ object PgLocksRow {
             mode = json.\("mode").toOption.map(_.as[String]),
             granted = json.\("granted").toOption.map(_.as[Boolean]),
             fastpath = json.\("fastpath").toOption.map(_.as[Boolean]),
-            waitstart = json.\("waitstart").toOption.map(_.as[LocalDateTime])
+            waitstart = json.\("waitstart").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

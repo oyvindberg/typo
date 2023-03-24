@@ -17,18 +17,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ApplicableRolesRow(
-  grantee: /* unknown nullability */ Option[String],
-  roleName: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String]
+  grantee: Option[String],
+  roleName: Option[String],
+  isGrantable: Option[String]
 )
 
 object ApplicableRolesRow {
   implicit val rowParser: RowParser[ApplicableRolesRow] = { row =>
     Success(
       ApplicableRolesRow(
-        grantee = row[/* unknown nullability */ Option[String]]("grantee"),
-        roleName = row[/* unknown nullability */ Option[String]]("role_name"),
-        isGrantable = row[/* unknown nullability */ Option[String]]("is_grantable")
+        grantee = row[Option[String]]("grantee"),
+        roleName = row[Option[String]]("role_name"),
+        isGrantable = row[Option[String]]("is_grantable")
       )
     )
   }

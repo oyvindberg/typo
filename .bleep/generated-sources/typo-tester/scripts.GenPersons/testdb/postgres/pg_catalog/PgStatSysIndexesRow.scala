@@ -17,21 +17,13 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSysIndexesRow(
-  /** Points to [[PgStatAllIndexesRow.relid]] */
   relid: Option[Long],
-  /** Points to [[PgStatAllIndexesRow.indexrelid]] */
   indexrelid: Option[Long],
-  /** Points to [[PgStatAllIndexesRow.schemaname]] */
   schemaname: Option[String],
-  /** Points to [[PgStatAllIndexesRow.relname]] */
   relname: Option[String],
-  /** Points to [[PgStatAllIndexesRow.indexrelname]] */
   indexrelname: Option[String],
-  /** Points to [[PgStatAllIndexesRow.idxScan]] */
   idxScan: Option[Long],
-  /** Points to [[PgStatAllIndexesRow.idxTupRead]] */
   idxTupRead: Option[Long],
-  /** Points to [[PgStatAllIndexesRow.idxTupFetch]] */
   idxTupFetch: Option[Long]
 )
 

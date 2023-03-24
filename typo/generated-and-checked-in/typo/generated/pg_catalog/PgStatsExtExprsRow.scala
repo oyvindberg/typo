@@ -20,48 +20,44 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatsExtExprsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"tablename","columnName":"tablename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  statisticsSchemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_schemaname","columnName":"statistics_schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgStatisticExtRow.stxname]] */
-  statisticsName: String /* {"baseColumnName":"stxname","baseRelationName":"pg_catalog.pg_statistic_ext","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_name","columnName":"statistics_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_statistic_ext"} */,
-  statisticsOwner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"statistics_owner","columnName":"statistics_owner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  expr: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"expr","columnName":"expr","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  nullFrac: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"null_frac","columnName":"null_frac","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  avgWidth: /* unknown nullability */ Option[Int] /* {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"avg_width","columnName":"avg_width","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */,
-  nDistinct: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"n_distinct","columnName":"n_distinct","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  mostCommonVals: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_vals","columnName":"most_common_vals","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  mostCommonFreqs: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"most_common_freqs","columnName":"most_common_freqs","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  histogramBounds: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"histogram_bounds","columnName":"histogram_bounds","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  correlation: /* unknown nullability */ Option[Float] /* {"columnClassName":"java.lang.Float","columnDisplaySize":15,"columnLabel":"correlation","columnName":"correlation","columnType":"Real","columnTypeName":"float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  mostCommonElems: /* unknown nullability */ Option[/* anyarray */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"most_common_elems","columnName":"most_common_elems","columnType":"Other","columnTypeName":"anyarray","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  mostCommonElemFreqs: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"most_common_elem_freqs","columnName":"most_common_elem_freqs","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */,
-  elemCountHistogram: /* unknown nullability */ Option[Array[Float]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":15,"columnLabel":"elem_count_histogram","columnName":"elem_count_histogram","columnType":"Array","columnTypeName":"_float4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":8,"scale":8} */
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"schemaname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tablename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"tablename","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statisticsSchemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"statistics_schemaname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statisticsName: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"statistics_name","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statisticsOwner: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"statistics_owner","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  expr: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"expr","ordinal_position":6,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  nullFrac: Option[Float] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"null_frac","ordinal_position":7,"is_nullable":"YES","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  avgWidth: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"avg_width","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  nDistinct: Option[Float] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"n_distinct","ordinal_position":9,"is_nullable":"YES","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  mostCommonVals: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"most_common_vals","ordinal_position":10,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  mostCommonFreqs: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"most_common_freqs","ordinal_position":11,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  histogramBounds: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"histogram_bounds","ordinal_position":12,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  correlation: Option[Float] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"correlation","ordinal_position":13,"is_nullable":"YES","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  mostCommonElems: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"most_common_elems","ordinal_position":14,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  mostCommonElemFreqs: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"most_common_elem_freqs","ordinal_position":15,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  elemCountHistogram: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stats_ext_exprs","column_name":"elem_count_histogram","ordinal_position":16,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgStatsExtExprsRow {
   implicit val rowParser: RowParser[PgStatsExtExprsRow] = { row =>
     Success(
       PgStatsExtExprsRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        statisticsSchemaname = row[String]("statistics_schemaname"),
-        statisticsName = row[String]("statistics_name"),
-        statisticsOwner = row[/* unknown nullability */ Option[String]]("statistics_owner"),
-        expr = row[/* unknown nullability */ Option[String]]("expr"),
-        nullFrac = row[/* unknown nullability */ Option[Float]]("null_frac"),
-        avgWidth = row[/* unknown nullability */ Option[Int]]("avg_width"),
-        nDistinct = row[/* unknown nullability */ Option[Float]]("n_distinct"),
-        mostCommonVals = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_vals"),
-        mostCommonFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_freqs"),
-        histogramBounds = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("histogram_bounds"),
-        correlation = row[/* unknown nullability */ Option[Float]]("correlation"),
-        mostCommonElems = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_elems"),
-        mostCommonElemFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_elem_freqs"),
-        elemCountHistogram = row[/* unknown nullability */ Option[Array[Float]]]("elem_count_histogram")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        statisticsSchemaname = row[Option[String]]("statistics_schemaname"),
+        statisticsName = row[Option[String]]("statistics_name"),
+        statisticsOwner = row[Option[String]]("statistics_owner"),
+        expr = row[Option[String]]("expr"),
+        nullFrac = row[Option[Float]]("null_frac"),
+        avgWidth = row[Option[Int]]("avg_width"),
+        nDistinct = row[Option[Float]]("n_distinct"),
+        mostCommonVals = row[Option[PGobject]]("most_common_vals"),
+        mostCommonFreqs = row[Option[Array[Float]]]("most_common_freqs"),
+        histogramBounds = row[Option[PGobject]]("histogram_bounds"),
+        correlation = row[Option[Float]]("correlation"),
+        mostCommonElems = row[Option[PGobject]]("most_common_elems"),
+        mostCommonElemFreqs = row[Option[Array[Float]]]("most_common_elem_freqs"),
+        elemCountHistogram = row[Option[Array[Float]]]("elem_count_histogram")
       )
     )
   }
@@ -91,20 +87,20 @@ object PgStatsExtExprsRow {
       JsResult.fromTry(
         Try(
           PgStatsExtExprsRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            statisticsSchemaname = json.\("statistics_schemaname").as[String],
-            statisticsName = json.\("statistics_name").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as[String]),
+            statisticsName = json.\("statistics_name").toOption.map(_.as[String]),
             statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
             expr = json.\("expr").toOption.map(_.as[String]),
             nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
             avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
             nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
-            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ PGobject]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[PGobject]),
             mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
-            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ PGobject]),
+            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[PGobject]),
             correlation = json.\("correlation").toOption.map(_.as[Float]),
-            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ PGobject]),
+            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[PGobject]),
             mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
             elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
           )

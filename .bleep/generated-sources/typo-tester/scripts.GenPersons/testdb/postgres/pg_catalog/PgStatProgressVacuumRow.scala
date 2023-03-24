@@ -17,35 +17,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatProgressVacuumRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
-  /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  phase: /* unknown nullability */ Option[String],
-  heapBlksTotal: /* unknown nullability */ Option[Long],
-  heapBlksScanned: /* unknown nullability */ Option[Long],
-  heapBlksVacuumed: /* unknown nullability */ Option[Long],
-  indexVacuumCount: /* unknown nullability */ Option[Long],
-  maxDeadTuples: /* unknown nullability */ Option[Long],
-  numDeadTuples: /* unknown nullability */ Option[Long]
+  pid: Option[Int],
+  datid: Option[Long],
+  datname: Option[String],
+  relid: Option[Long],
+  phase: Option[String],
+  heapBlksTotal: Option[Long],
+  heapBlksScanned: Option[Long],
+  heapBlksVacuumed: Option[Long],
+  indexVacuumCount: Option[Long],
+  maxDeadTuples: Option[Long],
+  numDeadTuples: Option[Long]
 )
 
 object PgStatProgressVacuumRow {
   implicit val rowParser: RowParser[PgStatProgressVacuumRow] = { row =>
     Success(
       PgStatProgressVacuumRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        datid = row[/* unknown nullability */ Option[Long]]("datid"),
-        datname = row[String]("datname"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        phase = row[/* unknown nullability */ Option[String]]("phase"),
-        heapBlksTotal = row[/* unknown nullability */ Option[Long]]("heap_blks_total"),
-        heapBlksScanned = row[/* unknown nullability */ Option[Long]]("heap_blks_scanned"),
-        heapBlksVacuumed = row[/* unknown nullability */ Option[Long]]("heap_blks_vacuumed"),
-        indexVacuumCount = row[/* unknown nullability */ Option[Long]]("index_vacuum_count"),
-        maxDeadTuples = row[/* unknown nullability */ Option[Long]]("max_dead_tuples"),
-        numDeadTuples = row[/* unknown nullability */ Option[Long]]("num_dead_tuples")
+        pid = row[Option[Int]]("pid"),
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        relid = row[Option[Long]]("relid"),
+        phase = row[Option[String]]("phase"),
+        heapBlksTotal = row[Option[Long]]("heap_blks_total"),
+        heapBlksScanned = row[Option[Long]]("heap_blks_scanned"),
+        heapBlksVacuumed = row[Option[Long]]("heap_blks_vacuumed"),
+        indexVacuumCount = row[Option[Long]]("index_vacuum_count"),
+        maxDeadTuples = row[Option[Long]]("max_dead_tuples"),
+        numDeadTuples = row[Option[Long]]("num_dead_tuples")
       )
     )
   }
@@ -72,7 +71,7 @@ object PgStatProgressVacuumRow {
           PgStatProgressVacuumRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
             datid = json.\("datid").toOption.map(_.as[Long]),
-            datname = json.\("datname").as[String],
+            datname = json.\("datname").toOption.map(_.as[String]),
             relid = json.\("relid").toOption.map(_.as[Long]),
             phase = json.\("phase").toOption.map(_.as[String]),
             heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),

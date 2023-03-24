@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,68 +18,68 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatDatabaseRow(
-  datid: /* unknown nullability */ Option[Long],
-  datname: /* unknown nullability */ Option[String],
-  numbackends: /* unknown nullability */ Option[Int],
-  xactCommit: /* unknown nullability */ Option[Long],
-  xactRollback: /* unknown nullability */ Option[Long],
-  blksRead: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long],
-  tupReturned: /* unknown nullability */ Option[Long],
-  tupFetched: /* unknown nullability */ Option[Long],
-  tupInserted: /* unknown nullability */ Option[Long],
-  tupUpdated: /* unknown nullability */ Option[Long],
-  tupDeleted: /* unknown nullability */ Option[Long],
-  conflicts: /* unknown nullability */ Option[Long],
-  tempFiles: /* unknown nullability */ Option[Long],
-  tempBytes: /* unknown nullability */ Option[Long],
-  deadlocks: /* unknown nullability */ Option[Long],
-  checksumFailures: /* unknown nullability */ Option[Long],
-  checksumLastFailure: /* unknown nullability */ Option[LocalDateTime],
-  blkReadTime: /* unknown nullability */ Option[Double],
-  blkWriteTime: /* unknown nullability */ Option[Double],
-  sessionTime: /* unknown nullability */ Option[Double],
-  activeTime: /* unknown nullability */ Option[Double],
-  idleInTransactionTime: /* unknown nullability */ Option[Double],
-  sessions: /* unknown nullability */ Option[Long],
-  sessionsAbandoned: /* unknown nullability */ Option[Long],
-  sessionsFatal: /* unknown nullability */ Option[Long],
-  sessionsKilled: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  datid: Option[Long],
+  datname: Option[String],
+  numbackends: Option[Int],
+  xactCommit: Option[Long],
+  xactRollback: Option[Long],
+  blksRead: Option[Long],
+  blksHit: Option[Long],
+  tupReturned: Option[Long],
+  tupFetched: Option[Long],
+  tupInserted: Option[Long],
+  tupUpdated: Option[Long],
+  tupDeleted: Option[Long],
+  conflicts: Option[Long],
+  tempFiles: Option[Long],
+  tempBytes: Option[Long],
+  deadlocks: Option[Long],
+  checksumFailures: Option[Long],
+  checksumLastFailure: Option[ZonedDateTime],
+  blkReadTime: Option[Double],
+  blkWriteTime: Option[Double],
+  sessionTime: Option[Double],
+  activeTime: Option[Double],
+  idleInTransactionTime: Option[Double],
+  sessions: Option[Long],
+  sessionsAbandoned: Option[Long],
+  sessionsFatal: Option[Long],
+  sessionsKilled: Option[Long],
+  statsReset: Option[ZonedDateTime]
 )
 
 object PgStatDatabaseRow {
   implicit val rowParser: RowParser[PgStatDatabaseRow] = { row =>
     Success(
       PgStatDatabaseRow(
-        datid = row[/* unknown nullability */ Option[Long]]("datid"),
-        datname = row[/* unknown nullability */ Option[String]]("datname"),
-        numbackends = row[/* unknown nullability */ Option[Int]]("numbackends"),
-        xactCommit = row[/* unknown nullability */ Option[Long]]("xact_commit"),
-        xactRollback = row[/* unknown nullability */ Option[Long]]("xact_rollback"),
-        blksRead = row[/* unknown nullability */ Option[Long]]("blks_read"),
-        blksHit = row[/* unknown nullability */ Option[Long]]("blks_hit"),
-        tupReturned = row[/* unknown nullability */ Option[Long]]("tup_returned"),
-        tupFetched = row[/* unknown nullability */ Option[Long]]("tup_fetched"),
-        tupInserted = row[/* unknown nullability */ Option[Long]]("tup_inserted"),
-        tupUpdated = row[/* unknown nullability */ Option[Long]]("tup_updated"),
-        tupDeleted = row[/* unknown nullability */ Option[Long]]("tup_deleted"),
-        conflicts = row[/* unknown nullability */ Option[Long]]("conflicts"),
-        tempFiles = row[/* unknown nullability */ Option[Long]]("temp_files"),
-        tempBytes = row[/* unknown nullability */ Option[Long]]("temp_bytes"),
-        deadlocks = row[/* unknown nullability */ Option[Long]]("deadlocks"),
-        checksumFailures = row[/* unknown nullability */ Option[Long]]("checksum_failures"),
-        checksumLastFailure = row[/* unknown nullability */ Option[LocalDateTime]]("checksum_last_failure"),
-        blkReadTime = row[/* unknown nullability */ Option[Double]]("blk_read_time"),
-        blkWriteTime = row[/* unknown nullability */ Option[Double]]("blk_write_time"),
-        sessionTime = row[/* unknown nullability */ Option[Double]]("session_time"),
-        activeTime = row[/* unknown nullability */ Option[Double]]("active_time"),
-        idleInTransactionTime = row[/* unknown nullability */ Option[Double]]("idle_in_transaction_time"),
-        sessions = row[/* unknown nullability */ Option[Long]]("sessions"),
-        sessionsAbandoned = row[/* unknown nullability */ Option[Long]]("sessions_abandoned"),
-        sessionsFatal = row[/* unknown nullability */ Option[Long]]("sessions_fatal"),
-        sessionsKilled = row[/* unknown nullability */ Option[Long]]("sessions_killed"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        numbackends = row[Option[Int]]("numbackends"),
+        xactCommit = row[Option[Long]]("xact_commit"),
+        xactRollback = row[Option[Long]]("xact_rollback"),
+        blksRead = row[Option[Long]]("blks_read"),
+        blksHit = row[Option[Long]]("blks_hit"),
+        tupReturned = row[Option[Long]]("tup_returned"),
+        tupFetched = row[Option[Long]]("tup_fetched"),
+        tupInserted = row[Option[Long]]("tup_inserted"),
+        tupUpdated = row[Option[Long]]("tup_updated"),
+        tupDeleted = row[Option[Long]]("tup_deleted"),
+        conflicts = row[Option[Long]]("conflicts"),
+        tempFiles = row[Option[Long]]("temp_files"),
+        tempBytes = row[Option[Long]]("temp_bytes"),
+        deadlocks = row[Option[Long]]("deadlocks"),
+        checksumFailures = row[Option[Long]]("checksum_failures"),
+        checksumLastFailure = row[Option[ZonedDateTime]]("checksum_last_failure"),
+        blkReadTime = row[Option[Double]]("blk_read_time"),
+        blkWriteTime = row[Option[Double]]("blk_write_time"),
+        sessionTime = row[Option[Double]]("session_time"),
+        activeTime = row[Option[Double]]("active_time"),
+        idleInTransactionTime = row[Option[Double]]("idle_in_transaction_time"),
+        sessions = row[Option[Long]]("sessions"),
+        sessionsAbandoned = row[Option[Long]]("sessions_abandoned"),
+        sessionsFatal = row[Option[Long]]("sessions_fatal"),
+        sessionsKilled = row[Option[Long]]("sessions_killed"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -138,7 +138,7 @@ object PgStatDatabaseRow {
             tempBytes = json.\("temp_bytes").toOption.map(_.as[Long]),
             deadlocks = json.\("deadlocks").toOption.map(_.as[Long]),
             checksumFailures = json.\("checksum_failures").toOption.map(_.as[Long]),
-            checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as[LocalDateTime]),
+            checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as[ZonedDateTime]),
             blkReadTime = json.\("blk_read_time").toOption.map(_.as[Double]),
             blkWriteTime = json.\("blk_write_time").toOption.map(_.as[Double]),
             sessionTime = json.\("session_time").toOption.map(_.as[Double]),
@@ -148,7 +148,7 @@ object PgStatDatabaseRow {
             sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as[Long]),
             sessionsFatal = json.\("sessions_fatal").toOption.map(_.as[Long]),
             sessionsKilled = json.\("sessions_killed").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

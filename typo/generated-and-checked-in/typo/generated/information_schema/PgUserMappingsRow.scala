@@ -17,32 +17,25 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.PgUserMappingRow
 
 case class PgUserMappingsRow(
-  /** Points to [[PgUserMappingRow.oid]] */
-  oid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"oid","columnName":"oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
-  /** Points to [[PgUserMappingRow.umoptions]] */
-  umoptions: Option[Array[String]] /* {"baseColumnName":"umoptions","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"umoptions","columnName":"umoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_user_mapping"} */,
-  /** Points to [[PgUserMappingRow.umuser]] */
-  umuser: Long /* {"baseColumnName":"umuser","baseRelationName":"pg_catalog.pg_user_mapping","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"umuser","columnName":"umuser","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_user_mapping"} */,
-  authorizationIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[String] /* {"baseColumnName":"foreign_server_catalog","baseRelationName":"information_schema._pg_foreign_servers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_catalog","columnName":"foreign_server_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_servers"} */,
-  /** Points to [[PgForeignServersRow.foreignServerName]] */
-  foreignServerName: Option[String] /* {"baseColumnName":"foreign_server_name","baseRelationName":"information_schema._pg_foreign_servers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_server_name","columnName":"foreign_server_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_servers"} */,
-  /** Points to [[PgForeignServersRow.authorizationIdentifier]] */
-  srvowner: Option[String] /* {"baseColumnName":"authorization_identifier","baseRelationName":"information_schema._pg_foreign_servers","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"srvowner","columnName":"srvowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"_pg_foreign_servers"} */
+  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  umoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"umoptions","ordinal_position":2,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  umuser: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"umuser","ordinal_position":3,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  authorizationIdentifier: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"authorization_identifier","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  foreignServerCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"foreign_server_catalog","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  foreignServerName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"foreign_server_name","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  srvowner: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_user_mappings","column_name":"srvowner","ordinal_position":7,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgUserMappingsRow {
   implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        oid = row[Long]("oid"),
+        oid = row[Option[Long]]("oid"),
         umoptions = row[Option[Array[String]]]("umoptions"),
-        umuser = row[Long]("umuser"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier"),
+        umuser = row[Option[Long]]("umuser"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
         foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
         foreignServerName = row[Option[String]]("foreign_server_name"),
         srvowner = row[Option[String]]("srvowner")
@@ -66,9 +59,9 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").toOption.map(_.as[Long]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
-            umuser = json.\("umuser").as[Long],
+            umuser = json.\("umuser").toOption.map(_.as[Long]),
             authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

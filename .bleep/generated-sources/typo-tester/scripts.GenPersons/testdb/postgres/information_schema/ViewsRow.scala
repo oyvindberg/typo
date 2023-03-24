@@ -17,32 +17,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ViewsRow(
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  viewDefinition: /* unknown nullability */ Option[String],
-  checkOption: /* unknown nullability */ Option[String],
-  isUpdatable: /* unknown nullability */ Option[String],
-  isInsertableInto: /* unknown nullability */ Option[String],
-  isTriggerUpdatable: /* unknown nullability */ Option[String],
-  isTriggerDeletable: /* unknown nullability */ Option[String],
-  isTriggerInsertableInto: /* unknown nullability */ Option[String]
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  viewDefinition: Option[String],
+  checkOption: Option[String],
+  isUpdatable: Option[String],
+  isInsertableInto: Option[String],
+  isTriggerUpdatable: Option[String],
+  isTriggerDeletable: Option[String],
+  isTriggerInsertableInto: Option[String]
 )
 
 object ViewsRow {
   implicit val rowParser: RowParser[ViewsRow] = { row =>
     Success(
       ViewsRow(
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        viewDefinition = row[/* unknown nullability */ Option[String]]("view_definition"),
-        checkOption = row[/* unknown nullability */ Option[String]]("check_option"),
-        isUpdatable = row[/* unknown nullability */ Option[String]]("is_updatable"),
-        isInsertableInto = row[/* unknown nullability */ Option[String]]("is_insertable_into"),
-        isTriggerUpdatable = row[/* unknown nullability */ Option[String]]("is_trigger_updatable"),
-        isTriggerDeletable = row[/* unknown nullability */ Option[String]]("is_trigger_deletable"),
-        isTriggerInsertableInto = row[/* unknown nullability */ Option[String]]("is_trigger_insertable_into")
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        viewDefinition = row[Option[String]]("view_definition"),
+        checkOption = row[Option[String]]("check_option"),
+        isUpdatable = row[Option[String]]("is_updatable"),
+        isInsertableInto = row[Option[String]]("is_insertable_into"),
+        isTriggerUpdatable = row[Option[String]]("is_trigger_updatable"),
+        isTriggerDeletable = row[Option[String]]("is_trigger_deletable"),
+        isTriggerInsertableInto = row[Option[String]]("is_trigger_insertable_into")
       )
     )
   }

@@ -3,11 +3,8 @@ package metadb
 
 import typo.generated.information_schema.{KeyColumnUsageRow, TableConstraintsRow}
 
-class PrimaryKeys(
-    tableConstraints: List[TableConstraintsRow],
-    keyColumnUsage: List[KeyColumnUsageRow]
-) {
-  lazy val getAsMap: Map[db.RelationName, db.PrimaryKey] = {
+object PrimaryKeys {
+  def apply(tableConstraints: List[TableConstraintsRow], keyColumnUsage: List[KeyColumnUsageRow]): Map[db.RelationName, db.PrimaryKey] = {
     tableConstraints
       .filter(_.constraintType.contains("PRIMARY KEY"))
       .map { tc =>

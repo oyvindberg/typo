@@ -17,28 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UsagePrivilegesRow(
-  grantor: /* unknown nullability */ Option[String],
-  grantee: /* unknown nullability */ Option[String],
-  objectCatalog: /* unknown nullability */ Option[String],
-  objectSchema: /* unknown nullability */ Option[String],
-  objectName: /* unknown nullability */ Option[String],
-  objectType: /* unknown nullability */ Option[String],
-  privilegeType: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String]
+  grantor: Option[String],
+  grantee: Option[String],
+  objectCatalog: Option[String],
+  objectSchema: Option[String],
+  objectName: Option[String],
+  objectType: Option[String],
+  privilegeType: Option[String],
+  isGrantable: Option[String]
 )
 
 object UsagePrivilegesRow {
   implicit val rowParser: RowParser[UsagePrivilegesRow] = { row =>
     Success(
       UsagePrivilegesRow(
-        grantor = row[/* unknown nullability */ Option[String]]("grantor"),
-        grantee = row[/* unknown nullability */ Option[String]]("grantee"),
-        objectCatalog = row[/* unknown nullability */ Option[String]]("object_catalog"),
-        objectSchema = row[/* unknown nullability */ Option[String]]("object_schema"),
-        objectName = row[/* unknown nullability */ Option[String]]("object_name"),
-        objectType = row[/* unknown nullability */ Option[String]]("object_type"),
-        privilegeType = row[/* unknown nullability */ Option[String]]("privilege_type"),
-        isGrantable = row[/* unknown nullability */ Option[String]]("is_grantable")
+        grantor = row[Option[String]]("grantor"),
+        grantee = row[Option[String]]("grantee"),
+        objectCatalog = row[Option[String]]("object_catalog"),
+        objectSchema = row[Option[String]]("object_schema"),
+        objectName = row[Option[String]]("object_name"),
+        objectType = row[Option[String]]("object_type"),
+        privilegeType = row[Option[String]]("privilege_type"),
+        isGrantable = row[Option[String]]("is_grantable")
       )
     )
   }

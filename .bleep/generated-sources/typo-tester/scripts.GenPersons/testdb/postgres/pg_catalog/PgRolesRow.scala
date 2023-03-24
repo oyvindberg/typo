@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,50 +18,38 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRolesRow(
-  /** Points to [[PgAuthidRow.rolname]] */
-  rolname: String,
-  /** Points to [[PgAuthidRow.rolsuper]] */
-  rolsuper: Boolean,
-  /** Points to [[PgAuthidRow.rolinherit]] */
-  rolinherit: Boolean,
-  /** Points to [[PgAuthidRow.rolcreaterole]] */
-  rolcreaterole: Boolean,
-  /** Points to [[PgAuthidRow.rolcreatedb]] */
-  rolcreatedb: Boolean,
-  /** Points to [[PgAuthidRow.rolcanlogin]] */
-  rolcanlogin: Boolean,
-  /** Points to [[PgAuthidRow.rolreplication]] */
-  rolreplication: Boolean,
-  /** Points to [[PgAuthidRow.rolconnlimit]] */
-  rolconnlimit: Int,
-  rolpassword: /* unknown nullability */ Option[String],
-  /** Points to [[PgAuthidRow.rolvaliduntil]] */
-  rolvaliduntil: Option[LocalDateTime],
-  /** Points to [[PgAuthidRow.rolbypassrls]] */
-  rolbypassrls: Boolean,
-  /** Points to [[PgDbRoleSettingRow.setconfig]] */
+  rolname: Option[String],
+  rolsuper: Option[Boolean],
+  rolinherit: Option[Boolean],
+  rolcreaterole: Option[Boolean],
+  rolcreatedb: Option[Boolean],
+  rolcanlogin: Option[Boolean],
+  rolreplication: Option[Boolean],
+  rolconnlimit: Option[Int],
+  rolpassword: Option[String],
+  rolvaliduntil: Option[ZonedDateTime],
+  rolbypassrls: Option[Boolean],
   rolconfig: Option[Array[String]],
-  /** Points to [[PgAuthidRow.oid]] */
-  oid: Long
+  oid: Option[Long]
 )
 
 object PgRolesRow {
   implicit val rowParser: RowParser[PgRolesRow] = { row =>
     Success(
       PgRolesRow(
-        rolname = row[String]("rolname"),
-        rolsuper = row[Boolean]("rolsuper"),
-        rolinherit = row[Boolean]("rolinherit"),
-        rolcreaterole = row[Boolean]("rolcreaterole"),
-        rolcreatedb = row[Boolean]("rolcreatedb"),
-        rolcanlogin = row[Boolean]("rolcanlogin"),
-        rolreplication = row[Boolean]("rolreplication"),
-        rolconnlimit = row[Int]("rolconnlimit"),
-        rolpassword = row[/* unknown nullability */ Option[String]]("rolpassword"),
-        rolvaliduntil = row[Option[LocalDateTime]]("rolvaliduntil"),
-        rolbypassrls = row[Boolean]("rolbypassrls"),
+        rolname = row[Option[String]]("rolname"),
+        rolsuper = row[Option[Boolean]]("rolsuper"),
+        rolinherit = row[Option[Boolean]]("rolinherit"),
+        rolcreaterole = row[Option[Boolean]]("rolcreaterole"),
+        rolcreatedb = row[Option[Boolean]]("rolcreatedb"),
+        rolcanlogin = row[Option[Boolean]]("rolcanlogin"),
+        rolreplication = row[Option[Boolean]]("rolreplication"),
+        rolconnlimit = row[Option[Int]]("rolconnlimit"),
+        rolpassword = row[Option[String]]("rolpassword"),
+        rolvaliduntil = row[Option[ZonedDateTime]]("rolvaliduntil"),
+        rolbypassrls = row[Option[Boolean]]("rolbypassrls"),
         rolconfig = row[Option[Array[String]]]("rolconfig"),
-        oid = row[Long]("oid")
+        oid = row[Option[Long]]("oid")
       )
     )
   }
@@ -88,19 +76,19 @@ object PgRolesRow {
       JsResult.fromTry(
         Try(
           PgRolesRow(
-            rolname = json.\("rolname").as[String],
-            rolsuper = json.\("rolsuper").as[Boolean],
-            rolinherit = json.\("rolinherit").as[Boolean],
-            rolcreaterole = json.\("rolcreaterole").as[Boolean],
-            rolcreatedb = json.\("rolcreatedb").as[Boolean],
-            rolcanlogin = json.\("rolcanlogin").as[Boolean],
-            rolreplication = json.\("rolreplication").as[Boolean],
-            rolconnlimit = json.\("rolconnlimit").as[Int],
+            rolname = json.\("rolname").toOption.map(_.as[String]),
+            rolsuper = json.\("rolsuper").toOption.map(_.as[Boolean]),
+            rolinherit = json.\("rolinherit").toOption.map(_.as[Boolean]),
+            rolcreaterole = json.\("rolcreaterole").toOption.map(_.as[Boolean]),
+            rolcreatedb = json.\("rolcreatedb").toOption.map(_.as[Boolean]),
+            rolcanlogin = json.\("rolcanlogin").toOption.map(_.as[Boolean]),
+            rolreplication = json.\("rolreplication").toOption.map(_.as[Boolean]),
+            rolconnlimit = json.\("rolconnlimit").toOption.map(_.as[Int]),
             rolpassword = json.\("rolpassword").toOption.map(_.as[String]),
-            rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[LocalDateTime]),
-            rolbypassrls = json.\("rolbypassrls").as[Boolean],
+            rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[ZonedDateTime]),
+            rolbypassrls = json.\("rolbypassrls").toOption.map(_.as[Boolean]),
             rolconfig = json.\("rolconfig").toOption.map(_.as[Array[String]]),
-            oid = json.\("oid").as[Long]
+            oid = json.\("oid").toOption.map(_.as[Long])
           )
         )
       )

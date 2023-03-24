@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,23 +18,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgShadowRow(
-  /** Points to [[PgAuthidRow.rolname]] */
-  usename: String,
-  /** Points to [[PgAuthidRow.oid]] */
-  usesysid: Long,
-  /** Points to [[PgAuthidRow.rolcreatedb]] */
-  usecreatedb: Boolean,
-  /** Points to [[PgAuthidRow.rolsuper]] */
-  usesuper: Boolean,
-  /** Points to [[PgAuthidRow.rolreplication]] */
-  userepl: Boolean,
-  /** Points to [[PgAuthidRow.rolbypassrls]] */
-  usebypassrls: Boolean,
-  /** Points to [[PgAuthidRow.rolpassword]] */
+  usename: Option[String],
+  usesysid: Option[Long],
+  usecreatedb: Option[Boolean],
+  usesuper: Option[Boolean],
+  userepl: Option[Boolean],
+  usebypassrls: Option[Boolean],
   passwd: Option[String],
-  /** Points to [[PgAuthidRow.rolvaliduntil]] */
-  valuntil: Option[LocalDateTime],
-  /** Points to [[PgDbRoleSettingRow.setconfig]] */
+  valuntil: Option[ZonedDateTime],
   useconfig: Option[Array[String]]
 )
 
@@ -42,14 +33,14 @@ object PgShadowRow {
   implicit val rowParser: RowParser[PgShadowRow] = { row =>
     Success(
       PgShadowRow(
-        usename = row[String]("usename"),
-        usesysid = row[Long]("usesysid"),
-        usecreatedb = row[Boolean]("usecreatedb"),
-        usesuper = row[Boolean]("usesuper"),
-        userepl = row[Boolean]("userepl"),
-        usebypassrls = row[Boolean]("usebypassrls"),
+        usename = row[Option[String]]("usename"),
+        usesysid = row[Option[Long]]("usesysid"),
+        usecreatedb = row[Option[Boolean]]("usecreatedb"),
+        usesuper = row[Option[Boolean]]("usesuper"),
+        userepl = row[Option[Boolean]]("userepl"),
+        usebypassrls = row[Option[Boolean]]("usebypassrls"),
         passwd = row[Option[String]]("passwd"),
-        valuntil = row[Option[LocalDateTime]]("valuntil"),
+        valuntil = row[Option[ZonedDateTime]]("valuntil"),
         useconfig = row[Option[Array[String]]]("useconfig")
       )
     )
@@ -73,14 +64,14 @@ object PgShadowRow {
       JsResult.fromTry(
         Try(
           PgShadowRow(
-            usename = json.\("usename").as[String],
-            usesysid = json.\("usesysid").as[Long],
-            usecreatedb = json.\("usecreatedb").as[Boolean],
-            usesuper = json.\("usesuper").as[Boolean],
-            userepl = json.\("userepl").as[Boolean],
-            usebypassrls = json.\("usebypassrls").as[Boolean],
+            usename = json.\("usename").toOption.map(_.as[String]),
+            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usecreatedb = json.\("usecreatedb").toOption.map(_.as[Boolean]),
+            usesuper = json.\("usesuper").toOption.map(_.as[Boolean]),
+            userepl = json.\("userepl").toOption.map(_.as[Boolean]),
+            usebypassrls = json.\("usebypassrls").toOption.map(_.as[Boolean]),
             passwd = json.\("passwd").toOption.map(_.as[String]),
-            valuntil = json.\("valuntil").toOption.map(_.as[LocalDateTime]),
+            valuntil = json.\("valuntil").toOption.map(_.as[ZonedDateTime]),
             useconfig = json.\("useconfig").toOption.map(_.as[Array[String]])
           )
         )

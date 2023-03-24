@@ -17,32 +17,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class RoutinePrivilegesRow(
-  grantor: /* unknown nullability */ Option[String],
-  grantee: /* unknown nullability */ Option[String],
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String],
-  routineCatalog: /* unknown nullability */ Option[String],
-  routineSchema: /* unknown nullability */ Option[String],
-  routineName: /* unknown nullability */ Option[String],
-  privilegeType: /* unknown nullability */ Option[String],
-  isGrantable: /* unknown nullability */ Option[String]
+  grantor: Option[String],
+  grantee: Option[String],
+  specificCatalog: Option[String],
+  specificSchema: Option[String],
+  specificName: Option[String],
+  routineCatalog: Option[String],
+  routineSchema: Option[String],
+  routineName: Option[String],
+  privilegeType: Option[String],
+  isGrantable: Option[String]
 )
 
 object RoutinePrivilegesRow {
   implicit val rowParser: RowParser[RoutinePrivilegesRow] = { row =>
     Success(
       RoutinePrivilegesRow(
-        grantor = row[/* unknown nullability */ Option[String]]("grantor"),
-        grantee = row[/* unknown nullability */ Option[String]]("grantee"),
-        specificCatalog = row[/* unknown nullability */ Option[String]]("specific_catalog"),
-        specificSchema = row[/* unknown nullability */ Option[String]]("specific_schema"),
-        specificName = row[/* unknown nullability */ Option[String]]("specific_name"),
-        routineCatalog = row[/* unknown nullability */ Option[String]]("routine_catalog"),
-        routineSchema = row[/* unknown nullability */ Option[String]]("routine_schema"),
-        routineName = row[/* unknown nullability */ Option[String]]("routine_name"),
-        privilegeType = row[/* unknown nullability */ Option[String]]("privilege_type"),
-        isGrantable = row[/* unknown nullability */ Option[String]]("is_grantable")
+        grantor = row[Option[String]]("grantor"),
+        grantee = row[Option[String]]("grantee"),
+        specificCatalog = row[Option[String]]("specific_catalog"),
+        specificSchema = row[Option[String]]("specific_schema"),
+        specificName = row[Option[String]]("specific_name"),
+        routineCatalog = row[Option[String]]("routine_catalog"),
+        routineSchema = row[Option[String]]("routine_schema"),
+        routineName = row[Option[String]]("routine_name"),
+        privilegeType = row[Option[String]]("privilege_type"),
+        isGrantable = row[Option[String]]("is_grantable")
       )
     )
   }

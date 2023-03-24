@@ -19,20 +19,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgGroupRow(
-  /** Points to [[PgAuthidRow.rolname]] */
-  groname: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"groname","columnName":"groname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.oid]] */
-  grosysid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"grosysid","columnName":"grosysid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_authid"} */,
-  grolist: /* unknown nullability */ Option[Array[Long]] /* {"columnClassName":"java.sql.Array","columnDisplaySize":10,"columnLabel":"grolist","columnName":"grolist","columnType":"Array","columnTypeName":"_oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0} */
+  groname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_group","column_name":"groname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  grosysid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_group","column_name":"grosysid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  grolist: Option[Array[Long]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_group","column_name":"grolist","ordinal_position":3,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgGroupRow {
   implicit val rowParser: RowParser[PgGroupRow] = { row =>
     Success(
       PgGroupRow(
-        groname = row[String]("groname"),
-        grosysid = row[Long]("grosysid"),
-        grolist = row[/* unknown nullability */ Option[Array[Long]]]("grolist")
+        groname = row[Option[String]]("groname"),
+        grosysid = row[Option[Long]]("grosysid"),
+        grolist = row[Option[Array[Long]]]("grolist")
       )
     )
   }
@@ -49,8 +47,8 @@ object PgGroupRow {
       JsResult.fromTry(
         Try(
           PgGroupRow(
-            groname = json.\("groname").as[String],
-            grosysid = json.\("grosysid").as[Long],
+            groname = json.\("groname").toOption.map(_.as[String]),
+            grosysid = json.\("grosysid").toOption.map(_.as[Long]),
             grolist = json.\("grolist").toOption.map(_.as[Array[Long]])
           )
         )

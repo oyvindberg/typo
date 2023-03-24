@@ -17,32 +17,28 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.PgForeignDataWrapperRow
 
 case class PgForeignDataWrappersRow(
-  /** Points to [[PgForeignDataWrapperRow.oid]] */
-  oid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"oid","columnName":"oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
-  /** Points to [[PgForeignDataWrapperRow.fdwowner]] */
-  fdwowner: Long /* {"baseColumnName":"fdwowner","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"fdwowner","columnName":"fdwowner","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
-  /** Points to [[PgForeignDataWrapperRow.fdwoptions]] */
-  fdwoptions: Option[Array[String]] /* {"baseColumnName":"fdwoptions","baseRelationName":"pg_catalog.pg_foreign_data_wrapper","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"fdwoptions","columnName":"fdwoptions","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_foreign_data_wrapper"} */,
-  foreignDataWrapperCatalog: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_catalog","columnName":"foreign_data_wrapper_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  foreignDataWrapperName: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_name","columnName":"foreign_data_wrapper_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  authorizationIdentifier: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"authorization_identifier","columnName":"authorization_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  foreignDataWrapperLanguage: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"foreign_data_wrapper_language","columnName":"foreign_data_wrapper_language","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  fdwowner: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"fdwowner","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  fdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"fdwoptions","ordinal_position":3,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  foreignDataWrapperCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"foreign_data_wrapper_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  foreignDataWrapperName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"foreign_data_wrapper_name","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  authorizationIdentifier: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"authorization_identifier","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  foreignDataWrapperLanguage: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"foreign_data_wrapper_language","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgForeignDataWrappersRow {
   implicit val rowParser: RowParser[PgForeignDataWrappersRow] = { row =>
     Success(
       PgForeignDataWrappersRow(
-        oid = row[Long]("oid"),
-        fdwowner = row[Long]("fdwowner"),
+        oid = row[Option[Long]]("oid"),
+        fdwowner = row[Option[Long]]("fdwowner"),
         fdwoptions = row[Option[Array[String]]]("fdwoptions"),
-        foreignDataWrapperCatalog = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_name"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier"),
-        foreignDataWrapperLanguage = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_language")
+        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
+        foreignDataWrapperLanguage = row[Option[String]]("foreign_data_wrapper_language")
       )
     )
   }
@@ -63,8 +59,8 @@ object PgForeignDataWrappersRow {
       JsResult.fromTry(
         Try(
           PgForeignDataWrappersRow(
-            oid = json.\("oid").as[Long],
-            fdwowner = json.\("fdwowner").as[Long],
+            oid = json.\("oid").toOption.map(_.as[Long]),
+            fdwowner = json.\("fdwowner").toOption.map(_.as[Long]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
             foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
             foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),

@@ -17,12 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignDataWrapperOptionsRow(
-  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
-  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  optionName: Option[String],
+  optionValue: Option[String]
 )
 
 object ForeignDataWrapperOptionsRow {
@@ -31,8 +29,8 @@ object ForeignDataWrapperOptionsRow {
       ForeignDataWrapperOptionsRow(
         foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
         foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
-        optionName = row[/* unknown nullability */ Option[String]]("option_name"),
-        optionValue = row[/* unknown nullability */ Option[String]]("option_value")
+        optionName = row[Option[String]]("option_name"),
+        optionValue = row[Option[String]]("option_value")
       )
     )
   }

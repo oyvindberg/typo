@@ -17,19 +17,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class RoleUdtGrantsRow(
-  /** Points to [[UdtPrivilegesRow.grantor]] */
   grantor: Option[String],
-  /** Points to [[UdtPrivilegesRow.grantee]] */
   grantee: Option[String],
-  /** Points to [[UdtPrivilegesRow.udtCatalog]] */
   udtCatalog: Option[String],
-  /** Points to [[UdtPrivilegesRow.udtSchema]] */
   udtSchema: Option[String],
-  /** Points to [[UdtPrivilegesRow.udtName]] */
   udtName: Option[String],
-  /** Points to [[UdtPrivilegesRow.privilegeType]] */
   privilegeType: Option[String],
-  /** Points to [[UdtPrivilegesRow.isGrantable]] */
   isGrantable: Option[String]
 )
 

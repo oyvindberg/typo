@@ -17,33 +17,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatProgressCopyRow(
-  pid: /* unknown nullability */ Option[Int],
-  datid: /* unknown nullability */ Option[Long],
-  /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  relid: /* unknown nullability */ Option[Long],
-  command: /* unknown nullability */ Option[String],
-  `type`: /* unknown nullability */ Option[String],
-  bytesProcessed: /* unknown nullability */ Option[Long],
-  bytesTotal: /* unknown nullability */ Option[Long],
-  tuplesProcessed: /* unknown nullability */ Option[Long],
-  tuplesExcluded: /* unknown nullability */ Option[Long]
+  pid: Option[Int],
+  datid: Option[Long],
+  datname: Option[String],
+  relid: Option[Long],
+  command: Option[String],
+  `type`: Option[String],
+  bytesProcessed: Option[Long],
+  bytesTotal: Option[Long],
+  tuplesProcessed: Option[Long],
+  tuplesExcluded: Option[Long]
 )
 
 object PgStatProgressCopyRow {
   implicit val rowParser: RowParser[PgStatProgressCopyRow] = { row =>
     Success(
       PgStatProgressCopyRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        datid = row[/* unknown nullability */ Option[Long]]("datid"),
-        datname = row[String]("datname"),
-        relid = row[/* unknown nullability */ Option[Long]]("relid"),
-        command = row[/* unknown nullability */ Option[String]]("command"),
-        `type` = row[/* unknown nullability */ Option[String]]("type"),
-        bytesProcessed = row[/* unknown nullability */ Option[Long]]("bytes_processed"),
-        bytesTotal = row[/* unknown nullability */ Option[Long]]("bytes_total"),
-        tuplesProcessed = row[/* unknown nullability */ Option[Long]]("tuples_processed"),
-        tuplesExcluded = row[/* unknown nullability */ Option[Long]]("tuples_excluded")
+        pid = row[Option[Int]]("pid"),
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        relid = row[Option[Long]]("relid"),
+        command = row[Option[String]]("command"),
+        `type` = row[Option[String]]("type"),
+        bytesProcessed = row[Option[Long]]("bytes_processed"),
+        bytesTotal = row[Option[Long]]("bytes_total"),
+        tuplesProcessed = row[Option[Long]]("tuples_processed"),
+        tuplesExcluded = row[Option[Long]]("tuples_excluded")
       )
     )
   }
@@ -69,7 +68,7 @@ object PgStatProgressCopyRow {
           PgStatProgressCopyRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
             datid = json.\("datid").toOption.map(_.as[Long]),
-            datname = json.\("datname").as[String],
+            datname = json.\("datname").toOption.map(_.as[String]),
             relid = json.\("relid").toOption.map(_.as[Long]),
             command = json.\("command").toOption.map(_.as[String]),
             `type` = json.\("type").toOption.map(_.as[String]),

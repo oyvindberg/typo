@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ColumnOptionsRow(
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  columnName: /* unknown nullability */ Option[String],
-  optionName: /* unknown nullability */ Option[String],
-  optionValue: /* unknown nullability */ Option[String]
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  columnName: Option[String],
+  optionName: Option[String],
+  optionValue: Option[String]
 )
 
 object ColumnOptionsRow {
   implicit val rowParser: RowParser[ColumnOptionsRow] = { row =>
     Success(
       ColumnOptionsRow(
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        columnName = row[/* unknown nullability */ Option[String]]("column_name"),
-        optionName = row[/* unknown nullability */ Option[String]]("option_name"),
-        optionValue = row[/* unknown nullability */ Option[String]]("option_value")
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        columnName = row[Option[String]]("column_name"),
+        optionName = row[Option[String]]("option_name"),
+        optionValue = row[Option[String]]("option_value")
       )
     )
   }

@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CheckConstraintRoutineUsageRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String]
+  constraintCatalog: Option[String],
+  constraintSchema: Option[String],
+  constraintName: Option[String],
+  specificCatalog: Option[String],
+  specificSchema: Option[String],
+  specificName: Option[String]
 )
 
 object CheckConstraintRoutineUsageRow {
   implicit val rowParser: RowParser[CheckConstraintRoutineUsageRow] = { row =>
     Success(
       CheckConstraintRoutineUsageRow(
-        constraintCatalog = row[/* unknown nullability */ Option[String]]("constraint_catalog"),
-        constraintSchema = row[/* unknown nullability */ Option[String]]("constraint_schema"),
-        constraintName = row[/* unknown nullability */ Option[String]]("constraint_name"),
-        specificCatalog = row[/* unknown nullability */ Option[String]]("specific_catalog"),
-        specificSchema = row[/* unknown nullability */ Option[String]]("specific_schema"),
-        specificName = row[/* unknown nullability */ Option[String]]("specific_name")
+        constraintCatalog = row[Option[String]]("constraint_catalog"),
+        constraintSchema = row[Option[String]]("constraint_schema"),
+        constraintName = row[Option[String]]("constraint_name"),
+        specificCatalog = row[Option[String]]("specific_catalog"),
+        specificSchema = row[Option[String]]("specific_schema"),
+        specificName = row[Option[String]]("specific_name")
       )
     )
   }

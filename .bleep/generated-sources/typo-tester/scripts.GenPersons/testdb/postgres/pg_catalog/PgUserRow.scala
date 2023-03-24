@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,22 +18,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserRow(
-  /** Points to [[PgShadowRow.usename]] */
   usename: Option[String],
-  /** Points to [[PgShadowRow.usesysid]] */
   usesysid: Option[Long],
-  /** Points to [[PgShadowRow.usecreatedb]] */
   usecreatedb: Option[Boolean],
-  /** Points to [[PgShadowRow.usesuper]] */
   usesuper: Option[Boolean],
-  /** Points to [[PgShadowRow.userepl]] */
   userepl: Option[Boolean],
-  /** Points to [[PgShadowRow.usebypassrls]] */
   usebypassrls: Option[Boolean],
-  passwd: /* unknown nullability */ Option[String],
-  /** Points to [[PgShadowRow.valuntil]] */
-  valuntil: Option[LocalDateTime],
-  /** Points to [[PgShadowRow.useconfig]] */
+  passwd: Option[String],
+  valuntil: Option[ZonedDateTime],
   useconfig: Option[Array[String]]
 )
 
@@ -47,8 +39,8 @@ object PgUserRow {
         usesuper = row[Option[Boolean]]("usesuper"),
         userepl = row[Option[Boolean]]("userepl"),
         usebypassrls = row[Option[Boolean]]("usebypassrls"),
-        passwd = row[/* unknown nullability */ Option[String]]("passwd"),
-        valuntil = row[Option[LocalDateTime]]("valuntil"),
+        passwd = row[Option[String]]("passwd"),
+        valuntil = row[Option[ZonedDateTime]]("valuntil"),
         useconfig = row[Option[Array[String]]]("useconfig")
       )
     )
@@ -79,7 +71,7 @@ object PgUserRow {
             userepl = json.\("userepl").toOption.map(_.as[Boolean]),
             usebypassrls = json.\("usebypassrls").toOption.map(_.as[Boolean]),
             passwd = json.\("passwd").toOption.map(_.as[String]),
-            valuntil = json.\("valuntil").toOption.map(_.as[LocalDateTime]),
+            valuntil = json.\("valuntil").toOption.map(_.as[ZonedDateTime]),
             useconfig = json.\("useconfig").toOption.map(_.as[Array[String]])
           )
         )

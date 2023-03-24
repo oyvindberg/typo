@@ -17,27 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatUserFunctionsRow(
-  /** Points to [[PgProcRow.oid]] */
-  funcid: Long,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgProcRow.proname]] */
-  funcname: String,
-  calls: /* unknown nullability */ Option[Long],
-  totalTime: /* unknown nullability */ Option[Double],
-  selfTime: /* unknown nullability */ Option[Double]
+  funcid: Option[Long],
+  schemaname: Option[String],
+  funcname: Option[String],
+  calls: Option[Long],
+  totalTime: Option[Double],
+  selfTime: Option[Double]
 )
 
 object PgStatUserFunctionsRow {
   implicit val rowParser: RowParser[PgStatUserFunctionsRow] = { row =>
     Success(
       PgStatUserFunctionsRow(
-        funcid = row[Long]("funcid"),
-        schemaname = row[String]("schemaname"),
-        funcname = row[String]("funcname"),
-        calls = row[/* unknown nullability */ Option[Long]]("calls"),
-        totalTime = row[/* unknown nullability */ Option[Double]]("total_time"),
-        selfTime = row[/* unknown nullability */ Option[Double]]("self_time")
+        funcid = row[Option[Long]]("funcid"),
+        schemaname = row[Option[String]]("schemaname"),
+        funcname = row[Option[String]]("funcname"),
+        calls = row[Option[Long]]("calls"),
+        totalTime = row[Option[Double]]("total_time"),
+        selfTime = row[Option[Double]]("self_time")
       )
     )
   }
@@ -57,9 +54,9 @@ object PgStatUserFunctionsRow {
       JsResult.fromTry(
         Try(
           PgStatUserFunctionsRow(
-            funcid = json.\("funcid").as[Long],
-            schemaname = json.\("schemaname").as[String],
-            funcname = json.\("funcname").as[String],
+            funcid = json.\("funcid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            funcname = json.\("funcname").toOption.map(_.as[String]),
             calls = json.\("calls").toOption.map(_.as[Long]),
             totalTime = json.\("total_time").toOption.map(_.as[Double]),
             selfTime = json.\("self_time").toOption.map(_.as[Double])

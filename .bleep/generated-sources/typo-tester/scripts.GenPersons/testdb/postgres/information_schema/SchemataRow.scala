@@ -17,26 +17,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SchemataRow(
-  catalogName: /* unknown nullability */ Option[String],
-  schemaName: /* unknown nullability */ Option[String],
-  schemaOwner: /* unknown nullability */ Option[String],
-  defaultCharacterSetCatalog: /* unknown nullability */ Option[String],
-  defaultCharacterSetSchema: /* unknown nullability */ Option[String],
-  defaultCharacterSetName: /* unknown nullability */ Option[String],
-  sqlPath: /* unknown nullability */ Option[String]
+  catalogName: Option[String],
+  schemaName: Option[String],
+  schemaOwner: Option[String],
+  defaultCharacterSetCatalog: Option[String],
+  defaultCharacterSetSchema: Option[String],
+  defaultCharacterSetName: Option[String],
+  sqlPath: Option[String]
 )
 
 object SchemataRow {
   implicit val rowParser: RowParser[SchemataRow] = { row =>
     Success(
       SchemataRow(
-        catalogName = row[/* unknown nullability */ Option[String]]("catalog_name"),
-        schemaName = row[/* unknown nullability */ Option[String]]("schema_name"),
-        schemaOwner = row[/* unknown nullability */ Option[String]]("schema_owner"),
-        defaultCharacterSetCatalog = row[/* unknown nullability */ Option[String]]("default_character_set_catalog"),
-        defaultCharacterSetSchema = row[/* unknown nullability */ Option[String]]("default_character_set_schema"),
-        defaultCharacterSetName = row[/* unknown nullability */ Option[String]]("default_character_set_name"),
-        sqlPath = row[/* unknown nullability */ Option[String]]("sql_path")
+        catalogName = row[Option[String]]("catalog_name"),
+        schemaName = row[Option[String]]("schema_name"),
+        schemaOwner = row[Option[String]]("schema_owner"),
+        defaultCharacterSetCatalog = row[Option[String]]("default_character_set_catalog"),
+        defaultCharacterSetSchema = row[Option[String]]("default_character_set_schema"),
+        defaultCharacterSetName = row[Option[String]]("default_character_set_name"),
+        sqlPath = row[Option[String]]("sql_path")
       )
     )
   }

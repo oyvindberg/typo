@@ -20,42 +20,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSequencesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String /* {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"schemaname","columnName":"schemaname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */,
-  /** Points to [[PgClassRow.relname]] */
-  sequencename: String /* {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequencename","columnName":"sequencename","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */,
-  sequenceowner: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"sequenceowner","columnName":"sequenceowner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  dataType: /* unknown nullability */ Option[/* regtype */ PGobject] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"data_type","columnName":"data_type","columnType":"Other","columnTypeName":"regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  /** Points to [[PgSequenceRow.seqstart]] */
-  startValue: Long /* {"baseColumnName":"seqstart","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"start_value","columnName":"start_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
-  /** Points to [[PgSequenceRow.seqmin]] */
-  minValue: Long /* {"baseColumnName":"seqmin","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"min_value","columnName":"min_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
-  /** Points to [[PgSequenceRow.seqmax]] */
-  maxValue: Long /* {"baseColumnName":"seqmax","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"max_value","columnName":"max_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
-  /** Points to [[PgSequenceRow.seqincrement]] */
-  incrementBy: Long /* {"baseColumnName":"seqincrement","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"increment_by","columnName":"increment_by","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
-  /** Points to [[PgSequenceRow.seqcycle]] */
-  cycle: Boolean /* {"baseColumnName":"seqcycle","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"cycle","columnName":"cycle","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_sequence"} */,
-  /** Points to [[PgSequenceRow.seqcache]] */
-  cacheSize: Long /* {"baseColumnName":"seqcache","baseRelationName":"pg_catalog.pg_sequence","columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"cache_size","columnName":"cache_size","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0,"tableName":"pg_sequence"} */,
-  lastValue: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"last_value","columnName":"last_value","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
+  schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"schemaname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  sequencename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"sequencename","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  sequenceowner: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"sequenceowner","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  dataType: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"data_type","ordinal_position":4,"is_nullable":"YES","data_type":"regtype","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regtype","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  startValue: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"start_value","ordinal_position":5,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  minValue: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"min_value","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  maxValue: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"max_value","ordinal_position":7,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  incrementBy: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"increment_by","ordinal_position":8,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  cycle: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"cycle","ordinal_position":9,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  cacheSize: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"cache_size","ordinal_position":10,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastValue: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequences","column_name":"last_value","ordinal_position":11,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgSequencesRow {
   implicit val rowParser: RowParser[PgSequencesRow] = { row =>
     Success(
       PgSequencesRow(
-        schemaname = row[String]("schemaname"),
-        sequencename = row[String]("sequencename"),
-        sequenceowner = row[/* unknown nullability */ Option[String]]("sequenceowner"),
-        dataType = row[/* unknown nullability */ Option[/* regtype */ PGobject]]("data_type"),
-        startValue = row[Long]("start_value"),
-        minValue = row[Long]("min_value"),
-        maxValue = row[Long]("max_value"),
-        incrementBy = row[Long]("increment_by"),
-        cycle = row[Boolean]("cycle"),
-        cacheSize = row[Long]("cache_size"),
-        lastValue = row[/* unknown nullability */ Option[Long]]("last_value")
+        schemaname = row[Option[String]]("schemaname"),
+        sequencename = row[Option[String]]("sequencename"),
+        sequenceowner = row[Option[String]]("sequenceowner"),
+        dataType = row[Option[PGobject]]("data_type"),
+        startValue = row[Option[Long]]("start_value"),
+        minValue = row[Option[Long]]("min_value"),
+        maxValue = row[Option[Long]]("max_value"),
+        incrementBy = row[Option[Long]]("increment_by"),
+        cycle = row[Option[Boolean]]("cycle"),
+        cacheSize = row[Option[Long]]("cache_size"),
+        lastValue = row[Option[Long]]("last_value")
       )
     )
   }
@@ -80,16 +72,16 @@ object PgSequencesRow {
       JsResult.fromTry(
         Try(
           PgSequencesRow(
-            schemaname = json.\("schemaname").as[String],
-            sequencename = json.\("sequencename").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            sequencename = json.\("sequencename").toOption.map(_.as[String]),
             sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
-            dataType = json.\("data_type").toOption.map(_.as[/* regtype */ PGobject]),
-            startValue = json.\("start_value").as[Long],
-            minValue = json.\("min_value").as[Long],
-            maxValue = json.\("max_value").as[Long],
-            incrementBy = json.\("increment_by").as[Long],
-            cycle = json.\("cycle").as[Boolean],
-            cacheSize = json.\("cache_size").as[Long],
+            dataType = json.\("data_type").toOption.map(_.as[PGobject]),
+            startValue = json.\("start_value").toOption.map(_.as[Long]),
+            minValue = json.\("min_value").toOption.map(_.as[Long]),
+            maxValue = json.\("max_value").toOption.map(_.as[Long]),
+            incrementBy = json.\("increment_by").toOption.map(_.as[Long]),
+            cycle = json.\("cycle").toOption.map(_.as[Boolean]),
+            cacheSize = json.\("cache_size").toOption.map(_.as[Long]),
             lastValue = json.\("last_value").toOption.map(_.as[Long])
           )
         )

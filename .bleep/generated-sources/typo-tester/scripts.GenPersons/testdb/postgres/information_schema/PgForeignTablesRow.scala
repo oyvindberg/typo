@@ -15,30 +15,28 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.postgres.pg_catalog.PgForeignTableRow
 
 case class PgForeignTablesRow(
-  foreignTableCatalog: /* unknown nullability */ Option[String],
-  foreignTableSchema: /* unknown nullability */ Option[String],
-  foreignTableName: /* unknown nullability */ Option[String],
-  /** Points to [[PgForeignTableRow.ftoptions]] */
+  foreignTableCatalog: Option[String],
+  foreignTableSchema: Option[String],
+  foreignTableName: Option[String],
   ftoptions: Option[Array[String]],
-  foreignServerCatalog: /* unknown nullability */ Option[String],
-  foreignServerName: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String]
+  foreignServerCatalog: Option[String],
+  foreignServerName: Option[String],
+  authorizationIdentifier: Option[String]
 )
 
 object PgForeignTablesRow {
   implicit val rowParser: RowParser[PgForeignTablesRow] = { row =>
     Success(
       PgForeignTablesRow(
-        foreignTableCatalog = row[/* unknown nullability */ Option[String]]("foreign_table_catalog"),
-        foreignTableSchema = row[/* unknown nullability */ Option[String]]("foreign_table_schema"),
-        foreignTableName = row[/* unknown nullability */ Option[String]]("foreign_table_name"),
+        foreignTableCatalog = row[Option[String]]("foreign_table_catalog"),
+        foreignTableSchema = row[Option[String]]("foreign_table_schema"),
+        foreignTableName = row[Option[String]]("foreign_table_name"),
         ftoptions = row[Option[Array[String]]]("ftoptions"),
-        foreignServerCatalog = row[/* unknown nullability */ Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[/* unknown nullability */ Option[String]]("foreign_server_name"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier")
+        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
+        foreignServerName = row[Option[String]]("foreign_server_name"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier")
       )
     )
   }

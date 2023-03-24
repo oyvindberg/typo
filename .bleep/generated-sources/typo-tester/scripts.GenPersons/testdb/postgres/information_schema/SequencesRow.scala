@@ -17,36 +17,36 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SequencesRow(
-  sequenceCatalog: /* unknown nullability */ Option[String],
-  sequenceSchema: /* unknown nullability */ Option[String],
-  sequenceName: /* unknown nullability */ Option[String],
-  dataType: /* unknown nullability */ Option[String],
-  numericPrecision: /* unknown nullability */ Option[Int],
-  numericPrecisionRadix: /* unknown nullability */ Option[Int],
-  numericScale: /* unknown nullability */ Option[Int],
-  startValue: /* unknown nullability */ Option[String],
-  minimumValue: /* unknown nullability */ Option[String],
-  maximumValue: /* unknown nullability */ Option[String],
-  increment: /* unknown nullability */ Option[String],
-  cycleOption: /* unknown nullability */ Option[String]
+  sequenceCatalog: Option[String],
+  sequenceSchema: Option[String],
+  sequenceName: Option[String],
+  dataType: Option[String],
+  numericPrecision: Option[Int],
+  numericPrecisionRadix: Option[Int],
+  numericScale: Option[Int],
+  startValue: Option[String],
+  minimumValue: Option[String],
+  maximumValue: Option[String],
+  increment: Option[String],
+  cycleOption: Option[String]
 )
 
 object SequencesRow {
   implicit val rowParser: RowParser[SequencesRow] = { row =>
     Success(
       SequencesRow(
-        sequenceCatalog = row[/* unknown nullability */ Option[String]]("sequence_catalog"),
-        sequenceSchema = row[/* unknown nullability */ Option[String]]("sequence_schema"),
-        sequenceName = row[/* unknown nullability */ Option[String]]("sequence_name"),
-        dataType = row[/* unknown nullability */ Option[String]]("data_type"),
-        numericPrecision = row[/* unknown nullability */ Option[Int]]("numeric_precision"),
-        numericPrecisionRadix = row[/* unknown nullability */ Option[Int]]("numeric_precision_radix"),
-        numericScale = row[/* unknown nullability */ Option[Int]]("numeric_scale"),
-        startValue = row[/* unknown nullability */ Option[String]]("start_value"),
-        minimumValue = row[/* unknown nullability */ Option[String]]("minimum_value"),
-        maximumValue = row[/* unknown nullability */ Option[String]]("maximum_value"),
-        increment = row[/* unknown nullability */ Option[String]]("increment"),
-        cycleOption = row[/* unknown nullability */ Option[String]]("cycle_option")
+        sequenceCatalog = row[Option[String]]("sequence_catalog"),
+        sequenceSchema = row[Option[String]]("sequence_schema"),
+        sequenceName = row[Option[String]]("sequence_name"),
+        dataType = row[Option[String]]("data_type"),
+        numericPrecision = row[Option[Int]]("numeric_precision"),
+        numericPrecisionRadix = row[Option[Int]]("numeric_precision_radix"),
+        numericScale = row[Option[Int]]("numeric_scale"),
+        startValue = row[Option[String]]("start_value"),
+        minimumValue = row[Option[String]]("minimum_value"),
+        maximumValue = row[Option[String]]("maximum_value"),
+        increment = row[Option[String]]("increment"),
+        cycleOption = row[Option[String]]("cycle_option")
       )
     )
   }

@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,30 +18,30 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSlruRow(
-  name: /* unknown nullability */ Option[String],
-  blksZeroed: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long],
-  blksRead: /* unknown nullability */ Option[Long],
-  blksWritten: /* unknown nullability */ Option[Long],
-  blksExists: /* unknown nullability */ Option[Long],
-  flushes: /* unknown nullability */ Option[Long],
-  truncates: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  name: Option[String],
+  blksZeroed: Option[Long],
+  blksHit: Option[Long],
+  blksRead: Option[Long],
+  blksWritten: Option[Long],
+  blksExists: Option[Long],
+  flushes: Option[Long],
+  truncates: Option[Long],
+  statsReset: Option[ZonedDateTime]
 )
 
 object PgStatSlruRow {
   implicit val rowParser: RowParser[PgStatSlruRow] = { row =>
     Success(
       PgStatSlruRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        blksZeroed = row[/* unknown nullability */ Option[Long]]("blks_zeroed"),
-        blksHit = row[/* unknown nullability */ Option[Long]]("blks_hit"),
-        blksRead = row[/* unknown nullability */ Option[Long]]("blks_read"),
-        blksWritten = row[/* unknown nullability */ Option[Long]]("blks_written"),
-        blksExists = row[/* unknown nullability */ Option[Long]]("blks_exists"),
-        flushes = row[/* unknown nullability */ Option[Long]]("flushes"),
-        truncates = row[/* unknown nullability */ Option[Long]]("truncates"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        name = row[Option[String]]("name"),
+        blksZeroed = row[Option[Long]]("blks_zeroed"),
+        blksHit = row[Option[Long]]("blks_hit"),
+        blksRead = row[Option[Long]]("blks_read"),
+        blksWritten = row[Option[Long]]("blks_written"),
+        blksExists = row[Option[Long]]("blks_exists"),
+        flushes = row[Option[Long]]("flushes"),
+        truncates = row[Option[Long]]("truncates"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -72,7 +72,7 @@ object PgStatSlruRow {
             blksExists = json.\("blks_exists").toOption.map(_.as[Long]),
             flushes = json.\("flushes").toOption.map(_.as[Long]),
             truncates = json.\("truncates").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

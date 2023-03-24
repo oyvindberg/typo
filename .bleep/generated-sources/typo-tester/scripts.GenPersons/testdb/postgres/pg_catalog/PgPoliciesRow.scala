@@ -17,31 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPoliciesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  /** Points to [[PgPolicyRow.polname]] */
-  policyname: String,
-  permissive: /* unknown nullability */ Option[String],
-  roles: /* unknown nullability */ Option[Array[String]],
-  cmd: /* unknown nullability */ Option[String],
-  qual: /* unknown nullability */ Option[String],
-  withCheck: /* unknown nullability */ Option[String]
+  schemaname: Option[String],
+  tablename: Option[String],
+  policyname: Option[String],
+  permissive: Option[String],
+  roles: Option[Array[String]],
+  cmd: Option[String],
+  qual: Option[String],
+  withCheck: Option[String]
 )
 
 object PgPoliciesRow {
   implicit val rowParser: RowParser[PgPoliciesRow] = { row =>
     Success(
       PgPoliciesRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        policyname = row[String]("policyname"),
-        permissive = row[/* unknown nullability */ Option[String]]("permissive"),
-        roles = row[/* unknown nullability */ Option[Array[String]]]("roles"),
-        cmd = row[/* unknown nullability */ Option[String]]("cmd"),
-        qual = row[/* unknown nullability */ Option[String]]("qual"),
-        withCheck = row[/* unknown nullability */ Option[String]]("with_check")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        policyname = row[Option[String]]("policyname"),
+        permissive = row[Option[String]]("permissive"),
+        roles = row[Option[Array[String]]]("roles"),
+        cmd = row[Option[String]]("cmd"),
+        qual = row[Option[String]]("qual"),
+        withCheck = row[Option[String]]("with_check")
       )
     )
   }
@@ -63,9 +60,9 @@ object PgPoliciesRow {
       JsResult.fromTry(
         Try(
           PgPoliciesRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            policyname = json.\("policyname").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            policyname = json.\("policyname").toOption.map(_.as[String]),
             permissive = json.\("permissive").toOption.map(_.as[String]),
             roles = json.\("roles").toOption.map(_.as[Array[String]]),
             cmd = json.\("cmd").toOption.map(_.as[String]),

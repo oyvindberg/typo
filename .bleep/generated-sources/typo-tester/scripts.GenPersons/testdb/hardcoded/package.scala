@@ -116,14 +116,14 @@ package object hardcoded {
   }
 
   implicit val PGIntervalDb: anorm.ToStatement[org.postgresql.util.PGInterval] with anorm.ParameterMetaData[org.postgresql.util.PGInterval] with anorm.Column[org.postgresql.util.PGInterval] = new anorm.ToStatement[org.postgresql.util.PGInterval] with anorm.ParameterMetaData[org.postgresql.util.PGInterval] with anorm.Column[org.postgresql.util.PGInterval] {
-    override def sqlType: java.lang.String = "money"
+    override def sqlType: java.lang.String = "interval"
     override def jdbcType: scala.Int = java.sql.Types.OTHER
     override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.util.PGInterval): scala.Unit = s.setObject(index, v)
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGInterval] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGInterval])
   }
 
   implicit val PGmoneyDb: anorm.ToStatement[org.postgresql.util.PGmoney] with anorm.ParameterMetaData[org.postgresql.util.PGmoney] with anorm.Column[org.postgresql.util.PGmoney] = new anorm.ToStatement[org.postgresql.util.PGmoney] with anorm.ParameterMetaData[org.postgresql.util.PGmoney] with anorm.Column[org.postgresql.util.PGmoney] {
-    override def sqlType: java.lang.String = "interval"
+    override def sqlType: java.lang.String = "money"
     override def jdbcType: scala.Int = java.sql.Types.OTHER
     override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.util.PGmoney): scala.Unit = s.setObject(index, v)
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGmoney] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGmoney])

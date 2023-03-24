@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ConstraintTableUsageRow(
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String]
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  constraintCatalog: Option[String],
+  constraintSchema: Option[String],
+  constraintName: Option[String]
 )
 
 object ConstraintTableUsageRow {
   implicit val rowParser: RowParser[ConstraintTableUsageRow] = { row =>
     Success(
       ConstraintTableUsageRow(
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        constraintCatalog = row[/* unknown nullability */ Option[String]]("constraint_catalog"),
-        constraintSchema = row[/* unknown nullability */ Option[String]]("constraint_schema"),
-        constraintName = row[/* unknown nullability */ Option[String]]("constraint_name")
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        constraintCatalog = row[Option[String]]("constraint_catalog"),
+        constraintSchema = row[Option[String]]("constraint_schema"),
+        constraintName = row[Option[String]]("constraint_name")
       )
     )
   }

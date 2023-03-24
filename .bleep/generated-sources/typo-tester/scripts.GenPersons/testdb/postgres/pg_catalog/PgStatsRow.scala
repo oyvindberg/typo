@@ -18,47 +18,40 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  /** Points to [[PgAttributeRow.attname]] */
-  attname: String,
-  /** Points to [[PgStatisticRow.stainherit]] */
-  inherited: Boolean,
-  /** Points to [[PgStatisticRow.stanullfrac]] */
-  nullFrac: Float,
-  /** Points to [[PgStatisticRow.stawidth]] */
-  avgWidth: Int,
-  /** Points to [[PgStatisticRow.stadistinct]] */
-  nDistinct: Float,
-  mostCommonVals: /* unknown nullability */ Option[/* anyarray */ PGobject],
-  mostCommonFreqs: /* unknown nullability */ Option[Array[Float]],
-  histogramBounds: /* unknown nullability */ Option[/* anyarray */ PGobject],
-  correlation: /* unknown nullability */ Option[Float],
-  mostCommonElems: /* unknown nullability */ Option[/* anyarray */ PGobject],
-  mostCommonElemFreqs: /* unknown nullability */ Option[Array[Float]],
-  elemCountHistogram: /* unknown nullability */ Option[Array[Float]]
+  schemaname: Option[String],
+  tablename: Option[String],
+  attname: Option[String],
+  inherited: Option[Boolean],
+  nullFrac: Option[Float],
+  avgWidth: Option[Int],
+  nDistinct: Option[Float],
+  mostCommonVals: Option[PGobject],
+  mostCommonFreqs: Option[Array[Float]],
+  histogramBounds: Option[PGobject],
+  correlation: Option[Float],
+  mostCommonElems: Option[PGobject],
+  mostCommonElemFreqs: Option[Array[Float]],
+  elemCountHistogram: Option[Array[Float]]
 )
 
 object PgStatsRow {
   implicit val rowParser: RowParser[PgStatsRow] = { row =>
     Success(
       PgStatsRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        attname = row[String]("attname"),
-        inherited = row[Boolean]("inherited"),
-        nullFrac = row[Float]("null_frac"),
-        avgWidth = row[Int]("avg_width"),
-        nDistinct = row[Float]("n_distinct"),
-        mostCommonVals = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_vals"),
-        mostCommonFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_freqs"),
-        histogramBounds = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("histogram_bounds"),
-        correlation = row[/* unknown nullability */ Option[Float]]("correlation"),
-        mostCommonElems = row[/* unknown nullability */ Option[/* anyarray */ PGobject]]("most_common_elems"),
-        mostCommonElemFreqs = row[/* unknown nullability */ Option[Array[Float]]]("most_common_elem_freqs"),
-        elemCountHistogram = row[/* unknown nullability */ Option[Array[Float]]]("elem_count_histogram")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        attname = row[Option[String]]("attname"),
+        inherited = row[Option[Boolean]]("inherited"),
+        nullFrac = row[Option[Float]]("null_frac"),
+        avgWidth = row[Option[Int]]("avg_width"),
+        nDistinct = row[Option[Float]]("n_distinct"),
+        mostCommonVals = row[Option[PGobject]]("most_common_vals"),
+        mostCommonFreqs = row[Option[Array[Float]]]("most_common_freqs"),
+        histogramBounds = row[Option[PGobject]]("histogram_bounds"),
+        correlation = row[Option[Float]]("correlation"),
+        mostCommonElems = row[Option[PGobject]]("most_common_elems"),
+        mostCommonElemFreqs = row[Option[Array[Float]]]("most_common_elem_freqs"),
+        elemCountHistogram = row[Option[Array[Float]]]("elem_count_histogram")
       )
     )
   }
@@ -86,18 +79,18 @@ object PgStatsRow {
       JsResult.fromTry(
         Try(
           PgStatsRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            attname = json.\("attname").as[String],
-            inherited = json.\("inherited").as[Boolean],
-            nullFrac = json.\("null_frac").as[Float],
-            avgWidth = json.\("avg_width").as[Int],
-            nDistinct = json.\("n_distinct").as[Float],
-            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ PGobject]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            attname = json.\("attname").toOption.map(_.as[String]),
+            inherited = json.\("inherited").toOption.map(_.as[Boolean]),
+            nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
+            avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
+            nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[PGobject]),
             mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
-            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ PGobject]),
+            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[PGobject]),
             correlation = json.\("correlation").toOption.map(_.as[Float]),
-            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ PGobject]),
+            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[PGobject]),
             mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
             elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
           )

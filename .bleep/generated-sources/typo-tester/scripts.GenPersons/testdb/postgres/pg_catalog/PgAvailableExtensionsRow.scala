@@ -17,21 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAvailableExtensionsRow(
-  name: /* unknown nullability */ Option[String],
-  defaultVersion: /* unknown nullability */ Option[String],
-  /** Points to [[PgExtensionRow.extversion]] */
-  installedVersion: String,
-  comment: /* unknown nullability */ Option[String]
+  name: Option[String],
+  defaultVersion: Option[String],
+  installedVersion: Option[String],
+  comment: Option[String]
 )
 
 object PgAvailableExtensionsRow {
   implicit val rowParser: RowParser[PgAvailableExtensionsRow] = { row =>
     Success(
       PgAvailableExtensionsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        defaultVersion = row[/* unknown nullability */ Option[String]]("default_version"),
-        installedVersion = row[String]("installed_version"),
-        comment = row[/* unknown nullability */ Option[String]]("comment")
+        name = row[Option[String]]("name"),
+        defaultVersion = row[Option[String]]("default_version"),
+        installedVersion = row[Option[String]]("installed_version"),
+        comment = row[Option[String]]("comment")
       )
     )
   }
@@ -51,7 +50,7 @@ object PgAvailableExtensionsRow {
           PgAvailableExtensionsRow(
             name = json.\("name").toOption.map(_.as[String]),
             defaultVersion = json.\("default_version").toOption.map(_.as[String]),
-            installedVersion = json.\("installed_version").as[String],
+            installedVersion = json.\("installed_version").toOption.map(_.as[String]),
             comment = json.\("comment").toOption.map(_.as[String])
           )
         )

@@ -20,20 +20,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTimezoneNamesRow(
-  name: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"name","columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  abbrev: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"abbrev","columnName":"abbrev","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval] /* {"columnClassName":"org.postgresql.util.PGInterval","columnDisplaySize":49,"columnLabel":"utc_offset","columnName":"utc_offset","columnType":"Other","columnTypeName":"interval","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":49,"scale":6} */,
-  isDst: /* unknown nullability */ Option[Boolean] /* {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"is_dst","columnName":"is_dst","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
+  name: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_timezone_names","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  abbrev: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_timezone_names","column_name":"abbrev","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  utcOffset: Option[PGInterval] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_timezone_names","column_name":"utc_offset","ordinal_position":3,"is_nullable":"YES","data_type":"interval","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"interval","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  isDst: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_timezone_names","column_name":"is_dst","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgTimezoneNamesRow {
   implicit val rowParser: RowParser[PgTimezoneNamesRow] = { row =>
     Success(
       PgTimezoneNamesRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        abbrev = row[/* unknown nullability */ Option[String]]("abbrev"),
-        utcOffset = row[/* unknown nullability */ Option[/* interval */ PGInterval]]("utc_offset"),
-        isDst = row[/* unknown nullability */ Option[Boolean]]("is_dst")
+        name = row[Option[String]]("name"),
+        abbrev = row[Option[String]]("abbrev"),
+        utcOffset = row[Option[PGInterval]]("utc_offset"),
+        isDst = row[Option[Boolean]]("is_dst")
       )
     )
   }
@@ -53,7 +53,7 @@ object PgTimezoneNamesRow {
           PgTimezoneNamesRow(
             name = json.\("name").toOption.map(_.as[String]),
             abbrev = json.\("abbrev").toOption.map(_.as[String]),
-            utcOffset = json.\("utc_offset").toOption.map(_.as[/* interval */ PGInterval]),
+            utcOffset = json.\("utc_offset").toOption.map(_.as[PGInterval]),
             isDst = json.\("is_dst").toOption.map(_.as[Boolean])
           )
         )

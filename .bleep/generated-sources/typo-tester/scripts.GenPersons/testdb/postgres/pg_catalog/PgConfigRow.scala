@@ -17,16 +17,16 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgConfigRow(
-  name: /* unknown nullability */ Option[String],
-  setting: /* unknown nullability */ Option[String]
+  name: Option[String],
+  setting: Option[String]
 )
 
 object PgConfigRow {
   implicit val rowParser: RowParser[PgConfigRow] = { row =>
     Success(
       PgConfigRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        setting = row[/* unknown nullability */ Option[String]]("setting")
+        name = row[Option[String]]("name"),
+        setting = row[Option[String]]("setting")
       )
     )
   }

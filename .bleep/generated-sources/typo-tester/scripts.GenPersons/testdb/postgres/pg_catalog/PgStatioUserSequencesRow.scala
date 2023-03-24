@@ -17,15 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioUserSequencesRow(
-  /** Points to [[PgStatioAllSequencesRow.relid]] */
   relid: Option[Long],
-  /** Points to [[PgStatioAllSequencesRow.schemaname]] */
   schemaname: Option[String],
-  /** Points to [[PgStatioAllSequencesRow.relname]] */
   relname: Option[String],
-  /** Points to [[PgStatioAllSequencesRow.blksRead]] */
   blksRead: Option[Long],
-  /** Points to [[PgStatioAllSequencesRow.blksHit]] */
   blksHit: Option[Long]
 )
 

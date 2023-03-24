@@ -7,7 +7,7 @@ package testdb
 package postgres
 package pg_catalog
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 sealed abstract class PgUserFieldValue[T](val name: String, val value: T)
 
@@ -18,7 +18,7 @@ object PgUserFieldValue {
   case class usesuper(override val value: Option[Boolean]) extends PgUserFieldValue("usesuper", value)
   case class userepl(override val value: Option[Boolean]) extends PgUserFieldValue("userepl", value)
   case class usebypassrls(override val value: Option[Boolean]) extends PgUserFieldValue("usebypassrls", value)
-  case class passwd(override val value: /* unknown nullability */ Option[String]) extends PgUserFieldValue("passwd", value)
-  case class valuntil(override val value: Option[LocalDateTime]) extends PgUserFieldValue("valuntil", value)
+  case class passwd(override val value: Option[String]) extends PgUserFieldValue("passwd", value)
+  case class valuntil(override val value: Option[ZonedDateTime]) extends PgUserFieldValue("valuntil", value)
   case class useconfig(override val value: Option[Array[String]]) extends PgUserFieldValue("useconfig", value)
 }

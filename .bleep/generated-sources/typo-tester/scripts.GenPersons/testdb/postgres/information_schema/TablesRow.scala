@@ -17,36 +17,36 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class TablesRow(
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String],
-  tableType: /* unknown nullability */ Option[String],
-  selfReferencingColumnName: /* unknown nullability */ Option[String],
-  referenceGeneration: /* unknown nullability */ Option[String],
-  userDefinedTypeCatalog: /* unknown nullability */ Option[String],
-  userDefinedTypeSchema: /* unknown nullability */ Option[String],
-  userDefinedTypeName: /* unknown nullability */ Option[String],
-  isInsertableInto: /* unknown nullability */ Option[String],
-  isTyped: /* unknown nullability */ Option[String],
-  commitAction: /* unknown nullability */ Option[String]
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String],
+  tableType: Option[String],
+  selfReferencingColumnName: Option[String],
+  referenceGeneration: Option[String],
+  userDefinedTypeCatalog: Option[String],
+  userDefinedTypeSchema: Option[String],
+  userDefinedTypeName: Option[String],
+  isInsertableInto: Option[String],
+  isTyped: Option[String],
+  commitAction: Option[String]
 )
 
 object TablesRow {
   implicit val rowParser: RowParser[TablesRow] = { row =>
     Success(
       TablesRow(
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name"),
-        tableType = row[/* unknown nullability */ Option[String]]("table_type"),
-        selfReferencingColumnName = row[/* unknown nullability */ Option[String]]("self_referencing_column_name"),
-        referenceGeneration = row[/* unknown nullability */ Option[String]]("reference_generation"),
-        userDefinedTypeCatalog = row[/* unknown nullability */ Option[String]]("user_defined_type_catalog"),
-        userDefinedTypeSchema = row[/* unknown nullability */ Option[String]]("user_defined_type_schema"),
-        userDefinedTypeName = row[/* unknown nullability */ Option[String]]("user_defined_type_name"),
-        isInsertableInto = row[/* unknown nullability */ Option[String]]("is_insertable_into"),
-        isTyped = row[/* unknown nullability */ Option[String]]("is_typed"),
-        commitAction = row[/* unknown nullability */ Option[String]]("commit_action")
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name"),
+        tableType = row[Option[String]]("table_type"),
+        selfReferencingColumnName = row[Option[String]]("self_referencing_column_name"),
+        referenceGeneration = row[Option[String]]("reference_generation"),
+        userDefinedTypeCatalog = row[Option[String]]("user_defined_type_catalog"),
+        userDefinedTypeSchema = row[Option[String]]("user_defined_type_schema"),
+        userDefinedTypeName = row[Option[String]]("user_defined_type_name"),
+        isInsertableInto = row[Option[String]]("is_insertable_into"),
+        isTyped = row[Option[String]]("is_typed"),
+        commitAction = row[Option[String]]("commit_action")
       )
     )
   }

@@ -17,26 +17,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgIndexesRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  /** Points to [[PgClassRow.relname]] */
-  indexname: String,
-  /** Points to [[PgTablespaceRow.spcname]] */
-  tablespace: String,
-  indexdef: /* unknown nullability */ Option[String]
+  schemaname: Option[String],
+  tablename: Option[String],
+  indexname: Option[String],
+  tablespace: Option[String],
+  indexdef: Option[String]
 )
 
 object PgIndexesRow {
   implicit val rowParser: RowParser[PgIndexesRow] = { row =>
     Success(
       PgIndexesRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        indexname = row[String]("indexname"),
-        tablespace = row[String]("tablespace"),
-        indexdef = row[/* unknown nullability */ Option[String]]("indexdef")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        indexname = row[Option[String]]("indexname"),
+        tablespace = row[Option[String]]("tablespace"),
+        indexdef = row[Option[String]]("indexdef")
       )
     )
   }
@@ -55,10 +51,10 @@ object PgIndexesRow {
       JsResult.fromTry(
         Try(
           PgIndexesRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            indexname = json.\("indexname").as[String],
-            tablespace = json.\("tablespace").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            indexname = json.\("indexname").toOption.map(_.as[String]),
+            tablespace = json.\("tablespace").toOption.map(_.as[String]),
             indexdef = json.\("indexdef").toOption.map(_.as[String])
           )
         )

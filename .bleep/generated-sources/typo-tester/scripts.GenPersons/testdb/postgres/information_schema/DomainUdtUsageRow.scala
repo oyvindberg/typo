@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class DomainUdtUsageRow(
-  udtCatalog: /* unknown nullability */ Option[String],
-  udtSchema: /* unknown nullability */ Option[String],
-  udtName: /* unknown nullability */ Option[String],
-  domainCatalog: /* unknown nullability */ Option[String],
-  domainSchema: /* unknown nullability */ Option[String],
-  domainName: /* unknown nullability */ Option[String]
+  udtCatalog: Option[String],
+  udtSchema: Option[String],
+  udtName: Option[String],
+  domainCatalog: Option[String],
+  domainSchema: Option[String],
+  domainName: Option[String]
 )
 
 object DomainUdtUsageRow {
   implicit val rowParser: RowParser[DomainUdtUsageRow] = { row =>
     Success(
       DomainUdtUsageRow(
-        udtCatalog = row[/* unknown nullability */ Option[String]]("udt_catalog"),
-        udtSchema = row[/* unknown nullability */ Option[String]]("udt_schema"),
-        udtName = row[/* unknown nullability */ Option[String]]("udt_name"),
-        domainCatalog = row[/* unknown nullability */ Option[String]]("domain_catalog"),
-        domainSchema = row[/* unknown nullability */ Option[String]]("domain_schema"),
-        domainName = row[/* unknown nullability */ Option[String]]("domain_name")
+        udtCatalog = row[Option[String]]("udt_catalog"),
+        udtSchema = row[Option[String]]("udt_schema"),
+        udtName = row[Option[String]]("udt_name"),
+        domainCatalog = row[Option[String]]("domain_catalog"),
+        domainSchema = row[Option[String]]("domain_schema"),
+        domainName = row[Option[String]]("domain_name")
       )
     )
   }

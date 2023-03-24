@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,24 +18,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgCursorsRow(
-  name: /* unknown nullability */ Option[String],
-  statement: /* unknown nullability */ Option[String],
-  isHoldable: /* unknown nullability */ Option[Boolean],
-  isBinary: /* unknown nullability */ Option[Boolean],
-  isScrollable: /* unknown nullability */ Option[Boolean],
-  creationTime: /* unknown nullability */ Option[LocalDateTime]
+  name: Option[String],
+  statement: Option[String],
+  isHoldable: Option[Boolean],
+  isBinary: Option[Boolean],
+  isScrollable: Option[Boolean],
+  creationTime: Option[ZonedDateTime]
 )
 
 object PgCursorsRow {
   implicit val rowParser: RowParser[PgCursorsRow] = { row =>
     Success(
       PgCursorsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        statement = row[/* unknown nullability */ Option[String]]("statement"),
-        isHoldable = row[/* unknown nullability */ Option[Boolean]]("is_holdable"),
-        isBinary = row[/* unknown nullability */ Option[Boolean]]("is_binary"),
-        isScrollable = row[/* unknown nullability */ Option[Boolean]]("is_scrollable"),
-        creationTime = row[/* unknown nullability */ Option[LocalDateTime]]("creation_time")
+        name = row[Option[String]]("name"),
+        statement = row[Option[String]]("statement"),
+        isHoldable = row[Option[Boolean]]("is_holdable"),
+        isBinary = row[Option[Boolean]]("is_binary"),
+        isScrollable = row[Option[Boolean]]("is_scrollable"),
+        creationTime = row[Option[ZonedDateTime]]("creation_time")
       )
     )
   }
@@ -60,7 +60,7 @@ object PgCursorsRow {
             isHoldable = json.\("is_holdable").toOption.map(_.as[Boolean]),
             isBinary = json.\("is_binary").toOption.map(_.as[Boolean]),
             isScrollable = json.\("is_scrollable").toOption.map(_.as[Boolean]),
-            creationTime = json.\("creation_time").toOption.map(_.as[LocalDateTime])
+            creationTime = json.\("creation_time").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

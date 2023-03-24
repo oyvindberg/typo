@@ -18,28 +18,28 @@ import scala.math.BigDecimal
 import scala.util.Try
 
 case class PgStatSslRow(
-  pid: /* unknown nullability */ Option[Int],
-  ssl: /* unknown nullability */ Option[Boolean],
-  version: /* unknown nullability */ Option[String],
-  cipher: /* unknown nullability */ Option[String],
-  bits: /* unknown nullability */ Option[Int],
-  clientDn: /* unknown nullability */ Option[String],
-  clientSerial: /* unknown nullability */ Option[BigDecimal],
-  issuerDn: /* unknown nullability */ Option[String]
+  pid: Option[Int],
+  ssl: Option[Boolean],
+  version: Option[String],
+  cipher: Option[String],
+  bits: Option[Int],
+  clientDn: Option[String],
+  clientSerial: Option[BigDecimal],
+  issuerDn: Option[String]
 )
 
 object PgStatSslRow {
   implicit val rowParser: RowParser[PgStatSslRow] = { row =>
     Success(
       PgStatSslRow(
-        pid = row[/* unknown nullability */ Option[Int]]("pid"),
-        ssl = row[/* unknown nullability */ Option[Boolean]]("ssl"),
-        version = row[/* unknown nullability */ Option[String]]("version"),
-        cipher = row[/* unknown nullability */ Option[String]]("cipher"),
-        bits = row[/* unknown nullability */ Option[Int]]("bits"),
-        clientDn = row[/* unknown nullability */ Option[String]]("client_dn"),
-        clientSerial = row[/* unknown nullability */ Option[BigDecimal]]("client_serial"),
-        issuerDn = row[/* unknown nullability */ Option[String]]("issuer_dn")
+        pid = row[Option[Int]]("pid"),
+        ssl = row[Option[Boolean]]("ssl"),
+        version = row[Option[String]]("version"),
+        cipher = row[Option[String]]("cipher"),
+        bits = row[Option[Int]]("bits"),
+        clientDn = row[Option[String]]("client_dn"),
+        clientSerial = row[Option[BigDecimal]]("client_serial"),
+        issuerDn = row[Option[String]]("issuer_dn")
       )
     )
   }

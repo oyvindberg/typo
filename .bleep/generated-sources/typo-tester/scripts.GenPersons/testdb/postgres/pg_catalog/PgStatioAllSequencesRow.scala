@@ -17,25 +17,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioAllSequencesRow(
-  /** Points to [[PgClassRow.oid]] */
-  relid: Long,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  blksRead: /* unknown nullability */ Option[Long],
-  blksHit: /* unknown nullability */ Option[Long]
+  relid: Option[Long],
+  schemaname: Option[String],
+  relname: Option[String],
+  blksRead: Option[Long],
+  blksHit: Option[Long]
 )
 
 object PgStatioAllSequencesRow {
   implicit val rowParser: RowParser[PgStatioAllSequencesRow] = { row =>
     Success(
       PgStatioAllSequencesRow(
-        relid = row[Long]("relid"),
-        schemaname = row[String]("schemaname"),
-        relname = row[String]("relname"),
-        blksRead = row[/* unknown nullability */ Option[Long]]("blks_read"),
-        blksHit = row[/* unknown nullability */ Option[Long]]("blks_hit")
+        relid = row[Option[Long]]("relid"),
+        schemaname = row[Option[String]]("schemaname"),
+        relname = row[Option[String]]("relname"),
+        blksRead = row[Option[Long]]("blks_read"),
+        blksHit = row[Option[Long]]("blks_hit")
       )
     )
   }
@@ -54,9 +51,9 @@ object PgStatioAllSequencesRow {
       JsResult.fromTry(
         Try(
           PgStatioAllSequencesRow(
-            relid = json.\("relid").as[Long],
-            schemaname = json.\("schemaname").as[String],
-            relname = json.\("relname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
             blksRead = json.\("blks_read").toOption.map(_.as[Long]),
             blksHit = json.\("blks_hit").toOption.map(_.as[Long])
           )

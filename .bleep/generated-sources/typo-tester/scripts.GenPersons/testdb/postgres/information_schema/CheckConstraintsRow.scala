@@ -17,20 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CheckConstraintsRow(
-  constraintCatalog: /* unknown nullability */ Option[String],
-  constraintSchema: /* unknown nullability */ Option[String],
-  constraintName: /* unknown nullability */ Option[String],
-  checkClause: /* unknown nullability */ Option[String]
+  constraintCatalog: Option[String],
+  constraintSchema: Option[String],
+  constraintName: Option[String],
+  checkClause: Option[String]
 )
 
 object CheckConstraintsRow {
   implicit val rowParser: RowParser[CheckConstraintsRow] = { row =>
     Success(
       CheckConstraintsRow(
-        constraintCatalog = row[/* unknown nullability */ Option[String]]("constraint_catalog"),
-        constraintSchema = row[/* unknown nullability */ Option[String]]("constraint_schema"),
-        constraintName = row[/* unknown nullability */ Option[String]]("constraint_name"),
-        checkClause = row[/* unknown nullability */ Option[String]]("check_clause")
+        constraintCatalog = row[Option[String]]("constraint_catalog"),
+        constraintSchema = row[Option[String]]("constraint_schema"),
+        constraintName = row[Option[String]]("constraint_name"),
+        checkClause = row[Option[String]]("check_clause")
       )
     )
   }

@@ -17,22 +17,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgViewsRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  viewname: String,
-  viewowner: /* unknown nullability */ Option[String],
-  definition: /* unknown nullability */ Option[String]
+  schemaname: Option[String],
+  viewname: Option[String],
+  viewowner: Option[String],
+  definition: Option[String]
 )
 
 object PgViewsRow {
   implicit val rowParser: RowParser[PgViewsRow] = { row =>
     Success(
       PgViewsRow(
-        schemaname = row[String]("schemaname"),
-        viewname = row[String]("viewname"),
-        viewowner = row[/* unknown nullability */ Option[String]]("viewowner"),
-        definition = row[/* unknown nullability */ Option[String]]("definition")
+        schemaname = row[Option[String]]("schemaname"),
+        viewname = row[Option[String]]("viewname"),
+        viewowner = row[Option[String]]("viewowner"),
+        definition = row[Option[String]]("definition")
       )
     )
   }
@@ -50,8 +48,8 @@ object PgViewsRow {
       JsResult.fromTry(
         Try(
           PgViewsRow(
-            schemaname = json.\("schemaname").as[String],
-            viewname = json.\("viewname").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            viewname = json.\("viewname").toOption.map(_.as[String]),
             viewowner = json.\("viewowner").toOption.map(_.as[String]),
             definition = json.\("definition").toOption.map(_.as[String])
           )

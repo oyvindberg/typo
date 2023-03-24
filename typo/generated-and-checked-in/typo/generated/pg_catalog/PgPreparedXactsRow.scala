@@ -11,7 +11,8 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,24 +21,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPreparedXactsRow(
-  transaction: /* unknown nullability */ Option[/* xid */ String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"transaction","columnName":"transaction","columnType":"Other","columnTypeName":"xid","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  gid: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"gid","columnName":"gid","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  prepared: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"prepared","columnName":"prepared","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */,
-  /** Points to [[PgAuthidRow.rolname]] */
-  owner: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"owner","columnName":"owner","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgDatabaseRow.datname]] */
-  database: String /* {"baseColumnName":"datname","baseRelationName":"pg_catalog.pg_database","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"database","columnName":"database","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_database"} */
+  transaction: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"transaction","ordinal_position":1,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  gid: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"gid","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  prepared: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"prepared","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  owner: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"owner","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  database: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"database","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgPreparedXactsRow {
   implicit val rowParser: RowParser[PgPreparedXactsRow] = { row =>
     Success(
       PgPreparedXactsRow(
-        transaction = row[/* unknown nullability */ Option[/* xid */ String]]("transaction"),
-        gid = row[/* unknown nullability */ Option[String]]("gid"),
-        prepared = row[/* unknown nullability */ Option[LocalDateTime]]("prepared"),
-        owner = row[String]("owner"),
-        database = row[String]("database")
+        transaction = row[Option[PGobject]]("transaction"),
+        gid = row[Option[String]]("gid"),
+        prepared = row[Option[ZonedDateTime]]("prepared"),
+        owner = row[Option[String]]("owner"),
+        database = row[Option[String]]("database")
       )
     )
   }
@@ -56,11 +55,11 @@ object PgPreparedXactsRow {
       JsResult.fromTry(
         Try(
           PgPreparedXactsRow(
-            transaction = json.\("transaction").toOption.map(_.as[/* xid */ String]),
+            transaction = json.\("transaction").toOption.map(_.as[PGobject]),
             gid = json.\("gid").toOption.map(_.as[String]),
-            prepared = json.\("prepared").toOption.map(_.as[LocalDateTime]),
-            owner = json.\("owner").as[String],
-            database = json.\("database").as[String]
+            prepared = json.\("prepared").toOption.map(_.as[ZonedDateTime]),
+            owner = json.\("owner").toOption.map(_.as[String]),
+            database = json.\("database").toOption.map(_.as[String])
           )
         )
       )

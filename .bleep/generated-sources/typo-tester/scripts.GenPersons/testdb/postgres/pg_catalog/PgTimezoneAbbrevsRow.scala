@@ -18,18 +18,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTimezoneAbbrevsRow(
-  abbrev: /* unknown nullability */ Option[String],
-  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval],
-  isDst: /* unknown nullability */ Option[Boolean]
+  abbrev: Option[String],
+  utcOffset: Option[PGInterval],
+  isDst: Option[Boolean]
 )
 
 object PgTimezoneAbbrevsRow {
   implicit val rowParser: RowParser[PgTimezoneAbbrevsRow] = { row =>
     Success(
       PgTimezoneAbbrevsRow(
-        abbrev = row[/* unknown nullability */ Option[String]]("abbrev"),
-        utcOffset = row[/* unknown nullability */ Option[/* interval */ PGInterval]]("utc_offset"),
-        isDst = row[/* unknown nullability */ Option[Boolean]]("is_dst")
+        abbrev = row[Option[String]]("abbrev"),
+        utcOffset = row[Option[PGInterval]]("utc_offset"),
+        isDst = row[Option[Boolean]]("is_dst")
       )
     )
   }
@@ -47,7 +47,7 @@ object PgTimezoneAbbrevsRow {
         Try(
           PgTimezoneAbbrevsRow(
             abbrev = json.\("abbrev").toOption.map(_.as[String]),
-            utcOffset = json.\("utc_offset").toOption.map(_.as[/* interval */ PGInterval]),
+            utcOffset = json.\("utc_offset").toOption.map(_.as[PGInterval]),
             isDst = json.\("is_dst").toOption.map(_.as[Boolean])
           )
         )

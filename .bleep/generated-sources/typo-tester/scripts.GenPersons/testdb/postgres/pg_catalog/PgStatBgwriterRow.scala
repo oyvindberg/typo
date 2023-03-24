@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,34 +18,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatBgwriterRow(
-  checkpointsTimed: /* unknown nullability */ Option[Long],
-  checkpointsReq: /* unknown nullability */ Option[Long],
-  checkpointWriteTime: /* unknown nullability */ Option[Double],
-  checkpointSyncTime: /* unknown nullability */ Option[Double],
-  buffersCheckpoint: /* unknown nullability */ Option[Long],
-  buffersClean: /* unknown nullability */ Option[Long],
-  maxwrittenClean: /* unknown nullability */ Option[Long],
-  buffersBackend: /* unknown nullability */ Option[Long],
-  buffersBackendFsync: /* unknown nullability */ Option[Long],
-  buffersAlloc: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  checkpointsTimed: Option[Long],
+  checkpointsReq: Option[Long],
+  checkpointWriteTime: Option[Double],
+  checkpointSyncTime: Option[Double],
+  buffersCheckpoint: Option[Long],
+  buffersClean: Option[Long],
+  maxwrittenClean: Option[Long],
+  buffersBackend: Option[Long],
+  buffersBackendFsync: Option[Long],
+  buffersAlloc: Option[Long],
+  statsReset: Option[ZonedDateTime]
 )
 
 object PgStatBgwriterRow {
   implicit val rowParser: RowParser[PgStatBgwriterRow] = { row =>
     Success(
       PgStatBgwriterRow(
-        checkpointsTimed = row[/* unknown nullability */ Option[Long]]("checkpoints_timed"),
-        checkpointsReq = row[/* unknown nullability */ Option[Long]]("checkpoints_req"),
-        checkpointWriteTime = row[/* unknown nullability */ Option[Double]]("checkpoint_write_time"),
-        checkpointSyncTime = row[/* unknown nullability */ Option[Double]]("checkpoint_sync_time"),
-        buffersCheckpoint = row[/* unknown nullability */ Option[Long]]("buffers_checkpoint"),
-        buffersClean = row[/* unknown nullability */ Option[Long]]("buffers_clean"),
-        maxwrittenClean = row[/* unknown nullability */ Option[Long]]("maxwritten_clean"),
-        buffersBackend = row[/* unknown nullability */ Option[Long]]("buffers_backend"),
-        buffersBackendFsync = row[/* unknown nullability */ Option[Long]]("buffers_backend_fsync"),
-        buffersAlloc = row[/* unknown nullability */ Option[Long]]("buffers_alloc"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        checkpointsTimed = row[Option[Long]]("checkpoints_timed"),
+        checkpointsReq = row[Option[Long]]("checkpoints_req"),
+        checkpointWriteTime = row[Option[Double]]("checkpoint_write_time"),
+        checkpointSyncTime = row[Option[Double]]("checkpoint_sync_time"),
+        buffersCheckpoint = row[Option[Long]]("buffers_checkpoint"),
+        buffersClean = row[Option[Long]]("buffers_clean"),
+        maxwrittenClean = row[Option[Long]]("maxwritten_clean"),
+        buffersBackend = row[Option[Long]]("buffers_backend"),
+        buffersBackendFsync = row[Option[Long]]("buffers_backend_fsync"),
+        buffersAlloc = row[Option[Long]]("buffers_alloc"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -80,7 +80,7 @@ object PgStatBgwriterRow {
             buffersBackend = json.\("buffers_backend").toOption.map(_.as[Long]),
             buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as[Long]),
             buffersAlloc = json.\("buffers_alloc").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

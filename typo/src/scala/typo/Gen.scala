@@ -1,37 +1,26 @@
 package typo
 
-import typo.metadb.{MetaDb, ViewsRepo}
+import typo.metadb.MetaDb
 import typo.sc.syntax._
 
 import java.sql.Connection
 
 object Gen {
-  def apply(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
-    val views: List[View] =
-      ViewsRepo.all(c).map { view =>
-        val AnalyzeSql.Analyzed(Nil, columns) = AnalyzeSql.from(c, view.view_definition)
-        View(
-          name = db.RelationName(view.table_schema, view.table_name),
-          sql = view.view_definition,
-          isMaterialized = view.relkind == "m",
-          columns
-        )
-      }
-
-    val metaDB = new MetaDb
+  def fromDb(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
+    val output = MetaDb(MetaDb.Input.fromDb(c))
     apply(
       options,
-      metaDB.tables.getAsList.filter(x => selector.include(x.name)),
-      metaDB.enums.getAsList.filter(x => selector.include(x.name)),
-      views.filter(x => selector.include(x.name))
+      output.tables.filter(x => selector.include(x.name)),
+      output.views.filter(x => selector.include(x.name)),
+      output.enums.filter(x => selector.include(x.name))
     )
   }
 
   def apply(
       options: Options,
       tables: List[db.Table],
-      enums: List[db.StringEnum],
-      views: List[View]
+      views: List[db.View],
+      enums: List[db.StringEnum]
   ): List[sc.File] = {
     val default = DefaultComputed(options.pkg)
     val enumFiles: List[sc.File] =

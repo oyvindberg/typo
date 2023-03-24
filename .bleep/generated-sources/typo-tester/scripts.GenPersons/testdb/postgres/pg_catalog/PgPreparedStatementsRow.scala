@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,26 +19,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPreparedStatementsRow(
-  name: /* unknown nullability */ Option[String],
-  statement: /* unknown nullability */ Option[String],
-  prepareTime: /* unknown nullability */ Option[LocalDateTime],
-  parameterTypes: /* unknown nullability */ Option[Array[PGobject]],
-  fromSql: /* unknown nullability */ Option[Boolean],
-  genericPlans: /* unknown nullability */ Option[Long],
-  customPlans: /* unknown nullability */ Option[Long]
+  name: Option[String],
+  statement: Option[String],
+  prepareTime: Option[ZonedDateTime],
+  parameterTypes: Option[Array[PGobject]],
+  fromSql: Option[Boolean],
+  genericPlans: Option[Long],
+  customPlans: Option[Long]
 )
 
 object PgPreparedStatementsRow {
   implicit val rowParser: RowParser[PgPreparedStatementsRow] = { row =>
     Success(
       PgPreparedStatementsRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        statement = row[/* unknown nullability */ Option[String]]("statement"),
-        prepareTime = row[/* unknown nullability */ Option[LocalDateTime]]("prepare_time"),
-        parameterTypes = row[/* unknown nullability */ Option[Array[PGobject]]]("parameter_types"),
-        fromSql = row[/* unknown nullability */ Option[Boolean]]("from_sql"),
-        genericPlans = row[/* unknown nullability */ Option[Long]]("generic_plans"),
-        customPlans = row[/* unknown nullability */ Option[Long]]("custom_plans")
+        name = row[Option[String]]("name"),
+        statement = row[Option[String]]("statement"),
+        prepareTime = row[Option[ZonedDateTime]]("prepare_time"),
+        parameterTypes = row[Option[Array[PGobject]]]("parameter_types"),
+        fromSql = row[Option[Boolean]]("from_sql"),
+        genericPlans = row[Option[Long]]("generic_plans"),
+        customPlans = row[Option[Long]]("custom_plans")
       )
     )
   }
@@ -61,7 +61,7 @@ object PgPreparedStatementsRow {
           PgPreparedStatementsRow(
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
-            prepareTime = json.\("prepare_time").toOption.map(_.as[LocalDateTime]),
+            prepareTime = json.\("prepare_time").toOption.map(_.as[ZonedDateTime]),
             parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[PGobject]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),

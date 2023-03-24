@@ -17,24 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ViewTableUsageRow(
-  viewCatalog: /* unknown nullability */ Option[String],
-  viewSchema: /* unknown nullability */ Option[String],
-  viewName: /* unknown nullability */ Option[String],
-  tableCatalog: /* unknown nullability */ Option[String],
-  tableSchema: /* unknown nullability */ Option[String],
-  tableName: /* unknown nullability */ Option[String]
+  viewCatalog: Option[String],
+  viewSchema: Option[String],
+  viewName: Option[String],
+  tableCatalog: Option[String],
+  tableSchema: Option[String],
+  tableName: Option[String]
 )
 
 object ViewTableUsageRow {
   implicit val rowParser: RowParser[ViewTableUsageRow] = { row =>
     Success(
       ViewTableUsageRow(
-        viewCatalog = row[/* unknown nullability */ Option[String]]("view_catalog"),
-        viewSchema = row[/* unknown nullability */ Option[String]]("view_schema"),
-        viewName = row[/* unknown nullability */ Option[String]]("view_name"),
-        tableCatalog = row[/* unknown nullability */ Option[String]]("table_catalog"),
-        tableSchema = row[/* unknown nullability */ Option[String]]("table_schema"),
-        tableName = row[/* unknown nullability */ Option[String]]("table_name")
+        viewCatalog = row[Option[String]]("view_catalog"),
+        viewSchema = row[Option[String]]("view_schema"),
+        viewName = row[Option[String]]("view_name"),
+        tableCatalog = row[Option[String]]("table_catalog"),
+        tableSchema = row[Option[String]]("table_schema"),
+        tableName = row[Option[String]]("table_name")
       )
     )
   }

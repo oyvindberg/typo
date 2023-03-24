@@ -15,21 +15,14 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.postgres.pg_catalog.PgUserMappingRow
 
 case class PgUserMappingsRow(
-  /** Points to [[PgUserMappingRow.oid]] */
-  oid: Long,
-  /** Points to [[PgUserMappingRow.umoptions]] */
+  oid: Option[Long],
   umoptions: Option[Array[String]],
-  /** Points to [[PgUserMappingRow.umuser]] */
-  umuser: Long,
-  authorizationIdentifier: /* unknown nullability */ Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
+  umuser: Option[Long],
+  authorizationIdentifier: Option[String],
   foreignServerCatalog: Option[String],
-  /** Points to [[PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
-  /** Points to [[PgForeignServersRow.authorizationIdentifier]] */
   srvowner: Option[String]
 )
 
@@ -37,10 +30,10 @@ object PgUserMappingsRow {
   implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        oid = row[Long]("oid"),
+        oid = row[Option[Long]]("oid"),
         umoptions = row[Option[Array[String]]]("umoptions"),
-        umuser = row[Long]("umuser"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier"),
+        umuser = row[Option[Long]]("umuser"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
         foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
         foreignServerName = row[Option[String]]("foreign_server_name"),
         srvowner = row[Option[String]]("srvowner")
@@ -64,9 +57,9 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            oid = json.\("oid").as[Long],
+            oid = json.\("oid").toOption.map(_.as[Long]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
-            umuser = json.\("umuser").as[Long],
+            umuser = json.\("umuser").toOption.map(_.as[Long]),
             authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

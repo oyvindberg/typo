@@ -18,20 +18,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTimezoneNamesRow(
-  name: /* unknown nullability */ Option[String],
-  abbrev: /* unknown nullability */ Option[String],
-  utcOffset: /* unknown nullability */ Option[/* interval */ PGInterval],
-  isDst: /* unknown nullability */ Option[Boolean]
+  name: Option[String],
+  abbrev: Option[String],
+  utcOffset: Option[PGInterval],
+  isDst: Option[Boolean]
 )
 
 object PgTimezoneNamesRow {
   implicit val rowParser: RowParser[PgTimezoneNamesRow] = { row =>
     Success(
       PgTimezoneNamesRow(
-        name = row[/* unknown nullability */ Option[String]]("name"),
-        abbrev = row[/* unknown nullability */ Option[String]]("abbrev"),
-        utcOffset = row[/* unknown nullability */ Option[/* interval */ PGInterval]]("utc_offset"),
-        isDst = row[/* unknown nullability */ Option[Boolean]]("is_dst")
+        name = row[Option[String]]("name"),
+        abbrev = row[Option[String]]("abbrev"),
+        utcOffset = row[Option[PGInterval]]("utc_offset"),
+        isDst = row[Option[Boolean]]("is_dst")
       )
     )
   }
@@ -51,7 +51,7 @@ object PgTimezoneNamesRow {
           PgTimezoneNamesRow(
             name = json.\("name").toOption.map(_.as[String]),
             abbrev = json.\("abbrev").toOption.map(_.as[String]),
-            utcOffset = json.\("utc_offset").toOption.map(_.as[/* interval */ PGInterval]),
+            utcOffset = json.\("utc_offset").toOption.map(_.as[PGInterval]),
             isDst = json.\("is_dst").toOption.map(_.as[Boolean])
           )
         )

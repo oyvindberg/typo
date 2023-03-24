@@ -17,28 +17,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatDatabaseConflictsRow(
-  /** Points to [[PgDatabaseRow.oid]] */
-  datid: Long,
-  /** Points to [[PgDatabaseRow.datname]] */
-  datname: String,
-  conflTablespace: /* unknown nullability */ Option[Long],
-  conflLock: /* unknown nullability */ Option[Long],
-  conflSnapshot: /* unknown nullability */ Option[Long],
-  conflBufferpin: /* unknown nullability */ Option[Long],
-  conflDeadlock: /* unknown nullability */ Option[Long]
+  datid: Option[Long],
+  datname: Option[String],
+  conflTablespace: Option[Long],
+  conflLock: Option[Long],
+  conflSnapshot: Option[Long],
+  conflBufferpin: Option[Long],
+  conflDeadlock: Option[Long]
 )
 
 object PgStatDatabaseConflictsRow {
   implicit val rowParser: RowParser[PgStatDatabaseConflictsRow] = { row =>
     Success(
       PgStatDatabaseConflictsRow(
-        datid = row[Long]("datid"),
-        datname = row[String]("datname"),
-        conflTablespace = row[/* unknown nullability */ Option[Long]]("confl_tablespace"),
-        conflLock = row[/* unknown nullability */ Option[Long]]("confl_lock"),
-        conflSnapshot = row[/* unknown nullability */ Option[Long]]("confl_snapshot"),
-        conflBufferpin = row[/* unknown nullability */ Option[Long]]("confl_bufferpin"),
-        conflDeadlock = row[/* unknown nullability */ Option[Long]]("confl_deadlock")
+        datid = row[Option[Long]]("datid"),
+        datname = row[Option[String]]("datname"),
+        conflTablespace = row[Option[Long]]("confl_tablespace"),
+        conflLock = row[Option[Long]]("confl_lock"),
+        conflSnapshot = row[Option[Long]]("confl_snapshot"),
+        conflBufferpin = row[Option[Long]]("confl_bufferpin"),
+        conflDeadlock = row[Option[Long]]("confl_deadlock")
       )
     )
   }
@@ -59,8 +57,8 @@ object PgStatDatabaseConflictsRow {
       JsResult.fromTry(
         Try(
           PgStatDatabaseConflictsRow(
-            datid = json.\("datid").as[Long],
-            datname = json.\("datname").as[String],
+            datid = json.\("datid").toOption.map(_.as[Long]),
+            datname = json.\("datname").toOption.map(_.as[String]),
             conflTablespace = json.\("confl_tablespace").toOption.map(_.as[Long]),
             conflLock = json.\("confl_lock").toOption.map(_.as[Long]),
             conflSnapshot = json.\("confl_snapshot").toOption.map(_.as[Long]),

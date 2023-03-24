@@ -17,28 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class TransformsRow(
-  udtCatalog: /* unknown nullability */ Option[String],
-  udtSchema: /* unknown nullability */ Option[String],
-  udtName: /* unknown nullability */ Option[String],
-  specificCatalog: /* unknown nullability */ Option[String],
-  specificSchema: /* unknown nullability */ Option[String],
-  specificName: /* unknown nullability */ Option[String],
-  groupName: /* unknown nullability */ Option[String],
-  transformType: /* unknown nullability */ Option[String]
+  udtCatalog: Option[String],
+  udtSchema: Option[String],
+  udtName: Option[String],
+  specificCatalog: Option[String],
+  specificSchema: Option[String],
+  specificName: Option[String],
+  groupName: Option[String],
+  transformType: Option[String]
 )
 
 object TransformsRow {
   implicit val rowParser: RowParser[TransformsRow] = { row =>
     Success(
       TransformsRow(
-        udtCatalog = row[/* unknown nullability */ Option[String]]("udt_catalog"),
-        udtSchema = row[/* unknown nullability */ Option[String]]("udt_schema"),
-        udtName = row[/* unknown nullability */ Option[String]]("udt_name"),
-        specificCatalog = row[/* unknown nullability */ Option[String]]("specific_catalog"),
-        specificSchema = row[/* unknown nullability */ Option[String]]("specific_schema"),
-        specificName = row[/* unknown nullability */ Option[String]]("specific_name"),
-        groupName = row[/* unknown nullability */ Option[String]]("group_name"),
-        transformType = row[/* unknown nullability */ Option[String]]("transform_type")
+        udtCatalog = row[Option[String]]("udt_catalog"),
+        udtSchema = row[Option[String]]("udt_schema"),
+        udtName = row[Option[String]]("udt_name"),
+        specificCatalog = row[Option[String]]("specific_catalog"),
+        specificSchema = row[Option[String]]("specific_schema"),
+        specificName = row[Option[String]]("specific_name"),
+        groupName = row[Option[String]]("group_name"),
+        transformType = row[Option[String]]("transform_type")
       )
     )
   }

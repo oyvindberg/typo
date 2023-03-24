@@ -17,19 +17,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioUserIndexesRow(
-  /** Points to [[PgStatioAllIndexesRow.relid]] */
   relid: Option[Long],
-  /** Points to [[PgStatioAllIndexesRow.indexrelid]] */
   indexrelid: Option[Long],
-  /** Points to [[PgStatioAllIndexesRow.schemaname]] */
   schemaname: Option[String],
-  /** Points to [[PgStatioAllIndexesRow.relname]] */
   relname: Option[String],
-  /** Points to [[PgStatioAllIndexesRow.indexrelname]] */
   indexrelname: Option[String],
-  /** Points to [[PgStatioAllIndexesRow.idxBlksRead]] */
   idxBlksRead: Option[Long],
-  /** Points to [[PgStatioAllIndexesRow.idxBlksHit]] */
   idxBlksHit: Option[Long]
 )
 

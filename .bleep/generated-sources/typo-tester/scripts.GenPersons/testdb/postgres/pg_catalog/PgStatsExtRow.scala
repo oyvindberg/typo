@@ -17,47 +17,40 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatsExtRow(
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  statisticsSchemaname: String,
-  /** Points to [[PgStatisticExtRow.stxname]] */
-  statisticsName: String,
-  statisticsOwner: /* unknown nullability */ Option[String],
-  attnames: /* unknown nullability */ Option[Array[String]],
-  exprs: /* unknown nullability */ Option[Array[String]],
-  /** Points to [[PgStatisticExtRow.stxkind]] */
-  kinds: Array[String],
-  /** Points to [[PgStatisticExtDataRow.stxdndistinct]] */
-  nDistinct: Option[/* pg_ndistinct */ String],
-  /** Points to [[PgStatisticExtDataRow.stxddependencies]] */
-  dependencies: Option[/* pg_dependencies */ String],
-  mostCommonVals: /* unknown nullability */ Option[Array[String]],
-  mostCommonValNulls: /* unknown nullability */ Option[Array[Boolean]],
-  mostCommonFreqs: /* unknown nullability */ Option[Array[Double]],
-  mostCommonBaseFreqs: /* unknown nullability */ Option[Array[Double]]
+  schemaname: Option[String],
+  tablename: Option[String],
+  statisticsSchemaname: Option[String],
+  statisticsName: Option[String],
+  statisticsOwner: Option[String],
+  attnames: Option[Array[String]],
+  exprs: Option[Array[String]],
+  kinds: Option[Array[String]],
+  nDistinct: Option[String],
+  dependencies: Option[String],
+  mostCommonVals: Option[Array[String]],
+  mostCommonValNulls: Option[Array[Boolean]],
+  mostCommonFreqs: Option[Array[Double]],
+  mostCommonBaseFreqs: Option[Array[Double]]
 )
 
 object PgStatsExtRow {
   implicit val rowParser: RowParser[PgStatsExtRow] = { row =>
     Success(
       PgStatsExtRow(
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename"),
-        statisticsSchemaname = row[String]("statistics_schemaname"),
-        statisticsName = row[String]("statistics_name"),
-        statisticsOwner = row[/* unknown nullability */ Option[String]]("statistics_owner"),
-        attnames = row[/* unknown nullability */ Option[Array[String]]]("attnames"),
-        exprs = row[/* unknown nullability */ Option[Array[String]]]("exprs"),
-        kinds = row[Array[String]]("kinds"),
-        nDistinct = row[Option[/* pg_ndistinct */ String]]("n_distinct"),
-        dependencies = row[Option[/* pg_dependencies */ String]]("dependencies"),
-        mostCommonVals = row[/* unknown nullability */ Option[Array[String]]]("most_common_vals"),
-        mostCommonValNulls = row[/* unknown nullability */ Option[Array[Boolean]]]("most_common_val_nulls"),
-        mostCommonFreqs = row[/* unknown nullability */ Option[Array[Double]]]("most_common_freqs"),
-        mostCommonBaseFreqs = row[/* unknown nullability */ Option[Array[Double]]]("most_common_base_freqs")
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename"),
+        statisticsSchemaname = row[Option[String]]("statistics_schemaname"),
+        statisticsName = row[Option[String]]("statistics_name"),
+        statisticsOwner = row[Option[String]]("statistics_owner"),
+        attnames = row[Option[Array[String]]]("attnames"),
+        exprs = row[Option[Array[String]]]("exprs"),
+        kinds = row[Option[Array[String]]]("kinds"),
+        nDistinct = row[Option[String]]("n_distinct"),
+        dependencies = row[Option[String]]("dependencies"),
+        mostCommonVals = row[Option[Array[String]]]("most_common_vals"),
+        mostCommonValNulls = row[Option[Array[Boolean]]]("most_common_val_nulls"),
+        mostCommonFreqs = row[Option[Array[Double]]]("most_common_freqs"),
+        mostCommonBaseFreqs = row[Option[Array[Double]]]("most_common_base_freqs")
       )
     )
   }
@@ -85,16 +78,16 @@ object PgStatsExtRow {
       JsResult.fromTry(
         Try(
           PgStatsExtRow(
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String],
-            statisticsSchemaname = json.\("statistics_schemaname").as[String],
-            statisticsName = json.\("statistics_name").as[String],
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String]),
+            statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as[String]),
+            statisticsName = json.\("statistics_name").toOption.map(_.as[String]),
             statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
             attnames = json.\("attnames").toOption.map(_.as[Array[String]]),
             exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
-            kinds = json.\("kinds").as[Array[String]],
-            nDistinct = json.\("n_distinct").toOption.map(_.as[/* pg_ndistinct */ String]),
-            dependencies = json.\("dependencies").toOption.map(_.as[/* pg_dependencies */ String]),
+            kinds = json.\("kinds").toOption.map(_.as[Array[String]]),
+            nDistinct = json.\("n_distinct").toOption.map(_.as[String]),
+            dependencies = json.\("dependencies").toOption.map(_.as[String]),
             mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
             mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as[Array[Boolean]]),
             mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),

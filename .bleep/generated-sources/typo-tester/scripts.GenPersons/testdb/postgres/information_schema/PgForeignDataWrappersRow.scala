@@ -15,32 +15,28 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.postgres.pg_catalog.PgForeignDataWrapperRow
 
 case class PgForeignDataWrappersRow(
-  /** Points to [[PgForeignDataWrapperRow.oid]] */
-  oid: Long,
-  /** Points to [[PgForeignDataWrapperRow.fdwowner]] */
-  fdwowner: Long,
-  /** Points to [[PgForeignDataWrapperRow.fdwoptions]] */
+  oid: Option[Long],
+  fdwowner: Option[Long],
   fdwoptions: Option[Array[String]],
-  foreignDataWrapperCatalog: /* unknown nullability */ Option[String],
-  foreignDataWrapperName: /* unknown nullability */ Option[String],
-  authorizationIdentifier: /* unknown nullability */ Option[String],
-  foreignDataWrapperLanguage: /* unknown nullability */ Option[String]
+  foreignDataWrapperCatalog: Option[String],
+  foreignDataWrapperName: Option[String],
+  authorizationIdentifier: Option[String],
+  foreignDataWrapperLanguage: Option[String]
 )
 
 object PgForeignDataWrappersRow {
   implicit val rowParser: RowParser[PgForeignDataWrappersRow] = { row =>
     Success(
       PgForeignDataWrappersRow(
-        oid = row[Long]("oid"),
-        fdwowner = row[Long]("fdwowner"),
+        oid = row[Option[Long]]("oid"),
+        fdwowner = row[Option[Long]]("fdwowner"),
         fdwoptions = row[Option[Array[String]]]("fdwoptions"),
-        foreignDataWrapperCatalog = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_name"),
-        authorizationIdentifier = row[/* unknown nullability */ Option[String]]("authorization_identifier"),
-        foreignDataWrapperLanguage = row[/* unknown nullability */ Option[String]]("foreign_data_wrapper_language")
+        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
+        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
+        foreignDataWrapperLanguage = row[Option[String]]("foreign_data_wrapper_language")
       )
     )
   }
@@ -61,8 +57,8 @@ object PgForeignDataWrappersRow {
       JsResult.fromTry(
         Try(
           PgForeignDataWrappersRow(
-            oid = json.\("oid").as[Long],
-            fdwowner = json.\("fdwowner").as[Long],
+            oid = json.\("oid").toOption.map(_.as[Long]),
+            fdwowner = json.\("fdwowner").toOption.map(_.as[Long]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
             foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
             foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),

@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,30 +21,30 @@ import scala.math.BigDecimal
 import scala.util.Try
 
 case class PgStatWalRow(
-  walRecords: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_records","columnName":"wal_records","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  walFpi: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_fpi","columnName":"wal_fpi","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  walBytes: /* unknown nullability */ Option[BigDecimal] /* {"columnClassName":"java.math.BigDecimal","columnDisplaySize":131089,"columnLabel":"wal_bytes","columnName":"wal_bytes","columnType":"Numeric","columnTypeName":"numeric","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":0,"scale":0} */,
-  walBuffersFull: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_buffers_full","columnName":"wal_buffers_full","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  walWrite: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_write","columnName":"wal_write","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  walSync: /* unknown nullability */ Option[Long] /* {"columnClassName":"java.lang.Long","columnDisplaySize":20,"columnLabel":"wal_sync","columnName":"wal_sync","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */,
-  walWriteTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"wal_write_time","columnName":"wal_write_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
-  walSyncTime: /* unknown nullability */ Option[Double] /* {"columnClassName":"java.lang.Double","columnDisplaySize":25,"columnLabel":"wal_sync_time","columnName":"wal_sync_time","columnType":"Double","columnTypeName":"float8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":17,"scale":17} */,
-  statsReset: /* unknown nullability */ Option[LocalDateTime] /* {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"stats_reset","columnName":"stats_reset","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  walRecords: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_records","ordinal_position":1,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walFpi: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_fpi","ordinal_position":2,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walBytes: Option[BigDecimal] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_bytes","ordinal_position":3,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walBuffersFull: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_buffers_full","ordinal_position":4,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walWrite: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_write","ordinal_position":5,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walSync: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_sync","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walWriteTime: Option[Double] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_write_time","ordinal_position":7,"is_nullable":"YES","data_type":"double precision","numeric_precision":53,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  walSyncTime: Option[Double] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"wal_sync_time","ordinal_position":8,"is_nullable":"YES","data_type":"double precision","numeric_precision":53,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float8","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  statsReset: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_wal","column_name":"stats_reset","ordinal_position":9,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgStatWalRow {
   implicit val rowParser: RowParser[PgStatWalRow] = { row =>
     Success(
       PgStatWalRow(
-        walRecords = row[/* unknown nullability */ Option[Long]]("wal_records"),
-        walFpi = row[/* unknown nullability */ Option[Long]]("wal_fpi"),
-        walBytes = row[/* unknown nullability */ Option[BigDecimal]]("wal_bytes"),
-        walBuffersFull = row[/* unknown nullability */ Option[Long]]("wal_buffers_full"),
-        walWrite = row[/* unknown nullability */ Option[Long]]("wal_write"),
-        walSync = row[/* unknown nullability */ Option[Long]]("wal_sync"),
-        walWriteTime = row[/* unknown nullability */ Option[Double]]("wal_write_time"),
-        walSyncTime = row[/* unknown nullability */ Option[Double]]("wal_sync_time"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        walRecords = row[Option[Long]]("wal_records"),
+        walFpi = row[Option[Long]]("wal_fpi"),
+        walBytes = row[Option[BigDecimal]]("wal_bytes"),
+        walBuffersFull = row[Option[Long]]("wal_buffers_full"),
+        walWrite = row[Option[Long]]("wal_write"),
+        walSync = row[Option[Long]]("wal_sync"),
+        walWriteTime = row[Option[Double]]("wal_write_time"),
+        walSyncTime = row[Option[Double]]("wal_sync_time"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -75,7 +75,7 @@ object PgStatWalRow {
             walSync = json.\("wal_sync").toOption.map(_.as[Long]),
             walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
             walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

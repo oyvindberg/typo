@@ -9,7 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -18,32 +18,32 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatReplicationSlotsRow(
-  slotName: /* unknown nullability */ Option[String],
-  spillTxns: /* unknown nullability */ Option[Long],
-  spillCount: /* unknown nullability */ Option[Long],
-  spillBytes: /* unknown nullability */ Option[Long],
-  streamTxns: /* unknown nullability */ Option[Long],
-  streamCount: /* unknown nullability */ Option[Long],
-  streamBytes: /* unknown nullability */ Option[Long],
-  totalTxns: /* unknown nullability */ Option[Long],
-  totalBytes: /* unknown nullability */ Option[Long],
-  statsReset: /* unknown nullability */ Option[LocalDateTime]
+  slotName: Option[String],
+  spillTxns: Option[Long],
+  spillCount: Option[Long],
+  spillBytes: Option[Long],
+  streamTxns: Option[Long],
+  streamCount: Option[Long],
+  streamBytes: Option[Long],
+  totalTxns: Option[Long],
+  totalBytes: Option[Long],
+  statsReset: Option[ZonedDateTime]
 )
 
 object PgStatReplicationSlotsRow {
   implicit val rowParser: RowParser[PgStatReplicationSlotsRow] = { row =>
     Success(
       PgStatReplicationSlotsRow(
-        slotName = row[/* unknown nullability */ Option[String]]("slot_name"),
-        spillTxns = row[/* unknown nullability */ Option[Long]]("spill_txns"),
-        spillCount = row[/* unknown nullability */ Option[Long]]("spill_count"),
-        spillBytes = row[/* unknown nullability */ Option[Long]]("spill_bytes"),
-        streamTxns = row[/* unknown nullability */ Option[Long]]("stream_txns"),
-        streamCount = row[/* unknown nullability */ Option[Long]]("stream_count"),
-        streamBytes = row[/* unknown nullability */ Option[Long]]("stream_bytes"),
-        totalTxns = row[/* unknown nullability */ Option[Long]]("total_txns"),
-        totalBytes = row[/* unknown nullability */ Option[Long]]("total_bytes"),
-        statsReset = row[/* unknown nullability */ Option[LocalDateTime]]("stats_reset")
+        slotName = row[Option[String]]("slot_name"),
+        spillTxns = row[Option[Long]]("spill_txns"),
+        spillCount = row[Option[Long]]("spill_count"),
+        spillBytes = row[Option[Long]]("spill_bytes"),
+        streamTxns = row[Option[Long]]("stream_txns"),
+        streamCount = row[Option[Long]]("stream_count"),
+        streamBytes = row[Option[Long]]("stream_bytes"),
+        totalTxns = row[Option[Long]]("total_txns"),
+        totalBytes = row[Option[Long]]("total_bytes"),
+        statsReset = row[Option[ZonedDateTime]]("stats_reset")
       )
     )
   }
@@ -76,7 +76,7 @@ object PgStatReplicationSlotsRow {
             streamBytes = json.\("stream_bytes").toOption.map(_.as[Long]),
             totalTxns = json.\("total_txns").toOption.map(_.as[Long]),
             totalBytes = json.\("total_bytes").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[LocalDateTime])
+            statsReset = json.\("stats_reset").toOption.map(_.as[ZonedDateTime])
           )
         )
       )

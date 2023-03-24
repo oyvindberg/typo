@@ -11,7 +11,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,50 +20,38 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRolesRow(
-  /** Points to [[PgAuthidRow.rolname]] */
-  rolname: String /* {"baseColumnName":"rolname","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"rolname","columnName":"rolname","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolsuper]] */
-  rolsuper: Boolean /* {"baseColumnName":"rolsuper","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolsuper","columnName":"rolsuper","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolinherit]] */
-  rolinherit: Boolean /* {"baseColumnName":"rolinherit","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolinherit","columnName":"rolinherit","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolcreaterole]] */
-  rolcreaterole: Boolean /* {"baseColumnName":"rolcreaterole","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolcreaterole","columnName":"rolcreaterole","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolcreatedb]] */
-  rolcreatedb: Boolean /* {"baseColumnName":"rolcreatedb","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolcreatedb","columnName":"rolcreatedb","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolcanlogin]] */
-  rolcanlogin: Boolean /* {"baseColumnName":"rolcanlogin","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolcanlogin","columnName":"rolcanlogin","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolreplication]] */
-  rolreplication: Boolean /* {"baseColumnName":"rolreplication","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolreplication","columnName":"rolreplication","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolconnlimit]] */
-  rolconnlimit: Int /* {"baseColumnName":"rolconnlimit","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Integer","columnDisplaySize":11,"columnLabel":"rolconnlimit","columnName":"rolconnlimit","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_authid"} */,
-  rolpassword: /* unknown nullability */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"rolpassword","columnName":"rolpassword","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  /** Points to [[PgAuthidRow.rolvaliduntil]] */
-  rolvaliduntil: Option[LocalDateTime] /* {"baseColumnName":"rolvaliduntil","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"columnLabel":"rolvaliduntil","columnName":"rolvaliduntil","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6,"tableName":"pg_authid"} */,
-  /** Points to [[PgAuthidRow.rolbypassrls]] */
-  rolbypassrls: Boolean /* {"baseColumnName":"rolbypassrls","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Boolean","columnDisplaySize":1,"columnLabel":"rolbypassrls","columnName":"rolbypassrls","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_authid"} */,
-  /** Points to [[PgDbRoleSettingRow.setconfig]] */
-  rolconfig: Option[Array[String]] /* {"baseColumnName":"setconfig","baseRelationName":"pg_catalog.pg_db_role_setting","columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"columnLabel":"rolconfig","columnName":"rolconfig","columnType":"Array","columnTypeName":"_text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_db_role_setting"} */,
-  /** Points to [[PgAuthidRow.oid]] */
-  oid: Long /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_authid","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"oid","columnName":"oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_authid"} */
+  rolname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolname","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolsuper: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolsuper","ordinal_position":2,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolinherit: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolinherit","ordinal_position":3,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolcreaterole: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolcreaterole","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolcreatedb: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolcreatedb","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolcanlogin: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolcanlogin","ordinal_position":6,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolreplication: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolreplication","ordinal_position":7,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolconnlimit: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolconnlimit","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolpassword: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolpassword","ordinal_position":9,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolvaliduntil: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolvaliduntil","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolbypassrls: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolbypassrls","ordinal_position":11,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  rolconfig: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolconfig","ordinal_position":12,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"oid","ordinal_position":13,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgRolesRow {
   implicit val rowParser: RowParser[PgRolesRow] = { row =>
     Success(
       PgRolesRow(
-        rolname = row[String]("rolname"),
-        rolsuper = row[Boolean]("rolsuper"),
-        rolinherit = row[Boolean]("rolinherit"),
-        rolcreaterole = row[Boolean]("rolcreaterole"),
-        rolcreatedb = row[Boolean]("rolcreatedb"),
-        rolcanlogin = row[Boolean]("rolcanlogin"),
-        rolreplication = row[Boolean]("rolreplication"),
-        rolconnlimit = row[Int]("rolconnlimit"),
-        rolpassword = row[/* unknown nullability */ Option[String]]("rolpassword"),
-        rolvaliduntil = row[Option[LocalDateTime]]("rolvaliduntil"),
-        rolbypassrls = row[Boolean]("rolbypassrls"),
+        rolname = row[Option[String]]("rolname"),
+        rolsuper = row[Option[Boolean]]("rolsuper"),
+        rolinherit = row[Option[Boolean]]("rolinherit"),
+        rolcreaterole = row[Option[Boolean]]("rolcreaterole"),
+        rolcreatedb = row[Option[Boolean]]("rolcreatedb"),
+        rolcanlogin = row[Option[Boolean]]("rolcanlogin"),
+        rolreplication = row[Option[Boolean]]("rolreplication"),
+        rolconnlimit = row[Option[Int]]("rolconnlimit"),
+        rolpassword = row[Option[String]]("rolpassword"),
+        rolvaliduntil = row[Option[ZonedDateTime]]("rolvaliduntil"),
+        rolbypassrls = row[Option[Boolean]]("rolbypassrls"),
         rolconfig = row[Option[Array[String]]]("rolconfig"),
-        oid = row[Long]("oid")
+        oid = row[Option[Long]]("oid")
       )
     )
   }
@@ -90,19 +78,19 @@ object PgRolesRow {
       JsResult.fromTry(
         Try(
           PgRolesRow(
-            rolname = json.\("rolname").as[String],
-            rolsuper = json.\("rolsuper").as[Boolean],
-            rolinherit = json.\("rolinherit").as[Boolean],
-            rolcreaterole = json.\("rolcreaterole").as[Boolean],
-            rolcreatedb = json.\("rolcreatedb").as[Boolean],
-            rolcanlogin = json.\("rolcanlogin").as[Boolean],
-            rolreplication = json.\("rolreplication").as[Boolean],
-            rolconnlimit = json.\("rolconnlimit").as[Int],
+            rolname = json.\("rolname").toOption.map(_.as[String]),
+            rolsuper = json.\("rolsuper").toOption.map(_.as[Boolean]),
+            rolinherit = json.\("rolinherit").toOption.map(_.as[Boolean]),
+            rolcreaterole = json.\("rolcreaterole").toOption.map(_.as[Boolean]),
+            rolcreatedb = json.\("rolcreatedb").toOption.map(_.as[Boolean]),
+            rolcanlogin = json.\("rolcanlogin").toOption.map(_.as[Boolean]),
+            rolreplication = json.\("rolreplication").toOption.map(_.as[Boolean]),
+            rolconnlimit = json.\("rolconnlimit").toOption.map(_.as[Int]),
             rolpassword = json.\("rolpassword").toOption.map(_.as[String]),
-            rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[LocalDateTime]),
-            rolbypassrls = json.\("rolbypassrls").as[Boolean],
+            rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[ZonedDateTime]),
+            rolbypassrls = json.\("rolbypassrls").toOption.map(_.as[Boolean]),
             rolconfig = json.\("rolconfig").toOption.map(_.as[Array[String]]),
-            oid = json.\("oid").as[Long]
+            oid = json.\("oid").toOption.map(_.as[Long])
           )
         )
       )

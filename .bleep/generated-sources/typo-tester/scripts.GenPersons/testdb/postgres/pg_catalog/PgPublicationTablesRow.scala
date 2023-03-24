@@ -17,21 +17,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPublicationTablesRow(
-  /** Points to [[PgPublicationRow.pubname]] */
-  pubname: String,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  tablename: String
+  pubname: Option[String],
+  schemaname: Option[String],
+  tablename: Option[String]
 )
 
 object PgPublicationTablesRow {
   implicit val rowParser: RowParser[PgPublicationTablesRow] = { row =>
     Success(
       PgPublicationTablesRow(
-        pubname = row[String]("pubname"),
-        schemaname = row[String]("schemaname"),
-        tablename = row[String]("tablename")
+        pubname = row[Option[String]]("pubname"),
+        schemaname = row[Option[String]]("schemaname"),
+        tablename = row[Option[String]]("tablename")
       )
     )
   }
@@ -48,9 +45,9 @@ object PgPublicationTablesRow {
       JsResult.fromTry(
         Try(
           PgPublicationTablesRow(
-            pubname = json.\("pubname").as[String],
-            schemaname = json.\("schemaname").as[String],
-            tablename = json.\("tablename").as[String]
+            pubname = json.\("pubname").toOption.map(_.as[String]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            tablename = json.\("tablename").toOption.map(_.as[String])
           )
         )
       )

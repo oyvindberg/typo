@@ -17,37 +17,34 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatXactAllTablesRow(
-  /** Points to [[PgClassRow.oid]] */
-  relid: Long,
-  /** Points to [[PgNamespaceRow.nspname]] */
-  schemaname: String,
-  /** Points to [[PgClassRow.relname]] */
-  relname: String,
-  seqScan: /* unknown nullability */ Option[Long],
-  seqTupRead: /* unknown nullability */ Option[Long],
-  idxScan: /* unknown nullability */ Option[Long],
-  idxTupFetch: /* unknown nullability */ Option[Long],
-  nTupIns: /* unknown nullability */ Option[Long],
-  nTupUpd: /* unknown nullability */ Option[Long],
-  nTupDel: /* unknown nullability */ Option[Long],
-  nTupHotUpd: /* unknown nullability */ Option[Long]
+  relid: Option[Long],
+  schemaname: Option[String],
+  relname: Option[String],
+  seqScan: Option[Long],
+  seqTupRead: Option[Long],
+  idxScan: Option[Long],
+  idxTupFetch: Option[Long],
+  nTupIns: Option[Long],
+  nTupUpd: Option[Long],
+  nTupDel: Option[Long],
+  nTupHotUpd: Option[Long]
 )
 
 object PgStatXactAllTablesRow {
   implicit val rowParser: RowParser[PgStatXactAllTablesRow] = { row =>
     Success(
       PgStatXactAllTablesRow(
-        relid = row[Long]("relid"),
-        schemaname = row[String]("schemaname"),
-        relname = row[String]("relname"),
-        seqScan = row[/* unknown nullability */ Option[Long]]("seq_scan"),
-        seqTupRead = row[/* unknown nullability */ Option[Long]]("seq_tup_read"),
-        idxScan = row[/* unknown nullability */ Option[Long]]("idx_scan"),
-        idxTupFetch = row[/* unknown nullability */ Option[Long]]("idx_tup_fetch"),
-        nTupIns = row[/* unknown nullability */ Option[Long]]("n_tup_ins"),
-        nTupUpd = row[/* unknown nullability */ Option[Long]]("n_tup_upd"),
-        nTupDel = row[/* unknown nullability */ Option[Long]]("n_tup_del"),
-        nTupHotUpd = row[/* unknown nullability */ Option[Long]]("n_tup_hot_upd")
+        relid = row[Option[Long]]("relid"),
+        schemaname = row[Option[String]]("schemaname"),
+        relname = row[Option[String]]("relname"),
+        seqScan = row[Option[Long]]("seq_scan"),
+        seqTupRead = row[Option[Long]]("seq_tup_read"),
+        idxScan = row[Option[Long]]("idx_scan"),
+        idxTupFetch = row[Option[Long]]("idx_tup_fetch"),
+        nTupIns = row[Option[Long]]("n_tup_ins"),
+        nTupUpd = row[Option[Long]]("n_tup_upd"),
+        nTupDel = row[Option[Long]]("n_tup_del"),
+        nTupHotUpd = row[Option[Long]]("n_tup_hot_upd")
       )
     )
   }
@@ -72,9 +69,9 @@ object PgStatXactAllTablesRow {
       JsResult.fromTry(
         Try(
           PgStatXactAllTablesRow(
-            relid = json.\("relid").as[Long],
-            schemaname = json.\("schemaname").as[String],
-            relname = json.\("relname").as[String],
+            relid = json.\("relid").toOption.map(_.as[Long]),
+            schemaname = json.\("schemaname").toOption.map(_.as[String]),
+            relname = json.\("relname").toOption.map(_.as[String]),
             seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
             seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
             idxScan = json.\("idx_scan").toOption.map(_.as[Long]),

@@ -17,28 +17,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CharacterSetsRow(
-  characterSetCatalog: /* unknown nullability */ Option[String],
-  characterSetSchema: /* unknown nullability */ Option[String],
-  characterSetName: /* unknown nullability */ Option[String],
-  characterRepertoire: /* unknown nullability */ Option[String],
-  formOfUse: /* unknown nullability */ Option[String],
-  defaultCollateCatalog: /* unknown nullability */ Option[String],
-  defaultCollateSchema: /* unknown nullability */ Option[String],
-  defaultCollateName: /* unknown nullability */ Option[String]
+  characterSetCatalog: Option[String],
+  characterSetSchema: Option[String],
+  characterSetName: Option[String],
+  characterRepertoire: Option[String],
+  formOfUse: Option[String],
+  defaultCollateCatalog: Option[String],
+  defaultCollateSchema: Option[String],
+  defaultCollateName: Option[String]
 )
 
 object CharacterSetsRow {
   implicit val rowParser: RowParser[CharacterSetsRow] = { row =>
     Success(
       CharacterSetsRow(
-        characterSetCatalog = row[/* unknown nullability */ Option[String]]("character_set_catalog"),
-        characterSetSchema = row[/* unknown nullability */ Option[String]]("character_set_schema"),
-        characterSetName = row[/* unknown nullability */ Option[String]]("character_set_name"),
-        characterRepertoire = row[/* unknown nullability */ Option[String]]("character_repertoire"),
-        formOfUse = row[/* unknown nullability */ Option[String]]("form_of_use"),
-        defaultCollateCatalog = row[/* unknown nullability */ Option[String]]("default_collate_catalog"),
-        defaultCollateSchema = row[/* unknown nullability */ Option[String]]("default_collate_schema"),
-        defaultCollateName = row[/* unknown nullability */ Option[String]]("default_collate_name")
+        characterSetCatalog = row[Option[String]]("character_set_catalog"),
+        characterSetSchema = row[Option[String]]("character_set_schema"),
+        characterSetName = row[Option[String]]("character_set_name"),
+        characterRepertoire = row[Option[String]]("character_repertoire"),
+        formOfUse = row[Option[String]]("form_of_use"),
+        defaultCollateCatalog = row[Option[String]]("default_collate_catalog"),
+        defaultCollateSchema = row[Option[String]]("default_collate_schema"),
+        defaultCollateName = row[Option[String]]("default_collate_name")
       )
     )
   }

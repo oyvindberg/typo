@@ -9,6 +9,7 @@ package pg_catalog
 
 import anorm.RowParser
 import anorm.Success
+import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,43 +18,42 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgReplicationSlotsRow(
-  slotName: /* unknown nullability */ Option[String],
-  plugin: /* unknown nullability */ Option[String],
-  slotType: /* unknown nullability */ Option[String],
-  datoid: /* unknown nullability */ Option[Long],
-  /** Points to [[PgDatabaseRow.datname]] */
-  database: String,
-  temporary: /* unknown nullability */ Option[Boolean],
-  active: /* unknown nullability */ Option[Boolean],
-  activePid: /* unknown nullability */ Option[Int],
-  xmin: /* unknown nullability */ Option[/* xid */ String],
-  catalogXmin: /* unknown nullability */ Option[/* xid */ String],
-  restartLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  confirmedFlushLsn: /* unknown nullability */ Option[/* pg_lsn */ String],
-  walStatus: /* unknown nullability */ Option[String],
-  safeWalSize: /* unknown nullability */ Option[Long],
-  twoPhase: /* unknown nullability */ Option[Boolean]
+  slotName: Option[String],
+  plugin: Option[String],
+  slotType: Option[String],
+  datoid: Option[Long],
+  database: Option[String],
+  temporary: Option[Boolean],
+  active: Option[Boolean],
+  activePid: Option[Int],
+  xmin: Option[PGobject],
+  catalogXmin: Option[PGobject],
+  restartLsn: Option[String],
+  confirmedFlushLsn: Option[String],
+  walStatus: Option[String],
+  safeWalSize: Option[Long],
+  twoPhase: Option[Boolean]
 )
 
 object PgReplicationSlotsRow {
   implicit val rowParser: RowParser[PgReplicationSlotsRow] = { row =>
     Success(
       PgReplicationSlotsRow(
-        slotName = row[/* unknown nullability */ Option[String]]("slot_name"),
-        plugin = row[/* unknown nullability */ Option[String]]("plugin"),
-        slotType = row[/* unknown nullability */ Option[String]]("slot_type"),
-        datoid = row[/* unknown nullability */ Option[Long]]("datoid"),
-        database = row[String]("database"),
-        temporary = row[/* unknown nullability */ Option[Boolean]]("temporary"),
-        active = row[/* unknown nullability */ Option[Boolean]]("active"),
-        activePid = row[/* unknown nullability */ Option[Int]]("active_pid"),
-        xmin = row[/* unknown nullability */ Option[/* xid */ String]]("xmin"),
-        catalogXmin = row[/* unknown nullability */ Option[/* xid */ String]]("catalog_xmin"),
-        restartLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("restart_lsn"),
-        confirmedFlushLsn = row[/* unknown nullability */ Option[/* pg_lsn */ String]]("confirmed_flush_lsn"),
-        walStatus = row[/* unknown nullability */ Option[String]]("wal_status"),
-        safeWalSize = row[/* unknown nullability */ Option[Long]]("safe_wal_size"),
-        twoPhase = row[/* unknown nullability */ Option[Boolean]]("two_phase")
+        slotName = row[Option[String]]("slot_name"),
+        plugin = row[Option[String]]("plugin"),
+        slotType = row[Option[String]]("slot_type"),
+        datoid = row[Option[Long]]("datoid"),
+        database = row[Option[String]]("database"),
+        temporary = row[Option[Boolean]]("temporary"),
+        active = row[Option[Boolean]]("active"),
+        activePid = row[Option[Int]]("active_pid"),
+        xmin = row[Option[PGobject]]("xmin"),
+        catalogXmin = row[Option[PGobject]]("catalog_xmin"),
+        restartLsn = row[Option[String]]("restart_lsn"),
+        confirmedFlushLsn = row[Option[String]]("confirmed_flush_lsn"),
+        walStatus = row[Option[String]]("wal_status"),
+        safeWalSize = row[Option[Long]]("safe_wal_size"),
+        twoPhase = row[Option[Boolean]]("two_phase")
       )
     )
   }
@@ -86,14 +86,14 @@ object PgReplicationSlotsRow {
             plugin = json.\("plugin").toOption.map(_.as[String]),
             slotType = json.\("slot_type").toOption.map(_.as[String]),
             datoid = json.\("datoid").toOption.map(_.as[Long]),
-            database = json.\("database").as[String],
+            database = json.\("database").toOption.map(_.as[String]),
             temporary = json.\("temporary").toOption.map(_.as[Boolean]),
             active = json.\("active").toOption.map(_.as[Boolean]),
             activePid = json.\("active_pid").toOption.map(_.as[Int]),
-            xmin = json.\("xmin").toOption.map(_.as[/* xid */ String]),
-            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[/* xid */ String]),
-            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ String]),
-            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ String]),
+            xmin = json.\("xmin").toOption.map(_.as[PGobject]),
+            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[PGobject]),
+            restartLsn = json.\("restart_lsn").toOption.map(_.as[String]),
+            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[String]),
             walStatus = json.\("wal_status").toOption.map(_.as[String]),
             safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
             twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])

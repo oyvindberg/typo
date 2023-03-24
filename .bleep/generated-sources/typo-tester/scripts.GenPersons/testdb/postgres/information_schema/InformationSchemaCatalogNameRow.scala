@@ -17,14 +17,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class InformationSchemaCatalogNameRow(
-  catalogName: /* unknown nullability */ Option[String]
+  catalogName: Option[String]
 )
 
 object InformationSchemaCatalogNameRow {
   implicit val rowParser: RowParser[InformationSchemaCatalogNameRow] = { row =>
     Success(
       InformationSchemaCatalogNameRow(
-        catalogName = row[/* unknown nullability */ Option[String]]("catalog_name")
+        catalogName = row[Option[String]]("catalog_name")
       )
     )
   }

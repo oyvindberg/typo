@@ -1,30 +1,24 @@
 package typo
 
-import play.api.libs.json.Json
 import typo.doobie.{ColumnNullable, JdbcType}
 
-case class ViewComputed(pkg: sc.QIdent, view: View) {
-  val colsByName: Map[db.ColName, AnalyzeSql.Column] =
-    view.cols.map(col => (col.name, col)).toMap
+case class ViewComputed(pkg: sc.QIdent, view: db.View) {
+  val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
+    view.cols.map { dbCol =>
+      val finalType: sc.Type = typeMapper(pkg, dbCol)
 
-  val cols: List[ColumnComputed] = {
-    view.cols.map { col =>
-      val tpe: sc.Type = ViewComputed.scalaType(col).getOrElse {
-        val msg =
-          s"typo doesn't know how to translate: columnType: ${col.columnType}, columnTypeName: ${col.columnTypeName}, columnClassName: ${col.columnClassName}"
-        System.err.println(msg)
-        sc.Type.Any.withComment(msg)
-      }
-
-      val pointsTo = (col.baseColumnName, col.baseRelationName) match {
-        case (Some(colName), Some(relationName)) if relationName != view.name =>
-          Some((relationName, colName))
-        case _ =>
-          None
-      }
-      ColumnComputed(pointsTo, names.field(col.name), tpe, col.name, hasDefault = false, Json.toJson(col))
+      val pointsTo: Option[(db.RelationName, db.ColName)] = None
+//        (col.baseColumnName, col.baseRelationName) match {
+//        case (Some(colName), Some(relationName)) if relationName != view.name =>
+//          Some((relationName, colName))
+//        case _ =>
+//          None
+//      }
+      dbCol -> ColumnComputed(pointsTo, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
   }
+
+  val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(pkg, view.name, cols, maybeId = None)
   val RepoName: sc.QIdent = names.titleCase(pkg, view.name, "Repo")
   val RepoImplName: sc.QIdent = names.titleCase(pkg, view.name, "RepoImpl")
