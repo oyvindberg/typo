@@ -92,6 +92,6 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     SQL"""delete from pg_catalog.pg_publication where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniquePubname(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
-    ???
+    selectByFieldValues(List(PgPublicationFieldValue.pubname(pubname))).headOption
   }
 }

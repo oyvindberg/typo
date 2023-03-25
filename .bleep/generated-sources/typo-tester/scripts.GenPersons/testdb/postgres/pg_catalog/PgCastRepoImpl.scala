@@ -83,6 +83,6 @@ object PgCastRepoImpl extends PgCastRepo {
     SQL"""delete from pg_catalog.pg_cast where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueCastsourceCasttarget(castsource: Long, casttarget: Long)(implicit c: Connection): Option[PgCastRow] = {
-    ???
+    selectByFieldValues(List(PgCastFieldValue.castsource(castsource), PgCastFieldValue.casttarget(casttarget))).headOption
   }
 }

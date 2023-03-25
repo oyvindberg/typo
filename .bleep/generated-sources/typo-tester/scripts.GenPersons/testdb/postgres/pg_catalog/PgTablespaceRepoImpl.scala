@@ -80,6 +80,6 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     SQL"""delete from pg_catalog.pg_tablespace where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueSpcname(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
-    ???
+    selectByFieldValues(List(PgTablespaceFieldValue.spcname(spcname))).headOption
   }
 }

@@ -86,6 +86,6 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
     SQL"""delete from pg_catalog.pg_foreign_data_wrapper where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueFdwname(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
-    ???
+    selectByFieldValues(List(PgForeignDataWrapperFieldValue.fdwname(fdwname))).headOption
   }
 }

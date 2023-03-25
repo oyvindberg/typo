@@ -80,6 +80,6 @@ object PgTransformRepoImpl extends PgTransformRepo {
     SQL"""delete from pg_catalog.pg_transform where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueTrftypeTrflang(trftype: Long, trflang: Long)(implicit c: Connection): Option[PgTransformRow] = {
-    ???
+    selectByFieldValues(List(PgTransformFieldValue.trftype(trftype), PgTransformFieldValue.trflang(trflang))).headOption
   }
 }

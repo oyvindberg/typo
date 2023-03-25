@@ -86,6 +86,6 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     SQL"""delete from pg_catalog.pg_event_trigger where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueEvtname(evtname: String)(implicit c: Connection): Option[PgEventTriggerRow] = {
-    ???
+    selectByFieldValues(List(PgEventTriggerFieldValue.evtname(evtname))).headOption
   }
 }

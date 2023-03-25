@@ -164,6 +164,6 @@ object PgClassRepoImpl extends PgClassRepo {
     SQL"""delete from pg_catalog.pg_class where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: Long)(implicit c: Connection): Option[PgClassRow] = {
-    ???
+    selectByFieldValues(List(PgClassFieldValue.relname(relname), PgClassFieldValue.relnamespace(relnamespace))).headOption
   }
 }

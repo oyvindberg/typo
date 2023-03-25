@@ -92,6 +92,6 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     SQL"""delete from pg_catalog.pg_statistic_ext where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueStxnameStxnamespace(stxname: String, stxnamespace: Long)(implicit c: Connection): Option[PgStatisticExtRow] = {
-    ???
+    selectByFieldValues(List(PgStatisticExtFieldValue.stxname(stxname), PgStatisticExtFieldValue.stxnamespace(stxnamespace))).headOption
   }
 }

@@ -88,10 +88,10 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_conversion where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueConnamespaceConforencodingContoencodingOid(connamespace: Long, conforencoding: Int, contoencoding: Int, oid: Long)(implicit c: Connection): Option[PgConversionRow] = {
-    ???
+  override def selectByUniqueConnamespaceConforencodingContoencodingOid(connamespace: Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
+    selectByFieldValues(List(PgConversionFieldValue.connamespace(connamespace), PgConversionFieldValue.conforencoding(conforencoding), PgConversionFieldValue.contoencoding(contoencoding), PgConversionFieldValue.oid(oid))).headOption
   }
   override def selectByUniqueConnameConnamespace(conname: String, connamespace: Long)(implicit c: Connection): Option[PgConversionRow] = {
-    ???
+    selectByFieldValues(List(PgConversionFieldValue.conname(conname), PgConversionFieldValue.connamespace(connamespace))).headOption
   }
 }

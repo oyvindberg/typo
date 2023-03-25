@@ -77,6 +77,6 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     SQL"""delete from pg_catalog.pg_attrdef where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueAdrelidAdnum(adrelid: Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
-    ???
+    selectByFieldValues(List(PgAttrdefFieldValue.adrelid(adrelid), PgAttrdefFieldValue.adnum(adnum))).headOption
   }
 }

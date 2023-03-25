@@ -156,6 +156,6 @@ object PgProcRepoImpl extends PgProcRepo {
     SQL"""delete from pg_catalog.pg_proc where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniquePronameProargtypesPronamespace(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
-    ???
+    selectByFieldValues(List(PgProcFieldValue.proname(proname), PgProcFieldValue.proargtypes(proargtypes), PgProcFieldValue.pronamespace(pronamespace))).headOption
   }
 }

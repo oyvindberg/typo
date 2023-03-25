@@ -89,6 +89,6 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     SQL"""delete from pg_catalog.pg_ts_parser where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniquePrsnamePrsnamespace(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow] = {
-    ???
+    selectByFieldValues(List(PgTsParserFieldValue.prsname(prsname), PgTsParserFieldValue.prsnamespace(prsnamespace))).headOption
   }
 }

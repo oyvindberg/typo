@@ -86,6 +86,6 @@ object PgRangeRepoImpl extends PgRangeRepo {
     SQL"""delete from pg_catalog.pg_range where rngtypid = $rngtypid""".executeUpdate() > 0
   }
   override def selectByUniqueRngmultitypid(rngmultitypid: Long)(implicit c: Connection): Option[PgRangeRow] = {
-    ???
+    selectByFieldValues(List(PgRangeFieldValue.rngmultitypid(rngmultitypid))).headOption
   }
 }

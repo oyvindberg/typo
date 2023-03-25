@@ -80,6 +80,6 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     SQL"""delete from pg_catalog.pg_default_acl where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: Long, defaclnamespace: Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
-    ???
+    selectByFieldValues(List(PgDefaultAclFieldValue.defaclrole(defaclrole), PgDefaultAclFieldValue.defaclnamespace(defaclnamespace), PgDefaultAclFieldValue.defaclobjtype(defaclobjtype))).headOption
   }
 }

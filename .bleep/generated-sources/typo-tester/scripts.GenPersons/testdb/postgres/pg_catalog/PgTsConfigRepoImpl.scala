@@ -80,6 +80,6 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     SQL"""delete from pg_catalog.pg_ts_config where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueCfgnameCfgnamespace(cfgname: String, cfgnamespace: Long)(implicit c: Connection): Option[PgTsConfigRow] = {
-    ???
+    selectByFieldValues(List(PgTsConfigFieldValue.cfgname(cfgname), PgTsConfigFieldValue.cfgnamespace(cfgnamespace))).headOption
   }
 }

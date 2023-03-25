@@ -89,6 +89,6 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     SQL"""delete from pg_catalog.pg_policy where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniquePolrelidPolname(polrelid: Long, polname: String)(implicit c: Connection): Option[PgPolicyRow] = {
-    ???
+    selectByFieldValues(List(PgPolicyFieldValue.polrelid(polrelid), PgPolicyFieldValue.polname(polname))).headOption
   }
 }

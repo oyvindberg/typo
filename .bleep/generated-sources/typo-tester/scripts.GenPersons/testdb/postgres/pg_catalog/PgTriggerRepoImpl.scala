@@ -122,6 +122,6 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     SQL"""delete from pg_catalog.pg_trigger where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueTgrelidTgname(tgrelid: Long, tgname: String)(implicit c: Connection): Option[PgTriggerRow] = {
-    ???
+    selectByFieldValues(List(PgTriggerFieldValue.tgrelid(tgrelid), PgTriggerFieldValue.tgname(tgname))).headOption
   }
 }

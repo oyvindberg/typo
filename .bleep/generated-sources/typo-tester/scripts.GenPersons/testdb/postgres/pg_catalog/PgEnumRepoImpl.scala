@@ -77,9 +77,9 @@ object PgEnumRepoImpl extends PgEnumRepo {
     SQL"""delete from pg_catalog.pg_enum where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueEnumtypidEnumlabel(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
-    ???
+    selectByFieldValues(List(PgEnumFieldValue.enumtypid(enumtypid), PgEnumFieldValue.enumlabel(enumlabel))).headOption
   }
   override def selectByUniqueEnumtypidEnumsortorder(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
-    ???
+    selectByFieldValues(List(PgEnumFieldValue.enumtypid(enumtypid), PgEnumFieldValue.enumsortorder(enumsortorder))).headOption
   }
 }

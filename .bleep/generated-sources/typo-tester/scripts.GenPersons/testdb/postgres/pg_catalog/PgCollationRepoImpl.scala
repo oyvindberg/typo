@@ -95,6 +95,6 @@ object PgCollationRepoImpl extends PgCollationRepo {
     SQL"""delete from pg_catalog.pg_collation where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: Long)(implicit c: Connection): Option[PgCollationRow] = {
-    ???
+    selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption
   }
 }

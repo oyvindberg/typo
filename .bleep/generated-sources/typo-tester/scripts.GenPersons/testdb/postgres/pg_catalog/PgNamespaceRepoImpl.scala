@@ -77,6 +77,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""delete from pg_catalog.pg_namespace where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
-    ???
+    selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption
   }
 }

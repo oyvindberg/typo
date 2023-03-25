@@ -92,6 +92,6 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     SQL"""delete from pg_catalog.pg_opclass where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueOpcmethodOpcnameOpcnamespace(opcmethod: Long, opcname: String, opcnamespace: Long)(implicit c: Connection): Option[PgOpclassRow] = {
-    ???
+    selectByFieldValues(List(PgOpclassFieldValue.opcmethod(opcmethod), PgOpclassFieldValue.opcname(opcname), PgOpclassFieldValue.opcnamespace(opcnamespace))).headOption
   }
 }

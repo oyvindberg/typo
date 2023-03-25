@@ -107,6 +107,6 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
     SQL"""delete from pg_catalog.pg_database where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueDatname(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
-    ???
+    selectByFieldValues(List(PgDatabaseFieldValue.datname(datname))).headOption
   }
 }

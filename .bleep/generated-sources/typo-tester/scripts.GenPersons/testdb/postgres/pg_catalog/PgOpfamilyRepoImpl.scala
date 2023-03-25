@@ -80,6 +80,6 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     SQL"""delete from pg_catalog.pg_opfamily where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueOpfmethodOpfnameOpfnamespace(opfmethod: Long, opfname: String, opfnamespace: Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
-    ???
+    selectByFieldValues(List(PgOpfamilyFieldValue.opfmethod(opfmethod), PgOpfamilyFieldValue.opfname(opfname), PgOpfamilyFieldValue.opfnamespace(opfnamespace))).headOption
   }
 }

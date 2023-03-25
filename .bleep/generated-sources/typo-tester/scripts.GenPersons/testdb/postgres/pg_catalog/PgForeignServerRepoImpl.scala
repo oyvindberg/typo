@@ -89,6 +89,6 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     SQL"""delete from pg_catalog.pg_foreign_server where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueSrvname(srvname: String)(implicit c: Connection): Option[PgForeignServerRow] = {
-    ???
+    selectByFieldValues(List(PgForeignServerFieldValue.srvname(srvname))).headOption
   }
 }

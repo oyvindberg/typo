@@ -71,6 +71,6 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     SQL"""delete from pg_catalog.pg_replication_origin where roident = $roident""".executeUpdate() > 0
   }
   override def selectByUniqueRoname(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow] = {
-    ???
+    selectByFieldValues(List(PgReplicationOriginFieldValue.roname(roname))).headOption
   }
 }

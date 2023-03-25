@@ -115,7 +115,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           )
       },
       dbTable.uniqueKeys.map { uk =>
-        val params = uk.cols.map(colName => sc.Param(names.field(colName), typeMapper.scalaType(options.pkg, dbColsByName(colName))))
+        val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
         RepoMethod.SelectByUnique(params, RowType)
       }
     )

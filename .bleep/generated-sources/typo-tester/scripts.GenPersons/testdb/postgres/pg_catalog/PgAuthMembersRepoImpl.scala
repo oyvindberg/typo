@@ -73,6 +73,6 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     SQL"""delete from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid}, member = ${compositeId.member}""".executeUpdate() > 0
   }
   override def selectByUniqueMemberRoleid(member: Long, roleid: Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
-    ???
+    selectByFieldValues(List(PgAuthMembersFieldValue.member(member), PgAuthMembersFieldValue.roleid(roleid))).headOption
   }
 }

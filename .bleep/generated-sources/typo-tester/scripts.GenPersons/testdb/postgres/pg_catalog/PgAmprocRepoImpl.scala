@@ -83,6 +83,6 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     SQL"""delete from pg_catalog.pg_amproc where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueAmprocfamilyAmproclefttypeAmprocrighttypeAmprocnum(amprocfamily: Long, amproclefttype: Long, amprocrighttype: Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
-    ???
+    selectByFieldValues(List(PgAmprocFieldValue.amprocfamily(amprocfamily), PgAmprocFieldValue.amproclefttype(amproclefttype), PgAmprocFieldValue.amprocrighttype(amprocrighttype), PgAmprocFieldValue.amprocnum(amprocnum))).headOption
   }
 }

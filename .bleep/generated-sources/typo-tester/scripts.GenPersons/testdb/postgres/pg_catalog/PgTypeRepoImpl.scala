@@ -161,6 +161,6 @@ object PgTypeRepoImpl extends PgTypeRepo {
     SQL"""delete from pg_catalog.pg_type where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow] = {
-    ???
+    selectByFieldValues(List(PgTypeFieldValue.typname(typname), PgTypeFieldValue.typnamespace(typnamespace))).headOption
   }
 }

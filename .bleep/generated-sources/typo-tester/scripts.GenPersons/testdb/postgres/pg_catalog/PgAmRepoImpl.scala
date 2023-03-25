@@ -77,6 +77,6 @@ object PgAmRepoImpl extends PgAmRepo {
     SQL"""delete from pg_catalog.pg_am where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueAmname(amname: String)(implicit c: Connection): Option[PgAmRow] = {
-    ???
+    selectByFieldValues(List(PgAmFieldValue.amname(amname))).headOption
   }
 }

@@ -77,6 +77,6 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
     SQL"""delete from pg_catalog.pg_user_mapping where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueUmuserUmserver(umuser: Long, umserver: Long)(implicit c: Connection): Option[PgUserMappingRow] = {
-    ???
+    selectByFieldValues(List(PgUserMappingFieldValue.umuser(umuser), PgUserMappingFieldValue.umserver(umserver))).headOption
   }
 }

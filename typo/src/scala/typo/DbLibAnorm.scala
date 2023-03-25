@@ -68,7 +68,7 @@ object DbLibAnorm extends DbLib {
       code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectByUnique(params, rowType) =>
       val ident = names.camelCase(Array("selectByUnique") ++ params.map(_.name.value))
-      code"def $ident(${params.map(_.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
+      code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(param, rowType) =>
       code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.UpdateFieldValues(id, param) =>
@@ -111,7 +111,9 @@ object DbLibAnorm extends DbLib {
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
 
-      case RepoMethod.SelectByUnique(_, _) => "???"
+      case RepoMethod.SelectByUnique(params, _) =>
+        val args = params.map { param => code"${table.FieldValueName}.${param.name}(${param.name})" }.mkCode(", ")
+        code"""selectByFieldValues(${sc.Type.List}($args)).headOption"""
 
       case RepoMethod.SelectByFieldValues(param, _) =>
         val cases: Seq[sc.Code] =

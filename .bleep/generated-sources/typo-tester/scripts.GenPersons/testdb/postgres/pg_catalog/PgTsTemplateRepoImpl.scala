@@ -80,6 +80,6 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     SQL"""delete from pg_catalog.pg_ts_template where oid = $oid""".executeUpdate() > 0
   }
   override def selectByUniqueTmplnameTmplnamespace(tmplname: String, tmplnamespace: Long)(implicit c: Connection): Option[PgTsTemplateRow] = {
-    ???
+    selectByFieldValues(List(PgTsTemplateFieldValue.tmplname(tmplname), PgTsTemplateFieldValue.tmplnamespace(tmplnamespace))).headOption
   }
 }
