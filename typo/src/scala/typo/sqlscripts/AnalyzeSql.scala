@@ -1,4 +1,5 @@
 package typo
+package sqlscripts
 
 import play.api.libs.json.{Json, Writes}
 
@@ -13,14 +14,14 @@ object AnalyzeSql {
       columnDisplaySize: Int,
       columnLabel: db.ColName,
       columnName: db.ColName,
-      columnType: doobie.JdbcType,
+      columnType: JdbcType,
       columnTypeName: String,
       format: Int,
       isAutoIncrement: Boolean,
       isCaseSensitive: Boolean,
       isCurrency: Boolean,
       isDefinitelyWritable: Boolean,
-      isNullable: doobie.ColumnNullable,
+      isNullable: ColumnNullable,
       isReadOnly: Boolean,
       isSearchable: Boolean,
       isSigned: Boolean,
@@ -62,10 +63,10 @@ object AnalyzeSql {
   }
 
   case class ParameterColumn(
-      isNullable: doobie.ParameterNullable,
+      isNullable: ParameterNullable,
       isSigned: Boolean,
-      parameterMode: doobie.ParameterMode,
-      parameterType: doobie.JdbcType,
+      parameterMode: ParameterMode,
+      parameterType: JdbcType,
       parameterTypeName: String,
       precision: Int,
       scale: Int
@@ -84,14 +85,14 @@ object AnalyzeSql {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
           ParameterColumn(
-            isNullable = doobie.ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
+            isNullable = sqlscripts.ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
             },
             isSigned = metadata.isSigned(n),
-            parameterMode = doobie.ParameterMode.fromInt(metadata.getParameterMode(n)).getOrElse {
+            parameterMode = sqlscripts.ParameterMode.fromInt(metadata.getParameterMode(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.getParameterMode($n) = ${metadata.getParameterMode(n)}")
             },
-            parameterType = doobie.JdbcType.fromInt(metadata.getParameterType(n)),
+            parameterType = sqlscripts.JdbcType.fromInt(metadata.getParameterType(n)),
             parameterTypeName = metadata.getParameterTypeName(n),
             precision = metadata.getPrecision(n),
             scale = metadata.getScale(n)
@@ -112,14 +113,14 @@ object AnalyzeSql {
             columnDisplaySize = metadata.getColumnDisplaySize(n),
             columnLabel = db.ColName(metadata.getColumnLabel(n)),
             columnName = db.ColName(metadata.getColumnName(n)),
-            columnType = doobie.JdbcType.fromInt(metadata.getColumnType(n)),
+            columnType = sqlscripts.JdbcType.fromInt(metadata.getColumnType(n)),
             columnTypeName = metadata.getColumnTypeName(n),
             format = metadata.getFormat(n),
             isAutoIncrement = metadata.isAutoIncrement(n),
             isCaseSensitive = metadata.isCaseSensitive(n),
             isCurrency = metadata.isCurrency(n),
             isDefinitelyWritable = metadata.isDefinitelyWritable(n),
-            isNullable = doobie.ColumnNullable.fromInt(metadata.isNullable(n)).getOrElse {
+            isNullable = sqlscripts.ColumnNullable.fromInt(metadata.isNullable(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
             },
             isReadOnly = metadata.isReadOnly(n),

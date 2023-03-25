@@ -2,27 +2,18 @@
 // This software is licensed under the MIT License (MIT).
 // For more information see LICENSE or https://opensource.org/licenses/MIT
 
-package typo.doobie
+package typo
+package sqlscripts
 
-import java.sql.ParameterMetaData._
+import java.sql.ParameterMetaData
 
-/** @group Types */
 sealed abstract class ParameterMode(val toInt: Int) extends Product with Serializable
 
-/** @group Modules */
 object ParameterMode {
-
-  /** @group Values */
-  case object ModeIn extends ParameterMode(parameterModeIn)
-
-  /** @group Values */
-  case object ModeOut extends ParameterMode(parameterModeOut)
-
-  /** @group Values */
-  case object ModeInOut extends ParameterMode(parameterModeInOut)
-
-  /** @group Values */
-  case object ModeUnknown extends ParameterMode(parameterModeUnknown)
+  case object ModeIn extends ParameterMode(ParameterMetaData.parameterModeIn)
+  case object ModeOut extends ParameterMode(ParameterMetaData.parameterModeOut)
+  case object ModeInOut extends ParameterMode(ParameterMetaData.parameterModeInOut)
+  case object ModeUnknown extends ParameterMode(ParameterMetaData.parameterModeUnknown)
 
   def fromInt(n: Int): Option[ParameterMode] =
     Some(n) collect {

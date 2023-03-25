@@ -46,7 +46,7 @@ object db {
 
   case class StringEnum(name: db.RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
-  case class Col(name: ColName, tpe: Type, nullability: doobie.Nullability, hasDefault: Boolean, jsonDescription: JsValue)
+  case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, jsonDescription: JsValue)
   case class RelationName(schema: String, name: String)
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName = RelationName("", ""))
   case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName = RelationName("", "")) {

@@ -1,6 +1,5 @@
 package typo
 
-import typo.doobie.Nullability
 import typo.generated.information_schema.ColumnsRow
 
 object typeMapper {

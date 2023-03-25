@@ -1,7 +1,5 @@
 package typo
 
-import typo.doobie.Nullability
-
 case class TableComputed(options: Options, default: DefaultComputed, dbTable: db.Table) {
   val allKeyNames: Set[db.ColName] =
     (dbTable.primaryKey.toList.flatMap(_.colNames) ++ dbTable.uniqueKeys.flatMap(_.cols) ++ dbTable.foreignKeys.flatMap(_.cols)).toSet

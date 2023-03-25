@@ -63,9 +63,9 @@ object MetaDb {
               name = db.ColName(c.columnName.get),
               hasDefault = c.columnDefault.isDefined,
               nullability = c.isNullable match {
-                case Some("YES") => doobie.Nullability.Nullable
-                case Some("NO")  => doobie.Nullability.NoNulls
-                case None        => doobie.Nullability.NullableUnknown
+                case Some("YES") => Nullability.Nullable
+                case Some("NO")  => Nullability.NoNulls
+                case None        => Nullability.NullableUnknown
                 case other       => throw new Exception(s"Unknown nullability: $other")
               },
               tpe = typeMapper.dbTypeFrom(enumsByName, c),
