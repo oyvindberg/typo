@@ -23,10 +23,10 @@ object MetaDb {
         tableConstraints = TableConstraintsRepoImpl.selectAll,
         keyColumnUsage = KeyColumnUsageRepoImpl.selectAll,
         referentialConstraints = ReferentialConstraintsRepoImpl.selectAll,
-        pgEnums = PgEnum.all(c),
-        tablesRows = TablesRepoImpl.selectAll(c),
+        pgEnums = PgEnum.all,
+        tablesRows = TablesRepoImpl.selectAll,
         columnsRows = ColumnsRepoImpl.selectAll,
-        viewRows = ViewsRepo.all(c)
+        viewRows = ViewsRepo.all
       )
     }
   }
@@ -48,37 +48,38 @@ object MetaDb {
 
     val relations: List[db.Relation] = {
       input.tablesRows.map { table =>
-        val cols: List[db.Col] =
-          input.columnsRows
-            .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
-            .sortBy(_.ordinalPosition)
-            .map { c =>
-              db.Col(
-                name = db.ColName(c.columnName.get),
-                hasDefault = c.columnDefault.isDefined,
-                nullability = c.isNullable match {
-                  case Some("YES") => doobie.Nullability.Nullable
-                  case Some("NO")  => doobie.Nullability.NoNulls
-                  case None        => doobie.Nullability.NullableUnknown
-                  case _           => throw new Exception(s"Unknown nullability: ${c.isNullable}")
-                },
-                tpe = typeMapper.dbTypeFrom(enumsByName, c),
-                jsonDescription = Json.toJson(c)
-              )
-            }
-
         val relationName = db.RelationName(
           schema = table.tableSchema.get,
           name = table.tableName.get
         )
 
+        val columns = input.columnsRows
+          .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
+          .sortBy(_.ordinalPosition)
+
+        def mappedCols: List[db.Col] =
+          columns.map { c =>
+            db.Col(
+              name = db.ColName(c.columnName.get),
+              hasDefault = c.columnDefault.isDefined,
+              nullability = c.isNullable match {
+                case Some("YES") => doobie.Nullability.Nullable
+                case Some("NO")  => doobie.Nullability.NoNulls
+                case None        => doobie.Nullability.NullableUnknown
+                case other       => throw new Exception(s"Unknown nullability: $other")
+              },
+              tpe = typeMapper.dbTypeFrom(enumsByName, c),
+              jsonDescription = Json.toJson(c)
+            )
+          }
+
         groupedViewRows.get(relationName) match {
           case Some(view) =>
-            db.View(relationName, cols, view.view_definition, isMaterialized = view.relkind == "m")
+            db.View(relationName, mappedCols, view.view_definition, isMaterialized = view.relkind == "m")
           case None =>
             db.Table(
               name = relationName,
-              cols = cols,
+              cols = mappedCols,
               primaryKey = primaryKeys.get(relationName),
               uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
               foreignKeys = foreignKeys.getOrElse(relationName, List.empty)
