@@ -24,13 +24,13 @@ case class PgStatGssapiRow(
 )
 
 object PgStatGssapiRow {
-  implicit val rowParser: RowParser[PgStatGssapiRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatGssapiRow] = { row =>
     Success(
       PgStatGssapiRow(
-        pid = row[Option[Int]]("pid"),
-        gssAuthenticated = row[Option[Boolean]]("gss_authenticated"),
-        principal = row[Option[String]]("principal"),
-        encrypted = row[Option[Boolean]]("encrypted")
+        pid = row[Option[Int]](prefix + "pid"),
+        gssAuthenticated = row[Option[Boolean]](prefix + "gss_authenticated"),
+        principal = row[Option[String]](prefix + "principal"),
+        encrypted = row[Option[Boolean]](prefix + "encrypted")
       )
     )
   }

@@ -28,17 +28,17 @@ case class CharacterSetsRow(
 )
 
 object CharacterSetsRow {
-  implicit val rowParser: RowParser[CharacterSetsRow] = { row =>
+  def rowParser(prefix: String): RowParser[CharacterSetsRow] = { row =>
     Success(
       CharacterSetsRow(
-        characterSetCatalog = row[Option[String]]("character_set_catalog"),
-        characterSetSchema = row[Option[String]]("character_set_schema"),
-        characterSetName = row[Option[String]]("character_set_name"),
-        characterRepertoire = row[Option[String]]("character_repertoire"),
-        formOfUse = row[Option[String]]("form_of_use"),
-        defaultCollateCatalog = row[Option[String]]("default_collate_catalog"),
-        defaultCollateSchema = row[Option[String]]("default_collate_schema"),
-        defaultCollateName = row[Option[String]]("default_collate_name")
+        characterSetCatalog = row[Option[String]](prefix + "character_set_catalog"),
+        characterSetSchema = row[Option[String]](prefix + "character_set_schema"),
+        characterSetName = row[Option[String]](prefix + "character_set_name"),
+        characterRepertoire = row[Option[String]](prefix + "character_repertoire"),
+        formOfUse = row[Option[String]](prefix + "form_of_use"),
+        defaultCollateCatalog = row[Option[String]](prefix + "default_collate_catalog"),
+        defaultCollateSchema = row[Option[String]](prefix + "default_collate_schema"),
+        defaultCollateName = row[Option[String]](prefix + "default_collate_name")
       )
     )
   }

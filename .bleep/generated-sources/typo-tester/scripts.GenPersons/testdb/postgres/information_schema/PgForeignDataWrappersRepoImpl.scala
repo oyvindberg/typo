@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgForeignDataWrappersRepoImpl extends PgForeignDataWrappersRepo {
   override def selectAll(implicit c: Connection): List[PgForeignDataWrappersRow] = {
-    SQL"""select oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language from information_schema._pg_foreign_data_wrappers""".as(PgForeignDataWrappersRow.rowParser.*)
+    SQL"""select oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language from information_schema._pg_foreign_data_wrappers""".as(PgForeignDataWrappersRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgForeignDataWrappersFieldValue[_]])(implicit c: Connection): List[PgForeignDataWrappersRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgForeignDataWrappersRepoImpl extends PgForeignDataWrappersRepo {
         val q = s"""select * from information_schema._pg_foreign_data_wrappers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgForeignDataWrappersRow.rowParser.*)
+          .as(PgForeignDataWrappersRow.rowParser("").*)
     }
 
   }

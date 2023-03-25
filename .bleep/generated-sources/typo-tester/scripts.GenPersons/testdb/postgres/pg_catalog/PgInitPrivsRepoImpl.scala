@@ -15,10 +15,10 @@ import java.sql.Connection
 
 object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
   override def selectAll(implicit c: Connection): List[PgInitPrivsRow] = {
-    SQL"""select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs""".as(PgInitPrivsRow.rowParser.*)
+    SQL"""select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs""".as(PgInitPrivsRow.rowParser("").*)
   }
   override def selectById(compositeId: PgInitPrivsId)(implicit c: Connection): Option[PgInitPrivsRow] = {
-    SQL"""select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(PgInitPrivsRow.rowParser.singleOpt)
+    SQL"""select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(PgInitPrivsRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgInitPrivsFieldValue[_]])(implicit c: Connection): List[PgInitPrivsRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
         val q = s"""select * from pg_catalog.pg_init_privs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgInitPrivsRow.rowParser.*)
+          .as(PgInitPrivsRow.rowParser("").*)
     }
 
   }

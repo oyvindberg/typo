@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object RoutineSequenceUsageRepoImpl extends RoutineSequenceUsageRepo {
   override def selectAll(implicit c: Connection): List[RoutineSequenceUsageRow] = {
-    SQL"""select specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, sequence_catalog, sequence_schema, sequence_name from information_schema.routine_sequence_usage""".as(RoutineSequenceUsageRow.rowParser.*)
+    SQL"""select specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, sequence_catalog, sequence_schema, sequence_name from information_schema.routine_sequence_usage""".as(RoutineSequenceUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[RoutineSequenceUsageFieldValue[_]])(implicit c: Connection): List[RoutineSequenceUsageRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object RoutineSequenceUsageRepoImpl extends RoutineSequenceUsageRepo {
         val q = s"""select * from information_schema.routine_sequence_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(RoutineSequenceUsageRow.rowParser.*)
+          .as(RoutineSequenceUsageRow.rowParser("").*)
     }
 
   }

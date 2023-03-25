@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgRulesRepoImpl extends PgRulesRepo {
   override def selectAll(implicit c: Connection): List[PgRulesRow] = {
-    SQL"""select schemaname, tablename, rulename, definition from pg_catalog.pg_rules""".as(PgRulesRow.rowParser.*)
+    SQL"""select schemaname, tablename, rulename, definition from pg_catalog.pg_rules""".as(PgRulesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgRulesFieldValue[_]])(implicit c: Connection): List[PgRulesRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ object PgRulesRepoImpl extends PgRulesRepo {
         val q = s"""select * from pg_catalog.pg_rules where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgRulesRow.rowParser.*)
+          .as(PgRulesRow.rowParser("").*)
     }
 
   }

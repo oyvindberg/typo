@@ -27,16 +27,16 @@ case class PgEventTriggerRow(
 )
 
 object PgEventTriggerRow {
-  implicit val rowParser: RowParser[PgEventTriggerRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgEventTriggerRow] = { row =>
     Success(
       PgEventTriggerRow(
-        oid = row[PgEventTriggerId]("oid"),
-        evtname = row[String]("evtname"),
-        evtevent = row[String]("evtevent"),
-        evtowner = row[Long]("evtowner"),
-        evtfoid = row[Long]("evtfoid"),
-        evtenabled = row[String]("evtenabled"),
-        evttags = row[Option[Array[String]]]("evttags")
+        oid = row[PgEventTriggerId](prefix + "oid"),
+        evtname = row[String](prefix + "evtname"),
+        evtevent = row[String](prefix + "evtevent"),
+        evtowner = row[Long](prefix + "evtowner"),
+        evtfoid = row[Long](prefix + "evtfoid"),
+        evtenabled = row[String](prefix + "evtenabled"),
+        evttags = row[Option[Array[String]]](prefix + "evttags")
       )
     )
   }

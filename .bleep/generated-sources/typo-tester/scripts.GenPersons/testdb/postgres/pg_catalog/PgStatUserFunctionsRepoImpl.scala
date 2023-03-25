@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatUserFunctionsRepoImpl extends PgStatUserFunctionsRepo {
   override def selectAll(implicit c: Connection): List[PgStatUserFunctionsRow] = {
-    SQL"""select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_user_functions""".as(PgStatUserFunctionsRow.rowParser.*)
+    SQL"""select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_user_functions""".as(PgStatUserFunctionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatUserFunctionsFieldValue[_]])(implicit c: Connection): List[PgStatUserFunctionsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgStatUserFunctionsRepoImpl extends PgStatUserFunctionsRepo {
         val q = s"""select * from pg_catalog.pg_stat_user_functions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatUserFunctionsRow.rowParser.*)
+          .as(PgStatUserFunctionsRow.rowParser("").*)
     }
 
   }

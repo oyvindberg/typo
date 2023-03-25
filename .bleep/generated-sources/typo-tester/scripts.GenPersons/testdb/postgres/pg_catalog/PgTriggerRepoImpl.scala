@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def selectAll(implicit c: Connection): List[PgTriggerRow] = {
-    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger""".as(PgTriggerRow.rowParser.*)
+    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger""".as(PgTriggerRow.rowParser("").*)
   }
   override def selectById(oid: PgTriggerId)(implicit c: Connection): Option[PgTriggerRow] = {
-    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = $oid""".as(PgTriggerRow.rowParser.singleOpt)
+    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = $oid""".as(PgTriggerRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTriggerId])(implicit c: Connection): List[PgTriggerRow] = {
-    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid in $oids""".as(PgTriggerRow.rowParser.*)
+    SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid in $oids""".as(PgTriggerRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTriggerFieldValue[_]])(implicit c: Connection): List[PgTriggerRow] = {
     fieldValues match {
@@ -51,7 +51,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
         val q = s"""select * from pg_catalog.pg_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTriggerRow.rowParser.*)
+          .as(PgTriggerRow.rowParser("").*)
     }
 
   }

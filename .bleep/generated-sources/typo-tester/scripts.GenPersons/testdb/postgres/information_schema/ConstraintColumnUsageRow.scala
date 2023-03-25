@@ -27,16 +27,16 @@ case class ConstraintColumnUsageRow(
 )
 
 object ConstraintColumnUsageRow {
-  implicit val rowParser: RowParser[ConstraintColumnUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[ConstraintColumnUsageRow] = { row =>
     Success(
       ConstraintColumnUsageRow(
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name"),
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name")
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name"),
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name")
       )
     )
   }

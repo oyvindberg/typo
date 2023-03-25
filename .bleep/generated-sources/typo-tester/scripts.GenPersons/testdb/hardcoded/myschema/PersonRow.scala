@@ -33,20 +33,20 @@ case class PersonRow(
 )
 
 object PersonRow {
-  implicit val rowParser: RowParser[PersonRow] = { row =>
+  def rowParser(prefix: String): RowParser[PersonRow] = { row =>
     Success(
       PersonRow(
-        id = row[PersonId]("id"),
-        favouriteFootballClubId = row[String]("favourite_football_club_id"),
-        name = row[String]("name"),
-        nickName = row[Option[String]]("nick_name"),
-        blogUrl = row[Option[String]]("blog_url"),
-        email = row[String]("email"),
-        phone = row[String]("phone"),
-        likesPizza = row[Boolean]("likes_pizza"),
-        maritalStatusId = row[String]("marital_status_id"),
-        workEmail = row[Option[String]]("work_email"),
-        sector = row[SectorEnum]("sector")
+        id = row[PersonId](prefix + "id"),
+        favouriteFootballClubId = row[String](prefix + "favourite_football_club_id"),
+        name = row[String](prefix + "name"),
+        nickName = row[Option[String]](prefix + "nick_name"),
+        blogUrl = row[Option[String]](prefix + "blog_url"),
+        email = row[String](prefix + "email"),
+        phone = row[String](prefix + "phone"),
+        likesPizza = row[Boolean](prefix + "likes_pizza"),
+        maritalStatusId = row[String](prefix + "marital_status_id"),
+        workEmail = row[Option[String]](prefix + "work_email"),
+        sector = row[SectorEnum](prefix + "sector")
       )
     )
   }

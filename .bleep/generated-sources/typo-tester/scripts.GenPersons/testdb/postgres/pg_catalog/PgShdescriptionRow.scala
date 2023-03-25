@@ -25,12 +25,12 @@ case class PgShdescriptionRow(
 }
 
 object PgShdescriptionRow {
-  implicit val rowParser: RowParser[PgShdescriptionRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgShdescriptionRow] = { row =>
     Success(
       PgShdescriptionRow(
-        objoid = row[Long]("objoid"),
-        classoid = row[Long]("classoid"),
-        description = row[String]("description")
+        objoid = row[Long](prefix + "objoid"),
+        classoid = row[Long](prefix + "classoid"),
+        description = row[String](prefix + "description")
       )
     )
   }

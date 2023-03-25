@@ -26,15 +26,15 @@ case class CheckConstraintRoutineUsageRow(
 )
 
 object CheckConstraintRoutineUsageRow {
-  implicit val rowParser: RowParser[CheckConstraintRoutineUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[CheckConstraintRoutineUsageRow] = { row =>
     Success(
       CheckConstraintRoutineUsageRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name")
       )
     )
   }

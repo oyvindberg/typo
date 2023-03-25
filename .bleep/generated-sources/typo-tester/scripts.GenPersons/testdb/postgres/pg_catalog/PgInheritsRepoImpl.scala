@@ -15,10 +15,10 @@ import java.sql.Connection
 
 object PgInheritsRepoImpl extends PgInheritsRepo {
   override def selectAll(implicit c: Connection): List[PgInheritsRow] = {
-    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits""".as(PgInheritsRow.rowParser.*)
+    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits""".as(PgInheritsRow.rowParser("").*)
   }
   override def selectById(compositeId: PgInheritsId)(implicit c: Connection): Option[PgInheritsRow] = {
-    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}""".as(PgInheritsRow.rowParser.singleOpt)
+    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid}, inhseqno = ${compositeId.inhseqno}""".as(PgInheritsRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgInheritsFieldValue[_]])(implicit c: Connection): List[PgInheritsRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
         val q = s"""select * from pg_catalog.pg_inherits where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgInheritsRow.rowParser.*)
+          .as(PgInheritsRow.rowParser("").*)
     }
 
   }

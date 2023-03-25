@@ -15,10 +15,10 @@ import java.sql.Connection
 
 object PgShseclabelRepoImpl extends PgShseclabelRepo {
   override def selectAll(implicit c: Connection): List[PgShseclabelRow] = {
-    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel""".as(PgShseclabelRow.rowParser.*)
+    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel""".as(PgShseclabelRow.rowParser("").*)
   }
   override def selectById(compositeId: PgShseclabelId)(implicit c: Connection): Option[PgShseclabelRow] = {
-    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}""".as(PgShseclabelRow.rowParser.singleOpt)
+    SQL"""select objoid, classoid, provider, label from pg_catalog.pg_shseclabel where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, provider = ${compositeId.provider}""".as(PgShseclabelRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgShseclabelFieldValue[_]])(implicit c: Connection): List[PgShseclabelRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
         val q = s"""select * from pg_catalog.pg_shseclabel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgShseclabelRow.rowParser.*)
+          .as(PgShseclabelRow.rowParser("").*)
     }
 
   }

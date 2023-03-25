@@ -27,16 +27,16 @@ case class PgUserMappingsRow(
 )
 
 object PgUserMappingsRow {
-  implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        oid = row[Option[Long]]("oid"),
-        umoptions = row[Option[Array[String]]]("umoptions"),
-        umuser = row[Option[Long]]("umuser"),
-        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name"),
-        srvowner = row[Option[String]]("srvowner")
+        oid = row[Option[Long]](prefix + "oid"),
+        umoptions = row[Option[Array[String]]](prefix + "umoptions"),
+        umuser = row[Option[Long]](prefix + "umuser"),
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier"),
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
+        srvowner = row[Option[String]](prefix + "srvowner")
       )
     )
   }

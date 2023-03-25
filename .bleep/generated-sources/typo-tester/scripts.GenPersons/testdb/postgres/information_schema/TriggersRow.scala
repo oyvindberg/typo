@@ -38,26 +38,26 @@ case class TriggersRow(
 )
 
 object TriggersRow {
-  implicit val rowParser: RowParser[TriggersRow] = { row =>
+  def rowParser(prefix: String): RowParser[TriggersRow] = { row =>
     Success(
       TriggersRow(
-        triggerCatalog = row[Option[String]]("trigger_catalog"),
-        triggerSchema = row[Option[String]]("trigger_schema"),
-        triggerName = row[Option[String]]("trigger_name"),
-        eventManipulation = row[Option[String]]("event_manipulation"),
-        eventObjectCatalog = row[Option[String]]("event_object_catalog"),
-        eventObjectSchema = row[Option[String]]("event_object_schema"),
-        eventObjectTable = row[Option[String]]("event_object_table"),
-        actionOrder = row[Option[Int]]("action_order"),
-        actionCondition = row[Option[String]]("action_condition"),
-        actionStatement = row[Option[String]]("action_statement"),
-        actionOrientation = row[Option[String]]("action_orientation"),
-        actionTiming = row[Option[String]]("action_timing"),
-        actionReferenceOldTable = row[Option[String]]("action_reference_old_table"),
-        actionReferenceNewTable = row[Option[String]]("action_reference_new_table"),
-        actionReferenceOldRow = row[Option[String]]("action_reference_old_row"),
-        actionReferenceNewRow = row[Option[String]]("action_reference_new_row"),
-        created = row[Option[ZonedDateTime]]("created")
+        triggerCatalog = row[Option[String]](prefix + "trigger_catalog"),
+        triggerSchema = row[Option[String]](prefix + "trigger_schema"),
+        triggerName = row[Option[String]](prefix + "trigger_name"),
+        eventManipulation = row[Option[String]](prefix + "event_manipulation"),
+        eventObjectCatalog = row[Option[String]](prefix + "event_object_catalog"),
+        eventObjectSchema = row[Option[String]](prefix + "event_object_schema"),
+        eventObjectTable = row[Option[String]](prefix + "event_object_table"),
+        actionOrder = row[Option[Int]](prefix + "action_order"),
+        actionCondition = row[Option[String]](prefix + "action_condition"),
+        actionStatement = row[Option[String]](prefix + "action_statement"),
+        actionOrientation = row[Option[String]](prefix + "action_orientation"),
+        actionTiming = row[Option[String]](prefix + "action_timing"),
+        actionReferenceOldTable = row[Option[String]](prefix + "action_reference_old_table"),
+        actionReferenceNewTable = row[Option[String]](prefix + "action_reference_new_table"),
+        actionReferenceOldRow = row[Option[String]](prefix + "action_reference_old_row"),
+        actionReferenceNewRow = row[Option[String]](prefix + "action_reference_new_row"),
+        created = row[Option[ZonedDateTime]](prefix + "created")
       )
     )
   }

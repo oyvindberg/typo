@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object ColumnUdtUsageRepoImpl extends ColumnUdtUsageRepo {
   override def selectAll(implicit c: Connection): List[ColumnUdtUsageRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, table_catalog, table_schema, table_name, column_name from information_schema.column_udt_usage""".as(ColumnUdtUsageRow.rowParser.*)
+    SQL"""select udt_catalog, udt_schema, udt_name, table_catalog, table_schema, table_name, column_name from information_schema.column_udt_usage""".as(ColumnUdtUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ColumnUdtUsageFieldValue[_]])(implicit c: Connection): List[ColumnUdtUsageRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object ColumnUdtUsageRepoImpl extends ColumnUdtUsageRepo {
         val q = s"""select * from information_schema.column_udt_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ColumnUdtUsageRow.rowParser.*)
+          .as(ColumnUdtUsageRow.rowParser("").*)
     }
 
   }

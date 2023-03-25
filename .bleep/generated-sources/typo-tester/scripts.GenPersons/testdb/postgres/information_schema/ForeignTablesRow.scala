@@ -25,14 +25,14 @@ case class ForeignTablesRow(
 )
 
 object ForeignTablesRow {
-  implicit val rowParser: RowParser[ForeignTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[ForeignTablesRow] = { row =>
     Success(
       ForeignTablesRow(
-        foreignTableCatalog = row[Option[String]]("foreign_table_catalog"),
-        foreignTableSchema = row[Option[String]]("foreign_table_schema"),
-        foreignTableName = row[Option[String]]("foreign_table_name"),
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name")
+        foreignTableCatalog = row[Option[String]](prefix + "foreign_table_catalog"),
+        foreignTableSchema = row[Option[String]](prefix + "foreign_table_schema"),
+        foreignTableName = row[Option[String]](prefix + "foreign_table_name"),
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name")
       )
     )
   }

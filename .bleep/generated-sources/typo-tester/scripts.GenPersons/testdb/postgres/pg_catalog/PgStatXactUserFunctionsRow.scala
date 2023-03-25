@@ -26,15 +26,15 @@ case class PgStatXactUserFunctionsRow(
 )
 
 object PgStatXactUserFunctionsRow {
-  implicit val rowParser: RowParser[PgStatXactUserFunctionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatXactUserFunctionsRow] = { row =>
     Success(
       PgStatXactUserFunctionsRow(
-        funcid = row[Option[Long]]("funcid"),
-        schemaname = row[Option[String]]("schemaname"),
-        funcname = row[Option[String]]("funcname"),
-        calls = row[Option[Long]]("calls"),
-        totalTime = row[Option[Double]]("total_time"),
-        selfTime = row[Option[Double]]("self_time")
+        funcid = row[Option[Long]](prefix + "funcid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        funcname = row[Option[String]](prefix + "funcname"),
+        calls = row[Option[Long]](prefix + "calls"),
+        totalTime = row[Option[Double]](prefix + "total_time"),
+        selfTime = row[Option[Double]](prefix + "self_time")
       )
     )
   }

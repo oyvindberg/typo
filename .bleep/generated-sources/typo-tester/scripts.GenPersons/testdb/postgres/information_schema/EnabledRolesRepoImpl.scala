@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object EnabledRolesRepoImpl extends EnabledRolesRepo {
   override def selectAll(implicit c: Connection): List[EnabledRolesRow] = {
-    SQL"""select role_name from information_schema.enabled_roles""".as(EnabledRolesRow.rowParser.*)
+    SQL"""select role_name from information_schema.enabled_roles""".as(EnabledRolesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[EnabledRolesFieldValue[_]])(implicit c: Connection): List[EnabledRolesRow] = {
     fieldValues match {
@@ -27,7 +27,7 @@ object EnabledRolesRepoImpl extends EnabledRolesRepo {
         val q = s"""select * from information_schema.enabled_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(EnabledRolesRow.rowParser.*)
+          .as(EnabledRolesRow.rowParser("").*)
     }
 
   }

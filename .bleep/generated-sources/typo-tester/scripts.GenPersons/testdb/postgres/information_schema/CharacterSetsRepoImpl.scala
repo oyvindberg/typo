@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object CharacterSetsRepoImpl extends CharacterSetsRepo {
   override def selectAll(implicit c: Connection): List[CharacterSetsRow] = {
-    SQL"""select character_set_catalog, character_set_schema, character_set_name, character_repertoire, form_of_use, default_collate_catalog, default_collate_schema, default_collate_name from information_schema.character_sets""".as(CharacterSetsRow.rowParser.*)
+    SQL"""select character_set_catalog, character_set_schema, character_set_name, character_repertoire, form_of_use, default_collate_catalog, default_collate_schema, default_collate_name from information_schema.character_sets""".as(CharacterSetsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[CharacterSetsFieldValue[_]])(implicit c: Connection): List[CharacterSetsRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object CharacterSetsRepoImpl extends CharacterSetsRepo {
         val q = s"""select * from information_schema.character_sets where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(CharacterSetsRow.rowParser.*)
+          .as(CharacterSetsRow.rowParser("").*)
     }
 
   }

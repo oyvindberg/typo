@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatWalRepoImpl extends PgStatWalRepo {
   override def selectAll(implicit c: Connection): List[PgStatWalRow] = {
-    SQL"""select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset from pg_catalog.pg_stat_wal""".as(PgStatWalRow.rowParser.*)
+    SQL"""select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset from pg_catalog.pg_stat_wal""".as(PgStatWalRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatWalFieldValue[_]])(implicit c: Connection): List[PgStatWalRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgStatWalRepoImpl extends PgStatWalRepo {
         val q = s"""select * from pg_catalog.pg_stat_wal where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatWalRow.rowParser.*)
+          .as(PgStatWalRow.rowParser("").*)
     }
 
   }

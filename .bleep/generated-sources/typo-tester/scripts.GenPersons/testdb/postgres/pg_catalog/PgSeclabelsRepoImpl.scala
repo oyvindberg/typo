@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgSeclabelsRepoImpl extends PgSeclabelsRepo {
   override def selectAll(implicit c: Connection): List[PgSeclabelsRow] = {
-    SQL"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, label from pg_catalog.pg_seclabels""".as(PgSeclabelsRow.rowParser.*)
+    SQL"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, label from pg_catalog.pg_seclabels""".as(PgSeclabelsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgSeclabelsFieldValue[_]])(implicit c: Connection): List[PgSeclabelsRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object PgSeclabelsRepoImpl extends PgSeclabelsRepo {
         val q = s"""select * from pg_catalog.pg_seclabels where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgSeclabelsRow.rowParser.*)
+          .as(PgSeclabelsRow.rowParser("").*)
     }
 
   }

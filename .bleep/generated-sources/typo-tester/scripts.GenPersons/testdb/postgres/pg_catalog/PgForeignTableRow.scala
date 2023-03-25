@@ -23,12 +23,12 @@ case class PgForeignTableRow(
 )
 
 object PgForeignTableRow {
-  implicit val rowParser: RowParser[PgForeignTableRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignTableRow] = { row =>
     Success(
       PgForeignTableRow(
-        ftrelid = row[PgForeignTableId]("ftrelid"),
-        ftserver = row[Long]("ftserver"),
-        ftoptions = row[Option[Array[String]]]("ftoptions")
+        ftrelid = row[PgForeignTableId](prefix + "ftrelid"),
+        ftserver = row[Long](prefix + "ftserver"),
+        ftoptions = row[Option[Array[String]]](prefix + "ftoptions")
       )
     )
   }

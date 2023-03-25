@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object AttributesRepoImpl extends AttributesRepo {
   override def selectAll(implicit c: Connection): List[AttributesRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, attribute_name, ordinal_position, attribute_default, is_nullable, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, attribute_udt_catalog, attribute_udt_schema, attribute_udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_derived_reference_attribute from information_schema.attributes""".as(AttributesRow.rowParser.*)
+    SQL"""select udt_catalog, udt_schema, udt_name, attribute_name, ordinal_position, attribute_default, is_nullable, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, attribute_udt_catalog, attribute_udt_schema, attribute_udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_derived_reference_attribute from information_schema.attributes""".as(AttributesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[AttributesFieldValue[_]])(implicit c: Connection): List[AttributesRow] = {
     fieldValues match {
@@ -57,7 +57,7 @@ object AttributesRepoImpl extends AttributesRepo {
         val q = s"""select * from information_schema.attributes where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(AttributesRow.rowParser.*)
+          .as(AttributesRow.rowParser("").*)
     }
 
   }

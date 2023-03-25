@@ -25,14 +25,14 @@ case class PgStatioUserSequencesRow(
 )
 
 object PgStatioUserSequencesRow {
-  implicit val rowParser: RowParser[PgStatioUserSequencesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatioUserSequencesRow] = { row =>
     Success(
       PgStatioUserSequencesRow(
-        relid = row[Option[Long]]("relid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        blksRead = row[Option[Long]]("blks_read"),
-        blksHit = row[Option[Long]]("blks_hit")
+        relid = row[Option[Long]](prefix + "relid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        blksRead = row[Option[Long]](prefix + "blks_read"),
+        blksHit = row[Option[Long]](prefix + "blks_hit")
       )
     )
   }

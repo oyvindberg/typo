@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def selectAll(implicit c: Connection): List[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template""".as(PgTsTemplateRow.rowParser.*)
+    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template""".as(PgTsTemplateRow.rowParser("").*)
   }
   override def selectById(oid: PgTsTemplateId)(implicit c: Connection): Option[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = $oid""".as(PgTsTemplateRow.rowParser.singleOpt)
+    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = $oid""".as(PgTsTemplateRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTsTemplateId])(implicit c: Connection): List[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid in $oids""".as(PgTsTemplateRow.rowParser.*)
+    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid in $oids""".as(PgTsTemplateRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTsTemplateFieldValue[_]])(implicit c: Connection): List[PgTsTemplateRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
         val q = s"""select * from pg_catalog.pg_ts_template where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTsTemplateRow.rowParser.*)
+          .as(PgTsTemplateRow.rowParser("").*)
     }
 
   }

@@ -28,17 +28,17 @@ case class PgExtensionRow(
 )
 
 object PgExtensionRow {
-  implicit val rowParser: RowParser[PgExtensionRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgExtensionRow] = { row =>
     Success(
       PgExtensionRow(
-        oid = row[PgExtensionId]("oid"),
-        extname = row[String]("extname"),
-        extowner = row[Long]("extowner"),
-        extnamespace = row[Long]("extnamespace"),
-        extrelocatable = row[Boolean]("extrelocatable"),
-        extversion = row[String]("extversion"),
-        extconfig = row[Option[Array[Long]]]("extconfig"),
-        extcondition = row[Option[Array[String]]]("extcondition")
+        oid = row[PgExtensionId](prefix + "oid"),
+        extname = row[String](prefix + "extname"),
+        extowner = row[Long](prefix + "extowner"),
+        extnamespace = row[Long](prefix + "extnamespace"),
+        extrelocatable = row[Boolean](prefix + "extrelocatable"),
+        extversion = row[String](prefix + "extversion"),
+        extconfig = row[Option[Array[Long]]](prefix + "extconfig"),
+        extcondition = row[Option[Array[String]]](prefix + "extcondition")
       )
     )
   }

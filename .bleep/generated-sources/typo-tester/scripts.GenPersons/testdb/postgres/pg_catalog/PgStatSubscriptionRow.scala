@@ -30,18 +30,18 @@ case class PgStatSubscriptionRow(
 )
 
 object PgStatSubscriptionRow {
-  implicit val rowParser: RowParser[PgStatSubscriptionRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatSubscriptionRow] = { row =>
     Success(
       PgStatSubscriptionRow(
-        subid = row[Option[Long]]("subid"),
-        subname = row[Option[String]]("subname"),
-        pid = row[Option[Int]]("pid"),
-        relid = row[Option[Long]]("relid"),
-        receivedLsn = row[Option[String]]("received_lsn"),
-        lastMsgSendTime = row[Option[ZonedDateTime]]("last_msg_send_time"),
-        lastMsgReceiptTime = row[Option[ZonedDateTime]]("last_msg_receipt_time"),
-        latestEndLsn = row[Option[String]]("latest_end_lsn"),
-        latestEndTime = row[Option[ZonedDateTime]]("latest_end_time")
+        subid = row[Option[Long]](prefix + "subid"),
+        subname = row[Option[String]](prefix + "subname"),
+        pid = row[Option[Int]](prefix + "pid"),
+        relid = row[Option[Long]](prefix + "relid"),
+        receivedLsn = row[Option[String]](prefix + "received_lsn"),
+        lastMsgSendTime = row[Option[ZonedDateTime]](prefix + "last_msg_send_time"),
+        lastMsgReceiptTime = row[Option[ZonedDateTime]](prefix + "last_msg_receipt_time"),
+        latestEndLsn = row[Option[String]](prefix + "latest_end_lsn"),
+        latestEndTime = row[Option[ZonedDateTime]](prefix + "latest_end_time")
       )
     )
   }

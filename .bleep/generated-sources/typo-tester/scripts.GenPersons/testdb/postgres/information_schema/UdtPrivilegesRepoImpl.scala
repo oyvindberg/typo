@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object UdtPrivilegesRepoImpl extends UdtPrivilegesRepo {
   override def selectAll(implicit c: Connection): List[UdtPrivilegesRow] = {
-    SQL"""select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable from information_schema.udt_privileges""".as(UdtPrivilegesRow.rowParser.*)
+    SQL"""select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable from information_schema.udt_privileges""".as(UdtPrivilegesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[UdtPrivilegesFieldValue[_]])(implicit c: Connection): List[UdtPrivilegesRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object UdtPrivilegesRepoImpl extends UdtPrivilegesRepo {
         val q = s"""select * from information_schema.udt_privileges where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(UdtPrivilegesRow.rowParser.*)
+          .as(UdtPrivilegesRow.rowParser("").*)
     }
 
   }

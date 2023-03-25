@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
   override def selectAll(implicit c: Connection): List[SqlFeaturesRow] = {
-    SQL"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, comments from information_schema.sql_features""".as(SqlFeaturesRow.rowParser.*)
+    SQL"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, comments from information_schema.sql_features""".as(SqlFeaturesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SqlFeaturesFieldValue[_]])(implicit c: Connection): List[SqlFeaturesRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
         val q = s"""select * from information_schema.sql_features where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SqlFeaturesRow.rowParser.*)
+          .as(SqlFeaturesRow.rowParser("").*)
     }
 
   }

@@ -25,13 +25,13 @@ case class PgAttrdefRow(
 )
 
 object PgAttrdefRow {
-  implicit val rowParser: RowParser[PgAttrdefRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAttrdefRow] = { row =>
     Success(
       PgAttrdefRow(
-        oid = row[PgAttrdefId]("oid"),
-        adrelid = row[Long]("adrelid"),
-        adnum = row[Int]("adnum"),
-        adbin = row[PGobject]("adbin")
+        oid = row[PgAttrdefId](prefix + "oid"),
+        adrelid = row[Long](prefix + "adrelid"),
+        adnum = row[Int](prefix + "adnum"),
+        adbin = row[PGobject](prefix + "adbin")
       )
     )
   }

@@ -26,13 +26,13 @@ case class PgAuthMembersRow(
 }
 
 object PgAuthMembersRow {
-  implicit val rowParser: RowParser[PgAuthMembersRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAuthMembersRow] = { row =>
     Success(
       PgAuthMembersRow(
-        roleid = row[Long]("roleid"),
-        member = row[Long]("member"),
-        grantor = row[Long]("grantor"),
-        adminOption = row[Boolean]("admin_option")
+        roleid = row[Long](prefix + "roleid"),
+        member = row[Long](prefix + "member"),
+        grantor = row[Long](prefix + "grantor"),
+        adminOption = row[Boolean](prefix + "admin_option")
       )
     )
   }

@@ -44,32 +44,32 @@ case class PgStatSysTablesRow(
 )
 
 object PgStatSysTablesRow {
-  implicit val rowParser: RowParser[PgStatSysTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatSysTablesRow] = { row =>
     Success(
       PgStatSysTablesRow(
-        relid = row[Option[Long]]("relid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        seqScan = row[Option[Long]]("seq_scan"),
-        seqTupRead = row[Option[Long]]("seq_tup_read"),
-        idxScan = row[Option[Long]]("idx_scan"),
-        idxTupFetch = row[Option[Long]]("idx_tup_fetch"),
-        nTupIns = row[Option[Long]]("n_tup_ins"),
-        nTupUpd = row[Option[Long]]("n_tup_upd"),
-        nTupDel = row[Option[Long]]("n_tup_del"),
-        nTupHotUpd = row[Option[Long]]("n_tup_hot_upd"),
-        nLiveTup = row[Option[Long]]("n_live_tup"),
-        nDeadTup = row[Option[Long]]("n_dead_tup"),
-        nModSinceAnalyze = row[Option[Long]]("n_mod_since_analyze"),
-        nInsSinceVacuum = row[Option[Long]]("n_ins_since_vacuum"),
-        lastVacuum = row[Option[ZonedDateTime]]("last_vacuum"),
-        lastAutovacuum = row[Option[ZonedDateTime]]("last_autovacuum"),
-        lastAnalyze = row[Option[ZonedDateTime]]("last_analyze"),
-        lastAutoanalyze = row[Option[ZonedDateTime]]("last_autoanalyze"),
-        vacuumCount = row[Option[Long]]("vacuum_count"),
-        autovacuumCount = row[Option[Long]]("autovacuum_count"),
-        analyzeCount = row[Option[Long]]("analyze_count"),
-        autoanalyzeCount = row[Option[Long]]("autoanalyze_count")
+        relid = row[Option[Long]](prefix + "relid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        seqScan = row[Option[Long]](prefix + "seq_scan"),
+        seqTupRead = row[Option[Long]](prefix + "seq_tup_read"),
+        idxScan = row[Option[Long]](prefix + "idx_scan"),
+        idxTupFetch = row[Option[Long]](prefix + "idx_tup_fetch"),
+        nTupIns = row[Option[Long]](prefix + "n_tup_ins"),
+        nTupUpd = row[Option[Long]](prefix + "n_tup_upd"),
+        nTupDel = row[Option[Long]](prefix + "n_tup_del"),
+        nTupHotUpd = row[Option[Long]](prefix + "n_tup_hot_upd"),
+        nLiveTup = row[Option[Long]](prefix + "n_live_tup"),
+        nDeadTup = row[Option[Long]](prefix + "n_dead_tup"),
+        nModSinceAnalyze = row[Option[Long]](prefix + "n_mod_since_analyze"),
+        nInsSinceVacuum = row[Option[Long]](prefix + "n_ins_since_vacuum"),
+        lastVacuum = row[Option[ZonedDateTime]](prefix + "last_vacuum"),
+        lastAutovacuum = row[Option[ZonedDateTime]](prefix + "last_autovacuum"),
+        lastAnalyze = row[Option[ZonedDateTime]](prefix + "last_analyze"),
+        lastAutoanalyze = row[Option[ZonedDateTime]](prefix + "last_autoanalyze"),
+        vacuumCount = row[Option[Long]](prefix + "vacuum_count"),
+        autovacuumCount = row[Option[Long]](prefix + "autovacuum_count"),
+        analyzeCount = row[Option[Long]](prefix + "analyze_count"),
+        autoanalyzeCount = row[Option[Long]](prefix + "autoanalyze_count")
       )
     )
   }

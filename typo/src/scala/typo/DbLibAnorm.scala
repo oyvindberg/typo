@@ -40,8 +40,8 @@ object DbLibAnorm extends DbLib {
   }
 
   override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
-    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbName.value)})" }
-    val rowParser = code"""implicit val $rowParserIdent: ${RowParser(tpe)} = { row =>
+    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](prefix + ${sc.StrLit(x.dbName.value)})" }
+    val rowParser = code"""def $rowParserIdent(prefix: String): ${RowParser(tpe)} = { row =>
             |    $Success(
             |      $tpe(
             |        ${mappedValues.mkCode(",\n        ")}
@@ -55,7 +55,7 @@ object DbLibAnorm extends DbLib {
   override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type, colName: db.ColName): List[sc.Code] = {
     val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
     val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
-    val rowParser = code"implicit val $rowParserIdent: ${RowParser(wrapperType)} = $SqlParser.get[$wrapperType](${sc.StrLit(colName.value)})"
+    val rowParser = code"def $rowParserIdent(prefix: String): ${RowParser(wrapperType)} = $SqlParser.get[$wrapperType](prefix + ${sc.StrLit(colName.value)})"
     List(toStatement, column, rowParser)
   }
 
@@ -98,17 +98,17 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.SelectAll(_) =>
         val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent.*)"""
+        code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
 
       case RepoMethod.SelectById(id, _) =>
         val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchId(id)}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent.singleOpt)"""
+        code"""$sql.as(${table.RowName}.$rowParserIdent("").singleOpt)"""
 
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
         val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent.*)"""
+        code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
 
       case RepoMethod.SelectByUnique(_, _) => "???"
 
@@ -130,7 +130,7 @@ object DbLibAnorm extends DbLib {
               |        val q = $sql
               |        $SQL(q)
               |          .on(namedParams: _*)
-              |          .as(${table.RowName}.$rowParserIdent.*)
+              |          .as(${table.RowName}.$rowParserIdent("").*)
               |    }
               |""".stripMargin
 
@@ -182,7 +182,7 @@ object DbLibAnorm extends DbLib {
                |
                |    $sql
                |      .on(namedParameters :_*)
-               |      .executeInsert(${id.tpe}.$rowParserIdent.single)
+               |      .executeInsert(${id.tpe}.$rowParserIdent("").single)
                |"""
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>

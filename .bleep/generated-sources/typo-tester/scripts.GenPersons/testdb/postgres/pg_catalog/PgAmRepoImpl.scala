@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgAmRepoImpl extends PgAmRepo {
   override def selectAll(implicit c: Connection): List[PgAmRow] = {
-    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am""".as(PgAmRow.rowParser.*)
+    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am""".as(PgAmRow.rowParser("").*)
   }
   override def selectById(oid: PgAmId)(implicit c: Connection): Option[PgAmRow] = {
-    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = $oid""".as(PgAmRow.rowParser.singleOpt)
+    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = $oid""".as(PgAmRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAmId])(implicit c: Connection): List[PgAmRow] = {
-    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid in $oids""".as(PgAmRow.rowParser.*)
+    SQL"""select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid in $oids""".as(PgAmRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAmFieldValue[_]])(implicit c: Connection): List[PgAmRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PgAmRepoImpl extends PgAmRepo {
         val q = s"""select * from pg_catalog.pg_am where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAmRow.rowParser.*)
+          .as(PgAmRow.rowParser("").*)
     }
 
   }

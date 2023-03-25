@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def selectAll(implicit c: Connection): List[PgSequenceRow] = {
-    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence""".as(PgSequenceRow.rowParser.*)
+    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence""".as(PgSequenceRow.rowParser("").*)
   }
   override def selectById(seqrelid: PgSequenceId)(implicit c: Connection): Option[PgSequenceRow] = {
-    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = $seqrelid""".as(PgSequenceRow.rowParser.singleOpt)
+    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = $seqrelid""".as(PgSequenceRow.rowParser("").singleOpt)
   }
   override def selectByIds(seqrelids: List[PgSequenceId])(implicit c: Connection): List[PgSequenceRow] = {
-    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid in $seqrelids""".as(PgSequenceRow.rowParser.*)
+    SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid in $seqrelids""".as(PgSequenceRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgSequenceFieldValue[_]])(implicit c: Connection): List[PgSequenceRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
         val q = s"""select * from pg_catalog.pg_sequence where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgSequenceRow.rowParser.*)
+          .as(PgSequenceRow.rowParser("").*)
     }
 
   }

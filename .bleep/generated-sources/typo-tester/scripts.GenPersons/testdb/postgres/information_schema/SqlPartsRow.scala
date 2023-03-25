@@ -25,14 +25,14 @@ case class SqlPartsRow(
 )
 
 object SqlPartsRow {
-  implicit val rowParser: RowParser[SqlPartsRow] = { row =>
+  def rowParser(prefix: String): RowParser[SqlPartsRow] = { row =>
     Success(
       SqlPartsRow(
-        featureId = row[Option[String]]("feature_id"),
-        featureName = row[Option[String]]("feature_name"),
-        isSupported = row[Option[String]]("is_supported"),
-        isVerifiedBy = row[Option[String]]("is_verified_by"),
-        comments = row[Option[String]]("comments")
+        featureId = row[Option[String]](prefix + "feature_id"),
+        featureName = row[Option[String]](prefix + "feature_name"),
+        isSupported = row[Option[String]](prefix + "is_supported"),
+        isVerifiedBy = row[Option[String]](prefix + "is_verified_by"),
+        comments = row[Option[String]](prefix + "comments")
       )
     )
   }

@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status""".as(MaritalStatusRow.rowParser.*)
+    SQL"""select id from myschema.marital_status""".as(MaritalStatusRow.rowParser("").*)
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status where id = $id""".as(MaritalStatusRow.rowParser.singleOpt)
+    SQL"""select id from myschema.marital_status where id = $id""".as(MaritalStatusRow.rowParser("").singleOpt)
   }
   override def selectByIds(ids: List[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status where id in $ids""".as(MaritalStatusRow.rowParser.*)
+    SQL"""select id from myschema.marital_status where id in $ids""".as(MaritalStatusRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         val q = s"""select * from myschema.marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(MaritalStatusRow.rowParser.*)
+          .as(MaritalStatusRow.rowParser("").*)
     }
 
   }

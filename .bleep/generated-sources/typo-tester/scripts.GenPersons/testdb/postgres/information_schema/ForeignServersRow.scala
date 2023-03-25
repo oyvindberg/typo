@@ -27,16 +27,16 @@ case class ForeignServersRow(
 )
 
 object ForeignServersRow {
-  implicit val rowParser: RowParser[ForeignServersRow] = { row =>
+  def rowParser(prefix: String): RowParser[ForeignServersRow] = { row =>
     Success(
       ForeignServersRow(
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name"),
-        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
-        foreignServerType = row[Option[String]]("foreign_server_type"),
-        foreignServerVersion = row[Option[String]]("foreign_server_version"),
-        authorizationIdentifier = row[Option[String]]("authorization_identifier")
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
+        foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
+        foreignServerType = row[Option[String]](prefix + "foreign_server_type"),
+        foreignServerVersion = row[Option[String]](prefix + "foreign_server_version"),
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier")
       )
     )
   }

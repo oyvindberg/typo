@@ -28,14 +28,14 @@ case class PgInitPrivsRow(
 }
 
 object PgInitPrivsRow {
-  implicit val rowParser: RowParser[PgInitPrivsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgInitPrivsRow] = { row =>
     Success(
       PgInitPrivsRow(
-        objoid = row[Long]("objoid"),
-        classoid = row[Long]("classoid"),
-        objsubid = row[Int]("objsubid"),
-        privtype = row[String]("privtype"),
-        initprivs = row[Array[PGobject]]("initprivs")
+        objoid = row[Long](prefix + "objoid"),
+        classoid = row[Long](prefix + "classoid"),
+        objsubid = row[Int](prefix + "objsubid"),
+        privtype = row[String](prefix + "privtype"),
+        initprivs = row[Array[PGobject]](prefix + "initprivs")
       )
     )
   }

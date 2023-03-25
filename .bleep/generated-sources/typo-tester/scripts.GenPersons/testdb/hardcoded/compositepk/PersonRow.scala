@@ -25,12 +25,12 @@ case class PersonRow(
 }
 
 object PersonRow {
-  implicit val rowParser: RowParser[PersonRow] = { row =>
+  def rowParser(prefix: String): RowParser[PersonRow] = { row =>
     Success(
       PersonRow(
-        one = row[Long]("one"),
-        two = row[Option[String]]("two"),
-        name = row[Option[String]]("name")
+        one = row[Long](prefix + "one"),
+        two = row[Option[String]](prefix + "two"),
+        name = row[Option[String]](prefix + "name")
       )
     )
   }

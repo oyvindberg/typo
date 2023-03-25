@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object RoleRoutineGrantsRepoImpl extends RoleRoutineGrantsRepo {
   override def selectAll(implicit c: Connection): List[RoleRoutineGrantsRow] = {
-    SQL"""select grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, privilege_type, is_grantable from information_schema.role_routine_grants""".as(RoleRoutineGrantsRow.rowParser.*)
+    SQL"""select grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, privilege_type, is_grantable from information_schema.role_routine_grants""".as(RoleRoutineGrantsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[RoleRoutineGrantsFieldValue[_]])(implicit c: Connection): List[RoleRoutineGrantsRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object RoleRoutineGrantsRepoImpl extends RoleRoutineGrantsRepo {
         val q = s"""select * from information_schema.role_routine_grants where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(RoleRoutineGrantsRow.rowParser.*)
+          .as(RoleRoutineGrantsRow.rowParser("").*)
     }
 
   }

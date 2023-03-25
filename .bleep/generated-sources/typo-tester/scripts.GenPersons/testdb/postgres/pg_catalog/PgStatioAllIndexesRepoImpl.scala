@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatioAllIndexesRepoImpl extends PgStatioAllIndexesRepo {
   override def selectAll(implicit c: Connection): List[PgStatioAllIndexesRow] = {
-    SQL"""select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit from pg_catalog.pg_statio_all_indexes""".as(PgStatioAllIndexesRow.rowParser.*)
+    SQL"""select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit from pg_catalog.pg_statio_all_indexes""".as(PgStatioAllIndexesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatioAllIndexesFieldValue[_]])(implicit c: Connection): List[PgStatioAllIndexesRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgStatioAllIndexesRepoImpl extends PgStatioAllIndexesRepo {
         val q = s"""select * from pg_catalog.pg_statio_all_indexes where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatioAllIndexesRow.rowParser.*)
+          .as(PgStatioAllIndexesRow.rowParser("").*)
     }
 
   }

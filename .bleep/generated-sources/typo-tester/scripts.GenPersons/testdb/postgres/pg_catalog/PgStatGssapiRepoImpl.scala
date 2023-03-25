@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatGssapiRepoImpl extends PgStatGssapiRepo {
   override def selectAll(implicit c: Connection): List[PgStatGssapiRow] = {
-    SQL"""select pid, gss_authenticated, principal, encrypted from pg_catalog.pg_stat_gssapi""".as(PgStatGssapiRow.rowParser.*)
+    SQL"""select pid, gss_authenticated, principal, encrypted from pg_catalog.pg_stat_gssapi""".as(PgStatGssapiRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatGssapiFieldValue[_]])(implicit c: Connection): List[PgStatGssapiRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ object PgStatGssapiRepoImpl extends PgStatGssapiRepo {
         val q = s"""select * from pg_catalog.pg_stat_gssapi where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatGssapiRow.rowParser.*)
+          .as(PgStatGssapiRow.rowParser("").*)
     }
 
   }

@@ -26,13 +26,13 @@ case class PgSubscriptionRelRow(
 }
 
 object PgSubscriptionRelRow {
-  implicit val rowParser: RowParser[PgSubscriptionRelRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSubscriptionRelRow] = { row =>
     Success(
       PgSubscriptionRelRow(
-        srsubid = row[Long]("srsubid"),
-        srrelid = row[Long]("srrelid"),
-        srsubstate = row[String]("srsubstate"),
-        srsublsn = row[Option[String]]("srsublsn")
+        srsubid = row[Long](prefix + "srsubid"),
+        srrelid = row[Long](prefix + "srrelid"),
+        srsubstate = row[String](prefix + "srsubstate"),
+        srsublsn = row[Option[String]](prefix + "srsublsn")
       )
     )
   }

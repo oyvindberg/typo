@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgPreparedStatementsRepoImpl extends PgPreparedStatementsRepo {
   override def selectAll(implicit c: Connection): List[PgPreparedStatementsRow] = {
-    SQL"""select name, statement, prepare_time, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".as(PgPreparedStatementsRow.rowParser.*)
+    SQL"""select name, statement, prepare_time, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".as(PgPreparedStatementsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPreparedStatementsFieldValue[_]])(implicit c: Connection): List[PgPreparedStatementsRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgPreparedStatementsRepoImpl extends PgPreparedStatementsRepo {
         val q = s"""select * from pg_catalog.pg_prepared_statements where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPreparedStatementsRow.rowParser.*)
+          .as(PgPreparedStatementsRow.rowParser("").*)
     }
 
   }

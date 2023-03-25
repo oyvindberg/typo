@@ -25,12 +25,12 @@ case class PgLargeobjectRow(
 }
 
 object PgLargeobjectRow {
-  implicit val rowParser: RowParser[PgLargeobjectRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgLargeobjectRow] = { row =>
     Success(
       PgLargeobjectRow(
-        loid = row[Long]("loid"),
-        pageno = row[Int]("pageno"),
-        data = row[Array[Byte]]("data")
+        loid = row[Long](prefix + "loid"),
+        pageno = row[Int](prefix + "pageno"),
+        data = row[Array[Byte]](prefix + "data")
       )
     )
   }

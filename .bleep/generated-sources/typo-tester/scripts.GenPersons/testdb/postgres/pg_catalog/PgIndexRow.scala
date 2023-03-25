@@ -41,29 +41,29 @@ case class PgIndexRow(
 )
 
 object PgIndexRow {
-  implicit val rowParser: RowParser[PgIndexRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgIndexRow] = { row =>
     Success(
       PgIndexRow(
-        indexrelid = row[PgIndexId]("indexrelid"),
-        indrelid = row[Long]("indrelid"),
-        indnatts = row[Int]("indnatts"),
-        indnkeyatts = row[Int]("indnkeyatts"),
-        indisunique = row[Boolean]("indisunique"),
-        indisprimary = row[Boolean]("indisprimary"),
-        indisexclusion = row[Boolean]("indisexclusion"),
-        indimmediate = row[Boolean]("indimmediate"),
-        indisclustered = row[Boolean]("indisclustered"),
-        indisvalid = row[Boolean]("indisvalid"),
-        indcheckxmin = row[Boolean]("indcheckxmin"),
-        indisready = row[Boolean]("indisready"),
-        indislive = row[Boolean]("indislive"),
-        indisreplident = row[Boolean]("indisreplident"),
-        indkey = row[PGobject]("indkey"),
-        indcollation = row[PGobject]("indcollation"),
-        indclass = row[PGobject]("indclass"),
-        indoption = row[PGobject]("indoption"),
-        indexprs = row[Option[PGobject]]("indexprs"),
-        indpred = row[Option[PGobject]]("indpred")
+        indexrelid = row[PgIndexId](prefix + "indexrelid"),
+        indrelid = row[Long](prefix + "indrelid"),
+        indnatts = row[Int](prefix + "indnatts"),
+        indnkeyatts = row[Int](prefix + "indnkeyatts"),
+        indisunique = row[Boolean](prefix + "indisunique"),
+        indisprimary = row[Boolean](prefix + "indisprimary"),
+        indisexclusion = row[Boolean](prefix + "indisexclusion"),
+        indimmediate = row[Boolean](prefix + "indimmediate"),
+        indisclustered = row[Boolean](prefix + "indisclustered"),
+        indisvalid = row[Boolean](prefix + "indisvalid"),
+        indcheckxmin = row[Boolean](prefix + "indcheckxmin"),
+        indisready = row[Boolean](prefix + "indisready"),
+        indislive = row[Boolean](prefix + "indislive"),
+        indisreplident = row[Boolean](prefix + "indisreplident"),
+        indkey = row[PGobject](prefix + "indkey"),
+        indcollation = row[PGobject](prefix + "indcollation"),
+        indclass = row[PGobject](prefix + "indclass"),
+        indoption = row[PGobject](prefix + "indoption"),
+        indexprs = row[Option[PGobject]](prefix + "indexprs"),
+        indpred = row[Option[PGobject]](prefix + "indpred")
       )
     )
   }

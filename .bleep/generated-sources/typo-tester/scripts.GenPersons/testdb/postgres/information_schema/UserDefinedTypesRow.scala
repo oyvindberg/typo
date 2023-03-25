@@ -49,38 +49,38 @@ case class UserDefinedTypesRow(
 )
 
 object UserDefinedTypesRow {
-  implicit val rowParser: RowParser[UserDefinedTypesRow] = { row =>
+  def rowParser(prefix: String): RowParser[UserDefinedTypesRow] = { row =>
     Success(
       UserDefinedTypesRow(
-        userDefinedTypeCatalog = row[Option[String]]("user_defined_type_catalog"),
-        userDefinedTypeSchema = row[Option[String]]("user_defined_type_schema"),
-        userDefinedTypeName = row[Option[String]]("user_defined_type_name"),
-        userDefinedTypeCategory = row[Option[String]]("user_defined_type_category"),
-        isInstantiable = row[Option[String]]("is_instantiable"),
-        isFinal = row[Option[String]]("is_final"),
-        orderingForm = row[Option[String]]("ordering_form"),
-        orderingCategory = row[Option[String]]("ordering_category"),
-        orderingRoutineCatalog = row[Option[String]]("ordering_routine_catalog"),
-        orderingRoutineSchema = row[Option[String]]("ordering_routine_schema"),
-        orderingRoutineName = row[Option[String]]("ordering_routine_name"),
-        referenceType = row[Option[String]]("reference_type"),
-        dataType = row[Option[String]]("data_type"),
-        characterMaximumLength = row[Option[Int]]("character_maximum_length"),
-        characterOctetLength = row[Option[Int]]("character_octet_length"),
-        characterSetCatalog = row[Option[String]]("character_set_catalog"),
-        characterSetSchema = row[Option[String]]("character_set_schema"),
-        characterSetName = row[Option[String]]("character_set_name"),
-        collationCatalog = row[Option[String]]("collation_catalog"),
-        collationSchema = row[Option[String]]("collation_schema"),
-        collationName = row[Option[String]]("collation_name"),
-        numericPrecision = row[Option[Int]]("numeric_precision"),
-        numericPrecisionRadix = row[Option[Int]]("numeric_precision_radix"),
-        numericScale = row[Option[Int]]("numeric_scale"),
-        datetimePrecision = row[Option[Int]]("datetime_precision"),
-        intervalType = row[Option[String]]("interval_type"),
-        intervalPrecision = row[Option[Int]]("interval_precision"),
-        sourceDtdIdentifier = row[Option[String]]("source_dtd_identifier"),
-        refDtdIdentifier = row[Option[String]]("ref_dtd_identifier")
+        userDefinedTypeCatalog = row[Option[String]](prefix + "user_defined_type_catalog"),
+        userDefinedTypeSchema = row[Option[String]](prefix + "user_defined_type_schema"),
+        userDefinedTypeName = row[Option[String]](prefix + "user_defined_type_name"),
+        userDefinedTypeCategory = row[Option[String]](prefix + "user_defined_type_category"),
+        isInstantiable = row[Option[String]](prefix + "is_instantiable"),
+        isFinal = row[Option[String]](prefix + "is_final"),
+        orderingForm = row[Option[String]](prefix + "ordering_form"),
+        orderingCategory = row[Option[String]](prefix + "ordering_category"),
+        orderingRoutineCatalog = row[Option[String]](prefix + "ordering_routine_catalog"),
+        orderingRoutineSchema = row[Option[String]](prefix + "ordering_routine_schema"),
+        orderingRoutineName = row[Option[String]](prefix + "ordering_routine_name"),
+        referenceType = row[Option[String]](prefix + "reference_type"),
+        dataType = row[Option[String]](prefix + "data_type"),
+        characterMaximumLength = row[Option[Int]](prefix + "character_maximum_length"),
+        characterOctetLength = row[Option[Int]](prefix + "character_octet_length"),
+        characterSetCatalog = row[Option[String]](prefix + "character_set_catalog"),
+        characterSetSchema = row[Option[String]](prefix + "character_set_schema"),
+        characterSetName = row[Option[String]](prefix + "character_set_name"),
+        collationCatalog = row[Option[String]](prefix + "collation_catalog"),
+        collationSchema = row[Option[String]](prefix + "collation_schema"),
+        collationName = row[Option[String]](prefix + "collation_name"),
+        numericPrecision = row[Option[Int]](prefix + "numeric_precision"),
+        numericPrecisionRadix = row[Option[Int]](prefix + "numeric_precision_radix"),
+        numericScale = row[Option[Int]](prefix + "numeric_scale"),
+        datetimePrecision = row[Option[Int]](prefix + "datetime_precision"),
+        intervalType = row[Option[String]](prefix + "interval_type"),
+        intervalPrecision = row[Option[Int]](prefix + "interval_precision"),
+        sourceDtdIdentifier = row[Option[String]](prefix + "source_dtd_identifier"),
+        refDtdIdentifier = row[Option[String]](prefix + "ref_dtd_identifier")
       )
     )
   }

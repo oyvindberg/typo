@@ -27,15 +27,15 @@ case class PgAmprocRow(
 )
 
 object PgAmprocRow {
-  implicit val rowParser: RowParser[PgAmprocRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAmprocRow] = { row =>
     Success(
       PgAmprocRow(
-        oid = row[PgAmprocId]("oid"),
-        amprocfamily = row[Long]("amprocfamily"),
-        amproclefttype = row[Long]("amproclefttype"),
-        amprocrighttype = row[Long]("amprocrighttype"),
-        amprocnum = row[Int]("amprocnum"),
-        amproc = row[PGobject]("amproc")
+        oid = row[PgAmprocId](prefix + "oid"),
+        amprocfamily = row[Long](prefix + "amprocfamily"),
+        amproclefttype = row[Long](prefix + "amproclefttype"),
+        amprocrighttype = row[Long](prefix + "amprocrighttype"),
+        amprocnum = row[Int](prefix + "amprocnum"),
+        amproc = row[PGobject](prefix + "amproc")
       )
     )
   }

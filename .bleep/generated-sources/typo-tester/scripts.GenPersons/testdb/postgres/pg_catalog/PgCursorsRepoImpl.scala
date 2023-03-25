@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgCursorsRepoImpl extends PgCursorsRepo {
   override def selectAll(implicit c: Connection): List[PgCursorsRow] = {
-    SQL"""select name, statement, is_holdable, is_binary, is_scrollable, creation_time from pg_catalog.pg_cursors""".as(PgCursorsRow.rowParser.*)
+    SQL"""select name, statement, is_holdable, is_binary, is_scrollable, creation_time from pg_catalog.pg_cursors""".as(PgCursorsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgCursorsFieldValue[_]])(implicit c: Connection): List[PgCursorsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgCursorsRepoImpl extends PgCursorsRepo {
         val q = s"""select * from pg_catalog.pg_cursors where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgCursorsRow.rowParser.*)
+          .as(PgCursorsRow.rowParser("").*)
     }
 
   }

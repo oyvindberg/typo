@@ -29,18 +29,18 @@ case class KeyColumnUsageRow(
 )
 
 object KeyColumnUsageRow {
-  implicit val rowParser: RowParser[KeyColumnUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[KeyColumnUsageRow] = { row =>
     Success(
       KeyColumnUsageRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name"),
-        ordinalPosition = row[Option[Int]]("ordinal_position"),
-        positionInUniqueConstraint = row[Option[Int]]("position_in_unique_constraint")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name"),
+        ordinalPosition = row[Option[Int]](prefix + "ordinal_position"),
+        positionInUniqueConstraint = row[Option[Int]](prefix + "position_in_unique_constraint")
       )
     )
   }

@@ -29,17 +29,17 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  implicit val rowParser: RowParser[PgTsParserRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsParserRow] = { row =>
     Success(
       PgTsParserRow(
-        oid = row[PgTsParserId]("oid"),
-        prsname = row[String]("prsname"),
-        prsnamespace = row[Long]("prsnamespace"),
-        prsstart = row[PGobject]("prsstart"),
-        prstoken = row[PGobject]("prstoken"),
-        prsend = row[PGobject]("prsend"),
-        prsheadline = row[PGobject]("prsheadline"),
-        prslextype = row[PGobject]("prslextype")
+        oid = row[PgTsParserId](prefix + "oid"),
+        prsname = row[String](prefix + "prsname"),
+        prsnamespace = row[Long](prefix + "prsnamespace"),
+        prsstart = row[PGobject](prefix + "prsstart"),
+        prstoken = row[PGobject](prefix + "prstoken"),
+        prsend = row[PGobject](prefix + "prsend"),
+        prsheadline = row[PGobject](prefix + "prsheadline"),
+        prslextype = row[PGobject](prefix + "prslextype")
       )
     )
   }

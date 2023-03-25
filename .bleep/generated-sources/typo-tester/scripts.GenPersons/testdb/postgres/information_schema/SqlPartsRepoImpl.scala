@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object SqlPartsRepoImpl extends SqlPartsRepo {
   override def selectAll(implicit c: Connection): List[SqlPartsRow] = {
-    SQL"""select feature_id, feature_name, is_supported, is_verified_by, comments from information_schema.sql_parts""".as(SqlPartsRow.rowParser.*)
+    SQL"""select feature_id, feature_name, is_supported, is_verified_by, comments from information_schema.sql_parts""".as(SqlPartsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SqlPartsFieldValue[_]])(implicit c: Connection): List[SqlPartsRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
         val q = s"""select * from information_schema.sql_parts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SqlPartsRow.rowParser.*)
+          .as(SqlPartsRow.rowParser("").*)
     }
 
   }

@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatBgwriterRepoImpl extends PgStatBgwriterRepo {
   override def selectAll(implicit c: Connection): List[PgStatBgwriterRow] = {
-    SQL"""select checkpoints_timed, checkpoints_req, checkpoint_write_time, checkpoint_sync_time, buffers_checkpoint, buffers_clean, maxwritten_clean, buffers_backend, buffers_backend_fsync, buffers_alloc, stats_reset from pg_catalog.pg_stat_bgwriter""".as(PgStatBgwriterRow.rowParser.*)
+    SQL"""select checkpoints_timed, checkpoints_req, checkpoint_write_time, checkpoint_sync_time, buffers_checkpoint, buffers_clean, maxwritten_clean, buffers_backend, buffers_backend_fsync, buffers_alloc, stats_reset from pg_catalog.pg_stat_bgwriter""".as(PgStatBgwriterRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatBgwriterFieldValue[_]])(implicit c: Connection): List[PgStatBgwriterRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgStatBgwriterRepoImpl extends PgStatBgwriterRepo {
         val q = s"""select * from pg_catalog.pg_stat_bgwriter where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatBgwriterRow.rowParser.*)
+          .as(PgStatBgwriterRow.rowParser("").*)
     }
 
   }

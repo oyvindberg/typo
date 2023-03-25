@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatSslRepoImpl extends PgStatSslRepo {
   override def selectAll(implicit c: Connection): List[PgStatSslRow] = {
-    SQL"""select pid, ssl, version, cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".as(PgStatSslRow.rowParser.*)
+    SQL"""select pid, ssl, version, cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".as(PgStatSslRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatSslFieldValue[_]])(implicit c: Connection): List[PgStatSslRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object PgStatSslRepoImpl extends PgStatSslRepo {
         val q = s"""select * from pg_catalog.pg_stat_ssl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatSslRow.rowParser.*)
+          .as(PgStatSslRow.rowParser("").*)
     }
 
   }

@@ -23,12 +23,12 @@ case class PgPublicationTablesRow(
 )
 
 object PgPublicationTablesRow {
-  implicit val rowParser: RowParser[PgPublicationTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPublicationTablesRow] = { row =>
     Success(
       PgPublicationTablesRow(
-        pubname = row[Option[String]]("pubname"),
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename")
+        pubname = row[Option[String]](prefix + "pubname"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename")
       )
     )
   }

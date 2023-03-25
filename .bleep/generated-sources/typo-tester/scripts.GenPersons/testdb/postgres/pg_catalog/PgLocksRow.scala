@@ -38,25 +38,25 @@ case class PgLocksRow(
 )
 
 object PgLocksRow {
-  implicit val rowParser: RowParser[PgLocksRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgLocksRow] = { row =>
     Success(
       PgLocksRow(
-        locktype = row[Option[String]]("locktype"),
-        database = row[Option[Long]]("database"),
-        relation = row[Option[Long]]("relation"),
-        page = row[Option[Int]]("page"),
-        tuple = row[Option[Int]]("tuple"),
-        virtualxid = row[Option[String]]("virtualxid"),
-        transactionid = row[Option[PGobject]]("transactionid"),
-        classid = row[Option[Long]]("classid"),
-        objid = row[Option[Long]]("objid"),
-        objsubid = row[Option[Int]]("objsubid"),
-        virtualtransaction = row[Option[String]]("virtualtransaction"),
-        pid = row[Option[Int]]("pid"),
-        mode = row[Option[String]]("mode"),
-        granted = row[Option[Boolean]]("granted"),
-        fastpath = row[Option[Boolean]]("fastpath"),
-        waitstart = row[Option[ZonedDateTime]]("waitstart")
+        locktype = row[Option[String]](prefix + "locktype"),
+        database = row[Option[Long]](prefix + "database"),
+        relation = row[Option[Long]](prefix + "relation"),
+        page = row[Option[Int]](prefix + "page"),
+        tuple = row[Option[Int]](prefix + "tuple"),
+        virtualxid = row[Option[String]](prefix + "virtualxid"),
+        transactionid = row[Option[PGobject]](prefix + "transactionid"),
+        classid = row[Option[Long]](prefix + "classid"),
+        objid = row[Option[Long]](prefix + "objid"),
+        objsubid = row[Option[Int]](prefix + "objsubid"),
+        virtualtransaction = row[Option[String]](prefix + "virtualtransaction"),
+        pid = row[Option[Int]](prefix + "pid"),
+        mode = row[Option[String]](prefix + "mode"),
+        granted = row[Option[Boolean]](prefix + "granted"),
+        fastpath = row[Option[Boolean]](prefix + "fastpath"),
+        waitstart = row[Option[ZonedDateTime]](prefix + "waitstart")
       )
     )
   }

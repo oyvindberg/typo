@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum""".as(PgEnumRow.rowParser.*)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum""".as(PgEnumRow.rowParser("").*)
   }
   override def selectById(oid: PgEnumId)(implicit c: Connection): Option[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = $oid""".as(PgEnumRow.rowParser.singleOpt)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = $oid""".as(PgEnumRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgEnumId])(implicit c: Connection): List[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid in $oids""".as(PgEnumRow.rowParser.*)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid in $oids""".as(PgEnumRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgEnumFieldValue[_]])(implicit c: Connection): List[PgEnumRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
         val q = s"""select * from pg_catalog.pg_enum where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgEnumRow.rowParser.*)
+          .as(PgEnumRow.rowParser("").*)
     }
 
   }

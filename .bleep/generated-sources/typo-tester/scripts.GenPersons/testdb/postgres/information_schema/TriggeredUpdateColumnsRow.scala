@@ -27,16 +27,16 @@ case class TriggeredUpdateColumnsRow(
 )
 
 object TriggeredUpdateColumnsRow {
-  implicit val rowParser: RowParser[TriggeredUpdateColumnsRow] = { row =>
+  def rowParser(prefix: String): RowParser[TriggeredUpdateColumnsRow] = { row =>
     Success(
       TriggeredUpdateColumnsRow(
-        triggerCatalog = row[Option[String]]("trigger_catalog"),
-        triggerSchema = row[Option[String]]("trigger_schema"),
-        triggerName = row[Option[String]]("trigger_name"),
-        eventObjectCatalog = row[Option[String]]("event_object_catalog"),
-        eventObjectSchema = row[Option[String]]("event_object_schema"),
-        eventObjectTable = row[Option[String]]("event_object_table"),
-        eventObjectColumn = row[Option[String]]("event_object_column")
+        triggerCatalog = row[Option[String]](prefix + "trigger_catalog"),
+        triggerSchema = row[Option[String]](prefix + "trigger_schema"),
+        triggerName = row[Option[String]](prefix + "trigger_name"),
+        eventObjectCatalog = row[Option[String]](prefix + "event_object_catalog"),
+        eventObjectSchema = row[Option[String]](prefix + "event_object_schema"),
+        eventObjectTable = row[Option[String]](prefix + "event_object_table"),
+        eventObjectColumn = row[Option[String]](prefix + "event_object_column")
       )
     )
   }

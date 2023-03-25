@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object ColumnDomainUsageRepoImpl extends ColumnDomainUsageRepo {
   override def selectAll(implicit c: Connection): List[ColumnDomainUsageRow] = {
-    SQL"""select domain_catalog, domain_schema, domain_name, table_catalog, table_schema, table_name, column_name from information_schema.column_domain_usage""".as(ColumnDomainUsageRow.rowParser.*)
+    SQL"""select domain_catalog, domain_schema, domain_name, table_catalog, table_schema, table_name, column_name from information_schema.column_domain_usage""".as(ColumnDomainUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ColumnDomainUsageFieldValue[_]])(implicit c: Connection): List[ColumnDomainUsageRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object ColumnDomainUsageRepoImpl extends ColumnDomainUsageRepo {
         val q = s"""select * from information_schema.column_domain_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ColumnDomainUsageRow.rowParser.*)
+          .as(ColumnDomainUsageRow.rowParser("").*)
     }
 
   }

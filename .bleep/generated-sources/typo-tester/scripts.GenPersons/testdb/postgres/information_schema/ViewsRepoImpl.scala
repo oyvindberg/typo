@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object ViewsRepoImpl extends ViewsRepo {
   override def selectAll(implicit c: Connection): List[ViewsRow] = {
-    SQL"""select table_catalog, table_schema, table_name, view_definition, check_option, is_updatable, is_insertable_into, is_trigger_updatable, is_trigger_deletable, is_trigger_insertable_into from information_schema.views""".as(ViewsRow.rowParser.*)
+    SQL"""select table_catalog, table_schema, table_name, view_definition, check_option, is_updatable, is_insertable_into, is_trigger_updatable, is_trigger_deletable, is_trigger_insertable_into from information_schema.views""".as(ViewsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ViewsFieldValue[_]])(implicit c: Connection): List[ViewsRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object ViewsRepoImpl extends ViewsRepo {
         val q = s"""select * from information_schema.views where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ViewsRow.rowParser.*)
+          .as(ViewsRow.rowParser("").*)
     }
 
   }

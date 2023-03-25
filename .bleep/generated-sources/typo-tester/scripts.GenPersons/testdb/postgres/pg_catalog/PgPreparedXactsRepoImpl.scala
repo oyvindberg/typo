@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgPreparedXactsRepoImpl extends PgPreparedXactsRepo {
   override def selectAll(implicit c: Connection): List[PgPreparedXactsRow] = {
-    SQL"""select transaction, gid, prepared, owner, database from pg_catalog.pg_prepared_xacts""".as(PgPreparedXactsRow.rowParser.*)
+    SQL"""select transaction, gid, prepared, owner, database from pg_catalog.pg_prepared_xacts""".as(PgPreparedXactsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPreparedXactsFieldValue[_]])(implicit c: Connection): List[PgPreparedXactsRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object PgPreparedXactsRepoImpl extends PgPreparedXactsRepo {
         val q = s"""select * from pg_catalog.pg_prepared_xacts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPreparedXactsRow.rowParser.*)
+          .as(PgPreparedXactsRow.rowParser("").*)
     }
 
   }

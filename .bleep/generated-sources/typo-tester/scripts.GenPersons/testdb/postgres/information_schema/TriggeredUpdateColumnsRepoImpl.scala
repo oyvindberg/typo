@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object TriggeredUpdateColumnsRepoImpl extends TriggeredUpdateColumnsRepo {
   override def selectAll(implicit c: Connection): List[TriggeredUpdateColumnsRow] = {
-    SQL"""select trigger_catalog, trigger_schema, trigger_name, event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".as(TriggeredUpdateColumnsRow.rowParser.*)
+    SQL"""select trigger_catalog, trigger_schema, trigger_name, event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".as(TriggeredUpdateColumnsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[TriggeredUpdateColumnsFieldValue[_]])(implicit c: Connection): List[TriggeredUpdateColumnsRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object TriggeredUpdateColumnsRepoImpl extends TriggeredUpdateColumnsRepo {
         val q = s"""select * from information_schema.triggered_update_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(TriggeredUpdateColumnsRow.rowParser.*)
+          .as(TriggeredUpdateColumnsRow.rowParser("").*)
     }
 
   }

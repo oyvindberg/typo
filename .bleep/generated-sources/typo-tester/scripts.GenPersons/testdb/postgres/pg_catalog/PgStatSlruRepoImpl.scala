@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatSlruRepoImpl extends PgStatSlruRepo {
   override def selectAll(implicit c: Connection): List[PgStatSlruRow] = {
-    SQL"""select name, blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset from pg_catalog.pg_stat_slru""".as(PgStatSlruRow.rowParser.*)
+    SQL"""select name, blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset from pg_catalog.pg_stat_slru""".as(PgStatSlruRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatSlruFieldValue[_]])(implicit c: Connection): List[PgStatSlruRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgStatSlruRepoImpl extends PgStatSlruRepo {
         val q = s"""select * from pg_catalog.pg_stat_slru where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatSlruRow.rowParser.*)
+          .as(PgStatSlruRow.rowParser("").*)
     }
 
   }

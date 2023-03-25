@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatProgressBasebackupRepoImpl extends PgStatProgressBasebackupRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressBasebackupRow] = {
-    SQL"""select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup""".as(PgStatProgressBasebackupRow.rowParser.*)
+    SQL"""select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup""".as(PgStatProgressBasebackupRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressBasebackupFieldValue[_]])(implicit c: Connection): List[PgStatProgressBasebackupRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgStatProgressBasebackupRepoImpl extends PgStatProgressBasebackupRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_basebackup where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressBasebackupRow.rowParser.*)
+          .as(PgStatProgressBasebackupRow.rowParser("").*)
     }
 
   }

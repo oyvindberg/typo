@@ -26,15 +26,15 @@ case class PgCastRow(
 )
 
 object PgCastRow {
-  implicit val rowParser: RowParser[PgCastRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgCastRow] = { row =>
     Success(
       PgCastRow(
-        oid = row[PgCastId]("oid"),
-        castsource = row[Long]("castsource"),
-        casttarget = row[Long]("casttarget"),
-        castfunc = row[Long]("castfunc"),
-        castcontext = row[String]("castcontext"),
-        castmethod = row[String]("castmethod")
+        oid = row[PgCastId](prefix + "oid"),
+        castsource = row[Long](prefix + "castsource"),
+        casttarget = row[Long](prefix + "casttarget"),
+        castfunc = row[Long](prefix + "castfunc"),
+        castcontext = row[String](prefix + "castcontext"),
+        castmethod = row[String](prefix + "castmethod")
       )
     )
   }

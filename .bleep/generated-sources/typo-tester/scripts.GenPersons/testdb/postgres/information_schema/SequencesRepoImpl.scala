@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object SequencesRepoImpl extends SequencesRepo {
   override def selectAll(implicit c: Connection): List[SequencesRow] = {
-    SQL"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, increment, cycle_option from information_schema.sequences""".as(SequencesRow.rowParser.*)
+    SQL"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, increment, cycle_option from information_schema.sequences""".as(SequencesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SequencesFieldValue[_]])(implicit c: Connection): List[SequencesRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object SequencesRepoImpl extends SequencesRepo {
         val q = s"""select * from information_schema.sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SequencesRow.rowParser.*)
+          .as(SequencesRow.rowParser("").*)
     }
 
   }

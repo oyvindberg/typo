@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgHbaFileRulesRepoImpl extends PgHbaFileRulesRepo {
   override def selectAll(implicit c: Connection): List[PgHbaFileRulesRow] = {
-    SQL"""select line_number, type, database, user_name, address, netmask, auth_method, options, error from pg_catalog.pg_hba_file_rules""".as(PgHbaFileRulesRow.rowParser.*)
+    SQL"""select line_number, type, database, user_name, address, netmask, auth_method, options, error from pg_catalog.pg_hba_file_rules""".as(PgHbaFileRulesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgHbaFileRulesFieldValue[_]])(implicit c: Connection): List[PgHbaFileRulesRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgHbaFileRulesRepoImpl extends PgHbaFileRulesRepo {
         val q = s"""select * from pg_catalog.pg_hba_file_rules where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgHbaFileRulesRow.rowParser.*)
+          .as(PgHbaFileRulesRow.rowParser("").*)
     }
 
   }

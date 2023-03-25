@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgOperatorRepoImpl extends PgOperatorRepo {
   override def selectAll(implicit c: Connection): List[PgOperatorRow] = {
-    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator""".as(PgOperatorRow.rowParser.*)
+    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator""".as(PgOperatorRow.rowParser("").*)
   }
   override def selectById(oid: PgOperatorId)(implicit c: Connection): Option[PgOperatorRow] = {
-    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = $oid""".as(PgOperatorRow.rowParser.singleOpt)
+    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = $oid""".as(PgOperatorRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgOperatorId])(implicit c: Connection): List[PgOperatorRow] = {
-    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid in $oids""".as(PgOperatorRow.rowParser.*)
+    SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid in $oids""".as(PgOperatorRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgOperatorFieldValue[_]])(implicit c: Connection): List[PgOperatorRow] = {
     fieldValues match {
@@ -47,7 +47,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
         val q = s"""select * from pg_catalog.pg_operator where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgOperatorRow.rowParser.*)
+          .as(PgOperatorRow.rowParser("").*)
     }
 
   }

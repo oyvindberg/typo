@@ -29,17 +29,17 @@ case class PgForeignServerRow(
 )
 
 object PgForeignServerRow {
-  implicit val rowParser: RowParser[PgForeignServerRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignServerRow] = { row =>
     Success(
       PgForeignServerRow(
-        oid = row[PgForeignServerId]("oid"),
-        srvname = row[String]("srvname"),
-        srvowner = row[Long]("srvowner"),
-        srvfdw = row[Long]("srvfdw"),
-        srvtype = row[Option[String]]("srvtype"),
-        srvversion = row[Option[String]]("srvversion"),
-        srvacl = row[Option[Array[PGobject]]]("srvacl"),
-        srvoptions = row[Option[Array[String]]]("srvoptions")
+        oid = row[PgForeignServerId](prefix + "oid"),
+        srvname = row[String](prefix + "srvname"),
+        srvowner = row[Long](prefix + "srvowner"),
+        srvfdw = row[Long](prefix + "srvfdw"),
+        srvtype = row[Option[String]](prefix + "srvtype"),
+        srvversion = row[Option[String]](prefix + "srvversion"),
+        srvacl = row[Option[Array[PGobject]]](prefix + "srvacl"),
+        srvoptions = row[Option[Array[String]]](prefix + "srvoptions")
       )
     )
   }

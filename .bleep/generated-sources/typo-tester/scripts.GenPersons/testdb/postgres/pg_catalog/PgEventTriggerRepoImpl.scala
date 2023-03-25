@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def selectAll(implicit c: Connection): List[PgEventTriggerRow] = {
-    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger""".as(PgEventTriggerRow.rowParser.*)
+    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger""".as(PgEventTriggerRow.rowParser("").*)
   }
   override def selectById(oid: PgEventTriggerId)(implicit c: Connection): Option[PgEventTriggerRow] = {
-    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = $oid""".as(PgEventTriggerRow.rowParser.singleOpt)
+    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = $oid""".as(PgEventTriggerRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgEventTriggerId])(implicit c: Connection): List[PgEventTriggerRow] = {
-    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid in $oids""".as(PgEventTriggerRow.rowParser.*)
+    SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid in $oids""".as(PgEventTriggerRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgEventTriggerFieldValue[_]])(implicit c: Connection): List[PgEventTriggerRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
         val q = s"""select * from pg_catalog.pg_event_trigger where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgEventTriggerRow.rowParser.*)
+          .as(PgEventTriggerRow.rowParser("").*)
     }
 
   }

@@ -22,11 +22,11 @@ case class PgConfigRow(
 )
 
 object PgConfigRow {
-  implicit val rowParser: RowParser[PgConfigRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgConfigRow] = { row =>
     Success(
       PgConfigRow(
-        name = row[Option[String]]("name"),
-        setting = row[Option[String]]("setting")
+        name = row[Option[String]](prefix + "name"),
+        setting = row[Option[String]](prefix + "setting")
       )
     )
   }

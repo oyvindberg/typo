@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatProgressAnalyzeRepoImpl extends PgStatProgressAnalyzeRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressAnalyzeRow] = {
-    SQL"""select pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid from pg_catalog.pg_stat_progress_analyze""".as(PgStatProgressAnalyzeRow.rowParser.*)
+    SQL"""select pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid from pg_catalog.pg_stat_progress_analyze""".as(PgStatProgressAnalyzeRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressAnalyzeFieldValue[_]])(implicit c: Connection): List[PgStatProgressAnalyzeRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgStatProgressAnalyzeRepoImpl extends PgStatProgressAnalyzeRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_analyze where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressAnalyzeRow.rowParser.*)
+          .as(PgStatProgressAnalyzeRow.rowParser("").*)
     }
 
   }

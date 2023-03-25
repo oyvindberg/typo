@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatProgressCreateIndexRepoImpl extends PgStatProgressCreateIndexRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressCreateIndexRow] = {
-    SQL"""select pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done from pg_catalog.pg_stat_progress_create_index""".as(PgStatProgressCreateIndexRow.rowParser.*)
+    SQL"""select pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done from pg_catalog.pg_stat_progress_create_index""".as(PgStatProgressCreateIndexRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressCreateIndexFieldValue[_]])(implicit c: Connection): List[PgStatProgressCreateIndexRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgStatProgressCreateIndexRepoImpl extends PgStatProgressCreateIndexRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_create_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressCreateIndexRow.rowParser.*)
+          .as(PgStatProgressCreateIndexRow.rowParser("").*)
     }
 
   }

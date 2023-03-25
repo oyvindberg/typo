@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def selectAll(implicit c: Connection): List[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index""".as(PgIndexRow.rowParser.*)
+    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index""".as(PgIndexRow.rowParser("").*)
   }
   override def selectById(indexrelid: PgIndexId)(implicit c: Connection): Option[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = $indexrelid""".as(PgIndexRow.rowParser.singleOpt)
+    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = $indexrelid""".as(PgIndexRow.rowParser("").singleOpt)
   }
   override def selectByIds(indexrelids: List[PgIndexId])(implicit c: Connection): List[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid in $indexrelids""".as(PgIndexRow.rowParser.*)
+    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid in $indexrelids""".as(PgIndexRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgIndexFieldValue[_]])(implicit c: Connection): List[PgIndexRow] = {
     fieldValues match {
@@ -52,7 +52,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
         val q = s"""select * from pg_catalog.pg_index where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgIndexRow.rowParser.*)
+          .as(PgIndexRow.rowParser("").*)
     }
 
   }

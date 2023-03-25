@@ -37,11 +37,11 @@ object PgLargeobjectId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgLargeobjectId] = { row =>
+  def rowParser(prefix: String): RowParser[PgLargeobjectId] = { row =>
     Success(
       PgLargeobjectId(
-        loid = row[Long]("loid"),
-        pageno = row[Int]("pageno")
+        loid = row[Long](prefix + "loid"),
+        pageno = row[Int](prefix + "pageno")
       )
     )
   }

@@ -27,16 +27,16 @@ case class UdtPrivilegesRow(
 )
 
 object UdtPrivilegesRow {
-  implicit val rowParser: RowParser[UdtPrivilegesRow] = { row =>
+  def rowParser(prefix: String): RowParser[UdtPrivilegesRow] = { row =>
     Success(
       UdtPrivilegesRow(
-        grantor = row[Option[String]]("grantor"),
-        grantee = row[Option[String]]("grantee"),
-        udtCatalog = row[Option[String]]("udt_catalog"),
-        udtSchema = row[Option[String]]("udt_schema"),
-        udtName = row[Option[String]]("udt_name"),
-        privilegeType = row[Option[String]]("privilege_type"),
-        isGrantable = row[Option[String]]("is_grantable")
+        grantor = row[Option[String]](prefix + "grantor"),
+        grantee = row[Option[String]](prefix + "grantee"),
+        udtCatalog = row[Option[String]](prefix + "udt_catalog"),
+        udtSchema = row[Option[String]](prefix + "udt_schema"),
+        udtName = row[Option[String]](prefix + "udt_name"),
+        privilegeType = row[Option[String]](prefix + "privilege_type"),
+        isGrantable = row[Option[String]](prefix + "is_grantable")
       )
     )
   }

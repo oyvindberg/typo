@@ -37,11 +37,11 @@ object PgDbRoleSettingId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgDbRoleSettingId] = { row =>
+  def rowParser(prefix: String): RowParser[PgDbRoleSettingId] = { row =>
     Success(
       PgDbRoleSettingId(
-        setdatabase = row[Long]("setdatabase"),
-        setrole = row[Long]("setrole")
+        setdatabase = row[Long](prefix + "setdatabase"),
+        setrole = row[Long](prefix + "setrole")
       )
     )
   }

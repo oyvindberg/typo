@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object CheckConstraintsRepoImpl extends CheckConstraintsRepo {
   override def selectAll(implicit c: Connection): List[CheckConstraintsRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, check_clause from information_schema.check_constraints""".as(CheckConstraintsRow.rowParser.*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, check_clause from information_schema.check_constraints""".as(CheckConstraintsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[CheckConstraintsFieldValue[_]])(implicit c: Connection): List[CheckConstraintsRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ object CheckConstraintsRepoImpl extends CheckConstraintsRepo {
         val q = s"""select * from information_schema.check_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(CheckConstraintsRow.rowParser.*)
+          .as(CheckConstraintsRow.rowParser("").*)
     }
 
   }

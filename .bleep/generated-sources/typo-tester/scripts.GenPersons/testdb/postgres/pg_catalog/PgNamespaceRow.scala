@@ -25,13 +25,13 @@ case class PgNamespaceRow(
 )
 
 object PgNamespaceRow {
-  implicit val rowParser: RowParser[PgNamespaceRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgNamespaceRow] = { row =>
     Success(
       PgNamespaceRow(
-        oid = row[PgNamespaceId]("oid"),
-        nspname = row[String]("nspname"),
-        nspowner = row[Long]("nspowner"),
-        nspacl = row[Option[Array[PGobject]]]("nspacl")
+        oid = row[PgNamespaceId](prefix + "oid"),
+        nspname = row[String](prefix + "nspname"),
+        nspowner = row[Long](prefix + "nspowner"),
+        nspacl = row[Option[Array[PGobject]]](prefix + "nspacl")
       )
     )
   }

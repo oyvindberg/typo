@@ -40,28 +40,28 @@ case class PgTriggerRow(
 )
 
 object PgTriggerRow {
-  implicit val rowParser: RowParser[PgTriggerRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTriggerRow] = { row =>
     Success(
       PgTriggerRow(
-        oid = row[PgTriggerId]("oid"),
-        tgrelid = row[Long]("tgrelid"),
-        tgparentid = row[Long]("tgparentid"),
-        tgname = row[String]("tgname"),
-        tgfoid = row[Long]("tgfoid"),
-        tgtype = row[Int]("tgtype"),
-        tgenabled = row[String]("tgenabled"),
-        tgisinternal = row[Boolean]("tgisinternal"),
-        tgconstrrelid = row[Long]("tgconstrrelid"),
-        tgconstrindid = row[Long]("tgconstrindid"),
-        tgconstraint = row[Long]("tgconstraint"),
-        tgdeferrable = row[Boolean]("tgdeferrable"),
-        tginitdeferred = row[Boolean]("tginitdeferred"),
-        tgnargs = row[Int]("tgnargs"),
-        tgattr = row[PGobject]("tgattr"),
-        tgargs = row[Array[Byte]]("tgargs"),
-        tgqual = row[Option[PGobject]]("tgqual"),
-        tgoldtable = row[Option[String]]("tgoldtable"),
-        tgnewtable = row[Option[String]]("tgnewtable")
+        oid = row[PgTriggerId](prefix + "oid"),
+        tgrelid = row[Long](prefix + "tgrelid"),
+        tgparentid = row[Long](prefix + "tgparentid"),
+        tgname = row[String](prefix + "tgname"),
+        tgfoid = row[Long](prefix + "tgfoid"),
+        tgtype = row[Int](prefix + "tgtype"),
+        tgenabled = row[String](prefix + "tgenabled"),
+        tgisinternal = row[Boolean](prefix + "tgisinternal"),
+        tgconstrrelid = row[Long](prefix + "tgconstrrelid"),
+        tgconstrindid = row[Long](prefix + "tgconstrindid"),
+        tgconstraint = row[Long](prefix + "tgconstraint"),
+        tgdeferrable = row[Boolean](prefix + "tgdeferrable"),
+        tginitdeferred = row[Boolean](prefix + "tginitdeferred"),
+        tgnargs = row[Int](prefix + "tgnargs"),
+        tgattr = row[PGobject](prefix + "tgattr"),
+        tgargs = row[Array[Byte]](prefix + "tgargs"),
+        tgqual = row[Option[PGobject]](prefix + "tgqual"),
+        tgoldtable = row[Option[String]](prefix + "tgoldtable"),
+        tgnewtable = row[Option[String]](prefix + "tgnewtable")
       )
     )
   }

@@ -24,13 +24,13 @@ case class PgUserMappingRow(
 )
 
 object PgUserMappingRow {
-  implicit val rowParser: RowParser[PgUserMappingRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgUserMappingRow] = { row =>
     Success(
       PgUserMappingRow(
-        oid = row[PgUserMappingId]("oid"),
-        umuser = row[Long]("umuser"),
-        umserver = row[Long]("umserver"),
-        umoptions = row[Option[Array[String]]]("umoptions")
+        oid = row[PgUserMappingId](prefix + "oid"),
+        umuser = row[Long](prefix + "umuser"),
+        umserver = row[Long](prefix + "umserver"),
+        umoptions = row[Option[Array[String]]](prefix + "umoptions")
       )
     )
   }

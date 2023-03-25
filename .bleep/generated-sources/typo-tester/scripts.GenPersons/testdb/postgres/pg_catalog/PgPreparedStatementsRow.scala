@@ -29,16 +29,16 @@ case class PgPreparedStatementsRow(
 )
 
 object PgPreparedStatementsRow {
-  implicit val rowParser: RowParser[PgPreparedStatementsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPreparedStatementsRow] = { row =>
     Success(
       PgPreparedStatementsRow(
-        name = row[Option[String]]("name"),
-        statement = row[Option[String]]("statement"),
-        prepareTime = row[Option[ZonedDateTime]]("prepare_time"),
-        parameterTypes = row[Option[Array[PGobject]]]("parameter_types"),
-        fromSql = row[Option[Boolean]]("from_sql"),
-        genericPlans = row[Option[Long]]("generic_plans"),
-        customPlans = row[Option[Long]]("custom_plans")
+        name = row[Option[String]](prefix + "name"),
+        statement = row[Option[String]](prefix + "statement"),
+        prepareTime = row[Option[ZonedDateTime]](prefix + "prepare_time"),
+        parameterTypes = row[Option[Array[PGobject]]](prefix + "parameter_types"),
+        fromSql = row[Option[Boolean]](prefix + "from_sql"),
+        genericPlans = row[Option[Long]](prefix + "generic_plans"),
+        customPlans = row[Option[Long]](prefix + "custom_plans")
       )
     )
   }

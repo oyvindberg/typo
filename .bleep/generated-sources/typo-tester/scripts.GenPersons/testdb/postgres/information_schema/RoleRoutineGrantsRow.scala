@@ -30,19 +30,19 @@ case class RoleRoutineGrantsRow(
 )
 
 object RoleRoutineGrantsRow {
-  implicit val rowParser: RowParser[RoleRoutineGrantsRow] = { row =>
+  def rowParser(prefix: String): RowParser[RoleRoutineGrantsRow] = { row =>
     Success(
       RoleRoutineGrantsRow(
-        grantor = row[Option[String]]("grantor"),
-        grantee = row[Option[String]]("grantee"),
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name"),
-        routineCatalog = row[Option[String]]("routine_catalog"),
-        routineSchema = row[Option[String]]("routine_schema"),
-        routineName = row[Option[String]]("routine_name"),
-        privilegeType = row[Option[String]]("privilege_type"),
-        isGrantable = row[Option[String]]("is_grantable")
+        grantor = row[Option[String]](prefix + "grantor"),
+        grantee = row[Option[String]](prefix + "grantee"),
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name"),
+        routineCatalog = row[Option[String]](prefix + "routine_catalog"),
+        routineSchema = row[Option[String]](prefix + "routine_schema"),
+        routineName = row[Option[String]](prefix + "routine_name"),
+        privilegeType = row[Option[String]](prefix + "privilege_type"),
+        isGrantable = row[Option[String]](prefix + "is_grantable")
       )
     )
   }

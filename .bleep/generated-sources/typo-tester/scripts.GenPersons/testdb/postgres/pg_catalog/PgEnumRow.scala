@@ -24,13 +24,13 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  implicit val rowParser: RowParser[PgEnumRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgEnumRow] = { row =>
     Success(
       PgEnumRow(
-        oid = row[PgEnumId]("oid"),
-        enumtypid = row[Long]("enumtypid"),
-        enumsortorder = row[Float]("enumsortorder"),
-        enumlabel = row[String]("enumlabel")
+        oid = row[PgEnumId](prefix + "oid"),
+        enumtypid = row[Long](prefix + "enumtypid"),
+        enumsortorder = row[Float](prefix + "enumsortorder"),
+        enumlabel = row[String](prefix + "enumlabel")
       )
     )
   }

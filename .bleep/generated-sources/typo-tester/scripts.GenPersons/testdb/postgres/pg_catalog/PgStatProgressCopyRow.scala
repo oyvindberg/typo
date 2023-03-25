@@ -30,19 +30,19 @@ case class PgStatProgressCopyRow(
 )
 
 object PgStatProgressCopyRow {
-  implicit val rowParser: RowParser[PgStatProgressCopyRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressCopyRow] = { row =>
     Success(
       PgStatProgressCopyRow(
-        pid = row[Option[Int]]("pid"),
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        relid = row[Option[Long]]("relid"),
-        command = row[Option[String]]("command"),
-        `type` = row[Option[String]]("type"),
-        bytesProcessed = row[Option[Long]]("bytes_processed"),
-        bytesTotal = row[Option[Long]]("bytes_total"),
-        tuplesProcessed = row[Option[Long]]("tuples_processed"),
-        tuplesExcluded = row[Option[Long]]("tuples_excluded")
+        pid = row[Option[Int]](prefix + "pid"),
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        relid = row[Option[Long]](prefix + "relid"),
+        command = row[Option[String]](prefix + "command"),
+        `type` = row[Option[String]](prefix + "type"),
+        bytesProcessed = row[Option[Long]](prefix + "bytes_processed"),
+        bytesTotal = row[Option[Long]](prefix + "bytes_total"),
+        tuplesProcessed = row[Option[Long]](prefix + "tuples_processed"),
+        tuplesExcluded = row[Option[Long]](prefix + "tuples_excluded")
       )
     )
   }

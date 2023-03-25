@@ -24,13 +24,13 @@ case class ForeignDataWrapperOptionsRow(
 )
 
 object ForeignDataWrapperOptionsRow {
-  implicit val rowParser: RowParser[ForeignDataWrapperOptionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[ForeignDataWrapperOptionsRow] = { row =>
     Success(
       ForeignDataWrapperOptionsRow(
-        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
-        optionName = row[Option[String]]("option_name"),
-        optionValue = row[Option[String]]("option_value")
+        foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
+        optionName = row[Option[String]](prefix + "option_name"),
+        optionValue = row[Option[String]](prefix + "option_value")
       )
     )
   }

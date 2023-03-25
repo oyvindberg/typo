@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def selectAll(implicit c: Connection): List[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc""".as(PgAmprocRow.rowParser.*)
+    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc""".as(PgAmprocRow.rowParser("").*)
   }
   override def selectById(oid: PgAmprocId)(implicit c: Connection): Option[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = $oid""".as(PgAmprocRow.rowParser.singleOpt)
+    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = $oid""".as(PgAmprocRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAmprocId])(implicit c: Connection): List[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid in $oids""".as(PgAmprocRow.rowParser.*)
+    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid in $oids""".as(PgAmprocRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAmprocFieldValue[_]])(implicit c: Connection): List[PgAmprocRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
         val q = s"""select * from pg_catalog.pg_amproc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAmprocRow.rowParser.*)
+          .as(PgAmprocRow.rowParser("").*)
     }
 
   }

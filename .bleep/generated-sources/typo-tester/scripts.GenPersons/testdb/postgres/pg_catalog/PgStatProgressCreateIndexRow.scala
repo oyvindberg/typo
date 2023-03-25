@@ -36,25 +36,25 @@ case class PgStatProgressCreateIndexRow(
 )
 
 object PgStatProgressCreateIndexRow {
-  implicit val rowParser: RowParser[PgStatProgressCreateIndexRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressCreateIndexRow] = { row =>
     Success(
       PgStatProgressCreateIndexRow(
-        pid = row[Option[Int]]("pid"),
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        relid = row[Option[Long]]("relid"),
-        indexRelid = row[Option[Long]]("index_relid"),
-        command = row[Option[String]]("command"),
-        phase = row[Option[String]]("phase"),
-        lockersTotal = row[Option[Long]]("lockers_total"),
-        lockersDone = row[Option[Long]]("lockers_done"),
-        currentLockerPid = row[Option[Long]]("current_locker_pid"),
-        blocksTotal = row[Option[Long]]("blocks_total"),
-        blocksDone = row[Option[Long]]("blocks_done"),
-        tuplesTotal = row[Option[Long]]("tuples_total"),
-        tuplesDone = row[Option[Long]]("tuples_done"),
-        partitionsTotal = row[Option[Long]]("partitions_total"),
-        partitionsDone = row[Option[Long]]("partitions_done")
+        pid = row[Option[Int]](prefix + "pid"),
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        relid = row[Option[Long]](prefix + "relid"),
+        indexRelid = row[Option[Long]](prefix + "index_relid"),
+        command = row[Option[String]](prefix + "command"),
+        phase = row[Option[String]](prefix + "phase"),
+        lockersTotal = row[Option[Long]](prefix + "lockers_total"),
+        lockersDone = row[Option[Long]](prefix + "lockers_done"),
+        currentLockerPid = row[Option[Long]](prefix + "current_locker_pid"),
+        blocksTotal = row[Option[Long]](prefix + "blocks_total"),
+        blocksDone = row[Option[Long]](prefix + "blocks_done"),
+        tuplesTotal = row[Option[Long]](prefix + "tuples_total"),
+        tuplesDone = row[Option[Long]](prefix + "tuples_done"),
+        partitionsTotal = row[Option[Long]](prefix + "partitions_total"),
+        partitionsDone = row[Option[Long]](prefix + "partitions_done")
       )
     )
   }

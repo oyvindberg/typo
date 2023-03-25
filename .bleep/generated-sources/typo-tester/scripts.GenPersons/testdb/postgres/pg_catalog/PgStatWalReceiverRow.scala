@@ -36,24 +36,24 @@ case class PgStatWalReceiverRow(
 )
 
 object PgStatWalReceiverRow {
-  implicit val rowParser: RowParser[PgStatWalReceiverRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatWalReceiverRow] = { row =>
     Success(
       PgStatWalReceiverRow(
-        pid = row[Option[Int]]("pid"),
-        status = row[Option[String]]("status"),
-        receiveStartLsn = row[Option[String]]("receive_start_lsn"),
-        receiveStartTli = row[Option[Int]]("receive_start_tli"),
-        writtenLsn = row[Option[String]]("written_lsn"),
-        flushedLsn = row[Option[String]]("flushed_lsn"),
-        receivedTli = row[Option[Int]]("received_tli"),
-        lastMsgSendTime = row[Option[ZonedDateTime]]("last_msg_send_time"),
-        lastMsgReceiptTime = row[Option[ZonedDateTime]]("last_msg_receipt_time"),
-        latestEndLsn = row[Option[String]]("latest_end_lsn"),
-        latestEndTime = row[Option[ZonedDateTime]]("latest_end_time"),
-        slotName = row[Option[String]]("slot_name"),
-        senderHost = row[Option[String]]("sender_host"),
-        senderPort = row[Option[Int]]("sender_port"),
-        conninfo = row[Option[String]]("conninfo")
+        pid = row[Option[Int]](prefix + "pid"),
+        status = row[Option[String]](prefix + "status"),
+        receiveStartLsn = row[Option[String]](prefix + "receive_start_lsn"),
+        receiveStartTli = row[Option[Int]](prefix + "receive_start_tli"),
+        writtenLsn = row[Option[String]](prefix + "written_lsn"),
+        flushedLsn = row[Option[String]](prefix + "flushed_lsn"),
+        receivedTli = row[Option[Int]](prefix + "received_tli"),
+        lastMsgSendTime = row[Option[ZonedDateTime]](prefix + "last_msg_send_time"),
+        lastMsgReceiptTime = row[Option[ZonedDateTime]](prefix + "last_msg_receipt_time"),
+        latestEndLsn = row[Option[String]](prefix + "latest_end_lsn"),
+        latestEndTime = row[Option[ZonedDateTime]](prefix + "latest_end_time"),
+        slotName = row[Option[String]](prefix + "slot_name"),
+        senderHost = row[Option[String]](prefix + "sender_host"),
+        senderPort = row[Option[Int]](prefix + "sender_port"),
+        conninfo = row[Option[String]](prefix + "conninfo")
       )
     )
   }

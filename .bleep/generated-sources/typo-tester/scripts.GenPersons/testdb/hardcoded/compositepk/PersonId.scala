@@ -37,11 +37,11 @@ object PersonId {
       )
     }
   }
-  implicit val rowParser: RowParser[PersonId] = { row =>
+  def rowParser(prefix: String): RowParser[PersonId] = { row =>
     Success(
       PersonId(
-        one = row[Long]("one"),
-        two = row[Option[String]]("two")
+        one = row[Long](prefix + "one"),
+        two = row[Option[String]](prefix + "two")
       )
     )
   }

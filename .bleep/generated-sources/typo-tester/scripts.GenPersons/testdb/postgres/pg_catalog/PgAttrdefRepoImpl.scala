@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def selectAll(implicit c: Connection): List[PgAttrdefRow] = {
-    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef""".as(PgAttrdefRow.rowParser.*)
+    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef""".as(PgAttrdefRow.rowParser("").*)
   }
   override def selectById(oid: PgAttrdefId)(implicit c: Connection): Option[PgAttrdefRow] = {
-    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = $oid""".as(PgAttrdefRow.rowParser.singleOpt)
+    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = $oid""".as(PgAttrdefRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAttrdefId])(implicit c: Connection): List[PgAttrdefRow] = {
-    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid in $oids""".as(PgAttrdefRow.rowParser.*)
+    SQL"""select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid in $oids""".as(PgAttrdefRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAttrdefFieldValue[_]])(implicit c: Connection): List[PgAttrdefRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
         val q = s"""select * from pg_catalog.pg_attrdef where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAttrdefRow.rowParser.*)
+          .as(PgAttrdefRow.rowParser("").*)
     }
 
   }

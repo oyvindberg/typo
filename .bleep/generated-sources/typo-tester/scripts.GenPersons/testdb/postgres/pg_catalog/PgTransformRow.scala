@@ -26,14 +26,14 @@ case class PgTransformRow(
 )
 
 object PgTransformRow {
-  implicit val rowParser: RowParser[PgTransformRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTransformRow] = { row =>
     Success(
       PgTransformRow(
-        oid = row[PgTransformId]("oid"),
-        trftype = row[Long]("trftype"),
-        trflang = row[Long]("trflang"),
-        trffromsql = row[PGobject]("trffromsql"),
-        trftosql = row[PGobject]("trftosql")
+        oid = row[PgTransformId](prefix + "oid"),
+        trftype = row[Long](prefix + "trftype"),
+        trflang = row[Long](prefix + "trflang"),
+        trffromsql = row[PGobject](prefix + "trffromsql"),
+        trftosql = row[PGobject](prefix + "trftosql")
       )
     )
   }

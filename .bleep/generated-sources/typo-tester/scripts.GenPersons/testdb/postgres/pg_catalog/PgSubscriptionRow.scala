@@ -31,20 +31,20 @@ case class PgSubscriptionRow(
 )
 
 object PgSubscriptionRow {
-  implicit val rowParser: RowParser[PgSubscriptionRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSubscriptionRow] = { row =>
     Success(
       PgSubscriptionRow(
-        oid = row[PgSubscriptionId]("oid"),
-        subdbid = row[Long]("subdbid"),
-        subname = row[String]("subname"),
-        subowner = row[Long]("subowner"),
-        subenabled = row[Boolean]("subenabled"),
-        subbinary = row[Boolean]("subbinary"),
-        substream = row[Boolean]("substream"),
-        subconninfo = row[String]("subconninfo"),
-        subslotname = row[Option[String]]("subslotname"),
-        subsynccommit = row[String]("subsynccommit"),
-        subpublications = row[Array[String]]("subpublications")
+        oid = row[PgSubscriptionId](prefix + "oid"),
+        subdbid = row[Long](prefix + "subdbid"),
+        subname = row[String](prefix + "subname"),
+        subowner = row[Long](prefix + "subowner"),
+        subenabled = row[Boolean](prefix + "subenabled"),
+        subbinary = row[Boolean](prefix + "subbinary"),
+        substream = row[Boolean](prefix + "substream"),
+        subconninfo = row[String](prefix + "subconninfo"),
+        subslotname = row[Option[String]](prefix + "subslotname"),
+        subsynccommit = row[String](prefix + "subsynccommit"),
+        subpublications = row[Array[String]](prefix + "subpublications")
       )
     )
   }

@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object DataTypePrivilegesRepoImpl extends DataTypePrivilegesRepo {
   override def selectAll(implicit c: Connection): List[DataTypePrivilegesRow] = {
-    SQL"""select object_catalog, object_schema, object_name, object_type, dtd_identifier from information_schema.data_type_privileges""".as(DataTypePrivilegesRow.rowParser.*)
+    SQL"""select object_catalog, object_schema, object_name, object_type, dtd_identifier from information_schema.data_type_privileges""".as(DataTypePrivilegesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[DataTypePrivilegesFieldValue[_]])(implicit c: Connection): List[DataTypePrivilegesRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object DataTypePrivilegesRepoImpl extends DataTypePrivilegesRepo {
         val q = s"""select * from information_schema.data_type_privileges where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(DataTypePrivilegesRow.rowParser.*)
+          .as(DataTypePrivilegesRow.rowParser("").*)
     }
 
   }

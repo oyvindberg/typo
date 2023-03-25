@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def selectAll(implicit c: Connection): List[PgLanguageRow] = {
-    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language""".as(PgLanguageRow.rowParser.*)
+    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language""".as(PgLanguageRow.rowParser("").*)
   }
   override def selectById(oid: PgLanguageId)(implicit c: Connection): Option[PgLanguageRow] = {
-    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = $oid""".as(PgLanguageRow.rowParser.singleOpt)
+    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = $oid""".as(PgLanguageRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgLanguageId])(implicit c: Connection): List[PgLanguageRow] = {
-    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid in $oids""".as(PgLanguageRow.rowParser.*)
+    SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid in $oids""".as(PgLanguageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgLanguageFieldValue[_]])(implicit c: Connection): List[PgLanguageRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
         val q = s"""select * from pg_catalog.pg_language where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgLanguageRow.rowParser.*)
+          .as(PgLanguageRow.rowParser("").*)
     }
 
   }

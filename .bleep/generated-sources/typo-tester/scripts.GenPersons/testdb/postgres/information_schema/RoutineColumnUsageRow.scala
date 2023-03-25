@@ -30,19 +30,19 @@ case class RoutineColumnUsageRow(
 )
 
 object RoutineColumnUsageRow {
-  implicit val rowParser: RowParser[RoutineColumnUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[RoutineColumnUsageRow] = { row =>
     Success(
       RoutineColumnUsageRow(
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name"),
-        routineCatalog = row[Option[String]]("routine_catalog"),
-        routineSchema = row[Option[String]]("routine_schema"),
-        routineName = row[Option[String]]("routine_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name")
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name"),
+        routineCatalog = row[Option[String]](prefix + "routine_catalog"),
+        routineSchema = row[Option[String]](prefix + "routine_schema"),
+        routineName = row[Option[String]](prefix + "routine_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name")
       )
     )
   }

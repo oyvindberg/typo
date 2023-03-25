@@ -25,13 +25,13 @@ case class PgAmRow(
 )
 
 object PgAmRow {
-  implicit val rowParser: RowParser[PgAmRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAmRow] = { row =>
     Success(
       PgAmRow(
-        oid = row[PgAmId]("oid"),
-        amname = row[String]("amname"),
-        amhandler = row[PGobject]("amhandler"),
-        amtype = row[String]("amtype")
+        oid = row[PgAmId](prefix + "oid"),
+        amname = row[String](prefix + "amname"),
+        amhandler = row[PGobject](prefix + "amhandler"),
+        amtype = row[String](prefix + "amtype")
       )
     )
   }

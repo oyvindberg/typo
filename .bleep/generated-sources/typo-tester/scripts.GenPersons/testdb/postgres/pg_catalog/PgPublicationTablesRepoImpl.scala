@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgPublicationTablesRepoImpl extends PgPublicationTablesRepo {
   override def selectAll(implicit c: Connection): List[PgPublicationTablesRow] = {
-    SQL"""select pubname, schemaname, tablename from pg_catalog.pg_publication_tables""".as(PgPublicationTablesRow.rowParser.*)
+    SQL"""select pubname, schemaname, tablename from pg_catalog.pg_publication_tables""".as(PgPublicationTablesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPublicationTablesFieldValue[_]])(implicit c: Connection): List[PgPublicationTablesRow] = {
     fieldValues match {
@@ -29,7 +29,7 @@ object PgPublicationTablesRepoImpl extends PgPublicationTablesRepo {
         val q = s"""select * from pg_catalog.pg_publication_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPublicationTablesRow.rowParser.*)
+          .as(PgPublicationTablesRow.rowParser("").*)
     }
 
   }

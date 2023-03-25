@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object ConstraintTableUsageRepoImpl extends ConstraintTableUsageRepo {
   override def selectAll(implicit c: Connection): List[ConstraintTableUsageRow] = {
-    SQL"""select table_catalog, table_schema, table_name, constraint_catalog, constraint_schema, constraint_name from information_schema.constraint_table_usage""".as(ConstraintTableUsageRow.rowParser.*)
+    SQL"""select table_catalog, table_schema, table_name, constraint_catalog, constraint_schema, constraint_name from information_schema.constraint_table_usage""".as(ConstraintTableUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ConstraintTableUsageFieldValue[_]])(implicit c: Connection): List[ConstraintTableUsageRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object ConstraintTableUsageRepoImpl extends ConstraintTableUsageRepo {
         val q = s"""select * from information_schema.constraint_table_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ConstraintTableUsageRow.rowParser.*)
+          .as(ConstraintTableUsageRow.rowParser("").*)
     }
 
   }

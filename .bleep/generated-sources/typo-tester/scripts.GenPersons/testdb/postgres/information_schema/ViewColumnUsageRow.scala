@@ -27,16 +27,16 @@ case class ViewColumnUsageRow(
 )
 
 object ViewColumnUsageRow {
-  implicit val rowParser: RowParser[ViewColumnUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[ViewColumnUsageRow] = { row =>
     Success(
       ViewColumnUsageRow(
-        viewCatalog = row[Option[String]]("view_catalog"),
-        viewSchema = row[Option[String]]("view_schema"),
-        viewName = row[Option[String]]("view_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name")
+        viewCatalog = row[Option[String]](prefix + "view_catalog"),
+        viewSchema = row[Option[String]](prefix + "view_schema"),
+        viewName = row[Option[String]](prefix + "view_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name")
       )
     )
   }

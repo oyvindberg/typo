@@ -28,17 +28,17 @@ case class RoleTableGrantsRow(
 )
 
 object RoleTableGrantsRow {
-  implicit val rowParser: RowParser[RoleTableGrantsRow] = { row =>
+  def rowParser(prefix: String): RowParser[RoleTableGrantsRow] = { row =>
     Success(
       RoleTableGrantsRow(
-        grantor = row[Option[String]]("grantor"),
-        grantee = row[Option[String]]("grantee"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        privilegeType = row[Option[String]]("privilege_type"),
-        isGrantable = row[Option[String]]("is_grantable"),
-        withHierarchy = row[Option[String]]("with_hierarchy")
+        grantor = row[Option[String]](prefix + "grantor"),
+        grantee = row[Option[String]](prefix + "grantee"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        privilegeType = row[Option[String]](prefix + "privilege_type"),
+        isGrantable = row[Option[String]](prefix + "is_grantable"),
+        withHierarchy = row[Option[String]](prefix + "with_hierarchy")
       )
     )
   }

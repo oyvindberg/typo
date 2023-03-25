@@ -30,19 +30,19 @@ case class TableConstraintsRow(
 )
 
 object TableConstraintsRow {
-  implicit val rowParser: RowParser[TableConstraintsRow] = { row =>
+  def rowParser(prefix: String): RowParser[TableConstraintsRow] = { row =>
     Success(
       TableConstraintsRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        constraintType = row[Option[String]]("constraint_type"),
-        isDeferrable = row[Option[String]]("is_deferrable"),
-        initiallyDeferred = row[Option[String]]("initially_deferred"),
-        enforced = row[Option[String]]("enforced")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        constraintType = row[Option[String]](prefix + "constraint_type"),
+        isDeferrable = row[Option[String]](prefix + "is_deferrable"),
+        initiallyDeferred = row[Option[String]](prefix + "initially_deferred"),
+        enforced = row[Option[String]](prefix + "enforced")
       )
     )
   }

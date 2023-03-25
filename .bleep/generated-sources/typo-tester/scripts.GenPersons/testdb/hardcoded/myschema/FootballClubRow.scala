@@ -22,11 +22,11 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  implicit val rowParser: RowParser[FootballClubRow] = { row =>
+  def rowParser(prefix: String): RowParser[FootballClubRow] = { row =>
     Success(
       FootballClubRow(
-        id = row[FootballClubId]("id"),
-        name = row[String]("name")
+        id = row[FootballClubId](prefix + "id"),
+        name = row[String](prefix + "name")
       )
     )
   }

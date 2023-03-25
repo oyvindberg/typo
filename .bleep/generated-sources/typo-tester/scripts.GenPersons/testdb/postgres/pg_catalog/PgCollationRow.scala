@@ -30,19 +30,19 @@ case class PgCollationRow(
 )
 
 object PgCollationRow {
-  implicit val rowParser: RowParser[PgCollationRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgCollationRow] = { row =>
     Success(
       PgCollationRow(
-        oid = row[PgCollationId]("oid"),
-        collname = row[String]("collname"),
-        collnamespace = row[Long]("collnamespace"),
-        collowner = row[Long]("collowner"),
-        collprovider = row[String]("collprovider"),
-        collisdeterministic = row[Boolean]("collisdeterministic"),
-        collencoding = row[Int]("collencoding"),
-        collcollate = row[String]("collcollate"),
-        collctype = row[String]("collctype"),
-        collversion = row[Option[String]]("collversion")
+        oid = row[PgCollationId](prefix + "oid"),
+        collname = row[String](prefix + "collname"),
+        collnamespace = row[Long](prefix + "collnamespace"),
+        collowner = row[Long](prefix + "collowner"),
+        collprovider = row[String](prefix + "collprovider"),
+        collisdeterministic = row[Boolean](prefix + "collisdeterministic"),
+        collencoding = row[Int](prefix + "collencoding"),
+        collcollate = row[String](prefix + "collcollate"),
+        collctype = row[String](prefix + "collctype"),
+        collversion = row[Option[String]](prefix + "collversion")
       )
     )
   }

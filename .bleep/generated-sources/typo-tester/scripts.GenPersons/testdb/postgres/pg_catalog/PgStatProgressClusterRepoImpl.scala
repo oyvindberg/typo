@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatProgressClusterRepoImpl extends PgStatProgressClusterRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressClusterRow] = {
-    SQL"""select pid, datid, datname, relid, command, phase, cluster_index_relid, heap_tuples_scanned, heap_tuples_written, heap_blks_total, heap_blks_scanned, index_rebuild_count from pg_catalog.pg_stat_progress_cluster""".as(PgStatProgressClusterRow.rowParser.*)
+    SQL"""select pid, datid, datname, relid, command, phase, cluster_index_relid, heap_tuples_scanned, heap_tuples_written, heap_blks_total, heap_blks_scanned, index_rebuild_count from pg_catalog.pg_stat_progress_cluster""".as(PgStatProgressClusterRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressClusterFieldValue[_]])(implicit c: Connection): List[PgStatProgressClusterRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgStatProgressClusterRepoImpl extends PgStatProgressClusterRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_cluster where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressClusterRow.rowParser.*)
+          .as(PgStatProgressClusterRow.rowParser("").*)
     }
 
   }

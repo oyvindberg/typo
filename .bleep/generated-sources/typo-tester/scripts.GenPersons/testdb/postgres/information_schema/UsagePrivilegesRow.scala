@@ -28,17 +28,17 @@ case class UsagePrivilegesRow(
 )
 
 object UsagePrivilegesRow {
-  implicit val rowParser: RowParser[UsagePrivilegesRow] = { row =>
+  def rowParser(prefix: String): RowParser[UsagePrivilegesRow] = { row =>
     Success(
       UsagePrivilegesRow(
-        grantor = row[Option[String]]("grantor"),
-        grantee = row[Option[String]]("grantee"),
-        objectCatalog = row[Option[String]]("object_catalog"),
-        objectSchema = row[Option[String]]("object_schema"),
-        objectName = row[Option[String]]("object_name"),
-        objectType = row[Option[String]]("object_type"),
-        privilegeType = row[Option[String]]("privilege_type"),
-        isGrantable = row[Option[String]]("is_grantable")
+        grantor = row[Option[String]](prefix + "grantor"),
+        grantee = row[Option[String]](prefix + "grantee"),
+        objectCatalog = row[Option[String]](prefix + "object_catalog"),
+        objectSchema = row[Option[String]](prefix + "object_schema"),
+        objectName = row[Option[String]](prefix + "object_name"),
+        objectType = row[Option[String]](prefix + "object_type"),
+        privilegeType = row[Option[String]](prefix + "privilege_type"),
+        isGrantable = row[Option[String]](prefix + "is_grantable")
       )
     )
   }

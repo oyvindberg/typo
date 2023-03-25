@@ -26,14 +26,14 @@ case class PgTsTemplateRow(
 )
 
 object PgTsTemplateRow {
-  implicit val rowParser: RowParser[PgTsTemplateRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsTemplateRow] = { row =>
     Success(
       PgTsTemplateRow(
-        oid = row[PgTsTemplateId]("oid"),
-        tmplname = row[String]("tmplname"),
-        tmplnamespace = row[Long]("tmplnamespace"),
-        tmplinit = row[PGobject]("tmplinit"),
-        tmpllexize = row[PGobject]("tmpllexize")
+        oid = row[PgTsTemplateId](prefix + "oid"),
+        tmplname = row[String](prefix + "tmplname"),
+        tmplnamespace = row[Long](prefix + "tmplnamespace"),
+        tmplinit = row[PGobject](prefix + "tmplinit"),
+        tmpllexize = row[PGobject](prefix + "tmpllexize")
       )
     )
   }

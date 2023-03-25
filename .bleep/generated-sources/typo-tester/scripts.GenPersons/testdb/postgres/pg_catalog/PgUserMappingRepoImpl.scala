@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def selectAll(implicit c: Connection): List[PgUserMappingRow] = {
-    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping""".as(PgUserMappingRow.rowParser.*)
+    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping""".as(PgUserMappingRow.rowParser("").*)
   }
   override def selectById(oid: PgUserMappingId)(implicit c: Connection): Option[PgUserMappingRow] = {
-    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = $oid""".as(PgUserMappingRow.rowParser.singleOpt)
+    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = $oid""".as(PgUserMappingRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgUserMappingId])(implicit c: Connection): List[PgUserMappingRow] = {
-    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid in $oids""".as(PgUserMappingRow.rowParser.*)
+    SQL"""select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid in $oids""".as(PgUserMappingRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgUserMappingFieldValue[_]])(implicit c: Connection): List[PgUserMappingRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
         val q = s"""select * from pg_catalog.pg_user_mapping where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgUserMappingRow.rowParser.*)
+          .as(PgUserMappingRow.rowParser("").*)
     }
 
   }

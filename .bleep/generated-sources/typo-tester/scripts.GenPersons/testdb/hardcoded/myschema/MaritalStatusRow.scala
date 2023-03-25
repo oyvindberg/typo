@@ -21,10 +21,10 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
-  implicit val rowParser: RowParser[MaritalStatusRow] = { row =>
+  def rowParser(prefix: String): RowParser[MaritalStatusRow] = { row =>
     Success(
       MaritalStatusRow(
-        id = row[MaritalStatusId]("id")
+        id = row[MaritalStatusId](prefix + "id")
       )
     )
   }

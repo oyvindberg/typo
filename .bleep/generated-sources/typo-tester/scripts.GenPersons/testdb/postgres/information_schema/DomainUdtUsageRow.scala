@@ -26,15 +26,15 @@ case class DomainUdtUsageRow(
 )
 
 object DomainUdtUsageRow {
-  implicit val rowParser: RowParser[DomainUdtUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[DomainUdtUsageRow] = { row =>
     Success(
       DomainUdtUsageRow(
-        udtCatalog = row[Option[String]]("udt_catalog"),
-        udtSchema = row[Option[String]]("udt_schema"),
-        udtName = row[Option[String]]("udt_name"),
-        domainCatalog = row[Option[String]]("domain_catalog"),
-        domainSchema = row[Option[String]]("domain_schema"),
-        domainName = row[Option[String]]("domain_name")
+        udtCatalog = row[Option[String]](prefix + "udt_catalog"),
+        udtSchema = row[Option[String]](prefix + "udt_schema"),
+        udtName = row[Option[String]](prefix + "udt_name"),
+        domainCatalog = row[Option[String]](prefix + "domain_catalog"),
+        domainSchema = row[Option[String]](prefix + "domain_schema"),
+        domainName = row[Option[String]](prefix + "domain_name")
       )
     )
   }

@@ -24,12 +24,12 @@ case class PgTimezoneAbbrevsRow(
 )
 
 object PgTimezoneAbbrevsRow {
-  implicit val rowParser: RowParser[PgTimezoneAbbrevsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTimezoneAbbrevsRow] = { row =>
     Success(
       PgTimezoneAbbrevsRow(
-        abbrev = row[Option[String]]("abbrev"),
-        utcOffset = row[Option[PGInterval]]("utc_offset"),
-        isDst = row[Option[Boolean]]("is_dst")
+        abbrev = row[Option[String]](prefix + "abbrev"),
+        utcOffset = row[Option[PGInterval]](prefix + "utc_offset"),
+        isDst = row[Option[Boolean]](prefix + "is_dst")
       )
     )
   }

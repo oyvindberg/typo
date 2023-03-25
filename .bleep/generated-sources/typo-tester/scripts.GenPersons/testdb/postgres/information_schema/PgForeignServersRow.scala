@@ -29,18 +29,18 @@ case class PgForeignServersRow(
 )
 
 object PgForeignServersRow {
-  implicit val rowParser: RowParser[PgForeignServersRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignServersRow] = { row =>
     Success(
       PgForeignServersRow(
-        oid = row[Option[Long]]("oid"),
-        srvoptions = row[Option[Array[String]]]("srvoptions"),
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name"),
-        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
-        foreignServerType = row[Option[String]]("foreign_server_type"),
-        foreignServerVersion = row[Option[String]]("foreign_server_version"),
-        authorizationIdentifier = row[Option[String]]("authorization_identifier")
+        oid = row[Option[Long]](prefix + "oid"),
+        srvoptions = row[Option[Array[String]]](prefix + "srvoptions"),
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
+        foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
+        foreignServerType = row[Option[String]](prefix + "foreign_server_type"),
+        foreignServerVersion = row[Option[String]](prefix + "foreign_server_version"),
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier")
       )
     )
   }

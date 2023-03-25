@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object SqlSizingRepoImpl extends SqlSizingRepo {
   override def selectAll(implicit c: Connection): List[SqlSizingRow] = {
-    SQL"""select sizing_id, sizing_name, supported_value, comments from information_schema.sql_sizing""".as(SqlSizingRow.rowParser.*)
+    SQL"""select sizing_id, sizing_name, supported_value, comments from information_schema.sql_sizing""".as(SqlSizingRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SqlSizingFieldValue[_]])(implicit c: Connection): List[SqlSizingRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
         val q = s"""select * from information_schema.sql_sizing where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SqlSizingRow.rowParser.*)
+          .as(SqlSizingRow.rowParser("").*)
     }
 
   }

@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object ColumnOptionsRepoImpl extends ColumnOptionsRepo {
   override def selectAll(implicit c: Connection): List[ColumnOptionsRow] = {
-    SQL"""select table_catalog, table_schema, table_name, column_name, option_name, option_value from information_schema.column_options""".as(ColumnOptionsRow.rowParser.*)
+    SQL"""select table_catalog, table_schema, table_name, column_name, option_name, option_value from information_schema.column_options""".as(ColumnOptionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ColumnOptionsFieldValue[_]])(implicit c: Connection): List[ColumnOptionsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object ColumnOptionsRepoImpl extends ColumnOptionsRepo {
         val q = s"""select * from information_schema.column_options where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ColumnOptionsRow.rowParser.*)
+          .as(ColumnOptionsRow.rowParser("").*)
     }
 
   }

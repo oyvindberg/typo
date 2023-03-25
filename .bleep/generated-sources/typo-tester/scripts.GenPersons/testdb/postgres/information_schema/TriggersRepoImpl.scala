@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object TriggersRepoImpl extends TriggersRepo {
   override def selectAll(implicit c: Connection): List[TriggersRow] = {
-    SQL"""select trigger_catalog, trigger_schema, trigger_name, event_manipulation, event_object_catalog, event_object_schema, event_object_table, action_order, action_condition, action_statement, action_orientation, action_timing, action_reference_old_table, action_reference_new_table, action_reference_old_row, action_reference_new_row, created from information_schema.triggers""".as(TriggersRow.rowParser.*)
+    SQL"""select trigger_catalog, trigger_schema, trigger_name, event_manipulation, event_object_catalog, event_object_schema, event_object_table, action_order, action_condition, action_statement, action_orientation, action_timing, action_reference_old_table, action_reference_new_table, action_reference_old_row, action_reference_new_row, created from information_schema.triggers""".as(TriggersRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[TriggersFieldValue[_]])(implicit c: Connection): List[TriggersRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object TriggersRepoImpl extends TriggersRepo {
         val q = s"""select * from information_schema.triggers where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(TriggersRow.rowParser.*)
+          .as(TriggersRow.rowParser("").*)
     }
 
   }

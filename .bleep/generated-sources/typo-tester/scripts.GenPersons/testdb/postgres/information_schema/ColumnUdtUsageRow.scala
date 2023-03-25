@@ -27,16 +27,16 @@ case class ColumnUdtUsageRow(
 )
 
 object ColumnUdtUsageRow {
-  implicit val rowParser: RowParser[ColumnUdtUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[ColumnUdtUsageRow] = { row =>
     Success(
       ColumnUdtUsageRow(
-        udtCatalog = row[Option[String]]("udt_catalog"),
-        udtSchema = row[Option[String]]("udt_schema"),
-        udtName = row[Option[String]]("udt_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name")
+        udtCatalog = row[Option[String]](prefix + "udt_catalog"),
+        udtSchema = row[Option[String]](prefix + "udt_schema"),
+        udtName = row[Option[String]](prefix + "udt_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name")
       )
     )
   }

@@ -35,23 +35,23 @@ case class PgDatabaseRow(
 )
 
 object PgDatabaseRow {
-  implicit val rowParser: RowParser[PgDatabaseRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgDatabaseRow] = { row =>
     Success(
       PgDatabaseRow(
-        oid = row[PgDatabaseId]("oid"),
-        datname = row[String]("datname"),
-        datdba = row[Long]("datdba"),
-        encoding = row[Int]("encoding"),
-        datcollate = row[String]("datcollate"),
-        datctype = row[String]("datctype"),
-        datistemplate = row[Boolean]("datistemplate"),
-        datallowconn = row[Boolean]("datallowconn"),
-        datconnlimit = row[Int]("datconnlimit"),
-        datlastsysoid = row[Long]("datlastsysoid"),
-        datfrozenxid = row[PGobject]("datfrozenxid"),
-        datminmxid = row[PGobject]("datminmxid"),
-        dattablespace = row[Long]("dattablespace"),
-        datacl = row[Option[Array[PGobject]]]("datacl")
+        oid = row[PgDatabaseId](prefix + "oid"),
+        datname = row[String](prefix + "datname"),
+        datdba = row[Long](prefix + "datdba"),
+        encoding = row[Int](prefix + "encoding"),
+        datcollate = row[String](prefix + "datcollate"),
+        datctype = row[String](prefix + "datctype"),
+        datistemplate = row[Boolean](prefix + "datistemplate"),
+        datallowconn = row[Boolean](prefix + "datallowconn"),
+        datconnlimit = row[Int](prefix + "datconnlimit"),
+        datlastsysoid = row[Long](prefix + "datlastsysoid"),
+        datfrozenxid = row[PGobject](prefix + "datfrozenxid"),
+        datminmxid = row[PGobject](prefix + "datminmxid"),
+        dattablespace = row[Long](prefix + "dattablespace"),
+        datacl = row[Option[Array[PGobject]]](prefix + "datacl")
       )
     )
   }

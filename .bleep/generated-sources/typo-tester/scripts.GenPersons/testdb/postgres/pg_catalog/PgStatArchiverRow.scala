@@ -28,16 +28,16 @@ case class PgStatArchiverRow(
 )
 
 object PgStatArchiverRow {
-  implicit val rowParser: RowParser[PgStatArchiverRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatArchiverRow] = { row =>
     Success(
       PgStatArchiverRow(
-        archivedCount = row[Option[Long]]("archived_count"),
-        lastArchivedWal = row[Option[String]]("last_archived_wal"),
-        lastArchivedTime = row[Option[ZonedDateTime]]("last_archived_time"),
-        failedCount = row[Option[Long]]("failed_count"),
-        lastFailedWal = row[Option[String]]("last_failed_wal"),
-        lastFailedTime = row[Option[ZonedDateTime]]("last_failed_time"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        archivedCount = row[Option[Long]](prefix + "archived_count"),
+        lastArchivedWal = row[Option[String]](prefix + "last_archived_wal"),
+        lastArchivedTime = row[Option[ZonedDateTime]](prefix + "last_archived_time"),
+        failedCount = row[Option[Long]](prefix + "failed_count"),
+        lastFailedWal = row[Option[String]](prefix + "last_failed_wal"),
+        lastFailedTime = row[Option[ZonedDateTime]](prefix + "last_failed_time"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

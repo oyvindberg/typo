@@ -39,12 +39,12 @@ object PgInitPrivsId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgInitPrivsId] = { row =>
+  def rowParser(prefix: String): RowParser[PgInitPrivsId] = { row =>
     Success(
       PgInitPrivsId(
-        objoid = row[Long]("objoid"),
-        classoid = row[Long]("classoid"),
-        objsubid = row[Int]("objsubid")
+        objoid = row[Long](prefix + "objoid"),
+        classoid = row[Long](prefix + "classoid"),
+        objsubid = row[Int](prefix + "objsubid")
       )
     )
   }

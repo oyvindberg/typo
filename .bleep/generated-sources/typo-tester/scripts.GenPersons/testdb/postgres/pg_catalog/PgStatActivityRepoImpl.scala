@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatActivityRepoImpl extends PgStatActivityRepo {
   override def selectAll(implicit c: Connection): List[PgStatActivityRow] = {
-    SQL"""select datid, datname, pid, leader_pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start, xact_start, query_start, state_change, wait_event_type, wait_event, state, backend_xid, backend_xmin, query_id, query, backend_type from pg_catalog.pg_stat_activity""".as(PgStatActivityRow.rowParser.*)
+    SQL"""select datid, datname, pid, leader_pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start, xact_start, query_start, state_change, wait_event_type, wait_event, state, backend_xid, backend_xmin, query_id, query, backend_type from pg_catalog.pg_stat_activity""".as(PgStatActivityRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatActivityFieldValue[_]])(implicit c: Connection): List[PgStatActivityRow] = {
     fieldValues match {
@@ -48,7 +48,7 @@ object PgStatActivityRepoImpl extends PgStatActivityRepo {
         val q = s"""select * from pg_catalog.pg_stat_activity where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatActivityRow.rowParser.*)
+          .as(PgStatActivityRow.rowParser("").*)
     }
 
   }

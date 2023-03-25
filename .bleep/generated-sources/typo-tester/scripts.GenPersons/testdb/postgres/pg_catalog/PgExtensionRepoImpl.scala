@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def selectAll(implicit c: Connection): List[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension""".as(PgExtensionRow.rowParser.*)
+    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension""".as(PgExtensionRow.rowParser("").*)
   }
   override def selectById(oid: PgExtensionId)(implicit c: Connection): Option[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = $oid""".as(PgExtensionRow.rowParser.singleOpt)
+    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = $oid""".as(PgExtensionRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgExtensionId])(implicit c: Connection): List[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid in $oids""".as(PgExtensionRow.rowParser.*)
+    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid in $oids""".as(PgExtensionRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgExtensionFieldValue[_]])(implicit c: Connection): List[PgExtensionRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
         val q = s"""select * from pg_catalog.pg_extension where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgExtensionRow.rowParser.*)
+          .as(PgExtensionRow.rowParser("").*)
     }
 
   }

@@ -29,17 +29,17 @@ case class PgRewriteRow(
 )
 
 object PgRewriteRow {
-  implicit val rowParser: RowParser[PgRewriteRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgRewriteRow] = { row =>
     Success(
       PgRewriteRow(
-        oid = row[PgRewriteId]("oid"),
-        rulename = row[String]("rulename"),
-        evClass = row[Long]("ev_class"),
-        evType = row[String]("ev_type"),
-        evEnabled = row[String]("ev_enabled"),
-        isInstead = row[Boolean]("is_instead"),
-        evQual = row[PGobject]("ev_qual"),
-        evAction = row[PGobject]("ev_action")
+        oid = row[PgRewriteId](prefix + "oid"),
+        rulename = row[String](prefix + "rulename"),
+        evClass = row[Long](prefix + "ev_class"),
+        evType = row[String](prefix + "ev_type"),
+        evEnabled = row[String](prefix + "ev_enabled"),
+        isInstead = row[Boolean](prefix + "is_instead"),
+        evQual = row[PGobject](prefix + "ev_qual"),
+        evAction = row[PGobject](prefix + "ev_action")
       )
     )
   }

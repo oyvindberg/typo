@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object SchemataRepoImpl extends SchemataRepo {
   override def selectAll(implicit c: Connection): List[SchemataRow] = {
-    SQL"""select catalog_name, schema_name, schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path from information_schema.schemata""".as(SchemataRow.rowParser.*)
+    SQL"""select catalog_name, schema_name, schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path from information_schema.schemata""".as(SchemataRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SchemataFieldValue[_]])(implicit c: Connection): List[SchemataRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object SchemataRepoImpl extends SchemataRepo {
         val q = s"""select * from information_schema.schemata where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SchemataRow.rowParser.*)
+          .as(SchemataRow.rowParser("").*)
     }
 
   }

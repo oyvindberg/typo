@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatioUserSequencesRepoImpl extends PgStatioUserSequencesRepo {
   override def selectAll(implicit c: Connection): List[PgStatioUserSequencesRow] = {
-    SQL"""select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_user_sequences""".as(PgStatioUserSequencesRow.rowParser.*)
+    SQL"""select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_user_sequences""".as(PgStatioUserSequencesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatioUserSequencesFieldValue[_]])(implicit c: Connection): List[PgStatioUserSequencesRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object PgStatioUserSequencesRepoImpl extends PgStatioUserSequencesRepo {
         val q = s"""select * from pg_catalog.pg_statio_user_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatioUserSequencesRow.rowParser.*)
+          .as(PgStatioUserSequencesRow.rowParser("").*)
     }
 
   }

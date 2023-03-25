@@ -24,13 +24,13 @@ case class CheckConstraintsRow(
 )
 
 object CheckConstraintsRow {
-  implicit val rowParser: RowParser[CheckConstraintsRow] = { row =>
+  def rowParser(prefix: String): RowParser[CheckConstraintsRow] = { row =>
     Success(
       CheckConstraintsRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        checkClause = row[Option[String]]("check_clause")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        checkClause = row[Option[String]](prefix + "check_clause")
       )
     )
   }

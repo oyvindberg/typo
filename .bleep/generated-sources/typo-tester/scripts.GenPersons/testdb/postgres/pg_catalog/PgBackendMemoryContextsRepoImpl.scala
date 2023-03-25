@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgBackendMemoryContextsRepoImpl extends PgBackendMemoryContextsRepo {
   override def selectAll(implicit c: Connection): List[PgBackendMemoryContextsRow] = {
-    SQL"""select name, ident, parent, level, total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".as(PgBackendMemoryContextsRow.rowParser.*)
+    SQL"""select name, ident, parent, level, total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".as(PgBackendMemoryContextsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgBackendMemoryContextsFieldValue[_]])(implicit c: Connection): List[PgBackendMemoryContextsRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgBackendMemoryContextsRepoImpl extends PgBackendMemoryContextsRepo {
         val q = s"""select * from pg_catalog.pg_backend_memory_contexts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgBackendMemoryContextsRow.rowParser.*)
+          .as(PgBackendMemoryContextsRow.rowParser("").*)
     }
 
   }

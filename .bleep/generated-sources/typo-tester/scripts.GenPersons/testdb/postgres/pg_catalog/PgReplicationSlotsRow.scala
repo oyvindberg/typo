@@ -36,24 +36,24 @@ case class PgReplicationSlotsRow(
 )
 
 object PgReplicationSlotsRow {
-  implicit val rowParser: RowParser[PgReplicationSlotsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgReplicationSlotsRow] = { row =>
     Success(
       PgReplicationSlotsRow(
-        slotName = row[Option[String]]("slot_name"),
-        plugin = row[Option[String]]("plugin"),
-        slotType = row[Option[String]]("slot_type"),
-        datoid = row[Option[Long]]("datoid"),
-        database = row[Option[String]]("database"),
-        temporary = row[Option[Boolean]]("temporary"),
-        active = row[Option[Boolean]]("active"),
-        activePid = row[Option[Int]]("active_pid"),
-        xmin = row[Option[PGobject]]("xmin"),
-        catalogXmin = row[Option[PGobject]]("catalog_xmin"),
-        restartLsn = row[Option[String]]("restart_lsn"),
-        confirmedFlushLsn = row[Option[String]]("confirmed_flush_lsn"),
-        walStatus = row[Option[String]]("wal_status"),
-        safeWalSize = row[Option[Long]]("safe_wal_size"),
-        twoPhase = row[Option[Boolean]]("two_phase")
+        slotName = row[Option[String]](prefix + "slot_name"),
+        plugin = row[Option[String]](prefix + "plugin"),
+        slotType = row[Option[String]](prefix + "slot_type"),
+        datoid = row[Option[Long]](prefix + "datoid"),
+        database = row[Option[String]](prefix + "database"),
+        temporary = row[Option[Boolean]](prefix + "temporary"),
+        active = row[Option[Boolean]](prefix + "active"),
+        activePid = row[Option[Int]](prefix + "active_pid"),
+        xmin = row[Option[PGobject]](prefix + "xmin"),
+        catalogXmin = row[Option[PGobject]](prefix + "catalog_xmin"),
+        restartLsn = row[Option[String]](prefix + "restart_lsn"),
+        confirmedFlushLsn = row[Option[String]](prefix + "confirmed_flush_lsn"),
+        walStatus = row[Option[String]](prefix + "wal_status"),
+        safeWalSize = row[Option[Long]](prefix + "safe_wal_size"),
+        twoPhase = row[Option[Boolean]](prefix + "two_phase")
       )
     )
   }

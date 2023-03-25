@@ -49,37 +49,37 @@ case class PgStatDatabaseRow(
 )
 
 object PgStatDatabaseRow {
-  implicit val rowParser: RowParser[PgStatDatabaseRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatDatabaseRow] = { row =>
     Success(
       PgStatDatabaseRow(
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        numbackends = row[Option[Int]]("numbackends"),
-        xactCommit = row[Option[Long]]("xact_commit"),
-        xactRollback = row[Option[Long]]("xact_rollback"),
-        blksRead = row[Option[Long]]("blks_read"),
-        blksHit = row[Option[Long]]("blks_hit"),
-        tupReturned = row[Option[Long]]("tup_returned"),
-        tupFetched = row[Option[Long]]("tup_fetched"),
-        tupInserted = row[Option[Long]]("tup_inserted"),
-        tupUpdated = row[Option[Long]]("tup_updated"),
-        tupDeleted = row[Option[Long]]("tup_deleted"),
-        conflicts = row[Option[Long]]("conflicts"),
-        tempFiles = row[Option[Long]]("temp_files"),
-        tempBytes = row[Option[Long]]("temp_bytes"),
-        deadlocks = row[Option[Long]]("deadlocks"),
-        checksumFailures = row[Option[Long]]("checksum_failures"),
-        checksumLastFailure = row[Option[ZonedDateTime]]("checksum_last_failure"),
-        blkReadTime = row[Option[Double]]("blk_read_time"),
-        blkWriteTime = row[Option[Double]]("blk_write_time"),
-        sessionTime = row[Option[Double]]("session_time"),
-        activeTime = row[Option[Double]]("active_time"),
-        idleInTransactionTime = row[Option[Double]]("idle_in_transaction_time"),
-        sessions = row[Option[Long]]("sessions"),
-        sessionsAbandoned = row[Option[Long]]("sessions_abandoned"),
-        sessionsFatal = row[Option[Long]]("sessions_fatal"),
-        sessionsKilled = row[Option[Long]]("sessions_killed"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        numbackends = row[Option[Int]](prefix + "numbackends"),
+        xactCommit = row[Option[Long]](prefix + "xact_commit"),
+        xactRollback = row[Option[Long]](prefix + "xact_rollback"),
+        blksRead = row[Option[Long]](prefix + "blks_read"),
+        blksHit = row[Option[Long]](prefix + "blks_hit"),
+        tupReturned = row[Option[Long]](prefix + "tup_returned"),
+        tupFetched = row[Option[Long]](prefix + "tup_fetched"),
+        tupInserted = row[Option[Long]](prefix + "tup_inserted"),
+        tupUpdated = row[Option[Long]](prefix + "tup_updated"),
+        tupDeleted = row[Option[Long]](prefix + "tup_deleted"),
+        conflicts = row[Option[Long]](prefix + "conflicts"),
+        tempFiles = row[Option[Long]](prefix + "temp_files"),
+        tempBytes = row[Option[Long]](prefix + "temp_bytes"),
+        deadlocks = row[Option[Long]](prefix + "deadlocks"),
+        checksumFailures = row[Option[Long]](prefix + "checksum_failures"),
+        checksumLastFailure = row[Option[ZonedDateTime]](prefix + "checksum_last_failure"),
+        blkReadTime = row[Option[Double]](prefix + "blk_read_time"),
+        blkWriteTime = row[Option[Double]](prefix + "blk_write_time"),
+        sessionTime = row[Option[Double]](prefix + "session_time"),
+        activeTime = row[Option[Double]](prefix + "active_time"),
+        idleInTransactionTime = row[Option[Double]](prefix + "idle_in_transaction_time"),
+        sessions = row[Option[Long]](prefix + "sessions"),
+        sessionsAbandoned = row[Option[Long]](prefix + "sessions_abandoned"),
+        sessionsFatal = row[Option[Long]](prefix + "sessions_fatal"),
+        sessionsKilled = row[Option[Long]](prefix + "sessions_killed"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

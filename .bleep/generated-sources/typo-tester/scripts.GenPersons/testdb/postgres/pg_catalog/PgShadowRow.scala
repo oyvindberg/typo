@@ -30,18 +30,18 @@ case class PgShadowRow(
 )
 
 object PgShadowRow {
-  implicit val rowParser: RowParser[PgShadowRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgShadowRow] = { row =>
     Success(
       PgShadowRow(
-        usename = row[Option[String]]("usename"),
-        usesysid = row[Option[Long]]("usesysid"),
-        usecreatedb = row[Option[Boolean]]("usecreatedb"),
-        usesuper = row[Option[Boolean]]("usesuper"),
-        userepl = row[Option[Boolean]]("userepl"),
-        usebypassrls = row[Option[Boolean]]("usebypassrls"),
-        passwd = row[Option[String]]("passwd"),
-        valuntil = row[Option[ZonedDateTime]]("valuntil"),
-        useconfig = row[Option[Array[String]]]("useconfig")
+        usename = row[Option[String]](prefix + "usename"),
+        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usecreatedb = row[Option[Boolean]](prefix + "usecreatedb"),
+        usesuper = row[Option[Boolean]](prefix + "usesuper"),
+        userepl = row[Option[Boolean]](prefix + "userepl"),
+        usebypassrls = row[Option[Boolean]](prefix + "usebypassrls"),
+        passwd = row[Option[String]](prefix + "passwd"),
+        valuntil = row[Option[ZonedDateTime]](prefix + "valuntil"),
+        useconfig = row[Option[Array[String]]](prefix + "useconfig")
       )
     )
   }

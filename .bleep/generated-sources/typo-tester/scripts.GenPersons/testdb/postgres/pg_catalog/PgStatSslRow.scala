@@ -29,17 +29,17 @@ case class PgStatSslRow(
 )
 
 object PgStatSslRow {
-  implicit val rowParser: RowParser[PgStatSslRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatSslRow] = { row =>
     Success(
       PgStatSslRow(
-        pid = row[Option[Int]]("pid"),
-        ssl = row[Option[Boolean]]("ssl"),
-        version = row[Option[String]]("version"),
-        cipher = row[Option[String]]("cipher"),
-        bits = row[Option[Int]]("bits"),
-        clientDn = row[Option[String]]("client_dn"),
-        clientSerial = row[Option[BigDecimal]]("client_serial"),
-        issuerDn = row[Option[String]]("issuer_dn")
+        pid = row[Option[Int]](prefix + "pid"),
+        ssl = row[Option[Boolean]](prefix + "ssl"),
+        version = row[Option[String]](prefix + "version"),
+        cipher = row[Option[String]](prefix + "cipher"),
+        bits = row[Option[Int]](prefix + "bits"),
+        clientDn = row[Option[String]](prefix + "client_dn"),
+        clientSerial = row[Option[BigDecimal]](prefix + "client_serial"),
+        issuerDn = row[Option[String]](prefix + "issuer_dn")
       )
     )
   }

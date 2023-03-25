@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object CollationCharacterSetApplicabilityRepoImpl extends CollationCharacterSetApplicabilityRepo {
   override def selectAll(implicit c: Connection): List[CollationCharacterSetApplicabilityRow] = {
-    SQL"""select collation_catalog, collation_schema, collation_name, character_set_catalog, character_set_schema, character_set_name from information_schema.collation_character_set_applicability""".as(CollationCharacterSetApplicabilityRow.rowParser.*)
+    SQL"""select collation_catalog, collation_schema, collation_name, character_set_catalog, character_set_schema, character_set_name from information_schema.collation_character_set_applicability""".as(CollationCharacterSetApplicabilityRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[CollationCharacterSetApplicabilityFieldValue[_]])(implicit c: Connection): List[CollationCharacterSetApplicabilityRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object CollationCharacterSetApplicabilityRepoImpl extends CollationCharacterSetA
         val q = s"""select * from information_schema.collation_character_set_applicability where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(CollationCharacterSetApplicabilityRow.rowParser.*)
+          .as(CollationCharacterSetApplicabilityRow.rowParser("").*)
     }
 
   }

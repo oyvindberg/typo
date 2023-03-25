@@ -27,14 +27,14 @@ case class PgPreparedXactsRow(
 )
 
 object PgPreparedXactsRow {
-  implicit val rowParser: RowParser[PgPreparedXactsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPreparedXactsRow] = { row =>
     Success(
       PgPreparedXactsRow(
-        transaction = row[Option[PGobject]]("transaction"),
-        gid = row[Option[String]]("gid"),
-        prepared = row[Option[ZonedDateTime]]("prepared"),
-        owner = row[Option[String]]("owner"),
-        database = row[Option[String]]("database")
+        transaction = row[Option[PGobject]](prefix + "transaction"),
+        gid = row[Option[String]](prefix + "gid"),
+        prepared = row[Option[ZonedDateTime]](prefix + "prepared"),
+        owner = row[Option[String]](prefix + "owner"),
+        database = row[Option[String]](prefix + "database")
       )
     )
   }

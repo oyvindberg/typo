@@ -37,11 +37,11 @@ object PgSubscriptionRelId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgSubscriptionRelId] = { row =>
+  def rowParser(prefix: String): RowParser[PgSubscriptionRelId] = { row =>
     Success(
       PgSubscriptionRelId(
-        srrelid = row[Long]("srrelid"),
-        srsubid = row[Long]("srsubid")
+        srrelid = row[Long](prefix + "srrelid"),
+        srsubid = row[Long](prefix + "srsubid")
       )
     )
   }

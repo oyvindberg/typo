@@ -19,5 +19,5 @@ object PgTablespaceId {
   implicit val format: Format[PgTablespaceId] = implicitly[Format[Long]].bimap(PgTablespaceId.apply, _.value)
   implicit val toStatement: ToStatement[PgTablespaceId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[PgTablespaceId] = implicitly[Column[Long]].map(PgTablespaceId.apply)
-  implicit val rowParser: RowParser[PgTablespaceId] = SqlParser.get[PgTablespaceId]("oid")
+  def rowParser(prefix: String): RowParser[PgTablespaceId] = SqlParser.get[PgTablespaceId](prefix + "oid")
 }

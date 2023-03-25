@@ -34,22 +34,22 @@ case class PgRolesRow(
 )
 
 object PgRolesRow {
-  implicit val rowParser: RowParser[PgRolesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgRolesRow] = { row =>
     Success(
       PgRolesRow(
-        rolname = row[Option[String]]("rolname"),
-        rolsuper = row[Option[Boolean]]("rolsuper"),
-        rolinherit = row[Option[Boolean]]("rolinherit"),
-        rolcreaterole = row[Option[Boolean]]("rolcreaterole"),
-        rolcreatedb = row[Option[Boolean]]("rolcreatedb"),
-        rolcanlogin = row[Option[Boolean]]("rolcanlogin"),
-        rolreplication = row[Option[Boolean]]("rolreplication"),
-        rolconnlimit = row[Option[Int]]("rolconnlimit"),
-        rolpassword = row[Option[String]]("rolpassword"),
-        rolvaliduntil = row[Option[ZonedDateTime]]("rolvaliduntil"),
-        rolbypassrls = row[Option[Boolean]]("rolbypassrls"),
-        rolconfig = row[Option[Array[String]]]("rolconfig"),
-        oid = row[Option[Long]]("oid")
+        rolname = row[Option[String]](prefix + "rolname"),
+        rolsuper = row[Option[Boolean]](prefix + "rolsuper"),
+        rolinherit = row[Option[Boolean]](prefix + "rolinherit"),
+        rolcreaterole = row[Option[Boolean]](prefix + "rolcreaterole"),
+        rolcreatedb = row[Option[Boolean]](prefix + "rolcreatedb"),
+        rolcanlogin = row[Option[Boolean]](prefix + "rolcanlogin"),
+        rolreplication = row[Option[Boolean]](prefix + "rolreplication"),
+        rolconnlimit = row[Option[Int]](prefix + "rolconnlimit"),
+        rolpassword = row[Option[String]](prefix + "rolpassword"),
+        rolvaliduntil = row[Option[ZonedDateTime]](prefix + "rolvaliduntil"),
+        rolbypassrls = row[Option[Boolean]](prefix + "rolbypassrls"),
+        rolconfig = row[Option[Array[String]]](prefix + "rolconfig"),
+        oid = row[Option[Long]](prefix + "oid")
       )
     )
   }

@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop""".as(PgAmopRow.rowParser.*)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop""".as(PgAmopRow.rowParser("").*)
   }
   override def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = $oid""".as(PgAmopRow.rowParser.singleOpt)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = $oid""".as(PgAmopRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAmopId])(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid in $oids""".as(PgAmopRow.rowParser.*)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid in $oids""".as(PgAmopRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAmopFieldValue[_]])(implicit c: Connection): List[PgAmopRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
         val q = s"""select * from pg_catalog.pg_amop where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAmopRow.rowParser.*)
+          .as(PgAmopRow.rowParser("").*)
     }
 
   }

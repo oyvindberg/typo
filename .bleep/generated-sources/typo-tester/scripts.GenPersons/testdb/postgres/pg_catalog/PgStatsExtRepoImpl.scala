@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatsExtRepoImpl extends PgStatsExtRepo {
   override def selectAll(implicit c: Connection): List[PgStatsExtRow] = {
-    SQL"""select schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, attnames, exprs, kinds, n_distinct, dependencies, most_common_vals, most_common_val_nulls, most_common_freqs, most_common_base_freqs from pg_catalog.pg_stats_ext""".as(PgStatsExtRow.rowParser.*)
+    SQL"""select schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, attnames, exprs, kinds, n_distinct, dependencies, most_common_vals, most_common_val_nulls, most_common_freqs, most_common_base_freqs from pg_catalog.pg_stats_ext""".as(PgStatsExtRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatsExtFieldValue[_]])(implicit c: Connection): List[PgStatsExtRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object PgStatsExtRepoImpl extends PgStatsExtRepo {
         val q = s"""select * from pg_catalog.pg_stats_ext where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatsExtRow.rowParser.*)
+          .as(PgStatsExtRow.rowParser("").*)
     }
 
   }

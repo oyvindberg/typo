@@ -15,10 +15,10 @@ import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser.*)
+    SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser("").*)
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser.singleOpt)
+    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PersonRepoImpl extends PersonRepo {
         val q = s"""select * from compositepk.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser.*)
+          .as(PersonRow.rowParser("").*)
     }
 
   }
@@ -64,7 +64,7 @@ object PersonRepoImpl extends PersonRepo {
       returning one, two
       """
       .on(namedParameters :_*)
-      .executeInsert(PersonId.rowParser.single)
+      .executeInsert(PersonId.rowParser("").single)
 
   }
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {

@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatReplicationSlotsRepoImpl extends PgStatReplicationSlotsRepo {
   override def selectAll(implicit c: Connection): List[PgStatReplicationSlotsRow] = {
-    SQL"""select slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset from pg_catalog.pg_stat_replication_slots""".as(PgStatReplicationSlotsRow.rowParser.*)
+    SQL"""select slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset from pg_catalog.pg_stat_replication_slots""".as(PgStatReplicationSlotsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatReplicationSlotsFieldValue[_]])(implicit c: Connection): List[PgStatReplicationSlotsRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PgStatReplicationSlotsRepoImpl extends PgStatReplicationSlotsRepo {
         val q = s"""select * from pg_catalog.pg_stat_replication_slots where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatReplicationSlotsRow.rowParser.*)
+          .as(PgStatReplicationSlotsRow.rowParser("").*)
     }
 
   }

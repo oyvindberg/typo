@@ -41,13 +41,13 @@ object PgSeclabelId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgSeclabelId] = { row =>
+  def rowParser(prefix: String): RowParser[PgSeclabelId] = { row =>
     Success(
       PgSeclabelId(
-        objoid = row[Long]("objoid"),
-        classoid = row[Long]("classoid"),
-        objsubid = row[Int]("objsubid"),
-        provider = row[String]("provider")
+        objoid = row[Long](prefix + "objoid"),
+        classoid = row[Long](prefix + "classoid"),
+        objsubid = row[Int](prefix + "objsubid"),
+        provider = row[String](prefix + "provider")
       )
     )
   }

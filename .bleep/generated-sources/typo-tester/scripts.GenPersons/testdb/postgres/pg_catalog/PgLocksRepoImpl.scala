@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgLocksRepoImpl extends PgLocksRepo {
   override def selectAll(implicit c: Connection): List[PgLocksRow] = {
-    SQL"""select locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart from pg_catalog.pg_locks""".as(PgLocksRow.rowParser.*)
+    SQL"""select locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart from pg_catalog.pg_locks""".as(PgLocksRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgLocksFieldValue[_]])(implicit c: Connection): List[PgLocksRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgLocksRepoImpl extends PgLocksRepo {
         val q = s"""select * from pg_catalog.pg_locks where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgLocksRow.rowParser.*)
+          .as(PgLocksRow.rowParser("").*)
     }
 
   }

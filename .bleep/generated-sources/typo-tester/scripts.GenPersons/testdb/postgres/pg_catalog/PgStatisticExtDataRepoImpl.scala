@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data""".as(PgStatisticExtDataRow.rowParser.*)
+    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data""".as(PgStatisticExtDataRow.rowParser("").*)
   }
   override def selectById(stxoid: PgStatisticExtDataId)(implicit c: Connection): Option[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = $stxoid""".as(PgStatisticExtDataRow.rowParser.singleOpt)
+    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = $stxoid""".as(PgStatisticExtDataRow.rowParser("").singleOpt)
   }
   override def selectByIds(stxoids: List[PgStatisticExtDataId])(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid in $stxoids""".as(PgStatisticExtDataRow.rowParser.*)
+    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid in $stxoids""".as(PgStatisticExtDataRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatisticExtDataFieldValue[_]])(implicit c: Connection): List[PgStatisticExtDataRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
         val q = s"""select * from pg_catalog.pg_statistic_ext_data where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatisticExtDataRow.rowParser.*)
+          .as(PgStatisticExtDataRow.rowParser("").*)
     }
 
   }

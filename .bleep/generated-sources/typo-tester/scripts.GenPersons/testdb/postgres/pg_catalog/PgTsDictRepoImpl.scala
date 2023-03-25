@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def selectAll(implicit c: Connection): List[PgTsDictRow] = {
-    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict""".as(PgTsDictRow.rowParser.*)
+    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict""".as(PgTsDictRow.rowParser("").*)
   }
   override def selectById(oid: PgTsDictId)(implicit c: Connection): Option[PgTsDictRow] = {
-    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = $oid""".as(PgTsDictRow.rowParser.singleOpt)
+    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = $oid""".as(PgTsDictRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTsDictId])(implicit c: Connection): List[PgTsDictRow] = {
-    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid in $oids""".as(PgTsDictRow.rowParser.*)
+    SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid in $oids""".as(PgTsDictRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTsDictFieldValue[_]])(implicit c: Connection): List[PgTsDictRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
         val q = s"""select * from pg_catalog.pg_ts_dict where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTsDictRow.rowParser.*)
+          .as(PgTsDictRow.rowParser("").*)
     }
 
   }

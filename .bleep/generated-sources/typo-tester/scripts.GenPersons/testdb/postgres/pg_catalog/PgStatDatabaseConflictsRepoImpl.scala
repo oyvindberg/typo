@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatDatabaseConflictsRepoImpl extends PgStatDatabaseConflictsRepo {
   override def selectAll(implicit c: Connection): List[PgStatDatabaseConflictsRow] = {
-    SQL"""select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock from pg_catalog.pg_stat_database_conflicts""".as(PgStatDatabaseConflictsRow.rowParser.*)
+    SQL"""select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock from pg_catalog.pg_stat_database_conflicts""".as(PgStatDatabaseConflictsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatDatabaseConflictsFieldValue[_]])(implicit c: Connection): List[PgStatDatabaseConflictsRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object PgStatDatabaseConflictsRepoImpl extends PgStatDatabaseConflictsRepo {
         val q = s"""select * from pg_catalog.pg_stat_database_conflicts where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatDatabaseConflictsRow.rowParser.*)
+          .as(PgStatDatabaseConflictsRow.rowParser("").*)
     }
 
   }

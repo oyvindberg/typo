@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object TransformsRepoImpl extends TransformsRepo {
   override def selectAll(implicit c: Connection): List[TransformsRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, specific_name, group_name, transform_type from information_schema.transforms""".as(TransformsRow.rowParser.*)
+    SQL"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, specific_name, group_name, transform_type from information_schema.transforms""".as(TransformsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[TransformsFieldValue[_]])(implicit c: Connection): List[TransformsRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object TransformsRepoImpl extends TransformsRepo {
         val q = s"""select * from information_schema.transforms where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(TransformsRow.rowParser.*)
+          .as(TransformsRow.rowParser("").*)
     }
 
   }

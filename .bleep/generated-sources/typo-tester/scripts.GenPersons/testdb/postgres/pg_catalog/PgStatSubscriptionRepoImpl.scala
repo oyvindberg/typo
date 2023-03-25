@@ -15,7 +15,7 @@ import java.sql.Connection
 
 object PgStatSubscriptionRepoImpl extends PgStatSubscriptionRepo {
   override def selectAll(implicit c: Connection): List[PgStatSubscriptionRow] = {
-    SQL"""select subid, subname, pid, relid, received_lsn, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time from pg_catalog.pg_stat_subscription""".as(PgStatSubscriptionRow.rowParser.*)
+    SQL"""select subid, subname, pid, relid, received_lsn, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time from pg_catalog.pg_stat_subscription""".as(PgStatSubscriptionRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatSubscriptionFieldValue[_]])(implicit c: Connection): List[PgStatSubscriptionRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgStatSubscriptionRepoImpl extends PgStatSubscriptionRepo {
         val q = s"""select * from pg_catalog.pg_stat_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatSubscriptionRow.rowParser.*)
+          .as(PgStatSubscriptionRow.rowParser("").*)
     }
 
   }

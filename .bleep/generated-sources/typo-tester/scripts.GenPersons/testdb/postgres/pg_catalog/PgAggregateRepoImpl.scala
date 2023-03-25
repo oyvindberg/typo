@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def selectAll(implicit c: Connection): List[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate""".as(PgAggregateRow.rowParser.*)
+    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate""".as(PgAggregateRow.rowParser("").*)
   }
   override def selectById(aggfnoid: PgAggregateId)(implicit c: Connection): Option[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = $aggfnoid""".as(PgAggregateRow.rowParser.singleOpt)
+    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = $aggfnoid""".as(PgAggregateRow.rowParser("").singleOpt)
   }
   override def selectByIds(aggfnoids: List[PgAggregateId])(implicit c: Connection): List[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid in $aggfnoids""".as(PgAggregateRow.rowParser.*)
+    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid in $aggfnoids""".as(PgAggregateRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAggregateFieldValue[_]])(implicit c: Connection): List[PgAggregateRow] = {
     fieldValues match {
@@ -54,7 +54,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
         val q = s"""select * from pg_catalog.pg_aggregate where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAggregateRow.rowParser.*)
+          .as(PgAggregateRow.rowParser("").*)
     }
 
   }

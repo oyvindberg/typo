@@ -26,15 +26,15 @@ case class PgTsDictRow(
 )
 
 object PgTsDictRow {
-  implicit val rowParser: RowParser[PgTsDictRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsDictRow] = { row =>
     Success(
       PgTsDictRow(
-        oid = row[PgTsDictId]("oid"),
-        dictname = row[String]("dictname"),
-        dictnamespace = row[Long]("dictnamespace"),
-        dictowner = row[Long]("dictowner"),
-        dicttemplate = row[Long]("dicttemplate"),
-        dictinitoption = row[Option[String]]("dictinitoption")
+        oid = row[PgTsDictId](prefix + "oid"),
+        dictname = row[String](prefix + "dictname"),
+        dictnamespace = row[Long](prefix + "dictnamespace"),
+        dictowner = row[Long](prefix + "dictowner"),
+        dicttemplate = row[Long](prefix + "dicttemplate"),
+        dictinitoption = row[Option[String]](prefix + "dictinitoption")
       )
     )
   }

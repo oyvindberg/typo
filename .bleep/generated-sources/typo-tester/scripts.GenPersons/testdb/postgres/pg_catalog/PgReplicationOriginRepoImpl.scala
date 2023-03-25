@@ -15,13 +15,13 @@ import java.sql.Connection
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def selectAll(implicit c: Connection): List[PgReplicationOriginRow] = {
-    SQL"""select roident, roname from pg_catalog.pg_replication_origin""".as(PgReplicationOriginRow.rowParser.*)
+    SQL"""select roident, roname from pg_catalog.pg_replication_origin""".as(PgReplicationOriginRow.rowParser("").*)
   }
   override def selectById(roident: PgReplicationOriginId)(implicit c: Connection): Option[PgReplicationOriginRow] = {
-    SQL"""select roident, roname from pg_catalog.pg_replication_origin where roident = $roident""".as(PgReplicationOriginRow.rowParser.singleOpt)
+    SQL"""select roident, roname from pg_catalog.pg_replication_origin where roident = $roident""".as(PgReplicationOriginRow.rowParser("").singleOpt)
   }
   override def selectByIds(roidents: List[PgReplicationOriginId])(implicit c: Connection): List[PgReplicationOriginRow] = {
-    SQL"""select roident, roname from pg_catalog.pg_replication_origin where roident in $roidents""".as(PgReplicationOriginRow.rowParser.*)
+    SQL"""select roident, roname from pg_catalog.pg_replication_origin where roident in $roidents""".as(PgReplicationOriginRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgReplicationOriginFieldValue[_]])(implicit c: Connection): List[PgReplicationOriginRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
         val q = s"""select * from pg_catalog.pg_replication_origin where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgReplicationOriginRow.rowParser.*)
+          .as(PgReplicationOriginRow.rowParser("").*)
     }
 
   }

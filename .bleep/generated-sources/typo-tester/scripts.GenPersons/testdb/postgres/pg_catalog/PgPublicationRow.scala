@@ -29,18 +29,18 @@ case class PgPublicationRow(
 )
 
 object PgPublicationRow {
-  implicit val rowParser: RowParser[PgPublicationRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPublicationRow] = { row =>
     Success(
       PgPublicationRow(
-        oid = row[PgPublicationId]("oid"),
-        pubname = row[String]("pubname"),
-        pubowner = row[Long]("pubowner"),
-        puballtables = row[Boolean]("puballtables"),
-        pubinsert = row[Boolean]("pubinsert"),
-        pubupdate = row[Boolean]("pubupdate"),
-        pubdelete = row[Boolean]("pubdelete"),
-        pubtruncate = row[Boolean]("pubtruncate"),
-        pubviaroot = row[Boolean]("pubviaroot")
+        oid = row[PgPublicationId](prefix + "oid"),
+        pubname = row[String](prefix + "pubname"),
+        pubowner = row[Long](prefix + "pubowner"),
+        puballtables = row[Boolean](prefix + "puballtables"),
+        pubinsert = row[Boolean](prefix + "pubinsert"),
+        pubupdate = row[Boolean](prefix + "pubupdate"),
+        pubdelete = row[Boolean](prefix + "pubdelete"),
+        pubtruncate = row[Boolean](prefix + "pubtruncate"),
+        pubviaroot = row[Boolean](prefix + "pubviaroot")
       )
     )
   }
