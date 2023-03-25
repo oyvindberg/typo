@@ -17,5 +17,5 @@ trait PgAuthidRepo {
   def updateFieldValues(oid: PgAuthidId, fieldValues: List[PgAuthidFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgAuthidId, unsaved: PgAuthidRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgAuthidId)(implicit c: Connection): Boolean
-  def selectByUnique(rolname: String)(implicit c: Connection): Option[PgAuthidRow]
+  def selectByUniqueRolname(rolname: String)(implicit c: Connection): Option[PgAuthidRow]
 }

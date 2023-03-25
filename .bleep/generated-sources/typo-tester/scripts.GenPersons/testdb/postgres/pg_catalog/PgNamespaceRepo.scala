@@ -17,5 +17,5 @@ trait PgNamespaceRepo {
   def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean
-  def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow]
+  def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow]
 }

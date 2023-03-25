@@ -79,7 +79,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_tablespace where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
+  override def selectByUniqueSpcname(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
     ???
   }
 }

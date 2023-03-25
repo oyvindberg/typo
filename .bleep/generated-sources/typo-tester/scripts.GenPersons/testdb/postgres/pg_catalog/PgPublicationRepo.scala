@@ -17,5 +17,5 @@ trait PgPublicationRepo {
   def updateFieldValues(oid: PgPublicationId, fieldValues: List[PgPublicationFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgPublicationId, unsaved: PgPublicationRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgPublicationId)(implicit c: Connection): Boolean
-  def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow]
+  def selectByUniquePubname(pubname: String)(implicit c: Connection): Option[PgPublicationRow]
 }

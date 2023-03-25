@@ -17,5 +17,5 @@ trait PgUserMappingRepo {
   def updateFieldValues(oid: PgUserMappingId, fieldValues: List[PgUserMappingFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgUserMappingId, unsaved: PgUserMappingRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgUserMappingId)(implicit c: Connection): Boolean
-  def selectByUnique(umuser: Long, umserver: Long)(implicit c: Connection): Option[PgUserMappingRow]
+  def selectByUniqueUmuserUmserver(umuser: Long, umserver: Long)(implicit c: Connection): Option[PgUserMappingRow]
 }

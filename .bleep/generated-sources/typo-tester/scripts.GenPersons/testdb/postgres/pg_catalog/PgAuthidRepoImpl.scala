@@ -100,7 +100,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_authid where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(rolname: String)(implicit c: Connection): Option[PgAuthidRow] = {
+  override def selectByUniqueRolname(rolname: String)(implicit c: Connection): Option[PgAuthidRow] = {
     ???
   }
 }

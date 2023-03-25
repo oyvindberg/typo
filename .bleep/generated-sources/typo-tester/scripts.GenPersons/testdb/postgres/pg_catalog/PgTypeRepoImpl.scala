@@ -160,7 +160,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_type where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow] = {
+  override def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow] = {
     ???
   }
 }

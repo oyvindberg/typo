@@ -1,17 +1,18 @@
 package typo
 
 object names {
-  def camelCase(name: db.ColName): sc.Ident =
+  def camelCase(strings: Array[String]): sc.Ident =
     sc.Ident(
-      name.value
-        .split('_')
-        .zipWithIndex
+      strings.zipWithIndex
         .map {
           case (s, 0) => s
           case (s, _) => s.capitalize
         }
         .mkString("")
     )
+
+  def camelCase(name: db.ColName): sc.Ident =
+    camelCase(name.value.split('_'))
 
   def titleCase(name: String): String =
     name.split('_').map(_.capitalize).mkString("")

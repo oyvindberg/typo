@@ -17,6 +17,6 @@ trait PgEnumRepo {
   def updateFieldValues(oid: PgEnumId, fieldValues: List[PgEnumFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgEnumId, unsaved: PgEnumRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgEnumId)(implicit c: Connection): Boolean
-  def selectByUnique(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow]
-  def selectByUnique(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow]
+  def selectByUniqueEnumtypidEnumlabel(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow]
+  def selectByUniqueEnumtypidEnumsortorder(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow]
 }

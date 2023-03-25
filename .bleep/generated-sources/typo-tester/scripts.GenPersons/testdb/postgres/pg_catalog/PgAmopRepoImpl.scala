@@ -91,10 +91,10 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_amop where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUniqueAmopfamilyAmoplefttypeAmoprighttypeAmopstrategy(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
     ???
   }
-  override def selectByUnique(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUniqueAmopoprAmoppurposeAmopfamily(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow] = {
     ???
   }
 }

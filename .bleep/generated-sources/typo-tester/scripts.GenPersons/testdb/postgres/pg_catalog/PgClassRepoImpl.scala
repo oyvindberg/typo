@@ -163,7 +163,7 @@ object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_class where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(relname: String, relnamespace: Long)(implicit c: Connection): Option[PgClassRow] = {
+  override def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: Long)(implicit c: Connection): Option[PgClassRow] = {
     ???
   }
 }

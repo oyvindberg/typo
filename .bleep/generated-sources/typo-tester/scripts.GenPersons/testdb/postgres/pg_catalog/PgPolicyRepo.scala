@@ -17,5 +17,5 @@ trait PgPolicyRepo {
   def updateFieldValues(oid: PgPolicyId, fieldValues: List[PgPolicyFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgPolicyId, unsaved: PgPolicyRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgPolicyId)(implicit c: Connection): Boolean
-  def selectByUnique(polrelid: Long, polname: String)(implicit c: Connection): Option[PgPolicyRow]
+  def selectByUniquePolrelidPolname(polrelid: Long, polname: String)(implicit c: Connection): Option[PgPolicyRow]
 }

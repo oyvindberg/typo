@@ -88,7 +88,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_foreign_server where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(srvname: String)(implicit c: Connection): Option[PgForeignServerRow] = {
+  override def selectByUniqueSrvname(srvname: String)(implicit c: Connection): Option[PgForeignServerRow] = {
     ???
   }
 }

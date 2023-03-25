@@ -76,7 +76,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_user_mapping where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(umuser: Long, umserver: Long)(implicit c: Connection): Option[PgUserMappingRow] = {
+  override def selectByUniqueUmuserUmserver(umuser: Long, umserver: Long)(implicit c: Connection): Option[PgUserMappingRow] = {
     ???
   }
 }

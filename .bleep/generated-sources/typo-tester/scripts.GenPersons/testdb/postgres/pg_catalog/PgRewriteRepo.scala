@@ -17,5 +17,5 @@ trait PgRewriteRepo {
   def updateFieldValues(oid: PgRewriteId, fieldValues: List[PgRewriteFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgRewriteId, unsaved: PgRewriteRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgRewriteId)(implicit c: Connection): Boolean
-  def selectByUnique(evClass: Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow]
+  def selectByUniqueEvClassRulename(evClass: Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow]
 }

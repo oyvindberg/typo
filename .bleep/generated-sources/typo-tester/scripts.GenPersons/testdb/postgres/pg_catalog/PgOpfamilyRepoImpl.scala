@@ -79,7 +79,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_opfamily where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(opfmethod: Long, opfname: String, opfnamespace: Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
+  override def selectByUniqueOpfmethodOpfnameOpfnamespace(opfmethod: Long, opfname: String, opfnamespace: Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
     ???
   }
 }

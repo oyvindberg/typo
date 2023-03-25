@@ -1,6 +1,6 @@
 package typo
 
-import play.api.libs.json.{JsString, Json, Writes}
+import play.api.libs.json.{Json, Writes}
 
 import java.sql.{Connection, PreparedStatement}
 

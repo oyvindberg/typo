@@ -88,7 +88,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_extension where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow] = {
+  override def selectByUniqueExtname(extname: String)(implicit c: Connection): Option[PgExtensionRow] = {
     ???
   }
 }

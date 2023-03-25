@@ -76,7 +76,7 @@ object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_am where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(amname: String)(implicit c: Connection): Option[PgAmRow] = {
+  override def selectByUniqueAmname(amname: String)(implicit c: Connection): Option[PgAmRow] = {
     ???
   }
 }

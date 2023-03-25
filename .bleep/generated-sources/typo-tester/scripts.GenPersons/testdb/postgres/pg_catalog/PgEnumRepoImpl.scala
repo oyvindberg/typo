@@ -76,10 +76,10 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_enum where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
+  override def selectByUniqueEnumtypidEnumlabel(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
     ???
   }
-  override def selectByUnique(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
+  override def selectByUniqueEnumtypidEnumsortorder(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
     ???
   }
 }

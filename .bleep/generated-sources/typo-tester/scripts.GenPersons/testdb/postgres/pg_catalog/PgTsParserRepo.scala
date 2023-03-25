@@ -17,5 +17,5 @@ trait PgTsParserRepo {
   def updateFieldValues(oid: PgTsParserId, fieldValues: List[PgTsParserFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTsParserId, unsaved: PgTsParserRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTsParserId)(implicit c: Connection): Boolean
-  def selectByUnique(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow]
+  def selectByUniquePrsnamePrsnamespace(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow]
 }

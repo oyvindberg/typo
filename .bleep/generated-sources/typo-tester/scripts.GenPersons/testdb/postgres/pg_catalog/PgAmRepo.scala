@@ -17,5 +17,5 @@ trait PgAmRepo {
   def updateFieldValues(oid: PgAmId, fieldValues: List[PgAmFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgAmId, unsaved: PgAmRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgAmId)(implicit c: Connection): Boolean
-  def selectByUnique(amname: String)(implicit c: Connection): Option[PgAmRow]
+  def selectByUniqueAmname(amname: String)(implicit c: Connection): Option[PgAmRow]
 }

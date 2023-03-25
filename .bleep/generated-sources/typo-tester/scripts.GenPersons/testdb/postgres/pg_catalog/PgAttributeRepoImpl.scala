@@ -138,7 +138,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
   }
-  override def selectByUnique(attrelid: Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
+  override def selectByUniqueAttrelidAttname(attrelid: Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
     ???
   }
 }

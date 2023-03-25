@@ -91,7 +91,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_language where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(lanname: String)(implicit c: Connection): Option[PgLanguageRow] = {
+  override def selectByUniqueLanname(lanname: String)(implicit c: Connection): Option[PgLanguageRow] = {
     ???
   }
 }

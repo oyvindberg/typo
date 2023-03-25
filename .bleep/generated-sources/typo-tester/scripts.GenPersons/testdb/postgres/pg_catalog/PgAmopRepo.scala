@@ -17,6 +17,6 @@ trait PgAmopRepo {
   def updateFieldValues(oid: PgAmopId, fieldValues: List[PgAmopFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgAmopId, unsaved: PgAmopRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgAmopId)(implicit c: Connection): Boolean
-  def selectByUnique(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow]
-  def selectByUnique(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow]
+  def selectByUniqueAmopfamilyAmoplefttypeAmoprighttypeAmopstrategy(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow]
+  def selectByUniqueAmopoprAmoppurposeAmopfamily(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow]
 }

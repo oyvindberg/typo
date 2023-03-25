@@ -17,5 +17,5 @@ trait PgExtensionRepo {
   def updateFieldValues(oid: PgExtensionId, fieldValues: List[PgExtensionFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgExtensionId, unsaved: PgExtensionRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgExtensionId)(implicit c: Connection): Boolean
-  def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow]
+  def selectByUniqueExtname(extname: String)(implicit c: Connection): Option[PgExtensionRow]
 }

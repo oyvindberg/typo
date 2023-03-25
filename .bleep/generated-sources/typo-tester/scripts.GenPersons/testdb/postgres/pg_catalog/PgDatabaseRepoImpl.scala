@@ -106,7 +106,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_database where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
+  override def selectByUniqueDatname(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
     ???
   }
 }
