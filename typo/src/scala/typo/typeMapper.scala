@@ -49,54 +49,52 @@ object typeMapper {
     }
   }
 
-  def dbTypeFrom(enums: Map[String, db.StringEnum], c: ColumnsRow): db.Type = {
-    def go(udtName: String): Option[db.Type] = {
-      udtName match {
-        case "aclitem"                  => Some(db.Type.PgObject) // i.e. "postgres=arwdDxt/postgres"
-        case "anyarray"                 => Some(db.Type.AnyArray)
-        case "bool"                     => Some(db.Type.Boolean)
-        case "char"                     => Some(db.Type.Char)
-        case "float4"                   => Some(db.Type.Float4)
-        case "float8"                   => Some(db.Type.Float8)
-        case "hstore"                   => Some(db.Type.Hstore)
-        case "inet"                     => Some(db.Type.Inet)
-        case "smallint" | "int2"        => Some(db.Type.Int2)
-        case "int2vector"               => Some(db.Type.PgObject)
-        case "int4"                     => Some(db.Type.Int4)
-        case "int8"                     => Some(db.Type.Int8)
-        case "json"                     => Some(db.Type.Json)
-        case "name"                     => Some(db.Type.Name)
-        case "numeric"                  => Some(db.Type.Numeric)
-        case "oid"                      => Some(db.Type.Oid)
-        case "oidvector"                => Some(db.Type.PgObject) // space separated oids referencing i.e. pg_collation.oid
-        case "pg_node_tree"             => Some(db.Type.PgObject) // Expression trees (in nodeToString() representation)
-        case "regproc"                  => Some(db.Type.PgObject)
-        case "text"                     => Some(db.Type.Text)
-        case "timestamp"                => Some(db.Type.Timestamp)
-        case "timestamptz"              => Some(db.Type.TimestampTz)
-        case "varchar"                  => Some(db.Type.VarChar(c.characterMaximumLength))
-        case "xid"                      => Some(db.Type.PgObject) // transaction ID
-        case "regtype"                  => Some(db.Type.PgObject)
-        case "bytea"                    => Some(db.Type.Bytea)
-        case "box"                      => Some(db.Type.PGbox)
-        case "circle"                   => Some(db.Type.PGcircle)
-        case "line"                     => Some(db.Type.PGline)
-        case "lseg"                     => Some(db.Type.PGlseg)
-        case "path"                     => Some(db.Type.PGpath)
-        case "point"                    => Some(db.Type.PGpoint)
-        case "polygon"                  => Some(db.Type.PGpolygon)
-        case "interval"                 => Some(db.Type.PGInterval)
-        case "money"                    => Some(db.Type.PGmoney)
-        case "uuid"                     => Some(db.Type.UUID)
-        case str if str.startsWith("_") => go(udtName.drop(1)).map(tpe => db.Type.Array(tpe))
-        case typeName                   => enums.get(typeName).map(enum => db.Type.StringEnum(enum.name))
-      }
-    }
-
-    go(c.udtName.get).getOrElse {
+  def dbTypeFrom(enums: Map[String, db.StringEnum], c: ColumnsRow): db.Type =
+    dbTypeFrom(enums, c.udtName.get, c.characterMaximumLength).getOrElse {
       System.err.println(s"Couldn't translate type from column $c")
       db.Type.Text
     }
-  }
 
+  def dbTypeFrom(enums: Map[String, db.StringEnum], udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {
+    udtName match {
+      case "aclitem"                  => Some(db.Type.PgObject) // i.e. "postgres=arwdDxt/postgres"
+      case "anyarray"                 => Some(db.Type.AnyArray)
+      case "bool"                     => Some(db.Type.Boolean)
+      case "char"                     => Some(db.Type.Char)
+      case "float4"                   => Some(db.Type.Float4)
+      case "float8"                   => Some(db.Type.Float8)
+      case "hstore"                   => Some(db.Type.Hstore)
+      case "inet"                     => Some(db.Type.Inet)
+      case "smallint" | "int2"        => Some(db.Type.Int2)
+      case "int2vector"               => Some(db.Type.PgObject)
+      case "int4"                     => Some(db.Type.Int4)
+      case "int8"                     => Some(db.Type.Int8)
+      case "json"                     => Some(db.Type.Json)
+      case "name"                     => Some(db.Type.Name)
+      case "numeric"                  => Some(db.Type.Numeric)
+      case "oid"                      => Some(db.Type.Oid)
+      case "oidvector"                => Some(db.Type.PgObject) // space separated oids referencing i.e. pg_collation.oid
+      case "pg_node_tree"             => Some(db.Type.PgObject) // Expression trees (in nodeToString() representation)
+      case "regproc"                  => Some(db.Type.PgObject)
+      case "text"                     => Some(db.Type.Text)
+      case "timestamp"                => Some(db.Type.Timestamp)
+      case "timestamptz"              => Some(db.Type.TimestampTz)
+      case "varchar"                  => Some(db.Type.VarChar(characterMaximumLength))
+      case "xid"                      => Some(db.Type.PgObject) // transaction ID
+      case "regtype"                  => Some(db.Type.PgObject)
+      case "bytea"                    => Some(db.Type.Bytea)
+      case "box"                      => Some(db.Type.PGbox)
+      case "circle"                   => Some(db.Type.PGcircle)
+      case "line"                     => Some(db.Type.PGline)
+      case "lseg"                     => Some(db.Type.PGlseg)
+      case "path"                     => Some(db.Type.PGpath)
+      case "point"                    => Some(db.Type.PGpoint)
+      case "polygon"                  => Some(db.Type.PGpolygon)
+      case "interval"                 => Some(db.Type.PGInterval)
+      case "money"                    => Some(db.Type.PGmoney)
+      case "uuid"                     => Some(db.Type.UUID)
+      case str if str.startsWith("_") => dbTypeFrom(enums, udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
+      case typeName                   => enums.get(typeName).map(enum => db.Type.StringEnum(enum.name))
+    }
+  }
 }

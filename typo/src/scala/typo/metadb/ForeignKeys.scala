@@ -37,7 +37,7 @@ object ForeignKeys {
           }
         }
         .map { tc =>
-          db.RelationName(tc.tableSchema.get, tc.tableName.get)
+          db.RelationName(tc.tableSchema, tc.tableName.get)
         }
     }
 
@@ -64,11 +64,11 @@ object ForeignKeys {
       .filter(_.constraintType.contains("FOREIGN KEY"))
       .map { fk =>
         (
-          db.RelationName(fk.tableSchema.get, fk.tableName.get),
+          db.RelationName(fk.tableSchema, fk.tableName.get),
           getReferringColumns(fk),
           getReferredTable(fk),
           getReferredColumns(fk),
-          db.RelationName(fk.constraintSchema.get, fk.constraintName.get)
+          db.RelationName(fk.constraintSchema, fk.constraintName.get)
         )
       }
       .collect { case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>

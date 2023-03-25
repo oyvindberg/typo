@@ -3,11 +3,11 @@ package sqlscripts
 
 import java.nio.file.Path
 
-case class SqlFile (relPath: Path, content: String, params: List[ParameterColumn], cols: List[Column])
+case class SqlScript(relPath: Path, content: String, metadataParams: List[MetadataParameterColumn], cols: List[db.Col])
 
-object SqlFile {
+object SqlScript {
   // todo: provide missing instances somehow
-  def scalaType(col: Column): Option[sc.Type] = {
+  def scalaType(col: MetadataColumn): Option[sc.Type] = {
     def other = {
       col.columnTypeName match {
         case "hstore" =>

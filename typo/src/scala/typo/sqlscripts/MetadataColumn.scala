@@ -6,7 +6,7 @@ import play.api.libs.json.{Json, Writes}
 /**
  * Analyzed from postgres metadata for prepared statements through jdbc
  */
-case class Column(
+case class MetadataColumn(
     baseColumnName: Option[db.ColName],
     baseRelationName: Option[db.RelationName],
     catalogName: Option[String],
@@ -34,8 +34,8 @@ case class Column(
   def name = columnLabel
 }
 
-object Column {
-  implicit val oformat: Writes[Column] = (x: Column) =>
+object MetadataColumn {
+  implicit val oformat: Writes[MetadataColumn] = (x: MetadataColumn) =>
     Json.obj(
       "baseColumnName" -> x.baseColumnName.map(_.value),
       "baseRelationName" -> x.baseRelationName.map(x => s"${x.schema}.${x.name}"),

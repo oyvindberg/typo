@@ -10,7 +10,7 @@ trait Selector {
 }
 
 object Selector {
-  val Internal = Set("pg_catalog", "information_schema")
+  val Internal = Set("pg_catalog", "information_schema").map(Option.apply)
   val All: Selector = _ => true
   val ExcludePostgresInternal: Selector = rel => !Internal(rel.schema)
   val OnlyPostgresInternal: Selector = rel => Internal(rel.schema)

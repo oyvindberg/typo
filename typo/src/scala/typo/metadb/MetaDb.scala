@@ -40,7 +40,7 @@ object MetaDb {
   def apply(input: Input, selector: Selector): MetaDb = {
 
     val groupedViewRows: Map[db.RelationName, ViewRow] =
-      input.viewRows.map { view => (db.RelationName(view.table_schema, view.table_name), view) }.toMap
+      input.viewRows.map { view => (db.RelationName(Some(view.table_schema), view.table_name), view) }.toMap
 
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
@@ -51,7 +51,7 @@ object MetaDb {
     val relations: List[db.Relation] = {
       input.tablesRows.map { table =>
         val relationName = db.RelationName(
-          schema = table.tableSchema.get,
+          schema = table.tableSchema,
           name = table.tableName.get
         )
 

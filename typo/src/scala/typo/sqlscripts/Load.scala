@@ -1,13 +1,15 @@
-package typo.sqlscripts
+package typo
+package sqlscripts
+
+import play.api.libs.json.Json
 
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
 object Load {
-  def apply(scriptsPath: Path)(implicit c: Connection): List[SqlFile] = {
-    // create temporary views for all the sql files in the scripts directory
-    val found = List.newBuilder[SqlFile]
+  def apply(scriptsPath: Path, enums: Map[String, db.StringEnum])(implicit c: Connection): List[SqlScript] = {
+    val found = List.newBuilder[SqlScript]
     Files.walkFileTree(
       scriptsPath,
       new SimpleFileVisitor[Path] {
@@ -16,7 +18,21 @@ object Load {
             val relativePath = scriptsPath.relativize(file)
             val content = Files.readString(file)
             val analyzed = Analyzed.from(content)
-            val sqlFile = SqlFile(relativePath, content, analyzed.params, analyzed.columns)
+
+            val cols = analyzed.columns.map { col =>
+              db.Col(
+                name = col.name,
+                tpe = typeMapper.dbTypeFrom(enums, col.columnTypeName, Some(col.precision)).getOrElse {
+                  System.err.println(s"Couldn't translate type from column $col")
+                  db.Type.Text
+                },
+                hasDefault = col.isAutoIncrement,
+                jsonDescription = Json.toJson(col),
+                nullability = col.isNullable.toNullability
+              )
+
+            }
+            val sqlFile = SqlScript(relativePath, content, analyzed.params, cols)
             found += sqlFile
           }
           FileVisitResult.CONTINUE

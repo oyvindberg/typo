@@ -9,7 +9,7 @@ object PrimaryKeys {
       .filter(_.constraintType.contains("PRIMARY KEY"))
       .map { tc =>
         (
-          db.RelationName(tc.tableSchema.get, tc.tableName.get),
+          db.RelationName(tc.tableSchema, tc.tableName.get),
           db.PrimaryKey(
             colNames = keyColumnUsage
               .filter(kcu =>
@@ -19,7 +19,7 @@ object PrimaryKeys {
               )
               .sortBy(_.ordinalPosition)
               .map(kcu => db.ColName(kcu.columnName.get)),
-            constraintName = db.RelationName(tc.constraintSchema.get, tc.constraintName.get)
+            constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get)
           )
         )
       }

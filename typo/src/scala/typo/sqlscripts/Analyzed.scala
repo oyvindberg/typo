@@ -3,7 +3,7 @@ package sqlscripts
 
 import java.sql.{Connection, PreparedStatement}
 
-case class Analyzed(params: List[ParameterColumn], columns: List[Column])
+case class Analyzed(params: List[MetadataParameterColumn], columns: List[MetadataColumn])
 
 object Analyzed {
 
@@ -17,7 +17,7 @@ object Analyzed {
     val params = ps.getParameterMetaData match {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
-          ParameterColumn(
+          MetadataParameterColumn(
             isNullable = sqlscripts.ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
             },
@@ -38,9 +38,9 @@ object Analyzed {
     val columns = ps.getMetaData match {
       case metadata: org.postgresql.jdbc.PgResultSetMetaData =>
         0.until(metadata.getColumnCount).map(_ + 1).map { n =>
-          Column(
+          MetadataColumn(
             baseColumnName = nonEmpty(metadata.getBaseColumnName(n)).map(db.ColName.apply),
-            baseRelationName = nonEmpty(metadata.getBaseSchemaName(n)).zip(nonEmpty(metadata.getBaseTableName(n))).map(db.RelationName.tupled),
+            baseRelationName = nonEmpty(metadata.getBaseTableName(n)).map(name => db.RelationName(nonEmpty(metadata.getBaseSchemaName(n)), name)),
             catalogName = nonEmpty(metadata.getCatalogName(n)),
             columnClassName = metadata.getColumnClassName(n),
             columnDisplaySize = metadata.getColumnDisplaySize(n),

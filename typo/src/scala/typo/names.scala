@@ -18,10 +18,10 @@ object names {
     name.split('_').map(_.capitalize).mkString("")
 
   def titleCase(pkg: sc.QIdent, name: db.RelationName, suffix: String): sc.QIdent =
-    pkg / sc.Ident(name.schema) / sc.Ident(titleCase(name.name)).appended(suffix)
+    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(titleCase(name.name)).appended(suffix)
 
   def EnumName(pkg: sc.QIdent, name: db.RelationName): sc.QIdent =
-    pkg / sc.Ident(name.schema) / sc.Ident(titleCase(name.name)).appended("Enum")
+    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(titleCase(name.name)).appended("Enum")
 
   def field(name: db.ColName): sc.Ident = camelCase(name)
   def enumValue(name: String): sc.Ident = sc.Ident(name)

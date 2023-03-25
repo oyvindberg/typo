@@ -1,9 +1,10 @@
-package typo.sqlscripts
+package typo
+package sqlscripts
 
 /**
  * Analyzed from postgres metadata for prepared statements through jdbc
  */
-case class ParameterColumn(
+case class MetadataParameterColumn(
     isNullable: ParameterNullable,
     isSigned: Boolean,
     parameterMode: ParameterMode,

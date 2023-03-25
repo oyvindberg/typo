@@ -15,13 +15,13 @@ object UniqueKeys {
           .sortBy(_.ordinalPosition)
           .map(kcu => db.ColName(kcu.columnName.get))
 
-      db.UniqueKey(cols = columnsInKey, constraintName = db.RelationName(tc.constraintSchema.get, tc.constraintName.get))
+      db.UniqueKey(cols = columnsInKey, constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get))
     }
 
     val allUniqueConstraintsByTable: Map[db.RelationName, List[TableConstraintsRow]] =
       tableConstraints
         .filter(_.constraintType.contains("UNIQUE"))
-        .groupBy(uc => db.RelationName(uc.tableSchema.get, uc.tableName.get))
+        .groupBy(uc => db.RelationName(uc.tableSchema, uc.tableName.get))
 
     allUniqueConstraintsByTable
       .map { case (tableName, tcs) => (tableName, tcs.map(toUniqueKey)) }

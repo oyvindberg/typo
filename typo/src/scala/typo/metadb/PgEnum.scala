@@ -18,7 +18,7 @@ object PgEnum {
         anorm.Success {
           PgEnum.Row(
             name = db.RelationName(
-              row[String]("enum_schema"),
+              Some(row[String]("enum_schema")),
               row[String]("enum_name")
             ),
             enum_sort_order = row[Float]("enum_sort_order"),
