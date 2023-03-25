@@ -20,7 +20,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           val col = ColumnComputed(
             pointsTo.get(dbCol.name),
             names.field(dbCol.name),
-            typeMapper(options.pkg, dbCol),
+            typeMapper.scalaType(options.pkg, dbCol),
             dbCol.name,
             dbCol.hasDefault,
             dbCol.jsonDescription
@@ -31,7 +31,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           val cols: List[ColumnComputed] = colNames.map { colName =>
             val fieldName = names.field(colName)
             val dbCol = dbColsByName(colName)
-            val underlying = typeMapper(options.pkg, dbCol)
+            val underlying = typeMapper.scalaType(options.pkg, dbCol)
             ColumnComputed(None, fieldName, underlying, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
           }
           val paramName = sc.Ident("compositeId")
@@ -50,7 +50,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         }
         dbCol -> ColumnComputed(pointsTo.get(colName), names.field(colName), maybeId.get.tpe, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
       case dbCol =>
-        val finalType: sc.Type = typeMapper(options.pkg, dbCol)
+        val finalType: sc.Type = typeMapper.scalaType(options.pkg, dbCol)
 
         dbCol -> ColumnComputed(pointsTo.get(dbCol.name), names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
@@ -115,7 +115,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
           )
       },
       dbTable.uniqueKeys.map { uk =>
-        val params = uk.cols.map(colName => sc.Param(names.field(colName), typeMapper(options.pkg, dbColsByName(colName))))
+        val params = uk.cols.map(colName => sc.Param(names.field(colName), typeMapper.scalaType(options.pkg, dbColsByName(colName))))
         RepoMethod.SelectByUnique(params, RowType)
       }
     )

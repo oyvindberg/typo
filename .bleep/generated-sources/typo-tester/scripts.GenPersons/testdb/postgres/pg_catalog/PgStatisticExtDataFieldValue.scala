@@ -16,5 +16,5 @@ object PgStatisticExtDataFieldValue {
   case class stxdndistinct(override val value: Option[String]) extends PgStatisticExtDataFieldValue("stxdndistinct", value)
   case class stxddependencies(override val value: Option[String]) extends PgStatisticExtDataFieldValue("stxddependencies", value)
   case class stxdmcv(override val value: Option[String]) extends PgStatisticExtDataFieldValue("stxdmcv", value)
-  case class stxdexpr(override val value: Option[Array[String]]) extends PgStatisticExtDataFieldValue("stxdexpr", value)
+  case class stxdexpr(override val value: Option[String]) extends PgStatisticExtDataFieldValue("stxdexpr", value)
 }

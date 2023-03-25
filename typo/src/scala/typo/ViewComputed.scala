@@ -5,7 +5,7 @@ import typo.doobie.{ColumnNullable, JdbcType}
 case class ViewComputed(pkg: sc.QIdent, view: db.View) {
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     view.cols.map { dbCol =>
-      val finalType: sc.Type = typeMapper(pkg, dbCol)
+      val finalType: sc.Type = typeMapper.scalaType(pkg, dbCol)
 
       val pointsTo: Option[(db.RelationName, db.ColName)] = None
 //        (col.baseColumnName, col.baseRelationName) match {

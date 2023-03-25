@@ -20,7 +20,7 @@ case class PgStatisticExtDataRowUnsaved(
   stxdndistinct: Option[String],
   stxddependencies: Option[String],
   stxdmcv: Option[String],
-  stxdexpr: Option[Array[String]]
+  stxdexpr: Option[String]
 )
 object PgStatisticExtDataRowUnsaved {
   implicit val oFormat: OFormat[PgStatisticExtDataRowUnsaved] = new OFormat[PgStatisticExtDataRowUnsaved]{
@@ -39,7 +39,7 @@ object PgStatisticExtDataRowUnsaved {
             stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
             stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
             stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
-            stxdexpr = json.\("stxdexpr").toOption.map(_.as[Array[String]])
+            stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
           )
         )
       )

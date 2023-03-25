@@ -62,7 +62,7 @@ object MetaDb {
                   case None        => doobie.Nullability.NullableUnknown
                   case _           => throw new Exception(s"Unknown nullability: ${c.isNullable}")
                 },
-                tpe = typeMapper.typeFromUdtName(enumsByName, c.udtName.get, c.characterMaximumLength),
+                tpe = typeMapper.dbTypeFrom(enumsByName, c),
                 jsonDescription = Json.toJson(c)
               )
             }

@@ -29,6 +29,7 @@ object db {
     case object PGInterval extends Type
     case object PGmoney extends Type
 
+    case object UUID extends Type
     case class VarChar(maxLength: Option[Int]) extends Type
     case object Float4 extends Type
     case object Float8 extends Type

@@ -23,7 +23,7 @@ case class PgStatisticExtDataRow(
   stxdndistinct: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdndistinct","ordinal_position":2,"is_nullable":"YES","data_type":"pg_ndistinct","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_ndistinct","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stxddependencies: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxddependencies","ordinal_position":3,"is_nullable":"YES","data_type":"pg_dependencies","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_dependencies","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stxdmcv: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdmcv","ordinal_position":4,"is_nullable":"YES","data_type":"pg_mcv_list","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_mcv_list","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stxdexpr: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdexpr","ordinal_position":5,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_pg_statistic","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  stxdexpr: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic_ext_data","column_name":"stxdexpr","ordinal_position":5,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_pg_statistic","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgStatisticExtDataRow {
@@ -34,7 +34,7 @@ object PgStatisticExtDataRow {
         stxdndistinct = row[Option[String]]("stxdndistinct"),
         stxddependencies = row[Option[String]]("stxddependencies"),
         stxdmcv = row[Option[String]]("stxdmcv"),
-        stxdexpr = row[Option[Array[String]]]("stxdexpr")
+        stxdexpr = row[Option[String]]("stxdexpr")
       )
     )
   }
@@ -57,7 +57,7 @@ object PgStatisticExtDataRow {
             stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
             stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
             stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
-            stxdexpr = json.\("stxdexpr").toOption.map(_.as[Array[String]])
+            stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
           )
         )
       )

@@ -21,7 +21,7 @@ case class PgStatisticExtDataRow(
   stxdndistinct: Option[String],
   stxddependencies: Option[String],
   stxdmcv: Option[String],
-  stxdexpr: Option[Array[String]]
+  stxdexpr: Option[String]
 )
 
 object PgStatisticExtDataRow {
@@ -32,7 +32,7 @@ object PgStatisticExtDataRow {
         stxdndistinct = row[Option[String]]("stxdndistinct"),
         stxddependencies = row[Option[String]]("stxddependencies"),
         stxdmcv = row[Option[String]]("stxdmcv"),
-        stxdexpr = row[Option[Array[String]]]("stxdexpr")
+        stxdexpr = row[Option[String]]("stxdexpr")
       )
     )
   }
@@ -55,7 +55,7 @@ object PgStatisticExtDataRow {
             stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
             stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
             stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
-            stxdexpr = json.\("stxdexpr").toOption.map(_.as[Array[String]])
+            stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
           )
         )
       )

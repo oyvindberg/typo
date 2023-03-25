@@ -53,7 +53,6 @@ object sc {
     }
 
     val ZonedDateTime = sc.Type.Qualified("java.time.ZonedDateTime")
-    val Instant = sc.Type.Qualified("java.time.Instant")
     val LocalDate = sc.Type.Qualified("java.time.LocalDate")
     val LocalDateTime = sc.Type.Qualified("java.time.LocalDateTime")
     val LocalTime = sc.Type.Qualified("java.time.LocalTime")
@@ -98,9 +97,12 @@ object sc {
     val PGpolygon = Qualified("org.postgresql.geometric.PGpolygon")
     val PGInterval = Qualified("org.postgresql.util.PGInterval")
     val PGmoney = Qualified("org.postgresql.util.PGmoney")
+
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
+      // format: off
       Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right, StringContext)
+        // format: on
         .map(x => (x.value.name, x.value))
         .toMap
 
