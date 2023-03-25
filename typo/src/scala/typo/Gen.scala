@@ -2,32 +2,32 @@ package typo
 
 import typo.metadb.MetaDb
 import typo.sc.syntax._
+import typo.sqlscripts.SqlFile
 
+import java.nio.file.Path
 import java.sql.Connection
 
 object Gen {
-  def fromDb(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
-    val output = MetaDb(MetaDb.Input.fromDb(c))
-    apply(
-      options,
-      output.tables.filter(x => selector.include(x.name)),
-      output.views.filter(x => selector.include(x.name)),
-      output.enums.filter(x => selector.include(x.name))
-    )
+  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): List[sc.File] = {
+    val sqlScripts = sqlscripts.Load(scriptsPath)
+    val metadb = MetaDb(MetaDb.Input.fromDb(c), selector)
+    apply(options, metadb, sqlScripts)
   }
 
-  def apply(
-      options: Options,
-      tables: List[db.Table],
-      views: List[db.View],
-      enums: List[db.StringEnum]
-  ): List[sc.File] = {
-    val default = DefaultComputed(options.pkg)
+  def fromDb(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
+    val metadb = MetaDb(MetaDb.Input.fromDb(c), selector)
+    apply(options, metadb, sqlScripts = Nil)
+  }
+
+  def apply(options: Options, metaDb: MetaDb, sqlScripts: List[SqlFile]): List[sc.File] = {
+    val default: DefaultComputed =
+      DefaultComputed(options.pkg)
     val enumFiles: List[sc.File] =
-      enums.map(stringEnumClass(options))
+      metaDb.enums.map(stringEnumClass(options))
     val tableFiles: List[sc.File] =
-      tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all)
-    val viewFiles = views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all)
+      metaDb.tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all)
+    val viewFiles: List[sc.File] =
+      metaDb.views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all)
     val mostFiles: List[sc.File] =
       List(DefaultFile(default, options.jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles
 

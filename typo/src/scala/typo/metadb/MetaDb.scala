@@ -6,6 +6,12 @@ import typo.generated.information_schema._
 
 import java.sql.Connection
 
+case class MetaDb(
+    tables: List[db.Table],
+    views: List[db.View],
+    enums: List[db.StringEnum]
+)
+
 object MetaDb {
   case class Input(
       tableConstraints: List[TableConstraintsRow],
@@ -30,12 +36,8 @@ object MetaDb {
       )
     }
   }
-  case class Output(
-      tables: List[db.Table],
-      views: List[db.View],
-      enums: List[db.StringEnum]
-  )
-  def apply(input: Input): Output = {
+
+  def apply(input: Input, selector: Selector): MetaDb = {
 
     val groupedViewRows: Map[db.RelationName, ViewRow] =
       input.viewRows.map { view => (db.RelationName(view.table_schema, view.table_name), view) }.toMap
@@ -88,9 +90,11 @@ object MetaDb {
       }
     }
 
-    Output(
-      relations.collect { case x: db.Table => x },
-      relations.collect { case x: db.View => x },
+    // note: we should transitively check references between relations when considering `selector`.
+    // especially we'll just include all enums for now.
+    MetaDb(
+      relations.collect { case x: db.Table if selector.include(x.name) => x },
+      relations.collect { case x: db.View if selector.include(x.name) => x },
       enums
     )
   }
