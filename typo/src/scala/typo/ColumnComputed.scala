@@ -1,5 +1,4 @@
 package typo
-package codegen
 
 import play.api.libs.json.JsValue
 

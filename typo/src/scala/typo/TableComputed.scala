@@ -1,6 +1,4 @@
-package typo.codegen
-
-import typo._
+package typo
 
 case class TableComputed(options: Options, default: DefaultComputed, dbTable: db.Table) {
   val allKeyNames: Set[db.ColName] =

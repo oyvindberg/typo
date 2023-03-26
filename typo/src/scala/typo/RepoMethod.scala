@@ -1,5 +1,4 @@
 package typo
-package codegen
 
 sealed trait RepoMethod
 

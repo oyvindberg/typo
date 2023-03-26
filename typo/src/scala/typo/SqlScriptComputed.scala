@@ -1,7 +1,6 @@
-package typo.codegen
+package typo
 
 import typo.sqlscripts.SqlScript
-import typo._
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 

@@ -1,5 +1,4 @@
 package typo
-package codegen
 
 case class RelationComputed(pkg: sc.QIdent, relationName: db.RelationName, cols: Seq[ColumnComputed], maybeId: Option[IdComputed]) {
   val RepoName: sc.QIdent = names.titleCase(pkg, relationName, "Repo")

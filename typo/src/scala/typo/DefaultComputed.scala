@@ -1,5 +1,4 @@
 package typo
-package codegen
 
 case class DefaultComputed(pkg: sc.QIdent) {
   val Defaulted = pkg / sc.Ident("Defaulted")
