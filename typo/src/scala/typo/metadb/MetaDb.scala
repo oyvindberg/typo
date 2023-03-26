@@ -3,7 +3,7 @@ package metadb
 
 import play.api.libs.json.Json
 import typo.generated.information_schema._
-import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow}
+import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow, ViewColumnDependenciesRepoImpl, ViewColumnDependenciesRow}
 
 import java.sql.Connection
 
@@ -21,7 +21,8 @@ object MetaDb {
       pgEnums: List[PgEnum.Row],
       tablesRows: List[TablesRow],
       columnsRows: List[ColumnsRow],
-      viewRows: List[FindAllViewsRow]
+      viewRows: List[FindAllViewsRow],
+      viewColumnDeps: List[ViewColumnDependenciesRow]
   )
 
   object Input {
@@ -33,7 +34,8 @@ object MetaDb {
         pgEnums = PgEnum.all,
         tablesRows = TablesRepoImpl.selectAll,
         columnsRows = ColumnsRepoImpl.selectAll,
-        viewRows = FindAllViewsRepoImpl()
+        viewRows = FindAllViewsRepoImpl(),
+        viewColumnDeps = ViewColumnDependenciesRepoImpl()
       )
     }
   }
@@ -78,7 +80,16 @@ object MetaDb {
 
         groupedViewRows.get(relationName) match {
           case Some(view) =>
-            db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m")
+            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+              input.viewColumnDeps.collect {
+                case x if x.viewSchema.map(_.getValue) == relationName.schema && x.viewName == relationName.name =>
+                  // TODO: I'm only able to get the column name from one of the two tables involved in the dependency.
+                  // I suppose this means that we'll only find the dependency if the column name is the same in both tables.
+                  val colName = db.ColName(x.columnName)
+                  colName -> (db.RelationName(x.tableSchema.map(_.getValue), x.tableName), colName)
+              }.toMap
+
+            db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m", deps)
           case None =>
             db.Table(
               name = relationName,

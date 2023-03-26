@@ -17,8 +17,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class AdministrableRoleAuthorizationsRow(
+  /** Points to [[ApplicableRolesRow.grantee]] */
   grantee: Option[String],
+  /** Points to [[ApplicableRolesRow.roleName]] */
   roleName: Option[String],
+  /** Points to [[ApplicableRolesRow.isGrantable]] */
   isGrantable: Option[String]
 )
 

@@ -24,10 +24,10 @@ case class PgStatSubscriptionRow(
   subname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"subname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   pid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"pid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   relid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"relid","ordinal_position":4,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  receivedLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"received_lsn","ordinal_position":5,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  receivedLsn: Option[/* pg_lsn */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"received_lsn","ordinal_position":5,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   lastMsgSendTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"last_msg_send_time","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   lastMsgReceiptTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"last_msg_receipt_time","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  latestEndLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"latest_end_lsn","ordinal_position":8,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  latestEndLsn: Option[/* pg_lsn */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"latest_end_lsn","ordinal_position":8,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   latestEndTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_subscription","column_name":"latest_end_time","ordinal_position":9,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
@@ -39,10 +39,10 @@ object PgStatSubscriptionRow {
         subname = row[Option[String]](prefix + "subname"),
         pid = row[Option[Int]](prefix + "pid"),
         relid = row[Option[/* oid */ Long]](prefix + "relid"),
-        receivedLsn = row[Option[String]](prefix + "received_lsn"),
+        receivedLsn = row[Option[/* pg_lsn */ Long]](prefix + "received_lsn"),
         lastMsgSendTime = row[Option[ZonedDateTime]](prefix + "last_msg_send_time"),
         lastMsgReceiptTime = row[Option[ZonedDateTime]](prefix + "last_msg_receipt_time"),
-        latestEndLsn = row[Option[String]](prefix + "latest_end_lsn"),
+        latestEndLsn = row[Option[/* pg_lsn */ Long]](prefix + "latest_end_lsn"),
         latestEndTime = row[Option[ZonedDateTime]](prefix + "latest_end_time")
       )
     )
@@ -70,10 +70,10 @@ object PgStatSubscriptionRow {
             subname = json.\("subname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            receivedLsn = json.\("received_lsn").toOption.map(_.as[String]),
+            receivedLsn = json.\("received_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[ZonedDateTime]),
             lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[ZonedDateTime]),
-            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[String]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             latestEndTime = json.\("latest_end_time").toOption.map(_.as[ZonedDateTime])
           )
         )

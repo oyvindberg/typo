@@ -5,13 +5,8 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View) {
     view.cols.map { dbCol =>
       val finalType: sc.Type = typeMapper.scalaType(pkg, dbCol)
 
-      val pointsTo: Option[(db.RelationName, db.ColName)] = None
-//        (col.baseColumnName, col.baseRelationName) match {
-//        case (Some(colName), Some(relationName)) if relationName != view.name =>
-//          Some((relationName, colName))
-//        case _ =>
-//          None
-//      }
+      val pointsTo: Option[(db.RelationName, db.ColName)] = view.dependencies.get(dbCol.name)
+
       dbCol -> ColumnComputed(pointsTo, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
   }

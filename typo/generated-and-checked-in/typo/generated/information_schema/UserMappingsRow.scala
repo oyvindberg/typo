@@ -19,8 +19,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UserMappingsRow(
+  /** Points to [[PgUserMappingsRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"user_mappings","column_name":"authorization_identifier","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  /** Points to [[PgUserMappingsRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"user_mappings","column_name":"foreign_server_catalog","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  /** Points to [[PgUserMappingsRow.foreignServerName]] */
   foreignServerName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"user_mappings","column_name":"foreign_server_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

@@ -9,7 +9,7 @@ package typo
 package generated
 package pg_catalog
 
-import scala.math.BigDecimal
+
 
 sealed abstract class PgStatSslFieldValue[T](val name: String, val value: T)
 

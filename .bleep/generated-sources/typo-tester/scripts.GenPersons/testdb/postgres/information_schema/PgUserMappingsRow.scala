@@ -17,11 +17,15 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingsRow(
+  /** Points to [[PgForeignServersRow.oid]] */
   oid: Option[/* oid */ Long],
   umoptions: Option[Array[String]],
   umuser: Option[/* oid */ Long],
+  /** Points to [[PgForeignServersRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String],
+  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
   srvowner: Option[String]
 )

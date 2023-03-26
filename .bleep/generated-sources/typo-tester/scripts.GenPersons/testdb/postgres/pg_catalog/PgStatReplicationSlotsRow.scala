@@ -18,6 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatReplicationSlotsRow(
+  /** Points to [[PgReplicationSlotsRow.slotName]] */
   slotName: Option[String],
   spillTxns: Option[Long],
   spillCount: Option[Long],

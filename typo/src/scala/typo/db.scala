@@ -71,6 +71,7 @@ object db {
       name: db.RelationName,
       cols: List[Col],
       sql: String,
-      isMaterialized: Boolean
+      isMaterialized: Boolean,
+      dependencies: Map[ColName, (RelationName, ColName)]
   ) extends Relation
 }

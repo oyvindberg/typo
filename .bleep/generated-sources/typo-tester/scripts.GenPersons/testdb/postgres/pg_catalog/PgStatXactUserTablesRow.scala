@@ -17,16 +17,27 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatXactUserTablesRow(
+  /** Points to [[PgStatXactAllTablesRow.relid]] */
   relid: Option[/* oid */ Long],
+  /** Points to [[PgStatXactAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[PgStatXactAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[PgStatXactAllTablesRow.seqScan]] */
   seqScan: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.idxScan]] */
   idxScan: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.nTupIns]] */
   nTupIns: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.nTupDel]] */
   nTupDel: Option[Long],
+  /** Points to [[PgStatXactAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long]
 )
 

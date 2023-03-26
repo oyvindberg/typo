@@ -17,7 +17,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignServerOptionsRow(
+  /** Points to [[PgForeignServersRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String],
+  /** Points to [[PgForeignServersRow.foreignServerName]] */
   foreignServerName: Option[String],
   optionName: Option[String],
   optionValue: Option[String]

@@ -17,16 +17,27 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioSysTablesRow(
+  /** Points to [[PgStatioAllTablesRow.relid]] */
   relid: Option[/* oid */ Long],
+  /** Points to [[PgStatioAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[PgStatioAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[PgStatioAllTablesRow.heapBlksRead]] */
   heapBlksRead: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.heapBlksHit]] */
   heapBlksHit: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.idxBlksRead]] */
   idxBlksRead: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.idxBlksHit]] */
   idxBlksHit: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.toastBlksRead]] */
   toastBlksRead: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.toastBlksHit]] */
   toastBlksHit: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.tidxBlksRead]] */
   tidxBlksRead: Option[Long],
+  /** Points to [[PgStatioAllTablesRow.tidxBlksHit]] */
   tidxBlksHit: Option[Long]
 )
 

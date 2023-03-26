@@ -17,5 +17,5 @@ object PgSubscriptionRelFieldValue {
   case class srsubid(override val value: /* oid */ Long) extends PgSubscriptionRelFieldValue("srsubid", value)
   case class srrelid(override val value: /* oid */ Long) extends PgSubscriptionRelFieldValue("srrelid", value)
   case class srsubstate(override val value: String) extends PgSubscriptionRelFieldValue("srsubstate", value)
-  case class srsublsn(override val value: Option[String]) extends PgSubscriptionRelFieldValue("srsublsn", value)
+  case class srsublsn(override val value: Option[/* pg_lsn */ Long]) extends PgSubscriptionRelFieldValue("srsublsn", value)
 }

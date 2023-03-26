@@ -17,8 +17,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignTableOptionsRow(
+  /** Points to [[PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String],
+  /** Points to [[PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String],
+  /** Points to [[PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String],
   optionName: Option[String],
   optionValue: Option[String]

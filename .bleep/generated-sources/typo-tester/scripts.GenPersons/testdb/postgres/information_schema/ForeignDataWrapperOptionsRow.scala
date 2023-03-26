@@ -17,7 +17,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignDataWrapperOptionsRow(
+  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
+  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
   optionName: Option[String],
   optionValue: Option[String]

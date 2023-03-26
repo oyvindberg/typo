@@ -18,28 +18,51 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatUserTablesRow(
+  /** Points to [[PgStatAllTablesRow.relid]] */
   relid: Option[/* oid */ Long],
+  /** Points to [[PgStatAllTablesRow.schemaname]] */
   schemaname: Option[String],
+  /** Points to [[PgStatAllTablesRow.relname]] */
   relname: Option[String],
+  /** Points to [[PgStatAllTablesRow.seqScan]] */
   seqScan: Option[Long],
+  /** Points to [[PgStatAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long],
+  /** Points to [[PgStatAllTablesRow.idxScan]] */
   idxScan: Option[Long],
+  /** Points to [[PgStatAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nTupIns]] */
   nTupIns: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nTupDel]] */
   nTupDel: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nLiveTup]] */
   nLiveTup: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nDeadTup]] */
   nDeadTup: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nModSinceAnalyze]] */
   nModSinceAnalyze: Option[Long],
+  /** Points to [[PgStatAllTablesRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long],
+  /** Points to [[PgStatAllTablesRow.lastVacuum]] */
   lastVacuum: Option[ZonedDateTime],
+  /** Points to [[PgStatAllTablesRow.lastAutovacuum]] */
   lastAutovacuum: Option[ZonedDateTime],
+  /** Points to [[PgStatAllTablesRow.lastAnalyze]] */
   lastAnalyze: Option[ZonedDateTime],
+  /** Points to [[PgStatAllTablesRow.lastAutoanalyze]] */
   lastAutoanalyze: Option[ZonedDateTime],
+  /** Points to [[PgStatAllTablesRow.vacuumCount]] */
   vacuumCount: Option[Long],
+  /** Points to [[PgStatAllTablesRow.autovacuumCount]] */
   autovacuumCount: Option[Long],
+  /** Points to [[PgStatAllTablesRow.analyzeCount]] */
   analyzeCount: Option[Long],
+  /** Points to [[PgStatAllTablesRow.autoanalyzeCount]] */
   autoanalyzeCount: Option[Long]
 )
 

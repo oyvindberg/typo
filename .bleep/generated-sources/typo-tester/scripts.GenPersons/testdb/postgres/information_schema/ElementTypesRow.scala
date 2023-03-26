@@ -18,8 +18,11 @@ import scala.util.Try
 
 case class ElementTypesRow(
   objectCatalog: Option[String],
+  /** Points to [[DataTypePrivilegesRow.objectSchema]] */
   objectSchema: Option[String],
+  /** Points to [[DataTypePrivilegesRow.objectName]] */
   objectName: Option[String],
+  /** Points to [[DataTypePrivilegesRow.objectType]] */
   objectType: Option[String],
   collectionTypeIdentifier: Option[String],
   dataType: Option[String],
@@ -45,6 +48,7 @@ case class ElementTypesRow(
   scopeSchema: Option[String],
   scopeName: Option[String],
   maximumCardinality: Option[Int],
+  /** Points to [[DataTypePrivilegesRow.dtdIdentifier]] */
   dtdIdentifier: Option[String]
 )
 

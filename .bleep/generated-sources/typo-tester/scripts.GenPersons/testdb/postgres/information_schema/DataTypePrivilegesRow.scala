@@ -21,6 +21,7 @@ case class DataTypePrivilegesRow(
   objectSchema: Option[String],
   objectName: Option[String],
   objectType: Option[String],
+  /** Points to [[AttributesRow.dtdIdentifier]] */
   dtdIdentifier: Option[String]
 )
 

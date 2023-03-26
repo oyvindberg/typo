@@ -30,8 +30,8 @@ case class PgReplicationSlotsRow(
   activePid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"active_pid","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   xmin: Option[/* xid */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"xmin","ordinal_position":9,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   catalogXmin: Option[/* xid */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"catalog_xmin","ordinal_position":10,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  restartLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"restart_lsn","ordinal_position":11,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  confirmedFlushLsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"confirmed_flush_lsn","ordinal_position":12,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  restartLsn: Option[/* pg_lsn */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"restart_lsn","ordinal_position":11,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  confirmedFlushLsn: Option[/* pg_lsn */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"confirmed_flush_lsn","ordinal_position":12,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   walStatus: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"wal_status","ordinal_position":13,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   safeWalSize: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"safe_wal_size","ordinal_position":14,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   twoPhase: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_replication_slots","column_name":"two_phase","ordinal_position":15,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
@@ -51,8 +51,8 @@ object PgReplicationSlotsRow {
         activePid = row[Option[Int]](prefix + "active_pid"),
         xmin = row[Option[/* xid */ PGobject]](prefix + "xmin"),
         catalogXmin = row[Option[/* xid */ PGobject]](prefix + "catalog_xmin"),
-        restartLsn = row[Option[String]](prefix + "restart_lsn"),
-        confirmedFlushLsn = row[Option[String]](prefix + "confirmed_flush_lsn"),
+        restartLsn = row[Option[/* pg_lsn */ Long]](prefix + "restart_lsn"),
+        confirmedFlushLsn = row[Option[/* pg_lsn */ Long]](prefix + "confirmed_flush_lsn"),
         walStatus = row[Option[String]](prefix + "wal_status"),
         safeWalSize = row[Option[Long]](prefix + "safe_wal_size"),
         twoPhase = row[Option[Boolean]](prefix + "two_phase")
@@ -94,8 +94,8 @@ object PgReplicationSlotsRow {
             activePid = json.\("active_pid").toOption.map(_.as[Int]),
             xmin = json.\("xmin").toOption.map(_.as[/* xid */ PGobject]),
             catalogXmin = json.\("catalog_xmin").toOption.map(_.as[/* xid */ PGobject]),
-            restartLsn = json.\("restart_lsn").toOption.map(_.as[String]),
-            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[String]),
+            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             walStatus = json.\("wal_status").toOption.map(_.as[String]),
             safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
             twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])

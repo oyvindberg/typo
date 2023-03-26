@@ -18,14 +18,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserRow(
+  /** Points to [[PgShadowRow.usename]] */
   usename: Option[String],
+  /** Points to [[PgShadowRow.usesysid]] */
   usesysid: Option[/* oid */ Long],
+  /** Points to [[PgShadowRow.usecreatedb]] */
   usecreatedb: Option[Boolean],
+  /** Points to [[PgShadowRow.usesuper]] */
   usesuper: Option[Boolean],
+  /** Points to [[PgShadowRow.userepl]] */
   userepl: Option[Boolean],
+  /** Points to [[PgShadowRow.usebypassrls]] */
   usebypassrls: Option[Boolean],
   passwd: Option[String],
+  /** Points to [[PgShadowRow.valuntil]] */
   valuntil: Option[ZonedDateTime],
+  /** Points to [[PgShadowRow.useconfig]] */
   useconfig: Option[Array[String]]
 )
 

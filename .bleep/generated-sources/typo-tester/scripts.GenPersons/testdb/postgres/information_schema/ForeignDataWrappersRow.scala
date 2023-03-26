@@ -17,10 +17,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ForeignDataWrappersRow(
+  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperCatalog]] */
   foreignDataWrapperCatalog: Option[String],
+  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperName]] */
   foreignDataWrapperName: Option[String],
+  /** Points to [[PgForeignDataWrappersRow.authorizationIdentifier]] */
   authorizationIdentifier: Option[String],
   libraryName: Option[String],
+  /** Points to [[PgForeignDataWrappersRow.foreignDataWrapperLanguage]] */
   foreignDataWrapperLanguage: Option[String]
 )
 
