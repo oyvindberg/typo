@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgInheritsRowUnsaved(
-  inhparent: Long,
+  inhparent: /* oid */ Long,
   inhdetachpending: Boolean
 )
 object PgInheritsRowUnsaved {
@@ -32,7 +32,7 @@ object PgInheritsRowUnsaved {
       JsResult.fromTry(
         Try(
           PgInheritsRowUnsaved(
-            inhparent = json.\("inhparent").as[Long],
+            inhparent = json.\("inhparent").as[/* oid */ Long],
             inhdetachpending = json.\("inhdetachpending").as[Boolean]
           )
         )

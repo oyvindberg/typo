@@ -19,10 +19,10 @@ import scala.util.Try
 
 case class PgTransformRow(
   oid: PgTransformId,
-  trftype: Long,
-  trflang: Long,
-  trffromsql: PGobject,
-  trftosql: PGobject
+  trftype: /* oid */ Long,
+  trflang: /* oid */ Long,
+  trffromsql: /* regproc */ PGobject,
+  trftosql: /* regproc */ PGobject
 )
 
 object PgTransformRow {
@@ -30,10 +30,10 @@ object PgTransformRow {
     Success(
       PgTransformRow(
         oid = row[PgTransformId](prefix + "oid"),
-        trftype = row[Long](prefix + "trftype"),
-        trflang = row[Long](prefix + "trflang"),
-        trffromsql = row[PGobject](prefix + "trffromsql"),
-        trftosql = row[PGobject](prefix + "trftosql")
+        trftype = row[/* oid */ Long](prefix + "trftype"),
+        trflang = row[/* oid */ Long](prefix + "trflang"),
+        trffromsql = row[/* regproc */ PGobject](prefix + "trffromsql"),
+        trftosql = row[/* regproc */ PGobject](prefix + "trftosql")
       )
     )
   }
@@ -53,10 +53,10 @@ object PgTransformRow {
         Try(
           PgTransformRow(
             oid = json.\("oid").as[PgTransformId],
-            trftype = json.\("trftype").as[Long],
-            trflang = json.\("trflang").as[Long],
-            trffromsql = json.\("trffromsql").as[PGobject],
-            trftosql = json.\("trftosql").as[PGobject]
+            trftype = json.\("trftype").as[/* oid */ Long],
+            trflang = json.\("trflang").as[/* oid */ Long],
+            trffromsql = json.\("trffromsql").as[/* regproc */ PGobject],
+            trftosql = json.\("trftosql").as[/* regproc */ PGobject]
           )
         )
       )

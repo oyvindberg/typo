@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLargeobjectRow(
-  loid: Long,
+  loid: /* oid */ Long,
   pageno: Int,
   data: Array[Byte]
 ){
@@ -28,7 +28,7 @@ object PgLargeobjectRow {
   def rowParser(prefix: String): RowParser[PgLargeobjectRow] = { row =>
     Success(
       PgLargeobjectRow(
-        loid = row[Long](prefix + "loid"),
+        loid = row[/* oid */ Long](prefix + "loid"),
         pageno = row[Int](prefix + "pageno"),
         data = row[Array[Byte]](prefix + "data")
       )
@@ -47,7 +47,7 @@ object PgLargeobjectRow {
       JsResult.fromTry(
         Try(
           PgLargeobjectRow(
-            loid = json.\("loid").as[Long],
+            loid = json.\("loid").as[/* oid */ Long],
             pageno = json.\("pageno").as[Int],
             data = json.\("data").as[Array[Byte]]
           )

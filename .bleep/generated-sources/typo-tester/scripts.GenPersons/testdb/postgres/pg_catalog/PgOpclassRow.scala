@@ -18,14 +18,14 @@ import scala.util.Try
 
 case class PgOpclassRow(
   oid: PgOpclassId,
-  opcmethod: Long,
+  opcmethod: /* oid */ Long,
   opcname: String,
-  opcnamespace: Long,
-  opcowner: Long,
-  opcfamily: Long,
-  opcintype: Long,
+  opcnamespace: /* oid */ Long,
+  opcowner: /* oid */ Long,
+  opcfamily: /* oid */ Long,
+  opcintype: /* oid */ Long,
   opcdefault: Boolean,
-  opckeytype: Long
+  opckeytype: /* oid */ Long
 )
 
 object PgOpclassRow {
@@ -33,14 +33,14 @@ object PgOpclassRow {
     Success(
       PgOpclassRow(
         oid = row[PgOpclassId](prefix + "oid"),
-        opcmethod = row[Long](prefix + "opcmethod"),
+        opcmethod = row[/* oid */ Long](prefix + "opcmethod"),
         opcname = row[String](prefix + "opcname"),
-        opcnamespace = row[Long](prefix + "opcnamespace"),
-        opcowner = row[Long](prefix + "opcowner"),
-        opcfamily = row[Long](prefix + "opcfamily"),
-        opcintype = row[Long](prefix + "opcintype"),
+        opcnamespace = row[/* oid */ Long](prefix + "opcnamespace"),
+        opcowner = row[/* oid */ Long](prefix + "opcowner"),
+        opcfamily = row[/* oid */ Long](prefix + "opcfamily"),
+        opcintype = row[/* oid */ Long](prefix + "opcintype"),
         opcdefault = row[Boolean](prefix + "opcdefault"),
-        opckeytype = row[Long](prefix + "opckeytype")
+        opckeytype = row[/* oid */ Long](prefix + "opckeytype")
       )
     )
   }
@@ -64,14 +64,14 @@ object PgOpclassRow {
         Try(
           PgOpclassRow(
             oid = json.\("oid").as[PgOpclassId],
-            opcmethod = json.\("opcmethod").as[Long],
+            opcmethod = json.\("opcmethod").as[/* oid */ Long],
             opcname = json.\("opcname").as[String],
-            opcnamespace = json.\("opcnamespace").as[Long],
-            opcowner = json.\("opcowner").as[Long],
-            opcfamily = json.\("opcfamily").as[Long],
-            opcintype = json.\("opcintype").as[Long],
+            opcnamespace = json.\("opcnamespace").as[/* oid */ Long],
+            opcowner = json.\("opcowner").as[/* oid */ Long],
+            opcfamily = json.\("opcfamily").as[/* oid */ Long],
+            opcintype = json.\("opcintype").as[/* oid */ Long],
             opcdefault = json.\("opcdefault").as[Boolean],
-            opckeytype = json.\("opckeytype").as[Long]
+            opckeytype = json.\("opckeytype").as[/* oid */ Long]
           )
         )
       )

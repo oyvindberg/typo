@@ -19,8 +19,8 @@ import scala.util.Try
 
 case class PgLargeobjectMetadataRow(
   oid: PgLargeobjectMetadataId,
-  lomowner: Long,
-  lomacl: Option[Array[PGobject]]
+  lomowner: /* oid */ Long,
+  lomacl: Option[Array[/* aclitem */ PGobject]]
 )
 
 object PgLargeobjectMetadataRow {
@@ -28,8 +28,8 @@ object PgLargeobjectMetadataRow {
     Success(
       PgLargeobjectMetadataRow(
         oid = row[PgLargeobjectMetadataId](prefix + "oid"),
-        lomowner = row[Long](prefix + "lomowner"),
-        lomacl = row[Option[Array[PGobject]]](prefix + "lomacl")
+        lomowner = row[/* oid */ Long](prefix + "lomowner"),
+        lomacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "lomacl")
       )
     )
   }
@@ -47,8 +47,8 @@ object PgLargeobjectMetadataRow {
         Try(
           PgLargeobjectMetadataRow(
             oid = json.\("oid").as[PgLargeobjectMetadataId],
-            lomowner = json.\("lomowner").as[Long],
-            lomacl = json.\("lomacl").toOption.map(_.as[Array[PGobject]])
+            lomowner = json.\("lomowner").as[/* oid */ Long],
+            lomacl = json.\("lomacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

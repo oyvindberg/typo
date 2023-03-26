@@ -18,7 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgShdescriptionId(objoid: Long, classoid: Long)
+case class PgShdescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long)
 object PgShdescriptionId {
   implicit val ordering: Ordering[PgShdescriptionId] = Ordering.by(x => (x.objoid, x.classoid))
   implicit val oFormat: OFormat[PgShdescriptionId] = new OFormat[PgShdescriptionId]{
@@ -32,8 +32,8 @@ object PgShdescriptionId {
       JsResult.fromTry(
         Try(
           PgShdescriptionId(
-            objoid = json.\("objoid").as[Long],
-            classoid = json.\("classoid").as[Long]
+            objoid = json.\("objoid").as[/* oid */ Long],
+            classoid = json.\("classoid").as[/* oid */ Long]
           )
         )
       )
@@ -42,8 +42,8 @@ object PgShdescriptionId {
   def rowParser(prefix: String): RowParser[PgShdescriptionId] = { row =>
     Success(
       PgShdescriptionId(
-        objoid = row[Long](prefix + "objoid"),
-        classoid = row[Long](prefix + "classoid")
+        objoid = row[/* oid */ Long](prefix + "objoid"),
+        classoid = row[/* oid */ Long](prefix + "classoid")
       )
     )
   }

@@ -26,5 +26,5 @@ object PgRolesFieldValue {
   case class rolvaliduntil(override val value: Option[ZonedDateTime]) extends PgRolesFieldValue("rolvaliduntil", value)
   case class rolbypassrls(override val value: Option[Boolean]) extends PgRolesFieldValue("rolbypassrls", value)
   case class rolconfig(override val value: Option[Array[String]]) extends PgRolesFieldValue("rolconfig", value)
-  case class oid(override val value: Option[Long]) extends PgRolesFieldValue("oid", value)
+  case class oid(override val value: Option[/* oid */ Long]) extends PgRolesFieldValue("oid", value)
 }

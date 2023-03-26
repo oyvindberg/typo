@@ -13,11 +13,11 @@ import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
-case class PgPublicationRelId(value: Long) extends AnyVal
+case class PgPublicationRelId(value: /* oid */ Long) extends AnyVal
 object PgPublicationRelId {
   implicit val ordering: Ordering[PgPublicationRelId] = Ordering.by(_.value)
-  implicit val format: Format[PgPublicationRelId] = implicitly[Format[Long]].bimap(PgPublicationRelId.apply, _.value)
-  implicit val toStatement: ToStatement[PgPublicationRelId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val column: Column[PgPublicationRelId] = implicitly[Column[Long]].map(PgPublicationRelId.apply)
+  implicit val format: Format[PgPublicationRelId] = implicitly[Format[/* oid */ Long]].bimap(PgPublicationRelId.apply, _.value)
+  implicit val toStatement: ToStatement[PgPublicationRelId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val column: Column[PgPublicationRelId] = implicitly[Column[/* oid */ Long]].map(PgPublicationRelId.apply)
   def rowParser(prefix: String): RowParser[PgPublicationRelId] = SqlParser.get[PgPublicationRelId](prefix + "oid")
 }

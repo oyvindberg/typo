@@ -17,5 +17,5 @@ trait PgCollationRepo {
   def updateFieldValues(oid: PgCollationId, fieldValues: List[PgCollationFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgCollationId)(implicit c: Connection): Boolean
-  def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: Long)(implicit c: Connection): Option[PgCollationRow]
+  def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow]
 }

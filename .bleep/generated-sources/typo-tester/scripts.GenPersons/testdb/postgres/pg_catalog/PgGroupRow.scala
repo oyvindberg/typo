@@ -18,8 +18,8 @@ import scala.util.Try
 
 case class PgGroupRow(
   groname: Option[String],
-  grosysid: Option[Long],
-  grolist: Option[Array[Long]]
+  grosysid: Option[/* oid */ Long],
+  grolist: Option[Array[/* oid */ Long]]
 )
 
 object PgGroupRow {
@@ -27,8 +27,8 @@ object PgGroupRow {
     Success(
       PgGroupRow(
         groname = row[Option[String]](prefix + "groname"),
-        grosysid = row[Option[Long]](prefix + "grosysid"),
-        grolist = row[Option[Array[Long]]](prefix + "grolist")
+        grosysid = row[Option[/* oid */ Long]](prefix + "grosysid"),
+        grolist = row[Option[Array[/* oid */ Long]]](prefix + "grolist")
       )
     )
   }
@@ -46,8 +46,8 @@ object PgGroupRow {
         Try(
           PgGroupRow(
             groname = json.\("groname").toOption.map(_.as[String]),
-            grosysid = json.\("grosysid").toOption.map(_.as[Long]),
-            grolist = json.\("grolist").toOption.map(_.as[Array[Long]])
+            grosysid = json.\("grosysid").toOption.map(_.as[/* oid */ Long]),
+            grolist = json.\("grolist").toOption.map(_.as[Array[/* oid */ Long]])
           )
         )
       )

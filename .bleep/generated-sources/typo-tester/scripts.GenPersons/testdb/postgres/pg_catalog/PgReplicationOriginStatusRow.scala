@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgReplicationOriginStatusRow(
-  localId: Option[Long],
+  localId: Option[/* oid */ Long],
   externalId: Option[String],
   remoteLsn: Option[String],
   localLsn: Option[String]
@@ -27,7 +27,7 @@ object PgReplicationOriginStatusRow {
   def rowParser(prefix: String): RowParser[PgReplicationOriginStatusRow] = { row =>
     Success(
       PgReplicationOriginStatusRow(
-        localId = row[Option[Long]](prefix + "local_id"),
+        localId = row[Option[/* oid */ Long]](prefix + "local_id"),
         externalId = row[Option[String]](prefix + "external_id"),
         remoteLsn = row[Option[String]](prefix + "remote_lsn"),
         localLsn = row[Option[String]](prefix + "local_lsn")
@@ -48,7 +48,7 @@ object PgReplicationOriginStatusRow {
       JsResult.fromTry(
         Try(
           PgReplicationOriginStatusRow(
-            localId = json.\("local_id").toOption.map(_.as[Long]),
+            localId = json.\("local_id").toOption.map(_.as[/* oid */ Long]),
             externalId = json.\("external_id").toOption.map(_.as[String]),
             remoteLsn = json.\("remote_lsn").toOption.map(_.as[String]),
             localLsn = json.\("local_lsn").toOption.map(_.as[String])

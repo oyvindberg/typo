@@ -13,6 +13,6 @@ sealed abstract class PgPublicationRelFieldValue[T](val name: String, val value:
 
 object PgPublicationRelFieldValue {
   case class oid(override val value: PgPublicationRelId) extends PgPublicationRelFieldValue("oid", value)
-  case class prpubid(override val value: Long) extends PgPublicationRelFieldValue("prpubid", value)
-  case class prrelid(override val value: Long) extends PgPublicationRelFieldValue("prrelid", value)
+  case class prpubid(override val value: /* oid */ Long) extends PgPublicationRelFieldValue("prpubid", value)
+  case class prrelid(override val value: /* oid */ Long) extends PgPublicationRelFieldValue("prrelid", value)
 }

@@ -17,12 +17,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgShdependRow(
-  dbid: Long,
-  classid: Long,
-  objid: Long,
+  dbid: /* oid */ Long,
+  classid: /* oid */ Long,
+  objid: /* oid */ Long,
   objsubid: Int,
-  refclassid: Long,
-  refobjid: Long,
+  refclassid: /* oid */ Long,
+  refobjid: /* oid */ Long,
   deptype: String
 )
 
@@ -30,12 +30,12 @@ object PgShdependRow {
   def rowParser(prefix: String): RowParser[PgShdependRow] = { row =>
     Success(
       PgShdependRow(
-        dbid = row[Long](prefix + "dbid"),
-        classid = row[Long](prefix + "classid"),
-        objid = row[Long](prefix + "objid"),
+        dbid = row[/* oid */ Long](prefix + "dbid"),
+        classid = row[/* oid */ Long](prefix + "classid"),
+        objid = row[/* oid */ Long](prefix + "objid"),
         objsubid = row[Int](prefix + "objsubid"),
-        refclassid = row[Long](prefix + "refclassid"),
-        refobjid = row[Long](prefix + "refobjid"),
+        refclassid = row[/* oid */ Long](prefix + "refclassid"),
+        refobjid = row[/* oid */ Long](prefix + "refobjid"),
         deptype = row[String](prefix + "deptype")
       )
     )
@@ -57,12 +57,12 @@ object PgShdependRow {
       JsResult.fromTry(
         Try(
           PgShdependRow(
-            dbid = json.\("dbid").as[Long],
-            classid = json.\("classid").as[Long],
-            objid = json.\("objid").as[Long],
+            dbid = json.\("dbid").as[/* oid */ Long],
+            classid = json.\("classid").as[/* oid */ Long],
+            objid = json.\("objid").as[/* oid */ Long],
             objsubid = json.\("objsubid").as[Int],
-            refclassid = json.\("refclassid").as[Long],
-            refobjid = json.\("refobjid").as[Long],
+            refclassid = json.\("refclassid").as[/* oid */ Long],
+            refobjid = json.\("refobjid").as[/* oid */ Long],
             deptype = json.\("deptype").as[String]
           )
         )

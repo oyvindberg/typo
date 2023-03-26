@@ -19,11 +19,11 @@ import scala.util.Try
 case class PgExtensionRow(
   oid: PgExtensionId,
   extname: String,
-  extowner: Long,
-  extnamespace: Long,
+  extowner: /* oid */ Long,
+  extnamespace: /* oid */ Long,
   extrelocatable: Boolean,
   extversion: String,
-  extconfig: Option[Array[Long]],
+  extconfig: Option[Array[/* oid */ Long]],
   extcondition: Option[Array[String]]
 )
 
@@ -33,11 +33,11 @@ object PgExtensionRow {
       PgExtensionRow(
         oid = row[PgExtensionId](prefix + "oid"),
         extname = row[String](prefix + "extname"),
-        extowner = row[Long](prefix + "extowner"),
-        extnamespace = row[Long](prefix + "extnamespace"),
+        extowner = row[/* oid */ Long](prefix + "extowner"),
+        extnamespace = row[/* oid */ Long](prefix + "extnamespace"),
         extrelocatable = row[Boolean](prefix + "extrelocatable"),
         extversion = row[String](prefix + "extversion"),
-        extconfig = row[Option[Array[Long]]](prefix + "extconfig"),
+        extconfig = row[Option[Array[/* oid */ Long]]](prefix + "extconfig"),
         extcondition = row[Option[Array[String]]](prefix + "extcondition")
       )
     )
@@ -62,11 +62,11 @@ object PgExtensionRow {
           PgExtensionRow(
             oid = json.\("oid").as[PgExtensionId],
             extname = json.\("extname").as[String],
-            extowner = json.\("extowner").as[Long],
-            extnamespace = json.\("extnamespace").as[Long],
+            extowner = json.\("extowner").as[/* oid */ Long],
+            extnamespace = json.\("extnamespace").as[/* oid */ Long],
             extrelocatable = json.\("extrelocatable").as[Boolean],
             extversion = json.\("extversion").as[String],
-            extconfig = json.\("extconfig").toOption.map(_.as[Array[Long]]),
+            extconfig = json.\("extconfig").toOption.map(_.as[Array[/* oid */ Long]]),
             extcondition = json.\("extcondition").toOption.map(_.as[Array[String]])
           )
         )

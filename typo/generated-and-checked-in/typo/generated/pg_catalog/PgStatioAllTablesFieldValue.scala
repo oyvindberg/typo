@@ -14,7 +14,7 @@ package pg_catalog
 sealed abstract class PgStatioAllTablesFieldValue[T](val name: String, val value: T)
 
 object PgStatioAllTablesFieldValue {
-  case class relid(override val value: Option[Long]) extends PgStatioAllTablesFieldValue("relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatioAllTablesFieldValue("relid", value)
   case class schemaname(override val value: Option[String]) extends PgStatioAllTablesFieldValue("schemaname", value)
   case class relname(override val value: Option[String]) extends PgStatioAllTablesFieldValue("relname", value)
   case class heapBlksRead(override val value: Option[Long]) extends PgStatioAllTablesFieldValue("heap_blks_read", value)

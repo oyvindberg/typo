@@ -21,7 +21,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPreparedXactsRow(
-  transaction: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"transaction","ordinal_position":1,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  transaction: Option[/* xid */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"transaction","ordinal_position":1,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   gid: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"gid","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   prepared: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"prepared","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   owner: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_xacts","column_name":"owner","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -32,7 +32,7 @@ object PgPreparedXactsRow {
   def rowParser(prefix: String): RowParser[PgPreparedXactsRow] = { row =>
     Success(
       PgPreparedXactsRow(
-        transaction = row[Option[PGobject]](prefix + "transaction"),
+        transaction = row[Option[/* xid */ PGobject]](prefix + "transaction"),
         gid = row[Option[String]](prefix + "gid"),
         prepared = row[Option[ZonedDateTime]](prefix + "prepared"),
         owner = row[Option[String]](prefix + "owner"),
@@ -55,7 +55,7 @@ object PgPreparedXactsRow {
       JsResult.fromTry(
         Try(
           PgPreparedXactsRow(
-            transaction = json.\("transaction").toOption.map(_.as[PGobject]),
+            transaction = json.\("transaction").toOption.map(_.as[/* xid */ PGobject]),
             gid = json.\("gid").toOption.map(_.as[String]),
             prepared = json.\("prepared").toOption.map(_.as[ZonedDateTime]),
             owner = json.\("owner").toOption.map(_.as[String]),

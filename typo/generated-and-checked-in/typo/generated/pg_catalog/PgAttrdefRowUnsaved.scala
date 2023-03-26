@@ -18,9 +18,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAttrdefRowUnsaved(
-  adrelid: Long,
+  adrelid: /* oid */ Long,
   adnum: Int,
-  adbin: PGobject
+  adbin: /* pg_node_tree */ PGobject
 )
 object PgAttrdefRowUnsaved {
   implicit val oFormat: OFormat[PgAttrdefRowUnsaved] = new OFormat[PgAttrdefRowUnsaved]{
@@ -35,9 +35,9 @@ object PgAttrdefRowUnsaved {
       JsResult.fromTry(
         Try(
           PgAttrdefRowUnsaved(
-            adrelid = json.\("adrelid").as[Long],
+            adrelid = json.\("adrelid").as[/* oid */ Long],
             adnum = json.\("adnum").as[Int],
-            adbin = json.\("adbin").as[PGobject]
+            adbin = json.\("adbin").as[/* pg_node_tree */ PGobject]
           )
         )
       )

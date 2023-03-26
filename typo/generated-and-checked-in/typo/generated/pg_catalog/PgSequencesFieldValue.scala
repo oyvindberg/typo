@@ -17,7 +17,7 @@ object PgSequencesFieldValue {
   case class schemaname(override val value: Option[String]) extends PgSequencesFieldValue("schemaname", value)
   case class sequencename(override val value: Option[String]) extends PgSequencesFieldValue("sequencename", value)
   case class sequenceowner(override val value: Option[String]) extends PgSequencesFieldValue("sequenceowner", value)
-  case class dataType(override val value: Option[PGobject]) extends PgSequencesFieldValue("data_type", value)
+  case class dataType(override val value: Option[/* regtype */ PGobject]) extends PgSequencesFieldValue("data_type", value)
   case class startValue(override val value: Option[Long]) extends PgSequencesFieldValue("start_value", value)
   case class minValue(override val value: Option[Long]) extends PgSequencesFieldValue("min_value", value)
   case class maxValue(override val value: Option[Long]) extends PgSequencesFieldValue("max_value", value)

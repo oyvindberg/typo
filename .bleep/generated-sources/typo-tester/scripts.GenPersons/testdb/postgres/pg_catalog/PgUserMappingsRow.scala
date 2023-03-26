@@ -17,10 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingsRow(
-  umid: Option[Long],
-  srvid: Option[Long],
+  umid: Option[/* oid */ Long],
+  srvid: Option[/* oid */ Long],
   srvname: Option[String],
-  umuser: Option[Long],
+  umuser: Option[/* oid */ Long],
   usename: Option[String],
   umoptions: Option[Array[String]]
 )
@@ -29,10 +29,10 @@ object PgUserMappingsRow {
   def rowParser(prefix: String): RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        umid = row[Option[Long]](prefix + "umid"),
-        srvid = row[Option[Long]](prefix + "srvid"),
+        umid = row[Option[/* oid */ Long]](prefix + "umid"),
+        srvid = row[Option[/* oid */ Long]](prefix + "srvid"),
         srvname = row[Option[String]](prefix + "srvname"),
-        umuser = row[Option[Long]](prefix + "umuser"),
+        umuser = row[Option[/* oid */ Long]](prefix + "umuser"),
         usename = row[Option[String]](prefix + "usename"),
         umoptions = row[Option[Array[String]]](prefix + "umoptions")
       )
@@ -54,10 +54,10 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            umid = json.\("umid").toOption.map(_.as[Long]),
-            srvid = json.\("srvid").toOption.map(_.as[Long]),
+            umid = json.\("umid").toOption.map(_.as[/* oid */ Long]),
+            srvid = json.\("srvid").toOption.map(_.as[/* oid */ Long]),
             srvname = json.\("srvname").toOption.map(_.as[String]),
-            umuser = json.\("umuser").toOption.map(_.as[Long]),
+            umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
             usename = json.\("usename").toOption.map(_.as[String]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
           )

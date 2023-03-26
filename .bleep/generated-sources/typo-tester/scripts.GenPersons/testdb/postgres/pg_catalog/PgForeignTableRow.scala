@@ -18,7 +18,7 @@ import scala.util.Try
 
 case class PgForeignTableRow(
   ftrelid: PgForeignTableId,
-  ftserver: Long,
+  ftserver: /* oid */ Long,
   ftoptions: Option[Array[String]]
 )
 
@@ -27,7 +27,7 @@ object PgForeignTableRow {
     Success(
       PgForeignTableRow(
         ftrelid = row[PgForeignTableId](prefix + "ftrelid"),
-        ftserver = row[Long](prefix + "ftserver"),
+        ftserver = row[/* oid */ Long](prefix + "ftserver"),
         ftoptions = row[Option[Array[String]]](prefix + "ftoptions")
       )
     )
@@ -46,7 +46,7 @@ object PgForeignTableRow {
         Try(
           PgForeignTableRow(
             ftrelid = json.\("ftrelid").as[PgForeignTableId],
-            ftserver = json.\("ftserver").as[Long],
+            ftserver = json.\("ftserver").as[/* oid */ Long],
             ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]])
           )
         )

@@ -19,10 +19,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTsConfigMapRow(
-  mapcfg: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"mapcfg","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  mapcfg: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"mapcfg","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   maptokentype: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"maptokentype","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   mapseqno: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"mapseqno","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  mapdict: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"mapdict","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  mapdict: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config_map","column_name":"mapdict","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgTsConfigMapId = PgTsConfigMapId(mapcfg, maptokentype, mapseqno)
 }
@@ -31,10 +31,10 @@ object PgTsConfigMapRow {
   def rowParser(prefix: String): RowParser[PgTsConfigMapRow] = { row =>
     Success(
       PgTsConfigMapRow(
-        mapcfg = row[Long](prefix + "mapcfg"),
+        mapcfg = row[/* oid */ Long](prefix + "mapcfg"),
         maptokentype = row[Int](prefix + "maptokentype"),
         mapseqno = row[Int](prefix + "mapseqno"),
-        mapdict = row[Long](prefix + "mapdict")
+        mapdict = row[/* oid */ Long](prefix + "mapdict")
       )
     )
   }
@@ -52,10 +52,10 @@ object PgTsConfigMapRow {
       JsResult.fromTry(
         Try(
           PgTsConfigMapRow(
-            mapcfg = json.\("mapcfg").as[Long],
+            mapcfg = json.\("mapcfg").as[/* oid */ Long],
             maptokentype = json.\("maptokentype").as[Int],
             mapseqno = json.\("mapseqno").as[Int],
-            mapdict = json.\("mapdict").as[Long]
+            mapdict = json.\("mapdict").as[/* oid */ Long]
           )
         )
       )

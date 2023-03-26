@@ -18,14 +18,14 @@ import scala.util.Try
 
 case class PgAmopRow(
   oid: PgAmopId,
-  amopfamily: Long,
-  amoplefttype: Long,
-  amoprighttype: Long,
+  amopfamily: /* oid */ Long,
+  amoplefttype: /* oid */ Long,
+  amoprighttype: /* oid */ Long,
   amopstrategy: Int,
   amoppurpose: String,
-  amopopr: Long,
-  amopmethod: Long,
-  amopsortfamily: Long
+  amopopr: /* oid */ Long,
+  amopmethod: /* oid */ Long,
+  amopsortfamily: /* oid */ Long
 )
 
 object PgAmopRow {
@@ -33,14 +33,14 @@ object PgAmopRow {
     Success(
       PgAmopRow(
         oid = row[PgAmopId](prefix + "oid"),
-        amopfamily = row[Long](prefix + "amopfamily"),
-        amoplefttype = row[Long](prefix + "amoplefttype"),
-        amoprighttype = row[Long](prefix + "amoprighttype"),
+        amopfamily = row[/* oid */ Long](prefix + "amopfamily"),
+        amoplefttype = row[/* oid */ Long](prefix + "amoplefttype"),
+        amoprighttype = row[/* oid */ Long](prefix + "amoprighttype"),
         amopstrategy = row[Int](prefix + "amopstrategy"),
         amoppurpose = row[String](prefix + "amoppurpose"),
-        amopopr = row[Long](prefix + "amopopr"),
-        amopmethod = row[Long](prefix + "amopmethod"),
-        amopsortfamily = row[Long](prefix + "amopsortfamily")
+        amopopr = row[/* oid */ Long](prefix + "amopopr"),
+        amopmethod = row[/* oid */ Long](prefix + "amopmethod"),
+        amopsortfamily = row[/* oid */ Long](prefix + "amopsortfamily")
       )
     )
   }
@@ -64,14 +64,14 @@ object PgAmopRow {
         Try(
           PgAmopRow(
             oid = json.\("oid").as[PgAmopId],
-            amopfamily = json.\("amopfamily").as[Long],
-            amoplefttype = json.\("amoplefttype").as[Long],
-            amoprighttype = json.\("amoprighttype").as[Long],
+            amopfamily = json.\("amopfamily").as[/* oid */ Long],
+            amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
+            amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
             amopstrategy = json.\("amopstrategy").as[Int],
             amoppurpose = json.\("amoppurpose").as[String],
-            amopopr = json.\("amopopr").as[Long],
-            amopmethod = json.\("amopmethod").as[Long],
-            amopsortfamily = json.\("amopsortfamily").as[Long]
+            amopopr = json.\("amopopr").as[/* oid */ Long],
+            amopmethod = json.\("amopmethod").as[/* oid */ Long],
+            amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
           )
         )
       )

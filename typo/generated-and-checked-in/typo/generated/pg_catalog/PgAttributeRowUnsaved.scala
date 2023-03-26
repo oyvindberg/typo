@@ -19,7 +19,7 @@ import scala.util.Try
 
 case class PgAttributeRowUnsaved(
   attname: String,
-  atttypid: Long,
+  atttypid: /* oid */ Long,
   attstattarget: Int,
   attlen: Int,
   attndims: Int,
@@ -37,11 +37,11 @@ case class PgAttributeRowUnsaved(
   attisdropped: Boolean,
   attislocal: Boolean,
   attinhcount: Int,
-  attcollation: Long,
-  attacl: Option[Array[PGobject]],
+  attcollation: /* oid */ Long,
+  attacl: Option[Array[/* aclitem */ PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[PGobject]
+  attmissingval: Option[/* anyarray */ PGobject]
 )
 object PgAttributeRowUnsaved {
   implicit val oFormat: OFormat[PgAttributeRowUnsaved] = new OFormat[PgAttributeRowUnsaved]{
@@ -78,7 +78,7 @@ object PgAttributeRowUnsaved {
         Try(
           PgAttributeRowUnsaved(
             attname = json.\("attname").as[String],
-            atttypid = json.\("atttypid").as[Long],
+            atttypid = json.\("atttypid").as[/* oid */ Long],
             attstattarget = json.\("attstattarget").as[Int],
             attlen = json.\("attlen").as[Int],
             attndims = json.\("attndims").as[Int],
@@ -96,11 +96,11 @@ object PgAttributeRowUnsaved {
             attisdropped = json.\("attisdropped").as[Boolean],
             attislocal = json.\("attislocal").as[Boolean],
             attinhcount = json.\("attinhcount").as[Int],
-            attcollation = json.\("attcollation").as[Long],
-            attacl = json.\("attacl").toOption.map(_.as[Array[PGobject]]),
+            attcollation = json.\("attcollation").as[/* oid */ Long],
+            attacl = json.\("attacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-            attmissingval = json.\("attmissingval").toOption.map(_.as[PGobject])
+            attmissingval = json.\("attmissingval").toOption.map(_.as[/* anyarray */ PGobject])
           )
         )
       )

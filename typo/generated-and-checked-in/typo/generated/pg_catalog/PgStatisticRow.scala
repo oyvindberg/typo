@@ -20,7 +20,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatisticRow(
-  starelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"starelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  starelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"starelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   staattnum: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staattnum","ordinal_position":2,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stainherit: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stainherit","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanullfrac: Float /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanullfrac","ordinal_position":4,"is_nullable":"NO","data_type":"real","numeric_precision":24,"numeric_precision_radix":2,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"float4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -31,26 +31,26 @@ case class PgStatisticRow(
   stakind3: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stakind3","ordinal_position":9,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stakind4: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stakind4","ordinal_position":10,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stakind5: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stakind5","ordinal_position":11,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  staop1: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop1","ordinal_position":12,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  staop2: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop2","ordinal_position":13,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  staop3: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop3","ordinal_position":14,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  staop4: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop4","ordinal_position":15,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  staop5: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop5","ordinal_position":16,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stacoll1: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll1","ordinal_position":17,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stacoll2: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll2","ordinal_position":18,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stacoll3: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll3","ordinal_position":19,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stacoll4: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll4","ordinal_position":20,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stacoll5: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll5","ordinal_position":21,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  staop1: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop1","ordinal_position":12,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  staop2: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop2","ordinal_position":13,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  staop3: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop3","ordinal_position":14,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  staop4: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop4","ordinal_position":15,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  staop5: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"staop5","ordinal_position":16,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stacoll1: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll1","ordinal_position":17,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stacoll2: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll2","ordinal_position":18,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stacoll3: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll3","ordinal_position":19,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stacoll4: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll4","ordinal_position":20,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stacoll5: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stacoll5","ordinal_position":21,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanumbers1: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanumbers1","ordinal_position":22,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanumbers2: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanumbers2","ordinal_position":23,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanumbers3: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanumbers3","ordinal_position":24,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanumbers4: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanumbers4","ordinal_position":25,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   stanumbers5: Option[Array[Float]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stanumbers5","ordinal_position":26,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_float4","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stavalues1: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues1","ordinal_position":27,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stavalues2: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues2","ordinal_position":28,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stavalues3: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues3","ordinal_position":29,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stavalues4: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues4","ordinal_position":30,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stavalues5: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues5","ordinal_position":31,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"31","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  stavalues1: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues1","ordinal_position":27,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stavalues2: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues2","ordinal_position":28,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stavalues3: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues3","ordinal_position":29,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stavalues4: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues4","ordinal_position":30,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stavalues5: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statistic","column_name":"stavalues5","ordinal_position":31,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"31","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
 }
@@ -59,7 +59,7 @@ object PgStatisticRow {
   def rowParser(prefix: String): RowParser[PgStatisticRow] = { row =>
     Success(
       PgStatisticRow(
-        starelid = row[Long](prefix + "starelid"),
+        starelid = row[/* oid */ Long](prefix + "starelid"),
         staattnum = row[Int](prefix + "staattnum"),
         stainherit = row[Boolean](prefix + "stainherit"),
         stanullfrac = row[Float](prefix + "stanullfrac"),
@@ -70,26 +70,26 @@ object PgStatisticRow {
         stakind3 = row[Int](prefix + "stakind3"),
         stakind4 = row[Int](prefix + "stakind4"),
         stakind5 = row[Int](prefix + "stakind5"),
-        staop1 = row[Long](prefix + "staop1"),
-        staop2 = row[Long](prefix + "staop2"),
-        staop3 = row[Long](prefix + "staop3"),
-        staop4 = row[Long](prefix + "staop4"),
-        staop5 = row[Long](prefix + "staop5"),
-        stacoll1 = row[Long](prefix + "stacoll1"),
-        stacoll2 = row[Long](prefix + "stacoll2"),
-        stacoll3 = row[Long](prefix + "stacoll3"),
-        stacoll4 = row[Long](prefix + "stacoll4"),
-        stacoll5 = row[Long](prefix + "stacoll5"),
+        staop1 = row[/* oid */ Long](prefix + "staop1"),
+        staop2 = row[/* oid */ Long](prefix + "staop2"),
+        staop3 = row[/* oid */ Long](prefix + "staop3"),
+        staop4 = row[/* oid */ Long](prefix + "staop4"),
+        staop5 = row[/* oid */ Long](prefix + "staop5"),
+        stacoll1 = row[/* oid */ Long](prefix + "stacoll1"),
+        stacoll2 = row[/* oid */ Long](prefix + "stacoll2"),
+        stacoll3 = row[/* oid */ Long](prefix + "stacoll3"),
+        stacoll4 = row[/* oid */ Long](prefix + "stacoll4"),
+        stacoll5 = row[/* oid */ Long](prefix + "stacoll5"),
         stanumbers1 = row[Option[Array[Float]]](prefix + "stanumbers1"),
         stanumbers2 = row[Option[Array[Float]]](prefix + "stanumbers2"),
         stanumbers3 = row[Option[Array[Float]]](prefix + "stanumbers3"),
         stanumbers4 = row[Option[Array[Float]]](prefix + "stanumbers4"),
         stanumbers5 = row[Option[Array[Float]]](prefix + "stanumbers5"),
-        stavalues1 = row[Option[PGobject]](prefix + "stavalues1"),
-        stavalues2 = row[Option[PGobject]](prefix + "stavalues2"),
-        stavalues3 = row[Option[PGobject]](prefix + "stavalues3"),
-        stavalues4 = row[Option[PGobject]](prefix + "stavalues4"),
-        stavalues5 = row[Option[PGobject]](prefix + "stavalues5")
+        stavalues1 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues1"),
+        stavalues2 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues2"),
+        stavalues3 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues3"),
+        stavalues4 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues4"),
+        stavalues5 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues5")
       )
     )
   }
@@ -134,7 +134,7 @@ object PgStatisticRow {
       JsResult.fromTry(
         Try(
           PgStatisticRow(
-            starelid = json.\("starelid").as[Long],
+            starelid = json.\("starelid").as[/* oid */ Long],
             staattnum = json.\("staattnum").as[Int],
             stainherit = json.\("stainherit").as[Boolean],
             stanullfrac = json.\("stanullfrac").as[Float],
@@ -145,26 +145,26 @@ object PgStatisticRow {
             stakind3 = json.\("stakind3").as[Int],
             stakind4 = json.\("stakind4").as[Int],
             stakind5 = json.\("stakind5").as[Int],
-            staop1 = json.\("staop1").as[Long],
-            staop2 = json.\("staop2").as[Long],
-            staop3 = json.\("staop3").as[Long],
-            staop4 = json.\("staop4").as[Long],
-            staop5 = json.\("staop5").as[Long],
-            stacoll1 = json.\("stacoll1").as[Long],
-            stacoll2 = json.\("stacoll2").as[Long],
-            stacoll3 = json.\("stacoll3").as[Long],
-            stacoll4 = json.\("stacoll4").as[Long],
-            stacoll5 = json.\("stacoll5").as[Long],
+            staop1 = json.\("staop1").as[/* oid */ Long],
+            staop2 = json.\("staop2").as[/* oid */ Long],
+            staop3 = json.\("staop3").as[/* oid */ Long],
+            staop4 = json.\("staop4").as[/* oid */ Long],
+            staop5 = json.\("staop5").as[/* oid */ Long],
+            stacoll1 = json.\("stacoll1").as[/* oid */ Long],
+            stacoll2 = json.\("stacoll2").as[/* oid */ Long],
+            stacoll3 = json.\("stacoll3").as[/* oid */ Long],
+            stacoll4 = json.\("stacoll4").as[/* oid */ Long],
+            stacoll5 = json.\("stacoll5").as[/* oid */ Long],
             stanumbers1 = json.\("stanumbers1").toOption.map(_.as[Array[Float]]),
             stanumbers2 = json.\("stanumbers2").toOption.map(_.as[Array[Float]]),
             stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
             stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
             stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
-            stavalues1 = json.\("stavalues1").toOption.map(_.as[PGobject]),
-            stavalues2 = json.\("stavalues2").toOption.map(_.as[PGobject]),
-            stavalues3 = json.\("stavalues3").toOption.map(_.as[PGobject]),
-            stavalues4 = json.\("stavalues4").toOption.map(_.as[PGobject]),
-            stavalues5 = json.\("stavalues5").toOption.map(_.as[PGobject])
+            stavalues1 = json.\("stavalues1").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues2 = json.\("stavalues2").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues3 = json.\("stavalues3").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues4 = json.\("stavalues4").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues5 = json.\("stavalues5").toOption.map(_.as[/* anyarray */ PGobject])
           )
         )
       )

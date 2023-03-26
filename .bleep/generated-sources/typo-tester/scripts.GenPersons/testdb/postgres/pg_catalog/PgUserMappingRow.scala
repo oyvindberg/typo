@@ -18,8 +18,8 @@ import scala.util.Try
 
 case class PgUserMappingRow(
   oid: PgUserMappingId,
-  umuser: Long,
-  umserver: Long,
+  umuser: /* oid */ Long,
+  umserver: /* oid */ Long,
   umoptions: Option[Array[String]]
 )
 
@@ -28,8 +28,8 @@ object PgUserMappingRow {
     Success(
       PgUserMappingRow(
         oid = row[PgUserMappingId](prefix + "oid"),
-        umuser = row[Long](prefix + "umuser"),
-        umserver = row[Long](prefix + "umserver"),
+        umuser = row[/* oid */ Long](prefix + "umuser"),
+        umserver = row[/* oid */ Long](prefix + "umserver"),
         umoptions = row[Option[Array[String]]](prefix + "umoptions")
       )
     )
@@ -49,8 +49,8 @@ object PgUserMappingRow {
         Try(
           PgUserMappingRow(
             oid = json.\("oid").as[PgUserMappingId],
-            umuser = json.\("umuser").as[Long],
-            umserver = json.\("umserver").as[Long],
+            umuser = json.\("umuser").as[/* oid */ Long],
+            umserver = json.\("umserver").as[/* oid */ Long],
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
           )
         )

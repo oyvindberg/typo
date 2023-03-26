@@ -19,5 +19,5 @@ trait PgTransformRepo {
   def updateFieldValues(oid: PgTransformId, fieldValues: List[PgTransformFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTransformId, unsaved: PgTransformRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTransformId)(implicit c: Connection): Boolean
-  def selectByUniqueTrftypeTrflang(trftype: Long, trflang: Long)(implicit c: Connection): Option[PgTransformRow]
+  def selectByUniqueTrftypeTrflang(trftype: /* oid */ Long, trflang: /* oid */ Long)(implicit c: Connection): Option[PgTransformRow]
 }

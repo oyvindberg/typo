@@ -20,8 +20,8 @@ import scala.util.Try
 case class PgNamespaceRow(
   oid: PgNamespaceId,
   nspname: String,
-  nspowner: Long,
-  nspacl: Option[Array[PGobject]]
+  nspowner: /* oid */ Long,
+  nspacl: Option[Array[/* aclitem */ PGobject]]
 )
 
 object PgNamespaceRow {
@@ -30,8 +30,8 @@ object PgNamespaceRow {
       PgNamespaceRow(
         oid = row[PgNamespaceId](prefix + "oid"),
         nspname = row[String](prefix + "nspname"),
-        nspowner = row[Long](prefix + "nspowner"),
-        nspacl = row[Option[Array[PGobject]]](prefix + "nspacl")
+        nspowner = row[/* oid */ Long](prefix + "nspowner"),
+        nspacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "nspacl")
       )
     )
   }
@@ -51,8 +51,8 @@ object PgNamespaceRow {
           PgNamespaceRow(
             oid = json.\("oid").as[PgNamespaceId],
             nspname = json.\("nspname").as[String],
-            nspowner = json.\("nspowner").as[Long],
-            nspacl = json.\("nspacl").toOption.map(_.as[Array[PGobject]])
+            nspowner = json.\("nspowner").as[/* oid */ Long],
+            nspacl = json.\("nspacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

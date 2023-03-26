@@ -16,11 +16,11 @@ import scala.util.Try
 
 case class PgExtensionRowUnsaved(
   extname: String,
-  extowner: Long,
-  extnamespace: Long,
+  extowner: /* oid */ Long,
+  extnamespace: /* oid */ Long,
   extrelocatable: Boolean,
   extversion: String,
-  extconfig: Option[Array[Long]],
+  extconfig: Option[Array[/* oid */ Long]],
   extcondition: Option[Array[String]]
 )
 object PgExtensionRowUnsaved {
@@ -41,11 +41,11 @@ object PgExtensionRowUnsaved {
         Try(
           PgExtensionRowUnsaved(
             extname = json.\("extname").as[String],
-            extowner = json.\("extowner").as[Long],
-            extnamespace = json.\("extnamespace").as[Long],
+            extowner = json.\("extowner").as[/* oid */ Long],
+            extnamespace = json.\("extnamespace").as[/* oid */ Long],
             extrelocatable = json.\("extrelocatable").as[Boolean],
             extversion = json.\("extversion").as[String],
-            extconfig = json.\("extconfig").toOption.map(_.as[Array[Long]]),
+            extconfig = json.\("extconfig").toOption.map(_.as[Array[/* oid */ Long]]),
             extcondition = json.\("extcondition").toOption.map(_.as[Array[String]])
           )
         )

@@ -20,7 +20,7 @@ import scala.util.Try
 case class PgAmRow(
   oid: PgAmId,
   amname: String,
-  amhandler: PGobject,
+  amhandler: /* regproc */ PGobject,
   amtype: String
 )
 
@@ -30,7 +30,7 @@ object PgAmRow {
       PgAmRow(
         oid = row[PgAmId](prefix + "oid"),
         amname = row[String](prefix + "amname"),
-        amhandler = row[PGobject](prefix + "amhandler"),
+        amhandler = row[/* regproc */ PGobject](prefix + "amhandler"),
         amtype = row[String](prefix + "amtype")
       )
     )
@@ -51,7 +51,7 @@ object PgAmRow {
           PgAmRow(
             oid = json.\("oid").as[PgAmId],
             amname = json.\("amname").as[String],
-            amhandler = json.\("amhandler").as[PGobject],
+            amhandler = json.\("amhandler").as[/* regproc */ PGobject],
             amtype = json.\("amtype").as[String]
           )
         )

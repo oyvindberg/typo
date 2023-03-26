@@ -15,11 +15,11 @@ import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
-case class PgUserMappingId(value: Long) extends AnyVal
+case class PgUserMappingId(value: /* oid */ Long) extends AnyVal
 object PgUserMappingId {
   implicit val ordering: Ordering[PgUserMappingId] = Ordering.by(_.value)
-  implicit val format: Format[PgUserMappingId] = implicitly[Format[Long]].bimap(PgUserMappingId.apply, _.value)
-  implicit val toStatement: ToStatement[PgUserMappingId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val column: Column[PgUserMappingId] = implicitly[Column[Long]].map(PgUserMappingId.apply)
+  implicit val format: Format[PgUserMappingId] = implicitly[Format[/* oid */ Long]].bimap(PgUserMappingId.apply, _.value)
+  implicit val toStatement: ToStatement[PgUserMappingId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val column: Column[PgUserMappingId] = implicitly[Column[/* oid */ Long]].map(PgUserMappingId.apply)
   def rowParser(prefix: String): RowParser[PgUserMappingId] = SqlParser.get[PgUserMappingId](prefix + "oid")
 }

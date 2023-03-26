@@ -17,14 +17,14 @@ sealed abstract class PgStatReplicationFieldValue[T](val name: String, val value
 
 object PgStatReplicationFieldValue {
   case class pid(override val value: Option[Int]) extends PgStatReplicationFieldValue("pid", value)
-  case class usesysid(override val value: Option[Long]) extends PgStatReplicationFieldValue("usesysid", value)
+  case class usesysid(override val value: Option[/* oid */ Long]) extends PgStatReplicationFieldValue("usesysid", value)
   case class usename(override val value: Option[String]) extends PgStatReplicationFieldValue("usename", value)
   case class applicationName(override val value: Option[String]) extends PgStatReplicationFieldValue("application_name", value)
-  case class clientAddr(override val value: Option[PGobject]) extends PgStatReplicationFieldValue("client_addr", value)
+  case class clientAddr(override val value: Option[/* inet */ PGobject]) extends PgStatReplicationFieldValue("client_addr", value)
   case class clientHostname(override val value: Option[String]) extends PgStatReplicationFieldValue("client_hostname", value)
   case class clientPort(override val value: Option[Int]) extends PgStatReplicationFieldValue("client_port", value)
   case class backendStart(override val value: Option[ZonedDateTime]) extends PgStatReplicationFieldValue("backend_start", value)
-  case class backendXmin(override val value: Option[PGobject]) extends PgStatReplicationFieldValue("backend_xmin", value)
+  case class backendXmin(override val value: Option[/* xid */ PGobject]) extends PgStatReplicationFieldValue("backend_xmin", value)
   case class state(override val value: Option[String]) extends PgStatReplicationFieldValue("state", value)
   case class sentLsn(override val value: Option[String]) extends PgStatReplicationFieldValue("sent_lsn", value)
   case class writeLsn(override val value: Option[String]) extends PgStatReplicationFieldValue("write_lsn", value)

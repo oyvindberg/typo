@@ -19,11 +19,11 @@ import scala.util.Try
 
 case class PgConversionRowUnsaved(
   conname: String,
-  connamespace: Long,
-  conowner: Long,
+  connamespace: /* oid */ Long,
+  conowner: /* oid */ Long,
   conforencoding: Int,
   contoencoding: Int,
-  conproc: PGobject,
+  conproc: /* regproc */ PGobject,
   condefault: Boolean
 )
 object PgConversionRowUnsaved {
@@ -44,11 +44,11 @@ object PgConversionRowUnsaved {
         Try(
           PgConversionRowUnsaved(
             conname = json.\("conname").as[String],
-            connamespace = json.\("connamespace").as[Long],
-            conowner = json.\("conowner").as[Long],
+            connamespace = json.\("connamespace").as[/* oid */ Long],
+            conowner = json.\("conowner").as[/* oid */ Long],
             conforencoding = json.\("conforencoding").as[Int],
             contoencoding = json.\("contoencoding").as[Int],
-            conproc = json.\("conproc").as[PGobject],
+            conproc = json.\("conproc").as[/* regproc */ PGobject],
             condefault = json.\("condefault").as[Boolean]
           )
         )

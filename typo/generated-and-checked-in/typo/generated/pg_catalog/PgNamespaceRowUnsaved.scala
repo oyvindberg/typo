@@ -19,8 +19,8 @@ import scala.util.Try
 
 case class PgNamespaceRowUnsaved(
   nspname: String,
-  nspowner: Long,
-  nspacl: Option[Array[PGobject]]
+  nspowner: /* oid */ Long,
+  nspacl: Option[Array[/* aclitem */ PGobject]]
 )
 object PgNamespaceRowUnsaved {
   implicit val oFormat: OFormat[PgNamespaceRowUnsaved] = new OFormat[PgNamespaceRowUnsaved]{
@@ -36,8 +36,8 @@ object PgNamespaceRowUnsaved {
         Try(
           PgNamespaceRowUnsaved(
             nspname = json.\("nspname").as[String],
-            nspowner = json.\("nspowner").as[Long],
-            nspacl = json.\("nspacl").toOption.map(_.as[Array[PGobject]])
+            nspowner = json.\("nspowner").as[/* oid */ Long],
+            nspacl = json.\("nspacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

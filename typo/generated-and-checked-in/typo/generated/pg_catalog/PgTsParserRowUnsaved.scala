@@ -19,12 +19,12 @@ import scala.util.Try
 
 case class PgTsParserRowUnsaved(
   prsname: String,
-  prsnamespace: Long,
-  prsstart: PGobject,
-  prstoken: PGobject,
-  prsend: PGobject,
-  prsheadline: PGobject,
-  prslextype: PGobject
+  prsnamespace: /* oid */ Long,
+  prsstart: /* regproc */ PGobject,
+  prstoken: /* regproc */ PGobject,
+  prsend: /* regproc */ PGobject,
+  prsheadline: /* regproc */ PGobject,
+  prslextype: /* regproc */ PGobject
 )
 object PgTsParserRowUnsaved {
   implicit val oFormat: OFormat[PgTsParserRowUnsaved] = new OFormat[PgTsParserRowUnsaved]{
@@ -44,12 +44,12 @@ object PgTsParserRowUnsaved {
         Try(
           PgTsParserRowUnsaved(
             prsname = json.\("prsname").as[String],
-            prsnamespace = json.\("prsnamespace").as[Long],
-            prsstart = json.\("prsstart").as[PGobject],
-            prstoken = json.\("prstoken").as[PGobject],
-            prsend = json.\("prsend").as[PGobject],
-            prsheadline = json.\("prsheadline").as[PGobject],
-            prslextype = json.\("prslextype").as[PGobject]
+            prsnamespace = json.\("prsnamespace").as[/* oid */ Long],
+            prsstart = json.\("prsstart").as[/* regproc */ PGobject],
+            prstoken = json.\("prstoken").as[/* regproc */ PGobject],
+            prsend = json.\("prsend").as[/* regproc */ PGobject],
+            prsheadline = json.\("prsheadline").as[/* regproc */ PGobject],
+            prslextype = json.\("prslextype").as[/* regproc */ PGobject]
           )
         )
       )

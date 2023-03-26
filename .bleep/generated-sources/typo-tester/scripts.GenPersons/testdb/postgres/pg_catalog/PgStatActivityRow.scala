@@ -19,14 +19,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatActivityRow(
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
   pid: Option[Int],
   leaderPid: Option[Int],
-  usesysid: Option[Long],
+  usesysid: Option[/* oid */ Long],
   usename: Option[String],
   applicationName: Option[String],
-  clientAddr: Option[PGobject],
+  clientAddr: Option[/* inet */ PGobject],
   clientHostname: Option[String],
   clientPort: Option[Int],
   backendStart: Option[ZonedDateTime],
@@ -36,8 +36,8 @@ case class PgStatActivityRow(
   waitEventType: Option[String],
   waitEvent: Option[String],
   state: Option[String],
-  backendXid: Option[PGobject],
-  backendXmin: Option[PGobject],
+  backendXid: Option[/* xid */ PGobject],
+  backendXmin: Option[/* xid */ PGobject],
   queryId: Option[Long],
   query: Option[String],
   backendType: Option[String]
@@ -47,14 +47,14 @@ object PgStatActivityRow {
   def rowParser(prefix: String): RowParser[PgStatActivityRow] = { row =>
     Success(
       PgStatActivityRow(
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
         pid = row[Option[Int]](prefix + "pid"),
         leaderPid = row[Option[Int]](prefix + "leader_pid"),
-        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usesysid = row[Option[/* oid */ Long]](prefix + "usesysid"),
         usename = row[Option[String]](prefix + "usename"),
         applicationName = row[Option[String]](prefix + "application_name"),
-        clientAddr = row[Option[PGobject]](prefix + "client_addr"),
+        clientAddr = row[Option[/* inet */ PGobject]](prefix + "client_addr"),
         clientHostname = row[Option[String]](prefix + "client_hostname"),
         clientPort = row[Option[Int]](prefix + "client_port"),
         backendStart = row[Option[ZonedDateTime]](prefix + "backend_start"),
@@ -64,8 +64,8 @@ object PgStatActivityRow {
         waitEventType = row[Option[String]](prefix + "wait_event_type"),
         waitEvent = row[Option[String]](prefix + "wait_event"),
         state = row[Option[String]](prefix + "state"),
-        backendXid = row[Option[PGobject]](prefix + "backend_xid"),
-        backendXmin = row[Option[PGobject]](prefix + "backend_xmin"),
+        backendXid = row[Option[/* xid */ PGobject]](prefix + "backend_xid"),
+        backendXmin = row[Option[/* xid */ PGobject]](prefix + "backend_xmin"),
         queryId = row[Option[Long]](prefix + "query_id"),
         query = row[Option[String]](prefix + "query"),
         backendType = row[Option[String]](prefix + "backend_type")
@@ -104,14 +104,14 @@ object PgStatActivityRow {
       JsResult.fromTry(
         Try(
           PgStatActivityRow(
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             leaderPid = json.\("leader_pid").toOption.map(_.as[Int]),
-            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usesysid = json.\("usesysid").toOption.map(_.as[/* oid */ Long]),
             usename = json.\("usename").toOption.map(_.as[String]),
             applicationName = json.\("application_name").toOption.map(_.as[String]),
-            clientAddr = json.\("client_addr").toOption.map(_.as[PGobject]),
+            clientAddr = json.\("client_addr").toOption.map(_.as[/* inet */ PGobject]),
             clientHostname = json.\("client_hostname").toOption.map(_.as[String]),
             clientPort = json.\("client_port").toOption.map(_.as[Int]),
             backendStart = json.\("backend_start").toOption.map(_.as[ZonedDateTime]),
@@ -121,8 +121,8 @@ object PgStatActivityRow {
             waitEventType = json.\("wait_event_type").toOption.map(_.as[String]),
             waitEvent = json.\("wait_event").toOption.map(_.as[String]),
             state = json.\("state").toOption.map(_.as[String]),
-            backendXid = json.\("backend_xid").toOption.map(_.as[PGobject]),
-            backendXmin = json.\("backend_xmin").toOption.map(_.as[PGobject]),
+            backendXid = json.\("backend_xid").toOption.map(_.as[/* xid */ PGobject]),
+            backendXmin = json.\("backend_xmin").toOption.map(_.as[/* xid */ PGobject]),
             queryId = json.\("query_id").toOption.map(_.as[Long]),
             query = json.\("query").toOption.map(_.as[String]),
             backendType = json.\("backend_type").toOption.map(_.as[String])

@@ -21,9 +21,9 @@ import scala.util.Try
 case class PgTsConfigRow(
   oid: PgTsConfigId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   cfgname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  cfgnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  cfgowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  cfgparser: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgparser","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  cfgnamespace: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgowner: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  cfgparser: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_ts_config","column_name":"cfgparser","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgTsConfigRow {
@@ -32,9 +32,9 @@ object PgTsConfigRow {
       PgTsConfigRow(
         oid = row[PgTsConfigId](prefix + "oid"),
         cfgname = row[String](prefix + "cfgname"),
-        cfgnamespace = row[Long](prefix + "cfgnamespace"),
-        cfgowner = row[Long](prefix + "cfgowner"),
-        cfgparser = row[Long](prefix + "cfgparser")
+        cfgnamespace = row[/* oid */ Long](prefix + "cfgnamespace"),
+        cfgowner = row[/* oid */ Long](prefix + "cfgowner"),
+        cfgparser = row[/* oid */ Long](prefix + "cfgparser")
       )
     )
   }
@@ -55,9 +55,9 @@ object PgTsConfigRow {
           PgTsConfigRow(
             oid = json.\("oid").as[PgTsConfigId],
             cfgname = json.\("cfgname").as[String],
-            cfgnamespace = json.\("cfgnamespace").as[Long],
-            cfgowner = json.\("cfgowner").as[Long],
-            cfgparser = json.\("cfgparser").as[Long]
+            cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
+            cfgowner = json.\("cfgowner").as[/* oid */ Long],
+            cfgparser = json.\("cfgparser").as[/* oid */ Long]
           )
         )
       )

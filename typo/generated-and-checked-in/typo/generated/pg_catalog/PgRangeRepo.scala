@@ -19,5 +19,5 @@ trait PgRangeRepo {
   def updateFieldValues(rngtypid: PgRangeId, fieldValues: List[PgRangeFieldValue[_]])(implicit c: Connection): Int
   def insert(rngtypid: PgRangeId, unsaved: PgRangeRowUnsaved)(implicit c: Connection): Boolean
   def delete(rngtypid: PgRangeId)(implicit c: Connection): Boolean
-  def selectByUniqueRngmultitypid(rngmultitypid: Long)(implicit c: Connection): Option[PgRangeRow]
+  def selectByUniqueRngmultitypid(rngmultitypid: /* oid */ Long)(implicit c: Connection): Option[PgRangeRow]
 }

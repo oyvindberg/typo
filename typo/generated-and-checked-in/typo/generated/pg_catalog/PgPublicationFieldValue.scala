@@ -16,7 +16,7 @@ sealed abstract class PgPublicationFieldValue[T](val name: String, val value: T)
 object PgPublicationFieldValue {
   case class oid(override val value: PgPublicationId) extends PgPublicationFieldValue("oid", value)
   case class pubname(override val value: String) extends PgPublicationFieldValue("pubname", value)
-  case class pubowner(override val value: Long) extends PgPublicationFieldValue("pubowner", value)
+  case class pubowner(override val value: /* oid */ Long) extends PgPublicationFieldValue("pubowner", value)
   case class puballtables(override val value: Boolean) extends PgPublicationFieldValue("puballtables", value)
   case class pubinsert(override val value: Boolean) extends PgPublicationFieldValue("pubinsert", value)
   case class pubupdate(override val value: Boolean) extends PgPublicationFieldValue("pubupdate", value)

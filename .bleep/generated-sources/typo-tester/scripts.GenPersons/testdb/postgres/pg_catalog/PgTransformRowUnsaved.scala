@@ -16,10 +16,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTransformRowUnsaved(
-  trftype: Long,
-  trflang: Long,
-  trffromsql: PGobject,
-  trftosql: PGobject
+  trftype: /* oid */ Long,
+  trflang: /* oid */ Long,
+  trffromsql: /* regproc */ PGobject,
+  trftosql: /* regproc */ PGobject
 )
 object PgTransformRowUnsaved {
   implicit val oFormat: OFormat[PgTransformRowUnsaved] = new OFormat[PgTransformRowUnsaved]{
@@ -35,10 +35,10 @@ object PgTransformRowUnsaved {
       JsResult.fromTry(
         Try(
           PgTransformRowUnsaved(
-            trftype = json.\("trftype").as[Long],
-            trflang = json.\("trflang").as[Long],
-            trffromsql = json.\("trffromsql").as[PGobject],
-            trftosql = json.\("trftosql").as[PGobject]
+            trftype = json.\("trftype").as[/* oid */ Long],
+            trflang = json.\("trflang").as[/* oid */ Long],
+            trffromsql = json.\("trffromsql").as[/* regproc */ PGobject],
+            trftosql = json.\("trftosql").as[/* regproc */ PGobject]
           )
         )
       )

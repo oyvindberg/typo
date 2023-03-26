@@ -13,6 +13,6 @@ sealed abstract class PgLargeobjectMetadataFieldValue[T](val name: String, val v
 
 object PgLargeobjectMetadataFieldValue {
   case class oid(override val value: PgLargeobjectMetadataId) extends PgLargeobjectMetadataFieldValue("oid", value)
-  case class lomowner(override val value: Long) extends PgLargeobjectMetadataFieldValue("lomowner", value)
-  case class lomacl(override val value: Option[Array[PGobject]]) extends PgLargeobjectMetadataFieldValue("lomacl", value)
+  case class lomowner(override val value: /* oid */ Long) extends PgLargeobjectMetadataFieldValue("lomowner", value)
+  case class lomacl(override val value: Option[Array[/* aclitem */ PGobject]]) extends PgLargeobjectMetadataFieldValue("lomacl", value)
 }

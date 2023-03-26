@@ -19,7 +19,7 @@ import scala.util.Try
 case class PgPublicationRow(
   oid: PgPublicationId,
   pubname: String,
-  pubowner: Long,
+  pubowner: /* oid */ Long,
   puballtables: Boolean,
   pubinsert: Boolean,
   pubupdate: Boolean,
@@ -34,7 +34,7 @@ object PgPublicationRow {
       PgPublicationRow(
         oid = row[PgPublicationId](prefix + "oid"),
         pubname = row[String](prefix + "pubname"),
-        pubowner = row[Long](prefix + "pubowner"),
+        pubowner = row[/* oid */ Long](prefix + "pubowner"),
         puballtables = row[Boolean](prefix + "puballtables"),
         pubinsert = row[Boolean](prefix + "pubinsert"),
         pubupdate = row[Boolean](prefix + "pubupdate"),
@@ -65,7 +65,7 @@ object PgPublicationRow {
           PgPublicationRow(
             oid = json.\("oid").as[PgPublicationId],
             pubname = json.\("pubname").as[String],
-            pubowner = json.\("pubowner").as[Long],
+            pubowner = json.\("pubowner").as[/* oid */ Long],
             puballtables = json.\("puballtables").as[Boolean],
             pubinsert = json.\("pubinsert").as[Boolean],
             pubupdate = json.\("pubupdate").as[Boolean],

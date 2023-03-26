@@ -20,11 +20,11 @@ import scala.util.Try
 case class PgForeignServerRow(
   oid: PgForeignServerId,
   srvname: String,
-  srvowner: Long,
-  srvfdw: Long,
+  srvowner: /* oid */ Long,
+  srvfdw: /* oid */ Long,
   srvtype: Option[String],
   srvversion: Option[String],
-  srvacl: Option[Array[PGobject]],
+  srvacl: Option[Array[/* aclitem */ PGobject]],
   srvoptions: Option[Array[String]]
 )
 
@@ -34,11 +34,11 @@ object PgForeignServerRow {
       PgForeignServerRow(
         oid = row[PgForeignServerId](prefix + "oid"),
         srvname = row[String](prefix + "srvname"),
-        srvowner = row[Long](prefix + "srvowner"),
-        srvfdw = row[Long](prefix + "srvfdw"),
+        srvowner = row[/* oid */ Long](prefix + "srvowner"),
+        srvfdw = row[/* oid */ Long](prefix + "srvfdw"),
         srvtype = row[Option[String]](prefix + "srvtype"),
         srvversion = row[Option[String]](prefix + "srvversion"),
-        srvacl = row[Option[Array[PGobject]]](prefix + "srvacl"),
+        srvacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "srvacl"),
         srvoptions = row[Option[Array[String]]](prefix + "srvoptions")
       )
     )
@@ -63,11 +63,11 @@ object PgForeignServerRow {
           PgForeignServerRow(
             oid = json.\("oid").as[PgForeignServerId],
             srvname = json.\("srvname").as[String],
-            srvowner = json.\("srvowner").as[Long],
-            srvfdw = json.\("srvfdw").as[Long],
+            srvowner = json.\("srvowner").as[/* oid */ Long],
+            srvfdw = json.\("srvfdw").as[/* oid */ Long],
             srvtype = json.\("srvtype").toOption.map(_.as[String]),
             srvversion = json.\("srvversion").toOption.map(_.as[String]),
-            srvacl = json.\("srvacl").toOption.map(_.as[Array[PGobject]]),
+            srvacl = json.\("srvacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]])
           )
         )

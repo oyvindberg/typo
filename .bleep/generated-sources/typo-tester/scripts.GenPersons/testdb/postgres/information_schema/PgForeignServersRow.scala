@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignServersRow(
-  oid: Option[Long],
+  oid: Option[/* oid */ Long],
   srvoptions: Option[Array[String]],
   foreignServerCatalog: Option[String],
   foreignServerName: Option[String],
@@ -32,7 +32,7 @@ object PgForeignServersRow {
   def rowParser(prefix: String): RowParser[PgForeignServersRow] = { row =>
     Success(
       PgForeignServersRow(
-        oid = row[Option[Long]](prefix + "oid"),
+        oid = row[Option[/* oid */ Long]](prefix + "oid"),
         srvoptions = row[Option[Array[String]]](prefix + "srvoptions"),
         foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
         foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
@@ -63,7 +63,7 @@ object PgForeignServersRow {
       JsResult.fromTry(
         Try(
           PgForeignServersRow(
-            oid = json.\("oid").toOption.map(_.as[Long]),
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
             srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

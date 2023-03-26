@@ -18,12 +18,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgRangeRowUnsaved(
-  rngsubtype: Long,
-  rngmultitypid: Long,
-  rngcollation: Long,
-  rngsubopc: Long,
-  rngcanonical: PGobject,
-  rngsubdiff: PGobject
+  rngsubtype: /* oid */ Long,
+  rngmultitypid: /* oid */ Long,
+  rngcollation: /* oid */ Long,
+  rngsubopc: /* oid */ Long,
+  rngcanonical: /* regproc */ PGobject,
+  rngsubdiff: /* regproc */ PGobject
 )
 object PgRangeRowUnsaved {
   implicit val oFormat: OFormat[PgRangeRowUnsaved] = new OFormat[PgRangeRowUnsaved]{
@@ -41,12 +41,12 @@ object PgRangeRowUnsaved {
       JsResult.fromTry(
         Try(
           PgRangeRowUnsaved(
-            rngsubtype = json.\("rngsubtype").as[Long],
-            rngmultitypid = json.\("rngmultitypid").as[Long],
-            rngcollation = json.\("rngcollation").as[Long],
-            rngsubopc = json.\("rngsubopc").as[Long],
-            rngcanonical = json.\("rngcanonical").as[PGobject],
-            rngsubdiff = json.\("rngsubdiff").as[PGobject]
+            rngsubtype = json.\("rngsubtype").as[/* oid */ Long],
+            rngmultitypid = json.\("rngmultitypid").as[/* oid */ Long],
+            rngcollation = json.\("rngcollation").as[/* oid */ Long],
+            rngsubopc = json.\("rngsubopc").as[/* oid */ Long],
+            rngcanonical = json.\("rngcanonical").as[/* regproc */ PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[/* regproc */ PGobject]
           )
         )
       )

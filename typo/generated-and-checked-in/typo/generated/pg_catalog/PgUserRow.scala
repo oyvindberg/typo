@@ -21,7 +21,7 @@ import scala.util.Try
 
 case class PgUserRow(
   usename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usename","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  usesysid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesysid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usesysid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesysid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   usecreatedb: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usecreatedb","ordinal_position":3,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   usesuper: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesuper","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   userepl: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"userepl","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -36,7 +36,7 @@ object PgUserRow {
     Success(
       PgUserRow(
         usename = row[Option[String]](prefix + "usename"),
-        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usesysid = row[Option[/* oid */ Long]](prefix + "usesysid"),
         usecreatedb = row[Option[Boolean]](prefix + "usecreatedb"),
         usesuper = row[Option[Boolean]](prefix + "usesuper"),
         userepl = row[Option[Boolean]](prefix + "userepl"),
@@ -67,7 +67,7 @@ object PgUserRow {
         Try(
           PgUserRow(
             usename = json.\("usename").toOption.map(_.as[String]),
-            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usesysid = json.\("usesysid").toOption.map(_.as[/* oid */ Long]),
             usecreatedb = json.\("usecreatedb").toOption.map(_.as[Boolean]),
             usesuper = json.\("usesuper").toOption.map(_.as[Boolean]),
             userepl = json.\("userepl").toOption.map(_.as[Boolean]),

@@ -20,19 +20,19 @@ import scala.util.Try
 case class PgOperatorRow(
   oid: PgOperatorId,
   oprname: String,
-  oprnamespace: Long,
-  oprowner: Long,
+  oprnamespace: /* oid */ Long,
+  oprowner: /* oid */ Long,
   oprkind: String,
   oprcanmerge: Boolean,
   oprcanhash: Boolean,
-  oprleft: Long,
-  oprright: Long,
-  oprresult: Long,
-  oprcom: Long,
-  oprnegate: Long,
-  oprcode: PGobject,
-  oprrest: PGobject,
-  oprjoin: PGobject
+  oprleft: /* oid */ Long,
+  oprright: /* oid */ Long,
+  oprresult: /* oid */ Long,
+  oprcom: /* oid */ Long,
+  oprnegate: /* oid */ Long,
+  oprcode: /* regproc */ PGobject,
+  oprrest: /* regproc */ PGobject,
+  oprjoin: /* regproc */ PGobject
 )
 
 object PgOperatorRow {
@@ -41,19 +41,19 @@ object PgOperatorRow {
       PgOperatorRow(
         oid = row[PgOperatorId](prefix + "oid"),
         oprname = row[String](prefix + "oprname"),
-        oprnamespace = row[Long](prefix + "oprnamespace"),
-        oprowner = row[Long](prefix + "oprowner"),
+        oprnamespace = row[/* oid */ Long](prefix + "oprnamespace"),
+        oprowner = row[/* oid */ Long](prefix + "oprowner"),
         oprkind = row[String](prefix + "oprkind"),
         oprcanmerge = row[Boolean](prefix + "oprcanmerge"),
         oprcanhash = row[Boolean](prefix + "oprcanhash"),
-        oprleft = row[Long](prefix + "oprleft"),
-        oprright = row[Long](prefix + "oprright"),
-        oprresult = row[Long](prefix + "oprresult"),
-        oprcom = row[Long](prefix + "oprcom"),
-        oprnegate = row[Long](prefix + "oprnegate"),
-        oprcode = row[PGobject](prefix + "oprcode"),
-        oprrest = row[PGobject](prefix + "oprrest"),
-        oprjoin = row[PGobject](prefix + "oprjoin")
+        oprleft = row[/* oid */ Long](prefix + "oprleft"),
+        oprright = row[/* oid */ Long](prefix + "oprright"),
+        oprresult = row[/* oid */ Long](prefix + "oprresult"),
+        oprcom = row[/* oid */ Long](prefix + "oprcom"),
+        oprnegate = row[/* oid */ Long](prefix + "oprnegate"),
+        oprcode = row[/* regproc */ PGobject](prefix + "oprcode"),
+        oprrest = row[/* regproc */ PGobject](prefix + "oprrest"),
+        oprjoin = row[/* regproc */ PGobject](prefix + "oprjoin")
       )
     )
   }
@@ -84,19 +84,19 @@ object PgOperatorRow {
           PgOperatorRow(
             oid = json.\("oid").as[PgOperatorId],
             oprname = json.\("oprname").as[String],
-            oprnamespace = json.\("oprnamespace").as[Long],
-            oprowner = json.\("oprowner").as[Long],
+            oprnamespace = json.\("oprnamespace").as[/* oid */ Long],
+            oprowner = json.\("oprowner").as[/* oid */ Long],
             oprkind = json.\("oprkind").as[String],
             oprcanmerge = json.\("oprcanmerge").as[Boolean],
             oprcanhash = json.\("oprcanhash").as[Boolean],
-            oprleft = json.\("oprleft").as[Long],
-            oprright = json.\("oprright").as[Long],
-            oprresult = json.\("oprresult").as[Long],
-            oprcom = json.\("oprcom").as[Long],
-            oprnegate = json.\("oprnegate").as[Long],
-            oprcode = json.\("oprcode").as[PGobject],
-            oprrest = json.\("oprrest").as[PGobject],
-            oprjoin = json.\("oprjoin").as[PGobject]
+            oprleft = json.\("oprleft").as[/* oid */ Long],
+            oprright = json.\("oprright").as[/* oid */ Long],
+            oprresult = json.\("oprresult").as[/* oid */ Long],
+            oprcom = json.\("oprcom").as[/* oid */ Long],
+            oprnegate = json.\("oprnegate").as[/* oid */ Long],
+            oprcode = json.\("oprcode").as[/* regproc */ PGobject],
+            oprrest = json.\("oprrest").as[/* regproc */ PGobject],
+            oprjoin = json.\("oprjoin").as[/* regproc */ PGobject]
           )
         )
       )

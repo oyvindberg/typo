@@ -20,12 +20,12 @@ import scala.util.Try
 case class PgRewriteRow(
   oid: PgRewriteId,
   rulename: String,
-  evClass: Long,
+  evClass: /* oid */ Long,
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: PGobject,
-  evAction: PGobject
+  evQual: /* pg_node_tree */ PGobject,
+  evAction: /* pg_node_tree */ PGobject
 )
 
 object PgRewriteRow {
@@ -34,12 +34,12 @@ object PgRewriteRow {
       PgRewriteRow(
         oid = row[PgRewriteId](prefix + "oid"),
         rulename = row[String](prefix + "rulename"),
-        evClass = row[Long](prefix + "ev_class"),
+        evClass = row[/* oid */ Long](prefix + "ev_class"),
         evType = row[String](prefix + "ev_type"),
         evEnabled = row[String](prefix + "ev_enabled"),
         isInstead = row[Boolean](prefix + "is_instead"),
-        evQual = row[PGobject](prefix + "ev_qual"),
-        evAction = row[PGobject](prefix + "ev_action")
+        evQual = row[/* pg_node_tree */ PGobject](prefix + "ev_qual"),
+        evAction = row[/* pg_node_tree */ PGobject](prefix + "ev_action")
       )
     )
   }
@@ -63,12 +63,12 @@ object PgRewriteRow {
           PgRewriteRow(
             oid = json.\("oid").as[PgRewriteId],
             rulename = json.\("rulename").as[String],
-            evClass = json.\("ev_class").as[Long],
+            evClass = json.\("ev_class").as[/* oid */ Long],
             evType = json.\("ev_type").as[String],
             evEnabled = json.\("ev_enabled").as[String],
             isInstead = json.\("is_instead").as[Boolean],
-            evQual = json.\("ev_qual").as[PGobject],
-            evAction = json.\("ev_action").as[PGobject]
+            evQual = json.\("ev_qual").as[/* pg_node_tree */ PGobject],
+            evAction = json.\("ev_action").as[/* pg_node_tree */ PGobject]
           )
         )
       )

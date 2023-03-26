@@ -17,10 +17,10 @@ import scala.util.Try
 
 case class PgForeignDataWrapperRowUnsaved(
   fdwname: String,
-  fdwowner: Long,
-  fdwhandler: Long,
-  fdwvalidator: Long,
-  fdwacl: Option[Array[PGobject]],
+  fdwowner: /* oid */ Long,
+  fdwhandler: /* oid */ Long,
+  fdwvalidator: /* oid */ Long,
+  fdwacl: Option[Array[/* aclitem */ PGobject]],
   fdwoptions: Option[Array[String]]
 )
 object PgForeignDataWrapperRowUnsaved {
@@ -40,10 +40,10 @@ object PgForeignDataWrapperRowUnsaved {
         Try(
           PgForeignDataWrapperRowUnsaved(
             fdwname = json.\("fdwname").as[String],
-            fdwowner = json.\("fdwowner").as[Long],
-            fdwhandler = json.\("fdwhandler").as[Long],
-            fdwvalidator = json.\("fdwvalidator").as[Long],
-            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[PGobject]]),
+            fdwowner = json.\("fdwowner").as[/* oid */ Long],
+            fdwhandler = json.\("fdwhandler").as[/* oid */ Long],
+            fdwvalidator = json.\("fdwvalidator").as[/* oid */ Long],
+            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
           )
         )

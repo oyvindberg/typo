@@ -18,9 +18,9 @@ import scala.util.Try
 
 case class PgSubscriptionRow(
   oid: PgSubscriptionId,
-  subdbid: Long,
+  subdbid: /* oid */ Long,
   subname: String,
-  subowner: Long,
+  subowner: /* oid */ Long,
   subenabled: Boolean,
   subbinary: Boolean,
   substream: Boolean,
@@ -35,9 +35,9 @@ object PgSubscriptionRow {
     Success(
       PgSubscriptionRow(
         oid = row[PgSubscriptionId](prefix + "oid"),
-        subdbid = row[Long](prefix + "subdbid"),
+        subdbid = row[/* oid */ Long](prefix + "subdbid"),
         subname = row[String](prefix + "subname"),
-        subowner = row[Long](prefix + "subowner"),
+        subowner = row[/* oid */ Long](prefix + "subowner"),
         subenabled = row[Boolean](prefix + "subenabled"),
         subbinary = row[Boolean](prefix + "subbinary"),
         substream = row[Boolean](prefix + "substream"),
@@ -70,9 +70,9 @@ object PgSubscriptionRow {
         Try(
           PgSubscriptionRow(
             oid = json.\("oid").as[PgSubscriptionId],
-            subdbid = json.\("subdbid").as[Long],
+            subdbid = json.\("subdbid").as[/* oid */ Long],
             subname = json.\("subname").as[String],
-            subowner = json.\("subowner").as[Long],
+            subowner = json.\("subowner").as[/* oid */ Long],
             subenabled = json.\("subenabled").as[Boolean],
             subbinary = json.\("subbinary").as[Boolean],
             substream = json.\("substream").as[Boolean],

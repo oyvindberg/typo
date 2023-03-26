@@ -16,7 +16,7 @@ import scala.util.Try
 
 case class PgPublicationRowUnsaved(
   pubname: String,
-  pubowner: Long,
+  pubowner: /* oid */ Long,
   puballtables: Boolean,
   pubinsert: Boolean,
   pubupdate: Boolean,
@@ -43,7 +43,7 @@ object PgPublicationRowUnsaved {
         Try(
           PgPublicationRowUnsaved(
             pubname = json.\("pubname").as[String],
-            pubowner = json.\("pubowner").as[Long],
+            pubowner = json.\("pubowner").as[/* oid */ Long],
             puballtables = json.\("puballtables").as[Boolean],
             pubinsert = json.\("pubinsert").as[Boolean],
             pubupdate = json.\("pubupdate").as[Boolean],

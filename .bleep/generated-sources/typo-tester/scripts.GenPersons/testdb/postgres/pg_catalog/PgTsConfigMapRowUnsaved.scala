@@ -15,7 +15,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTsConfigMapRowUnsaved(
-  mapdict: Long
+  mapdict: /* oid */ Long
 )
 object PgTsConfigMapRowUnsaved {
   implicit val oFormat: OFormat[PgTsConfigMapRowUnsaved] = new OFormat[PgTsConfigMapRowUnsaved]{
@@ -28,7 +28,7 @@ object PgTsConfigMapRowUnsaved {
       JsResult.fromTry(
         Try(
           PgTsConfigMapRowUnsaved(
-            mapdict = json.\("mapdict").as[Long]
+            mapdict = json.\("mapdict").as[/* oid */ Long]
           )
         )
       )

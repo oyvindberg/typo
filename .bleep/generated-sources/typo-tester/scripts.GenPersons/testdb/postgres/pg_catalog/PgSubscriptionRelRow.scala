@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSubscriptionRelRow(
-  srsubid: Long,
-  srrelid: Long,
+  srsubid: /* oid */ Long,
+  srrelid: /* oid */ Long,
   srsubstate: String,
   srsublsn: Option[String]
 ){
@@ -29,8 +29,8 @@ object PgSubscriptionRelRow {
   def rowParser(prefix: String): RowParser[PgSubscriptionRelRow] = { row =>
     Success(
       PgSubscriptionRelRow(
-        srsubid = row[Long](prefix + "srsubid"),
-        srrelid = row[Long](prefix + "srrelid"),
+        srsubid = row[/* oid */ Long](prefix + "srsubid"),
+        srrelid = row[/* oid */ Long](prefix + "srrelid"),
         srsubstate = row[String](prefix + "srsubstate"),
         srsublsn = row[Option[String]](prefix + "srsublsn")
       )
@@ -50,8 +50,8 @@ object PgSubscriptionRelRow {
       JsResult.fromTry(
         Try(
           PgSubscriptionRelRow(
-            srsubid = json.\("srsubid").as[Long],
-            srrelid = json.\("srrelid").as[Long],
+            srsubid = json.\("srsubid").as[/* oid */ Long],
+            srrelid = json.\("srrelid").as[/* oid */ Long],
             srsubstate = json.\("srsubstate").as[String],
             srsublsn = json.\("srsublsn").toOption.map(_.as[String])
           )

@@ -19,9 +19,9 @@ import scala.util.Try
 
 case class PgAttrdefRow(
   oid: PgAttrdefId,
-  adrelid: Long,
+  adrelid: /* oid */ Long,
   adnum: Int,
-  adbin: PGobject
+  adbin: /* pg_node_tree */ PGobject
 )
 
 object PgAttrdefRow {
@@ -29,9 +29,9 @@ object PgAttrdefRow {
     Success(
       PgAttrdefRow(
         oid = row[PgAttrdefId](prefix + "oid"),
-        adrelid = row[Long](prefix + "adrelid"),
+        adrelid = row[/* oid */ Long](prefix + "adrelid"),
         adnum = row[Int](prefix + "adnum"),
-        adbin = row[PGobject](prefix + "adbin")
+        adbin = row[/* pg_node_tree */ PGobject](prefix + "adbin")
       )
     )
   }
@@ -50,9 +50,9 @@ object PgAttrdefRow {
         Try(
           PgAttrdefRow(
             oid = json.\("oid").as[PgAttrdefId],
-            adrelid = json.\("adrelid").as[Long],
+            adrelid = json.\("adrelid").as[/* oid */ Long],
             adnum = json.\("adnum").as[Int],
-            adbin = json.\("adbin").as[PGobject]
+            adbin = json.\("adbin").as[/* pg_node_tree */ PGobject]
           )
         )
       )

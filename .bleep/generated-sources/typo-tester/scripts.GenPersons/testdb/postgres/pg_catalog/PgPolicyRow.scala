@@ -20,12 +20,12 @@ import scala.util.Try
 case class PgPolicyRow(
   oid: PgPolicyId,
   polname: String,
-  polrelid: Long,
+  polrelid: /* oid */ Long,
   polcmd: String,
   polpermissive: Boolean,
-  polroles: Array[Long],
-  polqual: Option[PGobject],
-  polwithcheck: Option[PGobject]
+  polroles: Array[/* oid */ Long],
+  polqual: Option[/* pg_node_tree */ PGobject],
+  polwithcheck: Option[/* pg_node_tree */ PGobject]
 )
 
 object PgPolicyRow {
@@ -34,12 +34,12 @@ object PgPolicyRow {
       PgPolicyRow(
         oid = row[PgPolicyId](prefix + "oid"),
         polname = row[String](prefix + "polname"),
-        polrelid = row[Long](prefix + "polrelid"),
+        polrelid = row[/* oid */ Long](prefix + "polrelid"),
         polcmd = row[String](prefix + "polcmd"),
         polpermissive = row[Boolean](prefix + "polpermissive"),
-        polroles = row[Array[Long]](prefix + "polroles"),
-        polqual = row[Option[PGobject]](prefix + "polqual"),
-        polwithcheck = row[Option[PGobject]](prefix + "polwithcheck")
+        polroles = row[Array[/* oid */ Long]](prefix + "polroles"),
+        polqual = row[Option[/* pg_node_tree */ PGobject]](prefix + "polqual"),
+        polwithcheck = row[Option[/* pg_node_tree */ PGobject]](prefix + "polwithcheck")
       )
     )
   }
@@ -63,12 +63,12 @@ object PgPolicyRow {
           PgPolicyRow(
             oid = json.\("oid").as[PgPolicyId],
             polname = json.\("polname").as[String],
-            polrelid = json.\("polrelid").as[Long],
+            polrelid = json.\("polrelid").as[/* oid */ Long],
             polcmd = json.\("polcmd").as[String],
             polpermissive = json.\("polpermissive").as[Boolean],
-            polroles = json.\("polroles").as[Array[Long]],
-            polqual = json.\("polqual").toOption.map(_.as[PGobject]),
-            polwithcheck = json.\("polwithcheck").toOption.map(_.as[PGobject])
+            polroles = json.\("polroles").as[Array[/* oid */ Long]],
+            polqual = json.\("polqual").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            polwithcheck = json.\("polwithcheck").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

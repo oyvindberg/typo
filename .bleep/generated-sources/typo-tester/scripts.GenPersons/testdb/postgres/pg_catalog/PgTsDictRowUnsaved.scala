@@ -16,9 +16,9 @@ import scala.util.Try
 
 case class PgTsDictRowUnsaved(
   dictname: String,
-  dictnamespace: Long,
-  dictowner: Long,
-  dicttemplate: Long,
+  dictnamespace: /* oid */ Long,
+  dictowner: /* oid */ Long,
+  dicttemplate: /* oid */ Long,
   dictinitoption: Option[String]
 )
 object PgTsDictRowUnsaved {
@@ -37,9 +37,9 @@ object PgTsDictRowUnsaved {
         Try(
           PgTsDictRowUnsaved(
             dictname = json.\("dictname").as[String],
-            dictnamespace = json.\("dictnamespace").as[Long],
-            dictowner = json.\("dictowner").as[Long],
-            dicttemplate = json.\("dicttemplate").as[Long],
+            dictnamespace = json.\("dictnamespace").as[/* oid */ Long],
+            dictowner = json.\("dictowner").as[/* oid */ Long],
+            dicttemplate = json.\("dicttemplate").as[/* oid */ Long],
             dictinitoption = json.\("dictinitoption").toOption.map(_.as[String])
           )
         )

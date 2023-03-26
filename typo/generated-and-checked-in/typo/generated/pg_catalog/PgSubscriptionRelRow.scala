@@ -19,8 +19,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSubscriptionRelRow(
-  srsubid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srsubid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  srrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srrelid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  srsubid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srsubid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  srrelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srrelid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   srsubstate: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srsubstate","ordinal_position":3,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   srsublsn: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription_rel","column_name":"srsublsn","ordinal_position":4,"is_nullable":"YES","data_type":"pg_lsn","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_lsn","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
@@ -31,8 +31,8 @@ object PgSubscriptionRelRow {
   def rowParser(prefix: String): RowParser[PgSubscriptionRelRow] = { row =>
     Success(
       PgSubscriptionRelRow(
-        srsubid = row[Long](prefix + "srsubid"),
-        srrelid = row[Long](prefix + "srrelid"),
+        srsubid = row[/* oid */ Long](prefix + "srsubid"),
+        srrelid = row[/* oid */ Long](prefix + "srrelid"),
         srsubstate = row[String](prefix + "srsubstate"),
         srsublsn = row[Option[String]](prefix + "srsublsn")
       )
@@ -52,8 +52,8 @@ object PgSubscriptionRelRow {
       JsResult.fromTry(
         Try(
           PgSubscriptionRelRow(
-            srsubid = json.\("srsubid").as[Long],
-            srrelid = json.\("srrelid").as[Long],
+            srsubid = json.\("srsubid").as[/* oid */ Long],
+            srrelid = json.\("srrelid").as[/* oid */ Long],
             srsubstate = json.\("srsubstate").as[String],
             srsublsn = json.\("srsublsn").toOption.map(_.as[String])
           )

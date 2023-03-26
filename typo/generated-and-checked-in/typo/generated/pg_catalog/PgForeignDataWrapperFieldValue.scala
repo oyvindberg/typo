@@ -16,9 +16,9 @@ sealed abstract class PgForeignDataWrapperFieldValue[T](val name: String, val va
 object PgForeignDataWrapperFieldValue {
   case class oid(override val value: PgForeignDataWrapperId) extends PgForeignDataWrapperFieldValue("oid", value)
   case class fdwname(override val value: String) extends PgForeignDataWrapperFieldValue("fdwname", value)
-  case class fdwowner(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwowner", value)
-  case class fdwhandler(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwhandler", value)
-  case class fdwvalidator(override val value: Long) extends PgForeignDataWrapperFieldValue("fdwvalidator", value)
-  case class fdwacl(override val value: Option[Array[PGobject]]) extends PgForeignDataWrapperFieldValue("fdwacl", value)
+  case class fdwowner(override val value: /* oid */ Long) extends PgForeignDataWrapperFieldValue("fdwowner", value)
+  case class fdwhandler(override val value: /* oid */ Long) extends PgForeignDataWrapperFieldValue("fdwhandler", value)
+  case class fdwvalidator(override val value: /* oid */ Long) extends PgForeignDataWrapperFieldValue("fdwvalidator", value)
+  case class fdwacl(override val value: Option[Array[/* aclitem */ PGobject]]) extends PgForeignDataWrapperFieldValue("fdwacl", value)
   case class fdwoptions(override val value: Option[Array[String]]) extends PgForeignDataWrapperFieldValue("fdwoptions", value)
 }

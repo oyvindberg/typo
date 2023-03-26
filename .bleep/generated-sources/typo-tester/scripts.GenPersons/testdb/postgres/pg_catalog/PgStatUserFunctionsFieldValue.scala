@@ -12,7 +12,7 @@ package pg_catalog
 sealed abstract class PgStatUserFunctionsFieldValue[T](val name: String, val value: T)
 
 object PgStatUserFunctionsFieldValue {
-  case class funcid(override val value: Option[Long]) extends PgStatUserFunctionsFieldValue("funcid", value)
+  case class funcid(override val value: Option[/* oid */ Long]) extends PgStatUserFunctionsFieldValue("funcid", value)
   case class schemaname(override val value: Option[String]) extends PgStatUserFunctionsFieldValue("schemaname", value)
   case class funcname(override val value: Option[String]) extends PgStatUserFunctionsFieldValue("funcname", value)
   case class calls(override val value: Option[Long]) extends PgStatUserFunctionsFieldValue("calls", value)

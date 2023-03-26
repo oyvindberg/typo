@@ -19,8 +19,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgShdescriptionRow(
-  objoid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"objoid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  classoid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"classoid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  objoid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"objoid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  classoid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"classoid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   description: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_shdescription","column_name":"description","ordinal_position":3,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgShdescriptionId = PgShdescriptionId(objoid, classoid)
@@ -30,8 +30,8 @@ object PgShdescriptionRow {
   def rowParser(prefix: String): RowParser[PgShdescriptionRow] = { row =>
     Success(
       PgShdescriptionRow(
-        objoid = row[Long](prefix + "objoid"),
-        classoid = row[Long](prefix + "classoid"),
+        objoid = row[/* oid */ Long](prefix + "objoid"),
+        classoid = row[/* oid */ Long](prefix + "classoid"),
         description = row[String](prefix + "description")
       )
     )
@@ -49,8 +49,8 @@ object PgShdescriptionRow {
       JsResult.fromTry(
         Try(
           PgShdescriptionRow(
-            objoid = json.\("objoid").as[Long],
-            classoid = json.\("classoid").as[Long],
+            objoid = json.\("objoid").as[/* oid */ Long],
+            classoid = json.\("classoid").as[/* oid */ Long],
             description = json.\("description").as[String]
           )
         )

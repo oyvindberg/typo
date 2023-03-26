@@ -19,13 +19,13 @@ import scala.util.Try
 
 case class PgProcRowUnsaved(
   proname: String,
-  pronamespace: Long,
-  proowner: Long,
-  prolang: Long,
+  pronamespace: /* oid */ Long,
+  proowner: /* oid */ Long,
+  prolang: /* oid */ Long,
   procost: Float,
   prorows: Float,
-  provariadic: Long,
-  prosupport: PGobject,
+  provariadic: /* oid */ Long,
+  prosupport: /* regproc */ PGobject,
   prokind: String,
   prosecdef: Boolean,
   proleakproof: Boolean,
@@ -35,18 +35,18 @@ case class PgProcRowUnsaved(
   proparallel: String,
   pronargs: Int,
   pronargdefaults: Int,
-  prorettype: Long,
-  proargtypes: PGobject,
-  proallargtypes: Option[Array[Long]],
+  prorettype: /* oid */ Long,
+  proargtypes: /* oidvector */ PGobject,
+  proallargtypes: Option[Array[/* oid */ Long]],
   proargmodes: Option[Array[String]],
   proargnames: Option[Array[String]],
-  proargdefaults: Option[PGobject],
-  protrftypes: Option[Array[Long]],
+  proargdefaults: Option[/* pg_node_tree */ PGobject],
+  protrftypes: Option[Array[/* oid */ Long]],
   prosrc: String,
   probin: Option[String],
-  prosqlbody: Option[PGobject],
+  prosqlbody: Option[/* pg_node_tree */ PGobject],
   proconfig: Option[Array[String]],
-  proacl: Option[Array[PGobject]]
+  proacl: Option[Array[/* aclitem */ PGobject]]
 )
 object PgProcRowUnsaved {
   implicit val oFormat: OFormat[PgProcRowUnsaved] = new OFormat[PgProcRowUnsaved]{
@@ -88,13 +88,13 @@ object PgProcRowUnsaved {
         Try(
           PgProcRowUnsaved(
             proname = json.\("proname").as[String],
-            pronamespace = json.\("pronamespace").as[Long],
-            proowner = json.\("proowner").as[Long],
-            prolang = json.\("prolang").as[Long],
+            pronamespace = json.\("pronamespace").as[/* oid */ Long],
+            proowner = json.\("proowner").as[/* oid */ Long],
+            prolang = json.\("prolang").as[/* oid */ Long],
             procost = json.\("procost").as[Float],
             prorows = json.\("prorows").as[Float],
-            provariadic = json.\("provariadic").as[Long],
-            prosupport = json.\("prosupport").as[PGobject],
+            provariadic = json.\("provariadic").as[/* oid */ Long],
+            prosupport = json.\("prosupport").as[/* regproc */ PGobject],
             prokind = json.\("prokind").as[String],
             prosecdef = json.\("prosecdef").as[Boolean],
             proleakproof = json.\("proleakproof").as[Boolean],
@@ -104,18 +104,18 @@ object PgProcRowUnsaved {
             proparallel = json.\("proparallel").as[String],
             pronargs = json.\("pronargs").as[Int],
             pronargdefaults = json.\("pronargdefaults").as[Int],
-            prorettype = json.\("prorettype").as[Long],
-            proargtypes = json.\("proargtypes").as[PGobject],
-            proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[Long]]),
+            prorettype = json.\("prorettype").as[/* oid */ Long],
+            proargtypes = json.\("proargtypes").as[/* oidvector */ PGobject],
+            proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[/* oid */ Long]]),
             proargmodes = json.\("proargmodes").toOption.map(_.as[Array[String]]),
             proargnames = json.\("proargnames").toOption.map(_.as[Array[String]]),
-            proargdefaults = json.\("proargdefaults").toOption.map(_.as[PGobject]),
-            protrftypes = json.\("protrftypes").toOption.map(_.as[Array[Long]]),
+            proargdefaults = json.\("proargdefaults").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            protrftypes = json.\("protrftypes").toOption.map(_.as[Array[/* oid */ Long]]),
             prosrc = json.\("prosrc").as[String],
             probin = json.\("probin").toOption.map(_.as[String]),
-            prosqlbody = json.\("prosqlbody").toOption.map(_.as[PGobject]),
+            prosqlbody = json.\("prosqlbody").toOption.map(_.as[/* pg_node_tree */ PGobject]),
             proconfig = json.\("proconfig").toOption.map(_.as[Array[String]]),
-            proacl = json.\("proacl").toOption.map(_.as[Array[PGobject]])
+            proacl = json.\("proacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

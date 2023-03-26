@@ -19,8 +19,8 @@ import scala.util.Try
 
 case class PgTablespaceRowUnsaved(
   spcname: String,
-  spcowner: Long,
-  spcacl: Option[Array[PGobject]],
+  spcowner: /* oid */ Long,
+  spcacl: Option[Array[/* aclitem */ PGobject]],
   spcoptions: Option[Array[String]]
 )
 object PgTablespaceRowUnsaved {
@@ -38,8 +38,8 @@ object PgTablespaceRowUnsaved {
         Try(
           PgTablespaceRowUnsaved(
             spcname = json.\("spcname").as[String],
-            spcowner = json.\("spcowner").as[Long],
-            spcacl = json.\("spcacl").toOption.map(_.as[Array[PGobject]]),
+            spcowner = json.\("spcowner").as[/* oid */ Long],
+            spcacl = json.\("spcacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
           )
         )

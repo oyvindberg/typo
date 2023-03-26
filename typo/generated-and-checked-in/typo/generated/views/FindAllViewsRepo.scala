@@ -7,10 +7,10 @@
  */
 package typo
 package generated
+package views
 
 import java.sql.Connection
 
-trait FindViewsRepo {
-  def selectAll(implicit c: Connection): List[FindViewsRow]
-  def selectByFieldValues(fieldValues: List[FindViewsFieldValue[_]])(implicit c: Connection): List[FindViewsRow]
+trait FindAllViewsRepo {
+  def apply()(implicit c: Connection): List[FindAllViewsRow]
 }

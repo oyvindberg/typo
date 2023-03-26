@@ -27,11 +27,11 @@ case class PgStatsExtExprsRow(
   nullFrac: Option[Float],
   avgWidth: Option[Int],
   nDistinct: Option[Float],
-  mostCommonVals: Option[PGobject],
+  mostCommonVals: Option[/* anyarray */ PGobject],
   mostCommonFreqs: Option[Array[Float]],
-  histogramBounds: Option[PGobject],
+  histogramBounds: Option[/* anyarray */ PGobject],
   correlation: Option[Float],
-  mostCommonElems: Option[PGobject],
+  mostCommonElems: Option[/* anyarray */ PGobject],
   mostCommonElemFreqs: Option[Array[Float]],
   elemCountHistogram: Option[Array[Float]]
 )
@@ -49,11 +49,11 @@ object PgStatsExtExprsRow {
         nullFrac = row[Option[Float]](prefix + "null_frac"),
         avgWidth = row[Option[Int]](prefix + "avg_width"),
         nDistinct = row[Option[Float]](prefix + "n_distinct"),
-        mostCommonVals = row[Option[PGobject]](prefix + "most_common_vals"),
+        mostCommonVals = row[Option[/* anyarray */ PGobject]](prefix + "most_common_vals"),
         mostCommonFreqs = row[Option[Array[Float]]](prefix + "most_common_freqs"),
-        histogramBounds = row[Option[PGobject]](prefix + "histogram_bounds"),
+        histogramBounds = row[Option[/* anyarray */ PGobject]](prefix + "histogram_bounds"),
         correlation = row[Option[Float]](prefix + "correlation"),
-        mostCommonElems = row[Option[PGobject]](prefix + "most_common_elems"),
+        mostCommonElems = row[Option[/* anyarray */ PGobject]](prefix + "most_common_elems"),
         mostCommonElemFreqs = row[Option[Array[Float]]](prefix + "most_common_elem_freqs"),
         elemCountHistogram = row[Option[Array[Float]]](prefix + "elem_count_histogram")
       )
@@ -94,11 +94,11 @@ object PgStatsExtExprsRow {
             nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
             avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
             nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
-            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[PGobject]),
+            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[/* anyarray */ PGobject]),
             mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
-            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[PGobject]),
+            histogramBounds = json.\("histogram_bounds").toOption.map(_.as[/* anyarray */ PGobject]),
             correlation = json.\("correlation").toOption.map(_.as[Float]),
-            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[PGobject]),
+            mostCommonElems = json.\("most_common_elems").toOption.map(_.as[/* anyarray */ PGobject]),
             mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
             elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
           )

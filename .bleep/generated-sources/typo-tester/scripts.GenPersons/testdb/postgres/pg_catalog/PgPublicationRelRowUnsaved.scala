@@ -15,8 +15,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPublicationRelRowUnsaved(
-  prpubid: Long,
-  prrelid: Long
+  prpubid: /* oid */ Long,
+  prrelid: /* oid */ Long
 )
 object PgPublicationRelRowUnsaved {
   implicit val oFormat: OFormat[PgPublicationRelRowUnsaved] = new OFormat[PgPublicationRelRowUnsaved]{
@@ -30,8 +30,8 @@ object PgPublicationRelRowUnsaved {
       JsResult.fromTry(
         Try(
           PgPublicationRelRowUnsaved(
-            prpubid = json.\("prpubid").as[Long],
-            prrelid = json.\("prrelid").as[Long]
+            prpubid = json.\("prpubid").as[/* oid */ Long],
+            prrelid = json.\("prrelid").as[/* oid */ Long]
           )
         )
       )

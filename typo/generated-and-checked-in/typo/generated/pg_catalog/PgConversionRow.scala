@@ -22,11 +22,11 @@ import scala.util.Try
 case class PgConversionRow(
   oid: PgConversionId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   conname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  connamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"connamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  conowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  connamespace: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"connamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  conowner: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   conforencoding: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conforencoding","ordinal_position":5,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   contoencoding: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"contoencoding","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  conproc: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conproc","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  conproc: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"conproc","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   condefault: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_conversion","column_name":"condefault","ordinal_position":8,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
@@ -36,11 +36,11 @@ object PgConversionRow {
       PgConversionRow(
         oid = row[PgConversionId](prefix + "oid"),
         conname = row[String](prefix + "conname"),
-        connamespace = row[Long](prefix + "connamespace"),
-        conowner = row[Long](prefix + "conowner"),
+        connamespace = row[/* oid */ Long](prefix + "connamespace"),
+        conowner = row[/* oid */ Long](prefix + "conowner"),
         conforencoding = row[Int](prefix + "conforencoding"),
         contoencoding = row[Int](prefix + "contoencoding"),
-        conproc = row[PGobject](prefix + "conproc"),
+        conproc = row[/* regproc */ PGobject](prefix + "conproc"),
         condefault = row[Boolean](prefix + "condefault")
       )
     )
@@ -65,11 +65,11 @@ object PgConversionRow {
           PgConversionRow(
             oid = json.\("oid").as[PgConversionId],
             conname = json.\("conname").as[String],
-            connamespace = json.\("connamespace").as[Long],
-            conowner = json.\("conowner").as[Long],
+            connamespace = json.\("connamespace").as[/* oid */ Long],
+            conowner = json.\("conowner").as[/* oid */ Long],
             conforencoding = json.\("conforencoding").as[Int],
             contoencoding = json.\("contoencoding").as[Int],
-            conproc = json.\("conproc").as[PGobject],
+            conproc = json.\("conproc").as[/* regproc */ PGobject],
             condefault = json.\("condefault").as[Boolean]
           )
         )

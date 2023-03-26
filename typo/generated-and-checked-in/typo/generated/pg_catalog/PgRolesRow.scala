@@ -32,7 +32,7 @@ case class PgRolesRow(
   rolvaliduntil: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolvaliduntil","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   rolbypassrls: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolbypassrls","ordinal_position":11,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   rolconfig: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"rolconfig","ordinal_position":12,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"oid","ordinal_position":13,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
+  oid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_roles","column_name":"oid","ordinal_position":13,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object PgRolesRow {
@@ -51,7 +51,7 @@ object PgRolesRow {
         rolvaliduntil = row[Option[ZonedDateTime]](prefix + "rolvaliduntil"),
         rolbypassrls = row[Option[Boolean]](prefix + "rolbypassrls"),
         rolconfig = row[Option[Array[String]]](prefix + "rolconfig"),
-        oid = row[Option[Long]](prefix + "oid")
+        oid = row[Option[/* oid */ Long]](prefix + "oid")
       )
     )
   }
@@ -90,7 +90,7 @@ object PgRolesRow {
             rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[ZonedDateTime]),
             rolbypassrls = json.\("rolbypassrls").toOption.map(_.as[Boolean]),
             rolconfig = json.\("rolconfig").toOption.map(_.as[Array[String]]),
-            oid = json.\("oid").toOption.map(_.as[Long])
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long])
           )
         )
       )

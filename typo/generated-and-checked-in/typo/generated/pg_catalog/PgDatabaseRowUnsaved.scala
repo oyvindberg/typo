@@ -19,18 +19,18 @@ import scala.util.Try
 
 case class PgDatabaseRowUnsaved(
   datname: String,
-  datdba: Long,
+  datdba: /* oid */ Long,
   encoding: Int,
   datcollate: String,
   datctype: String,
   datistemplate: Boolean,
   datallowconn: Boolean,
   datconnlimit: Int,
-  datlastsysoid: Long,
-  datfrozenxid: PGobject,
-  datminmxid: PGobject,
-  dattablespace: Long,
-  datacl: Option[Array[PGobject]]
+  datlastsysoid: /* oid */ Long,
+  datfrozenxid: /* xid */ PGobject,
+  datminmxid: /* xid */ PGobject,
+  dattablespace: /* oid */ Long,
+  datacl: Option[Array[/* aclitem */ PGobject]]
 )
 object PgDatabaseRowUnsaved {
   implicit val oFormat: OFormat[PgDatabaseRowUnsaved] = new OFormat[PgDatabaseRowUnsaved]{
@@ -56,18 +56,18 @@ object PgDatabaseRowUnsaved {
         Try(
           PgDatabaseRowUnsaved(
             datname = json.\("datname").as[String],
-            datdba = json.\("datdba").as[Long],
+            datdba = json.\("datdba").as[/* oid */ Long],
             encoding = json.\("encoding").as[Int],
             datcollate = json.\("datcollate").as[String],
             datctype = json.\("datctype").as[String],
             datistemplate = json.\("datistemplate").as[Boolean],
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
-            datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[PGobject],
-            datminmxid = json.\("datminmxid").as[PGobject],
-            dattablespace = json.\("dattablespace").as[Long],
-            datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
+            datlastsysoid = json.\("datlastsysoid").as[/* oid */ Long],
+            datfrozenxid = json.\("datfrozenxid").as[/* xid */ PGobject],
+            datminmxid = json.\("datminmxid").as[/* xid */ PGobject],
+            dattablespace = json.\("dattablespace").as[/* oid */ Long],
+            datacl = json.\("datacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

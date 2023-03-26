@@ -17,9 +17,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingsRow(
-  oid: Option[Long],
+  oid: Option[/* oid */ Long],
   umoptions: Option[Array[String]],
-  umuser: Option[Long],
+  umuser: Option[/* oid */ Long],
   authorizationIdentifier: Option[String],
   foreignServerCatalog: Option[String],
   foreignServerName: Option[String],
@@ -30,9 +30,9 @@ object PgUserMappingsRow {
   def rowParser(prefix: String): RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        oid = row[Option[Long]](prefix + "oid"),
+        oid = row[Option[/* oid */ Long]](prefix + "oid"),
         umoptions = row[Option[Array[String]]](prefix + "umoptions"),
-        umuser = row[Option[Long]](prefix + "umuser"),
+        umuser = row[Option[/* oid */ Long]](prefix + "umuser"),
         authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier"),
         foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
         foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
@@ -57,9 +57,9 @@ object PgUserMappingsRow {
       JsResult.fromTry(
         Try(
           PgUserMappingsRow(
-            oid = json.\("oid").toOption.map(_.as[Long]),
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
-            umuser = json.\("umuser").toOption.map(_.as[Long]),
+            umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
             authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[String]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

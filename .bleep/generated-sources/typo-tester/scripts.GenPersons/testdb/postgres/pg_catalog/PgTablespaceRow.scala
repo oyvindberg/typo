@@ -20,8 +20,8 @@ import scala.util.Try
 case class PgTablespaceRow(
   oid: PgTablespaceId,
   spcname: String,
-  spcowner: Long,
-  spcacl: Option[Array[PGobject]],
+  spcowner: /* oid */ Long,
+  spcacl: Option[Array[/* aclitem */ PGobject]],
   spcoptions: Option[Array[String]]
 )
 
@@ -31,8 +31,8 @@ object PgTablespaceRow {
       PgTablespaceRow(
         oid = row[PgTablespaceId](prefix + "oid"),
         spcname = row[String](prefix + "spcname"),
-        spcowner = row[Long](prefix + "spcowner"),
-        spcacl = row[Option[Array[PGobject]]](prefix + "spcacl"),
+        spcowner = row[/* oid */ Long](prefix + "spcowner"),
+        spcacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "spcacl"),
         spcoptions = row[Option[Array[String]]](prefix + "spcoptions")
       )
     )
@@ -54,8 +54,8 @@ object PgTablespaceRow {
           PgTablespaceRow(
             oid = json.\("oid").as[PgTablespaceId],
             spcname = json.\("spcname").as[String],
-            spcowner = json.\("spcowner").as[Long],
-            spcacl = json.\("spcacl").toOption.map(_.as[Array[PGobject]]),
+            spcowner = json.\("spcowner").as[/* oid */ Long],
+            spcacl = json.\("spcacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
           )
         )

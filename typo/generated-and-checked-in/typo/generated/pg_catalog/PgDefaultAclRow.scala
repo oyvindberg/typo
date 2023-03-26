@@ -21,10 +21,10 @@ import scala.util.Try
 
 case class PgDefaultAclRow(
   oid: PgDefaultAclId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  defaclrole: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclrole","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  defaclnamespace: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  defaclrole: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclrole","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  defaclnamespace: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclnamespace","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   defaclobjtype: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclobjtype","ordinal_position":4,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  defaclacl: Array[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclacl","ordinal_position":5,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  defaclacl: Array[/* aclitem */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_default_acl","column_name":"defaclacl","ordinal_position":5,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgDefaultAclRow {
@@ -32,10 +32,10 @@ object PgDefaultAclRow {
     Success(
       PgDefaultAclRow(
         oid = row[PgDefaultAclId](prefix + "oid"),
-        defaclrole = row[Long](prefix + "defaclrole"),
-        defaclnamespace = row[Long](prefix + "defaclnamespace"),
+        defaclrole = row[/* oid */ Long](prefix + "defaclrole"),
+        defaclnamespace = row[/* oid */ Long](prefix + "defaclnamespace"),
         defaclobjtype = row[String](prefix + "defaclobjtype"),
-        defaclacl = row[Array[PGobject]](prefix + "defaclacl")
+        defaclacl = row[Array[/* aclitem */ PGobject]](prefix + "defaclacl")
       )
     )
   }
@@ -55,10 +55,10 @@ object PgDefaultAclRow {
         Try(
           PgDefaultAclRow(
             oid = json.\("oid").as[PgDefaultAclId],
-            defaclrole = json.\("defaclrole").as[Long],
-            defaclnamespace = json.\("defaclnamespace").as[Long],
+            defaclrole = json.\("defaclrole").as[/* oid */ Long],
+            defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
             defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[PGobject]]
+            defaclacl = json.\("defaclacl").as[Array[/* aclitem */ PGobject]]
           )
         )
       )

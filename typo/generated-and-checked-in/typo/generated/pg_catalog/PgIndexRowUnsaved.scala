@@ -18,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgIndexRowUnsaved(
-  indrelid: Long,
+  indrelid: /* oid */ Long,
   indnatts: Int,
   indnkeyatts: Int,
   indisunique: Boolean,
@@ -31,12 +31,12 @@ case class PgIndexRowUnsaved(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: PGobject,
-  indcollation: PGobject,
-  indclass: PGobject,
-  indoption: PGobject,
-  indexprs: Option[PGobject],
-  indpred: Option[PGobject]
+  indkey: /* int2vector */ PGobject,
+  indcollation: /* oidvector */ PGobject,
+  indclass: /* oidvector */ PGobject,
+  indoption: /* int2vector */ PGobject,
+  indexprs: Option[/* pg_node_tree */ PGobject],
+  indpred: Option[/* pg_node_tree */ PGobject]
 )
 object PgIndexRowUnsaved {
   implicit val oFormat: OFormat[PgIndexRowUnsaved] = new OFormat[PgIndexRowUnsaved]{
@@ -67,7 +67,7 @@ object PgIndexRowUnsaved {
       JsResult.fromTry(
         Try(
           PgIndexRowUnsaved(
-            indrelid = json.\("indrelid").as[Long],
+            indrelid = json.\("indrelid").as[/* oid */ Long],
             indnatts = json.\("indnatts").as[Int],
             indnkeyatts = json.\("indnkeyatts").as[Int],
             indisunique = json.\("indisunique").as[Boolean],
@@ -80,12 +80,12 @@ object PgIndexRowUnsaved {
             indisready = json.\("indisready").as[Boolean],
             indislive = json.\("indislive").as[Boolean],
             indisreplident = json.\("indisreplident").as[Boolean],
-            indkey = json.\("indkey").as[PGobject],
-            indcollation = json.\("indcollation").as[PGobject],
-            indclass = json.\("indclass").as[PGobject],
-            indoption = json.\("indoption").as[PGobject],
-            indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
-            indpred = json.\("indpred").toOption.map(_.as[PGobject])
+            indkey = json.\("indkey").as[/* int2vector */ PGobject],
+            indcollation = json.\("indcollation").as[/* oidvector */ PGobject],
+            indclass = json.\("indclass").as[/* oidvector */ PGobject],
+            indoption = json.\("indoption").as[/* int2vector */ PGobject],
+            indexprs = json.\("indexprs").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            indpred = json.\("indpred").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

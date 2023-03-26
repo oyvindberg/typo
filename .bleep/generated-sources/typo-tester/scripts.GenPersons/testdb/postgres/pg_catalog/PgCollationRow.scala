@@ -19,8 +19,8 @@ import scala.util.Try
 case class PgCollationRow(
   oid: PgCollationId,
   collname: String,
-  collnamespace: Long,
-  collowner: Long,
+  collnamespace: /* oid */ Long,
+  collowner: /* oid */ Long,
   collprovider: String,
   collisdeterministic: Boolean,
   collencoding: Int,
@@ -35,8 +35,8 @@ object PgCollationRow {
       PgCollationRow(
         oid = row[PgCollationId](prefix + "oid"),
         collname = row[String](prefix + "collname"),
-        collnamespace = row[Long](prefix + "collnamespace"),
-        collowner = row[Long](prefix + "collowner"),
+        collnamespace = row[/* oid */ Long](prefix + "collnamespace"),
+        collowner = row[/* oid */ Long](prefix + "collowner"),
         collprovider = row[String](prefix + "collprovider"),
         collisdeterministic = row[Boolean](prefix + "collisdeterministic"),
         collencoding = row[Int](prefix + "collencoding"),
@@ -68,8 +68,8 @@ object PgCollationRow {
           PgCollationRow(
             oid = json.\("oid").as[PgCollationId],
             collname = json.\("collname").as[String],
-            collnamespace = json.\("collnamespace").as[Long],
-            collowner = json.\("collowner").as[Long],
+            collnamespace = json.\("collnamespace").as[/* oid */ Long],
+            collowner = json.\("collowner").as[/* oid */ Long],
             collprovider = json.\("collprovider").as[String],
             collisdeterministic = json.\("collisdeterministic").as[Boolean],
             collencoding = json.\("collencoding").as[Int],

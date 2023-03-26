@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatUserFunctionsRow(
-  funcid: Option[Long],
+  funcid: Option[/* oid */ Long],
   schemaname: Option[String],
   funcname: Option[String],
   calls: Option[Long],
@@ -29,7 +29,7 @@ object PgStatUserFunctionsRow {
   def rowParser(prefix: String): RowParser[PgStatUserFunctionsRow] = { row =>
     Success(
       PgStatUserFunctionsRow(
-        funcid = row[Option[Long]](prefix + "funcid"),
+        funcid = row[Option[/* oid */ Long]](prefix + "funcid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         funcname = row[Option[String]](prefix + "funcname"),
         calls = row[Option[Long]](prefix + "calls"),
@@ -54,7 +54,7 @@ object PgStatUserFunctionsRow {
       JsResult.fromTry(
         Try(
           PgStatUserFunctionsRow(
-            funcid = json.\("funcid").toOption.map(_.as[Long]),
+            funcid = json.\("funcid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             funcname = json.\("funcname").toOption.map(_.as[String]),
             calls = json.\("calls").toOption.map(_.as[Long]),

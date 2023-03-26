@@ -17,5 +17,5 @@ trait PgTriggerRepo {
   def updateFieldValues(oid: PgTriggerId, fieldValues: List[PgTriggerFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTriggerId, unsaved: PgTriggerRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTriggerId)(implicit c: Connection): Boolean
-  def selectByUniqueTgrelidTgname(tgrelid: Long, tgname: String)(implicit c: Connection): Option[PgTriggerRow]
+  def selectByUniqueTgrelidTgname(tgrelid: /* oid */ Long, tgname: String)(implicit c: Connection): Option[PgTriggerRow]
 }

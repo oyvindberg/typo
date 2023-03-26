@@ -18,7 +18,7 @@ import scala.util.Try
 
 case class PgEnumRow(
   oid: PgEnumId,
-  enumtypid: Long,
+  enumtypid: /* oid */ Long,
   enumsortorder: Float,
   enumlabel: String
 )
@@ -28,7 +28,7 @@ object PgEnumRow {
     Success(
       PgEnumRow(
         oid = row[PgEnumId](prefix + "oid"),
-        enumtypid = row[Long](prefix + "enumtypid"),
+        enumtypid = row[/* oid */ Long](prefix + "enumtypid"),
         enumsortorder = row[Float](prefix + "enumsortorder"),
         enumlabel = row[String](prefix + "enumlabel")
       )
@@ -49,7 +49,7 @@ object PgEnumRow {
         Try(
           PgEnumRow(
             oid = json.\("oid").as[PgEnumId],
-            enumtypid = json.\("enumtypid").as[Long],
+            enumtypid = json.\("enumtypid").as[/* oid */ Long],
             enumsortorder = json.\("enumsortorder").as[Float],
             enumlabel = json.\("enumlabel").as[String]
           )

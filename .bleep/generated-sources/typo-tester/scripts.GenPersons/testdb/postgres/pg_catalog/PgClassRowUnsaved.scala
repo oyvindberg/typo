@@ -17,17 +17,17 @@ import scala.util.Try
 
 case class PgClassRowUnsaved(
   relname: String,
-  relnamespace: Long,
-  reltype: Long,
-  reloftype: Long,
-  relowner: Long,
-  relam: Long,
-  relfilenode: Long,
-  reltablespace: Long,
+  relnamespace: /* oid */ Long,
+  reltype: /* oid */ Long,
+  reloftype: /* oid */ Long,
+  relowner: /* oid */ Long,
+  relam: /* oid */ Long,
+  relfilenode: /* oid */ Long,
+  reltablespace: /* oid */ Long,
   relpages: Int,
   reltuples: Float,
   relallvisible: Int,
-  reltoastrelid: Long,
+  reltoastrelid: /* oid */ Long,
   relhasindex: Boolean,
   relisshared: Boolean,
   relpersistence: String,
@@ -42,12 +42,12 @@ case class PgClassRowUnsaved(
   relispopulated: Boolean,
   relreplident: String,
   relispartition: Boolean,
-  relrewrite: Long,
-  relfrozenxid: PGobject,
-  relminmxid: PGobject,
-  relacl: Option[Array[PGobject]],
+  relrewrite: /* oid */ Long,
+  relfrozenxid: /* xid */ PGobject,
+  relminmxid: /* xid */ PGobject,
+  relacl: Option[Array[/* aclitem */ PGobject]],
   reloptions: Option[Array[String]],
-  relpartbound: Option[PGobject]
+  relpartbound: Option[/* pg_node_tree */ PGobject]
 )
 object PgClassRowUnsaved {
   implicit val oFormat: OFormat[PgClassRowUnsaved] = new OFormat[PgClassRowUnsaved]{
@@ -92,17 +92,17 @@ object PgClassRowUnsaved {
         Try(
           PgClassRowUnsaved(
             relname = json.\("relname").as[String],
-            relnamespace = json.\("relnamespace").as[Long],
-            reltype = json.\("reltype").as[Long],
-            reloftype = json.\("reloftype").as[Long],
-            relowner = json.\("relowner").as[Long],
-            relam = json.\("relam").as[Long],
-            relfilenode = json.\("relfilenode").as[Long],
-            reltablespace = json.\("reltablespace").as[Long],
+            relnamespace = json.\("relnamespace").as[/* oid */ Long],
+            reltype = json.\("reltype").as[/* oid */ Long],
+            reloftype = json.\("reloftype").as[/* oid */ Long],
+            relowner = json.\("relowner").as[/* oid */ Long],
+            relam = json.\("relam").as[/* oid */ Long],
+            relfilenode = json.\("relfilenode").as[/* oid */ Long],
+            reltablespace = json.\("reltablespace").as[/* oid */ Long],
             relpages = json.\("relpages").as[Int],
             reltuples = json.\("reltuples").as[Float],
             relallvisible = json.\("relallvisible").as[Int],
-            reltoastrelid = json.\("reltoastrelid").as[Long],
+            reltoastrelid = json.\("reltoastrelid").as[/* oid */ Long],
             relhasindex = json.\("relhasindex").as[Boolean],
             relisshared = json.\("relisshared").as[Boolean],
             relpersistence = json.\("relpersistence").as[String],
@@ -117,12 +117,12 @@ object PgClassRowUnsaved {
             relispopulated = json.\("relispopulated").as[Boolean],
             relreplident = json.\("relreplident").as[String],
             relispartition = json.\("relispartition").as[Boolean],
-            relrewrite = json.\("relrewrite").as[Long],
-            relfrozenxid = json.\("relfrozenxid").as[PGobject],
-            relminmxid = json.\("relminmxid").as[PGobject],
-            relacl = json.\("relacl").toOption.map(_.as[Array[PGobject]]),
+            relrewrite = json.\("relrewrite").as[/* oid */ Long],
+            relfrozenxid = json.\("relfrozenxid").as[/* xid */ PGobject],
+            relminmxid = json.\("relminmxid").as[/* xid */ PGobject],
+            relacl = json.\("relacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
-            relpartbound = json.\("relpartbound").toOption.map(_.as[PGobject])
+            relpartbound = json.\("relpartbound").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

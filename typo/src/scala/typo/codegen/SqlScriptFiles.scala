@@ -6,7 +6,6 @@ case class SqlScriptFiles(script: SqlScriptComputed, options: Options) {
   val all: List[sc.File] = List(
     relation.RowFile,
     relation.RepoTraitFile(script.repoMethods),
-    relation.RepoImplFile(script.repoMethods),
-    relation.FieldValueFile
+    relation.RepoImplFile(script.repoMethods)
   )
 }

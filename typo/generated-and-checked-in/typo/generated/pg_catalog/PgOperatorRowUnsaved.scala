@@ -19,19 +19,19 @@ import scala.util.Try
 
 case class PgOperatorRowUnsaved(
   oprname: String,
-  oprnamespace: Long,
-  oprowner: Long,
+  oprnamespace: /* oid */ Long,
+  oprowner: /* oid */ Long,
   oprkind: String,
   oprcanmerge: Boolean,
   oprcanhash: Boolean,
-  oprleft: Long,
-  oprright: Long,
-  oprresult: Long,
-  oprcom: Long,
-  oprnegate: Long,
-  oprcode: PGobject,
-  oprrest: PGobject,
-  oprjoin: PGobject
+  oprleft: /* oid */ Long,
+  oprright: /* oid */ Long,
+  oprresult: /* oid */ Long,
+  oprcom: /* oid */ Long,
+  oprnegate: /* oid */ Long,
+  oprcode: /* regproc */ PGobject,
+  oprrest: /* regproc */ PGobject,
+  oprjoin: /* regproc */ PGobject
 )
 object PgOperatorRowUnsaved {
   implicit val oFormat: OFormat[PgOperatorRowUnsaved] = new OFormat[PgOperatorRowUnsaved]{
@@ -58,19 +58,19 @@ object PgOperatorRowUnsaved {
         Try(
           PgOperatorRowUnsaved(
             oprname = json.\("oprname").as[String],
-            oprnamespace = json.\("oprnamespace").as[Long],
-            oprowner = json.\("oprowner").as[Long],
+            oprnamespace = json.\("oprnamespace").as[/* oid */ Long],
+            oprowner = json.\("oprowner").as[/* oid */ Long],
             oprkind = json.\("oprkind").as[String],
             oprcanmerge = json.\("oprcanmerge").as[Boolean],
             oprcanhash = json.\("oprcanhash").as[Boolean],
-            oprleft = json.\("oprleft").as[Long],
-            oprright = json.\("oprright").as[Long],
-            oprresult = json.\("oprresult").as[Long],
-            oprcom = json.\("oprcom").as[Long],
-            oprnegate = json.\("oprnegate").as[Long],
-            oprcode = json.\("oprcode").as[PGobject],
-            oprrest = json.\("oprrest").as[PGobject],
-            oprjoin = json.\("oprjoin").as[PGobject]
+            oprleft = json.\("oprleft").as[/* oid */ Long],
+            oprright = json.\("oprright").as[/* oid */ Long],
+            oprresult = json.\("oprresult").as[/* oid */ Long],
+            oprcom = json.\("oprcom").as[/* oid */ Long],
+            oprnegate = json.\("oprnegate").as[/* oid */ Long],
+            oprcode = json.\("oprcode").as[/* regproc */ PGobject],
+            oprrest = json.\("oprrest").as[/* regproc */ PGobject],
+            oprjoin = json.\("oprjoin").as[/* regproc */ PGobject]
           )
         )
       )

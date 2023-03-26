@@ -158,9 +158,7 @@ object sc {
     implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
     implicit val str: ToCode[String] = Code.Str.apply
     implicit val code: ToCode[Code] = identity
-    implicit val tableName: ToCode[db.RelationName] = { case db.RelationName(schema, name) =>
-      Code.Str(s"${schema.map(_ + ".").getOrElse("")}$name")
-    }
+    implicit val tableName: ToCode[db.RelationName] = (_.value)
   }
 
   object syntax {
@@ -210,6 +208,7 @@ object sc {
   }
 
   object Code {
+    val Empty: Code = Str("")
     case class Combined(codes: Iterable[Code]) extends Code
     case class Str(value: String) extends Code
     case class Tree(value: sc.Tree) extends Code

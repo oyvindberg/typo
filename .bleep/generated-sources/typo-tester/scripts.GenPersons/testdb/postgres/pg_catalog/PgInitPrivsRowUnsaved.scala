@@ -17,7 +17,7 @@ import scala.util.Try
 
 case class PgInitPrivsRowUnsaved(
   privtype: String,
-  initprivs: Array[PGobject]
+  initprivs: Array[/* aclitem */ PGobject]
 )
 object PgInitPrivsRowUnsaved {
   implicit val oFormat: OFormat[PgInitPrivsRowUnsaved] = new OFormat[PgInitPrivsRowUnsaved]{
@@ -32,7 +32,7 @@ object PgInitPrivsRowUnsaved {
         Try(
           PgInitPrivsRowUnsaved(
             privtype = json.\("privtype").as[String],
-            initprivs = json.\("initprivs").as[Array[PGobject]]
+            initprivs = json.\("initprivs").as[Array[/* aclitem */ PGobject]]
           )
         )
       )

@@ -18,10 +18,10 @@ import scala.util.Try
 
 case class PgOpfamilyRow(
   oid: PgOpfamilyId,
-  opfmethod: Long,
+  opfmethod: /* oid */ Long,
   opfname: String,
-  opfnamespace: Long,
-  opfowner: Long
+  opfnamespace: /* oid */ Long,
+  opfowner: /* oid */ Long
 )
 
 object PgOpfamilyRow {
@@ -29,10 +29,10 @@ object PgOpfamilyRow {
     Success(
       PgOpfamilyRow(
         oid = row[PgOpfamilyId](prefix + "oid"),
-        opfmethod = row[Long](prefix + "opfmethod"),
+        opfmethod = row[/* oid */ Long](prefix + "opfmethod"),
         opfname = row[String](prefix + "opfname"),
-        opfnamespace = row[Long](prefix + "opfnamespace"),
-        opfowner = row[Long](prefix + "opfowner")
+        opfnamespace = row[/* oid */ Long](prefix + "opfnamespace"),
+        opfowner = row[/* oid */ Long](prefix + "opfowner")
       )
     )
   }
@@ -52,10 +52,10 @@ object PgOpfamilyRow {
         Try(
           PgOpfamilyRow(
             oid = json.\("oid").as[PgOpfamilyId],
-            opfmethod = json.\("opfmethod").as[Long],
+            opfmethod = json.\("opfmethod").as[/* oid */ Long],
             opfname = json.\("opfname").as[String],
-            opfnamespace = json.\("opfnamespace").as[Long],
-            opfowner = json.\("opfowner").as[Long]
+            opfnamespace = json.\("opfnamespace").as[/* oid */ Long],
+            opfowner = json.\("opfowner").as[/* oid */ Long]
           )
         )
       )

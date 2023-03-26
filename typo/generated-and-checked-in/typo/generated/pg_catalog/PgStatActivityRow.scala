@@ -21,14 +21,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatActivityRow(
-  datid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"datid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  datid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"datid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   datname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"datname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   pid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"pid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   leaderPid: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"leader_pid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  usesysid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"usesysid","ordinal_position":5,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  usesysid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"usesysid","ordinal_position":5,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   usename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"usename","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   applicationName: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"application_name","ordinal_position":7,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  clientAddr: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"client_addr","ordinal_position":8,"is_nullable":"YES","data_type":"inet","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"inet","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  clientAddr: Option[/* inet */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"client_addr","ordinal_position":8,"is_nullable":"YES","data_type":"inet","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"inet","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   clientHostname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"client_hostname","ordinal_position":9,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   clientPort: Option[Int] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"client_port","ordinal_position":10,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   backendStart: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_start","ordinal_position":11,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -38,8 +38,8 @@ case class PgStatActivityRow(
   waitEventType: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"wait_event_type","ordinal_position":15,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   waitEvent: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"wait_event","ordinal_position":16,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   state: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"state","ordinal_position":17,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  backendXid: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_xid","ordinal_position":18,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  backendXmin: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_xmin","ordinal_position":19,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  backendXid: Option[/* xid */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_xid","ordinal_position":18,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  backendXmin: Option[/* xid */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_xmin","ordinal_position":19,"is_nullable":"YES","data_type":"xid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"xid","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   queryId: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"query_id","ordinal_position":20,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   query: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"query","ordinal_position":21,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   backendType: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_activity","column_name":"backend_type","ordinal_position":22,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
@@ -49,14 +49,14 @@ object PgStatActivityRow {
   def rowParser(prefix: String): RowParser[PgStatActivityRow] = { row =>
     Success(
       PgStatActivityRow(
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
         pid = row[Option[Int]](prefix + "pid"),
         leaderPid = row[Option[Int]](prefix + "leader_pid"),
-        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usesysid = row[Option[/* oid */ Long]](prefix + "usesysid"),
         usename = row[Option[String]](prefix + "usename"),
         applicationName = row[Option[String]](prefix + "application_name"),
-        clientAddr = row[Option[PGobject]](prefix + "client_addr"),
+        clientAddr = row[Option[/* inet */ PGobject]](prefix + "client_addr"),
         clientHostname = row[Option[String]](prefix + "client_hostname"),
         clientPort = row[Option[Int]](prefix + "client_port"),
         backendStart = row[Option[ZonedDateTime]](prefix + "backend_start"),
@@ -66,8 +66,8 @@ object PgStatActivityRow {
         waitEventType = row[Option[String]](prefix + "wait_event_type"),
         waitEvent = row[Option[String]](prefix + "wait_event"),
         state = row[Option[String]](prefix + "state"),
-        backendXid = row[Option[PGobject]](prefix + "backend_xid"),
-        backendXmin = row[Option[PGobject]](prefix + "backend_xmin"),
+        backendXid = row[Option[/* xid */ PGobject]](prefix + "backend_xid"),
+        backendXmin = row[Option[/* xid */ PGobject]](prefix + "backend_xmin"),
         queryId = row[Option[Long]](prefix + "query_id"),
         query = row[Option[String]](prefix + "query"),
         backendType = row[Option[String]](prefix + "backend_type")
@@ -106,14 +106,14 @@ object PgStatActivityRow {
       JsResult.fromTry(
         Try(
           PgStatActivityRow(
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             leaderPid = json.\("leader_pid").toOption.map(_.as[Int]),
-            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usesysid = json.\("usesysid").toOption.map(_.as[/* oid */ Long]),
             usename = json.\("usename").toOption.map(_.as[String]),
             applicationName = json.\("application_name").toOption.map(_.as[String]),
-            clientAddr = json.\("client_addr").toOption.map(_.as[PGobject]),
+            clientAddr = json.\("client_addr").toOption.map(_.as[/* inet */ PGobject]),
             clientHostname = json.\("client_hostname").toOption.map(_.as[String]),
             clientPort = json.\("client_port").toOption.map(_.as[Int]),
             backendStart = json.\("backend_start").toOption.map(_.as[ZonedDateTime]),
@@ -123,8 +123,8 @@ object PgStatActivityRow {
             waitEventType = json.\("wait_event_type").toOption.map(_.as[String]),
             waitEvent = json.\("wait_event").toOption.map(_.as[String]),
             state = json.\("state").toOption.map(_.as[String]),
-            backendXid = json.\("backend_xid").toOption.map(_.as[PGobject]),
-            backendXmin = json.\("backend_xmin").toOption.map(_.as[PGobject]),
+            backendXid = json.\("backend_xid").toOption.map(_.as[/* xid */ PGobject]),
+            backendXmin = json.\("backend_xmin").toOption.map(_.as[/* xid */ PGobject]),
             queryId = json.\("query_id").toOption.map(_.as[Long]),
             query = json.\("query").toOption.map(_.as[String]),
             backendType = json.\("backend_type").toOption.map(_.as[String])

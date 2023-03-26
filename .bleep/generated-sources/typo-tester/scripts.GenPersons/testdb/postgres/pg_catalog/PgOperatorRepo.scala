@@ -17,5 +17,5 @@ trait PgOperatorRepo {
   def updateFieldValues(oid: PgOperatorId, fieldValues: List[PgOperatorFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgOperatorId, unsaved: PgOperatorRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgOperatorId)(implicit c: Connection): Boolean
-  def selectByUniqueOprnameOprleftOprrightOprnamespace(oprname: String, oprleft: Long, oprright: Long, oprnamespace: Long)(implicit c: Connection): Option[PgOperatorRow]
+  def selectByUniqueOprnameOprleftOprrightOprnamespace(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOperatorRow]
 }

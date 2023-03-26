@@ -17,8 +17,8 @@ import scala.util.Try
 case class PgEventTriggerRowUnsaved(
   evtname: String,
   evtevent: String,
-  evtowner: Long,
-  evtfoid: Long,
+  evtowner: /* oid */ Long,
+  evtfoid: /* oid */ Long,
   evtenabled: String,
   evttags: Option[Array[String]]
 )
@@ -40,8 +40,8 @@ object PgEventTriggerRowUnsaved {
           PgEventTriggerRowUnsaved(
             evtname = json.\("evtname").as[String],
             evtevent = json.\("evtevent").as[String],
-            evtowner = json.\("evtowner").as[Long],
-            evtfoid = json.\("evtfoid").as[Long],
+            evtowner = json.\("evtowner").as[/* oid */ Long],
+            evtfoid = json.\("evtfoid").as[/* oid */ Long],
             evtenabled = json.\("evtenabled").as[String],
             evttags = json.\("evttags").toOption.map(_.as[Array[String]])
           )

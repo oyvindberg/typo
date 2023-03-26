@@ -14,7 +14,7 @@ package information_schema
 sealed abstract class PgForeignServersFieldValue[T](val name: String, val value: T)
 
 object PgForeignServersFieldValue {
-  case class oid(override val value: Option[Long]) extends PgForeignServersFieldValue("oid", value)
+  case class oid(override val value: Option[/* oid */ Long]) extends PgForeignServersFieldValue("oid", value)
   case class srvoptions(override val value: Option[Array[String]]) extends PgForeignServersFieldValue("srvoptions", value)
   case class foreignServerCatalog(override val value: Option[String]) extends PgForeignServersFieldValue("foreign_server_catalog", value)
   case class foreignServerName(override val value: Option[String]) extends PgForeignServersFieldValue("foreign_server_name", value)

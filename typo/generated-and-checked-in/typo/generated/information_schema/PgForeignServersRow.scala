@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignServersRow(
-  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_servers","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  oid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_servers","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   srvoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_servers","column_name":"srvoptions","ordinal_position":2,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   foreignServerCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_servers","column_name":"foreign_server_catalog","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   foreignServerName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_servers","column_name":"foreign_server_name","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -34,7 +34,7 @@ object PgForeignServersRow {
   def rowParser(prefix: String): RowParser[PgForeignServersRow] = { row =>
     Success(
       PgForeignServersRow(
-        oid = row[Option[Long]](prefix + "oid"),
+        oid = row[Option[/* oid */ Long]](prefix + "oid"),
         srvoptions = row[Option[Array[String]]](prefix + "srvoptions"),
         foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
         foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
@@ -65,7 +65,7 @@ object PgForeignServersRow {
       JsResult.fromTry(
         Try(
           PgForeignServersRow(
-            oid = json.\("oid").toOption.map(_.as[Long]),
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
             srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]]),
             foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[String]),
             foreignServerName = json.\("foreign_server_name").toOption.map(_.as[String]),

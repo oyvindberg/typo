@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatDatabaseConflictsRow(
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
   conflTablespace: Option[Long],
   conflLock: Option[Long],
@@ -30,7 +30,7 @@ object PgStatDatabaseConflictsRow {
   def rowParser(prefix: String): RowParser[PgStatDatabaseConflictsRow] = { row =>
     Success(
       PgStatDatabaseConflictsRow(
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
         conflTablespace = row[Option[Long]](prefix + "confl_tablespace"),
         conflLock = row[Option[Long]](prefix + "confl_lock"),
@@ -57,7 +57,7 @@ object PgStatDatabaseConflictsRow {
       JsResult.fromTry(
         Try(
           PgStatDatabaseConflictsRow(
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
             conflTablespace = json.\("confl_tablespace").toOption.map(_.as[Long]),
             conflLock = json.\("confl_lock").toOption.map(_.as[Long]),

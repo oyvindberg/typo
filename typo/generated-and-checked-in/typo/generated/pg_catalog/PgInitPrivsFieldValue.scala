@@ -14,9 +14,9 @@ import org.postgresql.util.PGobject
 sealed abstract class PgInitPrivsFieldValue[T](val name: String, val value: T)
 
 object PgInitPrivsFieldValue {
-  case class objoid(override val value: Long) extends PgInitPrivsFieldValue("objoid", value)
-  case class classoid(override val value: Long) extends PgInitPrivsFieldValue("classoid", value)
+  case class objoid(override val value: /* oid */ Long) extends PgInitPrivsFieldValue("objoid", value)
+  case class classoid(override val value: /* oid */ Long) extends PgInitPrivsFieldValue("classoid", value)
   case class objsubid(override val value: Int) extends PgInitPrivsFieldValue("objsubid", value)
   case class privtype(override val value: String) extends PgInitPrivsFieldValue("privtype", value)
-  case class initprivs(override val value: Array[PGobject]) extends PgInitPrivsFieldValue("initprivs", value)
+  case class initprivs(override val value: Array[/* aclitem */ PGobject]) extends PgInitPrivsFieldValue("initprivs", value)
 }

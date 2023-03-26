@@ -15,8 +15,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgUserMappingRowUnsaved(
-  umuser: Long,
-  umserver: Long,
+  umuser: /* oid */ Long,
+  umserver: /* oid */ Long,
   umoptions: Option[Array[String]]
 )
 object PgUserMappingRowUnsaved {
@@ -32,8 +32,8 @@ object PgUserMappingRowUnsaved {
       JsResult.fromTry(
         Try(
           PgUserMappingRowUnsaved(
-            umuser = json.\("umuser").as[Long],
-            umserver = json.\("umserver").as[Long],
+            umuser = json.\("umuser").as[/* oid */ Long],
+            umserver = json.\("umserver").as[/* oid */ Long],
             umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
           )
         )

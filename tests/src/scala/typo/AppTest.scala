@@ -9,7 +9,7 @@ import java.sql.{Connection, DriverManager}
 class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     implicit val conn: Connection = DriverManager.getConnection(
-      "jdbc:postgresql://localhost:5432/samordnaopptak?user=postgres&password=postgres"
+      "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=postgres"
     )
     println(information_schema.AdministrableRoleAuthorizationsRepoImpl.selectAll.take(1))
     println(information_schema.AdministrableRoleAuthorizationsRepoImpl.selectAll.take(1))

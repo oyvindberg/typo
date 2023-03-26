@@ -18,9 +18,9 @@ import scala.util.Try
 
 case class PgStatProgressVacuumRow(
   pid: Option[Int],
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   phase: Option[String],
   heapBlksTotal: Option[Long],
   heapBlksScanned: Option[Long],
@@ -35,9 +35,9 @@ object PgStatProgressVacuumRow {
     Success(
       PgStatProgressVacuumRow(
         pid = row[Option[Int]](prefix + "pid"),
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         phase = row[Option[String]](prefix + "phase"),
         heapBlksTotal = row[Option[Long]](prefix + "heap_blks_total"),
         heapBlksScanned = row[Option[Long]](prefix + "heap_blks_scanned"),
@@ -70,9 +70,9 @@ object PgStatProgressVacuumRow {
         Try(
           PgStatProgressVacuumRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             phase = json.\("phase").toOption.map(_.as[String]),
             heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
             heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),

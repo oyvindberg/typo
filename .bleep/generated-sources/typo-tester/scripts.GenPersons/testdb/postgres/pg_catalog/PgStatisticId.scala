@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgStatisticId(starelid: Long, staattnum: Int, stainherit: Boolean)
+case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
 object PgStatisticId {
   implicit val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
   implicit val oFormat: OFormat[PgStatisticId] = new OFormat[PgStatisticId]{
@@ -31,7 +31,7 @@ object PgStatisticId {
       JsResult.fromTry(
         Try(
           PgStatisticId(
-            starelid = json.\("starelid").as[Long],
+            starelid = json.\("starelid").as[/* oid */ Long],
             staattnum = json.\("staattnum").as[Int],
             stainherit = json.\("stainherit").as[Boolean]
           )
@@ -42,7 +42,7 @@ object PgStatisticId {
   def rowParser(prefix: String): RowParser[PgStatisticId] = { row =>
     Success(
       PgStatisticId(
-        starelid = row[Long](prefix + "starelid"),
+        starelid = row[/* oid */ Long](prefix + "starelid"),
         staattnum = row[Int](prefix + "staattnum"),
         stainherit = row[Boolean](prefix + "stainherit")
       )

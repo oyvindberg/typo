@@ -18,9 +18,9 @@ import scala.util.Try
 
 case class PgCastRow(
   oid: PgCastId,
-  castsource: Long,
-  casttarget: Long,
-  castfunc: Long,
+  castsource: /* oid */ Long,
+  casttarget: /* oid */ Long,
+  castfunc: /* oid */ Long,
   castcontext: String,
   castmethod: String
 )
@@ -30,9 +30,9 @@ object PgCastRow {
     Success(
       PgCastRow(
         oid = row[PgCastId](prefix + "oid"),
-        castsource = row[Long](prefix + "castsource"),
-        casttarget = row[Long](prefix + "casttarget"),
-        castfunc = row[Long](prefix + "castfunc"),
+        castsource = row[/* oid */ Long](prefix + "castsource"),
+        casttarget = row[/* oid */ Long](prefix + "casttarget"),
+        castfunc = row[/* oid */ Long](prefix + "castfunc"),
         castcontext = row[String](prefix + "castcontext"),
         castmethod = row[String](prefix + "castmethod")
       )
@@ -55,9 +55,9 @@ object PgCastRow {
         Try(
           PgCastRow(
             oid = json.\("oid").as[PgCastId],
-            castsource = json.\("castsource").as[Long],
-            casttarget = json.\("casttarget").as[Long],
-            castfunc = json.\("castfunc").as[Long],
+            castsource = json.\("castsource").as[/* oid */ Long],
+            casttarget = json.\("casttarget").as[/* oid */ Long],
+            castfunc = json.\("castfunc").as[/* oid */ Long],
             castcontext = json.\("castcontext").as[String],
             castmethod = json.\("castmethod").as[String]
           )

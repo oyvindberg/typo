@@ -21,11 +21,11 @@ import scala.util.Try
 
 case class PgAmprocRow(
   oid: PgAmprocId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amprocfamily: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amprocfamily","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amproclefttype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amproclefttype","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amprocrighttype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amprocrighttype","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amprocfamily: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amprocfamily","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amproclefttype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amproclefttype","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amprocrighttype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amprocrighttype","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   amprocnum: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amprocnum","ordinal_position":5,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amproc: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amproc","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  amproc: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amproc","column_name":"amproc","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgAmprocRow {
@@ -33,11 +33,11 @@ object PgAmprocRow {
     Success(
       PgAmprocRow(
         oid = row[PgAmprocId](prefix + "oid"),
-        amprocfamily = row[Long](prefix + "amprocfamily"),
-        amproclefttype = row[Long](prefix + "amproclefttype"),
-        amprocrighttype = row[Long](prefix + "amprocrighttype"),
+        amprocfamily = row[/* oid */ Long](prefix + "amprocfamily"),
+        amproclefttype = row[/* oid */ Long](prefix + "amproclefttype"),
+        amprocrighttype = row[/* oid */ Long](prefix + "amprocrighttype"),
         amprocnum = row[Int](prefix + "amprocnum"),
-        amproc = row[PGobject](prefix + "amproc")
+        amproc = row[/* regproc */ PGobject](prefix + "amproc")
       )
     )
   }
@@ -58,11 +58,11 @@ object PgAmprocRow {
         Try(
           PgAmprocRow(
             oid = json.\("oid").as[PgAmprocId],
-            amprocfamily = json.\("amprocfamily").as[Long],
-            amproclefttype = json.\("amproclefttype").as[Long],
-            amprocrighttype = json.\("amprocrighttype").as[Long],
+            amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
+            amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
+            amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
             amprocnum = json.\("amprocnum").as[Int],
-            amproc = json.\("amproc").as[PGobject]
+            amproc = json.\("amproc").as[/* regproc */ PGobject]
           )
         )
       )

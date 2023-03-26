@@ -19,5 +19,5 @@ trait PgStatisticExtRepo {
   def updateFieldValues(oid: PgStatisticExtId, fieldValues: List[PgStatisticExtFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgStatisticExtId, unsaved: PgStatisticExtRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgStatisticExtId)(implicit c: Connection): Boolean
-  def selectByUniqueStxnameStxnamespace(stxname: String, stxnamespace: Long)(implicit c: Connection): Option[PgStatisticExtRow]
+  def selectByUniqueStxnameStxnamespace(stxname: String, stxnamespace: /* oid */ Long)(implicit c: Connection): Option[PgStatisticExtRow]
 }

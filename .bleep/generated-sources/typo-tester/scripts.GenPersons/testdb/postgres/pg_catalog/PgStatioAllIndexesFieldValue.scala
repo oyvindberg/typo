@@ -12,8 +12,8 @@ package pg_catalog
 sealed abstract class PgStatioAllIndexesFieldValue[T](val name: String, val value: T)
 
 object PgStatioAllIndexesFieldValue {
-  case class relid(override val value: Option[Long]) extends PgStatioAllIndexesFieldValue("relid", value)
-  case class indexrelid(override val value: Option[Long]) extends PgStatioAllIndexesFieldValue("indexrelid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatioAllIndexesFieldValue("relid", value)
+  case class indexrelid(override val value: Option[/* oid */ Long]) extends PgStatioAllIndexesFieldValue("indexrelid", value)
   case class schemaname(override val value: Option[String]) extends PgStatioAllIndexesFieldValue("schemaname", value)
   case class relname(override val value: Option[String]) extends PgStatioAllIndexesFieldValue("relname", value)
   case class indexrelname(override val value: Option[String]) extends PgStatioAllIndexesFieldValue("indexrelname", value)

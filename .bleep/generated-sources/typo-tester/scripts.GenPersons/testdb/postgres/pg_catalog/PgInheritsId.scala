@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgInheritsId(inhrelid: Long, inhseqno: Int)
+case class PgInheritsId(inhrelid: /* oid */ Long, inhseqno: Int)
 object PgInheritsId {
   implicit val ordering: Ordering[PgInheritsId] = Ordering.by(x => (x.inhrelid, x.inhseqno))
   implicit val oFormat: OFormat[PgInheritsId] = new OFormat[PgInheritsId]{
@@ -30,7 +30,7 @@ object PgInheritsId {
       JsResult.fromTry(
         Try(
           PgInheritsId(
-            inhrelid = json.\("inhrelid").as[Long],
+            inhrelid = json.\("inhrelid").as[/* oid */ Long],
             inhseqno = json.\("inhseqno").as[Int]
           )
         )
@@ -40,7 +40,7 @@ object PgInheritsId {
   def rowParser(prefix: String): RowParser[PgInheritsId] = { row =>
     Success(
       PgInheritsId(
-        inhrelid = row[Long](prefix + "inhrelid"),
+        inhrelid = row[/* oid */ Long](prefix + "inhrelid"),
         inhseqno = row[Int](prefix + "inhseqno")
       )
     )

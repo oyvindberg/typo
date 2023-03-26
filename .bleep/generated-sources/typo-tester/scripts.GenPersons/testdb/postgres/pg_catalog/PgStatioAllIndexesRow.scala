@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioAllIndexesRow(
-  relid: Option[Long],
-  indexrelid: Option[Long],
+  relid: Option[/* oid */ Long],
+  indexrelid: Option[/* oid */ Long],
   schemaname: Option[String],
   relname: Option[String],
   indexrelname: Option[String],
@@ -30,8 +30,8 @@ object PgStatioAllIndexesRow {
   def rowParser(prefix: String): RowParser[PgStatioAllIndexesRow] = { row =>
     Success(
       PgStatioAllIndexesRow(
-        relid = row[Option[Long]](prefix + "relid"),
-        indexrelid = row[Option[Long]](prefix + "indexrelid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
+        indexrelid = row[Option[/* oid */ Long]](prefix + "indexrelid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         relname = row[Option[String]](prefix + "relname"),
         indexrelname = row[Option[String]](prefix + "indexrelname"),
@@ -57,8 +57,8 @@ object PgStatioAllIndexesRow {
       JsResult.fromTry(
         Try(
           PgStatioAllIndexesRow(
-            relid = json.\("relid").toOption.map(_.as[Long]),
-            indexrelid = json.\("indexrelid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+            indexrelid = json.\("indexrelid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             relname = json.\("relname").toOption.map(_.as[String]),
             indexrelname = json.\("indexrelname").toOption.map(_.as[String]),

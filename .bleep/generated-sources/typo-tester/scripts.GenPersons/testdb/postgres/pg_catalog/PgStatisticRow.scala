@@ -18,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatisticRow(
-  starelid: Long,
+  starelid: /* oid */ Long,
   staattnum: Int,
   stainherit: Boolean,
   stanullfrac: Float,
@@ -29,26 +29,26 @@ case class PgStatisticRow(
   stakind3: Int,
   stakind4: Int,
   stakind5: Int,
-  staop1: Long,
-  staop2: Long,
-  staop3: Long,
-  staop4: Long,
-  staop5: Long,
-  stacoll1: Long,
-  stacoll2: Long,
-  stacoll3: Long,
-  stacoll4: Long,
-  stacoll5: Long,
+  staop1: /* oid */ Long,
+  staop2: /* oid */ Long,
+  staop3: /* oid */ Long,
+  staop4: /* oid */ Long,
+  staop5: /* oid */ Long,
+  stacoll1: /* oid */ Long,
+  stacoll2: /* oid */ Long,
+  stacoll3: /* oid */ Long,
+  stacoll4: /* oid */ Long,
+  stacoll5: /* oid */ Long,
   stanumbers1: Option[Array[Float]],
   stanumbers2: Option[Array[Float]],
   stanumbers3: Option[Array[Float]],
   stanumbers4: Option[Array[Float]],
   stanumbers5: Option[Array[Float]],
-  stavalues1: Option[PGobject],
-  stavalues2: Option[PGobject],
-  stavalues3: Option[PGobject],
-  stavalues4: Option[PGobject],
-  stavalues5: Option[PGobject]
+  stavalues1: Option[/* anyarray */ PGobject],
+  stavalues2: Option[/* anyarray */ PGobject],
+  stavalues3: Option[/* anyarray */ PGobject],
+  stavalues4: Option[/* anyarray */ PGobject],
+  stavalues5: Option[/* anyarray */ PGobject]
 ){
   val compositeId: PgStatisticId = PgStatisticId(starelid, staattnum, stainherit)
 }
@@ -57,7 +57,7 @@ object PgStatisticRow {
   def rowParser(prefix: String): RowParser[PgStatisticRow] = { row =>
     Success(
       PgStatisticRow(
-        starelid = row[Long](prefix + "starelid"),
+        starelid = row[/* oid */ Long](prefix + "starelid"),
         staattnum = row[Int](prefix + "staattnum"),
         stainherit = row[Boolean](prefix + "stainherit"),
         stanullfrac = row[Float](prefix + "stanullfrac"),
@@ -68,26 +68,26 @@ object PgStatisticRow {
         stakind3 = row[Int](prefix + "stakind3"),
         stakind4 = row[Int](prefix + "stakind4"),
         stakind5 = row[Int](prefix + "stakind5"),
-        staop1 = row[Long](prefix + "staop1"),
-        staop2 = row[Long](prefix + "staop2"),
-        staop3 = row[Long](prefix + "staop3"),
-        staop4 = row[Long](prefix + "staop4"),
-        staop5 = row[Long](prefix + "staop5"),
-        stacoll1 = row[Long](prefix + "stacoll1"),
-        stacoll2 = row[Long](prefix + "stacoll2"),
-        stacoll3 = row[Long](prefix + "stacoll3"),
-        stacoll4 = row[Long](prefix + "stacoll4"),
-        stacoll5 = row[Long](prefix + "stacoll5"),
+        staop1 = row[/* oid */ Long](prefix + "staop1"),
+        staop2 = row[/* oid */ Long](prefix + "staop2"),
+        staop3 = row[/* oid */ Long](prefix + "staop3"),
+        staop4 = row[/* oid */ Long](prefix + "staop4"),
+        staop5 = row[/* oid */ Long](prefix + "staop5"),
+        stacoll1 = row[/* oid */ Long](prefix + "stacoll1"),
+        stacoll2 = row[/* oid */ Long](prefix + "stacoll2"),
+        stacoll3 = row[/* oid */ Long](prefix + "stacoll3"),
+        stacoll4 = row[/* oid */ Long](prefix + "stacoll4"),
+        stacoll5 = row[/* oid */ Long](prefix + "stacoll5"),
         stanumbers1 = row[Option[Array[Float]]](prefix + "stanumbers1"),
         stanumbers2 = row[Option[Array[Float]]](prefix + "stanumbers2"),
         stanumbers3 = row[Option[Array[Float]]](prefix + "stanumbers3"),
         stanumbers4 = row[Option[Array[Float]]](prefix + "stanumbers4"),
         stanumbers5 = row[Option[Array[Float]]](prefix + "stanumbers5"),
-        stavalues1 = row[Option[PGobject]](prefix + "stavalues1"),
-        stavalues2 = row[Option[PGobject]](prefix + "stavalues2"),
-        stavalues3 = row[Option[PGobject]](prefix + "stavalues3"),
-        stavalues4 = row[Option[PGobject]](prefix + "stavalues4"),
-        stavalues5 = row[Option[PGobject]](prefix + "stavalues5")
+        stavalues1 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues1"),
+        stavalues2 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues2"),
+        stavalues3 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues3"),
+        stavalues4 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues4"),
+        stavalues5 = row[Option[/* anyarray */ PGobject]](prefix + "stavalues5")
       )
     )
   }
@@ -132,7 +132,7 @@ object PgStatisticRow {
       JsResult.fromTry(
         Try(
           PgStatisticRow(
-            starelid = json.\("starelid").as[Long],
+            starelid = json.\("starelid").as[/* oid */ Long],
             staattnum = json.\("staattnum").as[Int],
             stainherit = json.\("stainherit").as[Boolean],
             stanullfrac = json.\("stanullfrac").as[Float],
@@ -143,26 +143,26 @@ object PgStatisticRow {
             stakind3 = json.\("stakind3").as[Int],
             stakind4 = json.\("stakind4").as[Int],
             stakind5 = json.\("stakind5").as[Int],
-            staop1 = json.\("staop1").as[Long],
-            staop2 = json.\("staop2").as[Long],
-            staop3 = json.\("staop3").as[Long],
-            staop4 = json.\("staop4").as[Long],
-            staop5 = json.\("staop5").as[Long],
-            stacoll1 = json.\("stacoll1").as[Long],
-            stacoll2 = json.\("stacoll2").as[Long],
-            stacoll3 = json.\("stacoll3").as[Long],
-            stacoll4 = json.\("stacoll4").as[Long],
-            stacoll5 = json.\("stacoll5").as[Long],
+            staop1 = json.\("staop1").as[/* oid */ Long],
+            staop2 = json.\("staop2").as[/* oid */ Long],
+            staop3 = json.\("staop3").as[/* oid */ Long],
+            staop4 = json.\("staop4").as[/* oid */ Long],
+            staop5 = json.\("staop5").as[/* oid */ Long],
+            stacoll1 = json.\("stacoll1").as[/* oid */ Long],
+            stacoll2 = json.\("stacoll2").as[/* oid */ Long],
+            stacoll3 = json.\("stacoll3").as[/* oid */ Long],
+            stacoll4 = json.\("stacoll4").as[/* oid */ Long],
+            stacoll5 = json.\("stacoll5").as[/* oid */ Long],
             stanumbers1 = json.\("stanumbers1").toOption.map(_.as[Array[Float]]),
             stanumbers2 = json.\("stanumbers2").toOption.map(_.as[Array[Float]]),
             stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
             stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
             stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
-            stavalues1 = json.\("stavalues1").toOption.map(_.as[PGobject]),
-            stavalues2 = json.\("stavalues2").toOption.map(_.as[PGobject]),
-            stavalues3 = json.\("stavalues3").toOption.map(_.as[PGobject]),
-            stavalues4 = json.\("stavalues4").toOption.map(_.as[PGobject]),
-            stavalues5 = json.\("stavalues5").toOption.map(_.as[PGobject])
+            stavalues1 = json.\("stavalues1").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues2 = json.\("stavalues2").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues3 = json.\("stavalues3").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues4 = json.\("stavalues4").toOption.map(_.as[/* anyarray */ PGobject]),
+            stavalues5 = json.\("stavalues5").toOption.map(_.as[/* anyarray */ PGobject])
           )
         )
       )

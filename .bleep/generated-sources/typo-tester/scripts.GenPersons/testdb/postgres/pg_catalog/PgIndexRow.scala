@@ -19,7 +19,7 @@ import scala.util.Try
 
 case class PgIndexRow(
   indexrelid: PgIndexId,
-  indrelid: Long,
+  indrelid: /* oid */ Long,
   indnatts: Int,
   indnkeyatts: Int,
   indisunique: Boolean,
@@ -32,12 +32,12 @@ case class PgIndexRow(
   indisready: Boolean,
   indislive: Boolean,
   indisreplident: Boolean,
-  indkey: PGobject,
-  indcollation: PGobject,
-  indclass: PGobject,
-  indoption: PGobject,
-  indexprs: Option[PGobject],
-  indpred: Option[PGobject]
+  indkey: /* int2vector */ PGobject,
+  indcollation: /* oidvector */ PGobject,
+  indclass: /* oidvector */ PGobject,
+  indoption: /* int2vector */ PGobject,
+  indexprs: Option[/* pg_node_tree */ PGobject],
+  indpred: Option[/* pg_node_tree */ PGobject]
 )
 
 object PgIndexRow {
@@ -45,7 +45,7 @@ object PgIndexRow {
     Success(
       PgIndexRow(
         indexrelid = row[PgIndexId](prefix + "indexrelid"),
-        indrelid = row[Long](prefix + "indrelid"),
+        indrelid = row[/* oid */ Long](prefix + "indrelid"),
         indnatts = row[Int](prefix + "indnatts"),
         indnkeyatts = row[Int](prefix + "indnkeyatts"),
         indisunique = row[Boolean](prefix + "indisunique"),
@@ -58,12 +58,12 @@ object PgIndexRow {
         indisready = row[Boolean](prefix + "indisready"),
         indislive = row[Boolean](prefix + "indislive"),
         indisreplident = row[Boolean](prefix + "indisreplident"),
-        indkey = row[PGobject](prefix + "indkey"),
-        indcollation = row[PGobject](prefix + "indcollation"),
-        indclass = row[PGobject](prefix + "indclass"),
-        indoption = row[PGobject](prefix + "indoption"),
-        indexprs = row[Option[PGobject]](prefix + "indexprs"),
-        indpred = row[Option[PGobject]](prefix + "indpred")
+        indkey = row[/* int2vector */ PGobject](prefix + "indkey"),
+        indcollation = row[/* oidvector */ PGobject](prefix + "indcollation"),
+        indclass = row[/* oidvector */ PGobject](prefix + "indclass"),
+        indoption = row[/* int2vector */ PGobject](prefix + "indoption"),
+        indexprs = row[Option[/* pg_node_tree */ PGobject]](prefix + "indexprs"),
+        indpred = row[Option[/* pg_node_tree */ PGobject]](prefix + "indpred")
       )
     )
   }
@@ -98,7 +98,7 @@ object PgIndexRow {
         Try(
           PgIndexRow(
             indexrelid = json.\("indexrelid").as[PgIndexId],
-            indrelid = json.\("indrelid").as[Long],
+            indrelid = json.\("indrelid").as[/* oid */ Long],
             indnatts = json.\("indnatts").as[Int],
             indnkeyatts = json.\("indnkeyatts").as[Int],
             indisunique = json.\("indisunique").as[Boolean],
@@ -111,12 +111,12 @@ object PgIndexRow {
             indisready = json.\("indisready").as[Boolean],
             indislive = json.\("indislive").as[Boolean],
             indisreplident = json.\("indisreplident").as[Boolean],
-            indkey = json.\("indkey").as[PGobject],
-            indcollation = json.\("indcollation").as[PGobject],
-            indclass = json.\("indclass").as[PGobject],
-            indoption = json.\("indoption").as[PGobject],
-            indexprs = json.\("indexprs").toOption.map(_.as[PGobject]),
-            indpred = json.\("indpred").toOption.map(_.as[PGobject])
+            indkey = json.\("indkey").as[/* int2vector */ PGobject],
+            indcollation = json.\("indcollation").as[/* oidvector */ PGobject],
+            indclass = json.\("indclass").as[/* oidvector */ PGobject],
+            indoption = json.\("indoption").as[/* int2vector */ PGobject],
+            indexprs = json.\("indexprs").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            indpred = json.\("indpred").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

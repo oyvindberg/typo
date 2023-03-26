@@ -19,9 +19,9 @@ import scala.util.Try
 case class PgTsConfigRow(
   oid: PgTsConfigId,
   cfgname: String,
-  cfgnamespace: Long,
-  cfgowner: Long,
-  cfgparser: Long
+  cfgnamespace: /* oid */ Long,
+  cfgowner: /* oid */ Long,
+  cfgparser: /* oid */ Long
 )
 
 object PgTsConfigRow {
@@ -30,9 +30,9 @@ object PgTsConfigRow {
       PgTsConfigRow(
         oid = row[PgTsConfigId](prefix + "oid"),
         cfgname = row[String](prefix + "cfgname"),
-        cfgnamespace = row[Long](prefix + "cfgnamespace"),
-        cfgowner = row[Long](prefix + "cfgowner"),
-        cfgparser = row[Long](prefix + "cfgparser")
+        cfgnamespace = row[/* oid */ Long](prefix + "cfgnamespace"),
+        cfgowner = row[/* oid */ Long](prefix + "cfgowner"),
+        cfgparser = row[/* oid */ Long](prefix + "cfgparser")
       )
     )
   }
@@ -53,9 +53,9 @@ object PgTsConfigRow {
           PgTsConfigRow(
             oid = json.\("oid").as[PgTsConfigId],
             cfgname = json.\("cfgname").as[String],
-            cfgnamespace = json.\("cfgnamespace").as[Long],
-            cfgowner = json.\("cfgowner").as[Long],
-            cfgparser = json.\("cfgparser").as[Long]
+            cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
+            cfgowner = json.\("cfgowner").as[/* oid */ Long],
+            cfgparser = json.\("cfgparser").as[/* oid */ Long]
           )
         )
       )

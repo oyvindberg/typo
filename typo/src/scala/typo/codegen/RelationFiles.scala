@@ -79,10 +79,9 @@ case class RelationFiles(relation: RelationComputed, options: Options) {
 
   def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
     val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
-      val impl: sc.Code = options.dbLib.repoImpl(relation, repoMethod)
       code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-               |    $impl
-               |  }""".stripMargin
+             |    ${options.dbLib.repoImpl(relation, repoMethod)}
+             |  }""".stripMargin
     }
 
     val str =

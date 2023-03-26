@@ -17,12 +17,12 @@ import scala.util.Try
 
 case class PgPolicyRowUnsaved(
   polname: String,
-  polrelid: Long,
+  polrelid: /* oid */ Long,
   polcmd: String,
   polpermissive: Boolean,
-  polroles: Array[Long],
-  polqual: Option[PGobject],
-  polwithcheck: Option[PGobject]
+  polroles: Array[/* oid */ Long],
+  polqual: Option[/* pg_node_tree */ PGobject],
+  polwithcheck: Option[/* pg_node_tree */ PGobject]
 )
 object PgPolicyRowUnsaved {
   implicit val oFormat: OFormat[PgPolicyRowUnsaved] = new OFormat[PgPolicyRowUnsaved]{
@@ -42,12 +42,12 @@ object PgPolicyRowUnsaved {
         Try(
           PgPolicyRowUnsaved(
             polname = json.\("polname").as[String],
-            polrelid = json.\("polrelid").as[Long],
+            polrelid = json.\("polrelid").as[/* oid */ Long],
             polcmd = json.\("polcmd").as[String],
             polpermissive = json.\("polpermissive").as[Boolean],
-            polroles = json.\("polroles").as[Array[Long]],
-            polqual = json.\("polqual").toOption.map(_.as[PGobject]),
-            polwithcheck = json.\("polwithcheck").toOption.map(_.as[PGobject])
+            polroles = json.\("polroles").as[Array[/* oid */ Long]],
+            polqual = json.\("polqual").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            polwithcheck = json.\("polwithcheck").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

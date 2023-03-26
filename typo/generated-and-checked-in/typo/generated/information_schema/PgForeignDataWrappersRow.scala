@@ -19,8 +19,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignDataWrappersRow(
-  oid: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  fdwowner: Option[Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"fdwowner","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  oid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"oid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  fdwowner: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"fdwowner","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   fdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"fdwoptions","ordinal_position":3,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   foreignDataWrapperCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"foreign_data_wrapper_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   foreignDataWrapperName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"_pg_foreign_data_wrappers","column_name":"foreign_data_wrapper_name","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -32,8 +32,8 @@ object PgForeignDataWrappersRow {
   def rowParser(prefix: String): RowParser[PgForeignDataWrappersRow] = { row =>
     Success(
       PgForeignDataWrappersRow(
-        oid = row[Option[Long]](prefix + "oid"),
-        fdwowner = row[Option[Long]](prefix + "fdwowner"),
+        oid = row[Option[/* oid */ Long]](prefix + "oid"),
+        fdwowner = row[Option[/* oid */ Long]](prefix + "fdwowner"),
         fdwoptions = row[Option[Array[String]]](prefix + "fdwoptions"),
         foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
         foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
@@ -59,8 +59,8 @@ object PgForeignDataWrappersRow {
       JsResult.fromTry(
         Try(
           PgForeignDataWrappersRow(
-            oid = json.\("oid").toOption.map(_.as[Long]),
-            fdwowner = json.\("fdwowner").toOption.map(_.as[Long]),
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
+            fdwowner = json.\("fdwowner").toOption.map(_.as[/* oid */ Long]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
             foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
             foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),

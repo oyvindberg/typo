@@ -15,7 +15,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAuthMembersRowUnsaved(
-  grantor: Long,
+  grantor: /* oid */ Long,
   adminOption: Boolean
 )
 object PgAuthMembersRowUnsaved {
@@ -30,7 +30,7 @@ object PgAuthMembersRowUnsaved {
       JsResult.fromTry(
         Try(
           PgAuthMembersRowUnsaved(
-            grantor = json.\("grantor").as[Long],
+            grantor = json.\("grantor").as[/* oid */ Long],
             adminOption = json.\("admin_option").as[Boolean]
           )
         )

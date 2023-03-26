@@ -18,8 +18,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgLargeobjectMetadataRowUnsaved(
-  lomowner: Long,
-  lomacl: Option[Array[PGobject]]
+  lomowner: /* oid */ Long,
+  lomacl: Option[Array[/* aclitem */ PGobject]]
 )
 object PgLargeobjectMetadataRowUnsaved {
   implicit val oFormat: OFormat[PgLargeobjectMetadataRowUnsaved] = new OFormat[PgLargeobjectMetadataRowUnsaved]{
@@ -33,8 +33,8 @@ object PgLargeobjectMetadataRowUnsaved {
       JsResult.fromTry(
         Try(
           PgLargeobjectMetadataRowUnsaved(
-            lomowner = json.\("lomowner").as[Long],
-            lomacl = json.\("lomacl").toOption.map(_.as[Array[PGobject]])
+            lomowner = json.\("lomowner").as[/* oid */ Long],
+            lomacl = json.\("lomacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

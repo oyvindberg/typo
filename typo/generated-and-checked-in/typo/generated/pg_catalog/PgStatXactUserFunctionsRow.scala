@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatXactUserFunctionsRow(
-  funcid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_xact_user_functions","column_name":"funcid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  funcid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_xact_user_functions","column_name":"funcid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_xact_user_functions","column_name":"schemaname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   funcname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_xact_user_functions","column_name":"funcname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   calls: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_xact_user_functions","column_name":"calls","ordinal_position":4,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -31,7 +31,7 @@ object PgStatXactUserFunctionsRow {
   def rowParser(prefix: String): RowParser[PgStatXactUserFunctionsRow] = { row =>
     Success(
       PgStatXactUserFunctionsRow(
-        funcid = row[Option[Long]](prefix + "funcid"),
+        funcid = row[Option[/* oid */ Long]](prefix + "funcid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         funcname = row[Option[String]](prefix + "funcname"),
         calls = row[Option[Long]](prefix + "calls"),
@@ -56,7 +56,7 @@ object PgStatXactUserFunctionsRow {
       JsResult.fromTry(
         Try(
           PgStatXactUserFunctionsRow(
-            funcid = json.\("funcid").toOption.map(_.as[Long]),
+            funcid = json.\("funcid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             funcname = json.\("funcname").toOption.map(_.as[String]),
             calls = json.\("calls").toOption.map(_.as[Long]),

@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgInheritsRow(
-  inhrelid: Long,
-  inhparent: Long,
+  inhrelid: /* oid */ Long,
+  inhparent: /* oid */ Long,
   inhseqno: Int,
   inhdetachpending: Boolean
 ){
@@ -29,8 +29,8 @@ object PgInheritsRow {
   def rowParser(prefix: String): RowParser[PgInheritsRow] = { row =>
     Success(
       PgInheritsRow(
-        inhrelid = row[Long](prefix + "inhrelid"),
-        inhparent = row[Long](prefix + "inhparent"),
+        inhrelid = row[/* oid */ Long](prefix + "inhrelid"),
+        inhparent = row[/* oid */ Long](prefix + "inhparent"),
         inhseqno = row[Int](prefix + "inhseqno"),
         inhdetachpending = row[Boolean](prefix + "inhdetachpending")
       )
@@ -50,8 +50,8 @@ object PgInheritsRow {
       JsResult.fromTry(
         Try(
           PgInheritsRow(
-            inhrelid = json.\("inhrelid").as[Long],
-            inhparent = json.\("inhparent").as[Long],
+            inhrelid = json.\("inhrelid").as[/* oid */ Long],
+            inhparent = json.\("inhparent").as[/* oid */ Long],
             inhseqno = json.\("inhseqno").as[Int],
             inhdetachpending = json.\("inhdetachpending").as[Boolean]
           )

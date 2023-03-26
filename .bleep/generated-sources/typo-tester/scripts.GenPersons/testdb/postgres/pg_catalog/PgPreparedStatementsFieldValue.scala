@@ -16,7 +16,7 @@ object PgPreparedStatementsFieldValue {
   case class name(override val value: Option[String]) extends PgPreparedStatementsFieldValue("name", value)
   case class statement(override val value: Option[String]) extends PgPreparedStatementsFieldValue("statement", value)
   case class prepareTime(override val value: Option[ZonedDateTime]) extends PgPreparedStatementsFieldValue("prepare_time", value)
-  case class parameterTypes(override val value: Option[Array[PGobject]]) extends PgPreparedStatementsFieldValue("parameter_types", value)
+  case class parameterTypes(override val value: Option[Array[/* regtype */ PGobject]]) extends PgPreparedStatementsFieldValue("parameter_types", value)
   case class fromSql(override val value: Option[Boolean]) extends PgPreparedStatementsFieldValue("from_sql", value)
   case class genericPlans(override val value: Option[Long]) extends PgPreparedStatementsFieldValue("generic_plans", value)
   case class customPlans(override val value: Option[Long]) extends PgPreparedStatementsFieldValue("custom_plans", value)

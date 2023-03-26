@@ -15,9 +15,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgCastRowUnsaved(
-  castsource: Long,
-  casttarget: Long,
-  castfunc: Long,
+  castsource: /* oid */ Long,
+  casttarget: /* oid */ Long,
+  castfunc: /* oid */ Long,
   castcontext: String,
   castmethod: String
 )
@@ -36,9 +36,9 @@ object PgCastRowUnsaved {
       JsResult.fromTry(
         Try(
           PgCastRowUnsaved(
-            castsource = json.\("castsource").as[Long],
-            casttarget = json.\("casttarget").as[Long],
-            castfunc = json.\("castfunc").as[Long],
+            castsource = json.\("castsource").as[/* oid */ Long],
+            casttarget = json.\("casttarget").as[/* oid */ Long],
+            castfunc = json.\("castfunc").as[/* oid */ Long],
             castcontext = json.\("castcontext").as[String],
             castmethod = json.\("castmethod").as[String]
           )

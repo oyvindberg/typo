@@ -18,8 +18,8 @@ import scala.util.Try
 
 case class PgPublicationRelRow(
   oid: PgPublicationRelId,
-  prpubid: Long,
-  prrelid: Long
+  prpubid: /* oid */ Long,
+  prrelid: /* oid */ Long
 )
 
 object PgPublicationRelRow {
@@ -27,8 +27,8 @@ object PgPublicationRelRow {
     Success(
       PgPublicationRelRow(
         oid = row[PgPublicationRelId](prefix + "oid"),
-        prpubid = row[Long](prefix + "prpubid"),
-        prrelid = row[Long](prefix + "prrelid")
+        prpubid = row[/* oid */ Long](prefix + "prpubid"),
+        prrelid = row[/* oid */ Long](prefix + "prrelid")
       )
     )
   }
@@ -46,8 +46,8 @@ object PgPublicationRelRow {
         Try(
           PgPublicationRelRow(
             oid = json.\("oid").as[PgPublicationRelId],
-            prpubid = json.\("prpubid").as[Long],
-            prrelid = json.\("prrelid").as[Long]
+            prpubid = json.\("prpubid").as[/* oid */ Long],
+            prrelid = json.\("prrelid").as[/* oid */ Long]
           )
         )
       )

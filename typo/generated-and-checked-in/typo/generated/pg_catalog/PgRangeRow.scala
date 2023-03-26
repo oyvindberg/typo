@@ -21,12 +21,12 @@ import scala.util.Try
 
 case class PgRangeRow(
   rngtypid: PgRangeId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngtypid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngsubtype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubtype","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngmultitypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngmultitypid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngcollation: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcollation","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngsubopc: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubopc","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngcanonical: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcanonical","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rngsubdiff: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubdiff","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  rngsubtype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubtype","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngmultitypid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngmultitypid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngcollation: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcollation","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngsubopc: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubopc","ordinal_position":5,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngcanonical: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngcanonical","ordinal_position":6,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  rngsubdiff: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_range","column_name":"rngsubdiff","ordinal_position":7,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgRangeRow {
@@ -34,12 +34,12 @@ object PgRangeRow {
     Success(
       PgRangeRow(
         rngtypid = row[PgRangeId](prefix + "rngtypid"),
-        rngsubtype = row[Long](prefix + "rngsubtype"),
-        rngmultitypid = row[Long](prefix + "rngmultitypid"),
-        rngcollation = row[Long](prefix + "rngcollation"),
-        rngsubopc = row[Long](prefix + "rngsubopc"),
-        rngcanonical = row[PGobject](prefix + "rngcanonical"),
-        rngsubdiff = row[PGobject](prefix + "rngsubdiff")
+        rngsubtype = row[/* oid */ Long](prefix + "rngsubtype"),
+        rngmultitypid = row[/* oid */ Long](prefix + "rngmultitypid"),
+        rngcollation = row[/* oid */ Long](prefix + "rngcollation"),
+        rngsubopc = row[/* oid */ Long](prefix + "rngsubopc"),
+        rngcanonical = row[/* regproc */ PGobject](prefix + "rngcanonical"),
+        rngsubdiff = row[/* regproc */ PGobject](prefix + "rngsubdiff")
       )
     )
   }
@@ -61,12 +61,12 @@ object PgRangeRow {
         Try(
           PgRangeRow(
             rngtypid = json.\("rngtypid").as[PgRangeId],
-            rngsubtype = json.\("rngsubtype").as[Long],
-            rngmultitypid = json.\("rngmultitypid").as[Long],
-            rngcollation = json.\("rngcollation").as[Long],
-            rngsubopc = json.\("rngsubopc").as[Long],
-            rngcanonical = json.\("rngcanonical").as[PGobject],
-            rngsubdiff = json.\("rngsubdiff").as[PGobject]
+            rngsubtype = json.\("rngsubtype").as[/* oid */ Long],
+            rngmultitypid = json.\("rngmultitypid").as[/* oid */ Long],
+            rngcollation = json.\("rngcollation").as[/* oid */ Long],
+            rngsubopc = json.\("rngsubopc").as[/* oid */ Long],
+            rngcanonical = json.\("rngcanonical").as[/* regproc */ PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[/* regproc */ PGobject]
           )
         )
       )

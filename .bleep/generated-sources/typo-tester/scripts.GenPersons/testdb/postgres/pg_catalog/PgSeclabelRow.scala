@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSeclabelRow(
-  objoid: Long,
-  classoid: Long,
+  objoid: /* oid */ Long,
+  classoid: /* oid */ Long,
   objsubid: Int,
   provider: String,
   label: String
@@ -30,8 +30,8 @@ object PgSeclabelRow {
   def rowParser(prefix: String): RowParser[PgSeclabelRow] = { row =>
     Success(
       PgSeclabelRow(
-        objoid = row[Long](prefix + "objoid"),
-        classoid = row[Long](prefix + "classoid"),
+        objoid = row[/* oid */ Long](prefix + "objoid"),
+        classoid = row[/* oid */ Long](prefix + "classoid"),
         objsubid = row[Int](prefix + "objsubid"),
         provider = row[String](prefix + "provider"),
         label = row[String](prefix + "label")
@@ -53,8 +53,8 @@ object PgSeclabelRow {
       JsResult.fromTry(
         Try(
           PgSeclabelRow(
-            objoid = json.\("objoid").as[Long],
-            classoid = json.\("classoid").as[Long],
+            objoid = json.\("objoid").as[/* oid */ Long],
+            classoid = json.\("classoid").as[/* oid */ Long],
             objsubid = json.\("objsubid").as[Int],
             provider = json.\("provider").as[String],
             label = json.\("label").as[String]

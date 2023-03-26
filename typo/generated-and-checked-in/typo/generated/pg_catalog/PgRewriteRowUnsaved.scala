@@ -19,12 +19,12 @@ import scala.util.Try
 
 case class PgRewriteRowUnsaved(
   rulename: String,
-  evClass: Long,
+  evClass: /* oid */ Long,
   evType: String,
   evEnabled: String,
   isInstead: Boolean,
-  evQual: PGobject,
-  evAction: PGobject
+  evQual: /* pg_node_tree */ PGobject,
+  evAction: /* pg_node_tree */ PGobject
 )
 object PgRewriteRowUnsaved {
   implicit val oFormat: OFormat[PgRewriteRowUnsaved] = new OFormat[PgRewriteRowUnsaved]{
@@ -44,12 +44,12 @@ object PgRewriteRowUnsaved {
         Try(
           PgRewriteRowUnsaved(
             rulename = json.\("rulename").as[String],
-            evClass = json.\("ev_class").as[Long],
+            evClass = json.\("ev_class").as[/* oid */ Long],
             evType = json.\("ev_type").as[String],
             evEnabled = json.\("ev_enabled").as[String],
             isInstead = json.\("is_instead").as[Boolean],
-            evQual = json.\("ev_qual").as[PGobject],
-            evAction = json.\("ev_action").as[PGobject]
+            evQual = json.\("ev_qual").as[/* pg_node_tree */ PGobject],
+            evAction = json.\("ev_action").as[/* pg_node_tree */ PGobject]
           )
         )
       )

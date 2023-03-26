@@ -21,9 +21,9 @@ import scala.util.Try
 
 case class PgAttrdefRow(
   oid: PgAttrdefId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  adrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"adrelid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  adrelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"adrelid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   adnum: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"adnum","ordinal_position":3,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  adbin: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"adbin","ordinal_position":4,"is_nullable":"NO","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  adbin: /* pg_node_tree */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attrdef","column_name":"adbin","ordinal_position":4,"is_nullable":"NO","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgAttrdefRow {
@@ -31,9 +31,9 @@ object PgAttrdefRow {
     Success(
       PgAttrdefRow(
         oid = row[PgAttrdefId](prefix + "oid"),
-        adrelid = row[Long](prefix + "adrelid"),
+        adrelid = row[/* oid */ Long](prefix + "adrelid"),
         adnum = row[Int](prefix + "adnum"),
-        adbin = row[PGobject](prefix + "adbin")
+        adbin = row[/* pg_node_tree */ PGobject](prefix + "adbin")
       )
     )
   }
@@ -52,9 +52,9 @@ object PgAttrdefRow {
         Try(
           PgAttrdefRow(
             oid = json.\("oid").as[PgAttrdefId],
-            adrelid = json.\("adrelid").as[Long],
+            adrelid = json.\("adrelid").as[/* oid */ Long],
             adnum = json.\("adnum").as[Int],
-            adbin = json.\("adbin").as[PGobject]
+            adbin = json.\("adbin").as[/* pg_node_tree */ PGobject]
           )
         )
       )

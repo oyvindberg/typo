@@ -12,7 +12,7 @@ package pg_catalog
 sealed abstract class PgShdescriptionFieldValue[T](val name: String, val value: T)
 
 object PgShdescriptionFieldValue {
-  case class objoid(override val value: Long) extends PgShdescriptionFieldValue("objoid", value)
-  case class classoid(override val value: Long) extends PgShdescriptionFieldValue("classoid", value)
+  case class objoid(override val value: /* oid */ Long) extends PgShdescriptionFieldValue("objoid", value)
+  case class classoid(override val value: /* oid */ Long) extends PgShdescriptionFieldValue("classoid", value)
   case class description(override val value: String) extends PgShdescriptionFieldValue("description", value)
 }

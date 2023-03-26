@@ -88,7 +88,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_ts_parser where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniquePrsnamePrsnamespace(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow] = {
+  override def selectByUniquePrsnamePrsnamespace(prsname: String, prsnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsParserRow] = {
     selectByFieldValues(List(PgTsParserFieldValue.prsname(prsname), PgTsParserFieldValue.prsnamespace(prsnamespace))).headOption
   }
 }

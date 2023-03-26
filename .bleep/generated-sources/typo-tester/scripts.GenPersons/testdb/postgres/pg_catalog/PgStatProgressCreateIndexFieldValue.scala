@@ -13,10 +13,10 @@ sealed abstract class PgStatProgressCreateIndexFieldValue[T](val name: String, v
 
 object PgStatProgressCreateIndexFieldValue {
   case class pid(override val value: Option[Int]) extends PgStatProgressCreateIndexFieldValue("pid", value)
-  case class datid(override val value: Option[Long]) extends PgStatProgressCreateIndexFieldValue("datid", value)
+  case class datid(override val value: Option[/* oid */ Long]) extends PgStatProgressCreateIndexFieldValue("datid", value)
   case class datname(override val value: Option[String]) extends PgStatProgressCreateIndexFieldValue("datname", value)
-  case class relid(override val value: Option[Long]) extends PgStatProgressCreateIndexFieldValue("relid", value)
-  case class indexRelid(override val value: Option[Long]) extends PgStatProgressCreateIndexFieldValue("index_relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatProgressCreateIndexFieldValue("relid", value)
+  case class indexRelid(override val value: Option[/* oid */ Long]) extends PgStatProgressCreateIndexFieldValue("index_relid", value)
   case class command(override val value: Option[String]) extends PgStatProgressCreateIndexFieldValue("command", value)
   case class phase(override val value: Option[String]) extends PgStatProgressCreateIndexFieldValue("phase", value)
   case class lockersTotal(override val value: Option[Long]) extends PgStatProgressCreateIndexFieldValue("lockers_total", value)

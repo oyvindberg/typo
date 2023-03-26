@@ -18,9 +18,9 @@ import scala.util.Try
 
 case class PgStatProgressCopyRow(
   pid: Option[Int],
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   command: Option[String],
   `type`: Option[String],
   bytesProcessed: Option[Long],
@@ -34,9 +34,9 @@ object PgStatProgressCopyRow {
     Success(
       PgStatProgressCopyRow(
         pid = row[Option[Int]](prefix + "pid"),
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         command = row[Option[String]](prefix + "command"),
         `type` = row[Option[String]](prefix + "type"),
         bytesProcessed = row[Option[Long]](prefix + "bytes_processed"),
@@ -67,9 +67,9 @@ object PgStatProgressCopyRow {
         Try(
           PgStatProgressCopyRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             command = json.\("command").toOption.map(_.as[String]),
             `type` = json.\("type").toOption.map(_.as[String]),
             bytesProcessed = json.\("bytes_processed").toOption.map(_.as[Long]),

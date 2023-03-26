@@ -20,7 +20,7 @@ import scala.util.Try
 
 case class PgSequenceRow(
   seqrelid: PgSequenceId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  seqtypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqtypid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  seqtypid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqtypid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   seqstart: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqstart","ordinal_position":3,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   seqincrement: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqincrement","ordinal_position":4,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   seqmax: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_sequence","column_name":"seqmax","ordinal_position":5,"is_nullable":"NO","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -34,7 +34,7 @@ object PgSequenceRow {
     Success(
       PgSequenceRow(
         seqrelid = row[PgSequenceId](prefix + "seqrelid"),
-        seqtypid = row[Long](prefix + "seqtypid"),
+        seqtypid = row[/* oid */ Long](prefix + "seqtypid"),
         seqstart = row[Long](prefix + "seqstart"),
         seqincrement = row[Long](prefix + "seqincrement"),
         seqmax = row[Long](prefix + "seqmax"),
@@ -63,7 +63,7 @@ object PgSequenceRow {
         Try(
           PgSequenceRow(
             seqrelid = json.\("seqrelid").as[PgSequenceId],
-            seqtypid = json.\("seqtypid").as[Long],
+            seqtypid = json.\("seqtypid").as[/* oid */ Long],
             seqstart = json.\("seqstart").as[Long],
             seqincrement = json.\("seqincrement").as[Long],
             seqmax = json.\("seqmax").as[Long],

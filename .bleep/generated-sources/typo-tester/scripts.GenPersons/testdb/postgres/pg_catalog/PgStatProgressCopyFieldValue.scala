@@ -13,9 +13,9 @@ sealed abstract class PgStatProgressCopyFieldValue[T](val name: String, val valu
 
 object PgStatProgressCopyFieldValue {
   case class pid(override val value: Option[Int]) extends PgStatProgressCopyFieldValue("pid", value)
-  case class datid(override val value: Option[Long]) extends PgStatProgressCopyFieldValue("datid", value)
+  case class datid(override val value: Option[/* oid */ Long]) extends PgStatProgressCopyFieldValue("datid", value)
   case class datname(override val value: Option[String]) extends PgStatProgressCopyFieldValue("datname", value)
-  case class relid(override val value: Option[Long]) extends PgStatProgressCopyFieldValue("relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatProgressCopyFieldValue("relid", value)
   case class command(override val value: Option[String]) extends PgStatProgressCopyFieldValue("command", value)
   case class `type`(override val value: Option[String]) extends PgStatProgressCopyFieldValue("type", value)
   case class bytesProcessed(override val value: Option[Long]) extends PgStatProgressCopyFieldValue("bytes_processed", value)

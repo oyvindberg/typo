@@ -18,11 +18,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAmprocRowUnsaved(
-  amprocfamily: Long,
-  amproclefttype: Long,
-  amprocrighttype: Long,
+  amprocfamily: /* oid */ Long,
+  amproclefttype: /* oid */ Long,
+  amprocrighttype: /* oid */ Long,
   amprocnum: Int,
-  amproc: PGobject
+  amproc: /* regproc */ PGobject
 )
 object PgAmprocRowUnsaved {
   implicit val oFormat: OFormat[PgAmprocRowUnsaved] = new OFormat[PgAmprocRowUnsaved]{
@@ -39,11 +39,11 @@ object PgAmprocRowUnsaved {
       JsResult.fromTry(
         Try(
           PgAmprocRowUnsaved(
-            amprocfamily = json.\("amprocfamily").as[Long],
-            amproclefttype = json.\("amproclefttype").as[Long],
-            amprocrighttype = json.\("amprocrighttype").as[Long],
+            amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
+            amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
+            amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
             amprocnum = json.\("amprocnum").as[Int],
-            amproc = json.\("amproc").as[PGobject]
+            amproc = json.\("amproc").as[/* regproc */ PGobject]
           )
         )
       )

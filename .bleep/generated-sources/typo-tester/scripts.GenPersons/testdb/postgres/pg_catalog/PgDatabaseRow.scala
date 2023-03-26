@@ -20,18 +20,18 @@ import scala.util.Try
 case class PgDatabaseRow(
   oid: PgDatabaseId,
   datname: String,
-  datdba: Long,
+  datdba: /* oid */ Long,
   encoding: Int,
   datcollate: String,
   datctype: String,
   datistemplate: Boolean,
   datallowconn: Boolean,
   datconnlimit: Int,
-  datlastsysoid: Long,
-  datfrozenxid: PGobject,
-  datminmxid: PGobject,
-  dattablespace: Long,
-  datacl: Option[Array[PGobject]]
+  datlastsysoid: /* oid */ Long,
+  datfrozenxid: /* xid */ PGobject,
+  datminmxid: /* xid */ PGobject,
+  dattablespace: /* oid */ Long,
+  datacl: Option[Array[/* aclitem */ PGobject]]
 )
 
 object PgDatabaseRow {
@@ -40,18 +40,18 @@ object PgDatabaseRow {
       PgDatabaseRow(
         oid = row[PgDatabaseId](prefix + "oid"),
         datname = row[String](prefix + "datname"),
-        datdba = row[Long](prefix + "datdba"),
+        datdba = row[/* oid */ Long](prefix + "datdba"),
         encoding = row[Int](prefix + "encoding"),
         datcollate = row[String](prefix + "datcollate"),
         datctype = row[String](prefix + "datctype"),
         datistemplate = row[Boolean](prefix + "datistemplate"),
         datallowconn = row[Boolean](prefix + "datallowconn"),
         datconnlimit = row[Int](prefix + "datconnlimit"),
-        datlastsysoid = row[Long](prefix + "datlastsysoid"),
-        datfrozenxid = row[PGobject](prefix + "datfrozenxid"),
-        datminmxid = row[PGobject](prefix + "datminmxid"),
-        dattablespace = row[Long](prefix + "dattablespace"),
-        datacl = row[Option[Array[PGobject]]](prefix + "datacl")
+        datlastsysoid = row[/* oid */ Long](prefix + "datlastsysoid"),
+        datfrozenxid = row[/* xid */ PGobject](prefix + "datfrozenxid"),
+        datminmxid = row[/* xid */ PGobject](prefix + "datminmxid"),
+        dattablespace = row[/* oid */ Long](prefix + "dattablespace"),
+        datacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "datacl")
       )
     )
   }
@@ -81,18 +81,18 @@ object PgDatabaseRow {
           PgDatabaseRow(
             oid = json.\("oid").as[PgDatabaseId],
             datname = json.\("datname").as[String],
-            datdba = json.\("datdba").as[Long],
+            datdba = json.\("datdba").as[/* oid */ Long],
             encoding = json.\("encoding").as[Int],
             datcollate = json.\("datcollate").as[String],
             datctype = json.\("datctype").as[String],
             datistemplate = json.\("datistemplate").as[Boolean],
             datallowconn = json.\("datallowconn").as[Boolean],
             datconnlimit = json.\("datconnlimit").as[Int],
-            datlastsysoid = json.\("datlastsysoid").as[Long],
-            datfrozenxid = json.\("datfrozenxid").as[PGobject],
-            datminmxid = json.\("datminmxid").as[PGobject],
-            dattablespace = json.\("dattablespace").as[Long],
-            datacl = json.\("datacl").toOption.map(_.as[Array[PGobject]])
+            datlastsysoid = json.\("datlastsysoid").as[/* oid */ Long],
+            datfrozenxid = json.\("datfrozenxid").as[/* xid */ PGobject],
+            datminmxid = json.\("datminmxid").as[/* xid */ PGobject],
+            dattablespace = json.\("dattablespace").as[/* oid */ Long],
+            datacl = json.\("datacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

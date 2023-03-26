@@ -17,13 +17,13 @@ import scala.util.Try
 
 case class PgLanguageRowUnsaved(
   lanname: String,
-  lanowner: Long,
+  lanowner: /* oid */ Long,
   lanispl: Boolean,
   lanpltrusted: Boolean,
-  lanplcallfoid: Long,
-  laninline: Long,
-  lanvalidator: Long,
-  lanacl: Option[Array[PGobject]]
+  lanplcallfoid: /* oid */ Long,
+  laninline: /* oid */ Long,
+  lanvalidator: /* oid */ Long,
+  lanacl: Option[Array[/* aclitem */ PGobject]]
 )
 object PgLanguageRowUnsaved {
   implicit val oFormat: OFormat[PgLanguageRowUnsaved] = new OFormat[PgLanguageRowUnsaved]{
@@ -44,13 +44,13 @@ object PgLanguageRowUnsaved {
         Try(
           PgLanguageRowUnsaved(
             lanname = json.\("lanname").as[String],
-            lanowner = json.\("lanowner").as[Long],
+            lanowner = json.\("lanowner").as[/* oid */ Long],
             lanispl = json.\("lanispl").as[Boolean],
             lanpltrusted = json.\("lanpltrusted").as[Boolean],
-            lanplcallfoid = json.\("lanplcallfoid").as[Long],
-            laninline = json.\("laninline").as[Long],
-            lanvalidator = json.\("lanvalidator").as[Long],
-            lanacl = json.\("lanacl").toOption.map(_.as[Array[PGobject]])
+            lanplcallfoid = json.\("lanplcallfoid").as[/* oid */ Long],
+            laninline = json.\("laninline").as[/* oid */ Long],
+            lanvalidator = json.\("lanvalidator").as[/* oid */ Long],
+            lanacl = json.\("lanacl").toOption.map(_.as[Array[/* aclitem */ PGobject]])
           )
         )
       )

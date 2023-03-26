@@ -18,10 +18,10 @@ import scala.util.Try
 
 case class PgStatProgressCreateIndexRow(
   pid: Option[Int],
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
-  relid: Option[Long],
-  indexRelid: Option[Long],
+  relid: Option[/* oid */ Long],
+  indexRelid: Option[/* oid */ Long],
   command: Option[String],
   phase: Option[String],
   lockersTotal: Option[Long],
@@ -40,10 +40,10 @@ object PgStatProgressCreateIndexRow {
     Success(
       PgStatProgressCreateIndexRow(
         pid = row[Option[Int]](prefix + "pid"),
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
-        relid = row[Option[Long]](prefix + "relid"),
-        indexRelid = row[Option[Long]](prefix + "index_relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
+        indexRelid = row[Option[/* oid */ Long]](prefix + "index_relid"),
         command = row[Option[String]](prefix + "command"),
         phase = row[Option[String]](prefix + "phase"),
         lockersTotal = row[Option[Long]](prefix + "lockers_total"),
@@ -85,10 +85,10 @@ object PgStatProgressCreateIndexRow {
         Try(
           PgStatProgressCreateIndexRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[Long]),
-            indexRelid = json.\("index_relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+            indexRelid = json.\("index_relid").toOption.map(_.as[/* oid */ Long]),
             command = json.\("command").toOption.map(_.as[String]),
             phase = json.\("phase").toOption.map(_.as[String]),
             lockersTotal = json.\("lockers_total").toOption.map(_.as[Long]),

@@ -18,12 +18,12 @@ import scala.util.Try
 
 case class PgStatProgressClusterRow(
   pid: Option[Int],
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   command: Option[String],
   phase: Option[String],
-  clusterIndexRelid: Option[Long],
+  clusterIndexRelid: Option[/* oid */ Long],
   heapTuplesScanned: Option[Long],
   heapTuplesWritten: Option[Long],
   heapBlksTotal: Option[Long],
@@ -36,12 +36,12 @@ object PgStatProgressClusterRow {
     Success(
       PgStatProgressClusterRow(
         pid = row[Option[Int]](prefix + "pid"),
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         command = row[Option[String]](prefix + "command"),
         phase = row[Option[String]](prefix + "phase"),
-        clusterIndexRelid = row[Option[Long]](prefix + "cluster_index_relid"),
+        clusterIndexRelid = row[Option[/* oid */ Long]](prefix + "cluster_index_relid"),
         heapTuplesScanned = row[Option[Long]](prefix + "heap_tuples_scanned"),
         heapTuplesWritten = row[Option[Long]](prefix + "heap_tuples_written"),
         heapBlksTotal = row[Option[Long]](prefix + "heap_blks_total"),
@@ -73,12 +73,12 @@ object PgStatProgressClusterRow {
         Try(
           PgStatProgressClusterRow(
             pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             command = json.\("command").toOption.map(_.as[String]),
             phase = json.\("phase").toOption.map(_.as[String]),
-            clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as[Long]),
+            clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as[/* oid */ Long]),
             heapTuplesScanned = json.\("heap_tuples_scanned").toOption.map(_.as[Long]),
             heapTuplesWritten = json.\("heap_tuples_written").toOption.map(_.as[Long]),
             heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),

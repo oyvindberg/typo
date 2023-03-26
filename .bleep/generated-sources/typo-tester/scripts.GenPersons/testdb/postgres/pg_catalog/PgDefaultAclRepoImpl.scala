@@ -79,7 +79,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_default_acl where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: Long, defaclnamespace: Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
+  override def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
     selectByFieldValues(List(PgDefaultAclFieldValue.defaclrole(defaclrole), PgDefaultAclFieldValue.defaclnamespace(defaclnamespace), PgDefaultAclFieldValue.defaclobjtype(defaclobjtype))).headOption
   }
 }

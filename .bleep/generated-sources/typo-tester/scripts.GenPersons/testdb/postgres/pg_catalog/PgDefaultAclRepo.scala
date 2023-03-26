@@ -17,5 +17,5 @@ trait PgDefaultAclRepo {
   def updateFieldValues(oid: PgDefaultAclId, fieldValues: List[PgDefaultAclFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgDefaultAclId, unsaved: PgDefaultAclRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean
-  def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: Long, defaclnamespace: Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow]
+  def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow]
 }

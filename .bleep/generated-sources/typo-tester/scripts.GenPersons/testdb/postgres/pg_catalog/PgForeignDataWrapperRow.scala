@@ -20,10 +20,10 @@ import scala.util.Try
 case class PgForeignDataWrapperRow(
   oid: PgForeignDataWrapperId,
   fdwname: String,
-  fdwowner: Long,
-  fdwhandler: Long,
-  fdwvalidator: Long,
-  fdwacl: Option[Array[PGobject]],
+  fdwowner: /* oid */ Long,
+  fdwhandler: /* oid */ Long,
+  fdwvalidator: /* oid */ Long,
+  fdwacl: Option[Array[/* aclitem */ PGobject]],
   fdwoptions: Option[Array[String]]
 )
 
@@ -33,10 +33,10 @@ object PgForeignDataWrapperRow {
       PgForeignDataWrapperRow(
         oid = row[PgForeignDataWrapperId](prefix + "oid"),
         fdwname = row[String](prefix + "fdwname"),
-        fdwowner = row[Long](prefix + "fdwowner"),
-        fdwhandler = row[Long](prefix + "fdwhandler"),
-        fdwvalidator = row[Long](prefix + "fdwvalidator"),
-        fdwacl = row[Option[Array[PGobject]]](prefix + "fdwacl"),
+        fdwowner = row[/* oid */ Long](prefix + "fdwowner"),
+        fdwhandler = row[/* oid */ Long](prefix + "fdwhandler"),
+        fdwvalidator = row[/* oid */ Long](prefix + "fdwvalidator"),
+        fdwacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "fdwacl"),
         fdwoptions = row[Option[Array[String]]](prefix + "fdwoptions")
       )
     )
@@ -60,10 +60,10 @@ object PgForeignDataWrapperRow {
           PgForeignDataWrapperRow(
             oid = json.\("oid").as[PgForeignDataWrapperId],
             fdwname = json.\("fdwname").as[String],
-            fdwowner = json.\("fdwowner").as[Long],
-            fdwhandler = json.\("fdwhandler").as[Long],
-            fdwvalidator = json.\("fdwvalidator").as[Long],
-            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[PGobject]]),
+            fdwowner = json.\("fdwowner").as[/* oid */ Long],
+            fdwhandler = json.\("fdwhandler").as[/* oid */ Long],
+            fdwvalidator = json.\("fdwvalidator").as[/* oid */ Long],
+            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
           )
         )

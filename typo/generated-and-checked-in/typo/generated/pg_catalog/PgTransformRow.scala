@@ -21,10 +21,10 @@ import scala.util.Try
 
 case class PgTransformRow(
   oid: PgTransformId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  trftype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trftype","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  trflang: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trflang","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  trffromsql: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trffromsql","ordinal_position":4,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  trftosql: PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trftosql","ordinal_position":5,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  trftype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trftype","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  trflang: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trflang","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  trffromsql: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trffromsql","ordinal_position":4,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  trftosql: /* regproc */ PGobject /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_transform","column_name":"trftosql","ordinal_position":5,"is_nullable":"NO","data_type":"regproc","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"regproc","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgTransformRow {
@@ -32,10 +32,10 @@ object PgTransformRow {
     Success(
       PgTransformRow(
         oid = row[PgTransformId](prefix + "oid"),
-        trftype = row[Long](prefix + "trftype"),
-        trflang = row[Long](prefix + "trflang"),
-        trffromsql = row[PGobject](prefix + "trffromsql"),
-        trftosql = row[PGobject](prefix + "trftosql")
+        trftype = row[/* oid */ Long](prefix + "trftype"),
+        trflang = row[/* oid */ Long](prefix + "trflang"),
+        trffromsql = row[/* regproc */ PGobject](prefix + "trffromsql"),
+        trftosql = row[/* regproc */ PGobject](prefix + "trftosql")
       )
     )
   }
@@ -55,10 +55,10 @@ object PgTransformRow {
         Try(
           PgTransformRow(
             oid = json.\("oid").as[PgTransformId],
-            trftype = json.\("trftype").as[Long],
-            trflang = json.\("trflang").as[Long],
-            trffromsql = json.\("trffromsql").as[PGobject],
-            trftosql = json.\("trftosql").as[PGobject]
+            trftype = json.\("trftype").as[/* oid */ Long],
+            trflang = json.\("trflang").as[/* oid */ Long],
+            trffromsql = json.\("trffromsql").as[/* regproc */ PGobject],
+            trftosql = json.\("trftosql").as[/* regproc */ PGobject]
           )
         )
       )

@@ -15,7 +15,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSequenceRowUnsaved(
-  seqtypid: Long,
+  seqtypid: /* oid */ Long,
   seqstart: Long,
   seqincrement: Long,
   seqmax: Long,
@@ -40,7 +40,7 @@ object PgSequenceRowUnsaved {
       JsResult.fromTry(
         Try(
           PgSequenceRowUnsaved(
-            seqtypid = json.\("seqtypid").as[Long],
+            seqtypid = json.\("seqtypid").as[/* oid */ Long],
             seqstart = json.\("seqstart").as[Long],
             seqincrement = json.\("seqincrement").as[Long],
             seqmax = json.\("seqmax").as[Long],

@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioSysTablesRow(
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   schemaname: Option[String],
   relname: Option[String],
   heapBlksRead: Option[Long],
@@ -34,7 +34,7 @@ object PgStatioSysTablesRow {
   def rowParser(prefix: String): RowParser[PgStatioSysTablesRow] = { row =>
     Success(
       PgStatioSysTablesRow(
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         relname = row[Option[String]](prefix + "relname"),
         heapBlksRead = row[Option[Long]](prefix + "heap_blks_read"),
@@ -69,7 +69,7 @@ object PgStatioSysTablesRow {
       JsResult.fromTry(
         Try(
           PgStatioSysTablesRow(
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             relname = json.\("relname").toOption.map(_.as[String]),
             heapBlksRead = json.\("heap_blks_read").toOption.map(_.as[Long]),

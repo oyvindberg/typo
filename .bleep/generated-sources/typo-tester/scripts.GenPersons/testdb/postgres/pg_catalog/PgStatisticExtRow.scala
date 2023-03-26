@@ -19,14 +19,14 @@ import scala.util.Try
 
 case class PgStatisticExtRow(
   oid: PgStatisticExtId,
-  stxrelid: Long,
+  stxrelid: /* oid */ Long,
   stxname: String,
-  stxnamespace: Long,
-  stxowner: Long,
+  stxnamespace: /* oid */ Long,
+  stxowner: /* oid */ Long,
   stxstattarget: Int,
-  stxkeys: PGobject,
+  stxkeys: /* int2vector */ PGobject,
   stxkind: Array[String],
-  stxexprs: Option[PGobject]
+  stxexprs: Option[/* pg_node_tree */ PGobject]
 )
 
 object PgStatisticExtRow {
@@ -34,14 +34,14 @@ object PgStatisticExtRow {
     Success(
       PgStatisticExtRow(
         oid = row[PgStatisticExtId](prefix + "oid"),
-        stxrelid = row[Long](prefix + "stxrelid"),
+        stxrelid = row[/* oid */ Long](prefix + "stxrelid"),
         stxname = row[String](prefix + "stxname"),
-        stxnamespace = row[Long](prefix + "stxnamespace"),
-        stxowner = row[Long](prefix + "stxowner"),
+        stxnamespace = row[/* oid */ Long](prefix + "stxnamespace"),
+        stxowner = row[/* oid */ Long](prefix + "stxowner"),
         stxstattarget = row[Int](prefix + "stxstattarget"),
-        stxkeys = row[PGobject](prefix + "stxkeys"),
+        stxkeys = row[/* int2vector */ PGobject](prefix + "stxkeys"),
         stxkind = row[Array[String]](prefix + "stxkind"),
-        stxexprs = row[Option[PGobject]](prefix + "stxexprs")
+        stxexprs = row[Option[/* pg_node_tree */ PGobject]](prefix + "stxexprs")
       )
     )
   }
@@ -65,14 +65,14 @@ object PgStatisticExtRow {
         Try(
           PgStatisticExtRow(
             oid = json.\("oid").as[PgStatisticExtId],
-            stxrelid = json.\("stxrelid").as[Long],
+            stxrelid = json.\("stxrelid").as[/* oid */ Long],
             stxname = json.\("stxname").as[String],
-            stxnamespace = json.\("stxnamespace").as[Long],
-            stxowner = json.\("stxowner").as[Long],
+            stxnamespace = json.\("stxnamespace").as[/* oid */ Long],
+            stxowner = json.\("stxowner").as[/* oid */ Long],
             stxstattarget = json.\("stxstattarget").as[Int],
-            stxkeys = json.\("stxkeys").as[PGobject],
+            stxkeys = json.\("stxkeys").as[/* int2vector */ PGobject],
             stxkind = json.\("stxkind").as[Array[String]],
-            stxexprs = json.\("stxexprs").toOption.map(_.as[PGobject])
+            stxexprs = json.\("stxexprs").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

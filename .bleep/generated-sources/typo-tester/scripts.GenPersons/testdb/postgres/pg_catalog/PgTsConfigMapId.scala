@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgTsConfigMapId(mapcfg: Long, maptokentype: Int, mapseqno: Int)
+case class PgTsConfigMapId(mapcfg: /* oid */ Long, maptokentype: Int, mapseqno: Int)
 object PgTsConfigMapId {
   implicit val ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
   implicit val oFormat: OFormat[PgTsConfigMapId] = new OFormat[PgTsConfigMapId]{
@@ -31,7 +31,7 @@ object PgTsConfigMapId {
       JsResult.fromTry(
         Try(
           PgTsConfigMapId(
-            mapcfg = json.\("mapcfg").as[Long],
+            mapcfg = json.\("mapcfg").as[/* oid */ Long],
             maptokentype = json.\("maptokentype").as[Int],
             mapseqno = json.\("mapseqno").as[Int]
           )
@@ -42,7 +42,7 @@ object PgTsConfigMapId {
   def rowParser(prefix: String): RowParser[PgTsConfigMapId] = { row =>
     Success(
       PgTsConfigMapId(
-        mapcfg = row[Long](prefix + "mapcfg"),
+        mapcfg = row[/* oid */ Long](prefix + "mapcfg"),
         maptokentype = row[Int](prefix + "maptokentype"),
         mapseqno = row[Int](prefix + "mapseqno")
       )

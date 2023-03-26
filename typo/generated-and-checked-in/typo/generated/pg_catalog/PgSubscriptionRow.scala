@@ -20,9 +20,9 @@ import scala.util.Try
 
 case class PgSubscriptionRow(
   oid: PgSubscriptionId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  subdbid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subdbid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subdbid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subdbid","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   subname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subname","ordinal_position":3,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  subowner: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  subowner: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subowner","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   subenabled: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subenabled","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   subbinary: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"subbinary","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   substream: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_subscription","column_name":"substream","ordinal_position":7,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -37,9 +37,9 @@ object PgSubscriptionRow {
     Success(
       PgSubscriptionRow(
         oid = row[PgSubscriptionId](prefix + "oid"),
-        subdbid = row[Long](prefix + "subdbid"),
+        subdbid = row[/* oid */ Long](prefix + "subdbid"),
         subname = row[String](prefix + "subname"),
-        subowner = row[Long](prefix + "subowner"),
+        subowner = row[/* oid */ Long](prefix + "subowner"),
         subenabled = row[Boolean](prefix + "subenabled"),
         subbinary = row[Boolean](prefix + "subbinary"),
         substream = row[Boolean](prefix + "substream"),
@@ -72,9 +72,9 @@ object PgSubscriptionRow {
         Try(
           PgSubscriptionRow(
             oid = json.\("oid").as[PgSubscriptionId],
-            subdbid = json.\("subdbid").as[Long],
+            subdbid = json.\("subdbid").as[/* oid */ Long],
             subname = json.\("subname").as[String],
-            subowner = json.\("subowner").as[Long],
+            subowner = json.\("subowner").as[/* oid */ Long],
             subenabled = json.\("subenabled").as[Boolean],
             subbinary = json.\("subbinary").as[Boolean],
             substream = json.\("substream").as[Boolean],

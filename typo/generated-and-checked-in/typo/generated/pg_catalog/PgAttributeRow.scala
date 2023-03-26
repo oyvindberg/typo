@@ -20,9 +20,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAttributeRow(
-  attrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  attrelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  atttypid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"atttypid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  atttypid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"atttypid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attstattarget: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attstattarget","ordinal_position":4,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attlen: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attlen","ordinal_position":5,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attnum: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attnum","ordinal_position":6,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -41,11 +41,11 @@ case class PgAttributeRow(
   attisdropped: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attisdropped","ordinal_position":19,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attislocal: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attislocal","ordinal_position":20,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attinhcount: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attinhcount","ordinal_position":21,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  attcollation: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attcollation","ordinal_position":22,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  attacl: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attacl","ordinal_position":23,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  attcollation: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attcollation","ordinal_position":22,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  attacl: Option[Array[/* aclitem */ PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attacl","ordinal_position":23,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_aclitem","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attoptions","ordinal_position":24,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attfdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attfdwoptions","ordinal_position":25,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  attmissingval: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attmissingval","ordinal_position":26,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  attmissingval: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attmissingval","ordinal_position":26,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
   val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
 }
@@ -54,9 +54,9 @@ object PgAttributeRow {
   def rowParser(prefix: String): RowParser[PgAttributeRow] = { row =>
     Success(
       PgAttributeRow(
-        attrelid = row[Long](prefix + "attrelid"),
+        attrelid = row[/* oid */ Long](prefix + "attrelid"),
         attname = row[String](prefix + "attname"),
-        atttypid = row[Long](prefix + "atttypid"),
+        atttypid = row[/* oid */ Long](prefix + "atttypid"),
         attstattarget = row[Int](prefix + "attstattarget"),
         attlen = row[Int](prefix + "attlen"),
         attnum = row[Int](prefix + "attnum"),
@@ -75,11 +75,11 @@ object PgAttributeRow {
         attisdropped = row[Boolean](prefix + "attisdropped"),
         attislocal = row[Boolean](prefix + "attislocal"),
         attinhcount = row[Int](prefix + "attinhcount"),
-        attcollation = row[Long](prefix + "attcollation"),
-        attacl = row[Option[Array[PGobject]]](prefix + "attacl"),
+        attcollation = row[/* oid */ Long](prefix + "attcollation"),
+        attacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "attacl"),
         attoptions = row[Option[Array[String]]](prefix + "attoptions"),
         attfdwoptions = row[Option[Array[String]]](prefix + "attfdwoptions"),
-        attmissingval = row[Option[PGobject]](prefix + "attmissingval")
+        attmissingval = row[Option[/* anyarray */ PGobject]](prefix + "attmissingval")
       )
     )
   }
@@ -119,9 +119,9 @@ object PgAttributeRow {
       JsResult.fromTry(
         Try(
           PgAttributeRow(
-            attrelid = json.\("attrelid").as[Long],
+            attrelid = json.\("attrelid").as[/* oid */ Long],
             attname = json.\("attname").as[String],
-            atttypid = json.\("atttypid").as[Long],
+            atttypid = json.\("atttypid").as[/* oid */ Long],
             attstattarget = json.\("attstattarget").as[Int],
             attlen = json.\("attlen").as[Int],
             attnum = json.\("attnum").as[Int],
@@ -140,11 +140,11 @@ object PgAttributeRow {
             attisdropped = json.\("attisdropped").as[Boolean],
             attislocal = json.\("attislocal").as[Boolean],
             attinhcount = json.\("attinhcount").as[Int],
-            attcollation = json.\("attcollation").as[Long],
-            attacl = json.\("attacl").toOption.map(_.as[Array[PGobject]]),
+            attcollation = json.\("attcollation").as[/* oid */ Long],
+            attacl = json.\("attacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-            attmissingval = json.\("attmissingval").toOption.map(_.as[PGobject])
+            attmissingval = json.\("attmissingval").toOption.map(_.as[/* anyarray */ PGobject])
           )
         )
       )

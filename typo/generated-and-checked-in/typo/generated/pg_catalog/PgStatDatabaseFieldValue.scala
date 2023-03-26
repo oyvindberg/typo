@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 sealed abstract class PgStatDatabaseFieldValue[T](val name: String, val value: T)
 
 object PgStatDatabaseFieldValue {
-  case class datid(override val value: Option[Long]) extends PgStatDatabaseFieldValue("datid", value)
+  case class datid(override val value: Option[/* oid */ Long]) extends PgStatDatabaseFieldValue("datid", value)
   case class datname(override val value: Option[String]) extends PgStatDatabaseFieldValue("datname", value)
   case class numbackends(override val value: Option[Int]) extends PgStatDatabaseFieldValue("numbackends", value)
   case class xactCommit(override val value: Option[Long]) extends PgStatDatabaseFieldValue("xact_commit", value)

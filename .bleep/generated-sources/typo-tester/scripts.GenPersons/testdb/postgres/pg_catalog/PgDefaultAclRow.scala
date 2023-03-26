@@ -19,10 +19,10 @@ import scala.util.Try
 
 case class PgDefaultAclRow(
   oid: PgDefaultAclId,
-  defaclrole: Long,
-  defaclnamespace: Long,
+  defaclrole: /* oid */ Long,
+  defaclnamespace: /* oid */ Long,
   defaclobjtype: String,
-  defaclacl: Array[PGobject]
+  defaclacl: Array[/* aclitem */ PGobject]
 )
 
 object PgDefaultAclRow {
@@ -30,10 +30,10 @@ object PgDefaultAclRow {
     Success(
       PgDefaultAclRow(
         oid = row[PgDefaultAclId](prefix + "oid"),
-        defaclrole = row[Long](prefix + "defaclrole"),
-        defaclnamespace = row[Long](prefix + "defaclnamespace"),
+        defaclrole = row[/* oid */ Long](prefix + "defaclrole"),
+        defaclnamespace = row[/* oid */ Long](prefix + "defaclnamespace"),
         defaclobjtype = row[String](prefix + "defaclobjtype"),
-        defaclacl = row[Array[PGobject]](prefix + "defaclacl")
+        defaclacl = row[Array[/* aclitem */ PGobject]](prefix + "defaclacl")
       )
     )
   }
@@ -53,10 +53,10 @@ object PgDefaultAclRow {
         Try(
           PgDefaultAclRow(
             oid = json.\("oid").as[PgDefaultAclId],
-            defaclrole = json.\("defaclrole").as[Long],
-            defaclnamespace = json.\("defaclnamespace").as[Long],
+            defaclrole = json.\("defaclrole").as[/* oid */ Long],
+            defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
             defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[PGobject]]
+            defaclacl = json.\("defaclacl").as[Array[/* aclitem */ PGobject]]
           )
         )
       )

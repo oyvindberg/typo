@@ -19,8 +19,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatioAllIndexesRow(
-  relid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"relid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  indexrelid: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"indexrelid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  relid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"relid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  indexrelid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"indexrelid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"schemaname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   relname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"relname","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   indexrelname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_statio_all_indexes","column_name":"indexrelname","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -32,8 +32,8 @@ object PgStatioAllIndexesRow {
   def rowParser(prefix: String): RowParser[PgStatioAllIndexesRow] = { row =>
     Success(
       PgStatioAllIndexesRow(
-        relid = row[Option[Long]](prefix + "relid"),
-        indexrelid = row[Option[Long]](prefix + "indexrelid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
+        indexrelid = row[Option[/* oid */ Long]](prefix + "indexrelid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         relname = row[Option[String]](prefix + "relname"),
         indexrelname = row[Option[String]](prefix + "indexrelname"),
@@ -59,8 +59,8 @@ object PgStatioAllIndexesRow {
       JsResult.fromTry(
         Try(
           PgStatioAllIndexesRow(
-            relid = json.\("relid").toOption.map(_.as[Long]),
-            indexrelid = json.\("indexrelid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+            indexrelid = json.\("indexrelid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             relname = json.\("relname").toOption.map(_.as[String]),
             indexrelname = json.\("indexrelname").toOption.map(_.as[String]),

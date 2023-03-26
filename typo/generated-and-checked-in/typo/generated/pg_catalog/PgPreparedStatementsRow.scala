@@ -24,7 +24,7 @@ case class PgPreparedStatementsRow(
   name: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   statement: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"statement","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   prepareTime: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"prepare_time","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  parameterTypes: Option[Array[PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"parameter_types","ordinal_position":4,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_regtype","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  parameterTypes: Option[Array[/* regtype */ PGobject]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"parameter_types","ordinal_position":4,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_regtype","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   fromSql: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"from_sql","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   genericPlans: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"generic_plans","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   customPlans: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"custom_plans","ordinal_position":7,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
@@ -37,7 +37,7 @@ object PgPreparedStatementsRow {
         name = row[Option[String]](prefix + "name"),
         statement = row[Option[String]](prefix + "statement"),
         prepareTime = row[Option[ZonedDateTime]](prefix + "prepare_time"),
-        parameterTypes = row[Option[Array[PGobject]]](prefix + "parameter_types"),
+        parameterTypes = row[Option[Array[/* regtype */ PGobject]]](prefix + "parameter_types"),
         fromSql = row[Option[Boolean]](prefix + "from_sql"),
         genericPlans = row[Option[Long]](prefix + "generic_plans"),
         customPlans = row[Option[Long]](prefix + "custom_plans")
@@ -64,7 +64,7 @@ object PgPreparedStatementsRow {
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
             prepareTime = json.\("prepare_time").toOption.map(_.as[ZonedDateTime]),
-            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[PGobject]]),
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[/* regtype */ PGobject]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
             customPlans = json.\("custom_plans").toOption.map(_.as[Long])

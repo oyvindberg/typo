@@ -17,14 +17,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgOpclassRowUnsaved(
-  opcmethod: Long,
+  opcmethod: /* oid */ Long,
   opcname: String,
-  opcnamespace: Long,
-  opcowner: Long,
-  opcfamily: Long,
-  opcintype: Long,
+  opcnamespace: /* oid */ Long,
+  opcowner: /* oid */ Long,
+  opcfamily: /* oid */ Long,
+  opcintype: /* oid */ Long,
   opcdefault: Boolean,
-  opckeytype: Long
+  opckeytype: /* oid */ Long
 )
 object PgOpclassRowUnsaved {
   implicit val oFormat: OFormat[PgOpclassRowUnsaved] = new OFormat[PgOpclassRowUnsaved]{
@@ -44,14 +44,14 @@ object PgOpclassRowUnsaved {
       JsResult.fromTry(
         Try(
           PgOpclassRowUnsaved(
-            opcmethod = json.\("opcmethod").as[Long],
+            opcmethod = json.\("opcmethod").as[/* oid */ Long],
             opcname = json.\("opcname").as[String],
-            opcnamespace = json.\("opcnamespace").as[Long],
-            opcowner = json.\("opcowner").as[Long],
-            opcfamily = json.\("opcfamily").as[Long],
-            opcintype = json.\("opcintype").as[Long],
+            opcnamespace = json.\("opcnamespace").as[/* oid */ Long],
+            opcowner = json.\("opcowner").as[/* oid */ Long],
+            opcfamily = json.\("opcfamily").as[/* oid */ Long],
+            opcintype = json.\("opcintype").as[/* oid */ Long],
             opcdefault = json.\("opcdefault").as[Boolean],
-            opckeytype = json.\("opckeytype").as[Long]
+            opckeytype = json.\("opckeytype").as[/* oid */ Long]
           )
         )
       )

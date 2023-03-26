@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgPreparedXactsRow(
-  transaction: Option[PGobject],
+  transaction: Option[/* xid */ PGobject],
   gid: Option[String],
   prepared: Option[ZonedDateTime],
   owner: Option[String],
@@ -30,7 +30,7 @@ object PgPreparedXactsRow {
   def rowParser(prefix: String): RowParser[PgPreparedXactsRow] = { row =>
     Success(
       PgPreparedXactsRow(
-        transaction = row[Option[PGobject]](prefix + "transaction"),
+        transaction = row[Option[/* xid */ PGobject]](prefix + "transaction"),
         gid = row[Option[String]](prefix + "gid"),
         prepared = row[Option[ZonedDateTime]](prefix + "prepared"),
         owner = row[Option[String]](prefix + "owner"),
@@ -53,7 +53,7 @@ object PgPreparedXactsRow {
       JsResult.fromTry(
         Try(
           PgPreparedXactsRow(
-            transaction = json.\("transaction").toOption.map(_.as[PGobject]),
+            transaction = json.\("transaction").toOption.map(_.as[/* xid */ PGobject]),
             gid = json.\("gid").toOption.map(_.as[String]),
             prepared = json.\("prepared").toOption.map(_.as[ZonedDateTime]),
             owner = json.\("owner").toOption.map(_.as[String]),

@@ -19,9 +19,9 @@ import scala.util.Try
 case class PgTsDictRow(
   oid: PgTsDictId,
   dictname: String,
-  dictnamespace: Long,
-  dictowner: Long,
-  dicttemplate: Long,
+  dictnamespace: /* oid */ Long,
+  dictowner: /* oid */ Long,
+  dicttemplate: /* oid */ Long,
   dictinitoption: Option[String]
 )
 
@@ -31,9 +31,9 @@ object PgTsDictRow {
       PgTsDictRow(
         oid = row[PgTsDictId](prefix + "oid"),
         dictname = row[String](prefix + "dictname"),
-        dictnamespace = row[Long](prefix + "dictnamespace"),
-        dictowner = row[Long](prefix + "dictowner"),
-        dicttemplate = row[Long](prefix + "dicttemplate"),
+        dictnamespace = row[/* oid */ Long](prefix + "dictnamespace"),
+        dictowner = row[/* oid */ Long](prefix + "dictowner"),
+        dicttemplate = row[/* oid */ Long](prefix + "dicttemplate"),
         dictinitoption = row[Option[String]](prefix + "dictinitoption")
       )
     )
@@ -56,9 +56,9 @@ object PgTsDictRow {
           PgTsDictRow(
             oid = json.\("oid").as[PgTsDictId],
             dictname = json.\("dictname").as[String],
-            dictnamespace = json.\("dictnamespace").as[Long],
-            dictowner = json.\("dictowner").as[Long],
-            dicttemplate = json.\("dicttemplate").as[Long],
+            dictnamespace = json.\("dictnamespace").as[/* oid */ Long],
+            dictowner = json.\("dictowner").as[/* oid */ Long],
+            dicttemplate = json.\("dicttemplate").as[/* oid */ Long],
             dictinitoption = json.\("dictinitoption").toOption.map(_.as[String])
           )
         )

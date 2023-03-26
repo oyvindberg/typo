@@ -17,9 +17,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAuthMembersRow(
-  roleid: Long,
-  member: Long,
-  grantor: Long,
+  roleid: /* oid */ Long,
+  member: /* oid */ Long,
+  grantor: /* oid */ Long,
   adminOption: Boolean
 ){
   val compositeId: PgAuthMembersId = PgAuthMembersId(roleid, member)
@@ -29,9 +29,9 @@ object PgAuthMembersRow {
   def rowParser(prefix: String): RowParser[PgAuthMembersRow] = { row =>
     Success(
       PgAuthMembersRow(
-        roleid = row[Long](prefix + "roleid"),
-        member = row[Long](prefix + "member"),
-        grantor = row[Long](prefix + "grantor"),
+        roleid = row[/* oid */ Long](prefix + "roleid"),
+        member = row[/* oid */ Long](prefix + "member"),
+        grantor = row[/* oid */ Long](prefix + "grantor"),
         adminOption = row[Boolean](prefix + "admin_option")
       )
     )
@@ -50,9 +50,9 @@ object PgAuthMembersRow {
       JsResult.fromTry(
         Try(
           PgAuthMembersRow(
-            roleid = json.\("roleid").as[Long],
-            member = json.\("member").as[Long],
-            grantor = json.\("grantor").as[Long],
+            roleid = json.\("roleid").as[/* oid */ Long],
+            member = json.\("member").as[/* oid */ Long],
+            grantor = json.\("grantor").as[/* oid */ Long],
             adminOption = json.\("admin_option").as[Boolean]
           )
         )

@@ -141,7 +141,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_constraint where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueConrelidContypidConname(conrelid: Long, contypid: Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
+  override def selectByUniqueConrelidContypidConname(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
     selectByFieldValues(List(PgConstraintFieldValue.conrelid(conrelid), PgConstraintFieldValue.contypid(contypid), PgConstraintFieldValue.conname(conname))).headOption
   }
 }

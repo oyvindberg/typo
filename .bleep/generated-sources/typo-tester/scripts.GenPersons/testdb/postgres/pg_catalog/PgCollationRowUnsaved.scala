@@ -16,8 +16,8 @@ import scala.util.Try
 
 case class PgCollationRowUnsaved(
   collname: String,
-  collnamespace: Long,
-  collowner: Long,
+  collnamespace: /* oid */ Long,
+  collowner: /* oid */ Long,
   collprovider: String,
   collisdeterministic: Boolean,
   collencoding: Int,
@@ -45,8 +45,8 @@ object PgCollationRowUnsaved {
         Try(
           PgCollationRowUnsaved(
             collname = json.\("collname").as[String],
-            collnamespace = json.\("collnamespace").as[Long],
-            collowner = json.\("collowner").as[Long],
+            collnamespace = json.\("collnamespace").as[/* oid */ Long],
+            collowner = json.\("collowner").as[/* oid */ Long],
             collprovider = json.\("collprovider").as[String],
             collisdeterministic = json.\("collisdeterministic").as[Boolean],
             collencoding = json.\("collencoding").as[Int],

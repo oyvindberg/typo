@@ -13,9 +13,9 @@ sealed abstract class PgSubscriptionFieldValue[T](val name: String, val value: T
 
 object PgSubscriptionFieldValue {
   case class oid(override val value: PgSubscriptionId) extends PgSubscriptionFieldValue("oid", value)
-  case class subdbid(override val value: Long) extends PgSubscriptionFieldValue("subdbid", value)
+  case class subdbid(override val value: /* oid */ Long) extends PgSubscriptionFieldValue("subdbid", value)
   case class subname(override val value: String) extends PgSubscriptionFieldValue("subname", value)
-  case class subowner(override val value: Long) extends PgSubscriptionFieldValue("subowner", value)
+  case class subowner(override val value: /* oid */ Long) extends PgSubscriptionFieldValue("subowner", value)
   case class subenabled(override val value: Boolean) extends PgSubscriptionFieldValue("subenabled", value)
   case class subbinary(override val value: Boolean) extends PgSubscriptionFieldValue("subbinary", value)
   case class substream(override val value: Boolean) extends PgSubscriptionFieldValue("substream", value)

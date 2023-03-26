@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignDataWrappersRow(
-  oid: Option[Long],
-  fdwowner: Option[Long],
+  oid: Option[/* oid */ Long],
+  fdwowner: Option[/* oid */ Long],
   fdwoptions: Option[Array[String]],
   foreignDataWrapperCatalog: Option[String],
   foreignDataWrapperName: Option[String],
@@ -30,8 +30,8 @@ object PgForeignDataWrappersRow {
   def rowParser(prefix: String): RowParser[PgForeignDataWrappersRow] = { row =>
     Success(
       PgForeignDataWrappersRow(
-        oid = row[Option[Long]](prefix + "oid"),
-        fdwowner = row[Option[Long]](prefix + "fdwowner"),
+        oid = row[Option[/* oid */ Long]](prefix + "oid"),
+        fdwowner = row[Option[/* oid */ Long]](prefix + "fdwowner"),
         fdwoptions = row[Option[Array[String]]](prefix + "fdwoptions"),
         foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
         foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
@@ -57,8 +57,8 @@ object PgForeignDataWrappersRow {
       JsResult.fromTry(
         Try(
           PgForeignDataWrappersRow(
-            oid = json.\("oid").toOption.map(_.as[Long]),
-            fdwowner = json.\("fdwowner").toOption.map(_.as[Long]),
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
+            fdwowner = json.\("fdwowner").toOption.map(_.as[/* oid */ Long]),
             fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
             foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[String]),
             foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[String]),

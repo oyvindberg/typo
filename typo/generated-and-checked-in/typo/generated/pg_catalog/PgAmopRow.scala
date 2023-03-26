@@ -20,14 +20,14 @@ import scala.util.Try
 
 case class PgAmopRow(
   oid: PgAmopId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amopfamily: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopfamily","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amoplefttype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amoplefttype","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amoprighttype: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amoprighttype","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amopfamily: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopfamily","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amoplefttype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amoplefttype","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amoprighttype: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amoprighttype","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   amopstrategy: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopstrategy","ordinal_position":5,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   amoppurpose: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amoppurpose","ordinal_position":6,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amopopr: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopopr","ordinal_position":7,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amopmethod: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopmethod","ordinal_position":8,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  amopsortfamily: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopsortfamily","ordinal_position":9,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  amopopr: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopopr","ordinal_position":7,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amopmethod: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopmethod","ordinal_position":8,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  amopsortfamily: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_amop","column_name":"amopsortfamily","ordinal_position":9,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgAmopRow {
@@ -35,14 +35,14 @@ object PgAmopRow {
     Success(
       PgAmopRow(
         oid = row[PgAmopId](prefix + "oid"),
-        amopfamily = row[Long](prefix + "amopfamily"),
-        amoplefttype = row[Long](prefix + "amoplefttype"),
-        amoprighttype = row[Long](prefix + "amoprighttype"),
+        amopfamily = row[/* oid */ Long](prefix + "amopfamily"),
+        amoplefttype = row[/* oid */ Long](prefix + "amoplefttype"),
+        amoprighttype = row[/* oid */ Long](prefix + "amoprighttype"),
         amopstrategy = row[Int](prefix + "amopstrategy"),
         amoppurpose = row[String](prefix + "amoppurpose"),
-        amopopr = row[Long](prefix + "amopopr"),
-        amopmethod = row[Long](prefix + "amopmethod"),
-        amopsortfamily = row[Long](prefix + "amopsortfamily")
+        amopopr = row[/* oid */ Long](prefix + "amopopr"),
+        amopmethod = row[/* oid */ Long](prefix + "amopmethod"),
+        amopsortfamily = row[/* oid */ Long](prefix + "amopsortfamily")
       )
     )
   }
@@ -66,14 +66,14 @@ object PgAmopRow {
         Try(
           PgAmopRow(
             oid = json.\("oid").as[PgAmopId],
-            amopfamily = json.\("amopfamily").as[Long],
-            amoplefttype = json.\("amoplefttype").as[Long],
-            amoprighttype = json.\("amoprighttype").as[Long],
+            amopfamily = json.\("amopfamily").as[/* oid */ Long],
+            amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
+            amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
             amopstrategy = json.\("amopstrategy").as[Int],
             amoppurpose = json.\("amoppurpose").as[String],
-            amopopr = json.\("amopopr").as[Long],
-            amopmethod = json.\("amopmethod").as[Long],
-            amopsortfamily = json.\("amopsortfamily").as[Long]
+            amopopr = json.\("amopopr").as[/* oid */ Long],
+            amopmethod = json.\("amopmethod").as[/* oid */ Long],
+            amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
           )
         )
       )

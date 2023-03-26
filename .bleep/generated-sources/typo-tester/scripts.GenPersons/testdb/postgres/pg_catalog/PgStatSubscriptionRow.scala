@@ -18,10 +18,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatSubscriptionRow(
-  subid: Option[Long],
+  subid: Option[/* oid */ Long],
   subname: Option[String],
   pid: Option[Int],
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   receivedLsn: Option[String],
   lastMsgSendTime: Option[ZonedDateTime],
   lastMsgReceiptTime: Option[ZonedDateTime],
@@ -33,10 +33,10 @@ object PgStatSubscriptionRow {
   def rowParser(prefix: String): RowParser[PgStatSubscriptionRow] = { row =>
     Success(
       PgStatSubscriptionRow(
-        subid = row[Option[Long]](prefix + "subid"),
+        subid = row[Option[/* oid */ Long]](prefix + "subid"),
         subname = row[Option[String]](prefix + "subname"),
         pid = row[Option[Int]](prefix + "pid"),
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         receivedLsn = row[Option[String]](prefix + "received_lsn"),
         lastMsgSendTime = row[Option[ZonedDateTime]](prefix + "last_msg_send_time"),
         lastMsgReceiptTime = row[Option[ZonedDateTime]](prefix + "last_msg_receipt_time"),
@@ -64,10 +64,10 @@ object PgStatSubscriptionRow {
       JsResult.fromTry(
         Try(
           PgStatSubscriptionRow(
-            subid = json.\("subid").toOption.map(_.as[Long]),
+            subid = json.\("subid").toOption.map(_.as[/* oid */ Long]),
             subname = json.\("subname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             receivedLsn = json.\("received_lsn").toOption.map(_.as[String]),
             lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[ZonedDateTime]),
             lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[ZonedDateTime]),

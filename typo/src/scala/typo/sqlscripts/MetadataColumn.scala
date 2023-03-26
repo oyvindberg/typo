@@ -37,7 +37,7 @@ object MetadataColumn {
   implicit val oformat: Writes[MetadataColumn] = (x: MetadataColumn) =>
     Json.obj(
       "baseColumnName" -> x.baseColumnName.map(_.value),
-      "baseRelationName" -> x.baseRelationName.map(x => s"${x.schema}.${x.name}"),
+      "baseRelationName" -> x.baseRelationName.map(_.value),
       "catalogName" -> x.catalogName,
       "columnClassName" -> x.columnClassName,
       "columnDisplaySize" -> x.columnDisplaySize,

@@ -19,6 +19,6 @@ trait PgConversionRepo {
   def updateFieldValues(oid: PgConversionId, fieldValues: List[PgConversionFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgConversionId, unsaved: PgConversionRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgConversionId)(implicit c: Connection): Boolean
-  def selectByUniqueConnamespaceConforencodingContoencodingOid(connamespace: Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow]
-  def selectByUniqueConnameConnamespace(conname: String, connamespace: Long)(implicit c: Connection): Option[PgConversionRow]
+  def selectByUniqueConnamespaceConforencodingContoencodingOid(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow]
+  def selectByUniqueConnameConnamespace(conname: String, connamespace: /* oid */ Long)(implicit c: Connection): Option[PgConversionRow]
 }

@@ -17,9 +17,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSubscriptionRowUnsaved(
-  subdbid: Long,
+  subdbid: /* oid */ Long,
   subname: String,
-  subowner: Long,
+  subowner: /* oid */ Long,
   subenabled: Boolean,
   subbinary: Boolean,
   substream: Boolean,
@@ -48,9 +48,9 @@ object PgSubscriptionRowUnsaved {
       JsResult.fromTry(
         Try(
           PgSubscriptionRowUnsaved(
-            subdbid = json.\("subdbid").as[Long],
+            subdbid = json.\("subdbid").as[/* oid */ Long],
             subname = json.\("subname").as[String],
-            subowner = json.\("subowner").as[Long],
+            subowner = json.\("subowner").as[/* oid */ Long],
             subenabled = json.\("subenabled").as[Boolean],
             subbinary = json.\("subbinary").as[Boolean],
             substream = json.\("substream").as[Boolean],

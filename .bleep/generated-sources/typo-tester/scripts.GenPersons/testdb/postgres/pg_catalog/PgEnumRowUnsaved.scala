@@ -15,7 +15,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgEnumRowUnsaved(
-  enumtypid: Long,
+  enumtypid: /* oid */ Long,
   enumsortorder: Float,
   enumlabel: String
 )
@@ -32,7 +32,7 @@ object PgEnumRowUnsaved {
       JsResult.fromTry(
         Try(
           PgEnumRowUnsaved(
-            enumtypid = json.\("enumtypid").as[Long],
+            enumtypid = json.\("enumtypid").as[/* oid */ Long],
             enumsortorder = json.\("enumsortorder").as[Float],
             enumlabel = json.\("enumlabel").as[String]
           )

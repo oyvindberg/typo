@@ -16,10 +16,10 @@ sealed abstract class PgForeignServerFieldValue[T](val name: String, val value: 
 object PgForeignServerFieldValue {
   case class oid(override val value: PgForeignServerId) extends PgForeignServerFieldValue("oid", value)
   case class srvname(override val value: String) extends PgForeignServerFieldValue("srvname", value)
-  case class srvowner(override val value: Long) extends PgForeignServerFieldValue("srvowner", value)
-  case class srvfdw(override val value: Long) extends PgForeignServerFieldValue("srvfdw", value)
+  case class srvowner(override val value: /* oid */ Long) extends PgForeignServerFieldValue("srvowner", value)
+  case class srvfdw(override val value: /* oid */ Long) extends PgForeignServerFieldValue("srvfdw", value)
   case class srvtype(override val value: Option[String]) extends PgForeignServerFieldValue("srvtype", value)
   case class srvversion(override val value: Option[String]) extends PgForeignServerFieldValue("srvversion", value)
-  case class srvacl(override val value: Option[Array[PGobject]]) extends PgForeignServerFieldValue("srvacl", value)
+  case class srvacl(override val value: Option[Array[/* aclitem */ PGobject]]) extends PgForeignServerFieldValue("srvacl", value)
   case class srvoptions(override val value: Option[Array[String]]) extends PgForeignServerFieldValue("srvoptions", value)
 }

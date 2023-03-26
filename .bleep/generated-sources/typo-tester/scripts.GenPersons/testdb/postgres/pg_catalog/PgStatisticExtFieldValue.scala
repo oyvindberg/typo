@@ -13,12 +13,12 @@ sealed abstract class PgStatisticExtFieldValue[T](val name: String, val value: T
 
 object PgStatisticExtFieldValue {
   case class oid(override val value: PgStatisticExtId) extends PgStatisticExtFieldValue("oid", value)
-  case class stxrelid(override val value: Long) extends PgStatisticExtFieldValue("stxrelid", value)
+  case class stxrelid(override val value: /* oid */ Long) extends PgStatisticExtFieldValue("stxrelid", value)
   case class stxname(override val value: String) extends PgStatisticExtFieldValue("stxname", value)
-  case class stxnamespace(override val value: Long) extends PgStatisticExtFieldValue("stxnamespace", value)
-  case class stxowner(override val value: Long) extends PgStatisticExtFieldValue("stxowner", value)
+  case class stxnamespace(override val value: /* oid */ Long) extends PgStatisticExtFieldValue("stxnamespace", value)
+  case class stxowner(override val value: /* oid */ Long) extends PgStatisticExtFieldValue("stxowner", value)
   case class stxstattarget(override val value: Int) extends PgStatisticExtFieldValue("stxstattarget", value)
-  case class stxkeys(override val value: PGobject) extends PgStatisticExtFieldValue("stxkeys", value)
+  case class stxkeys(override val value: /* int2vector */ PGobject) extends PgStatisticExtFieldValue("stxkeys", value)
   case class stxkind(override val value: Array[String]) extends PgStatisticExtFieldValue("stxkind", value)
-  case class stxexprs(override val value: Option[PGobject]) extends PgStatisticExtFieldValue("stxexprs", value)
+  case class stxexprs(override val value: Option[/* pg_node_tree */ PGobject]) extends PgStatisticExtFieldValue("stxexprs", value)
 }

@@ -18,7 +18,7 @@ import scala.util.Try
 
 case class PgSequenceRow(
   seqrelid: PgSequenceId,
-  seqtypid: Long,
+  seqtypid: /* oid */ Long,
   seqstart: Long,
   seqincrement: Long,
   seqmax: Long,
@@ -32,7 +32,7 @@ object PgSequenceRow {
     Success(
       PgSequenceRow(
         seqrelid = row[PgSequenceId](prefix + "seqrelid"),
-        seqtypid = row[Long](prefix + "seqtypid"),
+        seqtypid = row[/* oid */ Long](prefix + "seqtypid"),
         seqstart = row[Long](prefix + "seqstart"),
         seqincrement = row[Long](prefix + "seqincrement"),
         seqmax = row[Long](prefix + "seqmax"),
@@ -61,7 +61,7 @@ object PgSequenceRow {
         Try(
           PgSequenceRow(
             seqrelid = json.\("seqrelid").as[PgSequenceId],
-            seqtypid = json.\("seqtypid").as[Long],
+            seqtypid = json.\("seqtypid").as[/* oid */ Long],
             seqstart = json.\("seqstart").as[Long],
             seqincrement = json.\("seqincrement").as[Long],
             seqmax = json.\("seqmax").as[Long],

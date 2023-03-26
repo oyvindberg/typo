@@ -9,7 +9,6 @@ object db {
   object Type {
     case object BigInt extends Type
     case object Text extends Type
-    case object AnyArray extends Type
     case object Boolean extends Type
     case object Char extends Type
     case object Name extends Type
@@ -18,7 +17,7 @@ object db {
     case object Inet extends Type
     case object Oid extends Type
 
-    case object PgObject extends Type
+    case class PgObject(value: String) extends Type
     case object PGbox extends Type
     case object PGcircle extends Type
     case object PGline extends Type
@@ -47,7 +46,9 @@ object db {
   case class StringEnum(name: db.RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, jsonDescription: JsValue)
-  case class RelationName(schema: Option[String], name: String)
+  case class RelationName(schema: Option[String], name: String) {
+    def value = s"${schema.map(_ + ".").getOrElse("")}$name"
+  }
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName)
   case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName) {
     require(cols.size == otherCols.size)

@@ -75,7 +75,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_publication_rel where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniquePrrelidPrpubid(prrelid: Long, prpubid: Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
+  override def selectByUniquePrrelidPrpubid(prrelid: /* oid */ Long, prpubid: /* oid */ Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
     selectByFieldValues(List(PgPublicationRelFieldValue.prrelid(prrelid), PgPublicationRelFieldValue.prpubid(prpubid))).headOption
   }
 }

@@ -19,7 +19,7 @@ import scala.util.Try
 
 case class PgAmRowUnsaved(
   amname: String,
-  amhandler: PGobject,
+  amhandler: /* regproc */ PGobject,
   amtype: String
 )
 object PgAmRowUnsaved {
@@ -36,7 +36,7 @@ object PgAmRowUnsaved {
         Try(
           PgAmRowUnsaved(
             amname = json.\("amname").as[String],
-            amhandler = json.\("amhandler").as[PGobject],
+            amhandler = json.\("amhandler").as[/* regproc */ PGobject],
             amtype = json.\("amtype").as[String]
           )
         )

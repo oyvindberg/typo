@@ -20,16 +20,16 @@ import scala.util.Try
 case class PgConstraintRow(
   oid: PgConstraintId,
   conname: String,
-  connamespace: Long,
+  connamespace: /* oid */ Long,
   contype: String,
   condeferrable: Boolean,
   condeferred: Boolean,
   convalidated: Boolean,
-  conrelid: Long,
-  contypid: Long,
-  conindid: Long,
-  conparentid: Long,
-  confrelid: Long,
+  conrelid: /* oid */ Long,
+  contypid: /* oid */ Long,
+  conindid: /* oid */ Long,
+  conparentid: /* oid */ Long,
+  confrelid: /* oid */ Long,
   confupdtype: String,
   confdeltype: String,
   confmatchtype: String,
@@ -38,11 +38,11 @@ case class PgConstraintRow(
   connoinherit: Boolean,
   conkey: Option[Array[Int]],
   confkey: Option[Array[Int]],
-  conpfeqop: Option[Array[Long]],
-  conppeqop: Option[Array[Long]],
-  conffeqop: Option[Array[Long]],
-  conexclop: Option[Array[Long]],
-  conbin: Option[PGobject]
+  conpfeqop: Option[Array[/* oid */ Long]],
+  conppeqop: Option[Array[/* oid */ Long]],
+  conffeqop: Option[Array[/* oid */ Long]],
+  conexclop: Option[Array[/* oid */ Long]],
+  conbin: Option[/* pg_node_tree */ PGobject]
 )
 
 object PgConstraintRow {
@@ -51,16 +51,16 @@ object PgConstraintRow {
       PgConstraintRow(
         oid = row[PgConstraintId](prefix + "oid"),
         conname = row[String](prefix + "conname"),
-        connamespace = row[Long](prefix + "connamespace"),
+        connamespace = row[/* oid */ Long](prefix + "connamespace"),
         contype = row[String](prefix + "contype"),
         condeferrable = row[Boolean](prefix + "condeferrable"),
         condeferred = row[Boolean](prefix + "condeferred"),
         convalidated = row[Boolean](prefix + "convalidated"),
-        conrelid = row[Long](prefix + "conrelid"),
-        contypid = row[Long](prefix + "contypid"),
-        conindid = row[Long](prefix + "conindid"),
-        conparentid = row[Long](prefix + "conparentid"),
-        confrelid = row[Long](prefix + "confrelid"),
+        conrelid = row[/* oid */ Long](prefix + "conrelid"),
+        contypid = row[/* oid */ Long](prefix + "contypid"),
+        conindid = row[/* oid */ Long](prefix + "conindid"),
+        conparentid = row[/* oid */ Long](prefix + "conparentid"),
+        confrelid = row[/* oid */ Long](prefix + "confrelid"),
         confupdtype = row[String](prefix + "confupdtype"),
         confdeltype = row[String](prefix + "confdeltype"),
         confmatchtype = row[String](prefix + "confmatchtype"),
@@ -69,11 +69,11 @@ object PgConstraintRow {
         connoinherit = row[Boolean](prefix + "connoinherit"),
         conkey = row[Option[Array[Int]]](prefix + "conkey"),
         confkey = row[Option[Array[Int]]](prefix + "confkey"),
-        conpfeqop = row[Option[Array[Long]]](prefix + "conpfeqop"),
-        conppeqop = row[Option[Array[Long]]](prefix + "conppeqop"),
-        conffeqop = row[Option[Array[Long]]](prefix + "conffeqop"),
-        conexclop = row[Option[Array[Long]]](prefix + "conexclop"),
-        conbin = row[Option[PGobject]](prefix + "conbin")
+        conpfeqop = row[Option[Array[/* oid */ Long]]](prefix + "conpfeqop"),
+        conppeqop = row[Option[Array[/* oid */ Long]]](prefix + "conppeqop"),
+        conffeqop = row[Option[Array[/* oid */ Long]]](prefix + "conffeqop"),
+        conexclop = row[Option[Array[/* oid */ Long]]](prefix + "conexclop"),
+        conbin = row[Option[/* pg_node_tree */ PGobject]](prefix + "conbin")
       )
     )
   }
@@ -114,16 +114,16 @@ object PgConstraintRow {
           PgConstraintRow(
             oid = json.\("oid").as[PgConstraintId],
             conname = json.\("conname").as[String],
-            connamespace = json.\("connamespace").as[Long],
+            connamespace = json.\("connamespace").as[/* oid */ Long],
             contype = json.\("contype").as[String],
             condeferrable = json.\("condeferrable").as[Boolean],
             condeferred = json.\("condeferred").as[Boolean],
             convalidated = json.\("convalidated").as[Boolean],
-            conrelid = json.\("conrelid").as[Long],
-            contypid = json.\("contypid").as[Long],
-            conindid = json.\("conindid").as[Long],
-            conparentid = json.\("conparentid").as[Long],
-            confrelid = json.\("confrelid").as[Long],
+            conrelid = json.\("conrelid").as[/* oid */ Long],
+            contypid = json.\("contypid").as[/* oid */ Long],
+            conindid = json.\("conindid").as[/* oid */ Long],
+            conparentid = json.\("conparentid").as[/* oid */ Long],
+            confrelid = json.\("confrelid").as[/* oid */ Long],
             confupdtype = json.\("confupdtype").as[String],
             confdeltype = json.\("confdeltype").as[String],
             confmatchtype = json.\("confmatchtype").as[String],
@@ -132,11 +132,11 @@ object PgConstraintRow {
             connoinherit = json.\("connoinherit").as[Boolean],
             conkey = json.\("conkey").toOption.map(_.as[Array[Int]]),
             confkey = json.\("confkey").toOption.map(_.as[Array[Int]]),
-            conpfeqop = json.\("conpfeqop").toOption.map(_.as[Array[Long]]),
-            conppeqop = json.\("conppeqop").toOption.map(_.as[Array[Long]]),
-            conffeqop = json.\("conffeqop").toOption.map(_.as[Array[Long]]),
-            conexclop = json.\("conexclop").toOption.map(_.as[Array[Long]]),
-            conbin = json.\("conbin").toOption.map(_.as[PGobject])
+            conpfeqop = json.\("conpfeqop").toOption.map(_.as[Array[/* oid */ Long]]),
+            conppeqop = json.\("conppeqop").toOption.map(_.as[Array[/* oid */ Long]]),
+            conffeqop = json.\("conffeqop").toOption.map(_.as[Array[/* oid */ Long]]),
+            conexclop = json.\("conexclop").toOption.map(_.as[Array[/* oid */ Long]]),
+            conbin = json.\("conbin").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

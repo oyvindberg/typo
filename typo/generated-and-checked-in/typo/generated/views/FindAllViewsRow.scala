@@ -7,6 +7,7 @@
  */
 package typo
 package generated
+package views
 
 import anorm.RowParser
 import anorm.Success
@@ -17,17 +18,17 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class FindViewsRow(
+case class FindAllViewsRow(
   tableSchema: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   tableName: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
-  relkind: String /* {"baseColumnName":"relkind","baseRelationName":"Some(pg_catalog).pg_class","columnClassName":"java.lang.String","columnDisplaySize":1,"columnLabel":"relkind","columnName":"relkind","columnType":"Char","columnTypeName":"char","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
+  relkind: String /* {"baseColumnName":"relkind","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":1,"columnLabel":"relkind","columnName":"relkind","columnType":"Char","columnTypeName":"char","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0,"tableName":"pg_class"} */,
   viewDefinition: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_definition","columnName":"view_definition","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
-object FindViewsRow {
-  def rowParser(prefix: String): RowParser[FindViewsRow] = { row =>
+object FindAllViewsRow {
+  def rowParser(prefix: String): RowParser[FindAllViewsRow] = { row =>
     Success(
-      FindViewsRow(
+      FindAllViewsRow(
         tableSchema = row[/* nullability unknown */ Option[String]](prefix + "table_schema"),
         tableName = row[/* nullability unknown */ Option[String]](prefix + "table_name"),
         relkind = row[String](prefix + "relkind"),
@@ -36,8 +37,8 @@ object FindViewsRow {
     )
   }
 
-  implicit val oFormat: OFormat[FindViewsRow] = new OFormat[FindViewsRow]{
-    override def writes(o: FindViewsRow): JsObject =
+  implicit val oFormat: OFormat[FindAllViewsRow] = new OFormat[FindAllViewsRow]{
+    override def writes(o: FindAllViewsRow): JsObject =
       Json.obj(
         "table_schema" -> o.tableSchema,
       "table_name" -> o.tableName,
@@ -45,10 +46,10 @@ object FindViewsRow {
       "view_definition" -> o.viewDefinition
       )
 
-    override def reads(json: JsValue): JsResult[FindViewsRow] = {
+    override def reads(json: JsValue): JsResult[FindAllViewsRow] = {
       JsResult.fromTry(
         Try(
-          FindViewsRow(
+          FindAllViewsRow(
             tableSchema = json.\("table_schema").toOption.map(_.as[String]),
             tableName = json.\("table_name").toOption.map(_.as[String]),
             relkind = json.\("relkind").as[String],

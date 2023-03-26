@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgSubscriptionRelId(srrelid: Long, srsubid: Long)
+case class PgSubscriptionRelId(srrelid: /* oid */ Long, srsubid: /* oid */ Long)
 object PgSubscriptionRelId {
   implicit val ordering: Ordering[PgSubscriptionRelId] = Ordering.by(x => (x.srrelid, x.srsubid))
   implicit val oFormat: OFormat[PgSubscriptionRelId] = new OFormat[PgSubscriptionRelId]{
@@ -30,8 +30,8 @@ object PgSubscriptionRelId {
       JsResult.fromTry(
         Try(
           PgSubscriptionRelId(
-            srrelid = json.\("srrelid").as[Long],
-            srsubid = json.\("srsubid").as[Long]
+            srrelid = json.\("srrelid").as[/* oid */ Long],
+            srsubid = json.\("srsubid").as[/* oid */ Long]
           )
         )
       )
@@ -40,8 +40,8 @@ object PgSubscriptionRelId {
   def rowParser(prefix: String): RowParser[PgSubscriptionRelId] = { row =>
     Success(
       PgSubscriptionRelId(
-        srrelid = row[Long](prefix + "srrelid"),
-        srsubid = row[Long](prefix + "srsubid")
+        srrelid = row[/* oid */ Long](prefix + "srrelid"),
+        srsubid = row[/* oid */ Long](prefix + "srsubid")
       )
     )
   }

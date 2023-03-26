@@ -19,5 +19,5 @@ trait PgPublicationRelRepo {
   def updateFieldValues(oid: PgPublicationRelId, fieldValues: List[PgPublicationRelFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgPublicationRelId, unsaved: PgPublicationRelRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean
-  def selectByUniquePrrelidPrpubid(prrelid: Long, prpubid: Long)(implicit c: Connection): Option[PgPublicationRelRow]
+  def selectByUniquePrrelidPrpubid(prrelid: /* oid */ Long, prpubid: /* oid */ Long)(implicit c: Connection): Option[PgPublicationRelRow]
 }

@@ -18,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatAllTablesRow(
-  relid: Option[Long],
+  relid: Option[/* oid */ Long],
   schemaname: Option[String],
   relname: Option[String],
   seqScan: Option[Long],
@@ -47,7 +47,7 @@ object PgStatAllTablesRow {
   def rowParser(prefix: String): RowParser[PgStatAllTablesRow] = { row =>
     Success(
       PgStatAllTablesRow(
-        relid = row[Option[Long]](prefix + "relid"),
+        relid = row[Option[/* oid */ Long]](prefix + "relid"),
         schemaname = row[Option[String]](prefix + "schemaname"),
         relname = row[Option[String]](prefix + "relname"),
         seqScan = row[Option[Long]](prefix + "seq_scan"),
@@ -106,7 +106,7 @@ object PgStatAllTablesRow {
       JsResult.fromTry(
         Try(
           PgStatAllTablesRow(
-            relid = json.\("relid").toOption.map(_.as[Long]),
+            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
             schemaname = json.\("schemaname").toOption.map(_.as[String]),
             relname = json.\("relname").toOption.map(_.as[String]),
             seqScan = json.\("seq_scan").toOption.map(_.as[Long]),

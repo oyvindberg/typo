@@ -17,11 +17,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgSeclabelsRow(
-  objoid: Option[Long],
-  classoid: Option[Long],
+  objoid: Option[/* oid */ Long],
+  classoid: Option[/* oid */ Long],
   objsubid: Option[Int],
   objtype: Option[String],
-  objnamespace: Option[Long],
+  objnamespace: Option[/* oid */ Long],
   objname: Option[String],
   provider: Option[String],
   label: Option[String]
@@ -31,11 +31,11 @@ object PgSeclabelsRow {
   def rowParser(prefix: String): RowParser[PgSeclabelsRow] = { row =>
     Success(
       PgSeclabelsRow(
-        objoid = row[Option[Long]](prefix + "objoid"),
-        classoid = row[Option[Long]](prefix + "classoid"),
+        objoid = row[Option[/* oid */ Long]](prefix + "objoid"),
+        classoid = row[Option[/* oid */ Long]](prefix + "classoid"),
         objsubid = row[Option[Int]](prefix + "objsubid"),
         objtype = row[Option[String]](prefix + "objtype"),
-        objnamespace = row[Option[Long]](prefix + "objnamespace"),
+        objnamespace = row[Option[/* oid */ Long]](prefix + "objnamespace"),
         objname = row[Option[String]](prefix + "objname"),
         provider = row[Option[String]](prefix + "provider"),
         label = row[Option[String]](prefix + "label")
@@ -60,11 +60,11 @@ object PgSeclabelsRow {
       JsResult.fromTry(
         Try(
           PgSeclabelsRow(
-            objoid = json.\("objoid").toOption.map(_.as[Long]),
-            classoid = json.\("classoid").toOption.map(_.as[Long]),
+            objoid = json.\("objoid").toOption.map(_.as[/* oid */ Long]),
+            classoid = json.\("classoid").toOption.map(_.as[/* oid */ Long]),
             objsubid = json.\("objsubid").toOption.map(_.as[Int]),
             objtype = json.\("objtype").toOption.map(_.as[String]),
-            objnamespace = json.\("objnamespace").toOption.map(_.as[Long]),
+            objnamespace = json.\("objnamespace").toOption.map(_.as[/* oid */ Long]),
             objname = json.\("objname").toOption.map(_.as[String]),
             provider = json.\("provider").toOption.map(_.as[String]),
             label = json.\("label").toOption.map(_.as[String])

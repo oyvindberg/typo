@@ -30,7 +30,7 @@ case class PgRolesRow(
   rolvaliduntil: Option[ZonedDateTime],
   rolbypassrls: Option[Boolean],
   rolconfig: Option[Array[String]],
-  oid: Option[Long]
+  oid: Option[/* oid */ Long]
 )
 
 object PgRolesRow {
@@ -49,7 +49,7 @@ object PgRolesRow {
         rolvaliduntil = row[Option[ZonedDateTime]](prefix + "rolvaliduntil"),
         rolbypassrls = row[Option[Boolean]](prefix + "rolbypassrls"),
         rolconfig = row[Option[Array[String]]](prefix + "rolconfig"),
-        oid = row[Option[Long]](prefix + "oid")
+        oid = row[Option[/* oid */ Long]](prefix + "oid")
       )
     )
   }
@@ -88,7 +88,7 @@ object PgRolesRow {
             rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as[ZonedDateTime]),
             rolbypassrls = json.\("rolbypassrls").toOption.map(_.as[Boolean]),
             rolconfig = json.\("rolconfig").toOption.map(_.as[Array[String]]),
-            oid = json.\("oid").toOption.map(_.as[Long])
+            oid = json.\("oid").toOption.map(_.as[/* oid */ Long])
           )
         )
       )

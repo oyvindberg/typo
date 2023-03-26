@@ -90,7 +90,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_rewrite where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueEvClassRulename(evClass: Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
+  override def selectByUniqueEvClassRulename(evClass: /* oid */ Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
     selectByFieldValues(List(PgRewriteFieldValue.evClass(evClass), PgRewriteFieldValue.rulename(rulename))).headOption
   }
 }

@@ -19,7 +19,7 @@ import scala.util.Try
 
 case class PgUserRow(
   usename: Option[String],
-  usesysid: Option[Long],
+  usesysid: Option[/* oid */ Long],
   usecreatedb: Option[Boolean],
   usesuper: Option[Boolean],
   userepl: Option[Boolean],
@@ -34,7 +34,7 @@ object PgUserRow {
     Success(
       PgUserRow(
         usename = row[Option[String]](prefix + "usename"),
-        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usesysid = row[Option[/* oid */ Long]](prefix + "usesysid"),
         usecreatedb = row[Option[Boolean]](prefix + "usecreatedb"),
         usesuper = row[Option[Boolean]](prefix + "usesuper"),
         userepl = row[Option[Boolean]](prefix + "userepl"),
@@ -65,7 +65,7 @@ object PgUserRow {
         Try(
           PgUserRow(
             usename = json.\("usename").toOption.map(_.as[String]),
-            usesysid = json.\("usesysid").toOption.map(_.as[Long]),
+            usesysid = json.\("usesysid").toOption.map(_.as[/* oid */ Long]),
             usecreatedb = json.\("usecreatedb").toOption.map(_.as[Boolean]),
             usesuper = json.\("usesuper").toOption.map(_.as[Boolean]),
             userepl = json.\("userepl").toOption.map(_.as[Boolean]),

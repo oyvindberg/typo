@@ -19,11 +19,11 @@ import scala.util.Try
 
 case class PgAmprocRow(
   oid: PgAmprocId,
-  amprocfamily: Long,
-  amproclefttype: Long,
-  amprocrighttype: Long,
+  amprocfamily: /* oid */ Long,
+  amproclefttype: /* oid */ Long,
+  amprocrighttype: /* oid */ Long,
   amprocnum: Int,
-  amproc: PGobject
+  amproc: /* regproc */ PGobject
 )
 
 object PgAmprocRow {
@@ -31,11 +31,11 @@ object PgAmprocRow {
     Success(
       PgAmprocRow(
         oid = row[PgAmprocId](prefix + "oid"),
-        amprocfamily = row[Long](prefix + "amprocfamily"),
-        amproclefttype = row[Long](prefix + "amproclefttype"),
-        amprocrighttype = row[Long](prefix + "amprocrighttype"),
+        amprocfamily = row[/* oid */ Long](prefix + "amprocfamily"),
+        amproclefttype = row[/* oid */ Long](prefix + "amproclefttype"),
+        amprocrighttype = row[/* oid */ Long](prefix + "amprocrighttype"),
         amprocnum = row[Int](prefix + "amprocnum"),
-        amproc = row[PGobject](prefix + "amproc")
+        amproc = row[/* regproc */ PGobject](prefix + "amproc")
       )
     )
   }
@@ -56,11 +56,11 @@ object PgAmprocRow {
         Try(
           PgAmprocRow(
             oid = json.\("oid").as[PgAmprocId],
-            amprocfamily = json.\("amprocfamily").as[Long],
-            amproclefttype = json.\("amproclefttype").as[Long],
-            amprocrighttype = json.\("amprocrighttype").as[Long],
+            amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
+            amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
+            amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
             amprocnum = json.\("amprocnum").as[Int],
-            amproc = json.\("amproc").as[PGobject]
+            amproc = json.\("amproc").as[/* regproc */ PGobject]
           )
         )
       )

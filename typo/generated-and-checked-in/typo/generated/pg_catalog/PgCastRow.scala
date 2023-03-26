@@ -20,9 +20,9 @@ import scala.util.Try
 
 case class PgCastRow(
   oid: PgCastId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  castsource: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castsource","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  casttarget: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"casttarget","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  castfunc: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castfunc","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  castsource: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castsource","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  casttarget: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"casttarget","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  castfunc: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castfunc","ordinal_position":4,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   castcontext: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castcontext","ordinal_position":5,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   castmethod: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_cast","column_name":"castmethod","ordinal_position":6,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -32,9 +32,9 @@ object PgCastRow {
     Success(
       PgCastRow(
         oid = row[PgCastId](prefix + "oid"),
-        castsource = row[Long](prefix + "castsource"),
-        casttarget = row[Long](prefix + "casttarget"),
-        castfunc = row[Long](prefix + "castfunc"),
+        castsource = row[/* oid */ Long](prefix + "castsource"),
+        casttarget = row[/* oid */ Long](prefix + "casttarget"),
+        castfunc = row[/* oid */ Long](prefix + "castfunc"),
         castcontext = row[String](prefix + "castcontext"),
         castmethod = row[String](prefix + "castmethod")
       )
@@ -57,9 +57,9 @@ object PgCastRow {
         Try(
           PgCastRow(
             oid = json.\("oid").as[PgCastId],
-            castsource = json.\("castsource").as[Long],
-            casttarget = json.\("casttarget").as[Long],
-            castfunc = json.\("castfunc").as[Long],
+            castsource = json.\("castsource").as[/* oid */ Long],
+            casttarget = json.\("casttarget").as[/* oid */ Long],
+            castfunc = json.\("castfunc").as[/* oid */ Long],
             castcontext = json.\("castcontext").as[String],
             castmethod = json.\("castmethod").as[String]
           )

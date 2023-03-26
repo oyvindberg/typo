@@ -12,7 +12,7 @@ package pg_catalog
 sealed abstract class PgStatioAllSequencesFieldValue[T](val name: String, val value: T)
 
 object PgStatioAllSequencesFieldValue {
-  case class relid(override val value: Option[Long]) extends PgStatioAllSequencesFieldValue("relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatioAllSequencesFieldValue("relid", value)
   case class schemaname(override val value: Option[String]) extends PgStatioAllSequencesFieldValue("schemaname", value)
   case class relname(override val value: Option[String]) extends PgStatioAllSequencesFieldValue("relname", value)
   case class blksRead(override val value: Option[Long]) extends PgStatioAllSequencesFieldValue("blks_read", value)

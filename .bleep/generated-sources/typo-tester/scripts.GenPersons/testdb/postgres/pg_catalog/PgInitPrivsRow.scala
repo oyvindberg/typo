@@ -18,11 +18,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgInitPrivsRow(
-  objoid: Long,
-  classoid: Long,
+  objoid: /* oid */ Long,
+  classoid: /* oid */ Long,
   objsubid: Int,
   privtype: String,
-  initprivs: Array[PGobject]
+  initprivs: Array[/* aclitem */ PGobject]
 ){
   val compositeId: PgInitPrivsId = PgInitPrivsId(objoid, classoid, objsubid)
 }
@@ -31,11 +31,11 @@ object PgInitPrivsRow {
   def rowParser(prefix: String): RowParser[PgInitPrivsRow] = { row =>
     Success(
       PgInitPrivsRow(
-        objoid = row[Long](prefix + "objoid"),
-        classoid = row[Long](prefix + "classoid"),
+        objoid = row[/* oid */ Long](prefix + "objoid"),
+        classoid = row[/* oid */ Long](prefix + "classoid"),
         objsubid = row[Int](prefix + "objsubid"),
         privtype = row[String](prefix + "privtype"),
-        initprivs = row[Array[PGobject]](prefix + "initprivs")
+        initprivs = row[Array[/* aclitem */ PGobject]](prefix + "initprivs")
       )
     )
   }
@@ -54,11 +54,11 @@ object PgInitPrivsRow {
       JsResult.fromTry(
         Try(
           PgInitPrivsRow(
-            objoid = json.\("objoid").as[Long],
-            classoid = json.\("classoid").as[Long],
+            objoid = json.\("objoid").as[/* oid */ Long],
+            classoid = json.\("classoid").as[/* oid */ Long],
             objsubid = json.\("objsubid").as[Int],
             privtype = json.\("privtype").as[String],
-            initprivs = json.\("initprivs").as[Array[PGobject]]
+            initprivs = json.\("initprivs").as[Array[/* aclitem */ PGobject]]
           )
         )
       )

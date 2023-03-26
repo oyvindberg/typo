@@ -82,6 +82,8 @@ object DbLibAnorm extends DbLib {
       code"def insert(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.Delete(id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
+    case RepoMethod.SqlScript(sqlScript) =>
+      code"def apply()(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.RowName))}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -225,6 +227,10 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.Delete(id) =>
         val sql = interpolate(code"""delete from ${table.relationName} where ${matchId(id)}""")
         code"$sql.executeUpdate() > 0"
+      case RepoMethod.SqlScript(sqlScript) =>
+        code"""|val sql = ${interpolate(sqlScript.script.content)}
+               |    sql.as(${sc.Type.Qualified(sqlScript.RowName)}.$rowParserIdent("").*)
+               |""".stripMargin
     }
 
   override def missingInstances: List[sc.Code] = {

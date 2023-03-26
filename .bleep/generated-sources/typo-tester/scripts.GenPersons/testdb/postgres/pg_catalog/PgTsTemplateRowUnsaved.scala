@@ -17,9 +17,9 @@ import scala.util.Try
 
 case class PgTsTemplateRowUnsaved(
   tmplname: String,
-  tmplnamespace: Long,
-  tmplinit: PGobject,
-  tmpllexize: PGobject
+  tmplnamespace: /* oid */ Long,
+  tmplinit: /* regproc */ PGobject,
+  tmpllexize: /* regproc */ PGobject
 )
 object PgTsTemplateRowUnsaved {
   implicit val oFormat: OFormat[PgTsTemplateRowUnsaved] = new OFormat[PgTsTemplateRowUnsaved]{
@@ -36,9 +36,9 @@ object PgTsTemplateRowUnsaved {
         Try(
           PgTsTemplateRowUnsaved(
             tmplname = json.\("tmplname").as[String],
-            tmplnamespace = json.\("tmplnamespace").as[Long],
-            tmplinit = json.\("tmplinit").as[PGobject],
-            tmpllexize = json.\("tmpllexize").as[PGobject]
+            tmplnamespace = json.\("tmplnamespace").as[/* oid */ Long],
+            tmplinit = json.\("tmplinit").as[/* regproc */ PGobject],
+            tmpllexize = json.\("tmpllexize").as[/* regproc */ PGobject]
           )
         )
       )

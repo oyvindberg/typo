@@ -18,9 +18,9 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAttributeRow(
-  attrelid: Long,
+  attrelid: /* oid */ Long,
   attname: String,
-  atttypid: Long,
+  atttypid: /* oid */ Long,
   attstattarget: Int,
   attlen: Int,
   attnum: Int,
@@ -39,11 +39,11 @@ case class PgAttributeRow(
   attisdropped: Boolean,
   attislocal: Boolean,
   attinhcount: Int,
-  attcollation: Long,
-  attacl: Option[Array[PGobject]],
+  attcollation: /* oid */ Long,
+  attacl: Option[Array[/* aclitem */ PGobject]],
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
-  attmissingval: Option[PGobject]
+  attmissingval: Option[/* anyarray */ PGobject]
 ){
   val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
 }
@@ -52,9 +52,9 @@ object PgAttributeRow {
   def rowParser(prefix: String): RowParser[PgAttributeRow] = { row =>
     Success(
       PgAttributeRow(
-        attrelid = row[Long](prefix + "attrelid"),
+        attrelid = row[/* oid */ Long](prefix + "attrelid"),
         attname = row[String](prefix + "attname"),
-        atttypid = row[Long](prefix + "atttypid"),
+        atttypid = row[/* oid */ Long](prefix + "atttypid"),
         attstattarget = row[Int](prefix + "attstattarget"),
         attlen = row[Int](prefix + "attlen"),
         attnum = row[Int](prefix + "attnum"),
@@ -73,11 +73,11 @@ object PgAttributeRow {
         attisdropped = row[Boolean](prefix + "attisdropped"),
         attislocal = row[Boolean](prefix + "attislocal"),
         attinhcount = row[Int](prefix + "attinhcount"),
-        attcollation = row[Long](prefix + "attcollation"),
-        attacl = row[Option[Array[PGobject]]](prefix + "attacl"),
+        attcollation = row[/* oid */ Long](prefix + "attcollation"),
+        attacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "attacl"),
         attoptions = row[Option[Array[String]]](prefix + "attoptions"),
         attfdwoptions = row[Option[Array[String]]](prefix + "attfdwoptions"),
-        attmissingval = row[Option[PGobject]](prefix + "attmissingval")
+        attmissingval = row[Option[/* anyarray */ PGobject]](prefix + "attmissingval")
       )
     )
   }
@@ -117,9 +117,9 @@ object PgAttributeRow {
       JsResult.fromTry(
         Try(
           PgAttributeRow(
-            attrelid = json.\("attrelid").as[Long],
+            attrelid = json.\("attrelid").as[/* oid */ Long],
             attname = json.\("attname").as[String],
-            atttypid = json.\("atttypid").as[Long],
+            atttypid = json.\("atttypid").as[/* oid */ Long],
             attstattarget = json.\("attstattarget").as[Int],
             attlen = json.\("attlen").as[Int],
             attnum = json.\("attnum").as[Int],
@@ -138,11 +138,11 @@ object PgAttributeRow {
             attisdropped = json.\("attisdropped").as[Boolean],
             attislocal = json.\("attislocal").as[Boolean],
             attinhcount = json.\("attinhcount").as[Int],
-            attcollation = json.\("attcollation").as[Long],
-            attacl = json.\("attacl").toOption.map(_.as[Array[PGobject]]),
+            attcollation = json.\("attcollation").as[/* oid */ Long],
+            attacl = json.\("attacl").toOption.map(_.as[Array[/* aclitem */ PGobject]]),
             attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
             attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-            attmissingval = json.\("attmissingval").toOption.map(_.as[PGobject])
+            attmissingval = json.\("attmissingval").toOption.map(_.as[/* anyarray */ PGobject])
           )
         )
       )

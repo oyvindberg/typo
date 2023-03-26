@@ -13,7 +13,7 @@ sealed abstract class PgUserFieldValue[T](val name: String, val value: T)
 
 object PgUserFieldValue {
   case class usename(override val value: Option[String]) extends PgUserFieldValue("usename", value)
-  case class usesysid(override val value: Option[Long]) extends PgUserFieldValue("usesysid", value)
+  case class usesysid(override val value: Option[/* oid */ Long]) extends PgUserFieldValue("usesysid", value)
   case class usecreatedb(override val value: Option[Boolean]) extends PgUserFieldValue("usecreatedb", value)
   case class usesuper(override val value: Option[Boolean]) extends PgUserFieldValue("usesuper", value)
   case class userepl(override val value: Option[Boolean]) extends PgUserFieldValue("userepl", value)

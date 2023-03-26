@@ -82,7 +82,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_ts_dict where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueDictnameDictnamespace(dictname: String, dictnamespace: Long)(implicit c: Connection): Option[PgTsDictRow] = {
+  override def selectByUniqueDictnameDictnamespace(dictname: String, dictnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsDictRow] = {
     selectByFieldValues(List(PgTsDictFieldValue.dictname(dictname), PgTsDictFieldValue.dictnamespace(dictnamespace))).headOption
   }
 }

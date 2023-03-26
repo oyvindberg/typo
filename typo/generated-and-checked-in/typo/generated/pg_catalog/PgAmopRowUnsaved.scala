@@ -17,14 +17,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgAmopRowUnsaved(
-  amopfamily: Long,
-  amoplefttype: Long,
-  amoprighttype: Long,
+  amopfamily: /* oid */ Long,
+  amoplefttype: /* oid */ Long,
+  amoprighttype: /* oid */ Long,
   amopstrategy: Int,
   amoppurpose: String,
-  amopopr: Long,
-  amopmethod: Long,
-  amopsortfamily: Long
+  amopopr: /* oid */ Long,
+  amopmethod: /* oid */ Long,
+  amopsortfamily: /* oid */ Long
 )
 object PgAmopRowUnsaved {
   implicit val oFormat: OFormat[PgAmopRowUnsaved] = new OFormat[PgAmopRowUnsaved]{
@@ -44,14 +44,14 @@ object PgAmopRowUnsaved {
       JsResult.fromTry(
         Try(
           PgAmopRowUnsaved(
-            amopfamily = json.\("amopfamily").as[Long],
-            amoplefttype = json.\("amoplefttype").as[Long],
-            amoprighttype = json.\("amoprighttype").as[Long],
+            amopfamily = json.\("amopfamily").as[/* oid */ Long],
+            amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
+            amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
             amopstrategy = json.\("amopstrategy").as[Int],
             amoppurpose = json.\("amoppurpose").as[String],
-            amopopr = json.\("amopopr").as[Long],
-            amopmethod = json.\("amopmethod").as[Long],
-            amopsortfamily = json.\("amopsortfamily").as[Long]
+            amopopr = json.\("amopopr").as[/* oid */ Long],
+            amopmethod = json.\("amopmethod").as[/* oid */ Long],
+            amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
           )
         )
       )

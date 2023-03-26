@@ -19,12 +19,12 @@ import scala.util.Try
 
 case class PgRangeRow(
   rngtypid: PgRangeId,
-  rngsubtype: Long,
-  rngmultitypid: Long,
-  rngcollation: Long,
-  rngsubopc: Long,
-  rngcanonical: PGobject,
-  rngsubdiff: PGobject
+  rngsubtype: /* oid */ Long,
+  rngmultitypid: /* oid */ Long,
+  rngcollation: /* oid */ Long,
+  rngsubopc: /* oid */ Long,
+  rngcanonical: /* regproc */ PGobject,
+  rngsubdiff: /* regproc */ PGobject
 )
 
 object PgRangeRow {
@@ -32,12 +32,12 @@ object PgRangeRow {
     Success(
       PgRangeRow(
         rngtypid = row[PgRangeId](prefix + "rngtypid"),
-        rngsubtype = row[Long](prefix + "rngsubtype"),
-        rngmultitypid = row[Long](prefix + "rngmultitypid"),
-        rngcollation = row[Long](prefix + "rngcollation"),
-        rngsubopc = row[Long](prefix + "rngsubopc"),
-        rngcanonical = row[PGobject](prefix + "rngcanonical"),
-        rngsubdiff = row[PGobject](prefix + "rngsubdiff")
+        rngsubtype = row[/* oid */ Long](prefix + "rngsubtype"),
+        rngmultitypid = row[/* oid */ Long](prefix + "rngmultitypid"),
+        rngcollation = row[/* oid */ Long](prefix + "rngcollation"),
+        rngsubopc = row[/* oid */ Long](prefix + "rngsubopc"),
+        rngcanonical = row[/* regproc */ PGobject](prefix + "rngcanonical"),
+        rngsubdiff = row[/* regproc */ PGobject](prefix + "rngsubdiff")
       )
     )
   }
@@ -59,12 +59,12 @@ object PgRangeRow {
         Try(
           PgRangeRow(
             rngtypid = json.\("rngtypid").as[PgRangeId],
-            rngsubtype = json.\("rngsubtype").as[Long],
-            rngmultitypid = json.\("rngmultitypid").as[Long],
-            rngcollation = json.\("rngcollation").as[Long],
-            rngsubopc = json.\("rngsubopc").as[Long],
-            rngcanonical = json.\("rngcanonical").as[PGobject],
-            rngsubdiff = json.\("rngsubdiff").as[PGobject]
+            rngsubtype = json.\("rngsubtype").as[/* oid */ Long],
+            rngmultitypid = json.\("rngmultitypid").as[/* oid */ Long],
+            rngcollation = json.\("rngcollation").as[/* oid */ Long],
+            rngsubopc = json.\("rngsubopc").as[/* oid */ Long],
+            rngcanonical = json.\("rngcanonical").as[/* regproc */ PGobject],
+            rngsubdiff = json.\("rngsubdiff").as[/* regproc */ PGobject]
           )
         )
       )

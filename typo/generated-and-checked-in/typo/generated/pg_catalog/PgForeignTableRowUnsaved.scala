@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgForeignTableRowUnsaved(
-  ftserver: Long,
+  ftserver: /* oid */ Long,
   ftoptions: Option[Array[String]]
 )
 object PgForeignTableRowUnsaved {
@@ -32,7 +32,7 @@ object PgForeignTableRowUnsaved {
       JsResult.fromTry(
         Try(
           PgForeignTableRowUnsaved(
-            ftserver = json.\("ftserver").as[Long],
+            ftserver = json.\("ftserver").as[/* oid */ Long],
             ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]])
           )
         )

@@ -18,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgStatDatabaseRow(
-  datid: Option[Long],
+  datid: Option[/* oid */ Long],
   datname: Option[String],
   numbackends: Option[Int],
   xactCommit: Option[Long],
@@ -52,7 +52,7 @@ object PgStatDatabaseRow {
   def rowParser(prefix: String): RowParser[PgStatDatabaseRow] = { row =>
     Success(
       PgStatDatabaseRow(
-        datid = row[Option[Long]](prefix + "datid"),
+        datid = row[Option[/* oid */ Long]](prefix + "datid"),
         datname = row[Option[String]](prefix + "datname"),
         numbackends = row[Option[Int]](prefix + "numbackends"),
         xactCommit = row[Option[Long]](prefix + "xact_commit"),
@@ -121,7 +121,7 @@ object PgStatDatabaseRow {
       JsResult.fromTry(
         Try(
           PgStatDatabaseRow(
-            datid = json.\("datid").toOption.map(_.as[Long]),
+            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
             datname = json.\("datname").toOption.map(_.as[String]),
             numbackends = json.\("numbackends").toOption.map(_.as[Int]),
             xactCommit = json.\("xact_commit").toOption.map(_.as[Long]),

@@ -22,7 +22,7 @@ case class PgPreparedStatementsRow(
   name: Option[String],
   statement: Option[String],
   prepareTime: Option[ZonedDateTime],
-  parameterTypes: Option[Array[PGobject]],
+  parameterTypes: Option[Array[/* regtype */ PGobject]],
   fromSql: Option[Boolean],
   genericPlans: Option[Long],
   customPlans: Option[Long]
@@ -35,7 +35,7 @@ object PgPreparedStatementsRow {
         name = row[Option[String]](prefix + "name"),
         statement = row[Option[String]](prefix + "statement"),
         prepareTime = row[Option[ZonedDateTime]](prefix + "prepare_time"),
-        parameterTypes = row[Option[Array[PGobject]]](prefix + "parameter_types"),
+        parameterTypes = row[Option[Array[/* regtype */ PGobject]]](prefix + "parameter_types"),
         fromSql = row[Option[Boolean]](prefix + "from_sql"),
         genericPlans = row[Option[Long]](prefix + "generic_plans"),
         customPlans = row[Option[Long]](prefix + "custom_plans")
@@ -62,7 +62,7 @@ object PgPreparedStatementsRow {
             name = json.\("name").toOption.map(_.as[String]),
             statement = json.\("statement").toOption.map(_.as[String]),
             prepareTime = json.\("prepare_time").toOption.map(_.as[ZonedDateTime]),
-            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[PGobject]]),
+            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[/* regtype */ PGobject]]),
             fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
             genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
             customPlans = json.\("custom_plans").toOption.map(_.as[Long])

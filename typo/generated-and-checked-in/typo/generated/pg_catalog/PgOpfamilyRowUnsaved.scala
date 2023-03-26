@@ -17,10 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgOpfamilyRowUnsaved(
-  opfmethod: Long,
+  opfmethod: /* oid */ Long,
   opfname: String,
-  opfnamespace: Long,
-  opfowner: Long
+  opfnamespace: /* oid */ Long,
+  opfowner: /* oid */ Long
 )
 object PgOpfamilyRowUnsaved {
   implicit val oFormat: OFormat[PgOpfamilyRowUnsaved] = new OFormat[PgOpfamilyRowUnsaved]{
@@ -36,10 +36,10 @@ object PgOpfamilyRowUnsaved {
       JsResult.fromTry(
         Try(
           PgOpfamilyRowUnsaved(
-            opfmethod = json.\("opfmethod").as[Long],
+            opfmethod = json.\("opfmethod").as[/* oid */ Long],
             opfname = json.\("opfname").as[String],
-            opfnamespace = json.\("opfnamespace").as[Long],
-            opfowner = json.\("opfowner").as[Long]
+            opfnamespace = json.\("opfnamespace").as[/* oid */ Long],
+            opfowner = json.\("opfowner").as[/* oid */ Long]
           )
         )
       )

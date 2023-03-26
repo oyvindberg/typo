@@ -17,5 +17,5 @@ trait PgTsTemplateRepo {
   def updateFieldValues(oid: PgTsTemplateId, fieldValues: List[PgTsTemplateFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTsTemplateId, unsaved: PgTsTemplateRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTsTemplateId)(implicit c: Connection): Boolean
-  def selectByUniqueTmplnameTmplnamespace(tmplname: String, tmplnamespace: Long)(implicit c: Connection): Option[PgTsTemplateRow]
+  def selectByUniqueTmplnameTmplnamespace(tmplname: String, tmplnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsTemplateRow]
 }

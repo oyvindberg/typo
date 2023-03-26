@@ -19,5 +19,5 @@ trait PgTypeRepo {
   def updateFieldValues(oid: PgTypeId, fieldValues: List[PgTypeFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTypeId)(implicit c: Connection): Boolean
-  def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow]
+  def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow]
 }

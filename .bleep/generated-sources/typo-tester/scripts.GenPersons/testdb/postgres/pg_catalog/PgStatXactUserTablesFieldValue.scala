@@ -12,7 +12,7 @@ package pg_catalog
 sealed abstract class PgStatXactUserTablesFieldValue[T](val name: String, val value: T)
 
 object PgStatXactUserTablesFieldValue {
-  case class relid(override val value: Option[Long]) extends PgStatXactUserTablesFieldValue("relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatXactUserTablesFieldValue("relid", value)
   case class schemaname(override val value: Option[String]) extends PgStatXactUserTablesFieldValue("schemaname", value)
   case class relname(override val value: Option[String]) extends PgStatXactUserTablesFieldValue("relname", value)
   case class seqScan(override val value: Option[Long]) extends PgStatXactUserTablesFieldValue("seq_scan", value)

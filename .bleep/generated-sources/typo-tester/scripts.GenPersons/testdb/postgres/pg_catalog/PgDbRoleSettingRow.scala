@@ -17,8 +17,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgDbRoleSettingRow(
-  setdatabase: Long,
-  setrole: Long,
+  setdatabase: /* oid */ Long,
+  setrole: /* oid */ Long,
   setconfig: Option[Array[String]]
 ){
   val compositeId: PgDbRoleSettingId = PgDbRoleSettingId(setdatabase, setrole)
@@ -28,8 +28,8 @@ object PgDbRoleSettingRow {
   def rowParser(prefix: String): RowParser[PgDbRoleSettingRow] = { row =>
     Success(
       PgDbRoleSettingRow(
-        setdatabase = row[Long](prefix + "setdatabase"),
-        setrole = row[Long](prefix + "setrole"),
+        setdatabase = row[/* oid */ Long](prefix + "setdatabase"),
+        setrole = row[/* oid */ Long](prefix + "setrole"),
         setconfig = row[Option[Array[String]]](prefix + "setconfig")
       )
     )
@@ -47,8 +47,8 @@ object PgDbRoleSettingRow {
       JsResult.fromTry(
         Try(
           PgDbRoleSettingRow(
-            setdatabase = json.\("setdatabase").as[Long],
-            setrole = json.\("setrole").as[Long],
+            setdatabase = json.\("setdatabase").as[/* oid */ Long],
+            setrole = json.\("setrole").as[/* oid */ Long],
             setconfig = json.\("setconfig").toOption.map(_.as[Array[String]])
           )
         )

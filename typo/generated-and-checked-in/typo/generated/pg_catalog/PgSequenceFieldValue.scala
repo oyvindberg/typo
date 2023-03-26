@@ -15,7 +15,7 @@ sealed abstract class PgSequenceFieldValue[T](val name: String, val value: T)
 
 object PgSequenceFieldValue {
   case class seqrelid(override val value: PgSequenceId) extends PgSequenceFieldValue("seqrelid", value)
-  case class seqtypid(override val value: Long) extends PgSequenceFieldValue("seqtypid", value)
+  case class seqtypid(override val value: /* oid */ Long) extends PgSequenceFieldValue("seqtypid", value)
   case class seqstart(override val value: Long) extends PgSequenceFieldValue("seqstart", value)
   case class seqincrement(override val value: Long) extends PgSequenceFieldValue("seqincrement", value)
   case class seqmax(override val value: Long) extends PgSequenceFieldValue("seqmax", value)

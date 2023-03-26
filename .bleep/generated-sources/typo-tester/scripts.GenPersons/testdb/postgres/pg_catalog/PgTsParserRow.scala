@@ -20,12 +20,12 @@ import scala.util.Try
 case class PgTsParserRow(
   oid: PgTsParserId,
   prsname: String,
-  prsnamespace: Long,
-  prsstart: PGobject,
-  prstoken: PGobject,
-  prsend: PGobject,
-  prsheadline: PGobject,
-  prslextype: PGobject
+  prsnamespace: /* oid */ Long,
+  prsstart: /* regproc */ PGobject,
+  prstoken: /* regproc */ PGobject,
+  prsend: /* regproc */ PGobject,
+  prsheadline: /* regproc */ PGobject,
+  prslextype: /* regproc */ PGobject
 )
 
 object PgTsParserRow {
@@ -34,12 +34,12 @@ object PgTsParserRow {
       PgTsParserRow(
         oid = row[PgTsParserId](prefix + "oid"),
         prsname = row[String](prefix + "prsname"),
-        prsnamespace = row[Long](prefix + "prsnamespace"),
-        prsstart = row[PGobject](prefix + "prsstart"),
-        prstoken = row[PGobject](prefix + "prstoken"),
-        prsend = row[PGobject](prefix + "prsend"),
-        prsheadline = row[PGobject](prefix + "prsheadline"),
-        prslextype = row[PGobject](prefix + "prslextype")
+        prsnamespace = row[/* oid */ Long](prefix + "prsnamespace"),
+        prsstart = row[/* regproc */ PGobject](prefix + "prsstart"),
+        prstoken = row[/* regproc */ PGobject](prefix + "prstoken"),
+        prsend = row[/* regproc */ PGobject](prefix + "prsend"),
+        prsheadline = row[/* regproc */ PGobject](prefix + "prsheadline"),
+        prslextype = row[/* regproc */ PGobject](prefix + "prslextype")
       )
     )
   }
@@ -63,12 +63,12 @@ object PgTsParserRow {
           PgTsParserRow(
             oid = json.\("oid").as[PgTsParserId],
             prsname = json.\("prsname").as[String],
-            prsnamespace = json.\("prsnamespace").as[Long],
-            prsstart = json.\("prsstart").as[PGobject],
-            prstoken = json.\("prstoken").as[PGobject],
-            prsend = json.\("prsend").as[PGobject],
-            prsheadline = json.\("prsheadline").as[PGobject],
-            prslextype = json.\("prslextype").as[PGobject]
+            prsnamespace = json.\("prsnamespace").as[/* oid */ Long],
+            prsstart = json.\("prsstart").as[/* regproc */ PGobject],
+            prstoken = json.\("prstoken").as[/* regproc */ PGobject],
+            prsend = json.\("prsend").as[/* regproc */ PGobject],
+            prsheadline = json.\("prsheadline").as[/* regproc */ PGobject],
+            prslextype = json.\("prslextype").as[/* regproc */ PGobject]
           )
         )
       )

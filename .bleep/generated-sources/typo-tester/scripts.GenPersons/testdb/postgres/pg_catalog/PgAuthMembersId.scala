@@ -16,7 +16,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgAuthMembersId(roleid: Long, member: Long)
+case class PgAuthMembersId(roleid: /* oid */ Long, member: /* oid */ Long)
 object PgAuthMembersId {
   implicit val ordering: Ordering[PgAuthMembersId] = Ordering.by(x => (x.roleid, x.member))
   implicit val oFormat: OFormat[PgAuthMembersId] = new OFormat[PgAuthMembersId]{
@@ -30,8 +30,8 @@ object PgAuthMembersId {
       JsResult.fromTry(
         Try(
           PgAuthMembersId(
-            roleid = json.\("roleid").as[Long],
-            member = json.\("member").as[Long]
+            roleid = json.\("roleid").as[/* oid */ Long],
+            member = json.\("member").as[/* oid */ Long]
           )
         )
       )
@@ -40,8 +40,8 @@ object PgAuthMembersId {
   def rowParser(prefix: String): RowParser[PgAuthMembersId] = { row =>
     Success(
       PgAuthMembersId(
-        roleid = row[Long](prefix + "roleid"),
-        member = row[Long](prefix + "member")
+        roleid = row[/* oid */ Long](prefix + "roleid"),
+        member = row[/* oid */ Long](prefix + "member")
       )
     )
   }

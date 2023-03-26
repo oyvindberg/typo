@@ -99,7 +99,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_subscription where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueSubdbidSubname(subdbid: Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow] = {
+  override def selectByUniqueSubdbidSubname(subdbid: /* oid */ Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow] = {
     selectByFieldValues(List(PgSubscriptionFieldValue.subdbid(subdbid), PgSubscriptionFieldValue.subname(subname))).headOption
   }
 }

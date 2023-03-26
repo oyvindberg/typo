@@ -22,12 +22,12 @@ import scala.util.Try
 case class PgPolicyRow(
   oid: PgPolicyId /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   polname: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  polrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polrelid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  polrelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polrelid","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   polcmd: String /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polcmd","ordinal_position":4,"is_nullable":"NO","data_type":"\"char\"","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"char","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   polpermissive: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polpermissive","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  polroles: Array[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polroles","ordinal_position":6,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_oid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  polqual: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polqual","ordinal_position":7,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  polwithcheck: Option[PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polwithcheck","ordinal_position":8,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  polroles: Array[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polroles","ordinal_position":6,"is_nullable":"NO","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_oid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  polqual: Option[/* pg_node_tree */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polqual","ordinal_position":7,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  polwithcheck: Option[/* pg_node_tree */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_policy","column_name":"polwithcheck","ordinal_position":8,"is_nullable":"YES","data_type":"pg_node_tree","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"pg_node_tree","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
 object PgPolicyRow {
@@ -36,12 +36,12 @@ object PgPolicyRow {
       PgPolicyRow(
         oid = row[PgPolicyId](prefix + "oid"),
         polname = row[String](prefix + "polname"),
-        polrelid = row[Long](prefix + "polrelid"),
+        polrelid = row[/* oid */ Long](prefix + "polrelid"),
         polcmd = row[String](prefix + "polcmd"),
         polpermissive = row[Boolean](prefix + "polpermissive"),
-        polroles = row[Array[Long]](prefix + "polroles"),
-        polqual = row[Option[PGobject]](prefix + "polqual"),
-        polwithcheck = row[Option[PGobject]](prefix + "polwithcheck")
+        polroles = row[Array[/* oid */ Long]](prefix + "polroles"),
+        polqual = row[Option[/* pg_node_tree */ PGobject]](prefix + "polqual"),
+        polwithcheck = row[Option[/* pg_node_tree */ PGobject]](prefix + "polwithcheck")
       )
     )
   }
@@ -65,12 +65,12 @@ object PgPolicyRow {
           PgPolicyRow(
             oid = json.\("oid").as[PgPolicyId],
             polname = json.\("polname").as[String],
-            polrelid = json.\("polrelid").as[Long],
+            polrelid = json.\("polrelid").as[/* oid */ Long],
             polcmd = json.\("polcmd").as[String],
             polpermissive = json.\("polpermissive").as[Boolean],
-            polroles = json.\("polroles").as[Array[Long]],
-            polqual = json.\("polqual").toOption.map(_.as[PGobject]),
-            polwithcheck = json.\("polwithcheck").toOption.map(_.as[PGobject])
+            polroles = json.\("polroles").as[Array[/* oid */ Long]],
+            polqual = json.\("polqual").toOption.map(_.as[/* pg_node_tree */ PGobject]),
+            polwithcheck = json.\("polwithcheck").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

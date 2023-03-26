@@ -20,8 +20,8 @@ case class PgEventTriggerRow(
   oid: PgEventTriggerId,
   evtname: String,
   evtevent: String,
-  evtowner: Long,
-  evtfoid: Long,
+  evtowner: /* oid */ Long,
+  evtfoid: /* oid */ Long,
   evtenabled: String,
   evttags: Option[Array[String]]
 )
@@ -33,8 +33,8 @@ object PgEventTriggerRow {
         oid = row[PgEventTriggerId](prefix + "oid"),
         evtname = row[String](prefix + "evtname"),
         evtevent = row[String](prefix + "evtevent"),
-        evtowner = row[Long](prefix + "evtowner"),
-        evtfoid = row[Long](prefix + "evtfoid"),
+        evtowner = row[/* oid */ Long](prefix + "evtowner"),
+        evtfoid = row[/* oid */ Long](prefix + "evtfoid"),
         evtenabled = row[String](prefix + "evtenabled"),
         evttags = row[Option[Array[String]]](prefix + "evttags")
       )
@@ -60,8 +60,8 @@ object PgEventTriggerRow {
             oid = json.\("oid").as[PgEventTriggerId],
             evtname = json.\("evtname").as[String],
             evtevent = json.\("evtevent").as[String],
-            evtowner = json.\("evtowner").as[Long],
-            evtfoid = json.\("evtfoid").as[Long],
+            evtowner = json.\("evtowner").as[/* oid */ Long],
+            evtfoid = json.\("evtfoid").as[/* oid */ Long],
             evtenabled = json.\("evtenabled").as[String],
             evttags = json.\("evttags").toOption.map(_.as[Array[String]])
           )

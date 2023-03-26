@@ -13,7 +13,7 @@ sealed abstract class PgShadowFieldValue[T](val name: String, val value: T)
 
 object PgShadowFieldValue {
   case class usename(override val value: Option[String]) extends PgShadowFieldValue("usename", value)
-  case class usesysid(override val value: Option[Long]) extends PgShadowFieldValue("usesysid", value)
+  case class usesysid(override val value: Option[/* oid */ Long]) extends PgShadowFieldValue("usesysid", value)
   case class usecreatedb(override val value: Option[Boolean]) extends PgShadowFieldValue("usecreatedb", value)
   case class usesuper(override val value: Option[Boolean]) extends PgShadowFieldValue("usesuper", value)
   case class userepl(override val value: Option[Boolean]) extends PgShadowFieldValue("userepl", value)

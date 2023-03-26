@@ -20,5 +20,5 @@ trait PgProcRepo {
   def updateFieldValues(oid: PgProcId, fieldValues: List[PgProcFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgProcId, unsaved: PgProcRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgProcId)(implicit c: Connection): Boolean
-  def selectByUniquePronameProargtypesPronamespace(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow]
+  def selectByUniquePronameProargtypesPronamespace(proname: String, proargtypes: /* oidvector */ PGobject, pronamespace: /* oid */ Long)(implicit c: Connection): Option[PgProcRow]
 }

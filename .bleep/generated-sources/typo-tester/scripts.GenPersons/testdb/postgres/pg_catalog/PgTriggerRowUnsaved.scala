@@ -16,22 +16,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTriggerRowUnsaved(
-  tgrelid: Long,
-  tgparentid: Long,
+  tgrelid: /* oid */ Long,
+  tgparentid: /* oid */ Long,
   tgname: String,
-  tgfoid: Long,
+  tgfoid: /* oid */ Long,
   tgtype: Int,
   tgenabled: String,
   tgisinternal: Boolean,
-  tgconstrrelid: Long,
-  tgconstrindid: Long,
-  tgconstraint: Long,
+  tgconstrrelid: /* oid */ Long,
+  tgconstrindid: /* oid */ Long,
+  tgconstraint: /* oid */ Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
   tgnargs: Int,
-  tgattr: PGobject,
+  tgattr: /* int2vector */ PGobject,
   tgargs: Array[Byte],
-  tgqual: Option[PGobject],
+  tgqual: Option[/* pg_node_tree */ PGobject],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )
@@ -63,22 +63,22 @@ object PgTriggerRowUnsaved {
       JsResult.fromTry(
         Try(
           PgTriggerRowUnsaved(
-            tgrelid = json.\("tgrelid").as[Long],
-            tgparentid = json.\("tgparentid").as[Long],
+            tgrelid = json.\("tgrelid").as[/* oid */ Long],
+            tgparentid = json.\("tgparentid").as[/* oid */ Long],
             tgname = json.\("tgname").as[String],
-            tgfoid = json.\("tgfoid").as[Long],
+            tgfoid = json.\("tgfoid").as[/* oid */ Long],
             tgtype = json.\("tgtype").as[Int],
             tgenabled = json.\("tgenabled").as[String],
             tgisinternal = json.\("tgisinternal").as[Boolean],
-            tgconstrrelid = json.\("tgconstrrelid").as[Long],
-            tgconstrindid = json.\("tgconstrindid").as[Long],
-            tgconstraint = json.\("tgconstraint").as[Long],
+            tgconstrrelid = json.\("tgconstrrelid").as[/* oid */ Long],
+            tgconstrindid = json.\("tgconstrindid").as[/* oid */ Long],
+            tgconstraint = json.\("tgconstraint").as[/* oid */ Long],
             tgdeferrable = json.\("tgdeferrable").as[Boolean],
             tginitdeferred = json.\("tginitdeferred").as[Boolean],
             tgnargs = json.\("tgnargs").as[Int],
-            tgattr = json.\("tgattr").as[PGobject],
+            tgattr = json.\("tgattr").as[/* int2vector */ PGobject],
             tgargs = json.\("tgargs").as[Array[Byte]],
-            tgqual = json.\("tgqual").toOption.map(_.as[PGobject]),
+            tgqual = json.\("tgqual").toOption.map(_.as[/* pg_node_tree */ PGobject]),
             tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
             tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
           )

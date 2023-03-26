@@ -16,10 +16,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgDefaultAclRowUnsaved(
-  defaclrole: Long,
-  defaclnamespace: Long,
+  defaclrole: /* oid */ Long,
+  defaclnamespace: /* oid */ Long,
   defaclobjtype: String,
-  defaclacl: Array[PGobject]
+  defaclacl: Array[/* aclitem */ PGobject]
 )
 object PgDefaultAclRowUnsaved {
   implicit val oFormat: OFormat[PgDefaultAclRowUnsaved] = new OFormat[PgDefaultAclRowUnsaved]{
@@ -35,10 +35,10 @@ object PgDefaultAclRowUnsaved {
       JsResult.fromTry(
         Try(
           PgDefaultAclRowUnsaved(
-            defaclrole = json.\("defaclrole").as[Long],
-            defaclnamespace = json.\("defaclnamespace").as[Long],
+            defaclrole = json.\("defaclrole").as[/* oid */ Long],
+            defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
             defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[PGobject]]
+            defaclacl = json.\("defaclacl").as[Array[/* aclitem */ PGobject]]
           )
         )
       )

@@ -20,9 +20,9 @@ import scala.util.Try
 case class PgTsTemplateRow(
   oid: PgTsTemplateId,
   tmplname: String,
-  tmplnamespace: Long,
-  tmplinit: PGobject,
-  tmpllexize: PGobject
+  tmplnamespace: /* oid */ Long,
+  tmplinit: /* regproc */ PGobject,
+  tmpllexize: /* regproc */ PGobject
 )
 
 object PgTsTemplateRow {
@@ -31,9 +31,9 @@ object PgTsTemplateRow {
       PgTsTemplateRow(
         oid = row[PgTsTemplateId](prefix + "oid"),
         tmplname = row[String](prefix + "tmplname"),
-        tmplnamespace = row[Long](prefix + "tmplnamespace"),
-        tmplinit = row[PGobject](prefix + "tmplinit"),
-        tmpllexize = row[PGobject](prefix + "tmpllexize")
+        tmplnamespace = row[/* oid */ Long](prefix + "tmplnamespace"),
+        tmplinit = row[/* regproc */ PGobject](prefix + "tmplinit"),
+        tmpllexize = row[/* regproc */ PGobject](prefix + "tmpllexize")
       )
     )
   }
@@ -54,9 +54,9 @@ object PgTsTemplateRow {
           PgTsTemplateRow(
             oid = json.\("oid").as[PgTsTemplateId],
             tmplname = json.\("tmplname").as[String],
-            tmplnamespace = json.\("tmplnamespace").as[Long],
-            tmplinit = json.\("tmplinit").as[PGobject],
-            tmpllexize = json.\("tmpllexize").as[PGobject]
+            tmplnamespace = json.\("tmplnamespace").as[/* oid */ Long],
+            tmplinit = json.\("tmplinit").as[/* regproc */ PGobject],
+            tmpllexize = json.\("tmpllexize").as[/* regproc */ PGobject]
           )
         )
       )

@@ -17,10 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgTsConfigMapRow(
-  mapcfg: Long,
+  mapcfg: /* oid */ Long,
   maptokentype: Int,
   mapseqno: Int,
-  mapdict: Long
+  mapdict: /* oid */ Long
 ){
   val compositeId: PgTsConfigMapId = PgTsConfigMapId(mapcfg, maptokentype, mapseqno)
 }
@@ -29,10 +29,10 @@ object PgTsConfigMapRow {
   def rowParser(prefix: String): RowParser[PgTsConfigMapRow] = { row =>
     Success(
       PgTsConfigMapRow(
-        mapcfg = row[Long](prefix + "mapcfg"),
+        mapcfg = row[/* oid */ Long](prefix + "mapcfg"),
         maptokentype = row[Int](prefix + "maptokentype"),
         mapseqno = row[Int](prefix + "mapseqno"),
-        mapdict = row[Long](prefix + "mapdict")
+        mapdict = row[/* oid */ Long](prefix + "mapdict")
       )
     )
   }
@@ -50,10 +50,10 @@ object PgTsConfigMapRow {
       JsResult.fromTry(
         Try(
           PgTsConfigMapRow(
-            mapcfg = json.\("mapcfg").as[Long],
+            mapcfg = json.\("mapcfg").as[/* oid */ Long],
             maptokentype = json.\("maptokentype").as[Int],
             mapseqno = json.\("mapseqno").as[Int],
-            mapdict = json.\("mapdict").as[Long]
+            mapdict = json.\("mapdict").as[/* oid */ Long]
           )
         )
       )

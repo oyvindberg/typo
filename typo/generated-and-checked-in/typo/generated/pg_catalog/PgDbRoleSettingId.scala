@@ -18,7 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PgDbRoleSettingId(setdatabase: Long, setrole: Long)
+case class PgDbRoleSettingId(setdatabase: /* oid */ Long, setrole: /* oid */ Long)
 object PgDbRoleSettingId {
   implicit val ordering: Ordering[PgDbRoleSettingId] = Ordering.by(x => (x.setdatabase, x.setrole))
   implicit val oFormat: OFormat[PgDbRoleSettingId] = new OFormat[PgDbRoleSettingId]{
@@ -32,8 +32,8 @@ object PgDbRoleSettingId {
       JsResult.fromTry(
         Try(
           PgDbRoleSettingId(
-            setdatabase = json.\("setdatabase").as[Long],
-            setrole = json.\("setrole").as[Long]
+            setdatabase = json.\("setdatabase").as[/* oid */ Long],
+            setrole = json.\("setrole").as[/* oid */ Long]
           )
         )
       )
@@ -42,8 +42,8 @@ object PgDbRoleSettingId {
   def rowParser(prefix: String): RowParser[PgDbRoleSettingId] = { row =>
     Success(
       PgDbRoleSettingId(
-        setdatabase = row[Long](prefix + "setdatabase"),
-        setrole = row[Long](prefix + "setrole")
+        setdatabase = row[/* oid */ Long](prefix + "setdatabase"),
+        setrole = row[/* oid */ Long](prefix + "setrole")
       )
     )
   }

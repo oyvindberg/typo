@@ -20,11 +20,11 @@ import scala.util.Try
 case class PgPartitionedTableRowUnsaved(
   partstrat: String,
   partnatts: Int,
-  partdefid: Long,
-  partattrs: PGobject,
-  partclass: PGobject,
-  partcollation: PGobject,
-  partexprs: Option[PGobject]
+  partdefid: /* oid */ Long,
+  partattrs: /* int2vector */ PGobject,
+  partclass: /* oidvector */ PGobject,
+  partcollation: /* oidvector */ PGobject,
+  partexprs: Option[/* pg_node_tree */ PGobject]
 )
 object PgPartitionedTableRowUnsaved {
   implicit val oFormat: OFormat[PgPartitionedTableRowUnsaved] = new OFormat[PgPartitionedTableRowUnsaved]{
@@ -45,11 +45,11 @@ object PgPartitionedTableRowUnsaved {
           PgPartitionedTableRowUnsaved(
             partstrat = json.\("partstrat").as[String],
             partnatts = json.\("partnatts").as[Int],
-            partdefid = json.\("partdefid").as[Long],
-            partattrs = json.\("partattrs").as[PGobject],
-            partclass = json.\("partclass").as[PGobject],
-            partcollation = json.\("partcollation").as[PGobject],
-            partexprs = json.\("partexprs").toOption.map(_.as[PGobject])
+            partdefid = json.\("partdefid").as[/* oid */ Long],
+            partattrs = json.\("partattrs").as[/* int2vector */ PGobject],
+            partclass = json.\("partclass").as[/* oidvector */ PGobject],
+            partcollation = json.\("partcollation").as[/* oidvector */ PGobject],
+            partexprs = json.\("partexprs").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )

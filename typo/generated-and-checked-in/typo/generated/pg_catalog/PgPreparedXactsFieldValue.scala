@@ -15,7 +15,7 @@ import org.postgresql.util.PGobject
 sealed abstract class PgPreparedXactsFieldValue[T](val name: String, val value: T)
 
 object PgPreparedXactsFieldValue {
-  case class transaction(override val value: Option[PGobject]) extends PgPreparedXactsFieldValue("transaction", value)
+  case class transaction(override val value: Option[/* xid */ PGobject]) extends PgPreparedXactsFieldValue("transaction", value)
   case class gid(override val value: Option[String]) extends PgPreparedXactsFieldValue("gid", value)
   case class prepared(override val value: Option[ZonedDateTime]) extends PgPreparedXactsFieldValue("prepared", value)
   case class owner(override val value: Option[String]) extends PgPreparedXactsFieldValue("owner", value)

@@ -111,7 +111,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def delete(oid: PgOperatorId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_operator where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueOprnameOprleftOprrightOprnamespace(oprname: String, oprleft: Long, oprright: Long, oprnamespace: Long)(implicit c: Connection): Option[PgOperatorRow] = {
+  override def selectByUniqueOprnameOprleftOprrightOprnamespace(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOperatorRow] = {
     selectByFieldValues(List(PgOperatorFieldValue.oprname(oprname), PgOperatorFieldValue.oprleft(oprleft), PgOperatorFieldValue.oprright(oprright), PgOperatorFieldValue.oprnamespace(oprnamespace))).headOption
   }
 }

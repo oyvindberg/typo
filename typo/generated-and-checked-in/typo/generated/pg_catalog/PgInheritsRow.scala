@@ -19,8 +19,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PgInheritsRow(
-  inhrelid: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  inhparent: Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhparent","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  inhrelid: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhrelid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  inhparent: /* oid */ Long /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhparent","ordinal_position":2,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   inhseqno: Int /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhseqno","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   inhdetachpending: Boolean /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_inherits","column_name":"inhdetachpending","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
@@ -31,8 +31,8 @@ object PgInheritsRow {
   def rowParser(prefix: String): RowParser[PgInheritsRow] = { row =>
     Success(
       PgInheritsRow(
-        inhrelid = row[Long](prefix + "inhrelid"),
-        inhparent = row[Long](prefix + "inhparent"),
+        inhrelid = row[/* oid */ Long](prefix + "inhrelid"),
+        inhparent = row[/* oid */ Long](prefix + "inhparent"),
         inhseqno = row[Int](prefix + "inhseqno"),
         inhdetachpending = row[Boolean](prefix + "inhdetachpending")
       )
@@ -52,8 +52,8 @@ object PgInheritsRow {
       JsResult.fromTry(
         Try(
           PgInheritsRow(
-            inhrelid = json.\("inhrelid").as[Long],
-            inhparent = json.\("inhparent").as[Long],
+            inhrelid = json.\("inhrelid").as[/* oid */ Long],
+            inhparent = json.\("inhparent").as[/* oid */ Long],
             inhseqno = json.\("inhseqno").as[Int],
             inhdetachpending = json.\("inhdetachpending").as[Boolean]
           )

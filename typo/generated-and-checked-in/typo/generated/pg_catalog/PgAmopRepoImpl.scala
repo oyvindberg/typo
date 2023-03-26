@@ -93,10 +93,10 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_amop where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUniqueAmopfamilyAmoplefttypeAmoprighttypeAmopstrategy(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUniqueAmopfamilyAmoplefttypeAmoprighttypeAmopstrategy(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
     selectByFieldValues(List(PgAmopFieldValue.amopfamily(amopfamily), PgAmopFieldValue.amoplefttype(amoplefttype), PgAmopFieldValue.amoprighttype(amoprighttype), PgAmopFieldValue.amopstrategy(amopstrategy))).headOption
   }
-  override def selectByUniqueAmopoprAmoppurposeAmopfamily(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUniqueAmopoprAmoppurposeAmopfamily(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long)(implicit c: Connection): Option[PgAmopRow] = {
     selectByFieldValues(List(PgAmopFieldValue.amopopr(amopopr), PgAmopFieldValue.amoppurpose(amoppurpose), PgAmopFieldValue.amopfamily(amopfamily))).headOption
   }
 }

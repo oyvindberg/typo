@@ -17,8 +17,8 @@ object PgEventTriggerFieldValue {
   case class oid(override val value: PgEventTriggerId) extends PgEventTriggerFieldValue("oid", value)
   case class evtname(override val value: String) extends PgEventTriggerFieldValue("evtname", value)
   case class evtevent(override val value: String) extends PgEventTriggerFieldValue("evtevent", value)
-  case class evtowner(override val value: Long) extends PgEventTriggerFieldValue("evtowner", value)
-  case class evtfoid(override val value: Long) extends PgEventTriggerFieldValue("evtfoid", value)
+  case class evtowner(override val value: /* oid */ Long) extends PgEventTriggerFieldValue("evtowner", value)
+  case class evtfoid(override val value: /* oid */ Long) extends PgEventTriggerFieldValue("evtfoid", value)
   case class evtenabled(override val value: String) extends PgEventTriggerFieldValue("evtenabled", value)
   case class evttags(override val value: Option[Array[String]]) extends PgEventTriggerFieldValue("evttags", value)
 }

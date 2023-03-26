@@ -18,9 +18,9 @@ import scala.util.Try
 
 case class PgTsConfigRowUnsaved(
   cfgname: String,
-  cfgnamespace: Long,
-  cfgowner: Long,
-  cfgparser: Long
+  cfgnamespace: /* oid */ Long,
+  cfgowner: /* oid */ Long,
+  cfgparser: /* oid */ Long
 )
 object PgTsConfigRowUnsaved {
   implicit val oFormat: OFormat[PgTsConfigRowUnsaved] = new OFormat[PgTsConfigRowUnsaved]{
@@ -37,9 +37,9 @@ object PgTsConfigRowUnsaved {
         Try(
           PgTsConfigRowUnsaved(
             cfgname = json.\("cfgname").as[String],
-            cfgnamespace = json.\("cfgnamespace").as[Long],
-            cfgowner = json.\("cfgowner").as[Long],
-            cfgparser = json.\("cfgparser").as[Long]
+            cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
+            cfgowner = json.\("cfgowner").as[/* oid */ Long],
+            cfgparser = json.\("cfgparser").as[/* oid */ Long]
           )
         )
       )

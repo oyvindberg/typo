@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 sealed abstract class PgStatUserTablesFieldValue[T](val name: String, val value: T)
 
 object PgStatUserTablesFieldValue {
-  case class relid(override val value: Option[Long]) extends PgStatUserTablesFieldValue("relid", value)
+  case class relid(override val value: Option[/* oid */ Long]) extends PgStatUserTablesFieldValue("relid", value)
   case class schemaname(override val value: Option[String]) extends PgStatUserTablesFieldValue("schemaname", value)
   case class relname(override val value: Option[String]) extends PgStatUserTablesFieldValue("relname", value)
   case class seqScan(override val value: Option[Long]) extends PgStatUserTablesFieldValue("seq_scan", value)

@@ -12,9 +12,9 @@ import org.postgresql.util.PGobject
 sealed abstract class PgAttributeFieldValue[T](val name: String, val value: T)
 
 object PgAttributeFieldValue {
-  case class attrelid(override val value: Long) extends PgAttributeFieldValue("attrelid", value)
+  case class attrelid(override val value: /* oid */ Long) extends PgAttributeFieldValue("attrelid", value)
   case class attname(override val value: String) extends PgAttributeFieldValue("attname", value)
-  case class atttypid(override val value: Long) extends PgAttributeFieldValue("atttypid", value)
+  case class atttypid(override val value: /* oid */ Long) extends PgAttributeFieldValue("atttypid", value)
   case class attstattarget(override val value: Int) extends PgAttributeFieldValue("attstattarget", value)
   case class attlen(override val value: Int) extends PgAttributeFieldValue("attlen", value)
   case class attnum(override val value: Int) extends PgAttributeFieldValue("attnum", value)
@@ -33,9 +33,9 @@ object PgAttributeFieldValue {
   case class attisdropped(override val value: Boolean) extends PgAttributeFieldValue("attisdropped", value)
   case class attislocal(override val value: Boolean) extends PgAttributeFieldValue("attislocal", value)
   case class attinhcount(override val value: Int) extends PgAttributeFieldValue("attinhcount", value)
-  case class attcollation(override val value: Long) extends PgAttributeFieldValue("attcollation", value)
-  case class attacl(override val value: Option[Array[PGobject]]) extends PgAttributeFieldValue("attacl", value)
+  case class attcollation(override val value: /* oid */ Long) extends PgAttributeFieldValue("attcollation", value)
+  case class attacl(override val value: Option[Array[/* aclitem */ PGobject]]) extends PgAttributeFieldValue("attacl", value)
   case class attoptions(override val value: Option[Array[String]]) extends PgAttributeFieldValue("attoptions", value)
   case class attfdwoptions(override val value: Option[Array[String]]) extends PgAttributeFieldValue("attfdwoptions", value)
-  case class attmissingval(override val value: Option[PGobject]) extends PgAttributeFieldValue("attmissingval", value)
+  case class attmissingval(override val value: Option[/* anyarray */ PGobject]) extends PgAttributeFieldValue("attmissingval", value)
 }

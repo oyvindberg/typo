@@ -21,11 +21,11 @@ case class PgPartitionedTableRow(
   partrelid: PgPartitionedTableId,
   partstrat: String,
   partnatts: Int,
-  partdefid: Long,
-  partattrs: PGobject,
-  partclass: PGobject,
-  partcollation: PGobject,
-  partexprs: Option[PGobject]
+  partdefid: /* oid */ Long,
+  partattrs: /* int2vector */ PGobject,
+  partclass: /* oidvector */ PGobject,
+  partcollation: /* oidvector */ PGobject,
+  partexprs: Option[/* pg_node_tree */ PGobject]
 )
 
 object PgPartitionedTableRow {
@@ -35,11 +35,11 @@ object PgPartitionedTableRow {
         partrelid = row[PgPartitionedTableId](prefix + "partrelid"),
         partstrat = row[String](prefix + "partstrat"),
         partnatts = row[Int](prefix + "partnatts"),
-        partdefid = row[Long](prefix + "partdefid"),
-        partattrs = row[PGobject](prefix + "partattrs"),
-        partclass = row[PGobject](prefix + "partclass"),
-        partcollation = row[PGobject](prefix + "partcollation"),
-        partexprs = row[Option[PGobject]](prefix + "partexprs")
+        partdefid = row[/* oid */ Long](prefix + "partdefid"),
+        partattrs = row[/* int2vector */ PGobject](prefix + "partattrs"),
+        partclass = row[/* oidvector */ PGobject](prefix + "partclass"),
+        partcollation = row[/* oidvector */ PGobject](prefix + "partcollation"),
+        partexprs = row[Option[/* pg_node_tree */ PGobject]](prefix + "partexprs")
       )
     )
   }
@@ -64,11 +64,11 @@ object PgPartitionedTableRow {
             partrelid = json.\("partrelid").as[PgPartitionedTableId],
             partstrat = json.\("partstrat").as[String],
             partnatts = json.\("partnatts").as[Int],
-            partdefid = json.\("partdefid").as[Long],
-            partattrs = json.\("partattrs").as[PGobject],
-            partclass = json.\("partclass").as[PGobject],
-            partcollation = json.\("partcollation").as[PGobject],
-            partexprs = json.\("partexprs").toOption.map(_.as[PGobject])
+            partdefid = json.\("partdefid").as[/* oid */ Long],
+            partattrs = json.\("partattrs").as[/* int2vector */ PGobject],
+            partclass = json.\("partclass").as[/* oidvector */ PGobject],
+            partcollation = json.\("partcollation").as[/* oidvector */ PGobject],
+            partexprs = json.\("partexprs").toOption.map(_.as[/* pg_node_tree */ PGobject])
           )
         )
       )
