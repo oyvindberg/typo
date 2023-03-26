@@ -23,20 +23,19 @@ object Gen {
   def apply(options: Options, metaDb: MetaDb, sqlScripts: List[SqlScript]): List[sc.File] = {
     val default: DefaultComputed =
       DefaultComputed(options.pkg)
-    val enumFiles: List[sc.File] =
-      metaDb.enums.map(StringEnumFile.stringEnumClass(options))
-    val tableFiles: List[sc.File] =
-      metaDb.tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all)
-    val viewFiles: List[sc.File] =
-      metaDb.views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all)
-    val scriptFiles: List[sc.File] =
-      sqlScripts.flatMap(x => SqlScriptFiles(SqlScriptComputed(options.pkg, x), options).all)
+
     val mostFiles: List[sc.File] =
-      List(DefaultFile(default, options.jsonLib).file) ++ enumFiles ++ tableFiles ++ viewFiles ++ scriptFiles
+      List(
+        List(DefaultFile(default, options.jsonLib).file),
+        metaDb.enums.map(StringEnumFile.stringEnumClass(options)),
+        metaDb.tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all),
+        metaDb.views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all),
+        sqlScripts.flatMap(x => SqlScriptFiles(SqlScriptComputed(options.pkg, x), options).all)
+      ).flatten
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
-      mostFiles.groupBy { _.pkg }.map { case (pkg, files) =>
-        (pkg, files.map { f => (f.name, f.tpe.value) }.toMap)
+      mostFiles.groupBy(_.pkg).map { case (pkg, files) =>
+        (pkg, files.map(f => (f.name, f.tpe.value)).toMap)
       }
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.
@@ -44,6 +43,6 @@ object Gen {
     val pkgObject = List(PackageObjectFile.packageObject(options))
 
     val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
-    allFiles.map { file => file.copy(contents = options.header ++ file.contents) }
+    allFiles.map(file => file.copy(contents = options.header ++ file.contents))
   }
 }
