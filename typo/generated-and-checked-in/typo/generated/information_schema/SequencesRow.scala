@@ -34,21 +34,21 @@ case class SequencesRow(
 )
 
 object SequencesRow {
-  implicit val rowParser: RowParser[SequencesRow] = { row =>
+  def rowParser(prefix: String): RowParser[SequencesRow] = { row =>
     Success(
       SequencesRow(
-        sequenceCatalog = row[Option[String]]("sequence_catalog"),
-        sequenceSchema = row[Option[String]]("sequence_schema"),
-        sequenceName = row[Option[String]]("sequence_name"),
-        dataType = row[Option[String]]("data_type"),
-        numericPrecision = row[Option[Int]]("numeric_precision"),
-        numericPrecisionRadix = row[Option[Int]]("numeric_precision_radix"),
-        numericScale = row[Option[Int]]("numeric_scale"),
-        startValue = row[Option[String]]("start_value"),
-        minimumValue = row[Option[String]]("minimum_value"),
-        maximumValue = row[Option[String]]("maximum_value"),
-        increment = row[Option[String]]("increment"),
-        cycleOption = row[Option[String]]("cycle_option")
+        sequenceCatalog = row[Option[String]](prefix + "sequence_catalog"),
+        sequenceSchema = row[Option[String]](prefix + "sequence_schema"),
+        sequenceName = row[Option[String]](prefix + "sequence_name"),
+        dataType = row[Option[String]](prefix + "data_type"),
+        numericPrecision = row[Option[Int]](prefix + "numeric_precision"),
+        numericPrecisionRadix = row[Option[Int]](prefix + "numeric_precision_radix"),
+        numericScale = row[Option[Int]](prefix + "numeric_scale"),
+        startValue = row[Option[String]](prefix + "start_value"),
+        minimumValue = row[Option[String]](prefix + "minimum_value"),
+        maximumValue = row[Option[String]](prefix + "maximum_value"),
+        increment = row[Option[String]](prefix + "increment"),
+        cycleOption = row[Option[String]](prefix + "cycle_option")
       )
     )
   }

@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object RoleColumnGrantsRepoImpl extends RoleColumnGrantsRepo {
   override def selectAll(implicit c: Connection): List[RoleColumnGrantsRow] = {
-    SQL"""select grantor, grantee, table_catalog, table_schema, table_name, column_name, privilege_type, is_grantable from information_schema.role_column_grants""".as(RoleColumnGrantsRow.rowParser.*)
+    SQL"""select grantor, grantee, table_catalog, table_schema, table_name, column_name, privilege_type, is_grantable from information_schema.role_column_grants""".as(RoleColumnGrantsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[RoleColumnGrantsFieldValue[_]])(implicit c: Connection): List[RoleColumnGrantsRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object RoleColumnGrantsRepoImpl extends RoleColumnGrantsRepo {
         val q = s"""select * from information_schema.role_column_grants where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(RoleColumnGrantsRow.rowParser.*)
+          .as(RoleColumnGrantsRow.rowParser("").*)
     }
 
   }

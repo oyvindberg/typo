@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def selectAll(implicit c: Connection): List[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config""".as(PgTsConfigRow.rowParser.*)
+    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config""".as(PgTsConfigRow.rowParser("").*)
   }
   override def selectById(oid: PgTsConfigId)(implicit c: Connection): Option[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = $oid""".as(PgTsConfigRow.rowParser.singleOpt)
+    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = $oid""".as(PgTsConfigRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTsConfigId])(implicit c: Connection): List[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid in $oids""".as(PgTsConfigRow.rowParser.*)
+    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid in $oids""".as(PgTsConfigRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTsConfigFieldValue[_]])(implicit c: Connection): List[PgTsConfigRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
         val q = s"""select * from pg_catalog.pg_ts_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTsConfigRow.rowParser.*)
+          .as(PgTsConfigRow.rowParser("").*)
     }
 
   }
@@ -81,7 +81,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_ts_config where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(cfgname: String, cfgnamespace: Long)(implicit c: Connection): Option[PgTsConfigRow] = {
-    ???
+  override def selectByUniqueCfgnameCfgnamespace(cfgname: String, cfgnamespace: Long)(implicit c: Connection): Option[PgTsConfigRow] = {
+    selectByFieldValues(List(PgTsConfigFieldValue.cfgname(cfgname), PgTsConfigFieldValue.cfgnamespace(cfgnamespace))).headOption
   }
 }

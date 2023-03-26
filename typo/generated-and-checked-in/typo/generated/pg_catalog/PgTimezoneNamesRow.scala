@@ -27,13 +27,13 @@ case class PgTimezoneNamesRow(
 )
 
 object PgTimezoneNamesRow {
-  implicit val rowParser: RowParser[PgTimezoneNamesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTimezoneNamesRow] = { row =>
     Success(
       PgTimezoneNamesRow(
-        name = row[Option[String]]("name"),
-        abbrev = row[Option[String]]("abbrev"),
-        utcOffset = row[Option[PGInterval]]("utc_offset"),
-        isDst = row[Option[Boolean]]("is_dst")
+        name = row[Option[String]](prefix + "name"),
+        abbrev = row[Option[String]](prefix + "abbrev"),
+        utcOffset = row[Option[PGInterval]](prefix + "utc_offset"),
+        isDst = row[Option[Boolean]](prefix + "is_dst")
       )
     )
   }

@@ -33,18 +33,18 @@ case class PgStatWalRow(
 )
 
 object PgStatWalRow {
-  implicit val rowParser: RowParser[PgStatWalRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatWalRow] = { row =>
     Success(
       PgStatWalRow(
-        walRecords = row[Option[Long]]("wal_records"),
-        walFpi = row[Option[Long]]("wal_fpi"),
-        walBytes = row[Option[BigDecimal]]("wal_bytes"),
-        walBuffersFull = row[Option[Long]]("wal_buffers_full"),
-        walWrite = row[Option[Long]]("wal_write"),
-        walSync = row[Option[Long]]("wal_sync"),
-        walWriteTime = row[Option[Double]]("wal_write_time"),
-        walSyncTime = row[Option[Double]]("wal_sync_time"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        walRecords = row[Option[Long]](prefix + "wal_records"),
+        walFpi = row[Option[Long]](prefix + "wal_fpi"),
+        walBytes = row[Option[BigDecimal]](prefix + "wal_bytes"),
+        walBuffersFull = row[Option[Long]](prefix + "wal_buffers_full"),
+        walWrite = row[Option[Long]](prefix + "wal_write"),
+        walSync = row[Option[Long]](prefix + "wal_sync"),
+        walWriteTime = row[Option[Double]](prefix + "wal_write_time"),
+        walSyncTime = row[Option[Double]](prefix + "wal_sync_time"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

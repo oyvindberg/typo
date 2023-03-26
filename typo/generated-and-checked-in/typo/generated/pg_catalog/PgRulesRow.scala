@@ -26,13 +26,13 @@ case class PgRulesRow(
 )
 
 object PgRulesRow {
-  implicit val rowParser: RowParser[PgRulesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgRulesRow] = { row =>
     Success(
       PgRulesRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        rulename = row[Option[String]]("rulename"),
-        definition = row[Option[String]]("definition")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        rulename = row[Option[String]](prefix + "rulename"),
+        definition = row[Option[String]](prefix + "definition")
       )
     )
   }

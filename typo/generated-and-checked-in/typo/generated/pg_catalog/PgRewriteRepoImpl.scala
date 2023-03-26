@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite""".as(PgRewriteRow.rowParser.*)
+    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite""".as(PgRewriteRow.rowParser("").*)
   }
   override def selectById(oid: PgRewriteId)(implicit c: Connection): Option[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = $oid""".as(PgRewriteRow.rowParser.singleOpt)
+    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = $oid""".as(PgRewriteRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgRewriteId])(implicit c: Connection): List[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid in $oids""".as(PgRewriteRow.rowParser.*)
+    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid in $oids""".as(PgRewriteRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgRewriteFieldValue[_]])(implicit c: Connection): List[PgRewriteRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
         val q = s"""select * from pg_catalog.pg_rewrite where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgRewriteRow.rowParser.*)
+          .as(PgRewriteRow.rowParser("").*)
     }
 
   }
@@ -90,7 +90,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_rewrite where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(evClass: Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
-    ???
+  override def selectByUniqueEvClassRulename(evClass: Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
+    selectByFieldValues(List(PgRewriteFieldValue.evClass(evClass), PgRewriteFieldValue.rulename(rulename))).headOption
   }
 }

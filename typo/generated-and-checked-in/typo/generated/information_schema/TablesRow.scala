@@ -34,21 +34,21 @@ case class TablesRow(
 )
 
 object TablesRow {
-  implicit val rowParser: RowParser[TablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[TablesRow] = { row =>
     Success(
       TablesRow(
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        tableType = row[Option[String]]("table_type"),
-        selfReferencingColumnName = row[Option[String]]("self_referencing_column_name"),
-        referenceGeneration = row[Option[String]]("reference_generation"),
-        userDefinedTypeCatalog = row[Option[String]]("user_defined_type_catalog"),
-        userDefinedTypeSchema = row[Option[String]]("user_defined_type_schema"),
-        userDefinedTypeName = row[Option[String]]("user_defined_type_name"),
-        isInsertableInto = row[Option[String]]("is_insertable_into"),
-        isTyped = row[Option[String]]("is_typed"),
-        commitAction = row[Option[String]]("commit_action")
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        tableType = row[Option[String]](prefix + "table_type"),
+        selfReferencingColumnName = row[Option[String]](prefix + "self_referencing_column_name"),
+        referenceGeneration = row[Option[String]](prefix + "reference_generation"),
+        userDefinedTypeCatalog = row[Option[String]](prefix + "user_defined_type_catalog"),
+        userDefinedTypeSchema = row[Option[String]](prefix + "user_defined_type_schema"),
+        userDefinedTypeName = row[Option[String]](prefix + "user_defined_type_name"),
+        isInsertableInto = row[Option[String]](prefix + "is_insertable_into"),
+        isTyped = row[Option[String]](prefix + "is_typed"),
+        commitAction = row[Option[String]](prefix + "commit_action")
       )
     )
   }

@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgReplicationOriginStatusRepoImpl extends PgReplicationOriginStatusRepo {
   override def selectAll(implicit c: Connection): List[PgReplicationOriginStatusRow] = {
-    SQL"""select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status""".as(PgReplicationOriginStatusRow.rowParser.*)
+    SQL"""select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status""".as(PgReplicationOriginStatusRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgReplicationOriginStatusFieldValue[_]])(implicit c: Connection): List[PgReplicationOriginStatusRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgReplicationOriginStatusRepoImpl extends PgReplicationOriginStatusRepo {
         val q = s"""select * from pg_catalog.pg_replication_origin_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgReplicationOriginStatusRow.rowParser.*)
+          .as(PgReplicationOriginStatusRow.rowParser("").*)
     }
 
   }

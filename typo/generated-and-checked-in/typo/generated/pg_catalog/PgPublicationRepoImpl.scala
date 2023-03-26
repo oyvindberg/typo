@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgPublicationRepoImpl extends PgPublicationRepo {
   override def selectAll(implicit c: Connection): List[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication""".as(PgPublicationRow.rowParser.*)
+    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication""".as(PgPublicationRow.rowParser("").*)
   }
   override def selectById(oid: PgPublicationId)(implicit c: Connection): Option[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = $oid""".as(PgPublicationRow.rowParser.singleOpt)
+    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = $oid""".as(PgPublicationRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgPublicationId])(implicit c: Connection): List[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid in $oids""".as(PgPublicationRow.rowParser.*)
+    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid in $oids""".as(PgPublicationRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPublicationFieldValue[_]])(implicit c: Connection): List[PgPublicationRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
         val q = s"""select * from pg_catalog.pg_publication where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPublicationRow.rowParser.*)
+          .as(PgPublicationRow.rowParser("").*)
     }
 
   }
@@ -93,7 +93,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
   override def delete(oid: PgPublicationId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_publication where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
-    ???
+  override def selectByUniquePubname(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
+    selectByFieldValues(List(PgPublicationFieldValue.pubname(pubname))).headOption
   }
 }

@@ -28,13 +28,13 @@ case class PgInheritsRow(
 }
 
 object PgInheritsRow {
-  implicit val rowParser: RowParser[PgInheritsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgInheritsRow] = { row =>
     Success(
       PgInheritsRow(
-        inhrelid = row[Long]("inhrelid"),
-        inhparent = row[Long]("inhparent"),
-        inhseqno = row[Int]("inhseqno"),
-        inhdetachpending = row[Boolean]("inhdetachpending")
+        inhrelid = row[Long](prefix + "inhrelid"),
+        inhparent = row[Long](prefix + "inhparent"),
+        inhseqno = row[Int](prefix + "inhseqno"),
+        inhdetachpending = row[Boolean](prefix + "inhdetachpending")
       )
     )
   }

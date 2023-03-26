@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def selectAll(implicit c: Connection): List[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion""".as(PgConversionRow.rowParser.*)
+    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion""".as(PgConversionRow.rowParser("").*)
   }
   override def selectById(oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = $oid""".as(PgConversionRow.rowParser.singleOpt)
+    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = $oid""".as(PgConversionRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgConversionId])(implicit c: Connection): List[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid in $oids""".as(PgConversionRow.rowParser.*)
+    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid in $oids""".as(PgConversionRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgConversionFieldValue[_]])(implicit c: Connection): List[PgConversionRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
         val q = s"""select * from pg_catalog.pg_conversion where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgConversionRow.rowParser.*)
+          .as(PgConversionRow.rowParser("").*)
     }
 
   }
@@ -90,10 +90,10 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_conversion where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(connamespace: Long, conforencoding: Int, contoencoding: Int, oid: Long)(implicit c: Connection): Option[PgConversionRow] = {
-    ???
+  override def selectByUniqueConnamespaceConforencodingContoencodingOid(connamespace: Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
+    selectByFieldValues(List(PgConversionFieldValue.connamespace(connamespace), PgConversionFieldValue.conforencoding(conforencoding), PgConversionFieldValue.contoencoding(contoencoding), PgConversionFieldValue.oid(oid))).headOption
   }
-  override def selectByUnique(conname: String, connamespace: Long)(implicit c: Connection): Option[PgConversionRow] = {
-    ???
+  override def selectByUniqueConnameConnamespace(conname: String, connamespace: Long)(implicit c: Connection): Option[PgConversionRow] = {
+    selectByFieldValues(List(PgConversionFieldValue.conname(conname), PgConversionFieldValue.connamespace(connamespace))).headOption
   }
 }

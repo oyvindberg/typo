@@ -30,17 +30,17 @@ case class PgSeclabelsRow(
 )
 
 object PgSeclabelsRow {
-  implicit val rowParser: RowParser[PgSeclabelsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSeclabelsRow] = { row =>
     Success(
       PgSeclabelsRow(
-        objoid = row[Option[Long]]("objoid"),
-        classoid = row[Option[Long]]("classoid"),
-        objsubid = row[Option[Int]]("objsubid"),
-        objtype = row[Option[String]]("objtype"),
-        objnamespace = row[Option[Long]]("objnamespace"),
-        objname = row[Option[String]]("objname"),
-        provider = row[Option[String]]("provider"),
-        label = row[Option[String]]("label")
+        objoid = row[Option[Long]](prefix + "objoid"),
+        classoid = row[Option[Long]](prefix + "classoid"),
+        objsubid = row[Option[Int]](prefix + "objsubid"),
+        objtype = row[Option[String]](prefix + "objtype"),
+        objnamespace = row[Option[Long]](prefix + "objnamespace"),
+        objname = row[Option[String]](prefix + "objname"),
+        provider = row[Option[String]](prefix + "provider"),
+        label = row[Option[String]](prefix + "label")
       )
     )
   }

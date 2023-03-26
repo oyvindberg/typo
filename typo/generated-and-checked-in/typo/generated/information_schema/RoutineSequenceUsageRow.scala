@@ -31,18 +31,18 @@ case class RoutineSequenceUsageRow(
 )
 
 object RoutineSequenceUsageRow {
-  implicit val rowParser: RowParser[RoutineSequenceUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[RoutineSequenceUsageRow] = { row =>
     Success(
       RoutineSequenceUsageRow(
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name"),
-        routineCatalog = row[Option[String]]("routine_catalog"),
-        routineSchema = row[Option[String]]("routine_schema"),
-        routineName = row[Option[String]]("routine_name"),
-        sequenceCatalog = row[Option[String]]("sequence_catalog"),
-        sequenceSchema = row[Option[String]]("sequence_schema"),
-        sequenceName = row[Option[String]]("sequence_name")
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name"),
+        routineCatalog = row[Option[String]](prefix + "routine_catalog"),
+        routineSchema = row[Option[String]](prefix + "routine_schema"),
+        routineName = row[Option[String]](prefix + "routine_name"),
+        sequenceCatalog = row[Option[String]](prefix + "sequence_catalog"),
+        sequenceSchema = row[Option[String]](prefix + "sequence_schema"),
+        sequenceName = row[Option[String]](prefix + "sequence_name")
       )
     )
   }

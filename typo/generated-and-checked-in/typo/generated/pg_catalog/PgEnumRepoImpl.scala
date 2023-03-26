@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum""".as(PgEnumRow.rowParser.*)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum""".as(PgEnumRow.rowParser("").*)
   }
   override def selectById(oid: PgEnumId)(implicit c: Connection): Option[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = $oid""".as(PgEnumRow.rowParser.singleOpt)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = $oid""".as(PgEnumRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgEnumId])(implicit c: Connection): List[PgEnumRow] = {
-    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid in $oids""".as(PgEnumRow.rowParser.*)
+    SQL"""select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid in $oids""".as(PgEnumRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgEnumFieldValue[_]])(implicit c: Connection): List[PgEnumRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
         val q = s"""select * from pg_catalog.pg_enum where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgEnumRow.rowParser.*)
+          .as(PgEnumRow.rowParser("").*)
     }
 
   }
@@ -78,10 +78,10 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_enum where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
-    ???
+  override def selectByUniqueEnumtypidEnumlabel(enumtypid: Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
+    selectByFieldValues(List(PgEnumFieldValue.enumtypid(enumtypid), PgEnumFieldValue.enumlabel(enumlabel))).headOption
   }
-  override def selectByUnique(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
-    ???
+  override def selectByUniqueEnumtypidEnumsortorder(enumtypid: Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
+    selectByFieldValues(List(PgEnumFieldValue.enumtypid(enumtypid), PgEnumFieldValue.enumsortorder(enumsortorder))).headOption
   }
 }

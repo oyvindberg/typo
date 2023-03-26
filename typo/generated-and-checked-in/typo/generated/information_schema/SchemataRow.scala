@@ -29,16 +29,16 @@ case class SchemataRow(
 )
 
 object SchemataRow {
-  implicit val rowParser: RowParser[SchemataRow] = { row =>
+  def rowParser(prefix: String): RowParser[SchemataRow] = { row =>
     Success(
       SchemataRow(
-        catalogName = row[Option[String]]("catalog_name"),
-        schemaName = row[Option[String]]("schema_name"),
-        schemaOwner = row[Option[String]]("schema_owner"),
-        defaultCharacterSetCatalog = row[Option[String]]("default_character_set_catalog"),
-        defaultCharacterSetSchema = row[Option[String]]("default_character_set_schema"),
-        defaultCharacterSetName = row[Option[String]]("default_character_set_name"),
-        sqlPath = row[Option[String]]("sql_path")
+        catalogName = row[Option[String]](prefix + "catalog_name"),
+        schemaName = row[Option[String]](prefix + "schema_name"),
+        schemaOwner = row[Option[String]](prefix + "schema_owner"),
+        defaultCharacterSetCatalog = row[Option[String]](prefix + "default_character_set_catalog"),
+        defaultCharacterSetSchema = row[Option[String]](prefix + "default_character_set_schema"),
+        defaultCharacterSetName = row[Option[String]](prefix + "default_character_set_name"),
+        sqlPath = row[Option[String]](prefix + "sql_path")
       )
     )
   }

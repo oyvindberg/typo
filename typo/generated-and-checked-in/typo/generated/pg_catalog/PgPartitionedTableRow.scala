@@ -31,17 +31,17 @@ case class PgPartitionedTableRow(
 )
 
 object PgPartitionedTableRow {
-  implicit val rowParser: RowParser[PgPartitionedTableRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPartitionedTableRow] = { row =>
     Success(
       PgPartitionedTableRow(
-        partrelid = row[PgPartitionedTableId]("partrelid"),
-        partstrat = row[String]("partstrat"),
-        partnatts = row[Int]("partnatts"),
-        partdefid = row[Long]("partdefid"),
-        partattrs = row[PGobject]("partattrs"),
-        partclass = row[PGobject]("partclass"),
-        partcollation = row[PGobject]("partcollation"),
-        partexprs = row[Option[PGobject]]("partexprs")
+        partrelid = row[PgPartitionedTableId](prefix + "partrelid"),
+        partstrat = row[String](prefix + "partstrat"),
+        partnatts = row[Int](prefix + "partnatts"),
+        partdefid = row[Long](prefix + "partdefid"),
+        partattrs = row[PGobject](prefix + "partattrs"),
+        partclass = row[PGobject](prefix + "partclass"),
+        partcollation = row[PGobject](prefix + "partcollation"),
+        partexprs = row[Option[PGobject]](prefix + "partexprs")
       )
     )
   }

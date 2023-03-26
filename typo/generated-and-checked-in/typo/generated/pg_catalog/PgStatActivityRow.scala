@@ -46,31 +46,31 @@ case class PgStatActivityRow(
 )
 
 object PgStatActivityRow {
-  implicit val rowParser: RowParser[PgStatActivityRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatActivityRow] = { row =>
     Success(
       PgStatActivityRow(
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        pid = row[Option[Int]]("pid"),
-        leaderPid = row[Option[Int]]("leader_pid"),
-        usesysid = row[Option[Long]]("usesysid"),
-        usename = row[Option[String]]("usename"),
-        applicationName = row[Option[String]]("application_name"),
-        clientAddr = row[Option[PGobject]]("client_addr"),
-        clientHostname = row[Option[String]]("client_hostname"),
-        clientPort = row[Option[Int]]("client_port"),
-        backendStart = row[Option[ZonedDateTime]]("backend_start"),
-        xactStart = row[Option[ZonedDateTime]]("xact_start"),
-        queryStart = row[Option[ZonedDateTime]]("query_start"),
-        stateChange = row[Option[ZonedDateTime]]("state_change"),
-        waitEventType = row[Option[String]]("wait_event_type"),
-        waitEvent = row[Option[String]]("wait_event"),
-        state = row[Option[String]]("state"),
-        backendXid = row[Option[PGobject]]("backend_xid"),
-        backendXmin = row[Option[PGobject]]("backend_xmin"),
-        queryId = row[Option[Long]]("query_id"),
-        query = row[Option[String]]("query"),
-        backendType = row[Option[String]]("backend_type")
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        pid = row[Option[Int]](prefix + "pid"),
+        leaderPid = row[Option[Int]](prefix + "leader_pid"),
+        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usename = row[Option[String]](prefix + "usename"),
+        applicationName = row[Option[String]](prefix + "application_name"),
+        clientAddr = row[Option[PGobject]](prefix + "client_addr"),
+        clientHostname = row[Option[String]](prefix + "client_hostname"),
+        clientPort = row[Option[Int]](prefix + "client_port"),
+        backendStart = row[Option[ZonedDateTime]](prefix + "backend_start"),
+        xactStart = row[Option[ZonedDateTime]](prefix + "xact_start"),
+        queryStart = row[Option[ZonedDateTime]](prefix + "query_start"),
+        stateChange = row[Option[ZonedDateTime]](prefix + "state_change"),
+        waitEventType = row[Option[String]](prefix + "wait_event_type"),
+        waitEvent = row[Option[String]](prefix + "wait_event"),
+        state = row[Option[String]](prefix + "state"),
+        backendXid = row[Option[PGobject]](prefix + "backend_xid"),
+        backendXmin = row[Option[PGobject]](prefix + "backend_xmin"),
+        queryId = row[Option[Long]](prefix + "query_id"),
+        query = row[Option[String]](prefix + "query"),
+        backendType = row[Option[String]](prefix + "backend_type")
       )
     )
   }

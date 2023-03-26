@@ -25,12 +25,12 @@ case class UserMappingsRow(
 )
 
 object UserMappingsRow {
-  implicit val rowParser: RowParser[UserMappingsRow] = { row =>
+  def rowParser(prefix: String): RowParser[UserMappingsRow] = { row =>
     Success(
       UserMappingsRow(
-        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name")
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier"),
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name")
       )
     )
   }

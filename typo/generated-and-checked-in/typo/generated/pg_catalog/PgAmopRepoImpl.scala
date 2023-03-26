@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop""".as(PgAmopRow.rowParser.*)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop""".as(PgAmopRow.rowParser("").*)
   }
   override def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = $oid""".as(PgAmopRow.rowParser.singleOpt)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = $oid""".as(PgAmopRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAmopId])(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid in $oids""".as(PgAmopRow.rowParser.*)
+    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid in $oids""".as(PgAmopRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAmopFieldValue[_]])(implicit c: Connection): List[PgAmopRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
         val q = s"""select * from pg_catalog.pg_amop where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAmopRow.rowParser.*)
+          .as(PgAmopRow.rowParser("").*)
     }
 
   }
@@ -93,10 +93,10 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_amop where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
-    ???
+  override def selectByUniqueAmopfamilyAmoplefttypeAmoprighttypeAmopstrategy(amopfamily: Long, amoplefttype: Long, amoprighttype: Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+    selectByFieldValues(List(PgAmopFieldValue.amopfamily(amopfamily), PgAmopFieldValue.amoplefttype(amoplefttype), PgAmopFieldValue.amoprighttype(amoprighttype), PgAmopFieldValue.amopstrategy(amopstrategy))).headOption
   }
-  override def selectByUnique(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow] = {
-    ???
+  override def selectByUniqueAmopoprAmoppurposeAmopfamily(amopopr: Long, amoppurpose: String, amopfamily: Long)(implicit c: Connection): Option[PgAmopRow] = {
+    selectByFieldValues(List(PgAmopFieldValue.amopopr(amopopr), PgAmopFieldValue.amoppurpose(amoppurpose), PgAmopFieldValue.amopfamily(amopfamily))).headOption
   }
 }

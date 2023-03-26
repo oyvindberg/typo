@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
   override def selectAll(implicit c: Connection): List[ReferentialConstraintsRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints""".as(ReferentialConstraintsRow.rowParser.*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints""".as(ReferentialConstraintsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ReferentialConstraintsFieldValue[_]])(implicit c: Connection): List[ReferentialConstraintsRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
         val q = s"""select * from information_schema.referential_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ReferentialConstraintsRow.rowParser.*)
+          .as(ReferentialConstraintsRow.rowParser("").*)
     }
 
   }

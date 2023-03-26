@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgShdependRepoImpl extends PgShdependRepo {
   override def selectAll(implicit c: Connection): List[PgShdependRow] = {
-    SQL"""select dbid, classid, objid, objsubid, refclassid, refobjid, deptype from pg_catalog.pg_shdepend""".as(PgShdependRow.rowParser.*)
+    SQL"""select dbid, classid, objid, objsubid, refclassid, refobjid, deptype from pg_catalog.pg_shdepend""".as(PgShdependRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgShdependFieldValue[_]])(implicit c: Connection): List[PgShdependRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgShdependRepoImpl extends PgShdependRepo {
         val q = s"""select * from pg_catalog.pg_shdepend where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgShdependRow.rowParser.*)
+          .as(PgShdependRow.rowParser("").*)
     }
 
   }

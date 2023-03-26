@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgFileSettingsRepoImpl extends PgFileSettingsRepo {
   override def selectAll(implicit c: Connection): List[PgFileSettingsRow] = {
-    SQL"""select sourcefile, sourceline, seqno, name, setting, applied, error from pg_catalog.pg_file_settings""".as(PgFileSettingsRow.rowParser.*)
+    SQL"""select sourcefile, sourceline, seqno, name, setting, applied, error from pg_catalog.pg_file_settings""".as(PgFileSettingsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgFileSettingsFieldValue[_]])(implicit c: Connection): List[PgFileSettingsRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgFileSettingsRepoImpl extends PgFileSettingsRepo {
         val q = s"""select * from pg_catalog.pg_file_settings where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgFileSettingsRow.rowParser.*)
+          .as(PgFileSettingsRow.rowParser("").*)
     }
 
   }

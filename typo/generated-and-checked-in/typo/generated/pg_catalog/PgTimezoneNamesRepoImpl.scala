@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgTimezoneNamesRepoImpl extends PgTimezoneNamesRepo {
   override def selectAll(implicit c: Connection): List[PgTimezoneNamesRow] = {
-    SQL"""select name, abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_names""".as(PgTimezoneNamesRow.rowParser.*)
+    SQL"""select name, abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_names""".as(PgTimezoneNamesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTimezoneNamesFieldValue[_]])(implicit c: Connection): List[PgTimezoneNamesRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgTimezoneNamesRepoImpl extends PgTimezoneNamesRepo {
         val q = s"""select * from pg_catalog.pg_timezone_names where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTimezoneNamesRow.rowParser.*)
+          .as(PgTimezoneNamesRow.rowParser("").*)
     }
 
   }

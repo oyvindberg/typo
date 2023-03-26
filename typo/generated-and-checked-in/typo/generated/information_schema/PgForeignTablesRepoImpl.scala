@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgForeignTablesRepoImpl extends PgForeignTablesRepo {
   override def selectAll(implicit c: Connection): List[PgForeignTablesRow] = {
-    SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier from information_schema._pg_foreign_tables""".as(PgForeignTablesRow.rowParser.*)
+    SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier from information_schema._pg_foreign_tables""".as(PgForeignTablesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgForeignTablesFieldValue[_]])(implicit c: Connection): List[PgForeignTablesRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgForeignTablesRepoImpl extends PgForeignTablesRepo {
         val q = s"""select * from information_schema._pg_foreign_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgForeignTablesRow.rowParser.*)
+          .as(PgForeignTablesRow.rowParser("").*)
     }
 
   }

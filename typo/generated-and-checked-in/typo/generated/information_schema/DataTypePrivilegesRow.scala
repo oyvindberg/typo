@@ -27,14 +27,14 @@ case class DataTypePrivilegesRow(
 )
 
 object DataTypePrivilegesRow {
-  implicit val rowParser: RowParser[DataTypePrivilegesRow] = { row =>
+  def rowParser(prefix: String): RowParser[DataTypePrivilegesRow] = { row =>
     Success(
       DataTypePrivilegesRow(
-        objectCatalog = row[Option[String]]("object_catalog"),
-        objectSchema = row[Option[String]]("object_schema"),
-        objectName = row[Option[String]]("object_name"),
-        objectType = row[Option[String]]("object_type"),
-        dtdIdentifier = row[Option[String]]("dtd_identifier")
+        objectCatalog = row[Option[String]](prefix + "object_catalog"),
+        objectSchema = row[Option[String]](prefix + "object_schema"),
+        objectName = row[Option[String]](prefix + "object_name"),
+        objectType = row[Option[String]](prefix + "object_type"),
+        dtdIdentifier = row[Option[String]](prefix + "dtd_identifier")
       )
     )
   }

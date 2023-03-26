@@ -30,17 +30,17 @@ case class DomainConstraintsRow(
 )
 
 object DomainConstraintsRow {
-  implicit val rowParser: RowParser[DomainConstraintsRow] = { row =>
+  def rowParser(prefix: String): RowParser[DomainConstraintsRow] = { row =>
     Success(
       DomainConstraintsRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        domainCatalog = row[Option[String]]("domain_catalog"),
-        domainSchema = row[Option[String]]("domain_schema"),
-        domainName = row[Option[String]]("domain_name"),
-        isDeferrable = row[Option[String]]("is_deferrable"),
-        initiallyDeferred = row[Option[String]]("initially_deferred")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        domainCatalog = row[Option[String]](prefix + "domain_catalog"),
+        domainSchema = row[Option[String]](prefix + "domain_schema"),
+        domainName = row[Option[String]](prefix + "domain_name"),
+        isDeferrable = row[Option[String]](prefix + "is_deferrable"),
+        initiallyDeferred = row[Option[String]](prefix + "initially_deferred")
       )
     )
   }

@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute""".as(PgAttributeRow.rowParser.*)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute""".as(PgAttributeRow.rowParser("").*)
   }
   override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(PgAttributeRow.rowParser.singleOpt)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(PgAttributeRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): List[PgAttributeRow] = {
     fieldValues match {
@@ -57,7 +57,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         val q = s"""select * from pg_catalog.pg_attribute where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAttributeRow.rowParser.*)
+          .as(PgAttributeRow.rowParser("").*)
     }
 
   }
@@ -140,7 +140,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
   }
-  override def selectByUnique(attrelid: Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
-    ???
+  override def selectByUniqueAttrelidAttname(attrelid: Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
+    selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
   }
 }

@@ -27,12 +27,12 @@ case class PgDbRoleSettingRow(
 }
 
 object PgDbRoleSettingRow {
-  implicit val rowParser: RowParser[PgDbRoleSettingRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgDbRoleSettingRow] = { row =>
     Success(
       PgDbRoleSettingRow(
-        setdatabase = row[Long]("setdatabase"),
-        setrole = row[Long]("setrole"),
-        setconfig = row[Option[Array[String]]]("setconfig")
+        setdatabase = row[Long](prefix + "setdatabase"),
+        setrole = row[Long](prefix + "setrole"),
+        setconfig = row[Option[Array[String]]](prefix + "setconfig")
       )
     )
   }

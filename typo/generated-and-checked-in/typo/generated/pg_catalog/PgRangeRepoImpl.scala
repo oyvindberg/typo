@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def selectAll(implicit c: Connection): List[PgRangeRow] = {
-    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range""".as(PgRangeRow.rowParser.*)
+    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range""".as(PgRangeRow.rowParser("").*)
   }
   override def selectById(rngtypid: PgRangeId)(implicit c: Connection): Option[PgRangeRow] = {
-    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = $rngtypid""".as(PgRangeRow.rowParser.singleOpt)
+    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = $rngtypid""".as(PgRangeRow.rowParser("").singleOpt)
   }
   override def selectByIds(rngtypids: List[PgRangeId])(implicit c: Connection): List[PgRangeRow] = {
-    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid in $rngtypids""".as(PgRangeRow.rowParser.*)
+    SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid in $rngtypids""".as(PgRangeRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgRangeFieldValue[_]])(implicit c: Connection): List[PgRangeRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
         val q = s"""select * from pg_catalog.pg_range where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgRangeRow.rowParser.*)
+          .as(PgRangeRow.rowParser("").*)
     }
 
   }
@@ -87,7 +87,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_range where rngtypid = $rngtypid""".executeUpdate() > 0
   }
-  override def selectByUnique(rngmultitypid: Long)(implicit c: Connection): Option[PgRangeRow] = {
-    ???
+  override def selectByUniqueRngmultitypid(rngmultitypid: Long)(implicit c: Connection): Option[PgRangeRow] = {
+    selectByFieldValues(List(PgRangeFieldValue.rngmultitypid(rngmultitypid))).headOption
   }
 }

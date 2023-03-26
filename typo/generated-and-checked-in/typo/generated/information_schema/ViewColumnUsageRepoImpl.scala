@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object ViewColumnUsageRepoImpl extends ViewColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[ViewColumnUsageRow] = {
-    SQL"""select view_catalog, view_schema, view_name, table_catalog, table_schema, table_name, column_name from information_schema.view_column_usage""".as(ViewColumnUsageRow.rowParser.*)
+    SQL"""select view_catalog, view_schema, view_name, table_catalog, table_schema, table_name, column_name from information_schema.view_column_usage""".as(ViewColumnUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ViewColumnUsageFieldValue[_]])(implicit c: Connection): List[ViewColumnUsageRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object ViewColumnUsageRepoImpl extends ViewColumnUsageRepo {
         val q = s"""select * from information_schema.view_column_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ViewColumnUsageRow.rowParser.*)
+          .as(ViewColumnUsageRow.rowParser("").*)
     }
 
   }

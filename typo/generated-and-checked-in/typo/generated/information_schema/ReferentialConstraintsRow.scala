@@ -31,18 +31,18 @@ case class ReferentialConstraintsRow(
 )
 
 object ReferentialConstraintsRow {
-  implicit val rowParser: RowParser[ReferentialConstraintsRow] = { row =>
+  def rowParser(prefix: String): RowParser[ReferentialConstraintsRow] = { row =>
     Success(
       ReferentialConstraintsRow(
-        constraintCatalog = row[Option[String]]("constraint_catalog"),
-        constraintSchema = row[Option[String]]("constraint_schema"),
-        constraintName = row[Option[String]]("constraint_name"),
-        uniqueConstraintCatalog = row[Option[String]]("unique_constraint_catalog"),
-        uniqueConstraintSchema = row[Option[String]]("unique_constraint_schema"),
-        uniqueConstraintName = row[Option[String]]("unique_constraint_name"),
-        matchOption = row[Option[String]]("match_option"),
-        updateRule = row[Option[String]]("update_rule"),
-        deleteRule = row[Option[String]]("delete_rule")
+        constraintCatalog = row[Option[String]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[String]](prefix + "constraint_schema"),
+        constraintName = row[Option[String]](prefix + "constraint_name"),
+        uniqueConstraintCatalog = row[Option[String]](prefix + "unique_constraint_catalog"),
+        uniqueConstraintSchema = row[Option[String]](prefix + "unique_constraint_schema"),
+        uniqueConstraintName = row[Option[String]](prefix + "unique_constraint_name"),
+        matchOption = row[Option[String]](prefix + "match_option"),
+        updateRule = row[Option[String]](prefix + "update_rule"),
+        deleteRule = row[Option[String]](prefix + "delete_rule")
       )
     )
   }

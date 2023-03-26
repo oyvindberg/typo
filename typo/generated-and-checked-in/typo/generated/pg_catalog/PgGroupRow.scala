@@ -25,12 +25,12 @@ case class PgGroupRow(
 )
 
 object PgGroupRow {
-  implicit val rowParser: RowParser[PgGroupRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgGroupRow] = { row =>
     Success(
       PgGroupRow(
-        groname = row[Option[String]]("groname"),
-        grosysid = row[Option[Long]]("grosysid"),
-        grolist = row[Option[Array[Long]]]("grolist")
+        groname = row[Option[String]](prefix + "groname"),
+        grosysid = row[Option[Long]](prefix + "grosysid"),
+        grolist = row[Option[Array[Long]]](prefix + "grolist")
       )
     )
   }

@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgRolesRepoImpl extends PgRolesRepo {
   override def selectAll(implicit c: Connection): List[PgRolesRow] = {
-    SQL"""select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid from pg_catalog.pg_roles""".as(PgRolesRow.rowParser.*)
+    SQL"""select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid from pg_catalog.pg_roles""".as(PgRolesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgRolesFieldValue[_]])(implicit c: Connection): List[PgRolesRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PgRolesRepoImpl extends PgRolesRepo {
         val q = s"""select * from pg_catalog.pg_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgRolesRow.rowParser.*)
+          .as(PgRolesRow.rowParser("").*)
     }
 
   }

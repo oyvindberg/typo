@@ -34,20 +34,20 @@ case class PgStatBgwriterRow(
 )
 
 object PgStatBgwriterRow {
-  implicit val rowParser: RowParser[PgStatBgwriterRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatBgwriterRow] = { row =>
     Success(
       PgStatBgwriterRow(
-        checkpointsTimed = row[Option[Long]]("checkpoints_timed"),
-        checkpointsReq = row[Option[Long]]("checkpoints_req"),
-        checkpointWriteTime = row[Option[Double]]("checkpoint_write_time"),
-        checkpointSyncTime = row[Option[Double]]("checkpoint_sync_time"),
-        buffersCheckpoint = row[Option[Long]]("buffers_checkpoint"),
-        buffersClean = row[Option[Long]]("buffers_clean"),
-        maxwrittenClean = row[Option[Long]]("maxwritten_clean"),
-        buffersBackend = row[Option[Long]]("buffers_backend"),
-        buffersBackendFsync = row[Option[Long]]("buffers_backend_fsync"),
-        buffersAlloc = row[Option[Long]]("buffers_alloc"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        checkpointsTimed = row[Option[Long]](prefix + "checkpoints_timed"),
+        checkpointsReq = row[Option[Long]](prefix + "checkpoints_req"),
+        checkpointWriteTime = row[Option[Double]](prefix + "checkpoint_write_time"),
+        checkpointSyncTime = row[Option[Double]](prefix + "checkpoint_sync_time"),
+        buffersCheckpoint = row[Option[Long]](prefix + "buffers_checkpoint"),
+        buffersClean = row[Option[Long]](prefix + "buffers_clean"),
+        maxwrittenClean = row[Option[Long]](prefix + "maxwritten_clean"),
+        buffersBackend = row[Option[Long]](prefix + "buffers_backend"),
+        buffersBackendFsync = row[Option[Long]](prefix + "buffers_backend_fsync"),
+        buffersAlloc = row[Option[Long]](prefix + "buffers_alloc"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

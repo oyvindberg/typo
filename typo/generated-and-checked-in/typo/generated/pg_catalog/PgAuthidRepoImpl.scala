@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def selectAll(implicit c: Connection): List[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid""".as(PgAuthidRow.rowParser.*)
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid""".as(PgAuthidRow.rowParser("").*)
   }
   override def selectById(oid: PgAuthidId)(implicit c: Connection): Option[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid = $oid""".as(PgAuthidRow.rowParser.singleOpt)
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid = $oid""".as(PgAuthidRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgAuthidId])(implicit c: Connection): List[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid in $oids""".as(PgAuthidRow.rowParser.*)
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid in $oids""".as(PgAuthidRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAuthidFieldValue[_]])(implicit c: Connection): List[PgAuthidRow] = {
     fieldValues match {
@@ -46,7 +46,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
         val q = s"""select * from pg_catalog.pg_authid where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAuthidRow.rowParser.*)
+          .as(PgAuthidRow.rowParser("").*)
     }
 
   }
@@ -102,7 +102,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_authid where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(rolname: String)(implicit c: Connection): Option[PgAuthidRow] = {
-    ???
+  override def selectByUniqueRolname(rolname: String)(implicit c: Connection): Option[PgAuthidRow] = {
+    selectByFieldValues(List(PgAuthidFieldValue.rolname(rolname))).headOption
   }
 }

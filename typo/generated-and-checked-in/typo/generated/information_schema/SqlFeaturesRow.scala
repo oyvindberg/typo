@@ -29,16 +29,16 @@ case class SqlFeaturesRow(
 )
 
 object SqlFeaturesRow {
-  implicit val rowParser: RowParser[SqlFeaturesRow] = { row =>
+  def rowParser(prefix: String): RowParser[SqlFeaturesRow] = { row =>
     Success(
       SqlFeaturesRow(
-        featureId = row[Option[String]]("feature_id"),
-        featureName = row[Option[String]]("feature_name"),
-        subFeatureId = row[Option[String]]("sub_feature_id"),
-        subFeatureName = row[Option[String]]("sub_feature_name"),
-        isSupported = row[Option[String]]("is_supported"),
-        isVerifiedBy = row[Option[String]]("is_verified_by"),
-        comments = row[Option[String]]("comments")
+        featureId = row[Option[String]](prefix + "feature_id"),
+        featureName = row[Option[String]](prefix + "feature_name"),
+        subFeatureId = row[Option[String]](prefix + "sub_feature_id"),
+        subFeatureName = row[Option[String]](prefix + "sub_feature_name"),
+        isSupported = row[Option[String]](prefix + "is_supported"),
+        isVerifiedBy = row[Option[String]](prefix + "is_verified_by"),
+        comments = row[Option[String]](prefix + "comments")
       )
     )
   }

@@ -30,17 +30,17 @@ case class TransformsRow(
 )
 
 object TransformsRow {
-  implicit val rowParser: RowParser[TransformsRow] = { row =>
+  def rowParser(prefix: String): RowParser[TransformsRow] = { row =>
     Success(
       TransformsRow(
-        udtCatalog = row[Option[String]]("udt_catalog"),
-        udtSchema = row[Option[String]]("udt_schema"),
-        udtName = row[Option[String]]("udt_name"),
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name"),
-        groupName = row[Option[String]]("group_name"),
-        transformType = row[Option[String]]("transform_type")
+        udtCatalog = row[Option[String]](prefix + "udt_catalog"),
+        udtSchema = row[Option[String]](prefix + "udt_schema"),
+        udtName = row[Option[String]](prefix + "udt_name"),
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name"),
+        groupName = row[Option[String]](prefix + "group_name"),
+        transformType = row[Option[String]](prefix + "transform_type")
       )
     )
   }

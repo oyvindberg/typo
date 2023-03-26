@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def selectAll(implicit c: Connection): List[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext""".as(PgStatisticExtRow.rowParser.*)
+    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext""".as(PgStatisticExtRow.rowParser("").*)
   }
   override def selectById(oid: PgStatisticExtId)(implicit c: Connection): Option[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = $oid""".as(PgStatisticExtRow.rowParser.singleOpt)
+    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = $oid""".as(PgStatisticExtRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgStatisticExtId])(implicit c: Connection): List[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid in $oids""".as(PgStatisticExtRow.rowParser.*)
+    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid in $oids""".as(PgStatisticExtRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatisticExtFieldValue[_]])(implicit c: Connection): List[PgStatisticExtRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
         val q = s"""select * from pg_catalog.pg_statistic_ext where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatisticExtRow.rowParser.*)
+          .as(PgStatisticExtRow.rowParser("").*)
     }
 
   }
@@ -93,7 +93,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_statistic_ext where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(stxname: String, stxnamespace: Long)(implicit c: Connection): Option[PgStatisticExtRow] = {
-    ???
+  override def selectByUniqueStxnameStxnamespace(stxname: String, stxnamespace: Long)(implicit c: Connection): Option[PgStatisticExtRow] = {
+    selectByFieldValues(List(PgStatisticExtFieldValue.stxname(stxname), PgStatisticExtFieldValue.stxnamespace(stxnamespace))).headOption
   }
 }

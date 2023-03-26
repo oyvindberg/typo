@@ -28,15 +28,15 @@ case class PgUserMappingsRow(
 )
 
 object PgUserMappingsRow {
-  implicit val rowParser: RowParser[PgUserMappingsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgUserMappingsRow] = { row =>
     Success(
       PgUserMappingsRow(
-        umid = row[Option[Long]]("umid"),
-        srvid = row[Option[Long]]("srvid"),
-        srvname = row[Option[String]]("srvname"),
-        umuser = row[Option[Long]]("umuser"),
-        usename = row[Option[String]]("usename"),
-        umoptions = row[Option[Array[String]]]("umoptions")
+        umid = row[Option[Long]](prefix + "umid"),
+        srvid = row[Option[Long]](prefix + "srvid"),
+        srvname = row[Option[String]](prefix + "srvname"),
+        umuser = row[Option[Long]](prefix + "umuser"),
+        usename = row[Option[String]](prefix + "usename"),
+        umoptions = row[Option[Array[String]]](prefix + "umoptions")
       )
     )
   }

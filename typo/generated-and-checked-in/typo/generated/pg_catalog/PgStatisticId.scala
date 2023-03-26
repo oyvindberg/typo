@@ -41,12 +41,12 @@ object PgStatisticId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgStatisticId] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatisticId] = { row =>
     Success(
       PgStatisticId(
-        starelid = row[Long]("starelid"),
-        staattnum = row[Int]("staattnum"),
-        stainherit = row[Boolean]("stainherit")
+        starelid = row[Long](prefix + "starelid"),
+        staattnum = row[Int](prefix + "staattnum"),
+        stainherit = row[Boolean](prefix + "stainherit")
       )
     )
   }

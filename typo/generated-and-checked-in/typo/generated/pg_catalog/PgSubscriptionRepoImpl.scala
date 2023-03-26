@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def selectAll(implicit c: Connection): List[PgSubscriptionRow] = {
-    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription""".as(PgSubscriptionRow.rowParser.*)
+    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription""".as(PgSubscriptionRow.rowParser("").*)
   }
   override def selectById(oid: PgSubscriptionId)(implicit c: Connection): Option[PgSubscriptionRow] = {
-    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = $oid""".as(PgSubscriptionRow.rowParser.singleOpt)
+    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = $oid""".as(PgSubscriptionRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgSubscriptionId])(implicit c: Connection): List[PgSubscriptionRow] = {
-    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid in $oids""".as(PgSubscriptionRow.rowParser.*)
+    SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid in $oids""".as(PgSubscriptionRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgSubscriptionFieldValue[_]])(implicit c: Connection): List[PgSubscriptionRow] = {
     fieldValues match {
@@ -45,7 +45,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
         val q = s"""select * from pg_catalog.pg_subscription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgSubscriptionRow.rowParser.*)
+          .as(PgSubscriptionRow.rowParser("").*)
     }
 
   }
@@ -99,7 +99,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_subscription where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(subdbid: Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow] = {
-    ???
+  override def selectByUniqueSubdbidSubname(subdbid: Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow] = {
+    selectByFieldValues(List(PgSubscriptionFieldValue.subdbid(subdbid), PgSubscriptionFieldValue.subname(subname))).headOption
   }
 }

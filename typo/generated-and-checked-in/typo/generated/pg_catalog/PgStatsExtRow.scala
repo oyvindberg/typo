@@ -36,23 +36,23 @@ case class PgStatsExtRow(
 )
 
 object PgStatsExtRow {
-  implicit val rowParser: RowParser[PgStatsExtRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatsExtRow] = { row =>
     Success(
       PgStatsExtRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        statisticsSchemaname = row[Option[String]]("statistics_schemaname"),
-        statisticsName = row[Option[String]]("statistics_name"),
-        statisticsOwner = row[Option[String]]("statistics_owner"),
-        attnames = row[Option[Array[String]]]("attnames"),
-        exprs = row[Option[Array[String]]]("exprs"),
-        kinds = row[Option[Array[String]]]("kinds"),
-        nDistinct = row[Option[String]]("n_distinct"),
-        dependencies = row[Option[String]]("dependencies"),
-        mostCommonVals = row[Option[Array[String]]]("most_common_vals"),
-        mostCommonValNulls = row[Option[Array[Boolean]]]("most_common_val_nulls"),
-        mostCommonFreqs = row[Option[Array[Double]]]("most_common_freqs"),
-        mostCommonBaseFreqs = row[Option[Array[Double]]]("most_common_base_freqs")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        statisticsSchemaname = row[Option[String]](prefix + "statistics_schemaname"),
+        statisticsName = row[Option[String]](prefix + "statistics_name"),
+        statisticsOwner = row[Option[String]](prefix + "statistics_owner"),
+        attnames = row[Option[Array[String]]](prefix + "attnames"),
+        exprs = row[Option[Array[String]]](prefix + "exprs"),
+        kinds = row[Option[Array[String]]](prefix + "kinds"),
+        nDistinct = row[Option[String]](prefix + "n_distinct"),
+        dependencies = row[Option[String]](prefix + "dependencies"),
+        mostCommonVals = row[Option[Array[String]]](prefix + "most_common_vals"),
+        mostCommonValNulls = row[Option[Array[Boolean]]](prefix + "most_common_val_nulls"),
+        mostCommonFreqs = row[Option[Array[Double]]](prefix + "most_common_freqs"),
+        mostCommonBaseFreqs = row[Option[Array[Double]]](prefix + "most_common_base_freqs")
       )
     )
   }

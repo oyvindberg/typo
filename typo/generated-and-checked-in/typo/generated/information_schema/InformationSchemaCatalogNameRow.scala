@@ -23,10 +23,10 @@ case class InformationSchemaCatalogNameRow(
 )
 
 object InformationSchemaCatalogNameRow {
-  implicit val rowParser: RowParser[InformationSchemaCatalogNameRow] = { row =>
+  def rowParser(prefix: String): RowParser[InformationSchemaCatalogNameRow] = { row =>
     Success(
       InformationSchemaCatalogNameRow(
-        catalogName = row[Option[String]]("catalog_name")
+        catalogName = row[Option[String]](prefix + "catalog_name")
       )
     )
   }

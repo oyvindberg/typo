@@ -31,18 +31,18 @@ case class PgOpclassRow(
 )
 
 object PgOpclassRow {
-  implicit val rowParser: RowParser[PgOpclassRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgOpclassRow] = { row =>
     Success(
       PgOpclassRow(
-        oid = row[PgOpclassId]("oid"),
-        opcmethod = row[Long]("opcmethod"),
-        opcname = row[String]("opcname"),
-        opcnamespace = row[Long]("opcnamespace"),
-        opcowner = row[Long]("opcowner"),
-        opcfamily = row[Long]("opcfamily"),
-        opcintype = row[Long]("opcintype"),
-        opcdefault = row[Boolean]("opcdefault"),
-        opckeytype = row[Long]("opckeytype")
+        oid = row[PgOpclassId](prefix + "oid"),
+        opcmethod = row[Long](prefix + "opcmethod"),
+        opcname = row[String](prefix + "opcname"),
+        opcnamespace = row[Long](prefix + "opcnamespace"),
+        opcowner = row[Long](prefix + "opcowner"),
+        opcfamily = row[Long](prefix + "opcfamily"),
+        opcintype = row[Long](prefix + "opcintype"),
+        opcdefault = row[Boolean](prefix + "opcdefault"),
+        opckeytype = row[Long](prefix + "opckeytype")
       )
     )
   }

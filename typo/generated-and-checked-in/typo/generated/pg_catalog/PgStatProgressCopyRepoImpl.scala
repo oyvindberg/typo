@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatProgressCopyRepoImpl extends PgStatProgressCopyRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressCopyRow] = {
-    SQL"""select pid, datid, datname, relid, command, type, bytes_processed, bytes_total, tuples_processed, tuples_excluded from pg_catalog.pg_stat_progress_copy""".as(PgStatProgressCopyRow.rowParser.*)
+    SQL"""select pid, datid, datname, relid, command, type, bytes_processed, bytes_total, tuples_processed, tuples_excluded from pg_catalog.pg_stat_progress_copy""".as(PgStatProgressCopyRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressCopyFieldValue[_]])(implicit c: Connection): List[PgStatProgressCopyRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgStatProgressCopyRepoImpl extends PgStatProgressCopyRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_copy where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressCopyRow.rowParser.*)
+          .as(PgStatProgressCopyRow.rowParser("").*)
     }
 
   }

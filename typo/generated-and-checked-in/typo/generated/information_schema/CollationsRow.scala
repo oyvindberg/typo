@@ -26,13 +26,13 @@ case class CollationsRow(
 )
 
 object CollationsRow {
-  implicit val rowParser: RowParser[CollationsRow] = { row =>
+  def rowParser(prefix: String): RowParser[CollationsRow] = { row =>
     Success(
       CollationsRow(
-        collationCatalog = row[Option[String]]("collation_catalog"),
-        collationSchema = row[Option[String]]("collation_schema"),
-        collationName = row[Option[String]]("collation_name"),
-        padAttribute = row[Option[String]]("pad_attribute")
+        collationCatalog = row[Option[String]](prefix + "collation_catalog"),
+        collationSchema = row[Option[String]](prefix + "collation_schema"),
+        collationName = row[Option[String]](prefix + "collation_name"),
+        padAttribute = row[Option[String]](prefix + "pad_attribute")
       )
     )
   }

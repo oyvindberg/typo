@@ -27,14 +27,14 @@ case class PgStatisticExtDataRow(
 )
 
 object PgStatisticExtDataRow {
-  implicit val rowParser: RowParser[PgStatisticExtDataRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatisticExtDataRow] = { row =>
     Success(
       PgStatisticExtDataRow(
-        stxoid = row[PgStatisticExtDataId]("stxoid"),
-        stxdndistinct = row[Option[String]]("stxdndistinct"),
-        stxddependencies = row[Option[String]]("stxddependencies"),
-        stxdmcv = row[Option[String]]("stxdmcv"),
-        stxdexpr = row[Option[String]]("stxdexpr")
+        stxoid = row[PgStatisticExtDataId](prefix + "stxoid"),
+        stxdndistinct = row[Option[String]](prefix + "stxdndistinct"),
+        stxddependencies = row[Option[String]](prefix + "stxddependencies"),
+        stxdmcv = row[Option[String]](prefix + "stxdmcv"),
+        stxdexpr = row[Option[String]](prefix + "stxdexpr")
       )
     )
   }

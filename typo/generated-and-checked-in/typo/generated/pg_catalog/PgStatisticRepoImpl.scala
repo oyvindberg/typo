@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgStatisticRepoImpl extends PgStatisticRepo {
   override def selectAll(implicit c: Connection): List[PgStatisticRow] = {
-    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic""".as(PgStatisticRow.rowParser.*)
+    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic""".as(PgStatisticRow.rowParser("").*)
   }
   override def selectById(compositeId: PgStatisticId)(implicit c: Connection): Option[PgStatisticRow] = {
-    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}""".as(PgStatisticRow.rowParser.singleOpt)
+    SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}""".as(PgStatisticRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgStatisticFieldValue[_]])(implicit c: Connection): List[PgStatisticRow] = {
     fieldValues match {
@@ -62,7 +62,7 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
         val q = s"""select * from pg_catalog.pg_statistic where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatisticRow.rowParser.*)
+          .as(PgStatisticRow.rowParser("").*)
     }
 
   }

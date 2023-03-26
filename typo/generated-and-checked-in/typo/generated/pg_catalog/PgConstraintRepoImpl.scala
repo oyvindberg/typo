@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint""".as(PgConstraintRow.rowParser.*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint""".as(PgConstraintRow.rowParser("").*)
   }
   override def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid""".as(PgConstraintRow.rowParser.singleOpt)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid""".as(PgConstraintRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid in $oids""".as(PgConstraintRow.rowParser.*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid in $oids""".as(PgConstraintRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): List[PgConstraintRow] = {
     fieldValues match {
@@ -59,7 +59,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
         val q = s"""select * from pg_catalog.pg_constraint where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgConstraintRow.rowParser.*)
+          .as(PgConstraintRow.rowParser("").*)
     }
 
   }
@@ -141,7 +141,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_constraint where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(conrelid: Long, contypid: Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
-    ???
+  override def selectByUniqueConrelidContypidConname(conrelid: Long, contypid: Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
+    selectByFieldValues(List(PgConstraintFieldValue.conrelid(conrelid), PgConstraintFieldValue.contypid(contypid), PgConstraintFieldValue.conname(conname))).headOption
   }
 }

@@ -31,17 +31,17 @@ case class PgPolicyRow(
 )
 
 object PgPolicyRow {
-  implicit val rowParser: RowParser[PgPolicyRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPolicyRow] = { row =>
     Success(
       PgPolicyRow(
-        oid = row[PgPolicyId]("oid"),
-        polname = row[String]("polname"),
-        polrelid = row[Long]("polrelid"),
-        polcmd = row[String]("polcmd"),
-        polpermissive = row[Boolean]("polpermissive"),
-        polroles = row[Array[Long]]("polroles"),
-        polqual = row[Option[PGobject]]("polqual"),
-        polwithcheck = row[Option[PGobject]]("polwithcheck")
+        oid = row[PgPolicyId](prefix + "oid"),
+        polname = row[String](prefix + "polname"),
+        polrelid = row[Long](prefix + "polrelid"),
+        polcmd = row[String](prefix + "polcmd"),
+        polpermissive = row[Boolean](prefix + "polpermissive"),
+        polroles = row[Array[Long]](prefix + "polroles"),
+        polqual = row[Option[PGobject]](prefix + "polqual"),
+        polwithcheck = row[Option[PGobject]](prefix + "polwithcheck")
       )
     )
   }

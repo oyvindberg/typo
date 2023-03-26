@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object InformationSchemaCatalogNameRepoImpl extends InformationSchemaCatalogNameRepo {
   override def selectAll(implicit c: Connection): List[InformationSchemaCatalogNameRow] = {
-    SQL"""select catalog_name from information_schema.information_schema_catalog_name""".as(InformationSchemaCatalogNameRow.rowParser.*)
+    SQL"""select catalog_name from information_schema.information_schema_catalog_name""".as(InformationSchemaCatalogNameRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[InformationSchemaCatalogNameFieldValue[_]])(implicit c: Connection): List[InformationSchemaCatalogNameRow] = {
     fieldValues match {
@@ -29,7 +29,7 @@ object InformationSchemaCatalogNameRepoImpl extends InformationSchemaCatalogName
         val q = s"""select * from information_schema.information_schema_catalog_name where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(InformationSchemaCatalogNameRow.rowParser.*)
+          .as(InformationSchemaCatalogNameRow.rowParser("").*)
     }
 
   }

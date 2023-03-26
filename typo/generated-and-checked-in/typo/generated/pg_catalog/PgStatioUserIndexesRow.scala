@@ -29,16 +29,16 @@ case class PgStatioUserIndexesRow(
 )
 
 object PgStatioUserIndexesRow {
-  implicit val rowParser: RowParser[PgStatioUserIndexesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatioUserIndexesRow] = { row =>
     Success(
       PgStatioUserIndexesRow(
-        relid = row[Option[Long]]("relid"),
-        indexrelid = row[Option[Long]]("indexrelid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        indexrelname = row[Option[String]]("indexrelname"),
-        idxBlksRead = row[Option[Long]]("idx_blks_read"),
-        idxBlksHit = row[Option[Long]]("idx_blks_hit")
+        relid = row[Option[Long]](prefix + "relid"),
+        indexrelid = row[Option[Long]](prefix + "indexrelid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        indexrelname = row[Option[String]](prefix + "indexrelname"),
+        idxBlksRead = row[Option[Long]](prefix + "idx_blks_read"),
+        idxBlksHit = row[Option[Long]](prefix + "idx_blks_hit")
       )
     )
   }

@@ -32,19 +32,19 @@ case class ViewsRow(
 )
 
 object ViewsRow {
-  implicit val rowParser: RowParser[ViewsRow] = { row =>
+  def rowParser(prefix: String): RowParser[ViewsRow] = { row =>
     Success(
       ViewsRow(
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        viewDefinition = row[Option[String]]("view_definition"),
-        checkOption = row[Option[String]]("check_option"),
-        isUpdatable = row[Option[String]]("is_updatable"),
-        isInsertableInto = row[Option[String]]("is_insertable_into"),
-        isTriggerUpdatable = row[Option[String]]("is_trigger_updatable"),
-        isTriggerDeletable = row[Option[String]]("is_trigger_deletable"),
-        isTriggerInsertableInto = row[Option[String]]("is_trigger_insertable_into")
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        viewDefinition = row[Option[String]](prefix + "view_definition"),
+        checkOption = row[Option[String]](prefix + "check_option"),
+        isUpdatable = row[Option[String]](prefix + "is_updatable"),
+        isInsertableInto = row[Option[String]](prefix + "is_insertable_into"),
+        isTriggerUpdatable = row[Option[String]](prefix + "is_trigger_updatable"),
+        isTriggerDeletable = row[Option[String]](prefix + "is_trigger_deletable"),
+        isTriggerInsertableInto = row[Option[String]](prefix + "is_trigger_insertable_into")
       )
     )
   }

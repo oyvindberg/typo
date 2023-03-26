@@ -23,10 +23,10 @@ case class EnabledRolesRow(
 )
 
 object EnabledRolesRow {
-  implicit val rowParser: RowParser[EnabledRolesRow] = { row =>
+  def rowParser(prefix: String): RowParser[EnabledRolesRow] = { row =>
     Success(
       EnabledRolesRow(
-        roleName = row[Option[String]]("role_name")
+        roleName = row[Option[String]](prefix + "role_name")
       )
     )
   }

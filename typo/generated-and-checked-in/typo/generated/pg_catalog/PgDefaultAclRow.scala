@@ -28,14 +28,14 @@ case class PgDefaultAclRow(
 )
 
 object PgDefaultAclRow {
-  implicit val rowParser: RowParser[PgDefaultAclRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgDefaultAclRow] = { row =>
     Success(
       PgDefaultAclRow(
-        oid = row[PgDefaultAclId]("oid"),
-        defaclrole = row[Long]("defaclrole"),
-        defaclnamespace = row[Long]("defaclnamespace"),
-        defaclobjtype = row[String]("defaclobjtype"),
-        defaclacl = row[Array[PGobject]]("defaclacl")
+        oid = row[PgDefaultAclId](prefix + "oid"),
+        defaclrole = row[Long](prefix + "defaclrole"),
+        defaclnamespace = row[Long](prefix + "defaclnamespace"),
+        defaclobjtype = row[String](prefix + "defaclobjtype"),
+        defaclacl = row[Array[PGobject]](prefix + "defaclacl")
       )
     )
   }

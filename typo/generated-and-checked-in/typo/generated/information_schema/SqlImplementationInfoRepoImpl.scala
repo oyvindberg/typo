@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
   override def selectAll(implicit c: Connection): List[SqlImplementationInfoRow] = {
-    SQL"""select implementation_info_id, implementation_info_name, integer_value, character_value, comments from information_schema.sql_implementation_info""".as(SqlImplementationInfoRow.rowParser.*)
+    SQL"""select implementation_info_id, implementation_info_name, integer_value, character_value, comments from information_schema.sql_implementation_info""".as(SqlImplementationInfoRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[SqlImplementationInfoFieldValue[_]])(implicit c: Connection): List[SqlImplementationInfoRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
         val q = s"""select * from information_schema.sql_implementation_info where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(SqlImplementationInfoRow.rowParser.*)
+          .as(SqlImplementationInfoRow.rowParser("").*)
     }
 
   }

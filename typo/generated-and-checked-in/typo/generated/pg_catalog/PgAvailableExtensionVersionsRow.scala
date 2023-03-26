@@ -31,18 +31,18 @@ case class PgAvailableExtensionVersionsRow(
 )
 
 object PgAvailableExtensionVersionsRow {
-  implicit val rowParser: RowParser[PgAvailableExtensionVersionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAvailableExtensionVersionsRow] = { row =>
     Success(
       PgAvailableExtensionVersionsRow(
-        name = row[Option[String]]("name"),
-        version = row[Option[String]]("version"),
-        installed = row[Option[Boolean]]("installed"),
-        superuser = row[Option[Boolean]]("superuser"),
-        trusted = row[Option[Boolean]]("trusted"),
-        relocatable = row[Option[Boolean]]("relocatable"),
-        schema = row[Option[String]]("schema"),
-        requires = row[Option[Array[String]]]("requires"),
-        comment = row[Option[String]]("comment")
+        name = row[Option[String]](prefix + "name"),
+        version = row[Option[String]](prefix + "version"),
+        installed = row[Option[Boolean]](prefix + "installed"),
+        superuser = row[Option[Boolean]](prefix + "superuser"),
+        trusted = row[Option[Boolean]](prefix + "trusted"),
+        relocatable = row[Option[Boolean]](prefix + "relocatable"),
+        schema = row[Option[String]](prefix + "schema"),
+        requires = row[Option[Array[String]]](prefix + "requires"),
+        comment = row[Option[String]](prefix + "comment")
       )
     )
   }

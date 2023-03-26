@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatProgressVacuumRepoImpl extends PgStatProgressVacuumRepo {
   override def selectAll(implicit c: Connection): List[PgStatProgressVacuumRow] = {
-    SQL"""select pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuples, num_dead_tuples from pg_catalog.pg_stat_progress_vacuum""".as(PgStatProgressVacuumRow.rowParser.*)
+    SQL"""select pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuples, num_dead_tuples from pg_catalog.pg_stat_progress_vacuum""".as(PgStatProgressVacuumRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatProgressVacuumFieldValue[_]])(implicit c: Connection): List[PgStatProgressVacuumRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgStatProgressVacuumRepoImpl extends PgStatProgressVacuumRepo {
         val q = s"""select * from pg_catalog.pg_stat_progress_vacuum where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatProgressVacuumRow.rowParser.*)
+          .as(PgStatProgressVacuumRow.rowParser("").*)
     }
 
   }

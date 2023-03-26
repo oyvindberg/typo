@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object UserMappingOptionsRepoImpl extends UserMappingOptionsRepo {
   override def selectAll(implicit c: Connection): List[UserMappingOptionsRow] = {
-    SQL"""select authorization_identifier, foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.user_mapping_options""".as(UserMappingOptionsRow.rowParser.*)
+    SQL"""select authorization_identifier, foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.user_mapping_options""".as(UserMappingOptionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[UserMappingOptionsFieldValue[_]])(implicit c: Connection): List[UserMappingOptionsRow] = {
     fieldValues match {
@@ -33,7 +33,7 @@ object UserMappingOptionsRepoImpl extends UserMappingOptionsRepo {
         val q = s"""select * from information_schema.user_mapping_options where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(UserMappingOptionsRow.rowParser.*)
+          .as(UserMappingOptionsRow.rowParser("").*)
     }
 
   }

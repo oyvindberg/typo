@@ -29,16 +29,16 @@ case class PgForeignTablesRow(
 )
 
 object PgForeignTablesRow {
-  implicit val rowParser: RowParser[PgForeignTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignTablesRow] = { row =>
     Success(
       PgForeignTablesRow(
-        foreignTableCatalog = row[Option[String]]("foreign_table_catalog"),
-        foreignTableSchema = row[Option[String]]("foreign_table_schema"),
-        foreignTableName = row[Option[String]]("foreign_table_name"),
-        ftoptions = row[Option[Array[String]]]("ftoptions"),
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name"),
-        authorizationIdentifier = row[Option[String]]("authorization_identifier")
+        foreignTableCatalog = row[Option[String]](prefix + "foreign_table_catalog"),
+        foreignTableSchema = row[Option[String]](prefix + "foreign_table_schema"),
+        foreignTableName = row[Option[String]](prefix + "foreign_table_name"),
+        ftoptions = row[Option[Array[String]]](prefix + "ftoptions"),
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier")
       )
     )
   }

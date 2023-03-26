@@ -29,16 +29,16 @@ case class PgMatviewsRow(
 )
 
 object PgMatviewsRow {
-  implicit val rowParser: RowParser[PgMatviewsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgMatviewsRow] = { row =>
     Success(
       PgMatviewsRow(
-        schemaname = row[Option[String]]("schemaname"),
-        matviewname = row[Option[String]]("matviewname"),
-        matviewowner = row[Option[String]]("matviewowner"),
-        tablespace = row[Option[String]]("tablespace"),
-        hasindexes = row[Option[Boolean]]("hasindexes"),
-        ispopulated = row[Option[Boolean]]("ispopulated"),
-        definition = row[Option[String]]("definition")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        matviewname = row[Option[String]](prefix + "matviewname"),
+        matviewowner = row[Option[String]](prefix + "matviewowner"),
+        tablespace = row[Option[String]](prefix + "tablespace"),
+        hasindexes = row[Option[Boolean]](prefix + "hasindexes"),
+        ispopulated = row[Option[Boolean]](prefix + "ispopulated"),
+        definition = row[Option[String]](prefix + "definition")
       )
     )
   }

@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def selectAll(implicit c: Connection): List[PgForeignTableRow] = {
-    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table""".as(PgForeignTableRow.rowParser.*)
+    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table""".as(PgForeignTableRow.rowParser("").*)
   }
   override def selectById(ftrelid: PgForeignTableId)(implicit c: Connection): Option[PgForeignTableRow] = {
-    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = $ftrelid""".as(PgForeignTableRow.rowParser.singleOpt)
+    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = $ftrelid""".as(PgForeignTableRow.rowParser("").singleOpt)
   }
   override def selectByIds(ftrelids: List[PgForeignTableId])(implicit c: Connection): List[PgForeignTableRow] = {
-    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid in $ftrelids""".as(PgForeignTableRow.rowParser.*)
+    SQL"""select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid in $ftrelids""".as(PgForeignTableRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgForeignTableFieldValue[_]])(implicit c: Connection): List[PgForeignTableRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
         val q = s"""select * from pg_catalog.pg_foreign_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgForeignTableRow.rowParser.*)
+          .as(PgForeignTableRow.rowParser("").*)
     }
 
   }

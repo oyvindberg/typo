@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgConfigRepoImpl extends PgConfigRepo {
   override def selectAll(implicit c: Connection): List[PgConfigRow] = {
-    SQL"""select name, setting from pg_catalog.pg_config""".as(PgConfigRow.rowParser.*)
+    SQL"""select name, setting from pg_catalog.pg_config""".as(PgConfigRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgConfigFieldValue[_]])(implicit c: Connection): List[PgConfigRow] = {
     fieldValues match {
@@ -30,7 +30,7 @@ object PgConfigRepoImpl extends PgConfigRepo {
         val q = s"""select * from pg_catalog.pg_config where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgConfigRow.rowParser.*)
+          .as(PgConfigRow.rowParser("").*)
     }
 
   }

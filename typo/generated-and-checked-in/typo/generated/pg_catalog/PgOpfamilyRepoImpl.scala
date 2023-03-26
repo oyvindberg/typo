@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def selectAll(implicit c: Connection): List[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily""".as(PgOpfamilyRow.rowParser.*)
+    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily""".as(PgOpfamilyRow.rowParser("").*)
   }
   override def selectById(oid: PgOpfamilyId)(implicit c: Connection): Option[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = $oid""".as(PgOpfamilyRow.rowParser.singleOpt)
+    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = $oid""".as(PgOpfamilyRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgOpfamilyId])(implicit c: Connection): List[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid in $oids""".as(PgOpfamilyRow.rowParser.*)
+    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid in $oids""".as(PgOpfamilyRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgOpfamilyFieldValue[_]])(implicit c: Connection): List[PgOpfamilyRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
         val q = s"""select * from pg_catalog.pg_opfamily where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgOpfamilyRow.rowParser.*)
+          .as(PgOpfamilyRow.rowParser("").*)
     }
 
   }
@@ -81,7 +81,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_opfamily where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(opfmethod: Long, opfname: String, opfnamespace: Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
-    ???
+  override def selectByUniqueOpfmethodOpfnameOpfnamespace(opfmethod: Long, opfname: String, opfnamespace: Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
+    selectByFieldValues(List(PgOpfamilyFieldValue.opfmethod(opfmethod), PgOpfamilyFieldValue.opfname(opfname), PgOpfamilyFieldValue.opfnamespace(opfnamespace))).headOption
   }
 }

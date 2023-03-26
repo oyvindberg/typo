@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def selectAll(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
-    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata""".as(PgLargeobjectMetadataRow.rowParser.*)
+    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata""".as(PgLargeobjectMetadataRow.rowParser("").*)
   }
   override def selectById(oid: PgLargeobjectMetadataId)(implicit c: Connection): Option[PgLargeobjectMetadataRow] = {
-    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = $oid""".as(PgLargeobjectMetadataRow.rowParser.singleOpt)
+    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = $oid""".as(PgLargeobjectMetadataRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgLargeobjectMetadataId])(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
-    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid in $oids""".as(PgLargeobjectMetadataRow.rowParser.*)
+    SQL"""select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid in $oids""".as(PgLargeobjectMetadataRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgLargeobjectMetadataFieldValue[_]])(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
         val q = s"""select * from pg_catalog.pg_largeobject_metadata where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgLargeobjectMetadataRow.rowParser.*)
+          .as(PgLargeobjectMetadataRow.rowParser("").*)
     }
 
   }

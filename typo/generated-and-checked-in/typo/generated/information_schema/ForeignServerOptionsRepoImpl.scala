@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object ForeignServerOptionsRepoImpl extends ForeignServerOptionsRepo {
   override def selectAll(implicit c: Connection): List[ForeignServerOptionsRow] = {
-    SQL"""select foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.foreign_server_options""".as(ForeignServerOptionsRow.rowParser.*)
+    SQL"""select foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.foreign_server_options""".as(ForeignServerOptionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ForeignServerOptionsFieldValue[_]])(implicit c: Connection): List[ForeignServerOptionsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object ForeignServerOptionsRepoImpl extends ForeignServerOptionsRepo {
         val q = s"""select * from information_schema.foreign_server_options where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ForeignServerOptionsRow.rowParser.*)
+          .as(ForeignServerOptionsRow.rowParser("").*)
     }
 
   }

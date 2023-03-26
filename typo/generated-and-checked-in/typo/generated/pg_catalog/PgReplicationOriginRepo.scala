@@ -19,5 +19,5 @@ trait PgReplicationOriginRepo {
   def updateFieldValues(roident: PgReplicationOriginId, fieldValues: List[PgReplicationOriginFieldValue[_]])(implicit c: Connection): Int
   def insert(roident: PgReplicationOriginId, unsaved: PgReplicationOriginRowUnsaved)(implicit c: Connection): Boolean
   def delete(roident: PgReplicationOriginId)(implicit c: Connection): Boolean
-  def selectByUnique(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow]
+  def selectByUniqueRoname(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow]
 }

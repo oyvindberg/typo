@@ -27,14 +27,14 @@ case class PgIndexesRow(
 )
 
 object PgIndexesRow {
-  implicit val rowParser: RowParser[PgIndexesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgIndexesRow] = { row =>
     Success(
       PgIndexesRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        indexname = row[Option[String]]("indexname"),
-        tablespace = row[Option[String]]("tablespace"),
-        indexdef = row[Option[String]]("indexdef")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        indexname = row[Option[String]](prefix + "indexname"),
+        tablespace = row[Option[String]](prefix + "tablespace"),
+        indexdef = row[Option[String]](prefix + "indexdef")
       )
     )
   }

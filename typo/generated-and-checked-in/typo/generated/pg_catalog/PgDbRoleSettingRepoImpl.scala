@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
-    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting""".as(PgDbRoleSettingRow.rowParser.*)
+    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting""".as(PgDbRoleSettingRow.rowParser("").*)
   }
   override def selectById(compositeId: PgDbRoleSettingId)(implicit c: Connection): Option[PgDbRoleSettingRow] = {
-    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}""".as(PgDbRoleSettingRow.rowParser.singleOpt)
+    SQL"""select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase}, setrole = ${compositeId.setrole}""".as(PgDbRoleSettingRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgDbRoleSettingFieldValue[_]])(implicit c: Connection): List[PgDbRoleSettingRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
         val q = s"""select * from pg_catalog.pg_db_role_setting where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgDbRoleSettingRow.rowParser.*)
+          .as(PgDbRoleSettingRow.rowParser("").*)
     }
 
   }

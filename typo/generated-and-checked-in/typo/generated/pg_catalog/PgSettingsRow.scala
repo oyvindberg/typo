@@ -39,26 +39,26 @@ case class PgSettingsRow(
 )
 
 object PgSettingsRow {
-  implicit val rowParser: RowParser[PgSettingsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSettingsRow] = { row =>
     Success(
       PgSettingsRow(
-        name = row[Option[String]]("name"),
-        setting = row[Option[String]]("setting"),
-        unit = row[Option[String]]("unit"),
-        category = row[Option[String]]("category"),
-        shortDesc = row[Option[String]]("short_desc"),
-        extraDesc = row[Option[String]]("extra_desc"),
-        context = row[Option[String]]("context"),
-        vartype = row[Option[String]]("vartype"),
-        source = row[Option[String]]("source"),
-        minVal = row[Option[String]]("min_val"),
-        maxVal = row[Option[String]]("max_val"),
-        enumvals = row[Option[Array[String]]]("enumvals"),
-        bootVal = row[Option[String]]("boot_val"),
-        resetVal = row[Option[String]]("reset_val"),
-        sourcefile = row[Option[String]]("sourcefile"),
-        sourceline = row[Option[Int]]("sourceline"),
-        pendingRestart = row[Option[Boolean]]("pending_restart")
+        name = row[Option[String]](prefix + "name"),
+        setting = row[Option[String]](prefix + "setting"),
+        unit = row[Option[String]](prefix + "unit"),
+        category = row[Option[String]](prefix + "category"),
+        shortDesc = row[Option[String]](prefix + "short_desc"),
+        extraDesc = row[Option[String]](prefix + "extra_desc"),
+        context = row[Option[String]](prefix + "context"),
+        vartype = row[Option[String]](prefix + "vartype"),
+        source = row[Option[String]](prefix + "source"),
+        minVal = row[Option[String]](prefix + "min_val"),
+        maxVal = row[Option[String]](prefix + "max_val"),
+        enumvals = row[Option[Array[String]]](prefix + "enumvals"),
+        bootVal = row[Option[String]](prefix + "boot_val"),
+        resetVal = row[Option[String]](prefix + "reset_val"),
+        sourcefile = row[Option[String]](prefix + "sourcefile"),
+        sourceline = row[Option[Int]](prefix + "sourceline"),
+        pendingRestart = row[Option[Boolean]](prefix + "pending_restart")
       )
     )
   }

@@ -21,5 +21,5 @@ object PgLargeobjectMetadataId {
   implicit val format: Format[PgLargeobjectMetadataId] = implicitly[Format[Long]].bimap(PgLargeobjectMetadataId.apply, _.value)
   implicit val toStatement: ToStatement[PgLargeobjectMetadataId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[PgLargeobjectMetadataId] = implicitly[Column[Long]].map(PgLargeobjectMetadataId.apply)
-  implicit val rowParser: RowParser[PgLargeobjectMetadataId] = SqlParser.get[PgLargeobjectMetadataId]("oid")
+  def rowParser(prefix: String): RowParser[PgLargeobjectMetadataId] = SqlParser.get[PgLargeobjectMetadataId](prefix + "oid")
 }

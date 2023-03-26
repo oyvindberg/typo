@@ -30,16 +30,16 @@ case class PgRangeRow(
 )
 
 object PgRangeRow {
-  implicit val rowParser: RowParser[PgRangeRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgRangeRow] = { row =>
     Success(
       PgRangeRow(
-        rngtypid = row[PgRangeId]("rngtypid"),
-        rngsubtype = row[Long]("rngsubtype"),
-        rngmultitypid = row[Long]("rngmultitypid"),
-        rngcollation = row[Long]("rngcollation"),
-        rngsubopc = row[Long]("rngsubopc"),
-        rngcanonical = row[PGobject]("rngcanonical"),
-        rngsubdiff = row[PGobject]("rngsubdiff")
+        rngtypid = row[PgRangeId](prefix + "rngtypid"),
+        rngsubtype = row[Long](prefix + "rngsubtype"),
+        rngmultitypid = row[Long](prefix + "rngmultitypid"),
+        rngcollation = row[Long](prefix + "rngcollation"),
+        rngsubopc = row[Long](prefix + "rngsubopc"),
+        rngcanonical = row[PGobject](prefix + "rngcanonical"),
+        rngsubdiff = row[PGobject](prefix + "rngsubdiff")
       )
     )
   }

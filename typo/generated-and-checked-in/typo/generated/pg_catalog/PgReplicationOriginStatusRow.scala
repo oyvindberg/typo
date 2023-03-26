@@ -26,13 +26,13 @@ case class PgReplicationOriginStatusRow(
 )
 
 object PgReplicationOriginStatusRow {
-  implicit val rowParser: RowParser[PgReplicationOriginStatusRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgReplicationOriginStatusRow] = { row =>
     Success(
       PgReplicationOriginStatusRow(
-        localId = row[Option[Long]]("local_id"),
-        externalId = row[Option[String]]("external_id"),
-        remoteLsn = row[Option[String]]("remote_lsn"),
-        localLsn = row[Option[String]]("local_lsn")
+        localId = row[Option[Long]](prefix + "local_id"),
+        externalId = row[Option[String]](prefix + "external_id"),
+        remoteLsn = row[Option[String]](prefix + "remote_lsn"),
+        localLsn = row[Option[String]](prefix + "local_lsn")
       )
     )
   }

@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgCastRepoImpl extends PgCastRepo {
   override def selectAll(implicit c: Connection): List[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast""".as(PgCastRow.rowParser.*)
+    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast""".as(PgCastRow.rowParser("").*)
   }
   override def selectById(oid: PgCastId)(implicit c: Connection): Option[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = $oid""".as(PgCastRow.rowParser.singleOpt)
+    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = $oid""".as(PgCastRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgCastId])(implicit c: Connection): List[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid in $oids""".as(PgCastRow.rowParser.*)
+    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid in $oids""".as(PgCastRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgCastFieldValue[_]])(implicit c: Connection): List[PgCastRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object PgCastRepoImpl extends PgCastRepo {
         val q = s"""select * from pg_catalog.pg_cast where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgCastRow.rowParser.*)
+          .as(PgCastRow.rowParser("").*)
     }
 
   }
@@ -84,7 +84,7 @@ object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_cast where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(castsource: Long, casttarget: Long)(implicit c: Connection): Option[PgCastRow] = {
-    ???
+  override def selectByUniqueCastsourceCasttarget(castsource: Long, casttarget: Long)(implicit c: Connection): Option[PgCastRow] = {
+    selectByFieldValues(List(PgCastFieldValue.castsource(castsource), PgCastFieldValue.casttarget(casttarget))).headOption
   }
 }

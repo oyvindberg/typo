@@ -32,18 +32,18 @@ case class PgStatSlruRow(
 )
 
 object PgStatSlruRow {
-  implicit val rowParser: RowParser[PgStatSlruRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatSlruRow] = { row =>
     Success(
       PgStatSlruRow(
-        name = row[Option[String]]("name"),
-        blksZeroed = row[Option[Long]]("blks_zeroed"),
-        blksHit = row[Option[Long]]("blks_hit"),
-        blksRead = row[Option[Long]]("blks_read"),
-        blksWritten = row[Option[Long]]("blks_written"),
-        blksExists = row[Option[Long]]("blks_exists"),
-        flushes = row[Option[Long]]("flushes"),
-        truncates = row[Option[Long]]("truncates"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        name = row[Option[String]](prefix + "name"),
+        blksZeroed = row[Option[Long]](prefix + "blks_zeroed"),
+        blksHit = row[Option[Long]](prefix + "blks_hit"),
+        blksRead = row[Option[Long]](prefix + "blks_read"),
+        blksWritten = row[Option[Long]](prefix + "blks_written"),
+        blksExists = row[Option[Long]](prefix + "blks_exists"),
+        flushes = row[Option[Long]](prefix + "flushes"),
+        truncates = row[Option[Long]](prefix + "truncates"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

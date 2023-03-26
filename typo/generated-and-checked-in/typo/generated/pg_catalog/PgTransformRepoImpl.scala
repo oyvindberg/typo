@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def selectAll(implicit c: Connection): List[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform""".as(PgTransformRow.rowParser.*)
+    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform""".as(PgTransformRow.rowParser("").*)
   }
   override def selectById(oid: PgTransformId)(implicit c: Connection): Option[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = $oid""".as(PgTransformRow.rowParser.singleOpt)
+    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = $oid""".as(PgTransformRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTransformId])(implicit c: Connection): List[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid in $oids""".as(PgTransformRow.rowParser.*)
+    SQL"""select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid in $oids""".as(PgTransformRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTransformFieldValue[_]])(implicit c: Connection): List[PgTransformRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
         val q = s"""select * from pg_catalog.pg_transform where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTransformRow.rowParser.*)
+          .as(PgTransformRow.rowParser("").*)
     }
 
   }
@@ -81,7 +81,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_transform where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(trftype: Long, trflang: Long)(implicit c: Connection): Option[PgTransformRow] = {
-    ???
+  override def selectByUniqueTrftypeTrflang(trftype: Long, trflang: Long)(implicit c: Connection): Option[PgTransformRow] = {
+    selectByFieldValues(List(PgTransformFieldValue.trftype(trftype), PgTransformFieldValue.trflang(trflang))).headOption
   }
 }

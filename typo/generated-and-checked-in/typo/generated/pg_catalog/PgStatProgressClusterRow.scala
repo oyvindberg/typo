@@ -34,21 +34,21 @@ case class PgStatProgressClusterRow(
 )
 
 object PgStatProgressClusterRow {
-  implicit val rowParser: RowParser[PgStatProgressClusterRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressClusterRow] = { row =>
     Success(
       PgStatProgressClusterRow(
-        pid = row[Option[Int]]("pid"),
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        relid = row[Option[Long]]("relid"),
-        command = row[Option[String]]("command"),
-        phase = row[Option[String]]("phase"),
-        clusterIndexRelid = row[Option[Long]]("cluster_index_relid"),
-        heapTuplesScanned = row[Option[Long]]("heap_tuples_scanned"),
-        heapTuplesWritten = row[Option[Long]]("heap_tuples_written"),
-        heapBlksTotal = row[Option[Long]]("heap_blks_total"),
-        heapBlksScanned = row[Option[Long]]("heap_blks_scanned"),
-        indexRebuildCount = row[Option[Long]]("index_rebuild_count")
+        pid = row[Option[Int]](prefix + "pid"),
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        relid = row[Option[Long]](prefix + "relid"),
+        command = row[Option[String]](prefix + "command"),
+        phase = row[Option[String]](prefix + "phase"),
+        clusterIndexRelid = row[Option[Long]](prefix + "cluster_index_relid"),
+        heapTuplesScanned = row[Option[Long]](prefix + "heap_tuples_scanned"),
+        heapTuplesWritten = row[Option[Long]](prefix + "heap_tuples_written"),
+        heapBlksTotal = row[Option[Long]](prefix + "heap_blks_total"),
+        heapBlksScanned = row[Option[Long]](prefix + "heap_blks_scanned"),
+        indexRebuildCount = row[Option[Long]](prefix + "index_rebuild_count")
       )
     )
   }

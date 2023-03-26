@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(PgCollationRow.rowParser.*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(PgCollationRow.rowParser("").*)
   }
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(PgCollationRow.rowParser.singleOpt)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(PgCollationRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(PgCollationRow.rowParser.*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(PgCollationRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgCollationFieldValue[_]])(implicit c: Connection): List[PgCollationRow] = {
     fieldValues match {
@@ -44,7 +44,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
         val q = s"""select * from pg_catalog.pg_collation where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgCollationRow.rowParser.*)
+          .as(PgCollationRow.rowParser("").*)
     }
 
   }
@@ -96,7 +96,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_collation where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(collname: String, collencoding: Int, collnamespace: Long)(implicit c: Connection): Option[PgCollationRow] = {
-    ???
+  override def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: Long)(implicit c: Connection): Option[PgCollationRow] = {
+    selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption
   }
 }

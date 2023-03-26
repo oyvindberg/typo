@@ -32,18 +32,18 @@ case class PgStatisticExtRow(
 )
 
 object PgStatisticExtRow {
-  implicit val rowParser: RowParser[PgStatisticExtRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatisticExtRow] = { row =>
     Success(
       PgStatisticExtRow(
-        oid = row[PgStatisticExtId]("oid"),
-        stxrelid = row[Long]("stxrelid"),
-        stxname = row[String]("stxname"),
-        stxnamespace = row[Long]("stxnamespace"),
-        stxowner = row[Long]("stxowner"),
-        stxstattarget = row[Int]("stxstattarget"),
-        stxkeys = row[PGobject]("stxkeys"),
-        stxkind = row[Array[String]]("stxkind"),
-        stxexprs = row[Option[PGobject]]("stxexprs")
+        oid = row[PgStatisticExtId](prefix + "oid"),
+        stxrelid = row[Long](prefix + "stxrelid"),
+        stxname = row[String](prefix + "stxname"),
+        stxnamespace = row[Long](prefix + "stxnamespace"),
+        stxowner = row[Long](prefix + "stxowner"),
+        stxstattarget = row[Int](prefix + "stxstattarget"),
+        stxkeys = row[PGobject](prefix + "stxkeys"),
+        stxkind = row[Array[String]](prefix + "stxkind"),
+        stxexprs = row[Option[PGobject]](prefix + "stxexprs")
       )
     )
   }

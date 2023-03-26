@@ -26,13 +26,13 @@ case class PgForeignTableColumnsRow(
 )
 
 object PgForeignTableColumnsRow {
-  implicit val rowParser: RowParser[PgForeignTableColumnsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignTableColumnsRow] = { row =>
     Success(
       PgForeignTableColumnsRow(
-        nspname = row[Option[String]]("nspname"),
-        relname = row[Option[String]]("relname"),
-        attname = row[Option[String]]("attname"),
-        attfdwoptions = row[Option[Array[String]]]("attfdwoptions")
+        nspname = row[Option[String]](prefix + "nspname"),
+        relname = row[Option[String]](prefix + "relname"),
+        attname = row[Option[String]](prefix + "attname"),
+        attfdwoptions = row[Option[Array[String]]](prefix + "attfdwoptions")
       )
     )
   }

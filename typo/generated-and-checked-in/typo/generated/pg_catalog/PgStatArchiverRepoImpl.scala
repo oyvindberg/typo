@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatArchiverRepoImpl extends PgStatArchiverRepo {
   override def selectAll(implicit c: Connection): List[PgStatArchiverRow] = {
-    SQL"""select archived_count, last_archived_wal, last_archived_time, failed_count, last_failed_wal, last_failed_time, stats_reset from pg_catalog.pg_stat_archiver""".as(PgStatArchiverRow.rowParser.*)
+    SQL"""select archived_count, last_archived_wal, last_archived_time, failed_count, last_failed_wal, last_failed_time, stats_reset from pg_catalog.pg_stat_archiver""".as(PgStatArchiverRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatArchiverFieldValue[_]])(implicit c: Connection): List[PgStatArchiverRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgStatArchiverRepoImpl extends PgStatArchiverRepo {
         val q = s"""select * from pg_catalog.pg_stat_archiver where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatArchiverRow.rowParser.*)
+          .as(PgStatArchiverRow.rowParser("").*)
     }
 
   }

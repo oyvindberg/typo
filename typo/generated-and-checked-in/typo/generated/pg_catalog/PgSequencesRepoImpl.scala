@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgSequencesRepoImpl extends PgSequencesRepo {
   override def selectAll(implicit c: Connection): List[PgSequencesRow] = {
-    SQL"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, cycle, cache_size, last_value from pg_catalog.pg_sequences""".as(PgSequencesRow.rowParser.*)
+    SQL"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, cycle, cache_size, last_value from pg_catalog.pg_sequences""".as(PgSequencesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgSequencesFieldValue[_]])(implicit c: Connection): List[PgSequencesRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgSequencesRepoImpl extends PgSequencesRepo {
         val q = s"""select * from pg_catalog.pg_sequences where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgSequencesRow.rowParser.*)
+          .as(PgSequencesRow.rowParser("").*)
     }
 
   }

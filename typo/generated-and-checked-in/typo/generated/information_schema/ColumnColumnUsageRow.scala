@@ -27,14 +27,14 @@ case class ColumnColumnUsageRow(
 )
 
 object ColumnColumnUsageRow {
-  implicit val rowParser: RowParser[ColumnColumnUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[ColumnColumnUsageRow] = { row =>
     Success(
       ColumnColumnUsageRow(
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name"),
-        dependentColumn = row[Option[String]]("dependent_column")
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name"),
+        dependentColumn = row[Option[String]](prefix + "dependent_column")
       )
     )
   }

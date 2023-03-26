@@ -26,13 +26,13 @@ case class ForeignServerOptionsRow(
 )
 
 object ForeignServerOptionsRow {
-  implicit val rowParser: RowParser[ForeignServerOptionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[ForeignServerOptionsRow] = { row =>
     Success(
       ForeignServerOptionsRow(
-        foreignServerCatalog = row[Option[String]]("foreign_server_catalog"),
-        foreignServerName = row[Option[String]]("foreign_server_name"),
-        optionName = row[Option[String]]("option_name"),
-        optionValue = row[Option[String]]("option_value")
+        foreignServerCatalog = row[Option[String]](prefix + "foreign_server_catalog"),
+        foreignServerName = row[Option[String]](prefix + "foreign_server_name"),
+        optionName = row[Option[String]](prefix + "option_name"),
+        optionValue = row[Option[String]](prefix + "option_value")
       )
     )
   }

@@ -29,16 +29,16 @@ case class PgForeignDataWrappersRow(
 )
 
 object PgForeignDataWrappersRow {
-  implicit val rowParser: RowParser[PgForeignDataWrappersRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignDataWrappersRow] = { row =>
     Success(
       PgForeignDataWrappersRow(
-        oid = row[Option[Long]]("oid"),
-        fdwowner = row[Option[Long]]("fdwowner"),
-        fdwoptions = row[Option[Array[String]]]("fdwoptions"),
-        foreignDataWrapperCatalog = row[Option[String]]("foreign_data_wrapper_catalog"),
-        foreignDataWrapperName = row[Option[String]]("foreign_data_wrapper_name"),
-        authorizationIdentifier = row[Option[String]]("authorization_identifier"),
-        foreignDataWrapperLanguage = row[Option[String]]("foreign_data_wrapper_language")
+        oid = row[Option[Long]](prefix + "oid"),
+        fdwowner = row[Option[Long]](prefix + "fdwowner"),
+        fdwoptions = row[Option[Array[String]]](prefix + "fdwoptions"),
+        foreignDataWrapperCatalog = row[Option[String]](prefix + "foreign_data_wrapper_catalog"),
+        foreignDataWrapperName = row[Option[String]](prefix + "foreign_data_wrapper_name"),
+        authorizationIdentifier = row[Option[String]](prefix + "authorization_identifier"),
+        foreignDataWrapperLanguage = row[Option[String]](prefix + "foreign_data_wrapper_language")
       )
     )
   }

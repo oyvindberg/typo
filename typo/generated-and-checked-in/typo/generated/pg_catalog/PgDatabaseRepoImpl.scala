@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def selectAll(implicit c: Connection): List[PgDatabaseRow] = {
-    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".as(PgDatabaseRow.rowParser.*)
+    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".as(PgDatabaseRow.rowParser("").*)
   }
   override def selectById(oid: PgDatabaseId)(implicit c: Connection): Option[PgDatabaseRow] = {
-    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = $oid""".as(PgDatabaseRow.rowParser.singleOpt)
+    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = $oid""".as(PgDatabaseRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgDatabaseId])(implicit c: Connection): List[PgDatabaseRow] = {
-    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid in $oids""".as(PgDatabaseRow.rowParser.*)
+    SQL"""select oid, datname, datdba, encoding, datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid in $oids""".as(PgDatabaseRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgDatabaseFieldValue[_]])(implicit c: Connection): List[PgDatabaseRow] = {
     fieldValues match {
@@ -48,7 +48,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
         val q = s"""select * from pg_catalog.pg_database where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgDatabaseRow.rowParser.*)
+          .as(PgDatabaseRow.rowParser("").*)
     }
 
   }
@@ -108,7 +108,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_database where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
-    ???
+  override def selectByUniqueDatname(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
+    selectByFieldValues(List(PgDatabaseFieldValue.datname(datname))).headOption
   }
 }

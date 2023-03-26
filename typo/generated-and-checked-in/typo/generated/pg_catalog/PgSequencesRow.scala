@@ -34,20 +34,20 @@ case class PgSequencesRow(
 )
 
 object PgSequencesRow {
-  implicit val rowParser: RowParser[PgSequencesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSequencesRow] = { row =>
     Success(
       PgSequencesRow(
-        schemaname = row[Option[String]]("schemaname"),
-        sequencename = row[Option[String]]("sequencename"),
-        sequenceowner = row[Option[String]]("sequenceowner"),
-        dataType = row[Option[PGobject]]("data_type"),
-        startValue = row[Option[Long]]("start_value"),
-        minValue = row[Option[Long]]("min_value"),
-        maxValue = row[Option[Long]]("max_value"),
-        incrementBy = row[Option[Long]]("increment_by"),
-        cycle = row[Option[Boolean]]("cycle"),
-        cacheSize = row[Option[Long]]("cache_size"),
-        lastValue = row[Option[Long]]("last_value")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        sequencename = row[Option[String]](prefix + "sequencename"),
+        sequenceowner = row[Option[String]](prefix + "sequenceowner"),
+        dataType = row[Option[PGobject]](prefix + "data_type"),
+        startValue = row[Option[Long]](prefix + "start_value"),
+        minValue = row[Option[Long]](prefix + "min_value"),
+        maxValue = row[Option[Long]](prefix + "max_value"),
+        incrementBy = row[Option[Long]](prefix + "increment_by"),
+        cycle = row[Option[Boolean]](prefix + "cycle"),
+        cacheSize = row[Option[Long]](prefix + "cache_size"),
+        lastValue = row[Option[Long]](prefix + "last_value")
       )
     )
   }

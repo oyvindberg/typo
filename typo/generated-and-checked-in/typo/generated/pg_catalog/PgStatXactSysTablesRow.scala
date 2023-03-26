@@ -33,20 +33,20 @@ case class PgStatXactSysTablesRow(
 )
 
 object PgStatXactSysTablesRow {
-  implicit val rowParser: RowParser[PgStatXactSysTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatXactSysTablesRow] = { row =>
     Success(
       PgStatXactSysTablesRow(
-        relid = row[Option[Long]]("relid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        seqScan = row[Option[Long]]("seq_scan"),
-        seqTupRead = row[Option[Long]]("seq_tup_read"),
-        idxScan = row[Option[Long]]("idx_scan"),
-        idxTupFetch = row[Option[Long]]("idx_tup_fetch"),
-        nTupIns = row[Option[Long]]("n_tup_ins"),
-        nTupUpd = row[Option[Long]]("n_tup_upd"),
-        nTupDel = row[Option[Long]]("n_tup_del"),
-        nTupHotUpd = row[Option[Long]]("n_tup_hot_upd")
+        relid = row[Option[Long]](prefix + "relid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        seqScan = row[Option[Long]](prefix + "seq_scan"),
+        seqTupRead = row[Option[Long]](prefix + "seq_tup_read"),
+        idxScan = row[Option[Long]](prefix + "idx_scan"),
+        idxTupFetch = row[Option[Long]](prefix + "idx_tup_fetch"),
+        nTupIns = row[Option[Long]](prefix + "n_tup_ins"),
+        nTupUpd = row[Option[Long]](prefix + "n_tup_upd"),
+        nTupDel = row[Option[Long]](prefix + "n_tup_del"),
+        nTupHotUpd = row[Option[Long]](prefix + "n_tup_hot_upd")
       )
     )
   }

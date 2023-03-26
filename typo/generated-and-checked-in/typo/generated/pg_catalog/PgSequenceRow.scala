@@ -30,17 +30,17 @@ case class PgSequenceRow(
 )
 
 object PgSequenceRow {
-  implicit val rowParser: RowParser[PgSequenceRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgSequenceRow] = { row =>
     Success(
       PgSequenceRow(
-        seqrelid = row[PgSequenceId]("seqrelid"),
-        seqtypid = row[Long]("seqtypid"),
-        seqstart = row[Long]("seqstart"),
-        seqincrement = row[Long]("seqincrement"),
-        seqmax = row[Long]("seqmax"),
-        seqmin = row[Long]("seqmin"),
-        seqcache = row[Long]("seqcache"),
-        seqcycle = row[Boolean]("seqcycle")
+        seqrelid = row[PgSequenceId](prefix + "seqrelid"),
+        seqtypid = row[Long](prefix + "seqtypid"),
+        seqstart = row[Long](prefix + "seqstart"),
+        seqincrement = row[Long](prefix + "seqincrement"),
+        seqmax = row[Long](prefix + "seqmax"),
+        seqmin = row[Long](prefix + "seqmin"),
+        seqcache = row[Long](prefix + "seqcache"),
+        seqcycle = row[Boolean](prefix + "seqcycle")
       )
     )
   }

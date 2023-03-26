@@ -35,21 +35,21 @@ case class PgAuthidRow(
 )
 
 object PgAuthidRow {
-  implicit val rowParser: RowParser[PgAuthidRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAuthidRow] = { row =>
     Success(
       PgAuthidRow(
-        oid = row[PgAuthidId]("oid"),
-        rolname = row[String]("rolname"),
-        rolsuper = row[Boolean]("rolsuper"),
-        rolinherit = row[Boolean]("rolinherit"),
-        rolcreaterole = row[Boolean]("rolcreaterole"),
-        rolcreatedb = row[Boolean]("rolcreatedb"),
-        rolcanlogin = row[Boolean]("rolcanlogin"),
-        rolreplication = row[Boolean]("rolreplication"),
-        rolbypassrls = row[Boolean]("rolbypassrls"),
-        rolconnlimit = row[Int]("rolconnlimit"),
-        rolpassword = row[Option[String]]("rolpassword"),
-        rolvaliduntil = row[Option[ZonedDateTime]]("rolvaliduntil")
+        oid = row[PgAuthidId](prefix + "oid"),
+        rolname = row[String](prefix + "rolname"),
+        rolsuper = row[Boolean](prefix + "rolsuper"),
+        rolinherit = row[Boolean](prefix + "rolinherit"),
+        rolcreaterole = row[Boolean](prefix + "rolcreaterole"),
+        rolcreatedb = row[Boolean](prefix + "rolcreatedb"),
+        rolcanlogin = row[Boolean](prefix + "rolcanlogin"),
+        rolreplication = row[Boolean](prefix + "rolreplication"),
+        rolbypassrls = row[Boolean](prefix + "rolbypassrls"),
+        rolconnlimit = row[Int](prefix + "rolconnlimit"),
+        rolpassword = row[Option[String]](prefix + "rolpassword"),
+        rolvaliduntil = row[Option[ZonedDateTime]](prefix + "rolvaliduntil")
       )
     )
   }

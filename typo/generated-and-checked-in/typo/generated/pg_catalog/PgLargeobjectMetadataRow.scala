@@ -26,12 +26,12 @@ case class PgLargeobjectMetadataRow(
 )
 
 object PgLargeobjectMetadataRow {
-  implicit val rowParser: RowParser[PgLargeobjectMetadataRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgLargeobjectMetadataRow] = { row =>
     Success(
       PgLargeobjectMetadataRow(
-        oid = row[PgLargeobjectMetadataId]("oid"),
-        lomowner = row[Long]("lomowner"),
-        lomacl = row[Option[Array[PGobject]]]("lomacl")
+        oid = row[PgLargeobjectMetadataId](prefix + "oid"),
+        lomowner = row[Long](prefix + "lomowner"),
+        lomacl = row[Option[Array[PGobject]]](prefix + "lomacl")
       )
     )
   }

@@ -38,24 +38,24 @@ case class PgOperatorRow(
 )
 
 object PgOperatorRow {
-  implicit val rowParser: RowParser[PgOperatorRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgOperatorRow] = { row =>
     Success(
       PgOperatorRow(
-        oid = row[PgOperatorId]("oid"),
-        oprname = row[String]("oprname"),
-        oprnamespace = row[Long]("oprnamespace"),
-        oprowner = row[Long]("oprowner"),
-        oprkind = row[String]("oprkind"),
-        oprcanmerge = row[Boolean]("oprcanmerge"),
-        oprcanhash = row[Boolean]("oprcanhash"),
-        oprleft = row[Long]("oprleft"),
-        oprright = row[Long]("oprright"),
-        oprresult = row[Long]("oprresult"),
-        oprcom = row[Long]("oprcom"),
-        oprnegate = row[Long]("oprnegate"),
-        oprcode = row[PGobject]("oprcode"),
-        oprrest = row[PGobject]("oprrest"),
-        oprjoin = row[PGobject]("oprjoin")
+        oid = row[PgOperatorId](prefix + "oid"),
+        oprname = row[String](prefix + "oprname"),
+        oprnamespace = row[Long](prefix + "oprnamespace"),
+        oprowner = row[Long](prefix + "oprowner"),
+        oprkind = row[String](prefix + "oprkind"),
+        oprcanmerge = row[Boolean](prefix + "oprcanmerge"),
+        oprcanhash = row[Boolean](prefix + "oprcanhash"),
+        oprleft = row[Long](prefix + "oprleft"),
+        oprright = row[Long](prefix + "oprright"),
+        oprresult = row[Long](prefix + "oprresult"),
+        oprcom = row[Long](prefix + "oprcom"),
+        oprnegate = row[Long](prefix + "oprnegate"),
+        oprcode = row[PGobject](prefix + "oprcode"),
+        oprrest = row[PGobject](prefix + "oprrest"),
+        oprjoin = row[PGobject](prefix + "oprjoin")
       )
     )
   }

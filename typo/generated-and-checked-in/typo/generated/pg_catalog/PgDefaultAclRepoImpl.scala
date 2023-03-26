@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def selectAll(implicit c: Connection): List[PgDefaultAclRow] = {
-    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl""".as(PgDefaultAclRow.rowParser.*)
+    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl""".as(PgDefaultAclRow.rowParser("").*)
   }
   override def selectById(oid: PgDefaultAclId)(implicit c: Connection): Option[PgDefaultAclRow] = {
-    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = $oid""".as(PgDefaultAclRow.rowParser.singleOpt)
+    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = $oid""".as(PgDefaultAclRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgDefaultAclId])(implicit c: Connection): List[PgDefaultAclRow] = {
-    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid in $oids""".as(PgDefaultAclRow.rowParser.*)
+    SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid in $oids""".as(PgDefaultAclRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgDefaultAclFieldValue[_]])(implicit c: Connection): List[PgDefaultAclRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
         val q = s"""select * from pg_catalog.pg_default_acl where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgDefaultAclRow.rowParser.*)
+          .as(PgDefaultAclRow.rowParser("").*)
     }
 
   }
@@ -81,7 +81,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_default_acl where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(defaclrole: Long, defaclnamespace: Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
-    ???
+  override def selectByUniqueDefaclroleDefaclnamespaceDefaclobjtype(defaclrole: Long, defaclnamespace: Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
+    selectByFieldValues(List(PgDefaultAclFieldValue.defaclrole(defaclrole), PgDefaultAclFieldValue.defaclnamespace(defaclnamespace), PgDefaultAclFieldValue.defaclobjtype(defaclobjtype))).headOption
   }
 }

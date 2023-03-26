@@ -31,18 +31,18 @@ case class PgAmopRow(
 )
 
 object PgAmopRow {
-  implicit val rowParser: RowParser[PgAmopRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAmopRow] = { row =>
     Success(
       PgAmopRow(
-        oid = row[PgAmopId]("oid"),
-        amopfamily = row[Long]("amopfamily"),
-        amoplefttype = row[Long]("amoplefttype"),
-        amoprighttype = row[Long]("amoprighttype"),
-        amopstrategy = row[Int]("amopstrategy"),
-        amoppurpose = row[String]("amoppurpose"),
-        amopopr = row[Long]("amopopr"),
-        amopmethod = row[Long]("amopmethod"),
-        amopsortfamily = row[Long]("amopsortfamily")
+        oid = row[PgAmopId](prefix + "oid"),
+        amopfamily = row[Long](prefix + "amopfamily"),
+        amoplefttype = row[Long](prefix + "amoplefttype"),
+        amoprighttype = row[Long](prefix + "amoprighttype"),
+        amopstrategy = row[Int](prefix + "amopstrategy"),
+        amoppurpose = row[String](prefix + "amoppurpose"),
+        amopopr = row[Long](prefix + "amopopr"),
+        amopmethod = row[Long](prefix + "amopmethod"),
+        amopsortfamily = row[Long](prefix + "amopsortfamily")
       )
     )
   }

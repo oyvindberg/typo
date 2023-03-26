@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object ForeignDataWrapperOptionsRepoImpl extends ForeignDataWrapperOptionsRepo {
   override def selectAll(implicit c: Connection): List[ForeignDataWrapperOptionsRow] = {
-    SQL"""select foreign_data_wrapper_catalog, foreign_data_wrapper_name, option_name, option_value from information_schema.foreign_data_wrapper_options""".as(ForeignDataWrapperOptionsRow.rowParser.*)
+    SQL"""select foreign_data_wrapper_catalog, foreign_data_wrapper_name, option_name, option_value from information_schema.foreign_data_wrapper_options""".as(ForeignDataWrapperOptionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ForeignDataWrapperOptionsFieldValue[_]])(implicit c: Connection): List[ForeignDataWrapperOptionsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object ForeignDataWrapperOptionsRepoImpl extends ForeignDataWrapperOptionsRepo {
         val q = s"""select * from information_schema.foreign_data_wrapper_options where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ForeignDataWrapperOptionsRow.rowParser.*)
+          .as(ForeignDataWrapperOptionsRow.rowParser("").*)
     }
 
   }

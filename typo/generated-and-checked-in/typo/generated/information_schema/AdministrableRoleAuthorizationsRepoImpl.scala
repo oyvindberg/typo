@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object AdministrableRoleAuthorizationsRepoImpl extends AdministrableRoleAuthorizationsRepo {
   override def selectAll(implicit c: Connection): List[AdministrableRoleAuthorizationsRow] = {
-    SQL"""select grantee, role_name, is_grantable from information_schema.administrable_role_authorizations""".as(AdministrableRoleAuthorizationsRow.rowParser.*)
+    SQL"""select grantee, role_name, is_grantable from information_schema.administrable_role_authorizations""".as(AdministrableRoleAuthorizationsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[AdministrableRoleAuthorizationsFieldValue[_]])(implicit c: Connection): List[AdministrableRoleAuthorizationsRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object AdministrableRoleAuthorizationsRepoImpl extends AdministrableRoleAuthoriz
         val q = s"""select * from information_schema.administrable_role_authorizations where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(AdministrableRoleAuthorizationsRow.rowParser.*)
+          .as(AdministrableRoleAuthorizationsRow.rowParser("").*)
     }
 
   }

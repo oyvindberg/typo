@@ -33,20 +33,20 @@ case class PgStatProgressVacuumRow(
 )
 
 object PgStatProgressVacuumRow {
-  implicit val rowParser: RowParser[PgStatProgressVacuumRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressVacuumRow] = { row =>
     Success(
       PgStatProgressVacuumRow(
-        pid = row[Option[Int]]("pid"),
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        relid = row[Option[Long]]("relid"),
-        phase = row[Option[String]]("phase"),
-        heapBlksTotal = row[Option[Long]]("heap_blks_total"),
-        heapBlksScanned = row[Option[Long]]("heap_blks_scanned"),
-        heapBlksVacuumed = row[Option[Long]]("heap_blks_vacuumed"),
-        indexVacuumCount = row[Option[Long]]("index_vacuum_count"),
-        maxDeadTuples = row[Option[Long]]("max_dead_tuples"),
-        numDeadTuples = row[Option[Long]]("num_dead_tuples")
+        pid = row[Option[Int]](prefix + "pid"),
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        relid = row[Option[Long]](prefix + "relid"),
+        phase = row[Option[String]](prefix + "phase"),
+        heapBlksTotal = row[Option[Long]](prefix + "heap_blks_total"),
+        heapBlksScanned = row[Option[Long]](prefix + "heap_blks_scanned"),
+        heapBlksVacuumed = row[Option[Long]](prefix + "heap_blks_vacuumed"),
+        indexVacuumCount = row[Option[Long]](prefix + "index_vacuum_count"),
+        maxDeadTuples = row[Option[Long]](prefix + "max_dead_tuples"),
+        numDeadTuples = row[Option[Long]](prefix + "num_dead_tuples")
       )
     )
   }

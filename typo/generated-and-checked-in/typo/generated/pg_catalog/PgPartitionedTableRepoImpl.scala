@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table""".as(PgPartitionedTableRow.rowParser.*)
+    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table""".as(PgPartitionedTableRow.rowParser("").*)
   }
   override def selectById(partrelid: PgPartitionedTableId)(implicit c: Connection): Option[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = $partrelid""".as(PgPartitionedTableRow.rowParser.singleOpt)
+    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = $partrelid""".as(PgPartitionedTableRow.rowParser("").singleOpt)
   }
   override def selectByIds(partrelids: List[PgPartitionedTableId])(implicit c: Connection): List[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid in $partrelids""".as(PgPartitionedTableRow.rowParser.*)
+    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid in $partrelids""".as(PgPartitionedTableRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPartitionedTableFieldValue[_]])(implicit c: Connection): List[PgPartitionedTableRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
         val q = s"""select * from pg_catalog.pg_partitioned_table where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPartitionedTableRow.rowParser.*)
+          .as(PgPartitionedTableRow.rowParser("").*)
     }
 
   }

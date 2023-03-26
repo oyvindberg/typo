@@ -48,34 +48,34 @@ case class PgConstraintRow(
 )
 
 object PgConstraintRow {
-  implicit val rowParser: RowParser[PgConstraintRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgConstraintRow] = { row =>
     Success(
       PgConstraintRow(
-        oid = row[PgConstraintId]("oid"),
-        conname = row[String]("conname"),
-        connamespace = row[Long]("connamespace"),
-        contype = row[String]("contype"),
-        condeferrable = row[Boolean]("condeferrable"),
-        condeferred = row[Boolean]("condeferred"),
-        convalidated = row[Boolean]("convalidated"),
-        conrelid = row[Long]("conrelid"),
-        contypid = row[Long]("contypid"),
-        conindid = row[Long]("conindid"),
-        conparentid = row[Long]("conparentid"),
-        confrelid = row[Long]("confrelid"),
-        confupdtype = row[String]("confupdtype"),
-        confdeltype = row[String]("confdeltype"),
-        confmatchtype = row[String]("confmatchtype"),
-        conislocal = row[Boolean]("conislocal"),
-        coninhcount = row[Int]("coninhcount"),
-        connoinherit = row[Boolean]("connoinherit"),
-        conkey = row[Option[Array[Int]]]("conkey"),
-        confkey = row[Option[Array[Int]]]("confkey"),
-        conpfeqop = row[Option[Array[Long]]]("conpfeqop"),
-        conppeqop = row[Option[Array[Long]]]("conppeqop"),
-        conffeqop = row[Option[Array[Long]]]("conffeqop"),
-        conexclop = row[Option[Array[Long]]]("conexclop"),
-        conbin = row[Option[PGobject]]("conbin")
+        oid = row[PgConstraintId](prefix + "oid"),
+        conname = row[String](prefix + "conname"),
+        connamespace = row[Long](prefix + "connamespace"),
+        contype = row[String](prefix + "contype"),
+        condeferrable = row[Boolean](prefix + "condeferrable"),
+        condeferred = row[Boolean](prefix + "condeferred"),
+        convalidated = row[Boolean](prefix + "convalidated"),
+        conrelid = row[Long](prefix + "conrelid"),
+        contypid = row[Long](prefix + "contypid"),
+        conindid = row[Long](prefix + "conindid"),
+        conparentid = row[Long](prefix + "conparentid"),
+        confrelid = row[Long](prefix + "confrelid"),
+        confupdtype = row[String](prefix + "confupdtype"),
+        confdeltype = row[String](prefix + "confdeltype"),
+        confmatchtype = row[String](prefix + "confmatchtype"),
+        conislocal = row[Boolean](prefix + "conislocal"),
+        coninhcount = row[Int](prefix + "coninhcount"),
+        connoinherit = row[Boolean](prefix + "connoinherit"),
+        conkey = row[Option[Array[Int]]](prefix + "conkey"),
+        confkey = row[Option[Array[Int]]](prefix + "confkey"),
+        conpfeqop = row[Option[Array[Long]]](prefix + "conpfeqop"),
+        conppeqop = row[Option[Array[Long]]](prefix + "conppeqop"),
+        conffeqop = row[Option[Array[Long]]](prefix + "conffeqop"),
+        conexclop = row[Option[Array[Long]]](prefix + "conexclop"),
+        conbin = row[Option[PGobject]](prefix + "conbin")
       )
     )
   }

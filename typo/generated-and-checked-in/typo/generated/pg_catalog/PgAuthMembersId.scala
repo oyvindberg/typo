@@ -39,11 +39,11 @@ object PgAuthMembersId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgAuthMembersId] = { row =>
+  def rowParser(prefix: String): RowParser[PgAuthMembersId] = { row =>
     Success(
       PgAuthMembersId(
-        roleid = row[Long]("roleid"),
-        member = row[Long]("member")
+        roleid = row[Long](prefix + "roleid"),
+        member = row[Long](prefix + "member")
       )
     )
   }

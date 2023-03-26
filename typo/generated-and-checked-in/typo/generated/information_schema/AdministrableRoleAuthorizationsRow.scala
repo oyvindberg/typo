@@ -25,12 +25,12 @@ case class AdministrableRoleAuthorizationsRow(
 )
 
 object AdministrableRoleAuthorizationsRow {
-  implicit val rowParser: RowParser[AdministrableRoleAuthorizationsRow] = { row =>
+  def rowParser(prefix: String): RowParser[AdministrableRoleAuthorizationsRow] = { row =>
     Success(
       AdministrableRoleAuthorizationsRow(
-        grantee = row[Option[String]]("grantee"),
-        roleName = row[Option[String]]("role_name"),
-        isGrantable = row[Option[String]]("is_grantable")
+        grantee = row[Option[String]](prefix + "grantee"),
+        roleName = row[Option[String]](prefix + "role_name"),
+        isGrantable = row[Option[String]](prefix + "is_grantable")
       )
     )
   }

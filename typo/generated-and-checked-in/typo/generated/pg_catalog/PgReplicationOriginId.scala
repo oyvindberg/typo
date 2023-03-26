@@ -21,5 +21,5 @@ object PgReplicationOriginId {
   implicit val format: Format[PgReplicationOriginId] = implicitly[Format[Long]].bimap(PgReplicationOriginId.apply, _.value)
   implicit val toStatement: ToStatement[PgReplicationOriginId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[PgReplicationOriginId] = implicitly[Column[Long]].map(PgReplicationOriginId.apply)
-  implicit val rowParser: RowParser[PgReplicationOriginId] = SqlParser.get[PgReplicationOriginId]("roident")
+  def rowParser(prefix: String): RowParser[PgReplicationOriginId] = SqlParser.get[PgReplicationOriginId](prefix + "roident")
 }

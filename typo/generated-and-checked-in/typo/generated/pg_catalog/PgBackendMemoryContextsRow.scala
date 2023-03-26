@@ -31,18 +31,18 @@ case class PgBackendMemoryContextsRow(
 )
 
 object PgBackendMemoryContextsRow {
-  implicit val rowParser: RowParser[PgBackendMemoryContextsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgBackendMemoryContextsRow] = { row =>
     Success(
       PgBackendMemoryContextsRow(
-        name = row[Option[String]]("name"),
-        ident = row[Option[String]]("ident"),
-        parent = row[Option[String]]("parent"),
-        level = row[Option[Int]]("level"),
-        totalBytes = row[Option[Long]]("total_bytes"),
-        totalNblocks = row[Option[Long]]("total_nblocks"),
-        freeBytes = row[Option[Long]]("free_bytes"),
-        freeChunks = row[Option[Long]]("free_chunks"),
-        usedBytes = row[Option[Long]]("used_bytes")
+        name = row[Option[String]](prefix + "name"),
+        ident = row[Option[String]](prefix + "ident"),
+        parent = row[Option[String]](prefix + "parent"),
+        level = row[Option[Int]](prefix + "level"),
+        totalBytes = row[Option[Long]](prefix + "total_bytes"),
+        totalNblocks = row[Option[Long]](prefix + "total_nblocks"),
+        freeBytes = row[Option[Long]](prefix + "free_bytes"),
+        freeChunks = row[Option[Long]](prefix + "free_chunks"),
+        usedBytes = row[Option[Long]](prefix + "used_bytes")
       )
     )
   }

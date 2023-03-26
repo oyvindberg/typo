@@ -29,16 +29,16 @@ case class PgFileSettingsRow(
 )
 
 object PgFileSettingsRow {
-  implicit val rowParser: RowParser[PgFileSettingsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgFileSettingsRow] = { row =>
     Success(
       PgFileSettingsRow(
-        sourcefile = row[Option[String]]("sourcefile"),
-        sourceline = row[Option[Int]]("sourceline"),
-        seqno = row[Option[Int]]("seqno"),
-        name = row[Option[String]]("name"),
-        setting = row[Option[String]]("setting"),
-        applied = row[Option[Boolean]]("applied"),
-        error = row[Option[String]]("error")
+        sourcefile = row[Option[String]](prefix + "sourcefile"),
+        sourceline = row[Option[Int]](prefix + "sourceline"),
+        seqno = row[Option[Int]](prefix + "seqno"),
+        name = row[Option[String]](prefix + "name"),
+        setting = row[Option[String]](prefix + "setting"),
+        applied = row[Option[Boolean]](prefix + "applied"),
+        error = row[Option[String]](prefix + "error")
       )
     )
   }

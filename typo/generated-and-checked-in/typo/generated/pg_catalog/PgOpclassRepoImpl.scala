@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def selectAll(implicit c: Connection): List[PgOpclassRow] = {
-    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass""".as(PgOpclassRow.rowParser.*)
+    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass""".as(PgOpclassRow.rowParser("").*)
   }
   override def selectById(oid: PgOpclassId)(implicit c: Connection): Option[PgOpclassRow] = {
-    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = $oid""".as(PgOpclassRow.rowParser.singleOpt)
+    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = $oid""".as(PgOpclassRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgOpclassId])(implicit c: Connection): List[PgOpclassRow] = {
-    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid in $oids""".as(PgOpclassRow.rowParser.*)
+    SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid in $oids""".as(PgOpclassRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgOpclassFieldValue[_]])(implicit c: Connection): List[PgOpclassRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
         val q = s"""select * from pg_catalog.pg_opclass where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgOpclassRow.rowParser.*)
+          .as(PgOpclassRow.rowParser("").*)
     }
 
   }
@@ -93,7 +93,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_opclass where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(opcmethod: Long, opcname: String, opcnamespace: Long)(implicit c: Connection): Option[PgOpclassRow] = {
-    ???
+  override def selectByUniqueOpcmethodOpcnameOpcnamespace(opcmethod: Long, opcname: String, opcnamespace: Long)(implicit c: Connection): Option[PgOpclassRow] = {
+    selectByFieldValues(List(PgOpclassFieldValue.opcmethod(opcmethod), PgOpclassFieldValue.opcname(opcname), PgOpclassFieldValue.opcnamespace(opcnamespace))).headOption
   }
 }

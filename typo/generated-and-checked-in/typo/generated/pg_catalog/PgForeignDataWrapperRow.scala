@@ -30,16 +30,16 @@ case class PgForeignDataWrapperRow(
 )
 
 object PgForeignDataWrapperRow {
-  implicit val rowParser: RowParser[PgForeignDataWrapperRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgForeignDataWrapperRow] = { row =>
     Success(
       PgForeignDataWrapperRow(
-        oid = row[PgForeignDataWrapperId]("oid"),
-        fdwname = row[String]("fdwname"),
-        fdwowner = row[Long]("fdwowner"),
-        fdwhandler = row[Long]("fdwhandler"),
-        fdwvalidator = row[Long]("fdwvalidator"),
-        fdwacl = row[Option[Array[PGobject]]]("fdwacl"),
-        fdwoptions = row[Option[Array[String]]]("fdwoptions")
+        oid = row[PgForeignDataWrapperId](prefix + "oid"),
+        fdwname = row[String](prefix + "fdwname"),
+        fdwowner = row[Long](prefix + "fdwowner"),
+        fdwhandler = row[Long](prefix + "fdwhandler"),
+        fdwvalidator = row[Long](prefix + "fdwvalidator"),
+        fdwacl = row[Option[Array[PGobject]]](prefix + "fdwacl"),
+        fdwoptions = row[Option[Array[String]]](prefix + "fdwoptions")
       )
     )
   }

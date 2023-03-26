@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object DomainUdtUsageRepoImpl extends DomainUdtUsageRepo {
   override def selectAll(implicit c: Connection): List[DomainUdtUsageRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, domain_catalog, domain_schema, domain_name from information_schema.domain_udt_usage""".as(DomainUdtUsageRow.rowParser.*)
+    SQL"""select udt_catalog, udt_schema, udt_name, domain_catalog, domain_schema, domain_name from information_schema.domain_udt_usage""".as(DomainUdtUsageRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[DomainUdtUsageFieldValue[_]])(implicit c: Connection): List[DomainUdtUsageRow] = {
     fieldValues match {
@@ -34,7 +34,7 @@ object DomainUdtUsageRepoImpl extends DomainUdtUsageRepo {
         val q = s"""select * from information_schema.domain_udt_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(DomainUdtUsageRow.rowParser.*)
+          .as(DomainUdtUsageRow.rowParser("").*)
     }
 
   }

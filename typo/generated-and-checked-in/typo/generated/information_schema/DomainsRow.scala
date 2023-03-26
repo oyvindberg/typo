@@ -49,36 +49,36 @@ case class DomainsRow(
 )
 
 object DomainsRow {
-  implicit val rowParser: RowParser[DomainsRow] = { row =>
+  def rowParser(prefix: String): RowParser[DomainsRow] = { row =>
     Success(
       DomainsRow(
-        domainCatalog = row[Option[String]]("domain_catalog"),
-        domainSchema = row[Option[String]]("domain_schema"),
-        domainName = row[Option[String]]("domain_name"),
-        dataType = row[Option[String]]("data_type"),
-        characterMaximumLength = row[Option[Int]]("character_maximum_length"),
-        characterOctetLength = row[Option[Int]]("character_octet_length"),
-        characterSetCatalog = row[Option[String]]("character_set_catalog"),
-        characterSetSchema = row[Option[String]]("character_set_schema"),
-        characterSetName = row[Option[String]]("character_set_name"),
-        collationCatalog = row[Option[String]]("collation_catalog"),
-        collationSchema = row[Option[String]]("collation_schema"),
-        collationName = row[Option[String]]("collation_name"),
-        numericPrecision = row[Option[Int]]("numeric_precision"),
-        numericPrecisionRadix = row[Option[Int]]("numeric_precision_radix"),
-        numericScale = row[Option[Int]]("numeric_scale"),
-        datetimePrecision = row[Option[Int]]("datetime_precision"),
-        intervalType = row[Option[String]]("interval_type"),
-        intervalPrecision = row[Option[Int]]("interval_precision"),
-        domainDefault = row[Option[String]]("domain_default"),
-        udtCatalog = row[Option[String]]("udt_catalog"),
-        udtSchema = row[Option[String]]("udt_schema"),
-        udtName = row[Option[String]]("udt_name"),
-        scopeCatalog = row[Option[String]]("scope_catalog"),
-        scopeSchema = row[Option[String]]("scope_schema"),
-        scopeName = row[Option[String]]("scope_name"),
-        maximumCardinality = row[Option[Int]]("maximum_cardinality"),
-        dtdIdentifier = row[Option[String]]("dtd_identifier")
+        domainCatalog = row[Option[String]](prefix + "domain_catalog"),
+        domainSchema = row[Option[String]](prefix + "domain_schema"),
+        domainName = row[Option[String]](prefix + "domain_name"),
+        dataType = row[Option[String]](prefix + "data_type"),
+        characterMaximumLength = row[Option[Int]](prefix + "character_maximum_length"),
+        characterOctetLength = row[Option[Int]](prefix + "character_octet_length"),
+        characterSetCatalog = row[Option[String]](prefix + "character_set_catalog"),
+        characterSetSchema = row[Option[String]](prefix + "character_set_schema"),
+        characterSetName = row[Option[String]](prefix + "character_set_name"),
+        collationCatalog = row[Option[String]](prefix + "collation_catalog"),
+        collationSchema = row[Option[String]](prefix + "collation_schema"),
+        collationName = row[Option[String]](prefix + "collation_name"),
+        numericPrecision = row[Option[Int]](prefix + "numeric_precision"),
+        numericPrecisionRadix = row[Option[Int]](prefix + "numeric_precision_radix"),
+        numericScale = row[Option[Int]](prefix + "numeric_scale"),
+        datetimePrecision = row[Option[Int]](prefix + "datetime_precision"),
+        intervalType = row[Option[String]](prefix + "interval_type"),
+        intervalPrecision = row[Option[Int]](prefix + "interval_precision"),
+        domainDefault = row[Option[String]](prefix + "domain_default"),
+        udtCatalog = row[Option[String]](prefix + "udt_catalog"),
+        udtSchema = row[Option[String]](prefix + "udt_schema"),
+        udtName = row[Option[String]](prefix + "udt_name"),
+        scopeCatalog = row[Option[String]](prefix + "scope_catalog"),
+        scopeSchema = row[Option[String]](prefix + "scope_schema"),
+        scopeName = row[Option[String]](prefix + "scope_name"),
+        maximumCardinality = row[Option[Int]](prefix + "maximum_cardinality"),
+        dtdIdentifier = row[Option[String]](prefix + "dtd_identifier")
       )
     )
   }

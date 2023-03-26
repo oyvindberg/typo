@@ -45,29 +45,29 @@ case class PgStatReplicationRow(
 )
 
 object PgStatReplicationRow {
-  implicit val rowParser: RowParser[PgStatReplicationRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatReplicationRow] = { row =>
     Success(
       PgStatReplicationRow(
-        pid = row[Option[Int]]("pid"),
-        usesysid = row[Option[Long]]("usesysid"),
-        usename = row[Option[String]]("usename"),
-        applicationName = row[Option[String]]("application_name"),
-        clientAddr = row[Option[PGobject]]("client_addr"),
-        clientHostname = row[Option[String]]("client_hostname"),
-        clientPort = row[Option[Int]]("client_port"),
-        backendStart = row[Option[ZonedDateTime]]("backend_start"),
-        backendXmin = row[Option[PGobject]]("backend_xmin"),
-        state = row[Option[String]]("state"),
-        sentLsn = row[Option[String]]("sent_lsn"),
-        writeLsn = row[Option[String]]("write_lsn"),
-        flushLsn = row[Option[String]]("flush_lsn"),
-        replayLsn = row[Option[String]]("replay_lsn"),
-        writeLag = row[Option[PGInterval]]("write_lag"),
-        flushLag = row[Option[PGInterval]]("flush_lag"),
-        replayLag = row[Option[PGInterval]]("replay_lag"),
-        syncPriority = row[Option[Int]]("sync_priority"),
-        syncState = row[Option[String]]("sync_state"),
-        replyTime = row[Option[ZonedDateTime]]("reply_time")
+        pid = row[Option[Int]](prefix + "pid"),
+        usesysid = row[Option[Long]](prefix + "usesysid"),
+        usename = row[Option[String]](prefix + "usename"),
+        applicationName = row[Option[String]](prefix + "application_name"),
+        clientAddr = row[Option[PGobject]](prefix + "client_addr"),
+        clientHostname = row[Option[String]](prefix + "client_hostname"),
+        clientPort = row[Option[Int]](prefix + "client_port"),
+        backendStart = row[Option[ZonedDateTime]](prefix + "backend_start"),
+        backendXmin = row[Option[PGobject]](prefix + "backend_xmin"),
+        state = row[Option[String]](prefix + "state"),
+        sentLsn = row[Option[String]](prefix + "sent_lsn"),
+        writeLsn = row[Option[String]](prefix + "write_lsn"),
+        flushLsn = row[Option[String]](prefix + "flush_lsn"),
+        replayLsn = row[Option[String]](prefix + "replay_lsn"),
+        writeLag = row[Option[PGInterval]](prefix + "write_lag"),
+        flushLag = row[Option[PGInterval]](prefix + "flush_lag"),
+        replayLag = row[Option[PGInterval]](prefix + "replay_lag"),
+        syncPriority = row[Option[Int]](prefix + "sync_priority"),
+        syncState = row[Option[String]](prefix + "sync_state"),
+        replyTime = row[Option[ZonedDateTime]](prefix + "reply_time")
       )
     )
   }

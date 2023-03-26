@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel""".as(PgPublicationRelRow.rowParser.*)
+    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel""".as(PgPublicationRelRow.rowParser("").*)
   }
   override def selectById(oid: PgPublicationRelId)(implicit c: Connection): Option[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = $oid""".as(PgPublicationRelRow.rowParser.singleOpt)
+    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = $oid""".as(PgPublicationRelRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgPublicationRelId])(implicit c: Connection): List[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid in $oids""".as(PgPublicationRelRow.rowParser.*)
+    SQL"""select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid in $oids""".as(PgPublicationRelRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPublicationRelFieldValue[_]])(implicit c: Connection): List[PgPublicationRelRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
         val q = s"""select * from pg_catalog.pg_publication_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPublicationRelRow.rowParser.*)
+          .as(PgPublicationRelRow.rowParser("").*)
     }
 
   }
@@ -75,7 +75,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_publication_rel where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(prrelid: Long, prpubid: Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
-    ???
+  override def selectByUniquePrrelidPrpubid(prrelid: Long, prpubid: Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
+    selectByFieldValues(List(PgPublicationRelFieldValue.prrelid(prrelid), PgPublicationRelFieldValue.prpubid(prpubid))).headOption
   }
 }

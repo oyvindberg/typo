@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgGroupRepoImpl extends PgGroupRepo {
   override def selectAll(implicit c: Connection): List[PgGroupRow] = {
-    SQL"""select groname, grosysid, grolist from pg_catalog.pg_group""".as(PgGroupRow.rowParser.*)
+    SQL"""select groname, grosysid, grolist from pg_catalog.pg_group""".as(PgGroupRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgGroupFieldValue[_]])(implicit c: Connection): List[PgGroupRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object PgGroupRepoImpl extends PgGroupRepo {
         val q = s"""select * from pg_catalog.pg_group where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgGroupRow.rowParser.*)
+          .as(PgGroupRow.rowParser("").*)
     }
 
   }

@@ -51,35 +51,35 @@ case class PgAttributeRow(
 }
 
 object PgAttributeRow {
-  implicit val rowParser: RowParser[PgAttributeRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAttributeRow] = { row =>
     Success(
       PgAttributeRow(
-        attrelid = row[Long]("attrelid"),
-        attname = row[String]("attname"),
-        atttypid = row[Long]("atttypid"),
-        attstattarget = row[Int]("attstattarget"),
-        attlen = row[Int]("attlen"),
-        attnum = row[Int]("attnum"),
-        attndims = row[Int]("attndims"),
-        attcacheoff = row[Int]("attcacheoff"),
-        atttypmod = row[Int]("atttypmod"),
-        attbyval = row[Boolean]("attbyval"),
-        attalign = row[String]("attalign"),
-        attstorage = row[String]("attstorage"),
-        attcompression = row[String]("attcompression"),
-        attnotnull = row[Boolean]("attnotnull"),
-        atthasdef = row[Boolean]("atthasdef"),
-        atthasmissing = row[Boolean]("atthasmissing"),
-        attidentity = row[String]("attidentity"),
-        attgenerated = row[String]("attgenerated"),
-        attisdropped = row[Boolean]("attisdropped"),
-        attislocal = row[Boolean]("attislocal"),
-        attinhcount = row[Int]("attinhcount"),
-        attcollation = row[Long]("attcollation"),
-        attacl = row[Option[Array[PGobject]]]("attacl"),
-        attoptions = row[Option[Array[String]]]("attoptions"),
-        attfdwoptions = row[Option[Array[String]]]("attfdwoptions"),
-        attmissingval = row[Option[PGobject]]("attmissingval")
+        attrelid = row[Long](prefix + "attrelid"),
+        attname = row[String](prefix + "attname"),
+        atttypid = row[Long](prefix + "atttypid"),
+        attstattarget = row[Int](prefix + "attstattarget"),
+        attlen = row[Int](prefix + "attlen"),
+        attnum = row[Int](prefix + "attnum"),
+        attndims = row[Int](prefix + "attndims"),
+        attcacheoff = row[Int](prefix + "attcacheoff"),
+        atttypmod = row[Int](prefix + "atttypmod"),
+        attbyval = row[Boolean](prefix + "attbyval"),
+        attalign = row[String](prefix + "attalign"),
+        attstorage = row[String](prefix + "attstorage"),
+        attcompression = row[String](prefix + "attcompression"),
+        attnotnull = row[Boolean](prefix + "attnotnull"),
+        atthasdef = row[Boolean](prefix + "atthasdef"),
+        atthasmissing = row[Boolean](prefix + "atthasmissing"),
+        attidentity = row[String](prefix + "attidentity"),
+        attgenerated = row[String](prefix + "attgenerated"),
+        attisdropped = row[Boolean](prefix + "attisdropped"),
+        attislocal = row[Boolean](prefix + "attislocal"),
+        attinhcount = row[Int](prefix + "attinhcount"),
+        attcollation = row[Long](prefix + "attcollation"),
+        attacl = row[Option[Array[PGobject]]](prefix + "attacl"),
+        attoptions = row[Option[Array[String]]](prefix + "attoptions"),
+        attfdwoptions = row[Option[Array[String]]](prefix + "attfdwoptions"),
+        attmissingval = row[Option[PGobject]](prefix + "attmissingval")
       )
     )
   }

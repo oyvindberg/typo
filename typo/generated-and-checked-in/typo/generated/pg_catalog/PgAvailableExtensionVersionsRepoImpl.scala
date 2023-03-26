@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgAvailableExtensionVersionsRepoImpl extends PgAvailableExtensionVersionsRepo {
   override def selectAll(implicit c: Connection): List[PgAvailableExtensionVersionsRow] = {
-    SQL"""select name, version, installed, superuser, trusted, relocatable, schema, requires, comment from pg_catalog.pg_available_extension_versions""".as(PgAvailableExtensionVersionsRow.rowParser.*)
+    SQL"""select name, version, installed, superuser, trusted, relocatable, schema, requires, comment from pg_catalog.pg_available_extension_versions""".as(PgAvailableExtensionVersionsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgAvailableExtensionVersionsFieldValue[_]])(implicit c: Connection): List[PgAvailableExtensionVersionsRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgAvailableExtensionVersionsRepoImpl extends PgAvailableExtensionVersions
         val q = s"""select * from pg_catalog.pg_available_extension_versions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAvailableExtensionVersionsRow.rowParser.*)
+          .as(PgAvailableExtensionVersionsRow.rowParser("").*)
     }
 
   }

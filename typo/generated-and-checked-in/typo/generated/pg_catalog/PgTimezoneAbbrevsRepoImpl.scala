@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgTimezoneAbbrevsRepoImpl extends PgTimezoneAbbrevsRepo {
   override def selectAll(implicit c: Connection): List[PgTimezoneAbbrevsRow] = {
-    SQL"""select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs""".as(PgTimezoneAbbrevsRow.rowParser.*)
+    SQL"""select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs""".as(PgTimezoneAbbrevsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTimezoneAbbrevsFieldValue[_]])(implicit c: Connection): List[PgTimezoneAbbrevsRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object PgTimezoneAbbrevsRepoImpl extends PgTimezoneAbbrevsRepo {
         val q = s"""select * from pg_catalog.pg_timezone_abbrevs where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTimezoneAbbrevsRow.rowParser.*)
+          .as(PgTimezoneAbbrevsRow.rowParser("").*)
     }
 
   }

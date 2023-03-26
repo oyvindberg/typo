@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def selectAll(implicit c: Connection): List[PgTsParserRow] = {
-    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser""".as(PgTsParserRow.rowParser.*)
+    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser""".as(PgTsParserRow.rowParser("").*)
   }
   override def selectById(oid: PgTsParserId)(implicit c: Connection): Option[PgTsParserRow] = {
-    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = $oid""".as(PgTsParserRow.rowParser.singleOpt)
+    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = $oid""".as(PgTsParserRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTsParserId])(implicit c: Connection): List[PgTsParserRow] = {
-    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid in $oids""".as(PgTsParserRow.rowParser.*)
+    SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid in $oids""".as(PgTsParserRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTsParserFieldValue[_]])(implicit c: Connection): List[PgTsParserRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
         val q = s"""select * from pg_catalog.pg_ts_parser where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTsParserRow.rowParser.*)
+          .as(PgTsParserRow.rowParser("").*)
     }
 
   }
@@ -90,7 +90,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_ts_parser where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow] = {
-    ???
+  override def selectByUniquePrsnamePrsnamespace(prsname: String, prsnamespace: Long)(implicit c: Connection): Option[PgTsParserRow] = {
+    selectByFieldValues(List(PgTsParserFieldValue.prsname(prsname), PgTsParserFieldValue.prsnamespace(prsnamespace))).headOption
   }
 }

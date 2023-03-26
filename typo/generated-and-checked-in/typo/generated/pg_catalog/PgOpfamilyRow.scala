@@ -27,14 +27,14 @@ case class PgOpfamilyRow(
 )
 
 object PgOpfamilyRow {
-  implicit val rowParser: RowParser[PgOpfamilyRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgOpfamilyRow] = { row =>
     Success(
       PgOpfamilyRow(
-        oid = row[PgOpfamilyId]("oid"),
-        opfmethod = row[Long]("opfmethod"),
-        opfname = row[String]("opfname"),
-        opfnamespace = row[Long]("opfnamespace"),
-        opfowner = row[Long]("opfowner")
+        oid = row[PgOpfamilyId](prefix + "oid"),
+        opfmethod = row[Long](prefix + "opfmethod"),
+        opfname = row[String](prefix + "opfname"),
+        opfnamespace = row[Long](prefix + "opfnamespace"),
+        opfowner = row[Long](prefix + "opfowner")
       )
     )
   }

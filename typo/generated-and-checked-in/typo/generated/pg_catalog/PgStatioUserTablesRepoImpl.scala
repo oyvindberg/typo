@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatioUserTablesRepoImpl extends PgStatioUserTablesRepo {
   override def selectAll(implicit c: Connection): List[PgStatioUserTablesRow] = {
-    SQL"""select relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit from pg_catalog.pg_statio_user_tables""".as(PgStatioUserTablesRow.rowParser.*)
+    SQL"""select relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit from pg_catalog.pg_statio_user_tables""".as(PgStatioUserTablesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatioUserTablesFieldValue[_]])(implicit c: Connection): List[PgStatioUserTablesRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgStatioUserTablesRepoImpl extends PgStatioUserTablesRepo {
         val q = s"""select * from pg_catalog.pg_statio_user_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatioUserTablesRow.rowParser.*)
+          .as(PgStatioUserTablesRow.rowParser("").*)
     }
 
   }

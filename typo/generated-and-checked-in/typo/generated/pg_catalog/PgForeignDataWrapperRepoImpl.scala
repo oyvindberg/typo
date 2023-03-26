@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow] = {
-    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper""".as(PgForeignDataWrapperRow.rowParser.*)
+    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper""".as(PgForeignDataWrapperRow.rowParser("").*)
   }
   override def selectById(oid: PgForeignDataWrapperId)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
-    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = $oid""".as(PgForeignDataWrapperRow.rowParser.singleOpt)
+    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = $oid""".as(PgForeignDataWrapperRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgForeignDataWrapperId])(implicit c: Connection): List[PgForeignDataWrapperRow] = {
-    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid in $oids""".as(PgForeignDataWrapperRow.rowParser.*)
+    SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid in $oids""".as(PgForeignDataWrapperRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgForeignDataWrapperFieldValue[_]])(implicit c: Connection): List[PgForeignDataWrapperRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
         val q = s"""select * from pg_catalog.pg_foreign_data_wrapper where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgForeignDataWrapperRow.rowParser.*)
+          .as(PgForeignDataWrapperRow.rowParser("").*)
     }
 
   }
@@ -87,7 +87,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_foreign_data_wrapper where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
-    ???
+  override def selectByUniqueFdwname(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
+    selectByFieldValues(List(PgForeignDataWrapperFieldValue.fdwname(fdwname))).headOption
   }
 }

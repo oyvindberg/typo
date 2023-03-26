@@ -29,16 +29,16 @@ case class ColumnDomainUsageRow(
 )
 
 object ColumnDomainUsageRow {
-  implicit val rowParser: RowParser[ColumnDomainUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[ColumnDomainUsageRow] = { row =>
     Success(
       ColumnDomainUsageRow(
-        domainCatalog = row[Option[String]]("domain_catalog"),
-        domainSchema = row[Option[String]]("domain_schema"),
-        domainName = row[Option[String]]("domain_name"),
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name")
+        domainCatalog = row[Option[String]](prefix + "domain_catalog"),
+        domainSchema = row[Option[String]](prefix + "domain_schema"),
+        domainName = row[Option[String]](prefix + "domain_name"),
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name")
       )
     )
   }

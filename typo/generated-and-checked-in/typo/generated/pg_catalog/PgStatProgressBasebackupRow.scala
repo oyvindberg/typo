@@ -28,15 +28,15 @@ case class PgStatProgressBasebackupRow(
 )
 
 object PgStatProgressBasebackupRow {
-  implicit val rowParser: RowParser[PgStatProgressBasebackupRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressBasebackupRow] = { row =>
     Success(
       PgStatProgressBasebackupRow(
-        pid = row[Option[Int]]("pid"),
-        phase = row[Option[String]]("phase"),
-        backupTotal = row[Option[Long]]("backup_total"),
-        backupStreamed = row[Option[Long]]("backup_streamed"),
-        tablespacesTotal = row[Option[Long]]("tablespaces_total"),
-        tablespacesStreamed = row[Option[Long]]("tablespaces_streamed")
+        pid = row[Option[Int]](prefix + "pid"),
+        phase = row[Option[String]](prefix + "phase"),
+        backupTotal = row[Option[Long]](prefix + "backup_total"),
+        backupStreamed = row[Option[Long]](prefix + "backup_streamed"),
+        tablespacesTotal = row[Option[Long]](prefix + "tablespaces_total"),
+        tablespacesStreamed = row[Option[Long]](prefix + "tablespaces_streamed")
       )
     )
   }

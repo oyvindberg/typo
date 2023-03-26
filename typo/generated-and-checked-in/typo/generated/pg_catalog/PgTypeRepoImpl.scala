@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {
-    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type""".as(PgTypeRow.rowParser.*)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type""".as(PgTypeRow.rowParser("").*)
   }
   override def selectById(oid: PgTypeId)(implicit c: Connection): Option[PgTypeRow] = {
-    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = $oid""".as(PgTypeRow.rowParser.singleOpt)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = $oid""".as(PgTypeRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
-    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid in $oids""".as(PgTypeRow.rowParser.*)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid in $oids""".as(PgTypeRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTypeFieldValue[_]])(implicit c: Connection): List[PgTypeRow] = {
     fieldValues match {
@@ -66,7 +66,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
         val q = s"""select * from pg_catalog.pg_type where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTypeRow.rowParser.*)
+          .as(PgTypeRow.rowParser("").*)
     }
 
   }
@@ -162,7 +162,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_type where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow] = {
-    ???
+  override def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: Long)(implicit c: Connection): Option[PgTypeRow] = {
+    selectByFieldValues(List(PgTypeFieldValue.typname(typname), PgTypeFieldValue.typnamespace(typnamespace))).headOption
   }
 }

@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgForeignTableColumnsRepoImpl extends PgForeignTableColumnsRepo {
   override def selectAll(implicit c: Connection): List[PgForeignTableColumnsRow] = {
-    SQL"""select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns""".as(PgForeignTableColumnsRow.rowParser.*)
+    SQL"""select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns""".as(PgForeignTableColumnsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgForeignTableColumnsFieldValue[_]])(implicit c: Connection): List[PgForeignTableColumnsRow] = {
     fieldValues match {
@@ -32,7 +32,7 @@ object PgForeignTableColumnsRepoImpl extends PgForeignTableColumnsRepo {
         val q = s"""select * from information_schema._pg_foreign_table_columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgForeignTableColumnsRow.rowParser.*)
+          .as(PgForeignTableColumnsRow.rowParser("").*)
     }
 
   }

@@ -19,5 +19,5 @@ trait PgTsDictRepo {
   def updateFieldValues(oid: PgTsDictId, fieldValues: List[PgTsDictFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgTsDictId, unsaved: PgTsDictRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgTsDictId)(implicit c: Connection): Boolean
-  def selectByUnique(dictname: String, dictnamespace: Long)(implicit c: Connection): Option[PgTsDictRow]
+  def selectByUniqueDictnameDictnamespace(dictname: String, dictnamespace: Long)(implicit c: Connection): Option[PgTsDictRow]
 }

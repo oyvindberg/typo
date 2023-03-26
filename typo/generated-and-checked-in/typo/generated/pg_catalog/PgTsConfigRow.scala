@@ -27,14 +27,14 @@ case class PgTsConfigRow(
 )
 
 object PgTsConfigRow {
-  implicit val rowParser: RowParser[PgTsConfigRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsConfigRow] = { row =>
     Success(
       PgTsConfigRow(
-        oid = row[PgTsConfigId]("oid"),
-        cfgname = row[String]("cfgname"),
-        cfgnamespace = row[Long]("cfgnamespace"),
-        cfgowner = row[Long]("cfgowner"),
-        cfgparser = row[Long]("cfgparser")
+        oid = row[PgTsConfigId](prefix + "oid"),
+        cfgname = row[String](prefix + "cfgname"),
+        cfgnamespace = row[Long](prefix + "cfgnamespace"),
+        cfgowner = row[Long](prefix + "cfgowner"),
+        cfgparser = row[Long](prefix + "cfgparser")
       )
     )
   }

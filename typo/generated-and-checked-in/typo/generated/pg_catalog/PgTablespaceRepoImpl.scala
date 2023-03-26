@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def selectAll(implicit c: Connection): List[PgTablespaceRow] = {
-    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace""".as(PgTablespaceRow.rowParser.*)
+    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace""".as(PgTablespaceRow.rowParser("").*)
   }
   override def selectById(oid: PgTablespaceId)(implicit c: Connection): Option[PgTablespaceRow] = {
-    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = $oid""".as(PgTablespaceRow.rowParser.singleOpt)
+    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = $oid""".as(PgTablespaceRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgTablespaceId])(implicit c: Connection): List[PgTablespaceRow] = {
-    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid in $oids""".as(PgTablespaceRow.rowParser.*)
+    SQL"""select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid in $oids""".as(PgTablespaceRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgTablespaceFieldValue[_]])(implicit c: Connection): List[PgTablespaceRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
         val q = s"""select * from pg_catalog.pg_tablespace where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTablespaceRow.rowParser.*)
+          .as(PgTablespaceRow.rowParser("").*)
     }
 
   }
@@ -81,7 +81,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_tablespace where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
-    ???
+  override def selectByUniqueSpcname(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
+    selectByFieldValues(List(PgTablespaceFieldValue.spcname(spcname))).headOption
   }
 }

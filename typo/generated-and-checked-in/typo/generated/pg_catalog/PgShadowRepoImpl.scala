@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgShadowRepoImpl extends PgShadowRepo {
   override def selectAll(implicit c: Connection): List[PgShadowRow] = {
-    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig from pg_catalog.pg_shadow""".as(PgShadowRow.rowParser.*)
+    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig from pg_catalog.pg_shadow""".as(PgShadowRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgShadowFieldValue[_]])(implicit c: Connection): List[PgShadowRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PgShadowRepoImpl extends PgShadowRepo {
         val q = s"""select * from pg_catalog.pg_shadow where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgShadowRow.rowParser.*)
+          .as(PgShadowRow.rowParser("").*)
     }
 
   }

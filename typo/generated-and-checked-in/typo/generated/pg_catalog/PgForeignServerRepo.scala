@@ -19,5 +19,5 @@ trait PgForeignServerRepo {
   def updateFieldValues(oid: PgForeignServerId, fieldValues: List[PgForeignServerFieldValue[_]])(implicit c: Connection): Int
   def insert(oid: PgForeignServerId, unsaved: PgForeignServerRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgForeignServerId)(implicit c: Connection): Boolean
-  def selectByUnique(srvname: String)(implicit c: Connection): Option[PgForeignServerRow]
+  def selectByUniqueSrvname(srvname: String)(implicit c: Connection): Option[PgForeignServerRow]
 }

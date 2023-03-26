@@ -33,20 +33,20 @@ case class PgStatioUserTablesRow(
 )
 
 object PgStatioUserTablesRow {
-  implicit val rowParser: RowParser[PgStatioUserTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatioUserTablesRow] = { row =>
     Success(
       PgStatioUserTablesRow(
-        relid = row[Option[Long]]("relid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        heapBlksRead = row[Option[Long]]("heap_blks_read"),
-        heapBlksHit = row[Option[Long]]("heap_blks_hit"),
-        idxBlksRead = row[Option[Long]]("idx_blks_read"),
-        idxBlksHit = row[Option[Long]]("idx_blks_hit"),
-        toastBlksRead = row[Option[Long]]("toast_blks_read"),
-        toastBlksHit = row[Option[Long]]("toast_blks_hit"),
-        tidxBlksRead = row[Option[Long]]("tidx_blks_read"),
-        tidxBlksHit = row[Option[Long]]("tidx_blks_hit")
+        relid = row[Option[Long]](prefix + "relid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        heapBlksRead = row[Option[Long]](prefix + "heap_blks_read"),
+        heapBlksHit = row[Option[Long]](prefix + "heap_blks_hit"),
+        idxBlksRead = row[Option[Long]](prefix + "idx_blks_read"),
+        idxBlksHit = row[Option[Long]](prefix + "idx_blks_hit"),
+        toastBlksRead = row[Option[Long]](prefix + "toast_blks_read"),
+        toastBlksHit = row[Option[Long]](prefix + "toast_blks_hit"),
+        tidxBlksRead = row[Option[Long]](prefix + "tidx_blks_read"),
+        tidxBlksHit = row[Option[Long]](prefix + "tidx_blks_hit")
       )
     )
   }

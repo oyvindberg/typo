@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
-    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map""".as(PgTsConfigMapRow.rowParser.*)
+    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map""".as(PgTsConfigMapRow.rowParser("").*)
   }
   override def selectById(compositeId: PgTsConfigMapId)(implicit c: Connection): Option[PgTsConfigMapRow] = {
-    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}""".as(PgTsConfigMapRow.rowParser.singleOpt)
+    SQL"""select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}""".as(PgTsConfigMapRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgTsConfigMapFieldValue[_]])(implicit c: Connection): List[PgTsConfigMapRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
         val q = s"""select * from pg_catalog.pg_ts_config_map where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgTsConfigMapRow.rowParser.*)
+          .as(PgTsConfigMapRow.rowParser("").*)
     }
 
   }

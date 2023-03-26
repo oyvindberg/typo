@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace""".as(PgNamespaceRow.rowParser.*)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace""".as(PgNamespaceRow.rowParser("").*)
   }
   override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(PgNamespaceRow.rowParser.singleOpt)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(PgNamespaceRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(PgNamespaceRow.rowParser.*)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(PgNamespaceRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         val q = s"""select * from pg_catalog.pg_namespace where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgNamespaceRow.rowParser.*)
+          .as(PgNamespaceRow.rowParser("").*)
     }
 
   }
@@ -78,7 +78,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_namespace where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
-    ???
+  override def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
+    selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption
   }
 }

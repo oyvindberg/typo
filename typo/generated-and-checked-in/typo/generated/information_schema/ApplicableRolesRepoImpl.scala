@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object ApplicableRolesRepoImpl extends ApplicableRolesRepo {
   override def selectAll(implicit c: Connection): List[ApplicableRolesRow] = {
-    SQL"""select grantee, role_name, is_grantable from information_schema.applicable_roles""".as(ApplicableRolesRow.rowParser.*)
+    SQL"""select grantee, role_name, is_grantable from information_schema.applicable_roles""".as(ApplicableRolesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[ApplicableRolesFieldValue[_]])(implicit c: Connection): List[ApplicableRolesRow] = {
     fieldValues match {
@@ -31,7 +31,7 @@ object ApplicableRolesRepoImpl extends ApplicableRolesRepo {
         val q = s"""select * from information_schema.applicable_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(ApplicableRolesRow.rowParser.*)
+          .as(ApplicableRolesRow.rowParser("").*)
     }
 
   }

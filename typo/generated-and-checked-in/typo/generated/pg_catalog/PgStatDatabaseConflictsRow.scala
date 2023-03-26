@@ -29,16 +29,16 @@ case class PgStatDatabaseConflictsRow(
 )
 
 object PgStatDatabaseConflictsRow {
-  implicit val rowParser: RowParser[PgStatDatabaseConflictsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatDatabaseConflictsRow] = { row =>
     Success(
       PgStatDatabaseConflictsRow(
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        conflTablespace = row[Option[Long]]("confl_tablespace"),
-        conflLock = row[Option[Long]]("confl_lock"),
-        conflSnapshot = row[Option[Long]]("confl_snapshot"),
-        conflBufferpin = row[Option[Long]]("confl_bufferpin"),
-        conflDeadlock = row[Option[Long]]("confl_deadlock")
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        conflTablespace = row[Option[Long]](prefix + "confl_tablespace"),
+        conflLock = row[Option[Long]](prefix + "confl_lock"),
+        conflSnapshot = row[Option[Long]](prefix + "confl_snapshot"),
+        conflBufferpin = row[Option[Long]](prefix + "confl_bufferpin"),
+        conflDeadlock = row[Option[Long]](prefix + "confl_deadlock")
       )
     )
   }

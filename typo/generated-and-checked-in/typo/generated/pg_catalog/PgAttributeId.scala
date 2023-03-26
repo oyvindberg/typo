@@ -39,11 +39,11 @@ object PgAttributeId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgAttributeId] = { row =>
+  def rowParser(prefix: String): RowParser[PgAttributeId] = { row =>
     Success(
       PgAttributeId(
-        attrelid = row[Long]("attrelid"),
-        attnum = row[Int]("attnum")
+        attrelid = row[Long](prefix + "attrelid"),
+        attnum = row[Int](prefix + "attnum")
       )
     )
   }

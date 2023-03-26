@@ -26,13 +26,13 @@ case class PgAvailableExtensionsRow(
 )
 
 object PgAvailableExtensionsRow {
-  implicit val rowParser: RowParser[PgAvailableExtensionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAvailableExtensionsRow] = { row =>
     Success(
       PgAvailableExtensionsRow(
-        name = row[Option[String]]("name"),
-        defaultVersion = row[Option[String]]("default_version"),
-        installedVersion = row[Option[String]]("installed_version"),
-        comment = row[Option[String]]("comment")
+        name = row[Option[String]](prefix + "name"),
+        defaultVersion = row[Option[String]](prefix + "default_version"),
+        installedVersion = row[Option[String]](prefix + "installed_version"),
+        comment = row[Option[String]](prefix + "comment")
       )
     )
   }

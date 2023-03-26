@@ -29,16 +29,16 @@ case class PgDependRow(
 )
 
 object PgDependRow {
-  implicit val rowParser: RowParser[PgDependRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgDependRow] = { row =>
     Success(
       PgDependRow(
-        classid = row[Long]("classid"),
-        objid = row[Long]("objid"),
-        objsubid = row[Int]("objsubid"),
-        refclassid = row[Long]("refclassid"),
-        refobjid = row[Long]("refobjid"),
-        refobjsubid = row[Int]("refobjsubid"),
-        deptype = row[String]("deptype")
+        classid = row[Long](prefix + "classid"),
+        objid = row[Long](prefix + "objid"),
+        objsubid = row[Int](prefix + "objsubid"),
+        refclassid = row[Long](prefix + "refclassid"),
+        refobjid = row[Long](prefix + "refobjid"),
+        refobjsubid = row[Int](prefix + "refobjsubid"),
+        deptype = row[String](prefix + "deptype")
       )
     )
   }

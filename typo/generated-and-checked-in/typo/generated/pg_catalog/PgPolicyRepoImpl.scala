@@ -17,13 +17,13 @@ import java.sql.Connection
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def selectAll(implicit c: Connection): List[PgPolicyRow] = {
-    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy""".as(PgPolicyRow.rowParser.*)
+    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy""".as(PgPolicyRow.rowParser("").*)
   }
   override def selectById(oid: PgPolicyId)(implicit c: Connection): Option[PgPolicyRow] = {
-    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = $oid""".as(PgPolicyRow.rowParser.singleOpt)
+    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = $oid""".as(PgPolicyRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgPolicyId])(implicit c: Connection): List[PgPolicyRow] = {
-    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid in $oids""".as(PgPolicyRow.rowParser.*)
+    SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid in $oids""".as(PgPolicyRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgPolicyFieldValue[_]])(implicit c: Connection): List[PgPolicyRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
         val q = s"""select * from pg_catalog.pg_policy where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgPolicyRow.rowParser.*)
+          .as(PgPolicyRow.rowParser("").*)
     }
 
   }
@@ -90,7 +90,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_policy where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(polrelid: Long, polname: String)(implicit c: Connection): Option[PgPolicyRow] = {
-    ???
+  override def selectByUniquePolrelidPolname(polrelid: Long, polname: String)(implicit c: Connection): Option[PgPolicyRow] = {
+    selectByFieldValues(List(PgPolicyFieldValue.polrelid(polrelid), PgPolicyFieldValue.polname(polname))).headOption
   }
 }

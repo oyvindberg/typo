@@ -28,15 +28,15 @@ case class CollationCharacterSetApplicabilityRow(
 )
 
 object CollationCharacterSetApplicabilityRow {
-  implicit val rowParser: RowParser[CollationCharacterSetApplicabilityRow] = { row =>
+  def rowParser(prefix: String): RowParser[CollationCharacterSetApplicabilityRow] = { row =>
     Success(
       CollationCharacterSetApplicabilityRow(
-        collationCatalog = row[Option[String]]("collation_catalog"),
-        collationSchema = row[Option[String]]("collation_schema"),
-        collationName = row[Option[String]]("collation_name"),
-        characterSetCatalog = row[Option[String]]("character_set_catalog"),
-        characterSetSchema = row[Option[String]]("character_set_schema"),
-        characterSetName = row[Option[String]]("character_set_name")
+        collationCatalog = row[Option[String]](prefix + "collation_catalog"),
+        collationSchema = row[Option[String]](prefix + "collation_schema"),
+        collationName = row[Option[String]](prefix + "collation_name"),
+        characterSetCatalog = row[Option[String]](prefix + "character_set_catalog"),
+        characterSetSchema = row[Option[String]](prefix + "character_set_schema"),
+        characterSetName = row[Option[String]](prefix + "character_set_name")
       )
     )
   }

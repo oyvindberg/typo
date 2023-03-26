@@ -26,13 +26,13 @@ case class PgViewsRow(
 )
 
 object PgViewsRow {
-  implicit val rowParser: RowParser[PgViewsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgViewsRow] = { row =>
     Success(
       PgViewsRow(
-        schemaname = row[Option[String]]("schemaname"),
-        viewname = row[Option[String]]("viewname"),
-        viewowner = row[Option[String]]("viewowner"),
-        definition = row[Option[String]]("definition")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        viewname = row[Option[String]](prefix + "viewname"),
+        viewowner = row[Option[String]](prefix + "viewowner"),
+        definition = row[Option[String]](prefix + "definition")
       )
     )
   }

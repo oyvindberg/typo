@@ -39,11 +39,11 @@ object PgInheritsId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgInheritsId] = { row =>
+  def rowParser(prefix: String): RowParser[PgInheritsId] = { row =>
     Success(
       PgInheritsId(
-        inhrelid = row[Long]("inhrelid"),
-        inhseqno = row[Int]("inhseqno")
+        inhrelid = row[Long](prefix + "inhrelid"),
+        inhseqno = row[Int](prefix + "inhseqno")
       )
     )
   }

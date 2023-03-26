@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatWalReceiverRepoImpl extends PgStatWalReceiverRepo {
   override def selectAll(implicit c: Connection): List[PgStatWalReceiverRow] = {
-    SQL"""select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time, slot_name, sender_host, sender_port, conninfo from pg_catalog.pg_stat_wal_receiver""".as(PgStatWalReceiverRow.rowParser.*)
+    SQL"""select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time, slot_name, sender_host, sender_port, conninfo from pg_catalog.pg_stat_wal_receiver""".as(PgStatWalReceiverRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatWalReceiverFieldValue[_]])(implicit c: Connection): List[PgStatWalReceiverRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PgStatWalReceiverRepoImpl extends PgStatWalReceiverRepo {
         val q = s"""select * from pg_catalog.pg_stat_wal_receiver where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatWalReceiverRow.rowParser.*)
+          .as(PgStatWalReceiverRow.rowParser("").*)
     }
 
   }

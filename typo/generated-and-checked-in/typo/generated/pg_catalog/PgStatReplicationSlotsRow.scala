@@ -33,19 +33,19 @@ case class PgStatReplicationSlotsRow(
 )
 
 object PgStatReplicationSlotsRow {
-  implicit val rowParser: RowParser[PgStatReplicationSlotsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatReplicationSlotsRow] = { row =>
     Success(
       PgStatReplicationSlotsRow(
-        slotName = row[Option[String]]("slot_name"),
-        spillTxns = row[Option[Long]]("spill_txns"),
-        spillCount = row[Option[Long]]("spill_count"),
-        spillBytes = row[Option[Long]]("spill_bytes"),
-        streamTxns = row[Option[Long]]("stream_txns"),
-        streamCount = row[Option[Long]]("stream_count"),
-        streamBytes = row[Option[Long]]("stream_bytes"),
-        totalTxns = row[Option[Long]]("total_txns"),
-        totalBytes = row[Option[Long]]("total_bytes"),
-        statsReset = row[Option[ZonedDateTime]]("stats_reset")
+        slotName = row[Option[String]](prefix + "slot_name"),
+        spillTxns = row[Option[Long]](prefix + "spill_txns"),
+        spillCount = row[Option[Long]](prefix + "spill_count"),
+        spillBytes = row[Option[Long]](prefix + "spill_bytes"),
+        streamTxns = row[Option[Long]](prefix + "stream_txns"),
+        streamCount = row[Option[Long]](prefix + "stream_count"),
+        streamBytes = row[Option[Long]](prefix + "stream_bytes"),
+        totalTxns = row[Option[Long]](prefix + "total_txns"),
+        totalBytes = row[Option[Long]](prefix + "total_bytes"),
+        statsReset = row[Option[ZonedDateTime]](prefix + "stats_reset")
       )
     )
   }

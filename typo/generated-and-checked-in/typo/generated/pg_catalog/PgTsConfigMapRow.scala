@@ -28,13 +28,13 @@ case class PgTsConfigMapRow(
 }
 
 object PgTsConfigMapRow {
-  implicit val rowParser: RowParser[PgTsConfigMapRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsConfigMapRow] = { row =>
     Success(
       PgTsConfigMapRow(
-        mapcfg = row[Long]("mapcfg"),
-        maptokentype = row[Int]("maptokentype"),
-        mapseqno = row[Int]("mapseqno"),
-        mapdict = row[Long]("mapdict")
+        mapcfg = row[Long](prefix + "mapcfg"),
+        maptokentype = row[Int](prefix + "maptokentype"),
+        mapseqno = row[Int](prefix + "mapseqno"),
+        mapdict = row[Long](prefix + "mapdict")
       )
     )
   }

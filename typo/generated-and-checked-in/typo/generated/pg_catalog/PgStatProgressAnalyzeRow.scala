@@ -34,21 +34,21 @@ case class PgStatProgressAnalyzeRow(
 )
 
 object PgStatProgressAnalyzeRow {
-  implicit val rowParser: RowParser[PgStatProgressAnalyzeRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatProgressAnalyzeRow] = { row =>
     Success(
       PgStatProgressAnalyzeRow(
-        pid = row[Option[Int]]("pid"),
-        datid = row[Option[Long]]("datid"),
-        datname = row[Option[String]]("datname"),
-        relid = row[Option[Long]]("relid"),
-        phase = row[Option[String]]("phase"),
-        sampleBlksTotal = row[Option[Long]]("sample_blks_total"),
-        sampleBlksScanned = row[Option[Long]]("sample_blks_scanned"),
-        extStatsTotal = row[Option[Long]]("ext_stats_total"),
-        extStatsComputed = row[Option[Long]]("ext_stats_computed"),
-        childTablesTotal = row[Option[Long]]("child_tables_total"),
-        childTablesDone = row[Option[Long]]("child_tables_done"),
-        currentChildTableRelid = row[Option[Long]]("current_child_table_relid")
+        pid = row[Option[Int]](prefix + "pid"),
+        datid = row[Option[Long]](prefix + "datid"),
+        datname = row[Option[String]](prefix + "datname"),
+        relid = row[Option[Long]](prefix + "relid"),
+        phase = row[Option[String]](prefix + "phase"),
+        sampleBlksTotal = row[Option[Long]](prefix + "sample_blks_total"),
+        sampleBlksScanned = row[Option[Long]](prefix + "sample_blks_scanned"),
+        extStatsTotal = row[Option[Long]](prefix + "ext_stats_total"),
+        extStatsComputed = row[Option[Long]](prefix + "ext_stats_computed"),
+        childTablesTotal = row[Option[Long]](prefix + "child_tables_total"),
+        childTablesDone = row[Option[Long]](prefix + "child_tables_done"),
+        currentChildTableRelid = row[Option[Long]](prefix + "current_child_table_relid")
       )
     )
   }

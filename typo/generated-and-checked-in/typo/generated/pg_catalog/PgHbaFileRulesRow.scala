@@ -31,18 +31,18 @@ case class PgHbaFileRulesRow(
 )
 
 object PgHbaFileRulesRow {
-  implicit val rowParser: RowParser[PgHbaFileRulesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgHbaFileRulesRow] = { row =>
     Success(
       PgHbaFileRulesRow(
-        lineNumber = row[Option[Int]]("line_number"),
-        `type` = row[Option[String]]("type"),
-        database = row[Option[Array[String]]]("database"),
-        userName = row[Option[Array[String]]]("user_name"),
-        address = row[Option[String]]("address"),
-        netmask = row[Option[String]]("netmask"),
-        authMethod = row[Option[String]]("auth_method"),
-        options = row[Option[Array[String]]]("options"),
-        error = row[Option[String]]("error")
+        lineNumber = row[Option[Int]](prefix + "line_number"),
+        `type` = row[Option[String]](prefix + "type"),
+        database = row[Option[Array[String]]](prefix + "database"),
+        userName = row[Option[Array[String]]](prefix + "user_name"),
+        address = row[Option[String]](prefix + "address"),
+        netmask = row[Option[String]](prefix + "netmask"),
+        authMethod = row[Option[String]](prefix + "auth_method"),
+        options = row[Option[Array[String]]](prefix + "options"),
+        error = row[Option[String]](prefix + "error")
       )
     )
   }

@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
   override def selectAll(implicit c: Connection): List[PgSubscriptionRelRow] = {
-    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel""".as(PgSubscriptionRelRow.rowParser.*)
+    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel""".as(PgSubscriptionRelRow.rowParser("").*)
   }
   override def selectById(compositeId: PgSubscriptionRelId)(implicit c: Connection): Option[PgSubscriptionRelRow] = {
-    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}""".as(PgSubscriptionRelRow.rowParser.singleOpt)
+    SQL"""select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid}, srsubid = ${compositeId.srsubid}""".as(PgSubscriptionRelRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgSubscriptionRelFieldValue[_]])(implicit c: Connection): List[PgSubscriptionRelRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
         val q = s"""select * from pg_catalog.pg_subscription_rel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgSubscriptionRelRow.rowParser.*)
+          .as(PgSubscriptionRelRow.rowParser("").*)
     }
 
   }

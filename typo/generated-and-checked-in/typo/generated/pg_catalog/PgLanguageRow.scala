@@ -32,18 +32,18 @@ case class PgLanguageRow(
 )
 
 object PgLanguageRow {
-  implicit val rowParser: RowParser[PgLanguageRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgLanguageRow] = { row =>
     Success(
       PgLanguageRow(
-        oid = row[PgLanguageId]("oid"),
-        lanname = row[String]("lanname"),
-        lanowner = row[Long]("lanowner"),
-        lanispl = row[Boolean]("lanispl"),
-        lanpltrusted = row[Boolean]("lanpltrusted"),
-        lanplcallfoid = row[Long]("lanplcallfoid"),
-        laninline = row[Long]("laninline"),
-        lanvalidator = row[Long]("lanvalidator"),
-        lanacl = row[Option[Array[PGobject]]]("lanacl")
+        oid = row[PgLanguageId](prefix + "oid"),
+        lanname = row[String](prefix + "lanname"),
+        lanowner = row[Long](prefix + "lanowner"),
+        lanispl = row[Boolean](prefix + "lanispl"),
+        lanpltrusted = row[Boolean](prefix + "lanpltrusted"),
+        lanplcallfoid = row[Long](prefix + "lanplcallfoid"),
+        laninline = row[Long](prefix + "laninline"),
+        lanvalidator = row[Long](prefix + "lanvalidator"),
+        lanacl = row[Option[Array[PGobject]]](prefix + "lanacl")
       )
     )
   }

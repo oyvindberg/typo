@@ -30,17 +30,17 @@ case class PgTablesRow(
 )
 
 object PgTablesRow {
-  implicit val rowParser: RowParser[PgTablesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTablesRow] = { row =>
     Success(
       PgTablesRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        tableowner = row[Option[String]]("tableowner"),
-        tablespace = row[Option[String]]("tablespace"),
-        hasindexes = row[Option[Boolean]]("hasindexes"),
-        hasrules = row[Option[Boolean]]("hasrules"),
-        hastriggers = row[Option[Boolean]]("hastriggers"),
-        rowsecurity = row[Option[Boolean]]("rowsecurity")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        tableowner = row[Option[String]](prefix + "tableowner"),
+        tablespace = row[Option[String]](prefix + "tablespace"),
+        hasindexes = row[Option[Boolean]](prefix + "hasindexes"),
+        hasrules = row[Option[Boolean]](prefix + "hasrules"),
+        hastriggers = row[Option[Boolean]](prefix + "hastriggers"),
+        rowsecurity = row[Option[Boolean]](prefix + "rowsecurity")
       )
     )
   }

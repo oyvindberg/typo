@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatAllTablesRepoImpl extends PgStatAllTablesRepo {
   override def selectAll(implicit c: Connection): List[PgStatAllTablesRow] = {
-    SQL"""select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count, analyze_count, autoanalyze_count from pg_catalog.pg_stat_all_tables""".as(PgStatAllTablesRow.rowParser.*)
+    SQL"""select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count, analyze_count, autoanalyze_count from pg_catalog.pg_stat_all_tables""".as(PgStatAllTablesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatAllTablesFieldValue[_]])(implicit c: Connection): List[PgStatAllTablesRow] = {
     fieldValues match {
@@ -51,7 +51,7 @@ object PgStatAllTablesRepoImpl extends PgStatAllTablesRepo {
         val q = s"""select * from pg_catalog.pg_stat_all_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatAllTablesRow.rowParser.*)
+          .as(PgStatAllTablesRow.rowParser("").*)
     }
 
   }

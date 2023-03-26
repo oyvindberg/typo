@@ -28,15 +28,15 @@ case class RoutineRoutineUsageRow(
 )
 
 object RoutineRoutineUsageRow {
-  implicit val rowParser: RowParser[RoutineRoutineUsageRow] = { row =>
+  def rowParser(prefix: String): RowParser[RoutineRoutineUsageRow] = { row =>
     Success(
       RoutineRoutineUsageRow(
-        specificCatalog = row[Option[String]]("specific_catalog"),
-        specificSchema = row[Option[String]]("specific_schema"),
-        specificName = row[Option[String]]("specific_name"),
-        routineCatalog = row[Option[String]]("routine_catalog"),
-        routineSchema = row[Option[String]]("routine_schema"),
-        routineName = row[Option[String]]("routine_name")
+        specificCatalog = row[Option[String]](prefix + "specific_catalog"),
+        specificSchema = row[Option[String]](prefix + "specific_schema"),
+        specificName = row[Option[String]](prefix + "specific_name"),
+        routineCatalog = row[Option[String]](prefix + "routine_catalog"),
+        routineSchema = row[Option[String]](prefix + "routine_schema"),
+        routineName = row[Option[String]](prefix + "routine_name")
       )
     )
   }

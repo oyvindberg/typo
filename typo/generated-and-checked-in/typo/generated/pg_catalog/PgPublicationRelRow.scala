@@ -25,12 +25,12 @@ case class PgPublicationRelRow(
 )
 
 object PgPublicationRelRow {
-  implicit val rowParser: RowParser[PgPublicationRelRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgPublicationRelRow] = { row =>
     Success(
       PgPublicationRelRow(
-        oid = row[PgPublicationRelId]("oid"),
-        prpubid = row[Long]("prpubid"),
-        prrelid = row[Long]("prrelid")
+        oid = row[PgPublicationRelId](prefix + "oid"),
+        prpubid = row[Long](prefix + "prpubid"),
+        prrelid = row[Long](prefix + "prrelid")
       )
     )
   }

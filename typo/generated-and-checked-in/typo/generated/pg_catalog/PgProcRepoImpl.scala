@@ -18,13 +18,13 @@ import org.postgresql.util.PGobject
 
 object PgProcRepoImpl extends PgProcRepo {
   override def selectAll(implicit c: Connection): List[PgProcRow] = {
-    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc""".as(PgProcRow.rowParser.*)
+    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc""".as(PgProcRow.rowParser("").*)
   }
   override def selectById(oid: PgProcId)(implicit c: Connection): Option[PgProcRow] = {
-    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = $oid""".as(PgProcRow.rowParser.singleOpt)
+    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = $oid""".as(PgProcRow.rowParser("").singleOpt)
   }
   override def selectByIds(oids: List[PgProcId])(implicit c: Connection): List[PgProcRow] = {
-    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid in $oids""".as(PgProcRow.rowParser.*)
+    SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid in $oids""".as(PgProcRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgProcFieldValue[_]])(implicit c: Connection): List[PgProcRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object PgProcRepoImpl extends PgProcRepo {
         val q = s"""select * from pg_catalog.pg_proc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgProcRow.rowParser.*)
+          .as(PgProcRow.rowParser("").*)
     }
 
   }
@@ -157,7 +157,7 @@ object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_proc where oid = $oid""".executeUpdate() > 0
   }
-  override def selectByUnique(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
-    ???
+  override def selectByUniquePronameProargtypesPronamespace(proname: String, proargtypes: PGobject, pronamespace: Long)(implicit c: Connection): Option[PgProcRow] = {
+    selectByFieldValues(List(PgProcFieldValue.proname(proname), PgProcFieldValue.proargtypes(proargtypes), PgProcFieldValue.pronamespace(pronamespace))).headOption
   }
 }

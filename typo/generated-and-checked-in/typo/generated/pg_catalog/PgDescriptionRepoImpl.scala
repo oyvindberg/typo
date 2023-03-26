@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description""".as(PgDescriptionRow.rowParser.*)
+    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description""".as(PgDescriptionRow.rowParser("").*)
   }
   override def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(PgDescriptionRow.rowParser.singleOpt)
+    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(PgDescriptionRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgDescriptionFieldValue[_]])(implicit c: Connection): List[PgDescriptionRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
         val q = s"""select * from pg_catalog.pg_description where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgDescriptionRow.rowParser.*)
+          .as(PgDescriptionRow.rowParser("").*)
     }
 
   }

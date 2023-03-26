@@ -27,14 +27,14 @@ case class SqlImplementationInfoRow(
 )
 
 object SqlImplementationInfoRow {
-  implicit val rowParser: RowParser[SqlImplementationInfoRow] = { row =>
+  def rowParser(prefix: String): RowParser[SqlImplementationInfoRow] = { row =>
     Success(
       SqlImplementationInfoRow(
-        implementationInfoId = row[Option[String]]("implementation_info_id"),
-        implementationInfoName = row[Option[String]]("implementation_info_name"),
-        integerValue = row[Option[Int]]("integer_value"),
-        characterValue = row[Option[String]]("character_value"),
-        comments = row[Option[String]]("comments")
+        implementationInfoId = row[Option[String]](prefix + "implementation_info_id"),
+        implementationInfoName = row[Option[String]](prefix + "implementation_info_name"),
+        integerValue = row[Option[Int]](prefix + "integer_value"),
+        characterValue = row[Option[String]](prefix + "character_value"),
+        comments = row[Option[String]](prefix + "comments")
       )
     )
   }

@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgStatXactAllTablesRepoImpl extends PgStatXactAllTablesRepo {
   override def selectAll(implicit c: Connection): List[PgStatXactAllTablesRow] = {
-    SQL"""select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd from pg_catalog.pg_stat_xact_all_tables""".as(PgStatXactAllTablesRow.rowParser.*)
+    SQL"""select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd from pg_catalog.pg_stat_xact_all_tables""".as(PgStatXactAllTablesRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgStatXactAllTablesFieldValue[_]])(implicit c: Connection): List[PgStatXactAllTablesRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PgStatXactAllTablesRepoImpl extends PgStatXactAllTablesRepo {
         val q = s"""select * from pg_catalog.pg_stat_xact_all_tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgStatXactAllTablesRow.rowParser.*)
+          .as(PgStatXactAllTablesRow.rowParser("").*)
     }
 
   }

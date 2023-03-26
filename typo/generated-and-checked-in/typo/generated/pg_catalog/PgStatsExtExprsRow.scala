@@ -39,25 +39,25 @@ case class PgStatsExtExprsRow(
 )
 
 object PgStatsExtExprsRow {
-  implicit val rowParser: RowParser[PgStatsExtExprsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatsExtExprsRow] = { row =>
     Success(
       PgStatsExtExprsRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        statisticsSchemaname = row[Option[String]]("statistics_schemaname"),
-        statisticsName = row[Option[String]]("statistics_name"),
-        statisticsOwner = row[Option[String]]("statistics_owner"),
-        expr = row[Option[String]]("expr"),
-        nullFrac = row[Option[Float]]("null_frac"),
-        avgWidth = row[Option[Int]]("avg_width"),
-        nDistinct = row[Option[Float]]("n_distinct"),
-        mostCommonVals = row[Option[PGobject]]("most_common_vals"),
-        mostCommonFreqs = row[Option[Array[Float]]]("most_common_freqs"),
-        histogramBounds = row[Option[PGobject]]("histogram_bounds"),
-        correlation = row[Option[Float]]("correlation"),
-        mostCommonElems = row[Option[PGobject]]("most_common_elems"),
-        mostCommonElemFreqs = row[Option[Array[Float]]]("most_common_elem_freqs"),
-        elemCountHistogram = row[Option[Array[Float]]]("elem_count_histogram")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        statisticsSchemaname = row[Option[String]](prefix + "statistics_schemaname"),
+        statisticsName = row[Option[String]](prefix + "statistics_name"),
+        statisticsOwner = row[Option[String]](prefix + "statistics_owner"),
+        expr = row[Option[String]](prefix + "expr"),
+        nullFrac = row[Option[Float]](prefix + "null_frac"),
+        avgWidth = row[Option[Int]](prefix + "avg_width"),
+        nDistinct = row[Option[Float]](prefix + "n_distinct"),
+        mostCommonVals = row[Option[PGobject]](prefix + "most_common_vals"),
+        mostCommonFreqs = row[Option[Array[Float]]](prefix + "most_common_freqs"),
+        histogramBounds = row[Option[PGobject]](prefix + "histogram_bounds"),
+        correlation = row[Option[Float]](prefix + "correlation"),
+        mostCommonElems = row[Option[PGobject]](prefix + "most_common_elems"),
+        mostCommonElemFreqs = row[Option[Array[Float]]](prefix + "most_common_elem_freqs"),
+        elemCountHistogram = row[Option[Array[Float]]](prefix + "elem_count_histogram")
       )
     )
   }

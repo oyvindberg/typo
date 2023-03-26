@@ -28,14 +28,14 @@ case class PgTablespaceRow(
 )
 
 object PgTablespaceRow {
-  implicit val rowParser: RowParser[PgTablespaceRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgTablespaceRow] = { row =>
     Success(
       PgTablespaceRow(
-        oid = row[PgTablespaceId]("oid"),
-        spcname = row[String]("spcname"),
-        spcowner = row[Long]("spcowner"),
-        spcacl = row[Option[Array[PGobject]]]("spcacl"),
-        spcoptions = row[Option[Array[String]]]("spcoptions")
+        oid = row[PgTablespaceId](prefix + "oid"),
+        spcname = row[String](prefix + "spcname"),
+        spcowner = row[Long](prefix + "spcowner"),
+        spcacl = row[Option[Array[PGobject]]](prefix + "spcacl"),
+        spcoptions = row[Option[Array[String]]](prefix + "spcoptions")
       )
     )
   }

@@ -21,5 +21,5 @@ object PgPartitionedTableId {
   implicit val format: Format[PgPartitionedTableId] = implicitly[Format[Long]].bimap(PgPartitionedTableId.apply, _.value)
   implicit val toStatement: ToStatement[PgPartitionedTableId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[PgPartitionedTableId] = implicitly[Column[Long]].map(PgPartitionedTableId.apply)
-  implicit val rowParser: RowParser[PgPartitionedTableId] = SqlParser.get[PgPartitionedTableId]("partrelid")
+  def rowParser(prefix: String): RowParser[PgPartitionedTableId] = SqlParser.get[PgPartitionedTableId](prefix + "partrelid")
 }

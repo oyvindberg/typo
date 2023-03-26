@@ -31,17 +31,17 @@ case class PgConversionRow(
 )
 
 object PgConversionRow {
-  implicit val rowParser: RowParser[PgConversionRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgConversionRow] = { row =>
     Success(
       PgConversionRow(
-        oid = row[PgConversionId]("oid"),
-        conname = row[String]("conname"),
-        connamespace = row[Long]("connamespace"),
-        conowner = row[Long]("conowner"),
-        conforencoding = row[Int]("conforencoding"),
-        contoencoding = row[Int]("contoencoding"),
-        conproc = row[PGobject]("conproc"),
-        condefault = row[Boolean]("condefault")
+        oid = row[PgConversionId](prefix + "oid"),
+        conname = row[String](prefix + "conname"),
+        connamespace = row[Long](prefix + "connamespace"),
+        conowner = row[Long](prefix + "conowner"),
+        conforencoding = row[Int](prefix + "conforencoding"),
+        contoencoding = row[Int](prefix + "contoencoding"),
+        conproc = row[PGobject](prefix + "conproc"),
+        condefault = row[Boolean](prefix + "condefault")
       )
     )
   }

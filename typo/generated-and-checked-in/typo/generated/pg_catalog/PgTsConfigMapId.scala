@@ -41,12 +41,12 @@ object PgTsConfigMapId {
       )
     }
   }
-  implicit val rowParser: RowParser[PgTsConfigMapId] = { row =>
+  def rowParser(prefix: String): RowParser[PgTsConfigMapId] = { row =>
     Success(
       PgTsConfigMapId(
-        mapcfg = row[Long]("mapcfg"),
-        maptokentype = row[Int]("maptokentype"),
-        mapseqno = row[Int]("mapseqno")
+        mapcfg = row[Long](prefix + "mapcfg"),
+        maptokentype = row[Int](prefix + "maptokentype"),
+        mapseqno = row[Int](prefix + "mapseqno")
       )
     )
   }

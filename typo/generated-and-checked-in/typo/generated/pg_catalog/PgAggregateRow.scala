@@ -45,31 +45,31 @@ case class PgAggregateRow(
 )
 
 object PgAggregateRow {
-  implicit val rowParser: RowParser[PgAggregateRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgAggregateRow] = { row =>
     Success(
       PgAggregateRow(
-        aggfnoid = row[PgAggregateId]("aggfnoid"),
-        aggkind = row[String]("aggkind"),
-        aggnumdirectargs = row[Int]("aggnumdirectargs"),
-        aggtransfn = row[PGobject]("aggtransfn"),
-        aggfinalfn = row[PGobject]("aggfinalfn"),
-        aggcombinefn = row[PGobject]("aggcombinefn"),
-        aggserialfn = row[PGobject]("aggserialfn"),
-        aggdeserialfn = row[PGobject]("aggdeserialfn"),
-        aggmtransfn = row[PGobject]("aggmtransfn"),
-        aggminvtransfn = row[PGobject]("aggminvtransfn"),
-        aggmfinalfn = row[PGobject]("aggmfinalfn"),
-        aggfinalextra = row[Boolean]("aggfinalextra"),
-        aggmfinalextra = row[Boolean]("aggmfinalextra"),
-        aggfinalmodify = row[String]("aggfinalmodify"),
-        aggmfinalmodify = row[String]("aggmfinalmodify"),
-        aggsortop = row[Long]("aggsortop"),
-        aggtranstype = row[Long]("aggtranstype"),
-        aggtransspace = row[Int]("aggtransspace"),
-        aggmtranstype = row[Long]("aggmtranstype"),
-        aggmtransspace = row[Int]("aggmtransspace"),
-        agginitval = row[Option[String]]("agginitval"),
-        aggminitval = row[Option[String]]("aggminitval")
+        aggfnoid = row[PgAggregateId](prefix + "aggfnoid"),
+        aggkind = row[String](prefix + "aggkind"),
+        aggnumdirectargs = row[Int](prefix + "aggnumdirectargs"),
+        aggtransfn = row[PGobject](prefix + "aggtransfn"),
+        aggfinalfn = row[PGobject](prefix + "aggfinalfn"),
+        aggcombinefn = row[PGobject](prefix + "aggcombinefn"),
+        aggserialfn = row[PGobject](prefix + "aggserialfn"),
+        aggdeserialfn = row[PGobject](prefix + "aggdeserialfn"),
+        aggmtransfn = row[PGobject](prefix + "aggmtransfn"),
+        aggminvtransfn = row[PGobject](prefix + "aggminvtransfn"),
+        aggmfinalfn = row[PGobject](prefix + "aggmfinalfn"),
+        aggfinalextra = row[Boolean](prefix + "aggfinalextra"),
+        aggmfinalextra = row[Boolean](prefix + "aggmfinalextra"),
+        aggfinalmodify = row[String](prefix + "aggfinalmodify"),
+        aggmfinalmodify = row[String](prefix + "aggmfinalmodify"),
+        aggsortop = row[Long](prefix + "aggsortop"),
+        aggtranstype = row[Long](prefix + "aggtranstype"),
+        aggtransspace = row[Int](prefix + "aggtransspace"),
+        aggmtranstype = row[Long](prefix + "aggmtranstype"),
+        aggmtransspace = row[Int](prefix + "aggmtransspace"),
+        agginitval = row[Option[String]](prefix + "agginitval"),
+        aggminitval = row[Option[String]](prefix + "aggminitval")
       )
     )
   }

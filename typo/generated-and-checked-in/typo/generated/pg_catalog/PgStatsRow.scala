@@ -37,23 +37,23 @@ case class PgStatsRow(
 )
 
 object PgStatsRow {
-  implicit val rowParser: RowParser[PgStatsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatsRow] = { row =>
     Success(
       PgStatsRow(
-        schemaname = row[Option[String]]("schemaname"),
-        tablename = row[Option[String]]("tablename"),
-        attname = row[Option[String]]("attname"),
-        inherited = row[Option[Boolean]]("inherited"),
-        nullFrac = row[Option[Float]]("null_frac"),
-        avgWidth = row[Option[Int]]("avg_width"),
-        nDistinct = row[Option[Float]]("n_distinct"),
-        mostCommonVals = row[Option[PGobject]]("most_common_vals"),
-        mostCommonFreqs = row[Option[Array[Float]]]("most_common_freqs"),
-        histogramBounds = row[Option[PGobject]]("histogram_bounds"),
-        correlation = row[Option[Float]]("correlation"),
-        mostCommonElems = row[Option[PGobject]]("most_common_elems"),
-        mostCommonElemFreqs = row[Option[Array[Float]]]("most_common_elem_freqs"),
-        elemCountHistogram = row[Option[Array[Float]]]("elem_count_histogram")
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        tablename = row[Option[String]](prefix + "tablename"),
+        attname = row[Option[String]](prefix + "attname"),
+        inherited = row[Option[Boolean]](prefix + "inherited"),
+        nullFrac = row[Option[Float]](prefix + "null_frac"),
+        avgWidth = row[Option[Int]](prefix + "avg_width"),
+        nDistinct = row[Option[Float]](prefix + "n_distinct"),
+        mostCommonVals = row[Option[PGobject]](prefix + "most_common_vals"),
+        mostCommonFreqs = row[Option[Array[Float]]](prefix + "most_common_freqs"),
+        histogramBounds = row[Option[PGobject]](prefix + "histogram_bounds"),
+        correlation = row[Option[Float]](prefix + "correlation"),
+        mostCommonElems = row[Option[PGobject]](prefix + "most_common_elems"),
+        mostCommonElemFreqs = row[Option[Array[Float]]](prefix + "most_common_elem_freqs"),
+        elemCountHistogram = row[Option[Array[Float]]](prefix + "elem_count_histogram")
       )
     )
   }

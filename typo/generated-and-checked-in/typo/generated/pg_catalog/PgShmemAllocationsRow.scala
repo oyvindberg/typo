@@ -26,13 +26,13 @@ case class PgShmemAllocationsRow(
 )
 
 object PgShmemAllocationsRow {
-  implicit val rowParser: RowParser[PgShmemAllocationsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgShmemAllocationsRow] = { row =>
     Success(
       PgShmemAllocationsRow(
-        name = row[Option[String]]("name"),
-        off = row[Option[Long]]("off"),
-        size = row[Option[Long]]("size"),
-        allocatedSize = row[Option[Long]]("allocated_size")
+        name = row[Option[String]](prefix + "name"),
+        off = row[Option[Long]](prefix + "off"),
+        size = row[Option[Long]](prefix + "size"),
+        allocatedSize = row[Option[Long]](prefix + "allocated_size")
       )
     )
   }

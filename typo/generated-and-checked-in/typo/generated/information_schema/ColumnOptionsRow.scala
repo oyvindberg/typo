@@ -28,15 +28,15 @@ case class ColumnOptionsRow(
 )
 
 object ColumnOptionsRow {
-  implicit val rowParser: RowParser[ColumnOptionsRow] = { row =>
+  def rowParser(prefix: String): RowParser[ColumnOptionsRow] = { row =>
     Success(
       ColumnOptionsRow(
-        tableCatalog = row[Option[String]]("table_catalog"),
-        tableSchema = row[Option[String]]("table_schema"),
-        tableName = row[Option[String]]("table_name"),
-        columnName = row[Option[String]]("column_name"),
-        optionName = row[Option[String]]("option_name"),
-        optionValue = row[Option[String]]("option_value")
+        tableCatalog = row[Option[String]](prefix + "table_catalog"),
+        tableSchema = row[Option[String]](prefix + "table_schema"),
+        tableName = row[Option[String]](prefix + "table_name"),
+        columnName = row[Option[String]](prefix + "column_name"),
+        optionName = row[Option[String]](prefix + "option_name"),
+        optionValue = row[Option[String]](prefix + "option_value")
       )
     )
   }

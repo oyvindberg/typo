@@ -29,15 +29,15 @@ case class PgCursorsRow(
 )
 
 object PgCursorsRow {
-  implicit val rowParser: RowParser[PgCursorsRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgCursorsRow] = { row =>
     Success(
       PgCursorsRow(
-        name = row[Option[String]]("name"),
-        statement = row[Option[String]]("statement"),
-        isHoldable = row[Option[Boolean]]("is_holdable"),
-        isBinary = row[Option[Boolean]]("is_binary"),
-        isScrollable = row[Option[Boolean]]("is_scrollable"),
-        creationTime = row[Option[ZonedDateTime]]("creation_time")
+        name = row[Option[String]](prefix + "name"),
+        statement = row[Option[String]](prefix + "statement"),
+        isHoldable = row[Option[Boolean]](prefix + "is_holdable"),
+        isBinary = row[Option[Boolean]](prefix + "is_binary"),
+        isScrollable = row[Option[Boolean]](prefix + "is_scrollable"),
+        creationTime = row[Option[ZonedDateTime]](prefix + "creation_time")
       )
     )
   }

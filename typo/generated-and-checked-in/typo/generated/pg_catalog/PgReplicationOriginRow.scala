@@ -24,11 +24,11 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  implicit val rowParser: RowParser[PgReplicationOriginRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgReplicationOriginRow] = { row =>
     Success(
       PgReplicationOriginRow(
-        roident = row[PgReplicationOriginId]("roident"),
-        roname = row[String]("roname")
+        roident = row[PgReplicationOriginId](prefix + "roident"),
+        roname = row[String](prefix + "roname")
       )
     )
   }

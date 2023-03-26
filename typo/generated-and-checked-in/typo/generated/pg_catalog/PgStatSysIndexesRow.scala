@@ -30,17 +30,17 @@ case class PgStatSysIndexesRow(
 )
 
 object PgStatSysIndexesRow {
-  implicit val rowParser: RowParser[PgStatSysIndexesRow] = { row =>
+  def rowParser(prefix: String): RowParser[PgStatSysIndexesRow] = { row =>
     Success(
       PgStatSysIndexesRow(
-        relid = row[Option[Long]]("relid"),
-        indexrelid = row[Option[Long]]("indexrelid"),
-        schemaname = row[Option[String]]("schemaname"),
-        relname = row[Option[String]]("relname"),
-        indexrelname = row[Option[String]]("indexrelname"),
-        idxScan = row[Option[Long]]("idx_scan"),
-        idxTupRead = row[Option[Long]]("idx_tup_read"),
-        idxTupFetch = row[Option[Long]]("idx_tup_fetch")
+        relid = row[Option[Long]](prefix + "relid"),
+        indexrelid = row[Option[Long]](prefix + "indexrelid"),
+        schemaname = row[Option[String]](prefix + "schemaname"),
+        relname = row[Option[String]](prefix + "relname"),
+        indexrelname = row[Option[String]](prefix + "indexrelname"),
+        idxScan = row[Option[Long]](prefix + "idx_scan"),
+        idxTupRead = row[Option[Long]](prefix + "idx_tup_read"),
+        idxTupFetch = row[Option[Long]](prefix + "idx_tup_fetch")
       )
     )
   }

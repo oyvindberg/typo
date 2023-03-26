@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PgMatviewsRepoImpl extends PgMatviewsRepo {
   override def selectAll(implicit c: Connection): List[PgMatviewsRow] = {
-    SQL"""select schemaname, matviewname, matviewowner, tablespace, hasindexes, ispopulated, definition from pg_catalog.pg_matviews""".as(PgMatviewsRow.rowParser.*)
+    SQL"""select schemaname, matviewname, matviewowner, tablespace, hasindexes, ispopulated, definition from pg_catalog.pg_matviews""".as(PgMatviewsRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[PgMatviewsFieldValue[_]])(implicit c: Connection): List[PgMatviewsRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgMatviewsRepoImpl extends PgMatviewsRepo {
         val q = s"""select * from pg_catalog.pg_matviews where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgMatviewsRow.rowParser.*)
+          .as(PgMatviewsRow.rowParser("").*)
     }
 
   }

@@ -26,13 +26,13 @@ case class SqlSizingRow(
 )
 
 object SqlSizingRow {
-  implicit val rowParser: RowParser[SqlSizingRow] = { row =>
+  def rowParser(prefix: String): RowParser[SqlSizingRow] = { row =>
     Success(
       SqlSizingRow(
-        sizingId = row[Option[Int]]("sizing_id"),
-        sizingName = row[Option[String]]("sizing_name"),
-        supportedValue = row[Option[Int]]("supported_value"),
-        comments = row[Option[String]]("comments")
+        sizingId = row[Option[Int]](prefix + "sizing_id"),
+        sizingName = row[Option[String]](prefix + "sizing_name"),
+        supportedValue = row[Option[Int]](prefix + "supported_value"),
+        comments = row[Option[String]](prefix + "comments")
       )
     )
   }

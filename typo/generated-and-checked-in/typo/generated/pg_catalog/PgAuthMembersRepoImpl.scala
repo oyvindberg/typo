@@ -17,10 +17,10 @@ import java.sql.Connection
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def selectAll(implicit c: Connection): List[PgAuthMembersRow] = {
-    SQL"""select roleid, member, grantor, admin_option from pg_catalog.pg_auth_members""".as(PgAuthMembersRow.rowParser.*)
+    SQL"""select roleid, member, grantor, admin_option from pg_catalog.pg_auth_members""".as(PgAuthMembersRow.rowParser("").*)
   }
   override def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow] = {
-    SQL"""select roleid, member, grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid}, member = ${compositeId.member}""".as(PgAuthMembersRow.rowParser.singleOpt)
+    SQL"""select roleid, member, grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid}, member = ${compositeId.member}""".as(PgAuthMembersRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgAuthMembersFieldValue[_]])(implicit c: Connection): List[PgAuthMembersRow] = {
     fieldValues match {
@@ -35,7 +35,7 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
         val q = s"""select * from pg_catalog.pg_auth_members where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAuthMembersRow.rowParser.*)
+          .as(PgAuthMembersRow.rowParser("").*)
     }
 
   }
@@ -74,7 +74,7 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid}, member = ${compositeId.member}""".executeUpdate() > 0
   }
-  override def selectByUnique(member: Long, roleid: Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
-    ???
+  override def selectByUniqueMemberRoleid(member: Long, roleid: Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
+    selectByFieldValues(List(PgAuthMembersFieldValue.member(member), PgAuthMembersFieldValue.roleid(roleid))).headOption
   }
 }
