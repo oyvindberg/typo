@@ -30,9 +30,14 @@ object Load {
                 jsonDescription = Json.toJson(col),
                 nullability = col.isNullable.toNullability
               )
-
             }
-            val sqlFile = SqlScript(relativePath, content, analyzed.params, cols)
+
+            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+              analyzed.columns.flatMap { col =>
+                col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)
+              }.toMap
+
+            val sqlFile = SqlScript(relativePath, content, analyzed.params, cols, deps)
             found += sqlFile
           }
           FileVisitResult.CONTINUE

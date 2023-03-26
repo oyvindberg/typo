@@ -13,13 +13,7 @@ case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript) {
     script.cols.map { dbCol =>
       val finalType: sc.Type = typeMapper.scalaType(pkg0, dbCol)
 
-      val pointsTo: Option[(db.RelationName, db.ColName)] = None
-      //        (col.baseColumnName, col.baseRelationName) match {
-      //        case (Some(colName), Some(relationName)) if relationName != view.name =>
-      //          Some((relationName, colName))
-      //        case _ =>
-      //          None
-      //      }
+      val pointsTo: Option[(db.RelationName, db.ColName)] = script.dependencies.get(dbCol.name)
       dbCol -> ColumnComputed(pointsTo, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
   }
@@ -32,7 +26,7 @@ case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript) {
 
   val repoMethods: List[RepoMethod] = {
     List(
-      RepoMethod.SqlScript(this),
+      RepoMethod.SqlScript(this)
     )
   }
 }

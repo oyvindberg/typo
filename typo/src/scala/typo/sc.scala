@@ -124,7 +124,7 @@ object sc {
         Some,
         String,
         StringContext,
-        Unit,
+        Unit
       )
         .map(x => (x.value.name, x.value))
         .toMap

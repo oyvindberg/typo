@@ -29,7 +29,7 @@ case class RelationFiles(relation: RelationComputed, options: Options) {
 
       col.pointsTo match {
         case Some((relationName, columnName)) =>
-          val row = names.titleCase(relation.pkg, relationName, "Row")
+          val row = names.titleCase(options.pkg, relationName, "Row")
           code"""/** Points to [[$row.${names.field(columnName)}]] */
                 |  ${col.param}$originComment""".stripMargin
         case None => code"${col.param.code}$originComment"
