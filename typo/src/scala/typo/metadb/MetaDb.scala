@@ -3,6 +3,7 @@ package metadb
 
 import play.api.libs.json.Json
 import typo.generated.information_schema._
+import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow}
 
 import java.sql.Connection
 
@@ -20,7 +21,7 @@ object MetaDb {
       pgEnums: List[PgEnum.Row],
       tablesRows: List[TablesRow],
       columnsRows: List[ColumnsRow],
-      viewRows: List[ViewRow]
+      viewRows: List[FindAllViewsRow]
   )
 
   object Input {
@@ -32,15 +33,15 @@ object MetaDb {
         pgEnums = PgEnum.all,
         tablesRows = TablesRepoImpl.selectAll,
         columnsRows = ColumnsRepoImpl.selectAll,
-        viewRows = ViewsRepo.all
+        viewRows = FindAllViewsRepoImpl()
       )
     }
   }
 
   def apply(input: Input, selector: Selector): MetaDb = {
 
-    val groupedViewRows: Map[db.RelationName, ViewRow] =
-      input.viewRows.map { view => (db.RelationName(Some(view.table_schema), view.table_name), view) }.toMap
+    val groupedViewRows: Map[db.RelationName, FindAllViewsRow] =
+      input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
 
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
@@ -77,7 +78,7 @@ object MetaDb {
 
         groupedViewRows.get(relationName) match {
           case Some(view) =>
-            db.View(relationName, mappedCols, view.view_definition, isMaterialized = view.relkind == "m")
+            db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m")
           case None =>
             db.Table(
               name = relationName,
