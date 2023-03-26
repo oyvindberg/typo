@@ -1,9 +1,8 @@
 package typo
 package sqlscripts
 
-/**
- * Analyzed from postgres metadata for prepared statements through jdbc
- */
+/** Analyzed from postgres metadata for prepared statements through jdbc
+  */
 case class MetadataParameterColumn(
     isNullable: ParameterNullable,
     isSigned: Boolean,

@@ -1,7 +1,7 @@
 package typo
 
+import typo.codegen._
 import typo.metadb.MetaDb
-import typo.sc.syntax._
 import typo.sqlscripts.SqlScript
 
 import java.nio.file.Path
@@ -24,7 +24,7 @@ object Gen {
     val default: DefaultComputed =
       DefaultComputed(options.pkg)
     val enumFiles: List[sc.File] =
-      metaDb.enums.map(stringEnumClass(options))
+      metaDb.enums.map(StringEnumFile.stringEnumClass(options))
     val tableFiles: List[sc.File] =
       metaDb.tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all)
     val viewFiles: List[sc.File] =
@@ -41,51 +41,9 @@ object Gen {
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.
     // this should be a stop-gap solution anyway
-    val pkgObject = List(packageObject(options))
+    val pkgObject = List(PackageObjectFile.packageObject(options))
 
     val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
     allFiles.map { file => file.copy(contents = options.header ++ file.contents) }
-  }
-
-  def stringEnumClass(options: Options)(`enum`: db.StringEnum): sc.File = {
-    val qident = names.EnumName(options.pkg, `enum`.name)
-    val EnumType = sc.Type.Qualified(qident)
-
-    val members = `enum`.values.map { value =>
-      val name = names.enumValue(value)
-      name -> code"case object $name extends ${qident.name}(${sc.StrLit(value)})"
-    }
-    val ByName = sc.Ident("ByName")
-    val str =
-      code"""sealed abstract class ${qident.name}(val value: ${sc.Type.String})
-            |object ${qident.name} {
-            |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
-            |
-            |  val All: ${sc.Type.List.of(EnumType)} = ${sc.Type.List}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
-            |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
-            |  val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
-            |
-            |  ${options.dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
-            |  ${options.jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
-            |}
-            |""".stripMargin
-
-    sc.File(EnumType, str)
-  }
-
-  def packageObject(options: Options): sc.File = {
-    val parentPkg = options.pkg.idents.dropRight(1)
-    val content =
-      code"""|package ${parentPkg.map(_.code).mkCode(".")}
-             |
-             |package object ${options.pkg.name} {
-             |  ${options.dbLib.missingInstances.mkCode("\n  ")}
-             |  ${options.jsonLib.missingInstances.mkCode("\n  ")}
-             |  implicit val pgObjectOrdering: ${sc.Type.Ordering.of(sc.Type.PGobject)} =
-             |    ${sc.Type.Ordering}.by(x => (x.getType, x.getValue))
-             |}
-             |""".stripMargin
-
-    sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content)
   }
 }

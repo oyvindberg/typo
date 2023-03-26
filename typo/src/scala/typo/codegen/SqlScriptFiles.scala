@@ -1,4 +1,5 @@
 package typo
+package codegen
 
 case class SqlScriptFiles(script: SqlScriptComputed, options: Options) {
   val relation = RelationFiles(script.relation, options)

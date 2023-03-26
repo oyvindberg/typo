@@ -1,4 +1,6 @@
-package typo
+package typo.codegen
+
+import typo._
 
 case class ViewComputed(pkg: sc.QIdent, view: db.View) {
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
@@ -36,4 +38,3 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View) {
     )
   }
 }
-

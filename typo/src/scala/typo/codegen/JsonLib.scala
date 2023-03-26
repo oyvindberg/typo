@@ -1,4 +1,5 @@
 package typo
+package codegen
 
 trait JsonLib {
   def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code]
@@ -7,6 +8,7 @@ trait JsonLib {
   def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code]
   def missingInstances: List[sc.Code]
 }
+
 object JsonLib {
   object None extends JsonLib {
     def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code] = Nil

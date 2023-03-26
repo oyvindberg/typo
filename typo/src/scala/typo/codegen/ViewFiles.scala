@@ -1,4 +1,5 @@
 package typo
+package codegen
 
 case class ViewFiles(view: ViewComputed, options: Options) {
   val relation = RelationFiles(view.relation, options)

@@ -10,8 +10,8 @@ import java.sql.ResultSetMetaData
 sealed abstract class ColumnNullable(val toInt: Int) extends Product with Serializable {
   def toNullability: Nullability =
     this match {
-      case ColumnNullable.NoNulls => Nullability.NoNulls
-      case ColumnNullable.Nullable => Nullability.Nullable
+      case ColumnNullable.NoNulls         => Nullability.NoNulls
+      case ColumnNullable.Nullable        => Nullability.Nullable
       case ColumnNullable.NullableUnknown => Nullability.NullableUnknown
     }
 }

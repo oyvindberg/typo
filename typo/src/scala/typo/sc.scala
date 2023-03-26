@@ -158,8 +158,8 @@ object sc {
     implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
     implicit val str: ToCode[String] = Code.Str.apply
     implicit val code: ToCode[Code] = identity
-    implicit val tableName: ToCode[db.RelationName] = {
-      case db.RelationName(schema, name) => Code.Str(s"${schema.map(_ + ".").getOrElse("")}$name")
+    implicit val tableName: ToCode[db.RelationName] = { case db.RelationName(schema, name) =>
+      Code.Str(s"${schema.map(_ + ".").getOrElse("")}$name")
     }
   }
 

@@ -3,9 +3,8 @@ package sqlscripts
 
 import play.api.libs.json.{Json, Writes}
 
-/**
- * Analyzed from postgres metadata for prepared statements through jdbc
- */
+/** Analyzed from postgres metadata for prepared statements through jdbc
+  */
 case class MetadataColumn(
     baseColumnName: Option[db.ColName],
     baseRelationName: Option[db.RelationName],

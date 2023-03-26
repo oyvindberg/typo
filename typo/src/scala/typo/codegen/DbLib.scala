@@ -1,4 +1,5 @@
 package typo
+package codegen
 
 trait DbLib {
   def repoSig(repoMethod: RepoMethod): sc.Code

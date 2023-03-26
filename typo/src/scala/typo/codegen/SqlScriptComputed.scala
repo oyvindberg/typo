@@ -1,6 +1,7 @@
-package typo
+package typo.codegen
 
 import typo.sqlscripts.SqlScript
+import typo._
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -14,12 +15,12 @@ case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript) {
       val finalType: sc.Type = typeMapper.scalaType(pkg0, dbCol)
 
       val pointsTo: Option[(db.RelationName, db.ColName)] = None
-//        (col.baseColumnName, col.baseRelationName) match {
-//        case (Some(colName), Some(relationName)) if relationName != view.name =>
-//          Some((relationName, colName))
-//        case _ =>
-//          None
-//      }
+      //        (col.baseColumnName, col.baseRelationName) match {
+      //        case (Some(colName), Some(relationName)) if relationName != view.name =>
+      //          Some((relationName, colName))
+      //        case _ =>
+      //          None
+      //      }
       dbCol -> ColumnComputed(pointsTo, names.field(dbCol.name), finalType, dbCol.name, dbCol.hasDefault, dbCol.jsonDescription)
     }
   }
