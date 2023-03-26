@@ -101,9 +101,31 @@ object sc {
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, QIdent] =
-      // format: off
-      Set(Any, AnyVal, Float, Array, Short, Byte, Double, Ordering, Unit, Int, Long, String, Boolean, Option, List, Map, None, Some, Either, Left, Right, StringContext)
-        // format: on
+      Set(
+        Any,
+        AnyVal,
+        Array,
+        BigDecimal,
+        Boolean,
+        Byte,
+        Double,
+        Either,
+        Float,
+        Int,
+        Left,
+        List,
+        Long,
+        Map,
+        None,
+        Option,
+        Ordering,
+        Right,
+        Short,
+        Some,
+        String,
+        StringContext,
+        Unit,
+      )
         .map(x => (x.value.name, x.value))
         .toMap
 

@@ -8,7 +8,6 @@ package postgres
 package pg_catalog
 
 import java.time.ZonedDateTime
-import scala.math.BigDecimal
 
 sealed abstract class PgStatWalFieldValue[T](val name: String, val value: T)
 

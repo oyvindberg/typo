@@ -14,7 +14,6 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import scala.math.BigDecimal
 import scala.util.Try
 
 case class PgStatSslRow(

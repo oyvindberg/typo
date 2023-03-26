@@ -19,8 +19,8 @@ import scala.util.Try
 case class PgReplicationOriginStatusRow(
   localId: Option[/* oid */ Long],
   externalId: Option[String],
-  remoteLsn: Option[String],
-  localLsn: Option[String]
+  remoteLsn: Option[/* pg_lsn */ Long],
+  localLsn: Option[/* pg_lsn */ Long]
 )
 
 object PgReplicationOriginStatusRow {
@@ -29,8 +29,8 @@ object PgReplicationOriginStatusRow {
       PgReplicationOriginStatusRow(
         localId = row[Option[/* oid */ Long]](prefix + "local_id"),
         externalId = row[Option[String]](prefix + "external_id"),
-        remoteLsn = row[Option[String]](prefix + "remote_lsn"),
-        localLsn = row[Option[String]](prefix + "local_lsn")
+        remoteLsn = row[Option[/* pg_lsn */ Long]](prefix + "remote_lsn"),
+        localLsn = row[Option[/* pg_lsn */ Long]](prefix + "local_lsn")
       )
     )
   }
@@ -50,8 +50,8 @@ object PgReplicationOriginStatusRow {
           PgReplicationOriginStatusRow(
             localId = json.\("local_id").toOption.map(_.as[/* oid */ Long]),
             externalId = json.\("external_id").toOption.map(_.as[String]),
-            remoteLsn = json.\("remote_lsn").toOption.map(_.as[String]),
-            localLsn = json.\("local_lsn").toOption.map(_.as[String])
+            remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+            localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ Long])
           )
         )
       )

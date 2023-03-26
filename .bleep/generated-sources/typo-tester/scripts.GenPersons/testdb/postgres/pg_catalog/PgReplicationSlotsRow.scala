@@ -28,8 +28,8 @@ case class PgReplicationSlotsRow(
   activePid: Option[Int],
   xmin: Option[/* xid */ PGobject],
   catalogXmin: Option[/* xid */ PGobject],
-  restartLsn: Option[String],
-  confirmedFlushLsn: Option[String],
+  restartLsn: Option[/* pg_lsn */ Long],
+  confirmedFlushLsn: Option[/* pg_lsn */ Long],
   walStatus: Option[String],
   safeWalSize: Option[Long],
   twoPhase: Option[Boolean]
@@ -49,8 +49,8 @@ object PgReplicationSlotsRow {
         activePid = row[Option[Int]](prefix + "active_pid"),
         xmin = row[Option[/* xid */ PGobject]](prefix + "xmin"),
         catalogXmin = row[Option[/* xid */ PGobject]](prefix + "catalog_xmin"),
-        restartLsn = row[Option[String]](prefix + "restart_lsn"),
-        confirmedFlushLsn = row[Option[String]](prefix + "confirmed_flush_lsn"),
+        restartLsn = row[Option[/* pg_lsn */ Long]](prefix + "restart_lsn"),
+        confirmedFlushLsn = row[Option[/* pg_lsn */ Long]](prefix + "confirmed_flush_lsn"),
         walStatus = row[Option[String]](prefix + "wal_status"),
         safeWalSize = row[Option[Long]](prefix + "safe_wal_size"),
         twoPhase = row[Option[Boolean]](prefix + "two_phase")
@@ -92,8 +92,8 @@ object PgReplicationSlotsRow {
             activePid = json.\("active_pid").toOption.map(_.as[Int]),
             xmin = json.\("xmin").toOption.map(_.as[/* xid */ PGobject]),
             catalogXmin = json.\("catalog_xmin").toOption.map(_.as[/* xid */ PGobject]),
-            restartLsn = json.\("restart_lsn").toOption.map(_.as[String]),
-            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[String]),
+            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             walStatus = json.\("wal_status").toOption.map(_.as[String]),
             safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
             twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])

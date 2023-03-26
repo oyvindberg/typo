@@ -30,6 +30,7 @@ object typeMapper {
       case db.Type.PGbox            => sc.Type.PGbox
       case db.Type.PGcircle         => sc.Type.PGcircle
       case db.Type.PGline           => sc.Type.PGline
+      case db.Type.PGlsn            => sc.Type.Long.withComment("pg_lsn")
       case db.Type.PGlseg           => sc.Type.PGlseg
       case db.Type.PGpath           => sc.Type.PGpath
       case db.Type.PGpoint          => sc.Type.PGpoint
@@ -98,6 +99,7 @@ object typeMapper {
       case "numeric"                  => Some(db.Type.Numeric)
       case "oid"                      => Some(db.Type.Oid) // numeric object identifier
       case "path"                     => Some(db.Type.PGpath)
+      case "pg_lsn"                   => Some(db.Type.PGlsn)
       case "point"                    => Some(db.Type.PGpoint)
       case "polygon"                  => Some(db.Type.PGpolygon)
       case "smallint" | "int2"        => Some(db.Type.Int2)

@@ -22,10 +22,10 @@ case class PgStatSubscriptionRow(
   subname: Option[String],
   pid: Option[Int],
   relid: Option[/* oid */ Long],
-  receivedLsn: Option[String],
+  receivedLsn: Option[/* pg_lsn */ Long],
   lastMsgSendTime: Option[ZonedDateTime],
   lastMsgReceiptTime: Option[ZonedDateTime],
-  latestEndLsn: Option[String],
+  latestEndLsn: Option[/* pg_lsn */ Long],
   latestEndTime: Option[ZonedDateTime]
 )
 
@@ -37,10 +37,10 @@ object PgStatSubscriptionRow {
         subname = row[Option[String]](prefix + "subname"),
         pid = row[Option[Int]](prefix + "pid"),
         relid = row[Option[/* oid */ Long]](prefix + "relid"),
-        receivedLsn = row[Option[String]](prefix + "received_lsn"),
+        receivedLsn = row[Option[/* pg_lsn */ Long]](prefix + "received_lsn"),
         lastMsgSendTime = row[Option[ZonedDateTime]](prefix + "last_msg_send_time"),
         lastMsgReceiptTime = row[Option[ZonedDateTime]](prefix + "last_msg_receipt_time"),
-        latestEndLsn = row[Option[String]](prefix + "latest_end_lsn"),
+        latestEndLsn = row[Option[/* pg_lsn */ Long]](prefix + "latest_end_lsn"),
         latestEndTime = row[Option[ZonedDateTime]](prefix + "latest_end_time")
       )
     )
@@ -68,10 +68,10 @@ object PgStatSubscriptionRow {
             subname = json.\("subname").toOption.map(_.as[String]),
             pid = json.\("pid").toOption.map(_.as[Int]),
             relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            receivedLsn = json.\("received_lsn").toOption.map(_.as[String]),
+            receivedLsn = json.\("received_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[ZonedDateTime]),
             lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[ZonedDateTime]),
-            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[String]),
+            latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
             latestEndTime = json.\("latest_end_time").toOption.map(_.as[ZonedDateTime])
           )
         )

@@ -20,7 +20,7 @@ case class PgSubscriptionRelRow(
   srsubid: /* oid */ Long,
   srrelid: /* oid */ Long,
   srsubstate: String,
-  srsublsn: Option[String]
+  srsublsn: Option[/* pg_lsn */ Long]
 ){
   val compositeId: PgSubscriptionRelId = PgSubscriptionRelId(srrelid, srsubid)
 }
@@ -32,7 +32,7 @@ object PgSubscriptionRelRow {
         srsubid = row[/* oid */ Long](prefix + "srsubid"),
         srrelid = row[/* oid */ Long](prefix + "srrelid"),
         srsubstate = row[String](prefix + "srsubstate"),
-        srsublsn = row[Option[String]](prefix + "srsublsn")
+        srsublsn = row[Option[/* pg_lsn */ Long]](prefix + "srsublsn")
       )
     )
   }
@@ -53,7 +53,7 @@ object PgSubscriptionRelRow {
             srsubid = json.\("srsubid").as[/* oid */ Long],
             srrelid = json.\("srrelid").as[/* oid */ Long],
             srsubstate = json.\("srsubstate").as[String],
-            srsublsn = json.\("srsublsn").toOption.map(_.as[String])
+            srsublsn = json.\("srsublsn").toOption.map(_.as[/* pg_lsn */ Long])
           )
         )
       )

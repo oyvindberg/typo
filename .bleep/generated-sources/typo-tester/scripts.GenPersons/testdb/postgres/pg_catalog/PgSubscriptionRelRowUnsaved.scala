@@ -16,7 +16,7 @@ import scala.util.Try
 
 case class PgSubscriptionRelRowUnsaved(
   srsubstate: String,
-  srsublsn: Option[String]
+  srsublsn: Option[/* pg_lsn */ Long]
 )
 object PgSubscriptionRelRowUnsaved {
   implicit val oFormat: OFormat[PgSubscriptionRelRowUnsaved] = new OFormat[PgSubscriptionRelRowUnsaved]{
@@ -31,7 +31,7 @@ object PgSubscriptionRelRowUnsaved {
         Try(
           PgSubscriptionRelRowUnsaved(
             srsubstate = json.\("srsubstate").as[String],
-            srsublsn = json.\("srsublsn").toOption.map(_.as[String])
+            srsublsn = json.\("srsublsn").toOption.map(_.as[/* pg_lsn */ Long])
           )
         )
       )
