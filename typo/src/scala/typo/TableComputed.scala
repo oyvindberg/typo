@@ -123,7 +123,11 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
                 case Left(view)   => sc.Type.Qualified(view.relation.RowName)
                 case Right(table) => sc.Type.Qualified(table.relation.RowName)
               }
-              Right(sc.Param(paramName, tpe) :: acc)
+              val fkContainsNullableRow = fk.cols.exists { colName =>
+                dbColsByName(colName).nullability != Nullability.NoNulls
+              }
+              val tpeWithNullability = if (fkContainsNullableRow) sc.Type.Option.of(tpe) else tpe
+              Right(sc.Param(paramName, tpeWithNullability) :: acc)
             case None => Left(())
           }
       }
