@@ -1,11 +1,13 @@
 package typo
 
 import typo.codegen._
+import typo.internal.{Lazy, rewriteDependentData}
 import typo.metadb.MetaDb
 import typo.sqlscripts.SqlScript
 
 import java.nio.file.Path
 import java.sql.Connection
+import scala.collection.immutable.SortedMap
 
 object Gen {
   def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): List[sc.File] = {
@@ -24,12 +26,24 @@ object Gen {
     val default: DefaultComputed =
       DefaultComputed(options.pkg)
 
+    val computeds: SortedMap[db.RelationName, Lazy[Either[ViewComputed, TableComputed]]] =
+      rewriteDependentData(metaDb.relations.map(rel => rel.name -> rel).toMap)[Either[ViewComputed, TableComputed]] {
+        case (_, dbTable: db.Table, eval) =>
+          Right(TableComputed(options, default, dbTable, eval))
+        case (_, dbView: db.View, eval) =>
+          Left(ViewComputed(options.pkg, dbView, eval))
+      }
+
     val mostFiles: List[sc.File] =
       List(
         List(DefaultFile(default, options.jsonLib).file),
         metaDb.enums.map(StringEnumFile.stringEnumClass(options)),
-        metaDb.tables.flatMap(table => TableFiles(TableComputed(options, default, table), options).all),
-        metaDb.views.flatMap(view => ViewFiles(ViewComputed(options.pkg, view), options).all),
+        computeds.flatMap { case (_, lazyComputed) =>
+          lazyComputed.forceGet match {
+            case Left(viewComputed)   => ViewFiles(viewComputed, options).all
+            case Right(tableComputed) => TableFiles(tableComputed, options).all
+          }
+        },
         sqlScripts.flatMap(x => SqlScriptFiles(SqlScriptComputed(options.pkg, x), options).all)
       ).flatten
 

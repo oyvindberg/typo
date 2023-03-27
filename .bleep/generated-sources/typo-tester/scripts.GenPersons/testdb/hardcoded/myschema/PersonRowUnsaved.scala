@@ -16,14 +16,14 @@ import scala.util.Try
 import testdb.hardcoded.Defaulted
 
 case class PersonRowUnsaved(
-  favouriteFootballClubId: String,
+  favouriteFootballClubId: FootballClubId,
   name: String,
   nickName: Option[String],
   blogUrl: Option[String],
   email: String,
   phone: String,
   likesPizza: Boolean,
-  maritalStatusId: Defaulted[String],
+  maritalStatusId: Defaulted[MaritalStatusId],
   workEmail: Option[String],
   sector: Defaulted[SectorEnum]
 )
@@ -47,14 +47,14 @@ object PersonRowUnsaved {
       JsResult.fromTry(
         Try(
           PersonRowUnsaved(
-            favouriteFootballClubId = json.\("favourite_football_club_id").as[String],
+            favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
             name = json.\("name").as[String],
             nickName = json.\("nick_name").toOption.map(_.as[String]),
             blogUrl = json.\("blog_url").toOption.map(_.as[String]),
             email = json.\("email").as[String],
             phone = json.\("phone").as[String],
             likesPizza = json.\("likes_pizza").as[Boolean],
-            maritalStatusId = json.\("marital_status_id").as[Defaulted[String]],
+            maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
             workEmail = json.\("work_email").toOption.map(_.as[String]),
             sector = json.\("sector").as[Defaulted[SectorEnum]]
           )

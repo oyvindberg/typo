@@ -8,8 +8,7 @@ import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow, ViewColumnDe
 import java.sql.Connection
 
 case class MetaDb(
-    tables: List[db.Table],
-    views: List[db.View],
+    relations: List[db.Relation],
     enums: List[db.StringEnum]
 )
 
@@ -104,10 +103,6 @@ object MetaDb {
 
     // note: we should transitively check references between relations when considering `selector`.
     // especially we'll just include all enums for now.
-    MetaDb(
-      relations.collect { case x: db.Table if selector.include(x.name) => x },
-      relations.collect { case x: db.View if selector.include(x.name) => x },
-      enums
-    )
+    MetaDb(relations.filter(x => selector.include(x.name)), enums)
   }
 }

@@ -48,6 +48,10 @@ object db {
   case class RelationName(schema: Option[String], name: String) {
     def value = s"${schema.map(_ + ".").getOrElse("")}$name"
   }
+  object RelationName {
+    implicit val ordering: Ordering[RelationName] = Ordering.by(_.value)
+  }
+
   case class PrimaryKey(colNames: List[ColName], constraintName: RelationName)
   case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName) {
     require(cols.size == otherCols.size)

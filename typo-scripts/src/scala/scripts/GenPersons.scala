@@ -118,7 +118,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
 
     val files1: Map[RelPath, String] = {
       val options = Options(pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))), JsonLibPlay, DbLibAnorm, header, debugTypes = false)
-      Gen(options, MetaDb(all, views = Nil, enums), sqlScripts = Nil).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+      Gen(options, MetaDb(all, enums), sqlScripts = Nil).map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
         val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
         relpath -> content.render
       }.toMap

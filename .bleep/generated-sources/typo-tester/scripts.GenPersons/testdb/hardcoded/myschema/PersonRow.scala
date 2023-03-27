@@ -19,7 +19,7 @@ import scala.util.Try
 case class PersonRow(
   id: PersonId,
   /** Points to [[FootballClubRow.id]] */
-  favouriteFootballClubId: String,
+  favouriteFootballClubId: FootballClubId,
   name: String,
   nickName: Option[String],
   blogUrl: Option[String],
@@ -27,7 +27,7 @@ case class PersonRow(
   phone: String,
   likesPizza: Boolean,
   /** Points to [[MaritalStatusRow.id]] */
-  maritalStatusId: String,
+  maritalStatusId: MaritalStatusId,
   workEmail: Option[String],
   sector: SectorEnum
 )
@@ -37,14 +37,14 @@ object PersonRow {
     Success(
       PersonRow(
         id = row[PersonId](prefix + "id"),
-        favouriteFootballClubId = row[String](prefix + "favourite_football_club_id"),
+        favouriteFootballClubId = row[FootballClubId](prefix + "favourite_football_club_id"),
         name = row[String](prefix + "name"),
         nickName = row[Option[String]](prefix + "nick_name"),
         blogUrl = row[Option[String]](prefix + "blog_url"),
         email = row[String](prefix + "email"),
         phone = row[String](prefix + "phone"),
         likesPizza = row[Boolean](prefix + "likes_pizza"),
-        maritalStatusId = row[String](prefix + "marital_status_id"),
+        maritalStatusId = row[MaritalStatusId](prefix + "marital_status_id"),
         workEmail = row[Option[String]](prefix + "work_email"),
         sector = row[SectorEnum](prefix + "sector")
       )
@@ -72,14 +72,14 @@ object PersonRow {
         Try(
           PersonRow(
             id = json.\("id").as[PersonId],
-            favouriteFootballClubId = json.\("favourite_football_club_id").as[String],
+            favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
             name = json.\("name").as[String],
             nickName = json.\("nick_name").toOption.map(_.as[String]),
             blogUrl = json.\("blog_url").toOption.map(_.as[String]),
             email = json.\("email").as[String],
             phone = json.\("phone").as[String],
             likesPizza = json.\("likes_pizza").as[Boolean],
-            maritalStatusId = json.\("marital_status_id").as[String],
+            maritalStatusId = json.\("marital_status_id").as[MaritalStatusId],
             workEmail = json.\("work_email").toOption.map(_.as[String]),
             sector = json.\("sector").as[SectorEnum]
           )

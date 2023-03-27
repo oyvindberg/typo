@@ -86,7 +86,7 @@ object PersonRepoImpl extends PersonRepo {
       Some(NamedParameter("likes_pizza", ParameterValue.from(unsaved.likesPizza))),
       unsaved.maritalStatusId match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("marital_status_id", ParameterValue.from[String](value)))
+        case Provided(value) => Some(NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)))
       },
       Some(NamedParameter("work_email", ParameterValue.from(unsaved.workEmail))),
       unsaved.sector match {
