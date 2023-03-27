@@ -18,8 +18,12 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 import typo.generated.pg_catalog.PgClassRow
+import typo.generated.pg_catalog.PgNamespaceId
+import typo.generated.pg_catalog.PgNamespaceRow
 
 case class FindAllViewsRow(
+  /** Points to [[PgNamespaceRow.oid]] */
+  tableOid: PgNamespaceId /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"table_oid","columnName":"table_oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_namespace"} */,
   tableSchema: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   tableName: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
   /** Points to [[PgClassRow.relkind]] */
@@ -31,6 +35,7 @@ object FindAllViewsRow {
   def rowParser(prefix: String): RowParser[FindAllViewsRow] = { row =>
     Success(
       FindAllViewsRow(
+        tableOid = row[PgNamespaceId](prefix + "table_oid"),
         tableSchema = row[/* nullability unknown */ Option[String]](prefix + "table_schema"),
         tableName = row[/* nullability unknown */ Option[String]](prefix + "table_name"),
         relkind = row[String](prefix + "relkind"),
@@ -42,7 +47,8 @@ object FindAllViewsRow {
   implicit val oFormat: OFormat[FindAllViewsRow] = new OFormat[FindAllViewsRow]{
     override def writes(o: FindAllViewsRow): JsObject =
       Json.obj(
-        "table_schema" -> o.tableSchema,
+        "table_oid" -> o.tableOid,
+      "table_schema" -> o.tableSchema,
       "table_name" -> o.tableName,
       "relkind" -> o.relkind,
       "view_definition" -> o.viewDefinition
@@ -52,6 +58,7 @@ object FindAllViewsRow {
       JsResult.fromTry(
         Try(
           FindAllViewsRow(
+            tableOid = json.\("table_oid").as[PgNamespaceId],
             tableSchema = json.\("table_schema").toOption.map(_.as[String]),
             tableName = json.\("table_name").toOption.map(_.as[String]),
             relkind = json.\("relkind").as[String],

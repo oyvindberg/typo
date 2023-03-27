@@ -14,7 +14,9 @@ import java.sql.Connection
 
 object FindAllViewsRepoImpl extends FindAllViewsRepo {
   override def apply()(implicit c: Connection): List[FindAllViewsRow] = {
-    val sql = SQL"""SELECT nc.nspname::information_schema.sql_identifier         AS table_schema,
+    val sql = SQL"""SELECT
+    nc.oid as table_oid,
+    nc.nspname::information_schema.sql_identifier         AS table_schema,
        c.relname::information_schema.sql_identifier          AS table_name,
        c.relkind,
        CASE

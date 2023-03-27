@@ -39,7 +39,7 @@ object MetaDb {
     }
   }
 
-  def apply(input: Input, selector: Selector): MetaDb = {
+  def apply(input: Input): MetaDb = {
 
     val groupedViewRows: Map[db.RelationName, FindAllViewsRow] =
       input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
@@ -101,8 +101,6 @@ object MetaDb {
       }
     }
 
-    // note: we should transitively check references between relations when considering `selector`.
-    // especially we'll just include all enums for now.
-    MetaDb(relations.filter(x => selector.include(x.name)), enums)
+    MetaDb(relations, enums)
   }
 }

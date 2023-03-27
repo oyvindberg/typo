@@ -1,4 +1,6 @@
-SELECT nc.nspname::information_schema.sql_identifier         AS table_schema,
+SELECT
+    nc.oid as table_oid,
+    nc.nspname::information_schema.sql_identifier         AS table_schema,
        c.relname::information_schema.sql_identifier          AS table_name,
        c.relkind,
        CASE
