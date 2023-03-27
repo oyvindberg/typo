@@ -109,8 +109,33 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
   val RowUnsavedName: Option[sc.QIdent] =
     if (colsUnsaved.nonEmpty) Some(names.titleCase(options.pkg, dbTable.name, "RowUnsaved")) else None
 
-  val RowJoinedName: Option[sc.QIdent] =
-    if (dbTable.foreignKeys.nonEmpty) Some(names.titleCase(options.pkg, dbTable.name, "JoinedRow")) else None
+  val RowJoined: Option[RowJoinedComputed] =
+    if (dbTable.foreignKeys.nonEmpty) {
+      val name = names.titleCase(options.pkg, dbTable.name, "JoinedRow")
+
+      val maybeParams = dbTable.foreignKeys.foldLeft(Right(Nil): Either[Unit, List[sc.Param]]) {
+        case (left @ Left(_), _) => left
+        case (Right(acc), fk) =>
+          val paramName = names.camelCase(fk.cols.map(names.camelCase).map(_.value).toArray)
+          eval(fk.otherTable).get match {
+            case Some(nonCircular) =>
+              val tpe = nonCircular match {
+                case Left(view)   => sc.Type.Qualified(view.relation.RowName)
+                case Right(table) => sc.Type.Qualified(table.relation.RowName)
+              }
+              Right(sc.Param(paramName, tpe) :: acc)
+            case None => Left(())
+          }
+      }
+      maybeParams match {
+        case Left(()) =>
+          None
+        case Right(params) =>
+          val thisParam = sc.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName))
+          Some(RowJoinedComputed(name, thisParam :: params))
+      }
+
+    } else None
 
   val repoMethods: Option[List[RepoMethod]] = {
     val RowType = sc.Type.Qualified(relation.RowName)

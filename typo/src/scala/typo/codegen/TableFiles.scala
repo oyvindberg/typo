@@ -20,6 +20,17 @@ case class TableFiles(table: TableComputed, options: Options) {
 
     sc.File(rowType, str)
   }
+
+  val JoinedRowFile: Option[sc.File] = table.RowJoined.map { case rowJoined =>
+    val str =
+      code"""case class ${rowJoined.name.name}(
+            |  ${rowJoined.params.map(_.code).mkCode(",\n  ")}
+            |)
+            |""".stripMargin
+
+    sc.File(sc.Type.Qualified(rowJoined.name), str)
+  }
+
   val IdFile: Option[sc.File] = {
     table.maybeId.map {
       case id: IdComputed.Unary =>
@@ -54,6 +65,7 @@ case class TableFiles(table: TableComputed, options: Options) {
     table.repoMethods.map(relation.RepoTraitFile),
     table.repoMethods.map(relation.RepoImplFile),
     Some(relation.FieldValueFile),
-    IdFile
+    IdFile,
+    JoinedRowFile
   ).flatten
 }
