@@ -57,7 +57,7 @@ object typeMapper {
       case sc.Type.TApply(sc.Type.Option, List(tpe)) =>
         stripOption(tpe)
       case sc.Type.TApply(other, targs) =>
-        sc.Type.TApply(other, targs.map(stripOption))
+        sc.Type.TApply(stripOption(other), targs.map(stripOption))
       case sc.Type.Commented(underlying, comment) =>
         sc.Type.Commented(stripOption(underlying), comment)
       case tpe @ (sc.Type.Abstract(_) | sc.Type.Wildcard | sc.Type.Qualified(_)) =>
