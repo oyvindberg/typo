@@ -8,6 +8,7 @@ package postgres
 package pg_catalog
 
 import anorm.Column
+import anorm.ParameterMetaData
 import anorm.RowParser
 import anorm.SqlParser
 import anorm.ToStatement
@@ -20,4 +21,9 @@ object PgAttrdefId {
   implicit val toStatement: ToStatement[PgAttrdefId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
   implicit val column: Column[PgAttrdefId] = implicitly[Column[/* oid */ Long]].map(PgAttrdefId.apply)
   def rowParser(prefix: String): RowParser[PgAttrdefId] = SqlParser.get[PgAttrdefId](prefix + "oid")
+  implicit val parameterMetadata: ParameterMetaData[PgAttrdefId] = new ParameterMetaData[PgAttrdefId] {
+    override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
+  }
+
 }

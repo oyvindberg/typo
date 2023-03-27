@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 
 import anorm.Column
+import anorm.ParameterMetaData
 import anorm.RowParser
 import anorm.SqlParser
 import anorm.ToStatement
@@ -20,4 +21,9 @@ object PersonId {
   implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[PersonId] = implicitly[Column[Long]].map(PersonId.apply)
   def rowParser(prefix: String): RowParser[PersonId] = SqlParser.get[PersonId](prefix + "id")
+  implicit val parameterMetadata: ParameterMetaData[PersonId] = new ParameterMetaData[PersonId] {
+    override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType
+  }
+
 }

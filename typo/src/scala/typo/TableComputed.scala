@@ -70,7 +70,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
                 case Left(view)   => view.cols
                 case Right(table) => table.cols
               }
-              cols.find(_.dbName == otherColName).map(_.tpe)
+              cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
             case None =>
               System.err.println(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableName.value}")
               None

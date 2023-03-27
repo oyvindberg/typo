@@ -57,7 +57,13 @@ object DbLibAnorm extends DbLib {
     val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
     val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
     val rowParser = code"def $rowParserIdent(prefix: String): ${RowParser(wrapperType)} = $SqlParser.get[$wrapperType](prefix + ${sc.StrLit(colName.value)})"
-    List(toStatement, column, rowParser)
+    val parameterMetadata =
+      code"""|implicit val parameterMetadata: ${ParameterMetaData.of(wrapperType)} = new ${ParameterMetaData.of(wrapperType)} {
+             |    override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
+             |    override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
+             |  }
+             |""".stripMargin
+    List(toStatement, column, rowParser, parameterMetadata)
   }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {

@@ -10,6 +10,7 @@ package generated
 package pg_catalog
 
 import anorm.Column
+import anorm.ParameterMetaData
 import anorm.RowParser
 import anorm.SqlParser
 import anorm.ToStatement
@@ -22,4 +23,9 @@ object PgForeignDataWrapperId {
   implicit val toStatement: ToStatement[PgForeignDataWrapperId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
   implicit val column: Column[PgForeignDataWrapperId] = implicitly[Column[/* oid */ Long]].map(PgForeignDataWrapperId.apply)
   def rowParser(prefix: String): RowParser[PgForeignDataWrapperId] = SqlParser.get[PgForeignDataWrapperId](prefix + "oid")
+  implicit val parameterMetadata: ParameterMetaData[PgForeignDataWrapperId] = new ParameterMetaData[PgForeignDataWrapperId] {
+    override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
+  }
+
 }

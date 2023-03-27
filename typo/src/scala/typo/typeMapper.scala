@@ -42,12 +42,30 @@ object typeMapper {
 
     val baseTpe = go(col.tpe)
 
-    col.nullability match {
-      case Nullability.NoNulls         => baseTpe
-      case Nullability.Nullable        => sc.Type.Option.of(baseTpe)
-      case Nullability.NullableUnknown => sc.Type.Option.of(baseTpe).withComment("nullability unknown")
-    }
+    withNullability(baseTpe, col.nullability)
   }
+
+  def withNullability(tpe: sc.Type, nullability: Nullability): sc.Type =
+    nullability match {
+      case Nullability.NoNulls         => tpe
+      case Nullability.Nullable        => sc.Type.Option.of(tpe)
+      case Nullability.NullableUnknown => sc.Type.Option.of(tpe).withComment("nullability unknown")
+    }
+
+  def stripOption(tpe: sc.Type): sc.Type =
+    tpe match {
+      case sc.Type.TApply(sc.Type.Option, List(tpe)) =>
+        stripOption(tpe)
+      case sc.Type.TApply(other, targs) =>
+        sc.Type.TApply(other, targs.map(stripOption))
+      case sc.Type.Commented(underlying, comment) =>
+        sc.Type.Commented(stripOption(underlying), comment)
+      case tpe @ (sc.Type.Abstract(_) | sc.Type.Wildcard | sc.Type.Qualified(_)) =>
+        tpe
+    }
+
+  def reapplyNullability(tpe: sc.Type, nullability: Nullability): sc.Type =
+    withNullability(stripOption(tpe), nullability)
 
   def dbTypeFrom(enums: Map[String, db.StringEnum], c: ColumnsRow): db.Type =
     dbTypeFrom(enums, c.udtName.get, c.characterMaximumLength).getOrElse {

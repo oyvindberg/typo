@@ -34,7 +34,7 @@ case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript, eval: Eval[db.R
             case Left(view)   => view.cols
             case Right(table) => table.cols
           }
-          cols.find(_.dbName == otherColName).map(_.tpe)
+          cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
         case _ => None
       }
 

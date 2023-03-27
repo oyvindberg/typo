@@ -29,7 +29,7 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View, eval: Eval[db.RelationNam
                 case Left(view)   => view.cols
                 case Right(table) => table.cols
               }
-              cols.find(_.dbName == otherColName).map(_.tpe)
+              cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
             case None =>
               System.err.println(s"Unexpected circular dependency involving ${view.name.value} => ${otherTableName.value}")
               None
