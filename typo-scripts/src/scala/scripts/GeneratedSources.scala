@@ -36,7 +36,14 @@ object GeneratedSources {
 
     val filesByRelPath: Map[RelPath, String] = {
       val generated = sc.Ident("generated")
-      val options = Options(pkg = sc.QIdent(List(sc.Ident("typo"), generated)), JsonLibPlay, DbLibAnorm, header, debugTypes = true)
+      val options = Options(
+        pkg = sc.QIdent(List(sc.Ident("typo"), generated)),
+        JsonLibPlay,
+        DbLibAnorm,
+        typeOverride = TypeOverride.Empty,
+        header,
+        debugTypes = true
+      )
       Gen
         .fromDbAndScripts(options, sqlScriptDir, Selector.OnlyPostgresInternal)
         .map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>

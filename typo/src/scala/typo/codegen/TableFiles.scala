@@ -32,30 +32,42 @@ case class TableFiles(table: TableComputed, options: Options) {
   }
 
   val IdFile: Option[sc.File] = {
-    table.maybeId.map {
-      case id: IdComputed.Unary =>
+    table.maybeId.flatMap {
+      case id: IdComputed.UnaryNormal =>
         val str =
-          code"""case class ${id.name}(value: ${id.underlying}) extends AnyVal
-                |object ${id.name} {
+          code"""case class ${id.qident.name}(value: ${id.underlying}) extends AnyVal
+                |object ${id.qident.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
                 |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
                 |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbName).mkCode("\n  ")}
                 |}
 """.stripMargin
 
-        sc.File(id.tpe, str)
+        Some(sc.File(id.tpe, str))
+
+      case _: IdComputed.UnaryUserSpecified =>
+        None
 
       case id @ IdComputed.Composite(cols, qident, _) =>
         val ordering = sc.Type.Ordering.of(id.tpe)
+
+        // don't demand that user-specified types are ordered, but compositive key will be if they are
+        val orderingImplicits = cols.filter(x => sc.Type.containsUserDefined(x.tpe)) match {
+          case Nil => sc.Code.Empty
+          case nonEmpty =>
+            val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
+            code"(implicit ${orderingParams.mkCode(", ")})"
+        }
+
         val str =
           code"""case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                 |object ${qident.name} {
-                |  implicit val ordering: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
+                |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
                 |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
                 |  ${options.dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
                 |}
 """.stripMargin
-        sc.File(id.tpe, str)
+        Some(sc.File(id.tpe, str))
     }
   }
 

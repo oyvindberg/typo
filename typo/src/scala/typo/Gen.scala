@@ -23,19 +23,21 @@ object Gen {
   }
 
   def apply(options: Options, metaDb: MetaDb, sqlScripts: List[SqlScript], selector: Selector): List[sc.File] = {
+    val scalaTypeMapper = TypeMapperScala(options.pkg, options.typeOverride)
+
     val default: DefaultComputed =
       DefaultComputed(options.pkg)
 
     val computeds: SortedMap[db.RelationName, Lazy[Either[ViewComputed, TableComputed]]] =
       rewriteDependentData(metaDb.relations.map(rel => rel.name -> rel).toMap).apply[Either[ViewComputed, TableComputed]] {
         case (_, dbTable: db.Table, eval) =>
-          Right(TableComputed(options, default, dbTable, eval))
+          Right(TableComputed(options, default, dbTable, scalaTypeMapper, eval))
         case (_, dbView: db.View, eval) =>
-          Left(ViewComputed(options.pkg, dbView, eval))
+          Left(ViewComputed(options.pkg, dbView, scalaTypeMapper, eval))
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedScripts = sqlScripts.map(sqlScript => SqlScriptComputed(options.pkg, sqlScript, computeds.apply))
+    val computedScripts = sqlScripts.map(sqlScript => SqlScriptComputed(options.pkg, sqlScript, scalaTypeMapper, computeds.apply))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.forceGet
     }

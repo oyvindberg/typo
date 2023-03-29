@@ -188,13 +188,21 @@ object DbLibAnorm extends DbLib {
                  |      """.stripMargin
         )
 
+        // don't remand that user-specified id has a correct rowParser definition when we can trivially infer it
+        val rowParser = id match {
+          case IdComputed.UnaryUserSpecified(col, tpe) =>
+            code"""$SqlParser.get[$tpe](${sc.StrLit(col.dbName.value)})"""
+          case other =>
+            code"""${other.tpe}.$rowParserIdent("")"""
+        }
+
         code"""|val namedParameters = List(
                |      ${maybeNamedParameters.mkCode(",\n      ")}
                |    ).flatten
                |
                |    $sql
                |      .on(namedParameters :_*)
-               |      .executeInsert(${id.tpe}.$rowParserIdent("").single)
+               |      .executeInsert($rowParser.single)
                |"""
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>

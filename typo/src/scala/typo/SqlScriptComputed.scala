@@ -5,7 +5,12 @@ import typo.sqlscripts.SqlScript
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
+case class SqlScriptComputed(
+    pkg0: sc.QIdent,
+    script: SqlScript,
+    scalaTypeMapper: TypeMapperScala,
+    eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
+) {
   val pathSegments: List[sc.Ident] = script.relPath.iterator().asScala.map(p => sc.Ident(p.toString)).toList
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val pkg1 = pkg0 / pathSegments.dropRight(1)
@@ -34,12 +39,12 @@ case class SqlScriptComputed(pkg0: sc.QIdent, script: SqlScript, eval: Eval[db.R
             case Left(view)   => view.cols
             case Right(table) => table.cols
           }
-          cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
+          cols.find(_.dbName == otherColName).map(_.tpe)
         case _ => None
       }
 
     val tpe = typeFromFk.getOrElse {
-      typeMapper.scalaType(pkg0, dbCol)
+      scalaTypeMapper(Left(script.relPath), dbCol, typeFromFk)
     }
     tpe
   }

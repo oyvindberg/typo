@@ -45,6 +45,7 @@ object sc {
     case class Qualified(value: QIdent) extends Type
     case class Abstract(value: Ident) extends Type
     case class Commented(underlying: Type, comment: String) extends Type
+    case class UserDefined(underlying: Type) extends Type
 
     object Qualified {
       def apply(value: String): Qualified =
@@ -137,7 +138,17 @@ object sc {
         case Qualified(_)                    => scala.None
         case Abstract(_)                     => scala.None
         case Commented(underlying, _)        => unapply(underlying)
+        case UserDefined(underlying)         => unapply(underlying)
       }
+    }
+
+    def containsUserDefined(tpe: sc.Type): Boolean = tpe match {
+      case Wildcard                  => false
+      case TApply(underlying, targs) => containsUserDefined(underlying) || targs.exists(containsUserDefined)
+      case Qualified(_)              => false
+      case Abstract(_)               => false
+      case Commented(underlying, _)  => containsUserDefined(underlying)
+      case UserDefined(_)            => true
     }
   }
 
@@ -157,6 +168,7 @@ object sc {
           case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
           case Type.Qualified(value)               => renderTree(value)
           case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
+          case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
         val Quote = '"'.toString
@@ -179,6 +191,7 @@ object sc {
 
     implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
     implicit val str: ToCode[String] = Code.Str.apply
+    implicit val int: ToCode[Int] = _.toString
     implicit val code: ToCode[Code] = identity
     implicit val tableName: ToCode[db.RelationName] = (_.value)
   }

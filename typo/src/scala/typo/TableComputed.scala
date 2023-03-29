@@ -2,7 +2,13 @@ package typo
 
 import typo.internal.rewriteDependentData.Eval
 
-case class TableComputed(options: Options, default: DefaultComputed, dbTable: db.Table, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
+case class TableComputed(
+    options: Options,
+    default: DefaultComputed,
+    dbTable: db.Table,
+    scalaTypeMapper: TypeMapperScala,
+    eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
+) {
   val pointsTo: Map[db.ColName, (db.RelationName, db.ColName)] =
     dbTable.foreignKeys.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (fk.otherTable, cn)))).toMap
   val dbColsByName: Map[db.ColName, db.Col] =
@@ -15,15 +21,19 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         case Nil => None
         case colName :: Nil =>
           val dbCol = dbColsByName(colName)
+          val underlying = scalaTypeMapper(Right(dbTable.name), dbCol, None)
           val col = ColumnComputed(
             pointsTo = pointsTo.get(dbCol.name),
             name = names.field(dbCol.name),
-            tpe = typeMapper.scalaType(options.pkg, dbCol),
+            tpe = underlying,
             dbName = dbCol.name,
             hasDefault = dbCol.hasDefault,
             jsonDescription = dbCol.jsonDescription
           )
-          Some(IdComputed.Unary(col, qident))
+          if (sc.Type.containsUserDefined(underlying))
+            Some(IdComputed.UnaryUserSpecified(col, underlying))
+          else
+            Some(IdComputed.UnaryNormal(col, qident))
 
         case colNames =>
           val cols: List[ColumnComputed] =
@@ -70,7 +80,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
                 case Left(view)   => view.cols
                 case Right(table) => table.cols
               }
-              cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
+              cols.find(_.dbName == otherColName).map(_.tpe)
             case None =>
               System.err.println(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableName.value}")
               None
@@ -81,13 +91,12 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
 
     val typeFromId: Option[sc.Type] =
       maybeId match {
-        case Some(id @ IdComputed.Unary(col, _)) if col.dbName == dbCol.name => Some(id.tpe)
-        case _                                                               => None
+        case Some(id: IdComputed.Unary) if id.col.dbName == dbCol.name => Some(id.tpe)
+        case _                                                         => None
       }
 
-    val tpe = typeFromFk.orElse(typeFromId).getOrElse {
-      typeMapper.scalaType(options.pkg, dbCol)
-    }
+    val tpe = scalaTypeMapper(Right(dbTable.name), dbCol, typeFromFk.orElse(typeFromId))
+
     tpe
   }
 

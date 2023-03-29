@@ -72,7 +72,7 @@ object MetaDb {
                 case None        => Nullability.NullableUnknown
                 case other       => throw new Exception(s"Unknown nullability: $other")
               },
-              tpe = typeMapper.dbTypeFrom(enumsByName, c),
+              tpe = TypeMapperDb.dbTypeFrom(enumsByName, c),
               jsonDescription = Json.toJson(c)
             )
           }

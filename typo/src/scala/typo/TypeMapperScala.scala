@@ -1,0 +1,80 @@
+package typo
+
+import typo.db.Type
+
+import java.nio.file.Path
+
+case class TypeMapperScala(pkg: sc.QIdent, typeOverride: TypeOverride) {
+  def apply(relation: Either[Path, db.RelationName], col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
+    def go(tpe: db.Type): sc.Type = {
+      val maybeOverridden = typeOverride(relation, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
+      val maybeFromFK = typeFromFK.map(stripOptionAndArray)
+      val base = tpe match {
+        case db.Type.PgObject(tpe)    => sc.Type.PGobject.withComment(tpe)
+        case db.Type.BigInt           => sc.Type.Long
+        case db.Type.Text             => sc.Type.String
+        case db.Type.Boolean          => sc.Type.Boolean
+        case db.Type.Char             => sc.Type.String
+        case db.Type.Name             => sc.Type.String
+        case db.Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
+        case db.Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
+        case db.Type.Inet             => sc.Type.PGobject.withComment("inet") // wip
+        case db.Type.Oid              => sc.Type.Long.withComment("oid")
+        case db.Type.VarChar(_)       => sc.Type.String
+        case db.Type.Float4           => sc.Type.Float
+        case db.Type.Float8           => sc.Type.Double
+        case db.Type.Bytea            => sc.Type.Array.of(sc.Type.Byte)
+        case db.Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead of floats
+        case db.Type.Int4             => sc.Type.Int
+        case db.Type.Int8             => sc.Type.Long
+        case db.Type.Json             => sc.Type.String // wip
+        case db.Type.Numeric          => sc.Type.BigDecimal
+        case db.Type.Timestamp        => sc.Type.LocalDateTime
+        case db.Type.TimestampTz      => sc.Type.ZonedDateTime
+        case db.Type.Array(_)         => sys.error("no idea what to do with nested array types")
+        case db.Type.PGbox            => sc.Type.PGbox
+        case db.Type.PGcircle         => sc.Type.PGcircle
+        case db.Type.PGline           => sc.Type.PGline
+        case db.Type.PGlsn            => sc.Type.Long.withComment("pg_lsn")
+        case db.Type.PGlseg           => sc.Type.PGlseg
+        case db.Type.PGpath           => sc.Type.PGpath
+        case db.Type.PGpoint          => sc.Type.PGpoint
+        case db.Type.PGpolygon        => sc.Type.PGpolygon
+        case db.Type.PGInterval       => sc.Type.PGInterval
+        case db.Type.PGmoney          => sc.Type.PGmoney
+        case db.Type.UUID             => sc.Type.UUID
+      }
+      maybeOverridden.orElse(maybeFromFK).getOrElse(base)
+    }
+
+    val baseTpe = col.tpe match {
+      case Type.Array(tpe) =>
+        sc.Type.Array.of(go(tpe))
+      case other =>
+        go(other)
+    }
+
+    withNullability(baseTpe, col.nullability)
+  }
+
+  def withNullability(tpe: sc.Type, nullability: Nullability): sc.Type =
+    nullability match {
+      case Nullability.NoNulls         => tpe
+      case Nullability.Nullable        => sc.Type.Option.of(tpe)
+      case Nullability.NullableUnknown => sc.Type.Option.of(tpe).withComment("nullability unknown")
+    }
+
+  def stripOptionAndArray(tpe: sc.Type): sc.Type =
+    tpe match {
+      case sc.Type.TApply(sc.Type.Option | sc.Type.Array, List(tpe)) =>
+        stripOptionAndArray(tpe)
+      case sc.Type.TApply(other, targs) =>
+        sc.Type.TApply(stripOptionAndArray(other), targs.map(stripOptionAndArray))
+      case sc.Type.Commented(underlying, comment) =>
+        sc.Type.Commented(stripOptionAndArray(underlying), comment)
+      case sc.Type.UserDefined(underlying) =>
+        sc.Type.UserDefined(stripOptionAndArray(underlying))
+      case tpe @ (sc.Type.Abstract(_) | sc.Type.Wildcard | sc.Type.Qualified(_)) =>
+        tpe
+    }
+}

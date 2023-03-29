@@ -2,7 +2,7 @@ package typo
 
 import typo.internal.rewriteDependentData.Eval
 
-case class ViewComputed(pkg: sc.QIdent, view: db.View, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
+case class ViewComputed(pkg: sc.QIdent, view: db.View, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     view.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
@@ -29,7 +29,7 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View, eval: Eval[db.RelationNam
                 case Left(view)   => view.cols
                 case Right(table) => table.cols
               }
-              cols.find(_.dbName == otherColName).map(x => typeMapper.reapplyNullability(x.tpe, dbCol.nullability))
+              cols.find(_.dbName == otherColName).map(_.tpe)
             case None =>
               System.err.println(s"Unexpected circular dependency involving ${view.name.value} => ${otherTableName.value}")
               None
@@ -38,9 +38,7 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View, eval: Eval[db.RelationNam
         case _ => None
       }
 
-    val tpe = typeFromFk.getOrElse {
-      typeMapper.scalaType(pkg, dbCol)
-    }
+    val tpe = scalaTypeMapper(Right(view.name), dbCol, typeFromFk)
     tpe
   }
 

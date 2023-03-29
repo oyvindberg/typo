@@ -18,7 +18,7 @@ import scala.util.Try
 
 case class PersonId(one: Long, two: Option[String])
 object PersonId {
-  implicit val ordering: Ordering[PersonId] = Ordering.by(x => (x.one, x.two))
+  implicit def ordering: Ordering[PersonId] = Ordering.by(x => (x.one, x.two))
   implicit val oFormat: OFormat[PersonId] = new OFormat[PersonId]{
     override def writes(o: PersonId): JsObject =
       Json.obj(

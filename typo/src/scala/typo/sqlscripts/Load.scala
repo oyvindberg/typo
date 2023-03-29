@@ -22,7 +22,7 @@ object Load {
             val cols = analyzed.columns.map { col =>
               db.Col(
                 name = col.name,
-                tpe = typeMapper.dbTypeFrom(enums, col.columnTypeName, Some(col.precision)).getOrElse {
+                tpe = TypeMapperDb.dbTypeFrom(enums, col.columnTypeName, Some(col.precision)).getOrElse {
                   System.err.println(s"Couldn't translate type from column $col")
                   db.Type.Text
                 },
