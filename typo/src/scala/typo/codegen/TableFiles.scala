@@ -78,6 +78,6 @@ case class TableFiles(table: TableComputed, options: Options) {
     table.repoMethods.map(relation.RepoImplFile),
     Some(relation.FieldValueFile),
     IdFile,
-    JoinedRowFile
+    // JoinedRowFile
   ).flatten
 }
