@@ -2,12 +2,12 @@ package typo
 
 import typo.internal.rewriteDependentData.Eval
 
-case class ViewComputed(pkg: sc.QIdent, view: db.View, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
+case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     view.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
         pointsTo = view.dependencies.get(dbCol.name),
-        name = names.field(dbCol.name),
+        name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
         hasDefault = dbCol.hasDefault,
@@ -43,7 +43,7 @@ case class ViewComputed(pkg: sc.QIdent, view: db.View, scalaTypeMapper: TypeMapp
   }
 
   val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
-  val relation = RelationComputed(pkg, view.name, cols, maybeId = None)
+  val relation = RelationComputed(naming, view.name, cols, maybeId = None)
 
   val repoMethods: List[RepoMethod] = {
     val RowType = sc.Type.Qualified(relation.RowName)

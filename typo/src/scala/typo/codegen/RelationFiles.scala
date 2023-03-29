@@ -4,7 +4,7 @@ package codegen
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import typo.sc.syntax._
 
-case class RelationFiles(relation: RelationComputed, options: Options) {
+case class RelationFiles(naming: Naming, relation: RelationComputed, options: Options) {
   val RowFile: sc.File = {
     val rowType = sc.Type.Qualified(relation.RowName)
 
@@ -29,8 +29,8 @@ case class RelationFiles(relation: RelationComputed, options: Options) {
 
       col.pointsTo match {
         case Some((relationName, columnName)) =>
-          val row = names.titleCase(options.pkg, relationName, "Row")
-          code"""/** Points to [[$row.${names.field(columnName)}]] */
+          val row = naming.rowName(relationName)
+          code"""/** Points to [[$row.${naming.field(columnName)}]] */
                 |  ${col.param}$originComment""".stripMargin
         case None => code"${col.param.code}$originComment"
       }

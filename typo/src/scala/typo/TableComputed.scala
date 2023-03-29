@@ -6,6 +6,7 @@ case class TableComputed(
     options: Options,
     default: DefaultComputed,
     dbTable: db.Table,
+    naming: Naming,
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
@@ -16,7 +17,7 @@ case class TableComputed(
 
   val maybeId: Option[IdComputed] =
     dbTable.primaryKey.flatMap { pk =>
-      val qident = names.titleCase(options.pkg, dbTable.name, "Id")
+      val qident = naming.idName(dbTable.name)
       pk.colNames match {
         case Nil => None
         case colName :: Nil =>
@@ -24,7 +25,7 @@ case class TableComputed(
           val underlying = scalaTypeMapper(Right(dbTable.name), dbCol, None)
           val col = ColumnComputed(
             pointsTo = pointsTo.get(dbCol.name),
-            name = names.field(dbCol.name),
+            name = naming.field(dbCol.name),
             tpe = underlying,
             dbName = dbCol.name,
             hasDefault = dbCol.hasDefault,
@@ -41,7 +42,7 @@ case class TableComputed(
               val dbCol = dbColsByName(colName)
               ColumnComputed(
                 pointsTo = None,
-                name = names.field(colName),
+                name = naming.field(colName),
                 tpe = deriveType(dbCol),
                 dbName = dbCol.name,
                 hasDefault = dbCol.hasDefault,
@@ -58,7 +59,7 @@ case class TableComputed(
 
       val computed = ColumnComputed(
         pointsTo = pointsTo.get(dbCol.name),
-        name = names.field(dbCol.name),
+        name = naming.field(dbCol.name),
         tpe = tpe,
         dbName = dbCol.name,
         hasDefault = dbCol.hasDefault,
@@ -102,7 +103,7 @@ case class TableComputed(
 
   val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
 
-  val relation = RelationComputed(options.pkg, dbTable.name, cols, maybeId)
+  val relation = RelationComputed(naming, dbTable.name, cols, maybeId)
 
   val colsUnsaved: Option[List[ColumnComputed]] = maybeId
     .map { _ =>
@@ -116,16 +117,15 @@ case class TableComputed(
     .filter(_.nonEmpty)
 
   val RowUnsavedName: Option[sc.QIdent] =
-    if (colsUnsaved.nonEmpty) Some(names.titleCase(options.pkg, dbTable.name, "RowUnsaved")) else None
+    if (colsUnsaved.nonEmpty) Some(naming.rowUnsaved(dbTable.name)) else None
 
   val RowJoined: Option[RowJoinedComputed] =
     if (dbTable.foreignKeys.nonEmpty) {
-      val name = names.titleCase(options.pkg, dbTable.name, "JoinedRow")
+      val name = naming.joinedRow(dbTable.name)
 
       val maybeParams = dbTable.foreignKeys.foldLeft(Right(Nil): Either[Unit, List[RowJoinedComputed.Param]]) {
         case (left @ Left(_), _) => left
         case (Right(acc), fk) =>
-          val paramName = names.camelCase(fk.cols.map(names.camelCase).map(_.value).toArray)
           eval(fk.otherTable).get match {
             case Some(Right(nonCircularTable)) =>
               val tpe = sc.Type.Qualified(nonCircularTable.relation.RowName)
@@ -133,7 +133,15 @@ case class TableComputed(
                 dbColsByName(colName).nullability != Nullability.NoNulls
               }
               val tpeWithNullability = if (fkContainsNullableRow) sc.Type.Option.of(tpe) else tpe
-              Right(RowJoinedComputed.Param(paramName, tpeWithNullability, isOptional = fkContainsNullableRow, table = nonCircularTable) :: acc)
+
+              val newParam = RowJoinedComputed.Param(
+                name = naming.field(fk.cols),
+                tpe = tpeWithNullability,
+                isOptional = fkContainsNullableRow,
+                table = nonCircularTable
+              )
+
+              Right(newParam :: acc)
             case None => Left(())
           }
       }

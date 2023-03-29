@@ -74,7 +74,7 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.SelectAllByIds(_, idsParam, rowType) =>
       code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectByUnique(params, rowType) =>
-      val ident = names.camelCase(Array("selectByUnique") ++ params.map(_.name.value))
+      val ident = Naming.camelCase(Array("selectByUnique") ++ params.map(_.name.value))
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(param, rowType) =>
       code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"

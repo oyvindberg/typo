@@ -4,12 +4,12 @@ package codegen
 import typo.sc.syntax._
 
 object StringEnumFile {
-  def stringEnumClass(options: Options)(`enum`: db.StringEnum): sc.File = {
-    val qident = names.EnumName(options.pkg, `enum`.name)
+  def stringEnumClass(naming: Naming, options: Options)(`enum`: db.StringEnum): sc.File = {
+    val qident = naming.enumName(`enum`.name)
     val EnumType = sc.Type.Qualified(qident)
 
     val members = `enum`.values.map { value =>
-      val name = names.enumValue(value)
+      val name = naming.enumValue(value)
       name -> code"case object $name extends ${qident.name}(${sc.StrLit(value)})"
     }
     val ByName = sc.Ident("ByName")

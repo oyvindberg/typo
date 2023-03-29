@@ -1,8 +1,8 @@
 package typo
 
-case class RelationComputed(pkg: sc.QIdent, relationName: db.RelationName, cols: Seq[ColumnComputed], maybeId: Option[IdComputed]) {
-  val RepoName: sc.QIdent = names.titleCase(pkg, relationName, "Repo")
-  val RepoImplName: sc.QIdent = names.titleCase(pkg, relationName, "RepoImpl")
-  val RowName: sc.QIdent = names.titleCase(pkg, relationName, "Row")
-  val FieldValueName: sc.QIdent = names.titleCase(pkg, relationName, "FieldValue")
+case class RelationComputed(naming: Naming, relationName: db.RelationName, cols: Seq[ColumnComputed], maybeId: Option[IdComputed]) {
+  val RepoName: sc.QIdent = naming.repoName(relationName)
+  val RepoImplName: sc.QIdent = naming.repoImplName(relationName)
+  val RowName: sc.QIdent = naming.rowName(relationName)
+  val FieldValueName: sc.QIdent = naming.fieldValueName(relationName)
 }

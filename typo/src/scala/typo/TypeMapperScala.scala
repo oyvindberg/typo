@@ -4,7 +4,7 @@ import typo.db.Type
 
 import java.nio.file.Path
 
-case class TypeMapperScala(pkg: sc.QIdent, typeOverride: TypeOverride) {
+case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
   def apply(relation: Either[Path, db.RelationName], col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
       val maybeOverridden = typeOverride(relation, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
@@ -16,7 +16,7 @@ case class TypeMapperScala(pkg: sc.QIdent, typeOverride: TypeOverride) {
         case db.Type.Boolean          => sc.Type.Boolean
         case db.Type.Char             => sc.Type.String
         case db.Type.Name             => sc.Type.String
-        case db.Type.StringEnum(name) => sc.Type.Qualified(names.EnumName(pkg, name))
+        case db.Type.StringEnum(name) => sc.Type.Qualified(naming.enumName(name))
         case db.Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
         case db.Type.Inet             => sc.Type.PGobject.withComment("inet") // wip
         case db.Type.Oid              => sc.Type.Long.withComment("oid")

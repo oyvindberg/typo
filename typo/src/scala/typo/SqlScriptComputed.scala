@@ -6,20 +6,21 @@ import typo.sqlscripts.SqlScript
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 case class SqlScriptComputed(
-    pkg0: sc.QIdent,
     script: SqlScript,
+    pkg0: sc.QIdent,
+    mkNaming: sc.QIdent => Naming,
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
   val pathSegments: List[sc.Ident] = script.relPath.iterator().asScala.map(p => sc.Ident(p.toString)).toList
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
-  val pkg1 = pkg0 / pathSegments.dropRight(1)
+  val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 
   val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
     script.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
         pointsTo = script.dependencies.get(dbCol.name),
-        name = names.field(dbCol.name),
+        name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
         hasDefault = dbCol.hasDefault,
@@ -50,10 +51,10 @@ case class SqlScriptComputed(
   }
 
   val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
-  val relation = RelationComputed(pkg1, relationName, cols, maybeId = None)
-  val RepoName: sc.QIdent = names.titleCase(pkg1, relationName, "Repo")
-  val RepoImplName: sc.QIdent = names.titleCase(pkg1, relationName, "RepoImpl")
-  val RowName: sc.QIdent = names.titleCase(pkg1, relationName, "Row")
+  val relation = RelationComputed(naming, relationName, cols, maybeId = None)
+  val RepoName: sc.QIdent = naming.repoName(relationName)
+  val RepoImplName: sc.QIdent = naming.repoImplName(relationName)
+  val RowName: sc.QIdent = naming.rowName(relationName)
 
   val repoMethods: List[RepoMethod] = {
     List(

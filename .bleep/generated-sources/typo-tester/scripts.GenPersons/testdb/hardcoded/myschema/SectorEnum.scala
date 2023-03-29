@@ -19,11 +19,11 @@ import play.api.libs.json.Writes
 
 sealed abstract class SectorEnum(val value: String)
 object SectorEnum {
-  case object PUBLIC extends SectorEnum("PUBLIC")
-  case object PRIVATE extends SectorEnum("PRIVATE")
-  case object OTHER extends SectorEnum("OTHER")
+  case object `_public` extends SectorEnum("PUBLIC")
+  case object `_private` extends SectorEnum("PRIVATE")
+  case object `_other` extends SectorEnum("OTHER")
 
-  val All: List[SectorEnum] = List(PUBLIC, PRIVATE, OTHER)
+  val All: List[SectorEnum] = List(`_public`, `_private`, `_other`)
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, SectorEnum] = All.map(x => (x.value, x)).toMap
 

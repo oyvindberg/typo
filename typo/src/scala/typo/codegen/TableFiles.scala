@@ -4,7 +4,7 @@ package codegen
 import typo.sc.syntax._
 
 case class TableFiles(table: TableComputed, options: Options) {
-  val relation = RelationFiles(table.relation, options)
+  val relation = RelationFiles(table.naming, table.relation, options)
 
   val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsUnsaved).map { case (qident, colsUnsaved) =>
     val rowType = sc.Type.Qualified(qident)
@@ -77,7 +77,7 @@ case class TableFiles(table: TableComputed, options: Options) {
     table.repoMethods.map(relation.RepoTraitFile),
     table.repoMethods.map(relation.RepoImplFile),
     Some(relation.FieldValueFile),
-    IdFile,
+    IdFile
     // JoinedRowFile
   ).flatten
 }
