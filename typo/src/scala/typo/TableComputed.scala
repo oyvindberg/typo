@@ -113,21 +113,18 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
     if (dbTable.foreignKeys.nonEmpty) {
       val name = names.titleCase(options.pkg, dbTable.name, "JoinedRow")
 
-      val maybeParams = dbTable.foreignKeys.foldLeft(Right(Nil): Either[Unit, List[sc.Param]]) {
+      val maybeParams = dbTable.foreignKeys.foldLeft(Right(Nil): Either[Unit, List[RowJoinedComputed.Param]]) {
         case (left @ Left(_), _) => left
         case (Right(acc), fk) =>
           val paramName = names.camelCase(fk.cols.map(names.camelCase).map(_.value).toArray)
           eval(fk.otherTable).get match {
-            case Some(nonCircular) =>
-              val tpe = nonCircular match {
-                case Left(view)   => sc.Type.Qualified(view.relation.RowName)
-                case Right(table) => sc.Type.Qualified(table.relation.RowName)
-              }
+            case Some(Right(nonCircularTable)) =>
+              val tpe = sc.Type.Qualified(nonCircularTable.relation.RowName)
               val fkContainsNullableRow = fk.cols.exists { colName =>
                 dbColsByName(colName).nullability != Nullability.NoNulls
               }
               val tpeWithNullability = if (fkContainsNullableRow) sc.Type.Option.of(tpe) else tpe
-              Right(sc.Param(paramName, tpeWithNullability) :: acc)
+              Right(RowJoinedComputed.Param(paramName, tpeWithNullability, isOptional = fkContainsNullableRow, table = nonCircularTable) :: acc)
             case None => Left(())
           }
       }
@@ -135,7 +132,7 @@ case class TableComputed(options: Options, default: DefaultComputed, dbTable: db
         case Left(()) =>
           None
         case Right(params) =>
-          val thisParam = sc.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName))
+          val thisParam = RowJoinedComputed.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName), isOptional = false, table = this)
           Some(RowJoinedComputed(name, thisParam :: params))
       }
 

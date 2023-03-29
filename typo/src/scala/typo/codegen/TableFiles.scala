@@ -21,10 +21,10 @@ case class TableFiles(table: TableComputed, options: Options) {
     sc.File(rowType, str)
   }
 
-  val JoinedRowFile: Option[sc.File] = table.RowJoined.map { case rowJoined =>
+  val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>
     val str =
       code"""case class ${rowJoined.name.name}(
-            |  ${rowJoined.params.map(_.code).mkCode(",\n  ")}
+            |  ${rowJoined.params.map(_.param.code).mkCode(",\n  ")}
             |)
             |""".stripMargin
 
