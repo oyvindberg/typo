@@ -20,7 +20,7 @@ import scala.util.Try
 
 case class PgSubscriptionRelId(srrelid: /* oid */ Long, srsubid: /* oid */ Long)
 object PgSubscriptionRelId {
-  implicit val ordering: Ordering[PgSubscriptionRelId] = Ordering.by(x => (x.srrelid, x.srsubid))
+  implicit def ordering: Ordering[PgSubscriptionRelId] = Ordering.by(x => (x.srrelid, x.srsubid))
   implicit val oFormat: OFormat[PgSubscriptionRelId] = new OFormat[PgSubscriptionRelId]{
     override def writes(o: PgSubscriptionRelId): JsObject =
       Json.obj(

@@ -123,9 +123,9 @@ case class TableComputed(
     if (dbTable.foreignKeys.nonEmpty) {
       val name = naming.joinedRow(dbTable.name)
 
-      val maybeParams = dbTable.foreignKeys.foldLeft(Right(Nil): Either[Unit, List[RowJoinedComputed.Param]]) {
-        case (left @ Left(_), _) => left
-        case (Right(acc), fk) =>
+      val maybeParams = dbTable.foreignKeys.flatMap {
+        case fk if fk.otherTable == dbTable.name => None
+        case fk =>
           eval(fk.otherTable).get match {
             case Some(Right(nonCircularTable)) =>
               val tpe = sc.Type.Qualified(nonCircularTable.relation.RowName)
@@ -141,14 +141,16 @@ case class TableComputed(
                 table = nonCircularTable
               )
 
-              Right(newParam :: acc)
-            case None => Left(())
+              Some(newParam)
+            case None =>
+              System.err.println(s"Unexpected circular dependency ${dbTable.name.value} => ${fk.otherTable.value}")
+              None
           }
       }
       maybeParams match {
-        case Left(()) =>
+        case Nil =>
           None
-        case Right(params) =>
+        case params =>
           val thisParam = RowJoinedComputed.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName), isOptional = false, table = this)
           Some(RowJoinedComputed(name, thisParam :: params))
       }

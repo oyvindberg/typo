@@ -20,7 +20,7 @@ import scala.util.Try
 
 case class PgTsConfigMapId(mapcfg: /* oid */ Long, maptokentype: Int, mapseqno: Int)
 object PgTsConfigMapId {
-  implicit val ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
+  implicit def ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
   implicit val oFormat: OFormat[PgTsConfigMapId] = new OFormat[PgTsConfigMapId]{
     override def writes(o: PgTsConfigMapId): JsObject =
       Json.obj(
