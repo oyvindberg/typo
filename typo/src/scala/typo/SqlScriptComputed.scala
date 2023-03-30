@@ -1,7 +1,7 @@
 package typo
 
 import typo.internal.rewriteDependentData.Eval
-import typo.sqlscripts.SqlScript
+import typo.sqlscripts.{DecomposedSql, SqlScript}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -50,6 +50,15 @@ case class SqlScriptComputed(
     tpe
   }
 
+  val params: List[SqlScriptComputed.ParamComputed] =
+    script.params.map { param =>
+      val name = param.maybeName match {
+        case DecomposedSql.NotNamedParam    => sc.Ident(s"param${param.indices.head}")
+        case DecomposedSql.NamedParam(name) => naming.field(db.ColName(name))
+      }
+      SqlScriptComputed.ParamComputed(name, scalaTypeMapper.param(param.tpe, param.nullability), param)
+    }
+
   val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)
   val RepoName: sc.QIdent = naming.repoName(relationName)
@@ -61,4 +70,8 @@ case class SqlScriptComputed(
       RepoMethod.SqlScript(this)
     )
   }
+}
+
+object SqlScriptComputed {
+  case class ParamComputed(name: sc.Ident, tpe: sc.Type, underlying: SqlScript.Param)
 }

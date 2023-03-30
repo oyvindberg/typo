@@ -1,7 +1,7 @@
 package typo
 package codegen
 
-import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
+import play.api.libs.json.{JsNull, Json}
 import typo.sc.syntax._
 
 case class RelationFiles(naming: Naming, relation: RelationComputed, options: Options) {
@@ -19,12 +19,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: Op
     val formattedCols = relation.cols.map { col =>
       val originComment = col.jsonDescription match {
         case JsNull => ""
-        case other =>
-          def removeNullsFromJson(json: JsValue): JsValue = json match {
-            case x: JsObject => JsObject(x.fields.collect { case (k, v) if v != JsNull => k -> removeNullsFromJson(v) })
-            case other       => other
-          }
-          if (options.debugTypes) s" /* ${Json.stringify(removeNullsFromJson(other))} */" else ""
+        case other  => if (options.debugTypes) s" /* ${Json.stringify(other)} */" else ""
       }
 
       col.pointsTo match {

@@ -1,9 +1,9 @@
 package typo
 package metadb
 
-import play.api.libs.json.Json
 import typo.generated.information_schema._
 import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow, ViewColumnDependenciesRepoImpl, ViewColumnDependenciesRow}
+import typo.internal.minimalJson
 
 import java.sql.Connection
 
@@ -63,6 +63,7 @@ object MetaDb {
 
         def mappedCols: List[db.Col] =
           columns.map { c =>
+            val jsonDescription = minimalJson(c)
             db.Col(
               name = db.ColName(c.columnName.get),
               hasDefault = c.columnDefault.isDefined,
@@ -72,8 +73,11 @@ object MetaDb {
                 case None        => Nullability.NullableUnknown
                 case other       => throw new Exception(s"Unknown nullability: $other")
               },
-              tpe = TypeMapperDb.dbTypeFrom(enumsByName, c),
-              jsonDescription = Json.toJson(c)
+              tpe = TypeMapperDb.dbTypeFrom(enumsByName, c).getOrElse {
+                System.err.println(s"Couldn't translate type from column $jsonDescription")
+                db.Type.Text
+              },
+              jsonDescription = jsonDescription
             )
           }
 

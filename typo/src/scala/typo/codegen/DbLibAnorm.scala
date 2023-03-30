@@ -89,7 +89,11 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.Delete(id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.SqlScript(sqlScript) =>
-      code"def apply()(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.RowName))}"
+      val params = sqlScript.params match {
+        case Nil      => sc.Code.Empty
+        case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe).code }.mkCode(",\n                     ")
+      }
+      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.RowName))}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -242,7 +246,11 @@ object DbLibAnorm extends DbLib {
         val sql = interpolate(code"""delete from ${table.relationName} where ${matchId(id)}""")
         code"$sql.executeUpdate() > 0"
       case RepoMethod.SqlScript(sqlScript) =>
-        code"""|val sql = ${interpolate(sqlScript.script.content)}
+        val renderedScript = sqlScript.script.decomposedSql.render { (paramAtIndex: Int) =>
+          val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
+          s"$$${param.name.value}"
+        }
+        code"""|val sql = ${interpolate(renderedScript)}
                |    sql.as(${sc.Type.Qualified(sqlScript.RowName)}.$rowParserIdent("").*)
                |""".stripMargin
     }

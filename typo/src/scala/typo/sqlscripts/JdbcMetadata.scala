@@ -3,17 +3,16 @@ package sqlscripts
 
 import java.sql.{Connection, PreparedStatement}
 
-case class Analyzed(params: List[MetadataParameterColumn], columns: List[MetadataColumn])
+case class JdbcMetadata(params: List[MetadataParameterColumn], columns: List[MetadataColumn])
 
-object Analyzed {
-
-  def from(sql: String)(implicit c: Connection): Analyzed = {
+object JdbcMetadata {
+  def from(sql: String)(implicit c: Connection): JdbcMetadata = {
     val ps = c.prepareStatement(sql)
     try from(ps)
     finally ps.close()
   }
 
-  def from(ps: PreparedStatement): Analyzed = {
+  def from(ps: PreparedStatement): JdbcMetadata = {
     val params = ps.getParameterMetaData match {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
@@ -70,6 +69,6 @@ object Analyzed {
       case other => sys.error(s"Expected `org.postgresql.jdbc.PgResultSetMetaData`, ot ${other.getClass.getName}")
     }
 
-    Analyzed(params.toList, columns.toList)
+    JdbcMetadata(params.toList, columns.toList)
   }
 }
