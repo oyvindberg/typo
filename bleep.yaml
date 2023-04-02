@@ -45,7 +45,7 @@ templates:
     platform:
       name: jvm
     scala:
-      options: -encoding utf8 -feature -unchecked
+      options: -encoding utf8 -feature -unchecked -Xfatal-warnings
       strict: true
   template-cross:
     cross:

@@ -44,7 +44,9 @@ object GeneratedSources {
       )
       Gen
         .fromDbAndScripts(options, sqlScriptDir, Selector.OnlyPostgresInternal)
-        .map { case sc.File(sc.Type.Qualified(sc.QIdent(path :+ name)), content) =>
+        .map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content)=>
+          val path = idents.init
+          val name = idents.last
           val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
           relpath -> content.render
         }
