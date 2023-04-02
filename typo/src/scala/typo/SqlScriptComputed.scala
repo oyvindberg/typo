@@ -10,11 +10,7 @@ case class SqlScriptComputed(
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
-  val pathSegments: List[sc.Ident] = {
-    val b = List.newBuilder[sc.Ident]
-    script.relPath.forEach(p => b += sc.Ident(p.toString))
-    b.result()
-  }
+  val pathSegments: List[sc.Ident] = script.relPath.segments.map(sc.Ident.apply)
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 

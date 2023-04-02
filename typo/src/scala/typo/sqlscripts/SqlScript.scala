@@ -1,10 +1,8 @@
 package typo
 package sqlscripts
 
-import java.nio.file.Path
-
 case class SqlScript(
-    relPath: Path,
+    relPath: RelPath,
     decomposedSql: DecomposedSql,
     params: List[SqlScript.Param],
     cols: List[db.Col],

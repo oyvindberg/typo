@@ -1,7 +1,5 @@
 package scripts
 
-import bleep._
-import bleep.logging.Logger
 import typo._
 import typo.codegen.{DbLibAnorm, JsonLibPlay}
 
@@ -42,7 +40,7 @@ object GeneratedSources {
       "tables",
     )
 
-    val filesByRelPath: Map[RelPath, String] = {
+    val files: Generated = {
       val generated = sc.Ident("generated")
       val options = Options(
         pkg = sc.QIdent(List(sc.Ident("typo"), generated)),
@@ -51,26 +49,13 @@ object GeneratedSources {
         header = header,
         debugTypes = true
       )
-      Gen
-        .fromDbAndScripts(options, sqlScriptDir, selector)
-        .map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content)=>
-          val path = idents.init
-          val name = idents.last
-          val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-          relpath -> content.render
-        }
-        .toMap
+      Gen.fromDbAndScripts(options, sqlScriptDir, selector)
     }
 
-    FileSync
-      .syncStrings(
-        typoSources,
-        filesByRelPath,
-        deleteUnknowns = FileSync.DeleteUnknowns.Yes(maxDepth = None),
-        soft = true
-      )
+    files.overwriteFolder(typoSources, soft = true)
 
-    cli("add to git", typoSources, List("git", "add", "-f", typoSources.toString), Logger.DevNull, cli.Out.Raw)
+    import scala.sys.process._
+    List("git", "add", "-f", typoSources.toString).!!
     ()
   }
 }

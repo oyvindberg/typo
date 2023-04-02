@@ -11,19 +11,19 @@ import java.sql.Connection
 import scala.collection.immutable.SortedMap
 
 object Gen {
-  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): List[sc.File] = {
+  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
     val metadb = MetaDb(MetaDb.Input.fromDb(c))
     val enumsByName = metadb.enums.map(e => (e.name.name, e)).toMap
     val sqlScripts = sqlscripts.Load(scriptsPath, enumsByName)
     apply(options, metadb, sqlScripts, selector)
   }
 
-  def fromDb(options: Options, selector: Selector)(implicit c: Connection): List[sc.File] = {
+  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
     val metadb = MetaDb(MetaDb.Input.fromDb(c))
     apply(options, metadb, sqlScripts = Nil, selector)
   }
 
-  def apply(options: Options, metaDb: MetaDb, sqlScripts: List[SqlScript], selector: Selector): List[sc.File] = {
+  def apply(options: Options, metaDb: MetaDb, sqlScripts: List[SqlScript], selector: Selector): Generated = {
     val naming = options.naming(options.pkg)
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, naming)
 
@@ -67,6 +67,6 @@ object Gen {
     val pkgObject = List(PackageObjectFile.packageObject(options))
 
     val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
-    allFiles.map(file => file.copy(contents = options.header.code ++ file.contents))
+    Generated(allFiles.map(file => file.copy(contents = options.header.code ++ file.contents)))
   }
 }

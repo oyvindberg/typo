@@ -1,11 +1,7 @@
 package typo
 
-import typo.db.Type
-
-import java.nio.file.Path
-
 case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
-  def apply(relation: Either[Path, db.RelationName], col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
+  def apply(relation: Either[RelPath, db.RelationName], col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
       val maybeOverridden = typeOverride(relation, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
       val maybeFromFK = typeFromFK.map(stripOptionAndArray)
@@ -14,7 +10,7 @@ case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
     }
 
     val baseTpe = col.tpe match {
-      case Type.Array(tpe) =>
+      case db.Type.Array(tpe) =>
         sc.Type.Array.of(go(tpe))
       case other =>
         go(other)
@@ -25,7 +21,7 @@ case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
 
   def param(dbType: db.Type, nullability: Nullability): sc.Type = {
     val base = dbType match {
-      case Type.Array(tpe) =>
+      case db.Type.Array(tpe) =>
         sc.Type.Array.of(baseType(tpe))
       case other =>
         baseType(other)
@@ -34,7 +30,7 @@ case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
     withNullability(base, nullability)
   }
 
-  private def baseType(tpe: Type): sc.Type = {
+  private def baseType(tpe: db.Type): sc.Type = {
     tpe match {
       case db.Type.PgObject(tpe)    => sc.Type.PGobject.withComment(tpe)
       case db.Type.BigInt           => sc.Type.Long

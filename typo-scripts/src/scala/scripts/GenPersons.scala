@@ -105,7 +105,7 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
          | */
          |""".stripMargin
 
-    val files: Map[RelPath, String] = {
+    val generated: Generated = {
       Gen(
         Options(
           pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))),
@@ -120,22 +120,15 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
         MetaDb(all, enums),
         sqlScripts = Nil,
         Selector.All
-      ).map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content) =>
-        val path = idents.init
-        val name = idents.last
-        val relpath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-        relpath -> content.render
-      }.toMap
+      )
     }
 
     targets.foreach { target =>
-      FileSync
-        .syncStrings(
-          target.sources,
-          files,
-          deleteUnknowns = FileSync.DeleteUnknowns.Yes(maxDepth = None),
-          soft = false // todo: bleep should use something better than timestamps
-        )
+      generated.overwriteFolder(
+        target.sources,
+        // todo: bleep should use something better than timestamps
+        soft = false
+      )
       cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
     }
   }

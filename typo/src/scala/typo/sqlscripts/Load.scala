@@ -15,7 +15,7 @@ object Load {
       val decomposedSql = DecomposedSql.parse(sqlContent)
       try {
         val analyzed = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
-        val script = parseSqlScript(enums, scriptsPath.relativize(sqlFile), decomposedSql, analyzed)
+        val script = parseSqlScript(enums, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, analyzed)
         Some(script)
       } catch {
         case e: PSQLException =>
@@ -38,7 +38,7 @@ object Load {
     found.result()
   }
 
-  def parseSqlScript(enums: Map[String, db.StringEnum], relativePath: Path, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): SqlScript = {
+  def parseSqlScript(enums: Map[String, db.StringEnum], relativePath: RelPath, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): SqlScript = {
     val cols = jdbcMetadata.columns.map { col =>
       val jsonDescription = minimalJson(col)
       db.Col(
