@@ -93,7 +93,7 @@ object DbLibAnorm extends DbLib {
         case Nil      => sc.Code.Empty
         case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe).code }.mkCode(",\n                     ")
       }
-      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.RowName))}"
+      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.relation.RowName))}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -251,7 +251,7 @@ object DbLibAnorm extends DbLib {
           s"$$${param.name.value}"
         }
         code"""|val sql = ${interpolate(renderedScript)}
-               |    sql.as(${sc.Type.Qualified(sqlScript.RowName)}.$rowParserIdent("").*)
+               |    sql.as(${sc.Type.Qualified(sqlScript.relation.RowName)}.$rowParserIdent("").*)
                |""".stripMargin
     }
 

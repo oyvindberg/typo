@@ -61,9 +61,6 @@ case class SqlScriptComputed(
 
   val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)
-  val RepoName: sc.QIdent = naming.repoName(relationName)
-  val RepoImplName: sc.QIdent = naming.repoImplName(relationName)
-  val RowName: sc.QIdent = naming.rowName(relationName)
 
   val repoMethods: List[RepoMethod] = {
     List(
