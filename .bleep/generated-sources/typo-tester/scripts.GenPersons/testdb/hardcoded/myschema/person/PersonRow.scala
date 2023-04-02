@@ -18,13 +18,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 import testdb.hardcoded.myschema.SectorEnum
 import testdb.hardcoded.myschema.football_club.FootballClubId
-import testdb.hardcoded.myschema.football_club.FootballClubRow
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
-import testdb.hardcoded.myschema.marital_status.MaritalStatusRow
 
 case class PersonRow(
   id: PersonId,
-  /** Points to [[FootballClubRow.id]] */
+  /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
   name: String,
   nickName: Option[String],
@@ -32,7 +30,7 @@ case class PersonRow(
   email: String,
   phone: String,
   likesPizza: Boolean,
-  /** Points to [[MaritalStatusRow.id]] */
+  /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[String],
   sector: SectorEnum

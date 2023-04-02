@@ -18,18 +18,17 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.information_schema.`_pg_foreign_tables`.PgForeignTablesRow
 
 case class ForeignTablesRow(
-  /** Points to [[PgForeignTablesRow.foreignTableCatalog]] */
+  /** Points to [[`_pg_foreign_tables`.PgForeignTablesRow.foreignTableCatalog]] */
   foreignTableCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"foreign_tables","column_name":"foreign_table_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgForeignTablesRow.foreignTableSchema]] */
+  /** Points to [[`_pg_foreign_tables`.PgForeignTablesRow.foreignTableSchema]] */
   foreignTableSchema: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"foreign_tables","column_name":"foreign_table_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgForeignTablesRow.foreignTableName]] */
+  /** Points to [[`_pg_foreign_tables`.PgForeignTablesRow.foreignTableName]] */
   foreignTableName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"foreign_tables","column_name":"foreign_table_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgForeignTablesRow.foreignServerCatalog]] */
+  /** Points to [[`_pg_foreign_tables`.PgForeignTablesRow.foreignServerCatalog]] */
   foreignServerCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"foreign_tables","column_name":"foreign_server_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgForeignTablesRow.foreignServerName]] */
+  /** Points to [[`_pg_foreign_tables`.PgForeignTablesRow.foreignServerName]] */
   foreignServerName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"foreign_tables","column_name":"foreign_server_name","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

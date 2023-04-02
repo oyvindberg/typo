@@ -18,24 +18,23 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.pg_stat_all_indexes.PgStatAllIndexesRow
 
 case class PgStatSysIndexesRow(
-  /** Points to [[PgStatAllIndexesRow.relid]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.relid]] */
   relid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"relid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.indexrelid]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.indexrelid]] */
   indexrelid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"indexrelid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.schemaname]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.schemaname]] */
   schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"schemaname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.relname]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.relname]] */
   relname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"relname","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.indexrelname]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.indexrelname]] */
   indexrelname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"indexrelname","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.idxScan]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.idxScan]] */
   idxScan: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"idx_scan","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.idxTupRead]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.idxTupRead]] */
   idxTupRead: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"idx_tup_read","ordinal_position":7,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllIndexesRow.idxTupFetch]] */
+  /** Points to [[pg_stat_all_indexes.PgStatAllIndexesRow.idxTupFetch]] */
   idxTupFetch: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_indexes","column_name":"idx_tup_fetch","ordinal_position":8,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

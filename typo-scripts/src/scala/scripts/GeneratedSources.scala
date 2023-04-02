@@ -4,7 +4,6 @@ import bleep._
 import bleep.logging.Logger
 import typo._
 import typo.codegen.{DbLibAnorm, JsonLibPlay}
-import typo.sc.syntax.CodeInterpolator
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}

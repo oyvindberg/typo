@@ -19,25 +19,24 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.pg_shadow.PgShadowRow
 
 case class PgUserRow(
-  /** Points to [[PgShadowRow.usename]] */
+  /** Points to [[pg_shadow.PgShadowRow.usename]] */
   usename: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usename","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.usesysid]] */
+  /** Points to [[pg_shadow.PgShadowRow.usesysid]] */
   usesysid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesysid","ordinal_position":2,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.usecreatedb]] */
+  /** Points to [[pg_shadow.PgShadowRow.usecreatedb]] */
   usecreatedb: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usecreatedb","ordinal_position":3,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.usesuper]] */
+  /** Points to [[pg_shadow.PgShadowRow.usesuper]] */
   usesuper: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usesuper","ordinal_position":4,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.userepl]] */
+  /** Points to [[pg_shadow.PgShadowRow.userepl]] */
   userepl: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"userepl","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.usebypassrls]] */
+  /** Points to [[pg_shadow.PgShadowRow.usebypassrls]] */
   usebypassrls: Option[Boolean] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"usebypassrls","ordinal_position":6,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   passwd: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"passwd","ordinal_position":7,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.valuntil]] */
+  /** Points to [[pg_shadow.PgShadowRow.valuntil]] */
   valuntil: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"valuntil","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgShadowRow.useconfig]] */
+  /** Points to [[pg_shadow.PgShadowRow.useconfig]] */
   useconfig: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_user","column_name":"useconfig","ordinal_position":9,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

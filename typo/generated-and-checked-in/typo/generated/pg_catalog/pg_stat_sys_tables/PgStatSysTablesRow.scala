@@ -19,54 +19,53 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.pg_catalog.pg_stat_all_tables.PgStatAllTablesRow
 
 case class PgStatSysTablesRow(
-  /** Points to [[PgStatAllTablesRow.relid]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.relid]] */
   relid: Option[/* oid */ Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"relid","ordinal_position":1,"is_nullable":"YES","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.schemaname]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.schemaname]] */
   schemaname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"schemaname","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.relname]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.relname]] */
   relname: Option[String] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"relname","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.seqScan]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.seqScan]] */
   seqScan: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"seq_scan","ordinal_position":4,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.seqTupRead]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.seqTupRead]] */
   seqTupRead: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"seq_tup_read","ordinal_position":5,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.idxScan]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.idxScan]] */
   idxScan: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"idx_scan","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.idxTupFetch]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.idxTupFetch]] */
   idxTupFetch: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"idx_tup_fetch","ordinal_position":7,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nTupIns]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nTupIns]] */
   nTupIns: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_tup_ins","ordinal_position":8,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nTupUpd]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nTupUpd]] */
   nTupUpd: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_tup_upd","ordinal_position":9,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nTupDel]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nTupDel]] */
   nTupDel: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_tup_del","ordinal_position":10,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nTupHotUpd]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nTupHotUpd]] */
   nTupHotUpd: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_tup_hot_upd","ordinal_position":11,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nLiveTup]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nLiveTup]] */
   nLiveTup: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_live_tup","ordinal_position":12,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nDeadTup]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nDeadTup]] */
   nDeadTup: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_dead_tup","ordinal_position":13,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nModSinceAnalyze]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nModSinceAnalyze]] */
   nModSinceAnalyze: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_mod_since_analyze","ordinal_position":14,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.nInsSinceVacuum]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"n_ins_since_vacuum","ordinal_position":15,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.lastVacuum]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.lastVacuum]] */
   lastVacuum: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"last_vacuum","ordinal_position":16,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.lastAutovacuum]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.lastAutovacuum]] */
   lastAutovacuum: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"last_autovacuum","ordinal_position":17,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.lastAnalyze]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.lastAnalyze]] */
   lastAnalyze: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"last_analyze","ordinal_position":18,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.lastAutoanalyze]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.lastAutoanalyze]] */
   lastAutoanalyze: Option[ZonedDateTime] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"last_autoanalyze","ordinal_position":19,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.vacuumCount]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.vacuumCount]] */
   vacuumCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"vacuum_count","ordinal_position":20,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.autovacuumCount]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.autovacuumCount]] */
   autovacuumCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"autovacuum_count","ordinal_position":21,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.analyzeCount]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.analyzeCount]] */
   analyzeCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"analyze_count","ordinal_position":22,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[PgStatAllTablesRow.autoanalyzeCount]] */
+  /** Points to [[pg_stat_all_tables.PgStatAllTablesRow.autoanalyzeCount]] */
   autoanalyzeCount: Option[Long] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_stat_sys_tables","column_name":"autoanalyze_count","ordinal_position":23,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

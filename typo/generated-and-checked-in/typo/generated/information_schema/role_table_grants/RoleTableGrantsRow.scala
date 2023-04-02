@@ -18,24 +18,23 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.information_schema.table_privileges.TablePrivilegesRow
 
 case class RoleTableGrantsRow(
-  /** Points to [[TablePrivilegesRow.grantor]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.grantor]] */
   grantor: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"grantor","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.grantee]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.grantee]] */
   grantee: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"grantee","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.tableCatalog]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.tableCatalog]] */
   tableCatalog: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"table_catalog","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.tableSchema]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.tableSchema]] */
   tableSchema: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"table_schema","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.tableName]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.tableName]] */
   tableName: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"table_name","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.privilegeType]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.privilegeType]] */
   privilegeType: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"privilege_type","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.isGrantable]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.isGrantable]] */
   isGrantable: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"is_grantable","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  /** Points to [[TablePrivilegesRow.withHierarchy]] */
+  /** Points to [[table_privileges.TablePrivilegesRow.withHierarchy]] */
   withHierarchy: Option[String] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"role_table_grants","column_name":"with_hierarchy","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 

@@ -24,9 +24,9 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: Op
 
       col.pointsTo match {
         case Some((relationName, columnName)) =>
-          val row = naming.rowName(relationName)
-          code"""/** Points to [[$row.${naming.field(columnName)}]] */
-                |  ${col.param}$originComment""".stripMargin
+          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.idents))
+          code"""|/** Points to [[${sc.renderTree(shortened)}.${naming.field(columnName)}]] */
+                 |  ${col.param}$originComment""".stripMargin
         case None => code"${col.param.code}$originComment"
       }
     }
@@ -87,4 +87,10 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: Op
 
     sc.File(sc.Type.Qualified(relation.RepoImplName), str)
   }
+
+  def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =
+    (a, b) match {
+      case (x :: xs, y :: ys) if x == y => dropCommonPrefix(xs, ys)
+      case _                            => a
+    }
 }
