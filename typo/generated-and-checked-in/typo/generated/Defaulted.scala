@@ -17,8 +17,6 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import typo.generated.Defaulted.Provided
-import typo.generated.Defaulted.UseDefault
 
 
 /**

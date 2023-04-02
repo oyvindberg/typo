@@ -12,7 +12,7 @@ class Naming(pkg: sc.QIdent) {
   def fieldValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldValue")
   def rowUnsaved(name: db.RelationName): sc.QIdent = relation(name, "RowUnsaved")
   def joinedRow(name: db.RelationName): sc.QIdent = relation(name, "JoinedRow")
-  def className(names: List[sc.Ident]) = pkg / names
+  def className(names: List[sc.Ident]): sc.QIdent = pkg / names
 
   // enum names
   def enumName(name: db.RelationName): sc.QIdent =

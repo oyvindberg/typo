@@ -12,16 +12,18 @@ object addPackageAndImports {
     val newImports = mutable.Map.empty[sc.Ident, sc.QIdent]
 
     val withShortenedNames = file.contents.mapTrees { tree =>
-      shortenNames(tree) { currentQName =>
-        val currentName = currentQName.name
-        val shortenedQName = sc.QIdent(List(currentName))
-        knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
-          case Some(alreadyAvailable) =>
-            if (alreadyAvailable == currentQName) shortenedQName else currentQName
-          case None =>
-            newImports += ((currentName, currentQName))
-            shortenedQName
-        }
+      shortenNames(tree) {
+        case currentQName if currentQName.idents.length <= 1 => currentQName
+        case currentQName =>
+          val currentName = currentQName.name
+          val shortenedQName = sc.QIdent(List(currentName))
+          knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+            case Some(alreadyAvailable) =>
+              if (alreadyAvailable == currentQName) shortenedQName else currentQName
+            case None =>
+              newImports += ((currentName, currentQName))
+              shortenedQName
+          }
       }
     }
 

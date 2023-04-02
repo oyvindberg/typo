@@ -25,6 +25,7 @@ object sc {
     def /(ident: Ident): QIdent = QIdent(idents :+ ident)
     def /(newIdents: List[Ident]): QIdent = QIdent(idents ++ newIdents)
     def name = idents.last
+    def assertInScope = QIdent(List(idents.last))
   }
   object QIdent {
     implicit val ordering: Ordering[QIdent] = Ordering.by(renderTree)
