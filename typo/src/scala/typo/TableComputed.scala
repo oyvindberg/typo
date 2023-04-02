@@ -142,6 +142,9 @@ case class TableComputed(
               )
 
               Some(newParam)
+            case Some(Left(_)) =>
+              System.err.println(s"Unexpected dependency on view ${dbTable.name.value} => ${fk.otherTable.value}")
+              None
             case None =>
               System.err.println(s"Unexpected circular dependency ${dbTable.name.value} => ${fk.otherTable.value}")
               None
