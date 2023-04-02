@@ -28,7 +28,7 @@ projects:
     - org.postgresql:postgresql:42.5.4
     extends: template-nocross
     sourcegen:
-      main: scripts.GenPersons
+      main: scripts.GenHardcodedFiles
       project: typo-scripts
 scripts:
   generate-sources:

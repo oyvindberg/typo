@@ -5,7 +5,9 @@ import bleep.logging.Logger
 import play.api.libs.json.JsNull
 import typo._
 
-object GenPersons extends BleepCodegenScript("GenPersons") {
+// this runs automatically at build time to instantly see results.
+// it does not need a running database
+object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val enums = List(
     db.StringEnum(db.RelationName(Some("myschema"), "sector"), List("PUBLIC", "PRIVATE", "OTHER"))
   )
