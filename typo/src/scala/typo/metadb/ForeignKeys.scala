@@ -1,6 +1,8 @@
 package typo
 package metadb
-import typo.generated.information_schema.{KeyColumnUsageRow, ReferentialConstraintsRow, TableConstraintsRow}
+import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
+import typo.generated.information_schema.referential_constraints.ReferentialConstraintsRow
+import typo.generated.information_schema.table_constraints.TableConstraintsRow
 
 object ForeignKeys {
   def apply(

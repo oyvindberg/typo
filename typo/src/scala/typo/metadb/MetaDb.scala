@@ -1,8 +1,13 @@
 package typo
 package metadb
 
-import typo.generated.information_schema._
-import typo.generated.views.{FindAllViewsRepoImpl, FindAllViewsRow, ViewColumnDependenciesRepoImpl, ViewColumnDependenciesRow}
+import typo.generated.information_schema.columns.{ColumnsRepoImpl, ColumnsRow}
+import typo.generated.information_schema.key_column_usage.{KeyColumnUsageRepoImpl, KeyColumnUsageRow}
+import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsRepoImpl, ReferentialConstraintsRow}
+import typo.generated.information_schema.table_constraints.{TableConstraintsRepoImpl, TableConstraintsRow}
+import typo.generated.information_schema.tables.{TablesRepoImpl, TablesRow}
+import typo.generated.views.find_all_views._
+import typo.generated.views.view_column_dependencies._
 import typo.internal.minimalJson
 
 import java.sql.Connection

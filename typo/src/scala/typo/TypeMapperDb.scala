@@ -1,6 +1,6 @@
 package typo
 
-import typo.generated.information_schema.ColumnsRow
+import typo.generated.information_schema.columns.ColumnsRow
 
 object TypeMapperDb {
   def dbTypeFrom(enums: Map[String, db.StringEnum], c: ColumnsRow): Option[db.Type] =

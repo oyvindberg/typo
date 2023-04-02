@@ -1,7 +1,8 @@
 package typo
 package metadb
 
-import typo.generated.information_schema.{KeyColumnUsageRow, TableConstraintsRow}
+import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
+import typo.generated.information_schema.table_constraints.TableConstraintsRow
 
 object UniqueKeys {
   def apply(tableConstraints: List[TableConstraintsRow], keyColumnUsage: List[KeyColumnUsageRow]): Map[db.RelationName, List[db.UniqueKey]] = {

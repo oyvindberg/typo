@@ -2,7 +2,7 @@ package typo
 
 class Naming(pkg: sc.QIdent) {
   protected def relation(name: db.RelationName, suffix: String): sc.QIdent =
-    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
+    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(name.name) / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
 
   // class names
   def idName(name: db.RelationName): sc.QIdent = relation(name, "Id")
