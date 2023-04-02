@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.CodeInterpolator
-
 case class DefaultFile(dc: DefaultComputed, jsonLib: JsonLib) {
   val contents =
     code"""

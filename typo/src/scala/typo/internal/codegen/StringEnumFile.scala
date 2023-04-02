@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.*
-
 object StringEnumFile {
   def stringEnumClass(naming: Naming, options: InternalOptions)(`enum`: db.StringEnum): sc.File = {
     val qident = naming.enumName(`enum`.name)

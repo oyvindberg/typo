@@ -188,37 +188,6 @@ object sc {
     val pkg = QIdent(tpe.value.idents.dropRight(1))
   }
 
-  @FunctionalInterface
-  trait ToCode[T] {
-    def toCode(t: T): Code
-  }
-
-  object ToCode {
-    def apply[T: ToCode]: ToCode[T] = implicitly
-
-    implicit def tree[T <: Tree]: ToCode[T] = Code.Tree.apply
-    implicit val str: ToCode[String] = Code.Str.apply
-    implicit val int: ToCode[Int] = _.toString
-    implicit val code: ToCode[Code] = identity
-  }
-
-  object syntax {
-    implicit class ToCodeOps[T](private val t: T) extends AnyVal {
-      def code(implicit toCode: ToCode[T]): Code = toCode.toCode(t)
-    }
-
-    implicit final class CodeInterpolator(private val sc: StringContext) extends AnyVal {
-      def code(args: Code*): Code = {
-        val fragments = List.newBuilder[Code]
-        sc.parts.zipWithIndex.foreach { case (str, n) =>
-          if (n > 0) fragments += args(n - 1)
-          fragments += Code.Str(StringContext.processEscapes(str))
-        }
-        Code.Combined(fragments.result())
-      }
-    }
-  }
-
   /** Semi-structured generated code. We keep all `Tree`s as long as possible so we can write imports based on what is used
     */
   sealed trait Code {
@@ -253,19 +222,6 @@ object sc {
     case class Combined(codes: Iterable[Code]) extends Code
     case class Str(value: String) extends Code
     case class Tree(value: sc.Tree) extends Code
-
-    // magnet pattern
-    implicit def toCode[T: ToCode](x: T): Code = ToCode[T].toCode(x)
-
-    implicit class CodeOps[I[t] <: Iterable[t], C <: Code](private val codes: I[C]) extends AnyVal {
-      def mkCode(sep: Code): Code = {
-        val interspersed = codes.zipWithIndex.map {
-          case (c, 0) => c
-          case (c, _) => Combined(List(sep, c))
-        }
-        Combined(interspersed)
-      }
-    }
   }
 
   // `s"..." interpolator

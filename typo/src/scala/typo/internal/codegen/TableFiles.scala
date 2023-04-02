@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.*
-
 case class TableFiles(table: TableComputed, options: InternalOptions) {
   val relation = RelationFiles(table.naming, table.relation, options)
 

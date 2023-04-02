@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.*
-
 import scala.collection.mutable
 
 /** imports are automatically written based on the qualified idents found in the code

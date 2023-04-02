@@ -2,10 +2,8 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.*
-
 object DbLibAnorm extends DbLib {
-  implicit val tableName: sc.ToCode[db.RelationName] = _.value
+  implicit val tableName: ToCode[db.RelationName] = _.value
 
   def Column(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("anorm.Column"), List(t))
   val ToStatementName = sc.Type.Qualified("anorm.ToStatement")

@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.*
-
 object PackageObjectFile {
   def packageObject(options: InternalOptions): sc.File = {
     val parentPkg = options.pkg.idents.dropRight(1)

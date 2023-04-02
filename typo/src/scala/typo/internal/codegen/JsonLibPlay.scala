@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.sc.syntax.CodeInterpolator
-
 object JsonLibPlay extends JsonLib {
   def Format(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.Format"), List(t))
   val ReadsName = sc.Type.Qualified("play.api.libs.json.Reads")

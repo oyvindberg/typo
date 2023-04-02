@@ -2,7 +2,6 @@ import typo.internal.*
 import typo.internal.codegen.*
 import typo.internal.metadb.MetaDb
 import typo.internal.sqlscripts.{Load, SqlScript}
-import typo.sc.syntax.*
 
 import java.nio.file.Path
 import java.sql.Connection

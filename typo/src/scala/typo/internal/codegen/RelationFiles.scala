@@ -3,7 +3,6 @@ package internal
 package codegen
 
 import play.api.libs.json.{JsNull, Json}
-import typo.sc.syntax.*
 
 case class RelationFiles(naming: Naming, relation: RelationComputed, options: InternalOptions) {
   val RowFile: sc.File = {
