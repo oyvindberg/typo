@@ -1,6 +1,6 @@
-package typo.internal
+package typo
+package internal
 
-import typo.RelPath
 import typo.RelPath.PathOps
 
 import java.nio.charset.StandardCharsets

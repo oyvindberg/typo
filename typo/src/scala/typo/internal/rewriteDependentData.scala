@@ -1,4 +1,5 @@
-package typo.internal
+package typo
+package internal
 
 import scala.collection.immutable.SortedMap
 

@@ -1,8 +1,5 @@
 package scripts
 
-import typo._
-import typo.codegen.{DbLibAnorm, JsonLibPlay}
-
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
 import java.util
@@ -31,25 +28,24 @@ object GeneratedSources {
     val typoSources = buildDir.resolve("typo/generated-and-checked-in")
     val sqlScriptDir = buildDir.resolve("sql")
 
-    val selector = Selector.relationNames(
+    val selector = typo.Selector.relationNames(
       "columns",
       "key_column_usage",
       "pg_namespace",
       "referential_constraints",
       "table_constraints",
-      "tables",
+      "tables"
     )
 
-    val files: Generated = {
-      val generated = sc.Ident("generated")
-      val options = Options(
-        pkg = sc.QIdent(List(sc.Ident("typo"), generated)),
-        JsonLibPlay,
-        DbLibAnorm,
+    val files: typo.Generated = {
+      val options = typo.Options(
+        pkg = "typo.generated",
+        jsonLib = typo.JsonLibName.PlayJson,
+        dbLib = typo.DbLibName.Anorm,
         header = header,
         debugTypes = true
       )
-      Gen.fromDbAndScripts(options, sqlScriptDir, selector)
+      typo.fromDbAndScripts(options, sqlScriptDir, selector)
     }
 
     files.overwriteFolder(typoSources, soft = true)

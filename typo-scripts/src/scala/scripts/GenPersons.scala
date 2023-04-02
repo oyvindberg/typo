@@ -4,8 +4,6 @@ import bleep._
 import bleep.logging.Logger
 import play.api.libs.json.JsNull
 import typo._
-import typo.codegen.{DbLibAnorm, JsonLibPlay}
-import typo.metadb.MetaDb
 
 object GenPersons extends BleepCodegenScript("GenPersons") {
   val enums = List(
@@ -106,18 +104,19 @@ object GenPersons extends BleepCodegenScript("GenPersons") {
          |""".stripMargin
 
     val generated: Generated = {
-      Gen(
+      fromData(
         Options(
-          pkg = sc.QIdent(List(sc.Ident("testdb"), sc.Ident("hardcoded"))),
-          JsonLibPlay,
-          DbLibAnorm,
+          pkg = "testdb.hardcoded",
+          JsonLibName.PlayJson,
+          DbLibName.Anorm,
           naming = pkg =>
             new Naming(pkg) {
               override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)
             },
           header = header
         ),
-        MetaDb(all, enums),
+        all,
+        enums,
         sqlScripts = Nil,
         Selector.All
       )

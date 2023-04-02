@@ -43,13 +43,13 @@ object RelPath {
   implicit class PathOps(private val path: Path) extends AnyVal {
     def /(relPath: RelPath): Path =
       relPath.segments.foldLeft(path) {
-        case (acc, "..") => acc.getParent
+        case (acc, "..")    => acc.getParent
         case (acc, segment) => acc.resolve(segment)
       }
 
     def /(str: String): Path =
       RelPath(str) match {
-        case Left(err) => sys.error(err)
+        case Left(err)      => sys.error(err)
         case Right(relPath) => path / relPath
       }
   }

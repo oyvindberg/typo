@@ -1,6 +1,7 @@
-package typo.internal
+package typo
+package internal
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 object minimalJson {
   def apply[T: Writes](t: T): JsValue =

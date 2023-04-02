@@ -200,7 +200,6 @@ object sc {
     implicit val str: ToCode[String] = Code.Str.apply
     implicit val int: ToCode[Int] = _.toString
     implicit val code: ToCode[Code] = identity
-    implicit val tableName: ToCode[db.RelationName] = (_.value)
   }
 
   object syntax {

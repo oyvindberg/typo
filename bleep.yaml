@@ -53,9 +53,11 @@ templates:
         dependencies: org.scala-lang.modules::scala-collection-compat:2.9.0
         scala:
           version: 2.12.15
+          options: -Xsource:3
       jvm213:
         scala:
           version: 2.13.10
+          options: -Xsource:3
       jvm3:
         scala:
           version: 3.2.0
