@@ -15,5 +15,8 @@ object Selector {
   val ExcludePostgresInternal: Selector = rel => !Internal(rel.schema)
   val OnlyPostgresInternal: Selector = rel => Internal(rel.schema)
 
-  def keepNames(names: Set[String]): Selector = rel => names(rel.name)
+  def relationNames(names: String*): Selector = {
+    val wanted = names.toSet
+    rel => wanted(rel.name)
+  }
 }

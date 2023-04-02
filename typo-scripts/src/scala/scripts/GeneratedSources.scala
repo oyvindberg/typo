@@ -33,6 +33,15 @@ object GeneratedSources {
     val typoSources = buildDir.resolve("typo/generated-and-checked-in")
     val sqlScriptDir = buildDir.resolve("sql")
 
+    val selector = Selector.relationNames(
+      "columns",
+      "key_column_usage",
+      "pg_namespace",
+      "referential_constraints",
+      "table_constraints",
+      "tables",
+    )
+
     val filesByRelPath: Map[RelPath, String] = {
       val generated = sc.Ident("generated")
       val options = Options(
@@ -43,7 +52,7 @@ object GeneratedSources {
         debugTypes = true
       )
       Gen
-        .fromDbAndScripts(options, sqlScriptDir, Selector.OnlyPostgresInternal)
+        .fromDbAndScripts(options, sqlScriptDir, selector)
         .map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content)=>
           val path = idents.init
           val name = idents.last
