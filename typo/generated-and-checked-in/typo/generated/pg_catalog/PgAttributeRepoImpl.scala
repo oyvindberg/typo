@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -55,6 +54,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_attribute where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgAttributeRow.rowParser("").*)
@@ -96,6 +97,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         val q = s"""update pg_catalog.pg_attribute
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

@@ -60,9 +60,11 @@ object sc {
     val LocalTime = sc.Type.Qualified("java.time.LocalTime")
     val AnyVal = sc.Type.Qualified("scala.AnyVal")
     val Any = sc.Type.Qualified("scala.Any")
+    val AnyRef = sc.Type.Qualified("scala.AnyRef")
     val BigDecimal = sc.Type.Qualified("scala.math.BigDecimal")
     val Byte = sc.Type.Qualified("scala.Byte")
     val Short = sc.Type.Qualified("scala.Short")
+    val JavaShort = sc.Type.Qualified("java.lang.Short")
     val Array = sc.Type.Qualified("scala.Array")
     val Ordering = sc.Type.Qualified("scala.math.Ordering")
     val Connection = sc.Type.Qualified("java.sql.Connection")
@@ -70,12 +72,17 @@ object sc {
     val Types = sc.Type.Qualified("java.sql.Types")
     val Unit = Qualified("scala.Unit")
     val Int = Qualified("scala.Int")
+    val JavaInteger = Qualified("java.lang.Integer")
     val Double = Qualified("scala.Double")
+    val JavaDouble = Qualified("java.lang.Double")
     val UUID = Qualified("java.util.UUID")
     val Long = Qualified("scala.Long")
+    val JavaLong = Qualified("java.lang.Long")
     val String = Qualified("java.lang.String")
     val Float = Qualified("scala.Float")
+    val JavaFloat = Qualified("java.lang.Float")
     val Boolean = Qualified("scala.Boolean")
+    val JavaBoolean = Qualified("java.lang.Boolean")
     val Option = Qualified("scala.Option")
     val None = Qualified("scala.None")
     val Some = Qualified("scala.Some")
@@ -86,8 +93,6 @@ object sc {
     val Right = Qualified("scala.Right")
     val Try = Qualified("scala.util.Try")
     val JavaMap = Qualified("java.util.Map")
-    val MapHasAsJava = Qualified("scala.jdk.CollectionConverters.MapHasAsJava")
-    val MapHasAsScala = Qualified("scala.jdk.CollectionConverters.MapHasAsScala")
     val StringContext = Qualified("java.StringContext")
     val PGobject = Qualified("org.postgresql.util.PGobject")
     val PGbox = Qualified("org.postgresql.geometric.PGbox")
@@ -104,6 +109,7 @@ object sc {
     val BuiltIn: Map[Ident, QIdent] =
       Set(
         Any,
+        AnyRef,
         AnyVal,
         Array,
         BigDecimal,

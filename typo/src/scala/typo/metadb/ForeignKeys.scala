@@ -74,7 +74,9 @@ object ForeignKeys {
       .collect { case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
         tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
       }
-      .groupMap(_._1)(_._2)
+      .groupBy { case (k, _) => k }
+      .map { case (k, v) => k -> v.map(_._2) }
+
   }
 
 }

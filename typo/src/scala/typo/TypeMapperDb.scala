@@ -61,7 +61,7 @@ object TypeMapperDb {
       case "varchar"                           => Some(db.Type.VarChar(characterMaximumLength))
       case str if pgObjectTypes(str)           => Some(db.Type.PgObject(str))
       case str if str.startsWith("_")          => dbTypeFrom(enums, udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
-      case typeName                            => enums.get(typeName).map(enum => db.Type.StringEnum(enum.name))
+      case typeName                            => enums.get(typeName).map(`enum` => db.Type.StringEnum(`enum`.name))
     }
   }
 }

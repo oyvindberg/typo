@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -60,6 +59,8 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
           case PgStatisticFieldValue.stavalues5(value) => NamedParameter("stavalues5", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_statistic where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgStatisticRow.rowParser("").*)
@@ -106,6 +107,8 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
         val q = s"""update pg_catalog.pg_statistic
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where starelid = ${compositeId.starelid}, staattnum = ${compositeId.staattnum}, stainherit = ${compositeId.stainherit}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

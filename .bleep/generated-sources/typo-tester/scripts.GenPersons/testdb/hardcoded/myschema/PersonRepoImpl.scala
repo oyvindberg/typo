@@ -9,7 +9,6 @@ package myschema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
@@ -43,6 +42,8 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
         val q = s"""select * from myschema.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PersonRow.rowParser("").*)
@@ -69,6 +70,8 @@ object PersonRepoImpl extends PersonRepo {
         val q = s"""update myschema.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where id = $id"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

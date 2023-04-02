@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -36,6 +35,8 @@ object PgEnumRepoImpl extends PgEnumRepo {
           case PgEnumFieldValue.enumlabel(value) => NamedParameter("enumlabel", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_enum where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgEnumRow.rowParser("").*)
@@ -55,6 +56,8 @@ object PgEnumRepoImpl extends PgEnumRepo {
         val q = s"""update pg_catalog.pg_enum
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

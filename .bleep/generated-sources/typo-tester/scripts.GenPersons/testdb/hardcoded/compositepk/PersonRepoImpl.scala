@@ -9,7 +9,6 @@ package compositepk
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -30,6 +29,8 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
         val q = s"""select * from compositepk.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PersonRow.rowParser("").*)
@@ -48,6 +49,8 @@ object PersonRepoImpl extends PersonRepo {
         val q = s"""update compositepk.person
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where one = ${compositeId.one}, two = ${compositeId.two}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

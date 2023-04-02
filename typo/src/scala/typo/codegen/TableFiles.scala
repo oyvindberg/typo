@@ -6,7 +6,7 @@ import typo.sc.syntax._
 case class TableFiles(table: TableComputed, options: Options) {
   val relation = RelationFiles(table.naming, table.relation, options)
 
-  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsUnsaved).map { case (qident, colsUnsaved) =>
+  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsUnsaved).headOption.map { case (qident, colsUnsaved) =>
     val rowType = sc.Type.Qualified(qident)
 
     val str =

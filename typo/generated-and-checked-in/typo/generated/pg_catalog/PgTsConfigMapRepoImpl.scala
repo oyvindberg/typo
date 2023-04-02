@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -33,6 +32,8 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           case PgTsConfigMapFieldValue.mapdict(value) => NamedParameter("mapdict", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_ts_config_map where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgTsConfigMapRow.rowParser("").*)
@@ -52,6 +53,8 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
         val q = s"""update pg_catalog.pg_ts_config_map
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where mapcfg = ${compositeId.mapcfg}, maptokentype = ${compositeId.maptokentype}, mapseqno = ${compositeId.mapseqno}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

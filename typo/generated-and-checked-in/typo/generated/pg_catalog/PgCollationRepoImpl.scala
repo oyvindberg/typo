@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -42,6 +41,8 @@ object PgCollationRepoImpl extends PgCollationRepo {
           case PgCollationFieldValue.collversion(value) => NamedParameter("collversion", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_collation where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgCollationRow.rowParser("").*)
@@ -67,6 +68,8 @@ object PgCollationRepoImpl extends PgCollationRepo {
         val q = s"""update pg_catalog.pg_collation
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where oid = $oid"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()

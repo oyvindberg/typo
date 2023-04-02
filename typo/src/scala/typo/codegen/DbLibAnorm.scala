@@ -144,7 +144,9 @@ object DbLibAnorm extends DbLib {
               |          ${cases.mkCode("\n          ")}
               |        }
               |        val q = $sql
-              |        $SQL(q)
+              |        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+              |        import anorm._
+              |        SQL(q)
               |          .on(namedParams: _*)
               |          .as(${table.RowName}.$rowParserIdent("").*)
               |    }
@@ -168,7 +170,9 @@ object DbLibAnorm extends DbLib {
               |          ${cases.mkCode("\n          ")}
               |        }
               |        val q = $sql
-              |        $SQL(q)
+              |        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+              |        import anorm._
+              |        SQL(q)
               |          .on(namedParams: _*)
               |          .executeUpdate()
               |    }
@@ -259,25 +263,25 @@ object DbLibAnorm extends DbLib {
     def inout(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column(tpe)}"
     def out(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)}"
 
-    val arrayTypes = List(
-      sc.Type.String -> sc.StrLit("_varchar"),
-      sc.Type.Float -> sc.StrLit("_float4"),
-      sc.Type.Short -> sc.StrLit("_int2"),
-      sc.Type.Int -> sc.StrLit("_int4"),
-      sc.Type.Long -> sc.StrLit("_int8"),
-      sc.Type.Boolean -> sc.StrLit("_bool"),
-      sc.Type.Double -> sc.StrLit("_float8"),
-      sc.Type.UUID -> sc.StrLit("_uuid"),
-      sc.Type.BigDecimal -> sc.StrLit("_decimal"),
-      sc.Type.PGobject -> sc.StrLit("_aclitem")
+    val arrayTypes = List[(sc.Type.Qualified, sc.Type, sc.StrLit)](
+      (sc.Type.String, sc.Type.AnyRef, sc.StrLit("_varchar")),
+      (sc.Type.Float, sc.Type.JavaFloat, sc.StrLit("_float4")),
+      (sc.Type.Short, sc.Type.JavaShort, sc.StrLit("_int2")),
+      (sc.Type.Int, sc.Type.JavaInteger, sc.StrLit("_int4")),
+      (sc.Type.Long, sc.Type.JavaLong, sc.StrLit("_int8")),
+      (sc.Type.Boolean, sc.Type.JavaBoolean, sc.StrLit("_bool")),
+      (sc.Type.Double, sc.Type.JavaDouble, sc.StrLit("_float8")),
+      (sc.Type.UUID, sc.Type.AnyRef, sc.StrLit("_uuid")),
+      (sc.Type.BigDecimal, sc.Type.AnyRef, sc.StrLit("_decimal")),
+      (sc.Type.PGobject, sc.Type.AnyRef, sc.StrLit("_aclitem"))
     )
 
-    val arrayInstances = arrayTypes.map { case (tpe, elemType) =>
+    val arrayInstances = arrayTypes.map { case (tpe, anyRefType, elemType) =>
       val arrayType = sc.Type.Array.of(tpe)
       code"""|implicit val ${tpe.value.name}Array: ${out(arrayType)} = new ${out(arrayType)} {
              |    override def sqlType: ${sc.Type.String} = $elemType
              |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-             |    override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(x => x)))
+             |    override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $anyRefType)))
              |  }
              |""".stripMargin
     }

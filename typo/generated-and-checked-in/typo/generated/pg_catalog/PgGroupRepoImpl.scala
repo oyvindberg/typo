@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,6 +28,8 @@ object PgGroupRepoImpl extends PgGroupRepo {
           case PgGroupFieldValue.grolist(value) => NamedParameter("grolist", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_group where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgGroupRow.rowParser("").*)

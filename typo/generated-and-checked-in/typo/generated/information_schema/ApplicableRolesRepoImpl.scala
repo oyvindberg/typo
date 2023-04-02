@@ -11,7 +11,6 @@ package information_schema
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -29,6 +28,8 @@ object ApplicableRolesRepoImpl extends ApplicableRolesRepo {
           case ApplicableRolesFieldValue.isGrantable(value) => NamedParameter("is_grantable", ParameterValue.from(value))
         }
         val q = s"""select * from information_schema.applicable_roles where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(ApplicableRolesRow.rowParser("").*)

@@ -6,32 +6,40 @@ projects:
   tests:
     dependencies: org.scalatest::scalatest:3.2.13
     dependsOn: typo
-    extends: template-common
+    extends: template-nocross
     isTestProject: true
   typo:
-    extends: template-common
     dependencies:
-      - org.postgresql:postgresql:42.5.4
-      - org.playframework.anorm::anorm:2.7.0
-      - com.typesafe.play::play-json:2.10.0-RC7
+    - com.typesafe.play::play-json:2.10.0-RC7
+    - org.playframework.anorm::anorm:2.7.0
+    - org.postgresql:postgresql:42.5.4
+    extends: template-cross
     platform:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in
   typo-scripts:
+    dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
     dependsOn: typo
-    dependencies: build.bleep::bleep-core:${BLEEP_VERSION}
-    extends: template-common
-    platform:
-      mainClass: com.foo.App
+    extends: template-nocross
   typo-tester:
     dependencies:
-      - org.postgresql:postgresql:42.5.4
-      - org.playframework.anorm::anorm:2.7.0
-      - com.typesafe.play::play-json:2.10.0-RC7
-    extends: template-common
-    sourcegen: typo-scripts/scripts.GenPersons
+    - com.typesafe.play::play-json:2.10.0-RC7
+    - org.playframework.anorm::anorm:2.7.0
+    - org.postgresql:postgresql:42.5.4
+    extends: template-nocross
+    sourcegen:
+      main: scripts.GenPersons
+      project: typo-scripts
 scripts:
-  generate-sources: typo-scripts/scripts.GeneratedSources
+  generate-sources:
+    main: scripts.GeneratedSources
+    project: typo-scripts
+  my-publish-local:
+    main: scripts.PublishLocal
+    project: typo-scripts
+  publish:
+    main: scripts.Publish
+    project: typo-scripts
 templates:
   template-common:
     platform:
@@ -39,4 +47,20 @@ templates:
     scala:
       options: -encoding utf8 -feature -unchecked
       strict: true
+  template-cross:
+    cross:
+      jvm212:
+        dependencies: org.scala-lang.modules::scala-collection-compat:2.9.0
+        scala:
+          version: 2.12.15
+      jvm213:
+        scala:
+          version: 2.13.10
+      jvm3:
+        scala:
+          version: 3.2.0
+    extends: template-common
+  template-nocross:
+    extends: template-common
+    scala:
       version: 2.13.10

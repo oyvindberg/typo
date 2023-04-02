@@ -11,61 +11,61 @@ package object generated {
   implicit val StringArray: anorm.ToStatement[scala.Array[java.lang.String]] with anorm.ParameterMetaData[scala.Array[java.lang.String]] = new anorm.ToStatement[scala.Array[java.lang.String]] with anorm.ParameterMetaData[scala.Array[java.lang.String]] {
     override def sqlType: java.lang.String = "_varchar"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[java.lang.String]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_varchar", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[java.lang.String]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_varchar", v.map(v => v: scala.AnyRef)))
   }
 
   implicit val FloatArray: anorm.ToStatement[scala.Array[scala.Float]] with anorm.ParameterMetaData[scala.Array[scala.Float]] = new anorm.ToStatement[scala.Array[scala.Float]] with anorm.ParameterMetaData[scala.Array[scala.Float]] {
     override def sqlType: java.lang.String = "_float4"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Float]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_float4", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Float]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_float4", v.map(v => v: java.lang.Float)))
   }
 
   implicit val ShortArray: anorm.ToStatement[scala.Array[scala.Short]] with anorm.ParameterMetaData[scala.Array[scala.Short]] = new anorm.ToStatement[scala.Array[scala.Short]] with anorm.ParameterMetaData[scala.Array[scala.Short]] {
     override def sqlType: java.lang.String = "_int2"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Short]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int2", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Short]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int2", v.map(v => v: java.lang.Short)))
   }
 
   implicit val IntArray: anorm.ToStatement[scala.Array[scala.Int]] with anorm.ParameterMetaData[scala.Array[scala.Int]] = new anorm.ToStatement[scala.Array[scala.Int]] with anorm.ParameterMetaData[scala.Array[scala.Int]] {
     override def sqlType: java.lang.String = "_int4"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Int]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int4", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Int]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int4", v.map(v => v: java.lang.Integer)))
   }
 
   implicit val LongArray: anorm.ToStatement[scala.Array[scala.Long]] with anorm.ParameterMetaData[scala.Array[scala.Long]] = new anorm.ToStatement[scala.Array[scala.Long]] with anorm.ParameterMetaData[scala.Array[scala.Long]] {
     override def sqlType: java.lang.String = "_int8"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Long]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int8", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Long]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_int8", v.map(v => v: java.lang.Long)))
   }
 
   implicit val BooleanArray: anorm.ToStatement[scala.Array[scala.Boolean]] with anorm.ParameterMetaData[scala.Array[scala.Boolean]] = new anorm.ToStatement[scala.Array[scala.Boolean]] with anorm.ParameterMetaData[scala.Array[scala.Boolean]] {
     override def sqlType: java.lang.String = "_bool"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Boolean]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_bool", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Boolean]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_bool", v.map(v => v: java.lang.Boolean)))
   }
 
   implicit val DoubleArray: anorm.ToStatement[scala.Array[scala.Double]] with anorm.ParameterMetaData[scala.Array[scala.Double]] = new anorm.ToStatement[scala.Array[scala.Double]] with anorm.ParameterMetaData[scala.Array[scala.Double]] {
     override def sqlType: java.lang.String = "_float8"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Double]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_float8", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.Double]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_float8", v.map(v => v: java.lang.Double)))
   }
 
   implicit val UUIDArray: anorm.ToStatement[scala.Array[java.util.UUID]] with anorm.ParameterMetaData[scala.Array[java.util.UUID]] = new anorm.ToStatement[scala.Array[java.util.UUID]] with anorm.ParameterMetaData[scala.Array[java.util.UUID]] {
     override def sqlType: java.lang.String = "_uuid"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[java.util.UUID]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_uuid", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[java.util.UUID]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_uuid", v.map(v => v: scala.AnyRef)))
   }
 
   implicit val BigDecimalArray: anorm.ToStatement[scala.Array[scala.math.BigDecimal]] with anorm.ParameterMetaData[scala.Array[scala.math.BigDecimal]] = new anorm.ToStatement[scala.Array[scala.math.BigDecimal]] with anorm.ParameterMetaData[scala.Array[scala.math.BigDecimal]] {
     override def sqlType: java.lang.String = "_decimal"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.math.BigDecimal]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_decimal", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[scala.math.BigDecimal]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_decimal", v.map(v => v: scala.AnyRef)))
   }
 
   implicit val PGobjectArray: anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] = new anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] {
     override def sqlType: java.lang.String = "_aclitem"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[org.postgresql.util.PGobject]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_aclitem", v.map(x => x)))
+    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[org.postgresql.util.PGobject]): scala.Unit = ps.setArray(index, ps.getConnection.createArrayOf("_aclitem", v.map(v => v: scala.AnyRef)))
   }
 
   implicit val PGboxDb: anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] = new anorm.ToStatement[org.postgresql.geometric.PGbox] with anorm.ParameterMetaData[org.postgresql.geometric.PGbox] with anorm.Column[org.postgresql.geometric.PGbox] {
@@ -154,7 +154,11 @@ package object generated {
   implicit val PGpolygonFormat: play.api.libs.json.Format[org.postgresql.geometric.PGpolygon] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGpolygon](new org.postgresql.geometric.PGpolygon(_), _.getValue)
   implicit val PGIntervalFormat: play.api.libs.json.Format[org.postgresql.util.PGInterval] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGInterval](new org.postgresql.util.PGInterval(_), _.getValue)
   implicit val PGmoneyFormat: play.api.libs.json.Format[org.postgresql.util.PGmoney] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGmoney](new org.postgresql.util.PGmoney(_), _.getValue)
-  implicit val hstoreFormat: play.api.libs.json.Format[java.util.Map[java.lang.String, java.lang.String]] = implicitly[play.api.libs.json.Format[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].bimap(x => scala.jdk.CollectionConverters.MapHasAsJava(x).asJava, x => scala.jdk.CollectionConverters.MapHasAsScala(x).asScala.toMap)
+  implicit val hstoreFormat: play.api.libs.json.Format[java.util.Map[java.lang.String, java.lang.String]] = {
+    // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
+    import scala.jdk.CollectionConverters._
+    implicitly[play.api.libs.json.Format[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].bimap(_.asJava, _.asScala.toMap)
+}
   implicit val pgObjectFormat: play.api.libs.json.OFormat[org.postgresql.util.PGobject] =
     new play.api.libs.json.OFormat[org.postgresql.util.PGobject] {
       override def writes(o: org.postgresql.util.PGobject): play.api.libs.json.JsObject =

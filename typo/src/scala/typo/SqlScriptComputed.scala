@@ -3,8 +3,6 @@ package typo
 import typo.internal.rewriteDependentData.Eval
 import typo.sqlscripts.{DecomposedSql, SqlScript}
 
-import scala.jdk.CollectionConverters.IteratorHasAsScala
-
 case class SqlScriptComputed(
     script: SqlScript,
     pkg0: sc.QIdent,
@@ -12,7 +10,11 @@ case class SqlScriptComputed(
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
-  val pathSegments: List[sc.Ident] = script.relPath.iterator().asScala.map(p => sc.Ident(p.toString)).toList
+  val pathSegments: List[sc.Ident] = {
+    val b = List.newBuilder[sc.Ident]
+    script.relPath.forEach(p => b += sc.Ident(p.toString))
+    b.result()
+  }
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 

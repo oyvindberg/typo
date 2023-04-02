@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -34,6 +33,8 @@ object PgSeclabelsRepoImpl extends PgSeclabelsRepo {
           case PgSeclabelsFieldValue.label(value) => NamedParameter("label", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_seclabels where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgSeclabelsRow.rowParser("").*)

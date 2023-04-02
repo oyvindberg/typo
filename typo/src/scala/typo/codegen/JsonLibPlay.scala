@@ -106,7 +106,12 @@ object JsonLibPlay extends JsonLib {
     val hstore = {
       val javaMap = Format(sc.Type.JavaMap.of(sc.Type.String, sc.Type.String))
       val scalaMap = Format(sc.Type.Map.of(sc.Type.String, sc.Type.String))
-      code"""implicit val hstoreFormat: ${javaMap} = implicitly[$scalaMap].bimap(x => ${sc.Type.MapHasAsJava}(x).asJava, x => ${sc.Type.MapHasAsScala}(x).asScala.toMap)"""
+
+      code"""|implicit val hstoreFormat: $javaMap = {
+             |    // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
+             |    import scala.jdk.CollectionConverters._
+             |    implicitly[$scalaMap].bimap(_.asJava, _.asScala.toMap)
+             |}""".stripMargin
     }
 
     val pgObjectFormat = {

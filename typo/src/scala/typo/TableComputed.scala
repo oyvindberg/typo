@@ -180,7 +180,7 @@ case class TableComputed(
               RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
           }
 
-          List(
+          List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(RowType)),
             Some(RepoMethod.SelectById(id, RowType)),
             id match {

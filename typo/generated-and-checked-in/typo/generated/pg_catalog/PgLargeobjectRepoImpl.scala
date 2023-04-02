@@ -11,7 +11,6 @@ package pg_catalog
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.SQL
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -32,6 +31,8 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           case PgLargeobjectFieldValue.data(value) => NamedParameter("data", ParameterValue.from(value))
         }
         val q = s"""select * from pg_catalog.pg_largeobject where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .as(PgLargeobjectRow.rowParser("").*)
@@ -50,6 +51,8 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
         val q = s"""update pg_catalog.pg_largeobject
           set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
           where loid = ${compositeId.loid}, pageno = ${compositeId.pageno}"""
+        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+        import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
