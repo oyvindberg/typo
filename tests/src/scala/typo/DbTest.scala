@@ -9,7 +9,7 @@ import typo.generated.{information_schema, pg_catalog}
 
 import java.sql.{Connection, DriverManager}
 
-class AppTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     try {
       implicit val conn: Connection = DriverManager.getConnection(
