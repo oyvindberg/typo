@@ -235,11 +235,14 @@ object DbLibAnorm extends DbLib {
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
 
-        val joinedIdColNames = id.cols.map(_.dbName.value).mkString(", ")
-        val idValues: NonEmptyList[sc.Code] = id match {
-          case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
-          case id: IdComputed.Composite => id.cols.map(cc => code"$${${id.paramName}.${cc.name}}")
-        }
+        val joinedIdColNames: String =
+          id.cols.map(_.dbName.value).mkString(", ")
+
+        val idValues: NonEmptyList[sc.Code] =
+          id match {
+            case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
+            case id: IdComputed.Composite => id.cols.map(cc => code"$${${id.paramName}.${cc.name}}")
+          }
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}($joinedIdColNames, $${namedParameters.map(_.name).mkString(", ")})
@@ -256,7 +259,22 @@ object DbLibAnorm extends DbLib {
                |  .execute()
                |"""
 
-      case RepoMethod.InsertOnlyKey(_) => code"???"
+      case RepoMethod.InsertOnlyKey(id) =>
+        val joinedIdColNames = id.cols.map(_.dbName.value).mkString(", ")
+        val idValues: NonEmptyList[sc.Code] =
+          id match {
+            case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
+            case id: IdComputed.Composite => id.cols.map(cc => code"$${${id.paramName}.${cc.name}}")
+          }
+
+        val sql = interpolate(
+          code"""|insert into ${table.relationName}($joinedIdColNames)
+                 |      values (${idValues.mkCode(", ")})
+                 |""".stripMargin
+        )
+
+        code"$sql.execute()"
+
       case RepoMethod.Delete(id) =>
         val sql = interpolate(code"""delete from ${table.relationName} where ${matchId(id)}""")
         code"$sql.executeUpdate() > 0"

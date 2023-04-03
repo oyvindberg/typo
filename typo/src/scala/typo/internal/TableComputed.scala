@@ -168,14 +168,18 @@ case class TableComputed(
     val maybeMethods = List(
       maybeId match {
         case Some(id) =>
-          val insertMethod = RowUnsavedName.zip(colsNotId).map { case (unsaved, colsUnsaved) =>
-            val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
+          val insertMethod = RowUnsavedName
+            .zip(colsNotId)
+            .map { case (unsaved, colsUnsaved) =>
+              val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
 
-            if (id.cols.forall(_.hasDefault))
-              RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
-            else
-              RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
-          }
+              if (id.cols.forall(_.hasDefault))
+                RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
+              else
+                RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
+            }
+            .headOption
+            .orElse(maybeId.map(RepoMethod.InsertOnlyKey.apply))
 
           List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(RowType)),
