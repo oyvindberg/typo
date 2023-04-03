@@ -40,9 +40,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
     }
   
   }
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
@@ -54,9 +54,14 @@ object FootballClubRepoImpl extends FootballClubRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(id: FootballClubId, row: FootballClubRow)(implicit c: Connection): Boolean = {
+    SQL"""update myschema.football_club
+          set name = ${row.name}
+          where id = $id""".executeUpdate() > 0
   }
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(

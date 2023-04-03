@@ -53,9 +53,9 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
-  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
@@ -76,9 +76,23 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(id: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+    SQL"""update myschema.person
+          set favourite_football_club_id = ${row.favouriteFootballClubId},
+              name = ${row.name},
+              nick_name = ${row.nickName},
+              blog_url = ${row.blogUrl},
+              email = ${row.email},
+              phone = ${row.phone},
+              likes_pizza = ${row.likesPizza},
+              marital_status_id = ${row.maritalStatusId},
+              work_email = ${row.workEmail},
+              sector = ${row.sector}
+          where id = $id""".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
     val namedParameters = List(

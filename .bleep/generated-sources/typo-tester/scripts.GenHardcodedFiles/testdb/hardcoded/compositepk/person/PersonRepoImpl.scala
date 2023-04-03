@@ -38,9 +38,9 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
-  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
@@ -52,9 +52,14 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+    SQL"""update compositepk.person
+          set name = ${row.name}
+          where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
     val namedParameters = List(

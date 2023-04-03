@@ -73,9 +73,9 @@ object PgClassRepoImpl extends PgClassRepo {
     }
   
   }
-  override def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case PgClassFieldValue.relname(value) => NamedParameter("relname", ParameterValue.from(value))
@@ -118,9 +118,45 @@ object PgClassRepoImpl extends PgClassRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(oid: PgClassId, row: PgClassRow)(implicit c: Connection): Boolean = {
+    SQL"""update pg_catalog.pg_class
+          set relname = ${row.relname},
+              relnamespace = ${row.relnamespace},
+              reltype = ${row.reltype},
+              reloftype = ${row.reloftype},
+              relowner = ${row.relowner},
+              relam = ${row.relam},
+              relfilenode = ${row.relfilenode},
+              reltablespace = ${row.reltablespace},
+              relpages = ${row.relpages},
+              reltuples = ${row.reltuples},
+              relallvisible = ${row.relallvisible},
+              reltoastrelid = ${row.reltoastrelid},
+              relhasindex = ${row.relhasindex},
+              relisshared = ${row.relisshared},
+              relpersistence = ${row.relpersistence},
+              relkind = ${row.relkind},
+              relnatts = ${row.relnatts},
+              relchecks = ${row.relchecks},
+              relhasrules = ${row.relhasrules},
+              relhastriggers = ${row.relhastriggers},
+              relhassubclass = ${row.relhassubclass},
+              relrowsecurity = ${row.relrowsecurity},
+              relforcerowsecurity = ${row.relforcerowsecurity},
+              relispopulated = ${row.relispopulated},
+              relreplident = ${row.relreplident},
+              relispartition = ${row.relispartition},
+              relrewrite = ${row.relrewrite},
+              relfrozenxid = ${row.relfrozenxid},
+              relminmxid = ${row.relminmxid},
+              relacl = ${row.relacl},
+              reloptions = ${row.reloptions},
+              relpartbound = ${row.relpartbound}
+          where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(

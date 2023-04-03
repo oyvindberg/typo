@@ -10,6 +10,7 @@ object RepoMethod {
   case class SelectByUnique(params: NonEmptyList[ColumnComputed], rowType: sc.Type) extends RepoMethod
   case class SelectByFieldValues(param: sc.Param, rowType: sc.Type) extends RepoMethod
   case class UpdateFieldValues(id: IdComputed, param: sc.Param, cases: NonEmptyList[ColumnComputed]) extends RepoMethod
+  case class Update(id: IdComputed, param: sc.Param, colsUnsaved: NonEmptyList[ColumnComputed]) extends RepoMethod
   case class InsertDbGeneratedKey(id: IdComputed, colsUnsaved: NonEmptyList[ColumnComputed], unsavedParam: sc.Param, default: DefaultComputed)
       extends RepoMethod
   case class InsertProvidedKey(id: IdComputed, colsUnsaved: NonEmptyList[ColumnComputed], unsavedParam: sc.Param, default: DefaultComputed) extends RepoMethod

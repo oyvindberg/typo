@@ -181,9 +181,6 @@ case class TableComputed(
               RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
           }
 
-          def updateMethod =
-            colsNotId.map(colsNotId => RepoMethod.UpdateFieldValues(id, fieldValuesParam, colsNotId))
-
           List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(RowType)),
             Some(RepoMethod.SelectById(id, RowType)),
@@ -195,7 +192,8 @@ case class TableComputed(
                 None
             },
             Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)),
-            updateMethod,
+            colsNotId.map(colsNotId => RepoMethod.UpdateFieldValues(id, fieldValuesParam, colsNotId)),
+            colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), RowType), colsNotId)),
             insertMethod,
             Some(RepoMethod.Delete(id))
           ).flatten

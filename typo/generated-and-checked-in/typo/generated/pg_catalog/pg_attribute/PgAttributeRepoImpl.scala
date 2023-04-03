@@ -63,9 +63,9 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     }
   
   }
-  override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case PgAttributeFieldValue.attname(value) => NamedParameter("attname", ParameterValue.from(value))
@@ -100,9 +100,37 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(compositeId: PgAttributeId, row: PgAttributeRow)(implicit c: Connection): Boolean = {
+    SQL"""update pg_catalog.pg_attribute
+          set attname = ${row.attname},
+              atttypid = ${row.atttypid},
+              attstattarget = ${row.attstattarget},
+              attlen = ${row.attlen},
+              attndims = ${row.attndims},
+              attcacheoff = ${row.attcacheoff},
+              atttypmod = ${row.atttypmod},
+              attbyval = ${row.attbyval},
+              attalign = ${row.attalign},
+              attstorage = ${row.attstorage},
+              attcompression = ${row.attcompression},
+              attnotnull = ${row.attnotnull},
+              atthasdef = ${row.atthasdef},
+              atthasmissing = ${row.atthasmissing},
+              attidentity = ${row.attidentity},
+              attgenerated = ${row.attgenerated},
+              attisdropped = ${row.attisdropped},
+              attislocal = ${row.attislocal},
+              attinhcount = ${row.attinhcount},
+              attcollation = ${row.attcollation},
+              attacl = ${row.attacl},
+              attoptions = ${row.attoptions},
+              attfdwoptions = ${row.attfdwoptions},
+              attmissingval = ${row.attmissingval}
+          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
   }
   override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(

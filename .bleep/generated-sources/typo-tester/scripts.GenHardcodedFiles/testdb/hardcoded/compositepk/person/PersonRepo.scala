@@ -14,7 +14,8 @@ trait PersonRepo {
   def selectAll(implicit c: Connection): List[PersonRow]
   def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow]
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow]
-  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int
+  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean
+  def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean
   def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId
   def delete(compositeId: PersonId)(implicit c: Connection): Boolean
 }

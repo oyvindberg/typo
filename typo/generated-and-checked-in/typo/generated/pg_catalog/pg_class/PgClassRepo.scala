@@ -17,7 +17,8 @@ trait PgClassRepo {
   def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow]
   def selectByIds(oids: List[PgClassId])(implicit c: Connection): List[PgClassRow]
   def selectByFieldValues(fieldValues: List[PgClassFieldOrIdValue[_]])(implicit c: Connection): List[PgClassRow]
-  def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Int
+  def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Boolean
+  def update(oid: PgClassId, row: PgClassRow)(implicit c: Connection): Boolean
   def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean
   def delete(oid: PgClassId)(implicit c: Connection): Boolean
   def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow]

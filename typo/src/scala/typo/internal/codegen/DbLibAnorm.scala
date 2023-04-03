@@ -80,7 +80,9 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.SelectByFieldValues(param, rowType) =>
       code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.UpdateFieldValues(id, param, _) =>
-      code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Int}"
+      code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
+    case RepoMethod.Update(id, param, _) =>
+      code"def update(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.InsertDbGeneratedKey(id, _, unsavedParam, _) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): ${id.tpe}"
     case RepoMethod.InsertProvidedKey(id, _, unsavedParam, _) =>
@@ -165,7 +167,7 @@ object DbLibAnorm extends DbLib {
                 |    where ${matchId(id)}""".stripMargin
         )
         code"""${param.name} match {
-              |  case Nil => 0
+              |  case Nil => false
               |  case nonEmpty =>
               |    val namedParams = nonEmpty.map{
               |      ${cases.mkCode("\n")}
@@ -175,9 +177,17 @@ object DbLibAnorm extends DbLib {
               |    import anorm._
               |    SQL(q)
               |      .on(namedParams: _*)
-              |      .executeUpdate()
+              |      .executeUpdate() > 0
               |}
               |""".stripMargin
+
+      case RepoMethod.Update(id, param, colsUnsaved) =>
+        val sql = interpolate(
+          code"""update ${table.relationName}
+                |      set ${colsUnsaved.map { col => code"${col.dbName.value} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
+                |      where ${matchId(id)}""".stripMargin
+        )
+        code"""$sql.executeUpdate() > 0"""
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {

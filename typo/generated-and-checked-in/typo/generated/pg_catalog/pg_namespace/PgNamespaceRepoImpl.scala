@@ -44,9 +44,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     }
   
   }
-  override def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Int = {
+  override def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
-      case Nil => 0
+      case Nil => false
       case nonEmpty =>
         val namedParams = nonEmpty.map{
           case PgNamespaceFieldValue.nspname(value) => NamedParameter("nspname", ParameterValue.from(value))
@@ -60,9 +60,16 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .executeUpdate()
+          .executeUpdate() > 0
     }
   
+  }
+  override def update(oid: PgNamespaceId, row: PgNamespaceRow)(implicit c: Connection): Boolean = {
+    SQL"""update pg_catalog.pg_namespace
+          set nspname = ${row.nspname},
+              nspowner = ${row.nspowner},
+              nspacl = ${row.nspacl}
+          where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
