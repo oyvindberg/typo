@@ -203,7 +203,7 @@ object sc {
       }
 
     // render tree as a string in such a way that newlines inside interpolated strings preserves outer indentation
-    def render: String =
+    lazy val render: String =
       this match {
         case Code.Interpolated(parts, args) =>
           val lines = List.newBuilder[String]
@@ -262,6 +262,7 @@ object sc {
 
   object Code {
     val Empty: Code = Str("")
+    implicit val ordering: Ordering[Code] = Ordering.by(_.render)
     case class Interpolated(parts: Seq[String], args: Seq[Code]) extends Code
     case class Combined(codes: List[Code]) extends Code
     case class Str(value: String) extends Code

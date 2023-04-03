@@ -16,11 +16,46 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
+  override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
+    SQL"""delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
+  }
+  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
+    val namedParameters = List(
+      Some(NamedParameter("attname", ParameterValue.from(unsaved.attname))),
+      Some(NamedParameter("atttypid", ParameterValue.from(unsaved.atttypid))),
+      Some(NamedParameter("attstattarget", ParameterValue.from(unsaved.attstattarget))),
+      Some(NamedParameter("attlen", ParameterValue.from(unsaved.attlen))),
+      Some(NamedParameter("attndims", ParameterValue.from(unsaved.attndims))),
+      Some(NamedParameter("attcacheoff", ParameterValue.from(unsaved.attcacheoff))),
+      Some(NamedParameter("atttypmod", ParameterValue.from(unsaved.atttypmod))),
+      Some(NamedParameter("attbyval", ParameterValue.from(unsaved.attbyval))),
+      Some(NamedParameter("attalign", ParameterValue.from(unsaved.attalign))),
+      Some(NamedParameter("attstorage", ParameterValue.from(unsaved.attstorage))),
+      Some(NamedParameter("attcompression", ParameterValue.from(unsaved.attcompression))),
+      Some(NamedParameter("attnotnull", ParameterValue.from(unsaved.attnotnull))),
+      Some(NamedParameter("atthasdef", ParameterValue.from(unsaved.atthasdef))),
+      Some(NamedParameter("atthasmissing", ParameterValue.from(unsaved.atthasmissing))),
+      Some(NamedParameter("attidentity", ParameterValue.from(unsaved.attidentity))),
+      Some(NamedParameter("attgenerated", ParameterValue.from(unsaved.attgenerated))),
+      Some(NamedParameter("attisdropped", ParameterValue.from(unsaved.attisdropped))),
+      Some(NamedParameter("attislocal", ParameterValue.from(unsaved.attislocal))),
+      Some(NamedParameter("attinhcount", ParameterValue.from(unsaved.attinhcount))),
+      Some(NamedParameter("attcollation", ParameterValue.from(unsaved.attcollation))),
+      Some(NamedParameter("attacl", ParameterValue.from(unsaved.attacl))),
+      Some(NamedParameter("attoptions", ParameterValue.from(unsaved.attoptions))),
+      Some(NamedParameter("attfdwoptions", ParameterValue.from(unsaved.attfdwoptions))),
+      Some(NamedParameter("attmissingval", ParameterValue.from(unsaved.attmissingval)))
+    ).flatten
+    
+    SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, ${namedParameters.map(_.name).mkString(", ")})
+          values (${compositeId.attrelid}, ${compositeId.attnum}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
+      .on(namedParameters :_*)
+      .execute()
+  
+  }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
     SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute""".as(PgAttributeRow.rowParser("").*)
-  }
-  override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(PgAttributeRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PgAttributeFieldOrIdValue[_]])(implicit c: Connection): List[PgAttributeRow] = {
     fieldValues match {
@@ -63,6 +98,40 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     }
   
   }
+  override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(PgAttributeRow.rowParser("").singleOpt)
+  }
+  override def selectByUniqueAttrelidAttname(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
+    selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
+  }
+  override def update(compositeId: PgAttributeId, row: PgAttributeRow)(implicit c: Connection): Boolean = {
+    SQL"""update pg_catalog.pg_attribute
+          set attname = ${row.attname},
+              atttypid = ${row.atttypid},
+              attstattarget = ${row.attstattarget},
+              attlen = ${row.attlen},
+              attndims = ${row.attndims},
+              attcacheoff = ${row.attcacheoff},
+              atttypmod = ${row.atttypmod},
+              attbyval = ${row.attbyval},
+              attalign = ${row.attalign},
+              attstorage = ${row.attstorage},
+              attcompression = ${row.attcompression},
+              attnotnull = ${row.attnotnull},
+              atthasdef = ${row.atthasdef},
+              atthasmissing = ${row.atthasmissing},
+              attidentity = ${row.attidentity},
+              attgenerated = ${row.attgenerated},
+              attisdropped = ${row.attisdropped},
+              attislocal = ${row.attislocal},
+              attinhcount = ${row.attinhcount},
+              attcollation = ${row.attcollation},
+              attacl = ${row.attacl},
+              attoptions = ${row.attoptions},
+              attfdwoptions = ${row.attfdwoptions},
+              attmissingval = ${row.attmissingval}
+          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
+  }
   override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
@@ -103,74 +172,5 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           .executeUpdate() > 0
     }
   
-  }
-  override def update(compositeId: PgAttributeId, row: PgAttributeRow)(implicit c: Connection): Boolean = {
-    SQL"""update pg_catalog.pg_attribute
-          set attname = ${row.attname},
-              atttypid = ${row.atttypid},
-              attstattarget = ${row.attstattarget},
-              attlen = ${row.attlen},
-              attndims = ${row.attndims},
-              attcacheoff = ${row.attcacheoff},
-              atttypmod = ${row.atttypmod},
-              attbyval = ${row.attbyval},
-              attalign = ${row.attalign},
-              attstorage = ${row.attstorage},
-              attcompression = ${row.attcompression},
-              attnotnull = ${row.attnotnull},
-              atthasdef = ${row.atthasdef},
-              atthasmissing = ${row.atthasmissing},
-              attidentity = ${row.attidentity},
-              attgenerated = ${row.attgenerated},
-              attisdropped = ${row.attisdropped},
-              attislocal = ${row.attislocal},
-              attinhcount = ${row.attinhcount},
-              attcollation = ${row.attcollation},
-              attacl = ${row.attacl},
-              attoptions = ${row.attoptions},
-              attfdwoptions = ${row.attfdwoptions},
-              attmissingval = ${row.attmissingval}
-          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
-  }
-  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("attname", ParameterValue.from(unsaved.attname))),
-      Some(NamedParameter("atttypid", ParameterValue.from(unsaved.atttypid))),
-      Some(NamedParameter("attstattarget", ParameterValue.from(unsaved.attstattarget))),
-      Some(NamedParameter("attlen", ParameterValue.from(unsaved.attlen))),
-      Some(NamedParameter("attndims", ParameterValue.from(unsaved.attndims))),
-      Some(NamedParameter("attcacheoff", ParameterValue.from(unsaved.attcacheoff))),
-      Some(NamedParameter("atttypmod", ParameterValue.from(unsaved.atttypmod))),
-      Some(NamedParameter("attbyval", ParameterValue.from(unsaved.attbyval))),
-      Some(NamedParameter("attalign", ParameterValue.from(unsaved.attalign))),
-      Some(NamedParameter("attstorage", ParameterValue.from(unsaved.attstorage))),
-      Some(NamedParameter("attcompression", ParameterValue.from(unsaved.attcompression))),
-      Some(NamedParameter("attnotnull", ParameterValue.from(unsaved.attnotnull))),
-      Some(NamedParameter("atthasdef", ParameterValue.from(unsaved.atthasdef))),
-      Some(NamedParameter("atthasmissing", ParameterValue.from(unsaved.atthasmissing))),
-      Some(NamedParameter("attidentity", ParameterValue.from(unsaved.attidentity))),
-      Some(NamedParameter("attgenerated", ParameterValue.from(unsaved.attgenerated))),
-      Some(NamedParameter("attisdropped", ParameterValue.from(unsaved.attisdropped))),
-      Some(NamedParameter("attislocal", ParameterValue.from(unsaved.attislocal))),
-      Some(NamedParameter("attinhcount", ParameterValue.from(unsaved.attinhcount))),
-      Some(NamedParameter("attcollation", ParameterValue.from(unsaved.attcollation))),
-      Some(NamedParameter("attacl", ParameterValue.from(unsaved.attacl))),
-      Some(NamedParameter("attoptions", ParameterValue.from(unsaved.attoptions))),
-      Some(NamedParameter("attfdwoptions", ParameterValue.from(unsaved.attfdwoptions))),
-      Some(NamedParameter("attmissingval", ParameterValue.from(unsaved.attmissingval)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.attrelid}, ${compositeId.attnum}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
-  
-  }
-  override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
-  }
-  override def selectByUniqueAttrelidAttname(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
-    selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
   }
 }

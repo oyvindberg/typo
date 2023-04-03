@@ -14,14 +14,23 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object FootballClubRepoImpl extends FootballClubRepo {
+  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
+    SQL"""delete from myschema.football_club where id = $id""".executeUpdate() > 0
+  }
+  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
+    val namedParameters = List(
+      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
+    ).flatten
+    
+    SQL"""insert into myschema.football_club(id, ${namedParameters.map(_.name).mkString(", ")})
+          values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
+      .on(namedParameters :_*)
+      .execute()
+  
+  }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select id, name from myschema.football_club""".as(FootballClubRow.rowParser("").*)
-  }
-  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club where id = $id""".as(FootballClubRow.rowParser("").singleOpt)
-  }
-  override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club where id in $ids""".as(FootballClubRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
@@ -40,6 +49,17 @@ object FootballClubRepoImpl extends FootballClubRepo {
     }
   
   }
+  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
+    SQL"""select id, name from myschema.football_club where id = $id""".as(FootballClubRow.rowParser("").singleOpt)
+  }
+  override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
+    SQL"""select id, name from myschema.football_club where id in $ids""".as(FootballClubRow.rowParser("").*)
+  }
+  override def update(id: FootballClubId, row: FootballClubRow)(implicit c: Connection): Boolean = {
+    SQL"""update myschema.football_club
+          set name = ${row.name}
+          where id = $id""".executeUpdate() > 0
+  }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
@@ -57,25 +77,5 @@ object FootballClubRepoImpl extends FootballClubRepo {
           .executeUpdate() > 0
     }
   
-  }
-  override def update(id: FootballClubId, row: FootballClubRow)(implicit c: Connection): Boolean = {
-    SQL"""update myschema.football_club
-          set name = ${row.name}
-          where id = $id""".executeUpdate() > 0
-  }
-  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
-    ).flatten
-    
-    SQL"""insert into myschema.football_club(id, ${namedParameters.map(_.name).mkString(", ")})
-          values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
-  
-  }
-  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.football_club where id = $id""".executeUpdate() > 0
   }
 }

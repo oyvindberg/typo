@@ -14,11 +14,24 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
+  override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
+    SQL"""delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
+  }
+  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
+    val namedParameters = List(
+      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
+    ).flatten
+    
+    SQL"""insert into compositepk.person(${namedParameters.map(_.name).mkString(", ")})
+          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+          returning one, two
+    """
+      .on(namedParameters :_*)
+      .executeInsert(PersonId.rowParser("").single)
+  
+  }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser("").*)
-  }
-  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser("").singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -38,6 +51,14 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
+    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser("").singleOpt)
+  }
+  override def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+    SQL"""update compositepk.person
+          set name = ${row.name}
+          where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
+  }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
@@ -55,26 +76,5 @@ object PersonRepoImpl extends PersonRepo {
           .executeUpdate() > 0
     }
   
-  }
-  override def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
-    SQL"""update compositepk.person
-          set name = ${row.name}
-          where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
-  }
-  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
-    val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
-    ).flatten
-    
-    SQL"""insert into compositepk.person(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning one, two
-    """
-      .on(namedParameters :_*)
-      .executeInsert(PersonId.rowParser("").single)
-  
-  }
-  override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
   }
 }
