@@ -31,6 +31,7 @@ package object typo {
       pkg = sc.Type.Qualified(publicOptions.pkg).value,
       jsonLib = publicOptions.jsonLib match {
         case JsonLibName.PlayJson => JsonLibPlay
+        case JsonLibName.None     => JsonLib.None
       },
       dbLib = publicOptions.dbLib match {
         case DbLibName.Anorm => DbLibAnorm
