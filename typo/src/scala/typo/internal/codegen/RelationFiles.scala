@@ -66,7 +66,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
     sc.File(fieldValueType, str, secondaryTypes = List(fieldValueIdType))
   }
 
-  def RepoTraitFile(repoMethods: List[RepoMethod]): sc.File = {
+  def RepoTraitFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val tpe = sc.Type.Qualified(relation.RepoName)
     val str =
       code"""trait ${relation.RepoName.name} {
@@ -77,8 +77,8 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
     sc.File(tpe, str, secondaryTypes = Nil)
   }
 
-  def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
-    val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
+  def RepoImplFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.map { repoMethod =>
       code"""|override ${options.dbLib.repoSig(repoMethod)} = {
              |  ${options.dbLib.repoImpl(relation, repoMethod)}
              |}""".stripMargin

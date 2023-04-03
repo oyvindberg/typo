@@ -157,13 +157,9 @@ case class TableComputed(
 
     } else None
 
-  val repoMethods: Option[List[RepoMethod]] = {
+  val repoMethods: Option[NonEmptyList[RepoMethod]] = {
     val RowType = sc.Type.Qualified(relation.RowName)
 
-    val fieldValuesParam = sc.Param(
-      sc.Ident("fieldValues"),
-      sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
-    )
     val fieldValueOrIdsParam = sc.Param(
       sc.Ident("fieldValues"),
       sc.Type.List.of(sc.Type.Qualified(relation.FieldOrIdValueName).of(sc.Type.Wildcard))
@@ -192,7 +188,16 @@ case class TableComputed(
                 None
             },
             Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)),
-            colsNotId.map(colsNotId => RepoMethod.UpdateFieldValues(id, fieldValuesParam, colsNotId)),
+            colsNotId.map(colsNotId =>
+              RepoMethod.UpdateFieldValues(
+                id,
+                sc.Param(
+                  sc.Ident("fieldValues"),
+                  sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
+                ),
+                colsNotId
+              )
+            ),
             colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), RowType), colsNotId)),
             insertMethod,
             Some(RepoMethod.Delete(id))
@@ -208,6 +213,6 @@ case class TableComputed(
         RepoMethod.SelectByUnique(params, RowType)
       }
     )
-    Some(maybeMethods.flatten).filter(_.nonEmpty)
+    NonEmptyList.fromList(maybeMethods.flatten)
   }
 }

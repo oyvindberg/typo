@@ -46,14 +46,14 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
   val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, view.name, cols, maybeId = None)
 
-  val repoMethods: List[RepoMethod] = {
+  val repoMethods: NonEmptyList[RepoMethod] = {
     val RowType = sc.Type.Qualified(relation.RowName)
     val fieldValuesParam = sc.Param(
       sc.Ident("fieldValues"),
       sc.Type.List.of(sc.Type.Qualified(relation.FieldOrIdValueName).of(sc.Type.Wildcard))
     )
 
-    List(
+    NonEmptyList(
       RepoMethod.SelectAll(RowType),
       RepoMethod.SelectByFieldValues(fieldValuesParam, RowType)
     )

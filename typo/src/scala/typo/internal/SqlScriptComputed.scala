@@ -61,8 +61,8 @@ case class SqlScriptComputed(
   val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)
 
-  val repoMethods: List[RepoMethod] = {
-    List(
+  val repoMethods: NonEmptyList[RepoMethod] = {
+    NonEmptyList(
       RepoMethod.SqlScript(this)
     )
   }
