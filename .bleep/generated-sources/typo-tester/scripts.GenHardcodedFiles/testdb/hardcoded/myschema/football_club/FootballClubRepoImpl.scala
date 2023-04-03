@@ -38,7 +38,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
           .on(namedParams: _*)
           .as(FootballClubRow.rowParser("").*)
     }
-
+  
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
@@ -48,27 +48,27 @@ object FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
         val q = s"""update myschema.football_club
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = $id"""
+                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    where id = $id"""
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }
-
+  
   }
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
     ).flatten
-
+    
     SQL"""insert into myschema.football_club(id, ${namedParameters.map(_.name).mkString(", ")})
-      values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-      """
+          values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
       .on(namedParameters :_*)
       .execute()
-
+  
   }
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.football_club where id = $id""".executeUpdate() > 0

@@ -42,7 +42,7 @@ object db {
     case class VarChar(maxLength: Option[Int]) extends Type
   }
 
-  case class StringEnum(name: db.RelationName, values: List[String])
+  case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, jsonDescription: JsValue)
   case class RelationName(schema: Option[String], name: String) {
@@ -72,7 +72,7 @@ object db {
   ) extends Relation
 
   case class View(
-      name: db.RelationName,
+      name: RelationName,
       cols: NonEmptyList[Col],
       sql: String,
       isMaterialized: Boolean,

@@ -26,9 +26,9 @@ object PgAttributeId {
     override def writes(o: PgAttributeId): JsObject =
       Json.obj(
         "attrelid" -> o.attrelid,
-      "attnum" -> o.attnum
+        "attnum" -> o.attnum
       )
-
+  
     override def reads(json: JsValue): JsResult[PgAttributeId] = {
       JsResult.fromTry(
         Try(

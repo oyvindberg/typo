@@ -15,14 +15,14 @@ object StringEnumFile {
     val str =
       code"""sealed abstract class ${qident.name}(val value: ${sc.Type.String})
             |object ${qident.name} {
-            |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
+            |  ${members.map { case (_, definition) => definition }.mkCode("\n")}
             |
             |  val All: ${sc.Type.List.of(EnumType)} = ${sc.Type.List}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
             |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
             |  val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             |
-            |  ${options.dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
-            |  ${options.jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n  ")}
+            |  ${options.dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n")}
+            |  ${options.jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n")}
             |}
             |""".stripMargin
 

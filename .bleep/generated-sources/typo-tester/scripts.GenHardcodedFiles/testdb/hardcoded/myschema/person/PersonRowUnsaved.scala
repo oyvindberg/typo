@@ -36,17 +36,17 @@ object PersonRowUnsaved {
     override def writes(o: PersonRowUnsaved): JsObject =
       Json.obj(
         "favourite_football_club_id" -> o.favouriteFootballClubId,
-      "name" -> o.name,
-      "nick_name" -> o.nickName,
-      "blog_url" -> o.blogUrl,
-      "email" -> o.email,
-      "phone" -> o.phone,
-      "likes_pizza" -> o.likesPizza,
-      "marital_status_id" -> o.maritalStatusId,
-      "work_email" -> o.workEmail,
-      "sector" -> o.sector
+        "name" -> o.name,
+        "nick_name" -> o.nickName,
+        "blog_url" -> o.blogUrl,
+        "email" -> o.email,
+        "phone" -> o.phone,
+        "likes_pizza" -> o.likesPizza,
+        "marital_status_id" -> o.maritalStatusId,
+        "work_email" -> o.workEmail,
+        "sector" -> o.sector
       )
-
+  
     override def reads(json: JsValue): JsResult[PersonRowUnsaved] = {
       JsResult.fromTry(
         Try(

@@ -35,7 +35,7 @@ object SectorEnum {
   implicit val parameterMetadata: ParameterMetaData[SectorEnum] = new ParameterMetaData[SectorEnum] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
-}
+  }
   implicit val reads: Reads[SectorEnum] = (value: JsValue) =>
     value.validate[String].flatMap { str =>
       ByName.get(str) match {
@@ -43,6 +43,6 @@ object SectorEnum {
         case None => JsError(s"'$str' does not match any of the following legal values: $Names")
       }
     }
-
+  
   implicit val writes: Writes[SectorEnum] = value => implicitly[Writes[String]].writes(value.value)
 }

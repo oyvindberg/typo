@@ -49,31 +49,31 @@ object PgAttributeRowUnsaved {
     override def writes(o: PgAttributeRowUnsaved): JsObject =
       Json.obj(
         "attname" -> o.attname,
-      "atttypid" -> o.atttypid,
-      "attstattarget" -> o.attstattarget,
-      "attlen" -> o.attlen,
-      "attndims" -> o.attndims,
-      "attcacheoff" -> o.attcacheoff,
-      "atttypmod" -> o.atttypmod,
-      "attbyval" -> o.attbyval,
-      "attalign" -> o.attalign,
-      "attstorage" -> o.attstorage,
-      "attcompression" -> o.attcompression,
-      "attnotnull" -> o.attnotnull,
-      "atthasdef" -> o.atthasdef,
-      "atthasmissing" -> o.atthasmissing,
-      "attidentity" -> o.attidentity,
-      "attgenerated" -> o.attgenerated,
-      "attisdropped" -> o.attisdropped,
-      "attislocal" -> o.attislocal,
-      "attinhcount" -> o.attinhcount,
-      "attcollation" -> o.attcollation,
-      "attacl" -> o.attacl,
-      "attoptions" -> o.attoptions,
-      "attfdwoptions" -> o.attfdwoptions,
-      "attmissingval" -> o.attmissingval
+        "atttypid" -> o.atttypid,
+        "attstattarget" -> o.attstattarget,
+        "attlen" -> o.attlen,
+        "attndims" -> o.attndims,
+        "attcacheoff" -> o.attcacheoff,
+        "atttypmod" -> o.atttypmod,
+        "attbyval" -> o.attbyval,
+        "attalign" -> o.attalign,
+        "attstorage" -> o.attstorage,
+        "attcompression" -> o.attcompression,
+        "attnotnull" -> o.attnotnull,
+        "atthasdef" -> o.atthasdef,
+        "atthasmissing" -> o.atthasmissing,
+        "attidentity" -> o.attidentity,
+        "attgenerated" -> o.attgenerated,
+        "attisdropped" -> o.attisdropped,
+        "attislocal" -> o.attislocal,
+        "attinhcount" -> o.attinhcount,
+        "attcollation" -> o.attcollation,
+        "attacl" -> o.attacl,
+        "attoptions" -> o.attoptions,
+        "attfdwoptions" -> o.attfdwoptions,
+        "attmissingval" -> o.attmissingval
       )
-
+  
     override def reads(json: JsValue): JsResult[PgAttributeRowUnsaved] = {
       JsResult.fromTry(
         Try(

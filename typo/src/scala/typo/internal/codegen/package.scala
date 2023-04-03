@@ -8,19 +8,14 @@ package object codegen {
 
   implicit final class CodeInterpolator(private val stringContext: StringContext) extends AnyVal {
     def code(args: sc.Code*): sc.Code = {
-      val fragments = List.newBuilder[sc.Code]
-      stringContext.parts.zipWithIndex.foreach { case (str, n) =>
-        if (n > 0) fragments += args(n - 1)
-        fragments += sc.Code.Str(StringContext.processEscapes(str))
-      }
-      sc.Code.Combined(fragments.result())
+      sc.Code.Interpolated(stringContext.parts, args)
     }
   }
 
   // magnet pattern
   implicit def toCode[T: ToCode](x: T): sc.Code = ToCode[T].toCode(x)
 
-  implicit class CodeOps[I[t] <: Iterable[t], C <: sc.Code](private val codes: I[C]) extends AnyVal {
+  implicit class CodeOps[C <: sc.Code](private val codes: List[C]) extends AnyVal {
     def mkCode(sep: sc.Code): sc.Code = {
       val interspersed = codes.zipWithIndex.map {
         case (c, 0) => c

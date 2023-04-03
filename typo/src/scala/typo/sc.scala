@@ -198,10 +198,52 @@ object sc {
         case Code.Combined(codes) => Code.Combined(codes.map(_.stripMargin))
         case Code.Str(value)      => Code.Str(value.stripMargin)
         case tree @ Code.Tree(_)  => tree
+        case Code.Interpolated(parts, args) =>
+          Code.Interpolated(parts.map(_.stripMargin), args.map(_.stripMargin))
       }
 
+    // render tree as a string in such a way that newlines inside interpolated strings preserves outer indentation
     def render: String =
       this match {
+        case Code.Interpolated(parts, args) =>
+          val lines = List.newBuilder[String]
+          var currentLine = ""
+
+          def consume(str: String, indent: Int): Unit = {
+            // @unchecked because scala 2 and 3 disagree on exhaustivity
+            (str.linesWithSeparators.toList: @unchecked) match {
+              case Nil => ()
+              case List(one) if one.endsWith("\n") =>
+                lines += (currentLine + one)
+                currentLine = ""
+              case List(one) =>
+                currentLine += one
+              case List(first, rest*) =>
+                lines += (currentLine + first)
+                val indentedRest = rest.toList.map(str => (" " * indent) + str)
+                if (indentedRest.lastOption.exists(_.endsWith("\n"))) {
+                  lines ++= indentedRest
+                  currentLine = ""
+                } else {
+                  lines ++= indentedRest.init
+                  currentLine = indentedRest.last
+                }
+            }
+          }
+          // do the string interpolation
+          parts.zipWithIndex.foreach { case (str, n) =>
+            if (n > 0) {
+              val rendered = args(n - 1).render
+              // consider the current indentation level when interpolating in multiline strings
+              consume(rendered, indent = currentLine.length)
+            }
+            val escaped = StringContext.processEscapes(str)
+            consume(escaped, indent = 0)
+          }
+          // commit last line
+          lines += currentLine
+          // recombine lines back into one string
+          lines.result().mkString
         case Code.Combined(codes) => codes.map(_.render).mkString
         case Code.Str(str)        => str
         case Code.Tree(tree)      => renderTree(tree)
@@ -209,9 +251,10 @@ object sc {
 
     def mapTrees(f: Tree => Tree): Code =
       this match {
-        case Code.Combined(codes) => Code.Combined(codes.map(_.mapTrees(f)))
-        case str @ Code.Str(_)    => str
-        case Code.Tree(tree)      => Code.Tree(f(tree))
+        case Code.Interpolated(parts, args) => Code.Interpolated(parts, args.map(_.mapTrees(f)))
+        case Code.Combined(codes)           => Code.Combined(codes.map(_.mapTrees(f)))
+        case str @ Code.Str(_)              => str
+        case Code.Tree(tree)                => Code.Tree(f(tree))
       }
 
     def ++(other: Code): Code = Code.Combined(List(this, other))
@@ -219,7 +262,8 @@ object sc {
 
   object Code {
     val Empty: Code = Str("")
-    case class Combined(codes: Iterable[Code]) extends Code
+    case class Interpolated(parts: Seq[String], args: Seq[Code]) extends Code
+    case class Combined(codes: List[Code]) extends Code
     case class Str(value: String) extends Code
     case class Tree(value: sc.Tree) extends Code
   }

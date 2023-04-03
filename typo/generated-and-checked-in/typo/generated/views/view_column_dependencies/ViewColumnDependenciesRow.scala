@@ -48,12 +48,12 @@ object ViewColumnDependenciesRow {
     override def writes(o: ViewColumnDependenciesRow): JsObject =
       Json.obj(
         "view_schema" -> o.viewSchema,
-      "view_name" -> o.viewName,
-      "table_schema" -> o.tableSchema,
-      "table_name" -> o.tableName,
-      "column_name" -> o.columnName
+        "view_name" -> o.viewName,
+        "table_schema" -> o.tableSchema,
+        "table_name" -> o.tableName,
+        "column_name" -> o.columnName
       )
-
+  
     override def reads(json: JsValue): JsResult[ViewColumnDependenciesRow] = {
       JsResult.fromTry(
         Try(

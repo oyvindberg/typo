@@ -22,8 +22,8 @@ case class PersonRow(
   two: Option[String],
   name: Option[String]
 ){
-  val compositeId: PersonId = PersonId(one, two)
-}
+   val compositeId: PersonId = PersonId(one, two)
+ }
 
 object PersonRow {
   def rowParser(prefix: String): RowParser[PersonRow] = { row =>
@@ -40,10 +40,10 @@ object PersonRow {
     override def writes(o: PersonRow): JsObject =
       Json.obj(
         "one" -> o.one,
-      "two" -> o.two,
-      "name" -> o.name
+        "two" -> o.two,
+        "name" -> o.name
       )
-
+  
     override def reads(json: JsValue): JsResult[PersonRow] = {
       JsResult.fromTry(
         Try(

@@ -35,7 +35,7 @@ object MaritalStatusRow {
       Json.obj(
         "id" -> o.id
       )
-
+  
     override def reads(json: JsValue): JsResult[MaritalStatusRow] = {
       JsResult.fromTry(
         Try(

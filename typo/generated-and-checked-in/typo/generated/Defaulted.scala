@@ -35,7 +35,7 @@ object Defaulted {
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
   }
-
+  
   implicit def readsOpt[T: Reads]: Reads[Defaulted[Option[T]]] = {
     case JsString("defaulted") =>
       JsSuccess(UseDefault)
@@ -46,7 +46,7 @@ object Defaulted {
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
   }
-
+  
   implicit def writes[T: play.api.libs.json.Writes]: Writes[Defaulted[T]] = {
     case Provided(value) => Json.obj("provided" -> implicitly[Writes[T]].writes(value))
     case UseDefault      => JsString("defaulted")

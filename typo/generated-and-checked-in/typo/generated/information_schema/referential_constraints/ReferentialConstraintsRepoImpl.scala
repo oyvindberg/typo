@@ -41,6 +41,6 @@ object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
           .on(namedParams: _*)
           .as(ReferentialConstraintsRow.rowParser("").*)
     }
-
+  
   }
 }

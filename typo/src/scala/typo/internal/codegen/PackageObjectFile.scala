@@ -9,8 +9,8 @@ object PackageObjectFile {
       code"""|package ${parentPkg.map(_.code).mkCode(".")}
              |
              |package object ${options.pkg.name} {
-             |  ${options.dbLib.missingInstances.mkCode("\n  ")}
-             |  ${options.jsonLib.missingInstances.mkCode("\n  ")}
+             |  ${options.dbLib.missingInstances.mkCode("\n")}
+             |  ${options.jsonLib.missingInstances.mkCode("\n")}
              |  implicit val pgObjectOrdering: ${sc.Type.Ordering.of(sc.Type.PGobject)} =
              |    ${sc.Type.Ordering}.by(x => (x.getType, x.getValue))
              |}

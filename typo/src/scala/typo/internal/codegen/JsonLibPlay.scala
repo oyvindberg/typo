@@ -22,44 +22,48 @@ object JsonLibPlay extends JsonLib {
     val T = sc.Type.Abstract(sc.Ident("T"))
     val defaultOfT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(T))
     val defaultOfOptT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(sc.Type.Option.of(T)))
-    val reader = code"""implicit def reads[$T: $ReadsName]: ${Reads(defaultOfT)} = {
-            |    case $JsString("defaulted") =>
-            |      $JsSuccess($useDefault)
-            |    case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-            |      $Json.fromJson[T](providedJson).map($provided.apply)
-            |    case _ =>
-            |      $JsError(s"Expected `$defaulted` json object structure")
-            |  }
-            |""".stripMargin
-    val readerOpt = code"""implicit def readsOpt[$T: $ReadsName]: ${Reads(defaultOfOptT)} = {
-            |    case $JsString("defaulted") =>
-            |      $JsSuccess($useDefault)
-            |    case $JsObject(Seq(("provided", $JsNull))) =>
-            |      $JsSuccess($provided(${sc.Type.None}))
-            |    case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-            |      $Json.fromJson[T](providedJson).map(x => $provided(${sc.Type.Some}(x)))
-            |    case _ =>
-            |      $JsError(s"Expected `$defaulted` json object structure")
-            |  }
-            |""".stripMargin
+    val reader =
+      code"""|implicit def reads[$T: $ReadsName]: ${Reads(defaultOfT)} = {
+             |  case $JsString("defaulted") =>
+             |    $JsSuccess($useDefault)
+             |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
+             |    $Json.fromJson[T](providedJson).map($provided.apply)
+             |  case _ =>
+             |    $JsError(s"Expected `$defaulted` json object structure")
+             |}
+             |""".stripMargin
+    val readerOpt =
+      code"""|implicit def readsOpt[$T: $ReadsName]: ${Reads(defaultOfOptT)} = {
+             |  case $JsString("defaulted") =>
+             |    $JsSuccess($useDefault)
+             |  case $JsObject(Seq(("provided", $JsNull))) =>
+             |    $JsSuccess($provided(${sc.Type.None}))
+             |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
+             |    $Json.fromJson[T](providedJson).map(x => $provided(${sc.Type.Some}(x)))
+             |  case _ =>
+             |    $JsError(s"Expected `$defaulted` json object structure")
+             |}
+             |""".stripMargin
 
-    val writer = code"""implicit def writes[$T: $WritesName]: ${Writes(defaultOfT)} = {
-            |    case $provided(value) => $Json.obj("provided" -> implicitly[${Writes(T)}].writes(value))
-            |    case $useDefault      => $JsString("defaulted")
-            |  }
-            |""".stripMargin
+    val writer =
+      code"""|implicit def writes[$T: $WritesName]: ${Writes(defaultOfT)} = {
+             |  case $provided(value) => $Json.obj("provided" -> implicitly[${Writes(T)}].writes(value))
+             |  case $useDefault      => $JsString("defaulted")
+             |}
+             |""".stripMargin
 
     List(reader, readerOpt, writer)
   }
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
-    val reader = code"""implicit val reads: ${Reads(wrapperType)} = (value: $JsValue) =>
-                         |    value.validate[${sc.Type.String}].flatMap { str =>
-                         |      $lookup.get(str) match {
-                         |        case Some(value) => $JsSuccess(value)
-                         |        case None => $JsError(s"'$$str' does not match any of the following legal values: $$Names")
-                         |      }
-                         |    }
-                         |""".stripMargin
+    val reader =
+      code"""|implicit val reads: ${Reads(wrapperType)} = (value: $JsValue) =>
+             |  value.validate[${sc.Type.String}].flatMap { str =>
+             |    $lookup.get(str) match {
+             |      case Some(value) => $JsSuccess(value)
+             |      case None => $JsError(s"'$$str' does not match any of the following legal values: $$Names")
+             |    }
+             |  }
+             |""".stripMargin
     val writer = code"""implicit val writes: ${Writes(wrapperType)} = value => implicitly[${Writes(underlying)}].writes(value.value)"""
 
     List(reader, writer)
@@ -74,21 +78,21 @@ object JsonLibPlay extends JsonLib {
 
     List(
       code"""|implicit val oFormat: ${OFormat(tpe)} = new ${OFormat(tpe)}{
-             |    override def writes(o: $tpe): $JsObject =
-             |      $Json.obj(
-             |        ${cols.map(col => code"""${sc.StrLit(col.dbName.value)} -> o.${col.name}""").mkCode(",\n      ")}
-             |      )
+             |  override def writes(o: $tpe): $JsObject =
+             |    $Json.obj(
+             |      ${cols.map(col => code"""${sc.StrLit(col.dbName.value)} -> o.${col.name}""").mkCode(",\n")}
+             |    )
              |
-             |    override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
-             |      $JsResult.fromTry(
-             |        ${sc.Type.Try}(
-             |          $tpe(
-             |            ${cols.map(col => code"""${col.name} = ${as(col)}""").mkCode(",\n            ")}
-             |          )
+             |  override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
+             |    $JsResult.fromTry(
+             |      ${sc.Type.Try}(
+             |        $tpe(
+             |          ${cols.map(col => code"""${col.name} = ${as(col)}""").mkCode(",\n")}
              |        )
              |      )
-             |    }
-             |  }"""
+             |    )
+             |  }
+             |}"""
     )
   }
 
@@ -107,34 +111,34 @@ object JsonLibPlay extends JsonLib {
       val scalaMap = Format(sc.Type.Map.of(sc.Type.String, sc.Type.String))
 
       code"""|implicit val hstoreFormat: $javaMap = {
-             |    // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
-             |    import scala.jdk.CollectionConverters._
-             |    implicitly[$scalaMap].bimap(_.asJava, _.asScala.toMap)
+             |  // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
+             |  import scala.jdk.CollectionConverters._
+             |  implicitly[$scalaMap].bimap(_.asJava, _.asScala.toMap)
              |}""".stripMargin
     }
 
     val pgObjectFormat = {
       val formatType = OFormat(sc.Type.PGobject)
       code"""implicit val pgObjectFormat: $formatType =
-            |    new $formatType {
-            |      override def writes(o: ${sc.Type.PGobject}): $JsObject =
-            |        $JsObject(${sc.Type.Map}("type" -> $JsString(o.getType), "value" -> $JsString(o.getValue)))
+            |  new $formatType {
+            |    override def writes(o: ${sc.Type.PGobject}): $JsObject =
+            |      $JsObject(${sc.Type.Map}("type" -> $JsString(o.getType), "value" -> $JsString(o.getValue)))
             |
-            |      override def reads(json: $JsValue): $JsResult[${sc.Type.PGobject}] = json match {
-            |        case $JsObject(fields) =>
-            |          val t = fields.get("type").map(_.as[String])
-            |          val v = fields.get("value").map(_.as[String])
-            |          (t, v) match {
-            |            case (${sc.Type.Some}(t), ${sc.Type.Some}(v)) =>
-            |              val o = new ${sc.Type.PGobject}()
-            |              o.setType(t)
-            |              o.setValue(v)
-            |              $JsSuccess(o)
-            |            case _ => $JsError("Invalid PGobject")
-            |          }
-            |        case _ => $JsError("Invalid PGobject")
-            |      }
+            |    override def reads(json: $JsValue): $JsResult[${sc.Type.PGobject}] = json match {
+            |      case $JsObject(fields) =>
+            |        val t = fields.get("type").map(_.as[String])
+            |        val v = fields.get("value").map(_.as[String])
+            |        (t, v) match {
+            |          case (${sc.Type.Some}(t), ${sc.Type.Some}(v)) =>
+            |            val o = new ${sc.Type.PGobject}()
+            |            o.setType(t)
+            |            o.setValue(v)
+            |            $JsSuccess(o)
+            |          case _ => $JsError("Invalid PGobject")
+            |        }
+            |      case _ => $JsError("Invalid PGobject")
             |    }
+            |  }
             |""".stripMargin
     }
 

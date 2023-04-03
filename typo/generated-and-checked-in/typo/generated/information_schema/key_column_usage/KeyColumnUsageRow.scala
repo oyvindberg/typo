@@ -52,16 +52,16 @@ object KeyColumnUsageRow {
     override def writes(o: KeyColumnUsageRow): JsObject =
       Json.obj(
         "constraint_catalog" -> o.constraintCatalog,
-      "constraint_schema" -> o.constraintSchema,
-      "constraint_name" -> o.constraintName,
-      "table_catalog" -> o.tableCatalog,
-      "table_schema" -> o.tableSchema,
-      "table_name" -> o.tableName,
-      "column_name" -> o.columnName,
-      "ordinal_position" -> o.ordinalPosition,
-      "position_in_unique_constraint" -> o.positionInUniqueConstraint
+        "constraint_schema" -> o.constraintSchema,
+        "constraint_name" -> o.constraintName,
+        "table_catalog" -> o.tableCatalog,
+        "table_schema" -> o.tableSchema,
+        "table_name" -> o.tableName,
+        "column_name" -> o.columnName,
+        "ordinal_position" -> o.ordinalPosition,
+        "position_in_unique_constraint" -> o.positionInUniqueConstraint
       )
-
+  
     override def reads(json: JsValue): JsResult[KeyColumnUsageRow] = {
       JsResult.fromTry(
         Try(

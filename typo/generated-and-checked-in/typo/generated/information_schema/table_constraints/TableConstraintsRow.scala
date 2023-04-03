@@ -54,17 +54,17 @@ object TableConstraintsRow {
     override def writes(o: TableConstraintsRow): JsObject =
       Json.obj(
         "constraint_catalog" -> o.constraintCatalog,
-      "constraint_schema" -> o.constraintSchema,
-      "constraint_name" -> o.constraintName,
-      "table_catalog" -> o.tableCatalog,
-      "table_schema" -> o.tableSchema,
-      "table_name" -> o.tableName,
-      "constraint_type" -> o.constraintType,
-      "is_deferrable" -> o.isDeferrable,
-      "initially_deferred" -> o.initiallyDeferred,
-      "enforced" -> o.enforced
+        "constraint_schema" -> o.constraintSchema,
+        "constraint_name" -> o.constraintName,
+        "table_catalog" -> o.tableCatalog,
+        "table_schema" -> o.tableSchema,
+        "table_name" -> o.tableName,
+        "constraint_type" -> o.constraintType,
+        "is_deferrable" -> o.isDeferrable,
+        "initially_deferred" -> o.initiallyDeferred,
+        "enforced" -> o.enforced
       )
-
+  
     override def reads(json: JsValue): JsResult[TableConstraintsRow] = {
       JsResult.fromTry(
         Try(

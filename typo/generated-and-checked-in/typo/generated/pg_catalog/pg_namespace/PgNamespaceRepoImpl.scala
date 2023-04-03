@@ -42,7 +42,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           .on(namedParams: _*)
           .as(PgNamespaceRow.rowParser("").*)
     }
-
+  
   }
   override def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
@@ -54,15 +54,15 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))
         }
         val q = s"""update pg_catalog.pg_namespace
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where oid = $oid"""
+                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    where oid = $oid"""
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }
-
+  
   }
   override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -70,13 +70,13 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
       Some(NamedParameter("nspowner", ParameterValue.from(unsaved.nspowner))),
       Some(NamedParameter("nspacl", ParameterValue.from(unsaved.nspacl)))
     ).flatten
-
+    
     SQL"""insert into pg_catalog.pg_namespace(oid, ${namedParameters.map(_.name).mkString(", ")})
-      values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-      """
+          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
       .on(namedParameters :_*)
       .execute()
-
+  
   }
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_namespace where oid = $oid""".executeUpdate() > 0

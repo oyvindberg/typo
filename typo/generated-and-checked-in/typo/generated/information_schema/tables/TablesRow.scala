@@ -58,19 +58,19 @@ object TablesRow {
     override def writes(o: TablesRow): JsObject =
       Json.obj(
         "table_catalog" -> o.tableCatalog,
-      "table_schema" -> o.tableSchema,
-      "table_name" -> o.tableName,
-      "table_type" -> o.tableType,
-      "self_referencing_column_name" -> o.selfReferencingColumnName,
-      "reference_generation" -> o.referenceGeneration,
-      "user_defined_type_catalog" -> o.userDefinedTypeCatalog,
-      "user_defined_type_schema" -> o.userDefinedTypeSchema,
-      "user_defined_type_name" -> o.userDefinedTypeName,
-      "is_insertable_into" -> o.isInsertableInto,
-      "is_typed" -> o.isTyped,
-      "commit_action" -> o.commitAction
+        "table_schema" -> o.tableSchema,
+        "table_name" -> o.tableName,
+        "table_type" -> o.tableType,
+        "self_referencing_column_name" -> o.selfReferencingColumnName,
+        "reference_generation" -> o.referenceGeneration,
+        "user_defined_type_catalog" -> o.userDefinedTypeCatalog,
+        "user_defined_type_schema" -> o.userDefinedTypeSchema,
+        "user_defined_type_name" -> o.userDefinedTypeName,
+        "is_insertable_into" -> o.isInsertableInto,
+        "is_typed" -> o.isTyped,
+        "commit_action" -> o.commitAction
       )
-
+  
     override def reads(json: JsValue): JsResult[TablesRow] = {
       JsResult.fromTry(
         Try(

@@ -24,9 +24,9 @@ object PersonId {
     override def writes(o: PersonId): JsObject =
       Json.obj(
         "one" -> o.one,
-      "two" -> o.two
+        "two" -> o.two
       )
-
+  
     override def reads(json: JsValue): JsResult[PersonId] = {
       JsResult.fromTry(
         Try(

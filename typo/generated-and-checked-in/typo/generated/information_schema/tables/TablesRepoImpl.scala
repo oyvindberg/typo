@@ -44,6 +44,6 @@ object TablesRepoImpl extends TablesRepo {
           .on(namedParams: _*)
           .as(TablesRow.rowParser("").*)
     }
-
+  
   }
 }

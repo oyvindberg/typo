@@ -26,18 +26,18 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
         case Some((relationName, columnName)) =>
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.idents))
           code"""|/** Points to [[${sc.renderTree(shortened)}.${naming.field(columnName)}]] */
-                 |  ${col.param}$originComment""".stripMargin
+                 |${col.param}$originComment""".stripMargin
         case None => code"${col.param.code}$originComment"
       }
     }
     val str =
       code"""case class ${relation.RowName.name}(
-            |  ${formattedCols.mkCode(",\n  ")}
+            |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
             |object ${relation.RowName.name} {
-            |  ${options.dbLib.instances(rowType, relation.cols).mkCode("\n  ")}
-            |  ${options.jsonLib.instances(rowType, relation.cols).mkCode("\n  ")}
+            |  ${options.dbLib.instances(rowType, relation.cols).mkCode("\n")}
+            |  ${options.jsonLib.instances(rowType, relation.cols).mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -59,7 +59,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |sealed abstract class ${relation.FieldValueName.name}[T](name: String, value: T) extends ${relation.FieldOrIdValueName.name}(name, value)
             |
             |object ${relation.FieldValueName} {
-            |  ${members.mkCode("\n  ")}
+            |  ${members.mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -70,7 +70,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
     val tpe = sc.Type.Qualified(relation.RepoName)
     val str =
       code"""trait ${relation.RepoName.name} {
-            |  ${repoMethods.map(options.dbLib.repoSig).mkCode("\n  ")}
+            |  ${repoMethods.map(options.dbLib.repoSig).mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -80,15 +80,15 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
   def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
     val renderedMethods: List[sc.Code] = repoMethods.map { repoMethod =>
       code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-             |    ${options.dbLib.repoImpl(relation, repoMethod)}
-             |  }""".stripMargin
+             |  ${options.dbLib.repoImpl(relation, repoMethod)}
+             |}""".stripMargin
     }
 
     val str =
-      code"""object ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
-              |  ${renderedMethods.mkCode("\n  ")}
-              |}
-              |""".stripMargin
+      code"""|object ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
+             |  ${renderedMethods.mkCode("\n")}
+             |}
+             |""".stripMargin
 
     sc.File(sc.Type.Qualified(relation.RepoImplName), str, secondaryTypes = Nil)
   }

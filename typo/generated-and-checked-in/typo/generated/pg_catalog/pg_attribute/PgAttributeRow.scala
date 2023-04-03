@@ -48,8 +48,8 @@ case class PgAttributeRow(
   attfdwoptions: Option[Array[String]] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attfdwoptions","ordinal_position":25,"is_nullable":"YES","data_type":"ARRAY","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_text","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   attmissingval: Option[/* anyarray */ PGobject] /* {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_attribute","column_name":"attmissingval","ordinal_position":26,"is_nullable":"YES","data_type":"anyarray","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"anyarray","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 ){
-  val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
-}
+   val compositeId: PgAttributeId = PgAttributeId(attrelid, attnum)
+ }
 
 object PgAttributeRow {
   def rowParser(prefix: String): RowParser[PgAttributeRow] = { row =>
@@ -89,33 +89,33 @@ object PgAttributeRow {
     override def writes(o: PgAttributeRow): JsObject =
       Json.obj(
         "attrelid" -> o.attrelid,
-      "attname" -> o.attname,
-      "atttypid" -> o.atttypid,
-      "attstattarget" -> o.attstattarget,
-      "attlen" -> o.attlen,
-      "attnum" -> o.attnum,
-      "attndims" -> o.attndims,
-      "attcacheoff" -> o.attcacheoff,
-      "atttypmod" -> o.atttypmod,
-      "attbyval" -> o.attbyval,
-      "attalign" -> o.attalign,
-      "attstorage" -> o.attstorage,
-      "attcompression" -> o.attcompression,
-      "attnotnull" -> o.attnotnull,
-      "atthasdef" -> o.atthasdef,
-      "atthasmissing" -> o.atthasmissing,
-      "attidentity" -> o.attidentity,
-      "attgenerated" -> o.attgenerated,
-      "attisdropped" -> o.attisdropped,
-      "attislocal" -> o.attislocal,
-      "attinhcount" -> o.attinhcount,
-      "attcollation" -> o.attcollation,
-      "attacl" -> o.attacl,
-      "attoptions" -> o.attoptions,
-      "attfdwoptions" -> o.attfdwoptions,
-      "attmissingval" -> o.attmissingval
+        "attname" -> o.attname,
+        "atttypid" -> o.atttypid,
+        "attstattarget" -> o.attstattarget,
+        "attlen" -> o.attlen,
+        "attnum" -> o.attnum,
+        "attndims" -> o.attndims,
+        "attcacheoff" -> o.attcacheoff,
+        "atttypmod" -> o.atttypmod,
+        "attbyval" -> o.attbyval,
+        "attalign" -> o.attalign,
+        "attstorage" -> o.attstorage,
+        "attcompression" -> o.attcompression,
+        "attnotnull" -> o.attnotnull,
+        "atthasdef" -> o.atthasdef,
+        "atthasmissing" -> o.atthasmissing,
+        "attidentity" -> o.attidentity,
+        "attgenerated" -> o.attgenerated,
+        "attisdropped" -> o.attisdropped,
+        "attislocal" -> o.attislocal,
+        "attinhcount" -> o.attinhcount,
+        "attcollation" -> o.attcollation,
+        "attacl" -> o.attacl,
+        "attoptions" -> o.attoptions,
+        "attfdwoptions" -> o.attfdwoptions,
+        "attmissingval" -> o.attmissingval
       )
-
+  
     override def reads(json: JsValue): JsResult[PgAttributeRow] = {
       JsResult.fromTry(
         Try(

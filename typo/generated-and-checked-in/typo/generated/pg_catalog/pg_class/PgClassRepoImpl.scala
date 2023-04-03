@@ -71,7 +71,7 @@ object PgClassRepoImpl extends PgClassRepo {
           .on(namedParams: _*)
           .as(PgClassRow.rowParser("").*)
     }
-
+  
   }
   override def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
@@ -112,15 +112,15 @@ object PgClassRepoImpl extends PgClassRepo {
           case PgClassFieldValue.relpartbound(value) => NamedParameter("relpartbound", ParameterValue.from(value))
         }
         val q = s"""update pg_catalog.pg_class
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where oid = $oid"""
+                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    where oid = $oid"""
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }
-
+  
   }
   override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -157,13 +157,13 @@ object PgClassRepoImpl extends PgClassRepo {
       Some(NamedParameter("reloptions", ParameterValue.from(unsaved.reloptions))),
       Some(NamedParameter("relpartbound", ParameterValue.from(unsaved.relpartbound)))
     ).flatten
-
+    
     SQL"""insert into pg_catalog.pg_class(oid, ${namedParameters.map(_.name).mkString(", ")})
-      values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-      """
+          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
       .on(namedParameters :_*)
       .execute()
-
+  
   }
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_class where oid = $oid""".executeUpdate() > 0

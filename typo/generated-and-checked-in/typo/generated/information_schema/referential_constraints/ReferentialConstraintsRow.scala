@@ -52,16 +52,16 @@ object ReferentialConstraintsRow {
     override def writes(o: ReferentialConstraintsRow): JsObject =
       Json.obj(
         "constraint_catalog" -> o.constraintCatalog,
-      "constraint_schema" -> o.constraintSchema,
-      "constraint_name" -> o.constraintName,
-      "unique_constraint_catalog" -> o.uniqueConstraintCatalog,
-      "unique_constraint_schema" -> o.uniqueConstraintSchema,
-      "unique_constraint_name" -> o.uniqueConstraintName,
-      "match_option" -> o.matchOption,
-      "update_rule" -> o.updateRule,
-      "delete_rule" -> o.deleteRule
+        "constraint_schema" -> o.constraintSchema,
+        "constraint_name" -> o.constraintName,
+        "unique_constraint_catalog" -> o.uniqueConstraintCatalog,
+        "unique_constraint_schema" -> o.uniqueConstraintSchema,
+        "unique_constraint_name" -> o.uniqueConstraintName,
+        "match_option" -> o.matchOption,
+        "update_rule" -> o.updateRule,
+        "delete_rule" -> o.deleteRule
       )
-
+  
     override def reads(json: JsValue): JsResult[ReferentialConstraintsRow] = {
       JsResult.fromTry(
         Try(

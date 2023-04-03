@@ -43,11 +43,11 @@ object PgNamespaceRow {
     override def writes(o: PgNamespaceRow): JsObject =
       Json.obj(
         "oid" -> o.oid,
-      "nspname" -> o.nspname,
-      "nspowner" -> o.nspowner,
-      "nspacl" -> o.nspacl
+        "nspname" -> o.nspname,
+        "nspowner" -> o.nspowner,
+        "nspacl" -> o.nspacl
       )
-
+  
     override def reads(json: JsValue): JsResult[PgNamespaceRow] = {
       JsResult.fromTry(
         Try(

@@ -76,6 +76,6 @@ object ColumnsRepoImpl extends ColumnsRepo {
           .on(namedParams: _*)
           .as(ColumnsRow.rowParser("").*)
     }
-
+  
   }
 }

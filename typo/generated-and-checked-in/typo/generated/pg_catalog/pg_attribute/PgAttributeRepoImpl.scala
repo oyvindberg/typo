@@ -61,7 +61,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           .on(namedParams: _*)
           .as(PgAttributeRow.rowParser("").*)
     }
-
+  
   }
   override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
@@ -94,15 +94,15 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
         val q = s"""update pg_catalog.pg_attribute
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}"""
+                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}"""
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }
-
+  
   }
   override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -131,13 +131,13 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
       Some(NamedParameter("attfdwoptions", ParameterValue.from(unsaved.attfdwoptions))),
       Some(NamedParameter("attmissingval", ParameterValue.from(unsaved.attmissingval)))
     ).flatten
-
+    
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, ${namedParameters.map(_.name).mkString(", ")})
-      values (${compositeId.attrelid}, ${compositeId.attnum}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-      """
+          values (${compositeId.attrelid}, ${compositeId.attnum}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    """
       .on(namedParameters :_*)
       .execute()
-
+  
   }
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0

@@ -51,7 +51,7 @@ object PersonRepoImpl extends PersonRepo {
           .on(namedParams: _*)
           .as(PersonRow.rowParser("").*)
     }
-
+  
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Int = {
     fieldValues match {
@@ -70,15 +70,15 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
         val q = s"""update myschema.person
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = $id"""
+                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    where id = $id"""
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
           .executeUpdate()
     }
-
+  
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
     val namedParameters = List(
@@ -99,14 +99,14 @@ object PersonRepoImpl extends PersonRepo {
         case Provided(value) => Some(NamedParameter("sector", ParameterValue.from[SectorEnum](value)))
       }
     ).flatten
-
+    
     SQL"""insert into myschema.person(${namedParameters.map(_.name).mkString(", ")})
-      values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-      returning id
-      """
+          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+          returning id
+    """
       .on(namedParameters :_*)
       .executeInsert(PersonId.rowParser("").single)
-
+  
   }
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.person where id = $id""".executeUpdate() > 0

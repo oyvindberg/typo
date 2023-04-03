@@ -9,23 +9,23 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
     val rowType = sc.Type.Qualified(qident)
 
     val str =
-      code"""case class ${qident.name}(
-            |  ${colsUnsaved.map(_.param.code).mkCode(",\n  ")}
-            |)
-            |object ${qident.name} {
-            |  ${options.jsonLib.instances(rowType, colsUnsaved).mkCode("\n  ")}
-            |}
-            |""".stripMargin
+      code"""|case class ${qident.name}(
+             |  ${colsUnsaved.map(_.param.code).mkCode(",\n")}
+             |)
+             |object ${qident.name} {
+             |  ${options.jsonLib.instances(rowType, colsUnsaved).mkCode("\n")}
+             |}
+             |""".stripMargin
 
     sc.File(rowType, str, secondaryTypes = Nil)
   }
 
   val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>
     val str =
-      code"""case class ${rowJoined.name.name}(
-            |  ${rowJoined.params.map(_.param.code).mkCode(",\n  ")}
-            |)
-            |""".stripMargin
+      code"""|case class ${rowJoined.name.name}(
+             |  ${rowJoined.params.map(_.param.code).mkCode(",\n")}
+             |)
+             |""".stripMargin
 
     sc.File(sc.Type.Qualified(rowJoined.name), str, secondaryTypes = Nil)
   }
@@ -37,8 +37,8 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
           code"""case class ${id.qident.name}(value: ${id.underlying}) extends AnyVal
                 |object ${id.qident.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
-                |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n  ")}
-                |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbName).mkCode("\n  ")}
+                |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
+                |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbName).mkCode("\n")}
                 |}
 """.stripMargin
 
@@ -62,8 +62,8 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
           code"""case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                 |object ${qident.name} {
                 |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
-                |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
-                |  ${options.dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
+                |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}
+                |  ${options.dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}
                 |}
 """.stripMargin
         Some(sc.File(id.tpe, str, secondaryTypes = Nil))

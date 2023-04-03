@@ -13,7 +13,7 @@ sealed trait ${dc.Defaulted.name}[+T]
 object ${dc.Defaulted.name} {
   case class ${dc.Provided.name}[T](value: T) extends ${dc.Defaulted}[T]
   case object ${dc.UseDefault.name} extends ${dc.Defaulted}[Nothing]
-  ${jsonLib.defaultedInstance(dc.Defaulted, dc.Provided.assertInScope, dc.UseDefault.assertInScope).mkCode("\n  ")}
+  ${jsonLib.defaultedInstance(dc.Defaulted, dc.Provided.assertInScope, dc.UseDefault.assertInScope).mkCode("\n")}
 }
 """
 

@@ -59,18 +59,18 @@ object PersonRow {
     override def writes(o: PersonRow): JsObject =
       Json.obj(
         "id" -> o.id,
-      "favourite_football_club_id" -> o.favouriteFootballClubId,
-      "name" -> o.name,
-      "nick_name" -> o.nickName,
-      "blog_url" -> o.blogUrl,
-      "email" -> o.email,
-      "phone" -> o.phone,
-      "likes_pizza" -> o.likesPizza,
-      "marital_status_id" -> o.maritalStatusId,
-      "work_email" -> o.workEmail,
-      "sector" -> o.sector
+        "favourite_football_club_id" -> o.favouriteFootballClubId,
+        "name" -> o.name,
+        "nick_name" -> o.nickName,
+        "blog_url" -> o.blogUrl,
+        "email" -> o.email,
+        "phone" -> o.phone,
+        "likes_pizza" -> o.likesPizza,
+        "marital_status_id" -> o.maritalStatusId,
+        "work_email" -> o.workEmail,
+        "sector" -> o.sector
       )
-
+  
     override def reads(json: JsValue): JsResult[PersonRow] = {
       JsResult.fromTry(
         Try(

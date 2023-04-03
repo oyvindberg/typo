@@ -37,7 +37,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           .on(namedParams: _*)
           .as(MaritalStatusRow.rowParser("").*)
     }
-
+  
   }
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.marital_status where id = $id""".executeUpdate() > 0

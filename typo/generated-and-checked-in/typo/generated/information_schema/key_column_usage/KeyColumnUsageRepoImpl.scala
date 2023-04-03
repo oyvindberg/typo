@@ -41,6 +41,6 @@ object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
           .on(namedParams: _*)
           .as(KeyColumnUsageRow.rowParser("").*)
     }
-
+  
   }
 }

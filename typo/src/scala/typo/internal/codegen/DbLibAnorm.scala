@@ -27,30 +27,30 @@ object DbLibAnorm extends DbLib {
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     val column =
       code"""|implicit val column: ${Column(wrapperType)} =
-               |    implicitly[${Column(underlying)}]
-               |      .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin
+             |  implicitly[${Column(underlying)}]
+             |    .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin
     val toStatement =
       code"""|implicit val toStatement: ${ToStatement(wrapperType)} =
-             |    implicitly[${ToStatement(underlying)}].contramap(_.value)""".stripMargin
+             |  implicitly[${ToStatement(underlying)}].contramap(_.value)""".stripMargin
 
     val parameterMetadata =
       code"""|implicit val parameterMetadata: $ParameterMetaData[$wrapperType] = new $ParameterMetaData[$wrapperType] {
-             |    override def sqlType: ${sc.Type.String} = implicitly[${ParameterMetaData.of(underlying)}].sqlType
-             |    override def jdbcType: ${sc.Type.Int} = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
+             |  override def sqlType: ${sc.Type.String} = implicitly[${ParameterMetaData.of(underlying)}].sqlType
+             |  override def jdbcType: ${sc.Type.Int} = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}"""
     List(column, toStatement, parameterMetadata)
   }
 
   override def instances(tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
     val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](prefix + ${sc.StrLit(x.dbName.value)})" }
-    val rowParser = code"""def $rowParserIdent(prefix: String): ${RowParser(tpe)} = { row =>
-            |    $Success(
-            |      $tpe(
-            |        ${mappedValues.mkCode(",\n        ")}
-            |      )
-            |    )
-            |  }
-            |""".stripMargin
+    val rowParser = code"""|def $rowParserIdent(prefix: String): ${RowParser(tpe)} = { row =>
+                           |  $Success(
+                           |    $tpe(
+                           |      ${mappedValues.mkCode(",\n")}
+                           |    )
+                           |  )
+                           |}
+                           |""".stripMargin
 
     List(rowParser)
   }
@@ -60,9 +60,9 @@ object DbLibAnorm extends DbLib {
     val rowParser = code"def $rowParserIdent(prefix: String): ${RowParser(wrapperType)} = $SqlParser.get[$wrapperType](prefix + ${sc.StrLit(colName.value)})"
     val parameterMetadata =
       code"""|implicit val parameterMetadata: ${ParameterMetaData.of(wrapperType)} = new ${ParameterMetaData.of(wrapperType)} {
-             |    override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
-             |    override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
-             |  }
+             |  override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
+             |  override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
+             |}
              |""".stripMargin
     List(toStatement, column, rowParser, parameterMetadata)
   }
@@ -92,7 +92,7 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.SqlScript(sqlScript) =>
       val params = sqlScript.params match {
         case Nil      => sc.Code.Empty
-        case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe).code }.mkCode(",\n                     ")
+        case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe).code }.mkCode(",\n")
       }
       code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.relation.RowName))}"
   }
@@ -139,18 +139,18 @@ object DbLibAnorm extends DbLib {
           code"""select * from ${table.relationName} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
         )
         code"""${param.name} match {
-              |      case Nil => selectAll
-              |      case nonEmpty =>
-              |        val namedParams = nonEmpty.map{
-              |          ${cases.mkCode("\n          ")}
-              |        }
-              |        val q = $sql
-              |        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-              |        import anorm._
-              |        SQL(q)
-              |          .on(namedParams: _*)
-              |          .as(${table.RowName}.$rowParserIdent("").*)
+              |  case Nil => selectAll
+              |  case nonEmpty =>
+              |    val namedParams = nonEmpty.map{
+              |      ${cases.mkCode("\n")}
               |    }
+              |    val q = $sql
+              |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+              |    import anorm._
+              |    SQL(q)
+              |      .on(namedParams: _*)
+              |      .as(${table.RowName}.$rowParserIdent("").*)
+              |}
               |""".stripMargin
 
       case RepoMethod.UpdateFieldValues(id, param, cases0) =>
@@ -161,31 +161,31 @@ object DbLibAnorm extends DbLib {
 
         val sql = sc.s(
           code"""update ${table.relationName}
-                |          set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
-                |          where ${matchId(id)}""".stripMargin
+                |    set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
+                |    where ${matchId(id)}""".stripMargin
         )
         code"""${param.name} match {
-              |      case Nil => 0
-              |      case nonEmpty =>
-              |        val namedParams = nonEmpty.map{
-              |          ${cases.mkCode("\n          ")}
-              |        }
-              |        val q = $sql
-              |        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-              |        import anorm._
-              |        SQL(q)
-              |          .on(namedParams: _*)
-              |          .executeUpdate()
+              |  case Nil => 0
+              |  case nonEmpty =>
+              |    val namedParams = nonEmpty.map{
+              |      ${cases.mkCode("\n")}
               |    }
+              |    val q = $sql
+              |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+              |    import anorm._
+              |    SQL(q)
+              |      .on(namedParams: _*)
+              |      .executeUpdate()
+              |}
               |""".stripMargin
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
           case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
-                   |        case ${default.UseDefault} => None
-                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
-                   |      }"""
+                   |  case ${default.UseDefault} => None
+                   |  case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
+                   |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
@@ -194,7 +194,7 @@ object DbLibAnorm extends DbLib {
           code"""|insert into ${table.relationName}($${namedParameters.map(_.name).mkString(", ")})
                  |      values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
-                 |      """.stripMargin
+                 |""".stripMargin
         )
 
         // don't remand that user-specified id has a correct rowParser definition when we can trivially infer it
@@ -206,21 +206,21 @@ object DbLibAnorm extends DbLib {
         }
 
         code"""|val namedParameters = List(
-               |      ${maybeNamedParameters.mkCode(",\n      ")}
-               |    ).flatten
+               |  ${maybeNamedParameters.mkCode(",\n")}
+               |).flatten
                |
-               |    $sql
-               |      .on(namedParameters :_*)
-               |      .executeInsert($rowParser.single)
+               |$sql
+               |  .on(namedParameters :_*)
+               |  .executeInsert($rowParser.single)
                |"""
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
           case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
-                   |        case ${default.UseDefault} => None
-                   |        case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
-                   |      }"""
+                   |  case ${default.UseDefault} => None
+                   |  case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
+                   |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
@@ -234,16 +234,16 @@ object DbLibAnorm extends DbLib {
         val sql = interpolate(
           code"""|insert into ${table.relationName}($joinedIdColNames, $${namedParameters.map(_.name).mkString(", ")})
                  |      values (${idValues.mkCode(", ")}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
-                 |      """.stripMargin
+                 |""".stripMargin
         )
 
         code"""|val namedParameters = List(
-               |      ${maybeNamedParameters.mkCode(",\n      ")}
-               |    ).flatten
+               |  ${maybeNamedParameters.mkCode(",\n")}
+               |).flatten
                |
-               |    $sql
-               |      .on(namedParameters :_*)
-               |      .execute()
+               |$sql
+               |  .on(namedParameters :_*)
+               |  .execute()
                |"""
 
       case RepoMethod.InsertOnlyKey(_) => code"???"
@@ -256,7 +256,7 @@ object DbLibAnorm extends DbLib {
           s"$$${param.name.value}"
         }
         code"""|val sql = ${interpolate(renderedScript)}
-               |    sql.as(${sc.Type.Qualified(sqlScript.relation.RowName)}.$rowParserIdent("").*)
+               |sql.as(${sc.Type.Qualified(sqlScript.relation.RowName)}.$rowParserIdent("").*)
                |""".stripMargin
     }
 
@@ -280,32 +280,32 @@ object DbLibAnorm extends DbLib {
     val arrayInstances = arrayTypes.map { case (tpe, anyRefType, elemType) =>
       val arrayType = sc.Type.Array.of(tpe)
       code"""|implicit val ${tpe.value.name}Array: ${out(arrayType)} = new ${out(arrayType)} {
-             |    override def sqlType: ${sc.Type.String} = $elemType
-             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-             |    override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $anyRefType)))
-             |  }
+             |  override def sqlType: ${sc.Type.String} = $elemType
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
+             |  override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $anyRefType)))
+             |}
              |""".stripMargin
     }
 
     val postgresTypes = PostgresTypes.all.map { case (typeName, tpe) =>
       val either = sc.Type.Either.of(SqlRequestError, tpe)
       code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
-             |    override def sqlType: ${sc.Type.String} = $typeName
-             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-             |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-             |  }
+             |  override def sqlType: ${sc.Type.String} = $typeName
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |}
              |""".stripMargin
     }
     val hstore = {
       val tpe = sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
       val either = sc.Type.Either.of(SqlRequestError, tpe)
       code"""|implicit val hstoreDb: ${inout(tpe)} = new ${inout(tpe)} {
-             |    override def sqlType: ${sc.Type.String} = "hstore"
-             |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-             |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-             |  }
+             |  override def sqlType: ${sc.Type.String} = "hstore"
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |}
              |""".stripMargin
     }
 
@@ -313,11 +313,11 @@ object DbLibAnorm extends DbLib {
       val tpe = sc.Type.PGobject
       val either = sc.Type.Either.of(SqlRequestError, tpe)
       code"""|implicit val pgObjectDb: ${inout(tpe)} = new ${inout(tpe)} {
-           |    override def sqlType: ${sc.Type.String} = "hstore"
-           |    override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-           |    override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-           |    override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-           |  }
+           |  override def sqlType: ${sc.Type.String} = "hstore"
+           |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+           |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+           |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+           |}
            |""".stripMargin
     }
 

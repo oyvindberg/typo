@@ -24,7 +24,7 @@ object FootballClubRowUnsaved {
       Json.obj(
         "name" -> o.name
       )
-
+  
     override def reads(json: JsValue): JsResult[FootballClubRowUnsaved] = {
       JsResult.fromTry(
         Try(

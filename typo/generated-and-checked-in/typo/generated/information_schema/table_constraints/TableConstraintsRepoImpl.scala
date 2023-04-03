@@ -42,6 +42,6 @@ object TableConstraintsRepoImpl extends TableConstraintsRepo {
           .on(namedParams: _*)
           .as(TableConstraintsRow.rowParser("").*)
     }
-
+  
   }
 }

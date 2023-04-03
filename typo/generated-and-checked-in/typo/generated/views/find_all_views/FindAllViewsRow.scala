@@ -47,12 +47,12 @@ object FindAllViewsRow {
     override def writes(o: FindAllViewsRow): JsObject =
       Json.obj(
         "table_oid" -> o.tableOid,
-      "table_schema" -> o.tableSchema,
-      "table_name" -> o.tableName,
-      "relkind" -> o.relkind,
-      "view_definition" -> o.viewDefinition
+        "table_schema" -> o.tableSchema,
+        "table_name" -> o.tableName,
+        "relkind" -> o.relkind,
+        "view_definition" -> o.viewDefinition
       )
-
+  
     override def reads(json: JsValue): JsResult[FindAllViewsRow] = {
       JsResult.fromTry(
         Try(

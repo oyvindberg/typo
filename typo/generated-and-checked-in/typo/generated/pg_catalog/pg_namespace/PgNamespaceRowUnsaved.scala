@@ -28,10 +28,10 @@ object PgNamespaceRowUnsaved {
     override def writes(o: PgNamespaceRowUnsaved): JsObject =
       Json.obj(
         "nspname" -> o.nspname,
-      "nspowner" -> o.nspowner,
-      "nspacl" -> o.nspacl
+        "nspowner" -> o.nspowner,
+        "nspacl" -> o.nspacl
       )
-
+  
     override def reads(json: JsValue): JsResult[PgNamespaceRowUnsaved] = {
       JsResult.fromTry(
         Try(

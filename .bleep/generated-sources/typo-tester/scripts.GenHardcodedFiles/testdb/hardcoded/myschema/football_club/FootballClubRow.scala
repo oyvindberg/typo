@@ -36,9 +36,9 @@ object FootballClubRow {
     override def writes(o: FootballClubRow): JsObject =
       Json.obj(
         "id" -> o.id,
-      "name" -> o.name
+        "name" -> o.name
       )
-
+  
     override def reads(json: JsValue): JsResult[FootballClubRow] = {
       JsResult.fromTry(
         Try(
