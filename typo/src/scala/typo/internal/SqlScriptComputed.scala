@@ -15,7 +15,7 @@ case class SqlScriptComputed(
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 
-  val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
+  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
     script.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
         pointsTo = script.dependencies.get(dbCol.name),
@@ -58,7 +58,7 @@ case class SqlScriptComputed(
       SqlScriptComputed.ParamComputed(name, scalaTypeMapper.param(param.tpe, param.nullability), param)
     }
 
-  val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
+  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)
 
   val repoMethods: List[RepoMethod] = {

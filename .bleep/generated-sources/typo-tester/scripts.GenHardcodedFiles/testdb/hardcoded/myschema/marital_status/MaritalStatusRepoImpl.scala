@@ -23,7 +23,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectByIds(ids: List[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select id from myschema.marital_status where id in $ids""".as(MaritalStatusRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
+  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -36,24 +36,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         SQL(q)
           .on(namedParams: _*)
           .as(MaritalStatusRow.rowParser("").*)
-    }
-
-  }
-  override def updateFieldValues(id: MaritalStatusId, fieldValues: List[MaritalStatusFieldValue[_]])(implicit c: Connection): Int = {
-    fieldValues match {
-      case Nil => 0
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-        }
-        val q = s"""update myschema.marital_status
-          set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-          where id = $id"""
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .executeUpdate()
     }
 
   }

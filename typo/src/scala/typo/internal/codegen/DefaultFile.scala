@@ -17,5 +17,5 @@ object ${dc.Defaulted.name} {
 }
 """
 
-  val file = sc.File(dc.DefaultedType, contents)
+  val file = sc.File(dc.DefaultedType, contents, secondaryTypes = Nil)
 }

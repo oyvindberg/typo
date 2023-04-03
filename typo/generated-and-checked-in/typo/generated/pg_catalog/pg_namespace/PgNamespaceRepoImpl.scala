@@ -25,7 +25,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(PgNamespaceRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
+  override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -49,7 +49,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
       case Nil => 0
       case nonEmpty =>
         val namedParams = nonEmpty.map{
-          case PgNamespaceFieldValue.oid(value) => NamedParameter("oid", ParameterValue.from(value))
           case PgNamespaceFieldValue.nspname(value) => NamedParameter("nspname", ParameterValue.from(value))
           case PgNamespaceFieldValue.nspowner(value) => NamedParameter("nspowner", ParameterValue.from(value))
           case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))

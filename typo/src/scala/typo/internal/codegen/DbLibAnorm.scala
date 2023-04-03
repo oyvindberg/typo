@@ -41,7 +41,7 @@ object DbLibAnorm extends DbLib {
     List(column, toStatement, parameterMetadata)
   }
 
-  override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
+  override def instances(tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
     val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](prefix + ${sc.StrLit(x.dbName.value)})" }
     val rowParser = code"""def $rowParserIdent(prefix: String): ${RowParser(tpe)} = { row =>
             |    $Success(
@@ -75,11 +75,11 @@ object DbLibAnorm extends DbLib {
     case RepoMethod.SelectAllByIds(_, idsParam, rowType) =>
       code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectByUnique(params, rowType) =>
-      val ident = Naming.camelCase(Array("selectByUnique") ++ params.map(_.name.value))
+      val ident = Naming.camelCase(Array("selectByUnique") ++ params.map(_.name.value).toList)
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(param, rowType) =>
       code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
-    case RepoMethod.UpdateFieldValues(id, param) =>
+    case RepoMethod.UpdateFieldValues(id, param, _) =>
       code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Int}"
     case RepoMethod.InsertDbGeneratedKey(id, _, unsavedParam, _) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): ${id.tpe}"
@@ -130,7 +130,7 @@ object DbLibAnorm extends DbLib {
         code"""selectByFieldValues(${sc.Type.List}($args)).headOption"""
 
       case RepoMethod.SelectByFieldValues(param, _) =>
-        val cases: Seq[sc.Code] =
+        val cases: NonEmptyList[sc.Code] =
           table.cols.map(col =>
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           )
@@ -153,9 +153,9 @@ object DbLibAnorm extends DbLib {
               |    }
               |""".stripMargin
 
-      case RepoMethod.UpdateFieldValues(id, param) =>
-        val cases: Seq[sc.Code] =
-          table.cols.map { col =>
+      case RepoMethod.UpdateFieldValues(id, param, cases0) =>
+        val cases: NonEmptyList[sc.Code] =
+          cases0.map { col =>
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
@@ -226,8 +226,8 @@ object DbLibAnorm extends DbLib {
         }
 
         val joinedIdColNames = id.cols.map(_.dbName.value).mkString(", ")
-        val idValues: List[sc.Code] = id match {
-          case id: IdComputed.Unary     => List(code"$${${id.paramName}}")
+        val idValues: NonEmptyList[sc.Code] = id match {
+          case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
           case id: IdComputed.Composite => id.cols.map(cc => code"$${${id.paramName}.${cc.name}}")
         }
 

@@ -16,7 +16,7 @@ object PackageObjectFile {
              |}
              |""".stripMargin
 
-    sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content)
+    sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil)
   }
 
 }

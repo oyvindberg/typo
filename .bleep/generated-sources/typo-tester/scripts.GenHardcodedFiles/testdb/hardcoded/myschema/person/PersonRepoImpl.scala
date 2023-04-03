@@ -27,7 +27,7 @@ object PersonRepoImpl extends PersonRepo {
   override def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
     SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(PersonRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): List[PersonRow] = {
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -58,7 +58,6 @@ object PersonRepoImpl extends PersonRepo {
       case Nil => 0
       case nonEmpty =>
         val namedParams = nonEmpty.map{
-          case PersonFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))

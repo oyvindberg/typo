@@ -12,7 +12,8 @@ package table_constraints
 
 
 
-sealed abstract class TableConstraintsFieldValue[T](val name: String, val value: T)
+sealed abstract class TableConstraintsFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class TableConstraintsFieldValue[T](name: String, value: T) extends TableConstraintsFieldOrIdValue(name, value)
 
 object TableConstraintsFieldValue {
   case class constraintCatalog(override val value: Option[String]) extends TableConstraintsFieldValue("constraint_catalog", value)

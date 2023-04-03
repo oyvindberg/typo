@@ -10,8 +10,9 @@ package marital_status
 
 
 
-sealed abstract class MaritalStatusFieldValue[T](val name: String, val value: T)
+sealed abstract class MaritalStatusFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class MaritalStatusFieldValue[T](name: String, value: T) extends MaritalStatusFieldOrIdValue(name, value)
 
 object MaritalStatusFieldValue {
-  case class id(override val value: MaritalStatusId) extends MaritalStatusFieldValue("id", value)
+  case class id(override val value: MaritalStatusId) extends MaritalStatusFieldOrIdValue("id", value)
 }

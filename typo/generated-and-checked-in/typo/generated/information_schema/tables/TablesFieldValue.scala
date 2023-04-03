@@ -12,7 +12,8 @@ package tables
 
 
 
-sealed abstract class TablesFieldValue[T](val name: String, val value: T)
+sealed abstract class TablesFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class TablesFieldValue[T](name: String, value: T) extends TablesFieldOrIdValue(name, value)
 
 object TablesFieldValue {
   case class tableCatalog(override val value: Option[String]) extends TablesFieldValue("table_catalog", value)

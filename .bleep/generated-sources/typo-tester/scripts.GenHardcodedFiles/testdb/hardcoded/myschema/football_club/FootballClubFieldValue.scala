@@ -10,9 +10,10 @@ package football_club
 
 
 
-sealed abstract class FootballClubFieldValue[T](val name: String, val value: T)
+sealed abstract class FootballClubFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class FootballClubFieldValue[T](name: String, value: T) extends FootballClubFieldOrIdValue(name, value)
 
 object FootballClubFieldValue {
-  case class id(override val value: FootballClubId) extends FootballClubFieldValue("id", value)
+  case class id(override val value: FootballClubId) extends FootballClubFieldOrIdValue("id", value)
   case class name(override val value: String) extends FootballClubFieldValue("name", value)
 }

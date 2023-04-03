@@ -8,7 +8,7 @@ import typo.generated.information_schema.table_constraints.TableConstraintsRow
 object UniqueKeys {
   def apply(tableConstraints: List[TableConstraintsRow], keyColumnUsage: List[KeyColumnUsageRow]): Map[db.RelationName, List[db.UniqueKey]] = {
 
-    def toUniqueKey(tc: TableConstraintsRow): db.UniqueKey = {
+    def toUniqueKey(tc: TableConstraintsRow): Option[db.UniqueKey] = {
       val columnsInKey: List[db.ColName] =
         keyColumnUsage
           .filter { kcu =>
@@ -17,7 +17,9 @@ object UniqueKeys {
           .sortBy(_.ordinalPosition)
           .map(kcu => db.ColName(kcu.columnName.get))
 
-      db.UniqueKey(cols = columnsInKey, constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get))
+      for {
+        columnsInKey <- NonEmptyList.fromList(columnsInKey)
+      } yield db.UniqueKey(cols = columnsInKey, constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get))
     }
 
     val allUniqueConstraintsByTable: Map[db.RelationName, List[TableConstraintsRow]] =
@@ -26,7 +28,7 @@ object UniqueKeys {
         .groupBy(uc => db.RelationName(uc.tableSchema, uc.tableName.get))
 
     allUniqueConstraintsByTable
-      .map { case (tableName, tcs) => (tableName, tcs.map(toUniqueKey)) }
+      .map { case (tableName, tcs) => (tableName, tcs.flatMap(toUniqueKey)) }
   }
 
 }

@@ -6,7 +6,7 @@ case class SqlScript(
     relPath: RelPath,
     decomposedSql: DecomposedSql,
     params: List[SqlScript.Param],
-    cols: List[db.Col],
+    cols: NonEmptyList[db.Col],
     dependencies: Map[db.ColName, (db.RelationName, db.ColName)]
 )
 

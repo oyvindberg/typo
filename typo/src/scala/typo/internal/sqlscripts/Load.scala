@@ -15,8 +15,8 @@ object Load {
       val decomposedSql = DecomposedSql.parse(sqlContent)
       try {
         val analyzed = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
-        val script = parseSqlScript(enums, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, analyzed)
-        Some(script)
+        val maybeScript = parseSqlScript(enums, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, analyzed)
+        maybeScript
       } catch {
         case e: PSQLException =>
           System.err.println(s"Error while parsing $sqlFile : ${e.getMessage}. SQL: ${decomposedSql.sqlWithQuestionMarks}")
@@ -38,7 +38,7 @@ object Load {
     found.result()
   }
 
-  def parseSqlScript(enums: Map[String, db.StringEnum], relativePath: RelPath, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): SqlScript = {
+  def parseSqlScript(enums: Map[String, db.StringEnum], relativePath: RelPath, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): Option[SqlScript] = {
     val cols = jdbcMetadata.columns.map { col =>
       val jsonDescription = minimalJson(col)
       db.Col(
@@ -67,6 +67,8 @@ object Load {
       SqlScript.Param(maybeName, indices, tpe, jdbcParam.isNullable.toNullability)
     }
 
-    SqlScript(relativePath, decomposedSql, params, cols, deps)
+    for {
+      cols <- NonEmptyList.fromList(cols)
+    } yield SqlScript(relativePath, decomposedSql, params, cols, deps)
   }
 }

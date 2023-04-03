@@ -4,7 +4,7 @@ package internal
 import typo.internal.rewriteDependentData.Eval
 
 case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
-  val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
+  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
     view.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
         pointsTo = view.dependencies.get(dbCol.name),
@@ -43,14 +43,14 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     tpe
   }
 
-  val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
+  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, view.name, cols, maybeId = None)
 
   val repoMethods: List[RepoMethod] = {
     val RowType = sc.Type.Qualified(relation.RowName)
     val fieldValuesParam = sc.Param(
       sc.Ident("fieldValues"),
-      sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
+      sc.Type.List.of(sc.Type.Qualified(relation.FieldOrIdValueName).of(sc.Type.Wildcard))
     )
 
     List(

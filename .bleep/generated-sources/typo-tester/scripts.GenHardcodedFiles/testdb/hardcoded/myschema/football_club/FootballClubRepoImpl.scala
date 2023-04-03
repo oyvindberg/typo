@@ -23,7 +23,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select id, name from myschema.football_club where id in $ids""".as(FootballClubRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): List[FootballClubRow] = {
+  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -45,7 +45,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case Nil => 0
       case nonEmpty =>
         val namedParams = nonEmpty.map{
-          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
         val q = s"""update myschema.football_club

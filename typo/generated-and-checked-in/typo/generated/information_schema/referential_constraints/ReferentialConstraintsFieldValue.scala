@@ -12,7 +12,8 @@ package referential_constraints
 
 
 
-sealed abstract class ReferentialConstraintsFieldValue[T](val name: String, val value: T)
+sealed abstract class ReferentialConstraintsFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class ReferentialConstraintsFieldValue[T](name: String, value: T) extends ReferentialConstraintsFieldOrIdValue(name, value)
 
 object ReferentialConstraintsFieldValue {
   case class constraintCatalog(override val value: Option[String]) extends ReferentialConstraintsFieldValue("constraint_catalog", value)

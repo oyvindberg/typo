@@ -12,15 +12,16 @@ package pg_attribute
 
 import org.postgresql.util.PGobject
 
-sealed abstract class PgAttributeFieldValue[T](val name: String, val value: T)
+sealed abstract class PgAttributeFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class PgAttributeFieldValue[T](name: String, value: T) extends PgAttributeFieldOrIdValue(name, value)
 
 object PgAttributeFieldValue {
-  case class attrelid(override val value: /* oid */ Long) extends PgAttributeFieldValue("attrelid", value)
+  case class attrelid(override val value: /* oid */ Long) extends PgAttributeFieldOrIdValue("attrelid", value)
   case class attname(override val value: String) extends PgAttributeFieldValue("attname", value)
   case class atttypid(override val value: /* oid */ Long) extends PgAttributeFieldValue("atttypid", value)
   case class attstattarget(override val value: Int) extends PgAttributeFieldValue("attstattarget", value)
   case class attlen(override val value: Int) extends PgAttributeFieldValue("attlen", value)
-  case class attnum(override val value: Int) extends PgAttributeFieldValue("attnum", value)
+  case class attnum(override val value: Int) extends PgAttributeFieldOrIdValue("attnum", value)
   case class attndims(override val value: Int) extends PgAttributeFieldValue("attndims", value)
   case class attcacheoff(override val value: Int) extends PgAttributeFieldValue("attcacheoff", value)
   case class atttypmod(override val value: Int) extends PgAttributeFieldValue("atttypmod", value)

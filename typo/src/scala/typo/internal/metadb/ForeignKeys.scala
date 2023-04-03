@@ -76,8 +76,12 @@ object ForeignKeys {
         )
       }
       .collect { case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>
-        tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
+        for {
+          referringColumns <- NonEmptyList.fromList(referringColumns)
+          referredColumns <- NonEmptyList.fromList(referredColumns)
+        } yield tableName -> db.ForeignKey(referringColumns, referredTable, referredColumns, constraintName)
       }
+      .flatten
       .groupBy { case (k, _) => k }
       .map { case (k, v) => k -> v.map(_._2) }
 

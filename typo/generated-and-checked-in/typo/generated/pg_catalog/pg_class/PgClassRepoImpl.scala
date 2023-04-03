@@ -25,7 +25,7 @@ object PgClassRepoImpl extends PgClassRepo {
   override def selectByIds(oids: List[PgClassId])(implicit c: Connection): List[PgClassRow] = {
     SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid in $oids""".as(PgClassRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): List[PgClassRow] = {
+  override def selectByFieldValues(fieldValues: List[PgClassFieldOrIdValue[_]])(implicit c: Connection): List[PgClassRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -78,7 +78,6 @@ object PgClassRepoImpl extends PgClassRepo {
       case Nil => 0
       case nonEmpty =>
         val namedParams = nonEmpty.map{
-          case PgClassFieldValue.oid(value) => NamedParameter("oid", ParameterValue.from(value))
           case PgClassFieldValue.relname(value) => NamedParameter("relname", ParameterValue.from(value))
           case PgClassFieldValue.relnamespace(value) => NamedParameter("relnamespace", ParameterValue.from(value))
           case PgClassFieldValue.reltype(value) => NamedParameter("reltype", ParameterValue.from(value))

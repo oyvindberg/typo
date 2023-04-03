@@ -10,6 +10,7 @@ class Naming(pkg: sc.QIdent) {
   def repoImplName(name: db.RelationName): sc.QIdent = relation(name, "RepoImpl")
   def rowName(name: db.RelationName): sc.QIdent = relation(name, "Row")
   def fieldValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldValue")
+  def fieldOrIdValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldOrIdValue")
   def rowUnsaved(name: db.RelationName): sc.QIdent = relation(name, "RowUnsaved")
   def joinedRow(name: db.RelationName): sc.QIdent = relation(name, "JoinedRow")
   def className(names: List[sc.Ident]): sc.QIdent = pkg / names
@@ -24,7 +25,7 @@ class Naming(pkg: sc.QIdent) {
     Naming.camelCase(name.value.split('_'))
 
   // multiple field names together into one name
-  def field(colNames: List[db.ColName]): sc.Ident =
+  def field(colNames: NonEmptyList[db.ColName]): sc.Ident =
     Naming.camelCase(colNames.map(field).map(_.value).toArray)
 }
 

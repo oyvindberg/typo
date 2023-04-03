@@ -19,7 +19,7 @@ object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[KeyColumnUsageRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage""".as(KeyColumnUsageRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[KeyColumnUsageFieldValue[_]])(implicit c: Connection): List[KeyColumnUsageRow] = {
+  override def selectByFieldValues(fieldValues: List[KeyColumnUsageFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>

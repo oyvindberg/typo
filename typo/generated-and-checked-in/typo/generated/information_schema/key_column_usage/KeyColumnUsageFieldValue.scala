@@ -12,7 +12,8 @@ package key_column_usage
 
 
 
-sealed abstract class KeyColumnUsageFieldValue[T](val name: String, val value: T)
+sealed abstract class KeyColumnUsageFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class KeyColumnUsageFieldValue[T](name: String, value: T) extends KeyColumnUsageFieldOrIdValue(name, value)
 
 object KeyColumnUsageFieldValue {
   case class constraintCatalog(override val value: Option[String]) extends KeyColumnUsageFieldValue("constraint_catalog", value)

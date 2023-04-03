@@ -5,7 +5,7 @@ package codegen
 case class TableFiles(table: TableComputed, options: InternalOptions) {
   val relation = RelationFiles(table.naming, table.relation, options)
 
-  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsUnsaved).headOption.map { case (qident, colsUnsaved) =>
+  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsNotId).headOption.map { case (qident, colsUnsaved) =>
     val rowType = sc.Type.Qualified(qident)
 
     val str =
@@ -17,7 +17,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
             |}
             |""".stripMargin
 
-    sc.File(rowType, str)
+    sc.File(rowType, str, secondaryTypes = Nil)
   }
 
   val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>
@@ -27,7 +27,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
             |)
             |""".stripMargin
 
-    sc.File(sc.Type.Qualified(rowJoined.name), str)
+    sc.File(sc.Type.Qualified(rowJoined.name), str, secondaryTypes = Nil)
   }
 
   val IdFile: Option[sc.File] = {
@@ -42,7 +42,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
                 |}
 """.stripMargin
 
-        Some(sc.File(id.tpe, str))
+        Some(sc.File(id.tpe, str, secondaryTypes = Nil))
 
       case _: IdComputed.UnaryUserSpecified =>
         None
@@ -51,7 +51,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
         val ordering = sc.Type.Ordering.of(id.tpe)
 
         // don't demand that user-specified types are ordered, but compositive key will be if they are
-        val orderingImplicits = cols.filter(x => sc.Type.containsUserDefined(x.tpe)) match {
+        val orderingImplicits = cols.toList.filter(x => sc.Type.containsUserDefined(x.tpe)) match {
           case Nil => sc.Code.Empty
           case nonEmpty =>
             val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
@@ -66,7 +66,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
                 |  ${options.dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n  ")}
                 |}
 """.stripMargin
-        Some(sc.File(id.tpe, str))
+        Some(sc.File(id.tpe, str, secondaryTypes = Nil))
     }
   }
 

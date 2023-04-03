@@ -41,24 +41,29 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |}
             |""".stripMargin
 
-    sc.File(rowType, str)
+    sc.File(rowType, str, secondaryTypes = Nil)
   }
 
   val FieldValueFile: sc.File = {
     val fieldValueType = sc.Type.Qualified(relation.FieldValueName)
+    val fieldValueIdType = sc.Type.Qualified(relation.FieldOrIdValueName)
 
-    val members = relation.cols.map { col =>
-      col.name -> code"case class ${col.name}(override val value: ${col.tpe}) extends $fieldValueType(${sc.StrLit(col.dbName.value)}, value)"
+    val members = {
+      relation.cols.map { col =>
+        val parent = if (relation.isIdColumn(col.dbName)) fieldValueIdType else fieldValueType
+        code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
+      }
     }
     val str =
-      code"""sealed abstract class ${relation.FieldValueName.name}[T](val name: String, val value: T)
+      code"""sealed abstract class ${relation.FieldOrIdValueName.name}[T](val name: String, val value: T)
+            |sealed abstract class ${relation.FieldValueName.name}[T](name: String, value: T) extends ${relation.FieldOrIdValueName.name}(name, value)
             |
             |object ${relation.FieldValueName} {
-            |  ${members.map { case (_, definition) => definition }.mkCode("\n  ")}
+            |  ${members.mkCode("\n  ")}
             |}
             |""".stripMargin
 
-    sc.File(fieldValueType, str)
+    sc.File(fieldValueType, str, secondaryTypes = List(fieldValueIdType))
   }
 
   def RepoTraitFile(repoMethods: List[RepoMethod]): sc.File = {
@@ -69,7 +74,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |}
             |""".stripMargin
 
-    sc.File(tpe, str)
+    sc.File(tpe, str, secondaryTypes = Nil)
   }
 
   def RepoImplFile(repoMethods: List[RepoMethod]): sc.File = {
@@ -85,7 +90,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
               |}
               |""".stripMargin
 
-    sc.File(sc.Type.Qualified(relation.RepoImplName), str)
+    sc.File(sc.Type.Qualified(relation.RepoImplName), str, secondaryTypes = Nil)
   }
 
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =

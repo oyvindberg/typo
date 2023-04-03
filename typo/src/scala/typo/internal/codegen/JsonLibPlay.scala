@@ -65,7 +65,7 @@ object JsonLibPlay extends JsonLib {
     List(reader, writer)
   }
 
-  override def instances(tpe: sc.Type, cols: Seq[ColumnComputed]): List[sc.Code] = {
+  override def instances(tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
     def as(col: ColumnComputed): sc.Code =
       col.tpe match {
         case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(col.dbName.value)}).toOption.map(_.as[$of])"""

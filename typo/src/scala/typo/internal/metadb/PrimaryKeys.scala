@@ -9,21 +9,20 @@ object PrimaryKeys {
   def apply(tableConstraints: List[TableConstraintsRow], keyColumnUsage: List[KeyColumnUsageRow]): Map[db.RelationName, db.PrimaryKey] = {
     tableConstraints
       .filter(_.constraintType.contains("PRIMARY KEY"))
-      .map { tc =>
-        (
-          db.RelationName(tc.tableSchema, tc.tableName.get),
-          db.PrimaryKey(
-            colNames = keyColumnUsage
-              .filter(kcu =>
-                tc.constraintCatalog == kcu.constraintCatalog
-                  && tc.constraintSchema == kcu.constraintSchema
-                  && tc.constraintName == kcu.constraintName
-              )
-              .sortBy(_.ordinalPosition)
-              .map(kcu => db.ColName(kcu.columnName.get)),
-            constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get)
+      .flatMap { tc =>
+        val columns = keyColumnUsage
+          .filter(kcu =>
+            tc.constraintCatalog == kcu.constraintCatalog
+              && tc.constraintSchema == kcu.constraintSchema
+              && tc.constraintName == kcu.constraintName
           )
-        )
+          .sortBy(_.ordinalPosition)
+          .map(kcu => db.ColName(kcu.columnName.get))
+        val relName = db.RelationName(tc.tableSchema, tc.tableName.get)
+        val constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get)
+        for {
+          columns <- NonEmptyList.fromList(columns)
+        } yield (relName, db.PrimaryKey(colNames = columns, constraintName = constraintName))
       }
       .toMap
   }

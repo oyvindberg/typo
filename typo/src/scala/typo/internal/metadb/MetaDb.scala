@@ -56,7 +56,7 @@ object MetaDb {
     val enumsByName = enums.map(e => (e.name.name, e)).toMap
 
     val relations: List[db.Relation] = {
-      input.tablesRows.map { table =>
+      input.tablesRows.flatMap { table =>
         val relationName = db.RelationName(
           schema = table.tableSchema,
           name = table.tableName.get
@@ -97,9 +97,14 @@ object MetaDb {
                   (colName, (db.RelationName(x.tableSchema.map(_.getValue), x.tableName), colName))
               }.toMap
 
-            db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m", deps)
+            for {
+              mappedCols <- NonEmptyList.fromList(mappedCols)
+            } yield db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m", deps)
+
           case None =>
-            db.Table(
+            for {
+              mappedCols <- NonEmptyList.fromList(mappedCols)
+            } yield db.Table(
               name = relationName,
               cols = mappedCols,
               primaryKey = primaryKeys.get(relationName),

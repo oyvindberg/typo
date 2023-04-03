@@ -12,7 +12,8 @@ package columns
 
 
 
-sealed abstract class ColumnsFieldValue[T](val name: String, val value: T)
+sealed abstract class ColumnsFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class ColumnsFieldValue[T](name: String, value: T) extends ColumnsFieldOrIdValue(name, value)
 
 object ColumnsFieldValue {
   case class tableCatalog(override val value: Option[String]) extends ColumnsFieldValue("table_catalog", value)

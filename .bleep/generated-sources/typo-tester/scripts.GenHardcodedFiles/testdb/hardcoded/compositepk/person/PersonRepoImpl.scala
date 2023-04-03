@@ -20,7 +20,7 @@ object PersonRepoImpl extends PersonRepo {
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser("").singleOpt)
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): List[PersonRow] = {
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>
@@ -43,8 +43,6 @@ object PersonRepoImpl extends PersonRepo {
       case Nil => 0
       case nonEmpty =>
         val namedParams = nonEmpty.map{
-          case PersonFieldValue.one(value) => NamedParameter("one", ParameterValue.from(value))
-          case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
         val q = s"""update compositepk.person

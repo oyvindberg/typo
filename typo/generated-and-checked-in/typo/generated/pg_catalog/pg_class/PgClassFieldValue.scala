@@ -12,10 +12,11 @@ package pg_class
 
 import org.postgresql.util.PGobject
 
-sealed abstract class PgClassFieldValue[T](val name: String, val value: T)
+sealed abstract class PgClassFieldOrIdValue[T](val name: String, val value: T)
+sealed abstract class PgClassFieldValue[T](name: String, value: T) extends PgClassFieldOrIdValue(name, value)
 
 object PgClassFieldValue {
-  case class oid(override val value: PgClassId) extends PgClassFieldValue("oid", value)
+  case class oid(override val value: PgClassId) extends PgClassFieldOrIdValue("oid", value)
   case class relname(override val value: String) extends PgClassFieldValue("relname", value)
   case class relnamespace(override val value: /* oid */ Long) extends PgClassFieldValue("relnamespace", value)
   case class reltype(override val value: /* oid */ Long) extends PgClassFieldValue("reltype", value)

@@ -19,7 +19,7 @@ object TableConstraintsRepoImpl extends TableConstraintsRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsRow] = {
     SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced from information_schema.table_constraints""".as(TableConstraintsRow.rowParser("").*)
   }
-  override def selectByFieldValues(fieldValues: List[TableConstraintsFieldValue[_]])(implicit c: Connection): List[TableConstraintsRow] = {
+  override def selectByFieldValues(fieldValues: List[TableConstraintsFieldOrIdValue[_]])(implicit c: Connection): List[TableConstraintsRow] = {
     fieldValues match {
       case Nil => selectAll
       case nonEmpty =>

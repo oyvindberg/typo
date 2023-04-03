@@ -14,7 +14,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
 
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
-    cols = List(
+    cols = NonEmptyList(
       db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
       db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), Nullability.NoNulls, hasDefault = false, JsNull),
       db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, JsNull),
@@ -33,63 +33,63 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         JsNull
       )
     ),
-    Some(db.PrimaryKey(List(db.ColName("id")), db.RelationName(Some("myschema"), "person_pkey"))),
+    Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "person_pkey"))),
     Nil,
     List(
       db.ForeignKey(
-        List(db.ColName("favourite_football_club_id")),
+        NonEmptyList(db.ColName("favourite_football_club_id")),
         db.RelationName(Some("myschema"), "football_club"),
-        List(db.ColName("id")),
+        NonEmptyList(db.ColName("id")),
         db.RelationName(Some("myschema"), "person_favourite_football_club_id_fkey")
       ),
       db.ForeignKey(
-        List(db.ColName("marital_status_id")),
+        NonEmptyList(db.ColName("marital_status_id")),
         db.RelationName(Some("myschema"), "marital_status"),
-        List(db.ColName("id")),
+        NonEmptyList(db.ColName("id")),
         db.RelationName(Some("myschema"), "person_marital_status_id_fkey")
       )
     )
   )
   val football_club = db.Table(
     name = db.RelationName(Some("myschema"), "football_club"),
-    cols = List(
+    cols = NonEmptyList(
       db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull),
       db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, JsNull)
     ),
-    Some(db.PrimaryKey(List(db.ColName("id")), db.RelationName(Some("myschema"), "football_club_pkey"))),
+    Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "football_club_pkey"))),
     Nil,
     Nil
   )
   val marital_status = db.Table(
     name = db.RelationName(Some("myschema"), "marital_status"),
-    cols = List(
+    cols = NonEmptyList(
       db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull)
     ),
-    Some(db.PrimaryKey(List(db.ColName("id")), db.RelationName(Some("myschema"), "marital_status_pkey"))),
+    Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "marital_status_pkey"))),
     Nil,
     Nil
   )
 
   val cpk_person = db.Table(
     name = db.RelationName(Some("compositepk"), "person"), // name clash to ensure we handle it
-    cols = List(
+    cols = NonEmptyList(
       db.Col(db.ColName("one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
       db.Col(db.ColName("two"), db.Type.Text, Nullability.Nullable, hasDefault = true, JsNull),
       db.Col(db.ColName("name"), db.Type.Text, Nullability.Nullable, hasDefault = false, JsNull)
     ),
-    Some(db.PrimaryKey(List(db.ColName("one"), db.ColName("two")), db.RelationName(Some("compositepk"), "person_pkey"))),
+    Some(db.PrimaryKey(NonEmptyList(db.ColName("one"), db.ColName("two")), db.RelationName(Some("compositepk"), "person_pkey"))),
     Nil,
     Nil
   )
   val cpk_bike = db.Table(
     name = db.RelationName(Some("compositepk"), "bike"),
-    cols = List(
+    cols = NonEmptyList(
       db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
       db.Col(db.ColName("owner_one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull),
       db.Col(db.ColName("owner_two"), db.Type.Text, Nullability.Nullable, hasDefault = false, JsNull),
       db.Col(db.ColName("bike_name"), db.Type.Text, Nullability.NoNulls, hasDefault = false, JsNull)
     ),
-    Some(db.PrimaryKey(List(db.ColName("id")), db.RelationName(Some("compositepk"), "bike_pkey"))),
+    Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("compositepk"), "bike_pkey"))),
     Nil,
     Nil
   )

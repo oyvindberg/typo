@@ -183,7 +183,7 @@ object sc {
     }
   }
 
-  case class File(tpe: Type.Qualified, contents: Code) {
+  case class File(tpe: Type.Qualified, contents: Code, secondaryTypes: List[Type.Qualified]) {
     val name: Ident = tpe.value.name
     val pkg = QIdent(tpe.value.idents.dropRight(1))
   }

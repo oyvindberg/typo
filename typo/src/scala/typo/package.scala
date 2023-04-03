@@ -9,14 +9,14 @@ import scala.collection.immutable.SortedMap
 
 package object typo {
   def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
-    val metadb = MetaDb(MetaDb.Input.fromDb(c))
+    val metadb = MetaDb(MetaDb.Input.fromDb)
     val enumsByName = metadb.enums.map(e => (e.name.name, e)).toMap
     val sqlScripts = Load(scriptsPath, enumsByName)
     fromData(options, metadb.relations, metadb.enums, sqlScripts, selector)
   }
 
   def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
-    val metadb = MetaDb(MetaDb.Input.fromDb(c))
+    val metadb = MetaDb(MetaDb.Input.fromDb)
     fromData(options, metadb.relations, metadb.enums, sqlScripts = Nil, selector)
   }
 
@@ -75,7 +75,7 @@ package object typo {
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
       mostFiles.groupBy(_.pkg).map { case (pkg, files) =>
-        (pkg, files.map(f => (f.name, f.tpe.value)).toMap)
+        (pkg, files.flatMap(f => (f.name, f.tpe.value) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe.value))).toMap)
       }
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.

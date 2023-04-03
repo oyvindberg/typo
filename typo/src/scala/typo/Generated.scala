@@ -6,7 +6,7 @@ import java.nio.file.Path
 
 case class Generated(files: List[sc.File]) {
   val asRelativePaths: Map[RelPath, String] =
-    files.map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content) =>
+    files.map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), content, _) =>
       val path = idents.init
       val name = idents.last
       val relPath = RelPath(path.map(_.value) :+ (name.value + ".scala"))

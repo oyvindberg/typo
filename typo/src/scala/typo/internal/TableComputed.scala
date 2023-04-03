@@ -12,7 +12,7 @@ case class TableComputed(
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
   val pointsTo: Map[db.ColName, (db.RelationName, db.ColName)] =
-    dbTable.foreignKeys.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (fk.otherTable, cn)))).toMap
+    dbTable.foreignKeys.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (fk.otherTable, cn))).toList).toMap
   val dbColsByName: Map[db.ColName, db.Col] =
     dbTable.cols.map(col => (col.name, col)).toMap
 
@@ -20,8 +20,7 @@ case class TableComputed(
     dbTable.primaryKey.flatMap { pk =>
       val qident = naming.idName(dbTable.name)
       pk.colNames match {
-        case Nil => None
-        case colName :: Nil =>
+        case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
           val underlying = scalaTypeMapper(Right(dbTable.name), dbCol, None)
           val col = ColumnComputed(
@@ -38,7 +37,7 @@ case class TableComputed(
             Some(IdComputed.UnaryNormal(col, qident))
 
         case colNames =>
-          val cols: List[ColumnComputed] =
+          val cols: NonEmptyList[ColumnComputed] =
             colNames.map { colName =>
               val dbCol = dbColsByName(colName)
               ColumnComputed(
@@ -54,7 +53,7 @@ case class TableComputed(
       }
     }
 
-  val dbColsAndCols: List[(db.Col, ColumnComputed)] = {
+  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
     dbTable.cols.map { dbCol =>
       val tpe = deriveType(dbCol)
 
@@ -102,23 +101,23 @@ case class TableComputed(
     tpe
   }
 
-  val cols: List[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
+  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
 
   val relation = RelationComputed(naming, dbTable.name, cols, maybeId)
 
-  val colsUnsaved: Option[List[ColumnComputed]] = maybeId
-    .map { _ =>
-      dbColsAndCols
+  val colsNotId: Option[NonEmptyList[ColumnComputed]] =
+    maybeId.flatMap { _ =>
+      val all = dbColsAndCols.toList
         .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
         .map { case (dbCol, col) =>
           val newType = if (dbCol.hasDefault) sc.Type.TApply(default.DefaultedType, List(col.tpe)) else col.tpe
           col.copy(tpe = newType)
         }
+      NonEmptyList.fromList(all)
     }
-    .filter(_.nonEmpty)
 
   val RowUnsavedName: Option[sc.QIdent] =
-    if (colsUnsaved.nonEmpty) Some(naming.rowUnsaved(dbTable.name)) else None
+    colsNotId.map(_ => naming.rowUnsaved(dbTable.name))
 
   val RowJoined: Option[RowJoinedComputed] =
     if (dbTable.foreignKeys.nonEmpty) {
@@ -151,12 +150,9 @@ case class TableComputed(
               None
           }
       }
-      maybeParams match {
-        case Nil =>
-          None
-        case params =>
-          val thisParam = RowJoinedComputed.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName), isOptional = false, table = this)
-          Some(RowJoinedComputed(name, thisParam :: params))
+      NonEmptyList.fromList(maybeParams).map { params =>
+        val thisParam = RowJoinedComputed.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName), isOptional = false, table = this)
+        RowJoinedComputed(name, thisParam :: params)
       }
 
     } else None
@@ -168,11 +164,15 @@ case class TableComputed(
       sc.Ident("fieldValues"),
       sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
     )
+    val fieldValueOrIdsParam = sc.Param(
+      sc.Ident("fieldValues"),
+      sc.Type.List.of(sc.Type.Qualified(relation.FieldOrIdValueName).of(sc.Type.Wildcard))
+    )
 
     val maybeMethods = List(
       maybeId match {
         case Some(id) =>
-          val updateMethod = RowUnsavedName.zip(colsUnsaved).map { case (unsaved, colsUnsaved) =>
+          val insertMethod = RowUnsavedName.zip(colsNotId).map { case (unsaved, colsUnsaved) =>
             val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
 
             if (id.cols.forall(_.hasDefault))
@@ -181,6 +181,9 @@ case class TableComputed(
               RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
           }
 
+          def updateMethod =
+            colsNotId.map(colsNotId => RepoMethod.UpdateFieldValues(id, fieldValuesParam, colsNotId))
+
           List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(RowType)),
             Some(RepoMethod.SelectById(id, RowType)),
@@ -188,17 +191,18 @@ case class TableComputed(
               case unary: IdComputed.Unary =>
                 Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.List.of(id.tpe)), RowType))
               case IdComputed.Composite(_, _, _) =>
+                // todo: support composite ids
                 None
             },
-            Some(RepoMethod.SelectByFieldValues(fieldValuesParam, RowType)),
-            Some(RepoMethod.UpdateFieldValues(id, fieldValuesParam)),
+            Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)),
             updateMethod,
+            insertMethod,
             Some(RepoMethod.Delete(id))
           ).flatten
         case None =>
           List(
             RepoMethod.SelectAll(RowType),
-            RepoMethod.SelectByFieldValues(fieldValuesParam, RowType)
+            RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)
           )
       },
       dbTable.uniqueKeys.map { uk =>

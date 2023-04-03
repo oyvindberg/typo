@@ -26,6 +26,6 @@ object StringEnumFile {
             |}
             |""".stripMargin
 
-    sc.File(EnumType, str)
+    sc.File(EnumType, str, secondaryTypes = Nil)
   }
 }

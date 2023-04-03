@@ -52,20 +52,20 @@ object db {
     implicit val ordering: Ordering[RelationName] = Ordering.by(_.value)
   }
 
-  case class PrimaryKey(colNames: List[ColName], constraintName: RelationName)
-  case class ForeignKey(cols: List[ColName], otherTable: RelationName, otherCols: List[ColName], constraintName: RelationName) {
-    require(cols.size == otherCols.size)
+  case class PrimaryKey(colNames: NonEmptyList[ColName], constraintName: RelationName)
+  case class ForeignKey(cols: NonEmptyList[ColName], otherTable: RelationName, otherCols: NonEmptyList[ColName], constraintName: RelationName) {
+    require(cols.length == otherCols.length)
   }
-  case class UniqueKey(cols: List[ColName], constraintName: RelationName)
+  case class UniqueKey(cols: NonEmptyList[ColName], constraintName: RelationName)
 
   sealed trait Relation {
     def name: RelationName
-    def cols: List[Col]
+    def cols: NonEmptyList[Col]
   }
 
   case class Table(
       name: RelationName,
-      cols: List[Col],
+      cols: NonEmptyList[Col],
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],
       foreignKeys: List[ForeignKey]
@@ -73,7 +73,7 @@ object db {
 
   case class View(
       name: db.RelationName,
-      cols: List[Col],
+      cols: NonEmptyList[Col],
       sql: String,
       isMaterialized: Boolean,
       dependencies: Map[ColName, (RelationName, ColName)]
