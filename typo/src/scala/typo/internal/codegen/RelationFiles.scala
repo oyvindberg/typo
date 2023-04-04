@@ -95,7 +95,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
 
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =
     (a, b) match {
-      case (x :: xs, y :: ys) if x == y => dropCommonPrefix(xs, ys)
-      case _                            => a
+      case (x :: xs, y :: ys) if x == y && xs.nonEmpty => dropCommonPrefix(xs, ys)
+      case _                                           => a
     }
 }
