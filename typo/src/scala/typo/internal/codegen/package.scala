@@ -34,4 +34,8 @@ package object codegen {
       sc.Code.Combined(interspersed)
     }
   }
+
+  def maybeQuoted(colName: db.ColName): sc.Code =
+    if (colName.value.exists(x => !x.isUnicodeIdentifierPart)) sc.StrLit(colName.value) else sc.Code.Str(colName.value)
+
 }

@@ -14,7 +14,7 @@ import java.sql.Connection
 
 object VjobcandidateemploymentRepoImpl extends VjobcandidateemploymentRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateemploymentRow] = {
-    SQL"""select jobcandidateid, Emp.StartDate, Emp.EndDate, Emp.OrgName, Emp.JobTitle, Emp.Responsibility, Emp.FunctionCategory, Emp.IndustryCategory, Emp.Loc.CountryRegion, Emp.Loc.State, Emp.Loc.City from humanresources.vjobcandidateemployment""".as(VjobcandidateemploymentRow.rowParser("").*)
+    SQL"""select jobcandidateid, "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".as(VjobcandidateemploymentRow.rowParser("").*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateemploymentFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateemploymentRow] = {
     fieldValues match {

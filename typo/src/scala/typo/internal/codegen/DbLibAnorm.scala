@@ -102,28 +102,28 @@ object DbLibAnorm extends DbLib {
   def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${id.col.dbName.value} = $$${id.paramName}"
+        code"${maybeQuoted(id.col.dbName)} = $$${id.paramName}"
       case compositive: IdComputed.Composite =>
-        code"${compositive.cols.map(cc => code"${cc.dbName.value} = $${${compositive.paramName}.${cc.name}}").mkCode(", ")}"
+        code"${compositive.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${compositive.paramName}.${cc.name}}").mkCode(", ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${x.col.dbName.value} in $$${idsParam.name}"
+    code"${maybeQuoted(x.col.dbName)} in $$${idsParam.name}"
 
   override def repoImpl(table: RelationComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectAll(_) =>
-        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
 
       case RepoMethod.SelectById(id, _) =>
-        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchId(id)}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent("").singleOpt)"""
 
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
-        val joinedColNames = table.cols.map(_.dbName.value).mkString(", ")
+        val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
         code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
 
@@ -184,7 +184,7 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.Update(id, param, colsUnsaved) =>
         val sql = interpolate(
           code"""update ${table.relationName}
-                |      set ${colsUnsaved.map { col => code"${col.dbName.value} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
+                |      set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
                 |      where ${matchId(id)}""".stripMargin
         )
         code"""$sql.executeUpdate() > 0"""
@@ -235,8 +235,8 @@ object DbLibAnorm extends DbLib {
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
         }
 
-        val joinedIdColNames: String =
-          id.cols.map(_.dbName.value).mkString(", ")
+        val joinedIdColNames: sc.Code =
+          id.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
 
         val idValues: NonEmptyList[sc.Code] =
           id match {
@@ -260,7 +260,7 @@ object DbLibAnorm extends DbLib {
                |"""
 
       case RepoMethod.InsertOnlyKey(id) =>
-        val joinedIdColNames = id.cols.map(_.dbName.value).mkString(", ")
+        val joinedIdColNames = id.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val idValues: NonEmptyList[sc.Code] =
           id match {
             case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
