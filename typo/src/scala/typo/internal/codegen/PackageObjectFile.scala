@@ -4,9 +4,9 @@ package codegen
 
 object PackageObjectFile {
   def packageObject(options: InternalOptions): sc.File = {
-    val parentPkg = options.pkg.idents.dropRight(1)
+    val parentPkg = NonEmptyList.fromList(options.pkg.idents.dropRight(1))
     val content =
-      code"""|package ${parentPkg.map(_.code).mkCode(".")}
+      code"""|${parentPkg.fold(sc.Code.Empty)(nonEmpty => code"package ${nonEmpty.map(_.code).mkCode(".")}")}
              |
              |package object ${options.pkg.name} {
              |  ${options.dbLib.missingInstances.mkCode("\n")}

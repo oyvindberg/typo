@@ -3,7 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package 
+
 
 package object adventureworks {
   implicit val StringArray: anorm.ToStatement[scala.Array[java.lang.String]] with anorm.ParameterMetaData[scala.Array[java.lang.String]] = new anorm.ToStatement[scala.Array[java.lang.String]] with anorm.ParameterMetaData[scala.Array[java.lang.String]] {
