@@ -14,6 +14,9 @@ trait TypeOverride {
     * @return
     */
   def apply(from: OverrideFrom, colName: db.ColName): Option[String]
+
+  final def orElse(other: TypeOverride): TypeOverride =
+    (from, colName) => apply(from, colName).orElse(other(from, colName))
 }
 
 object TypeOverride {

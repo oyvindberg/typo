@@ -13,8 +13,30 @@ trait NullabilityOverride {
     * @return
     */
   def apply(from: OverrideFrom, colName: db.ColName): Option[Nullability]
+
+  final def orElse(other: NullabilityOverride): NullabilityOverride =
+    (from, colName) => apply(from, colName).orElse(other(from, colName))
 }
 
 object NullabilityOverride {
   val Empty: NullabilityOverride = (_, _) => None
+
+  def of(pf: PartialFunction[(OverrideFrom, db.ColName), Nullability]): NullabilityOverride =
+    (from, colName) => pf.lift((from, colName))
+
+  def relation(pf: PartialFunction[( /* name without schema*/ String, /* column name*/ String), Nullability]): NullabilityOverride =
+    (from, colName) => {
+      from match {
+        case rel: OverrideFrom.Relation => pf.lift((rel.name.value, colName.value))
+        case _                          => None
+      }
+    }
+
+  def script(pf: PartialFunction[(RelPath, /* column name*/ String), Nullability]): NullabilityOverride =
+    (from, colName) => {
+      from match {
+        case OverrideFrom.SqlScript(relPath) => pf.lift((relPath, colName.value))
+        case _                               => None
+      }
+    }
 }
