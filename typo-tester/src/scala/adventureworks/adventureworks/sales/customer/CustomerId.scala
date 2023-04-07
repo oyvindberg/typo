@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `sales.customer` */
 case class CustomerId(value: Int) extends AnyVal
 object CustomerId {
   implicit val ordering: Ordering[CustomerId] = Ordering.by(_.value)

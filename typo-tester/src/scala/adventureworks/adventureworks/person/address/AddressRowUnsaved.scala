@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `person.address` which has not been persisted yet */
 case class AddressRowUnsaved(
   addressline1: String,
   addressline2: Option[String],

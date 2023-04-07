@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.location` */
 case class LocationId(value: Int) extends AnyVal
 object LocationId {
   implicit val ordering: Ordering[LocationId] = Ordering.by(_.value)

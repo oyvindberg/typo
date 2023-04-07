@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** Type for the composite primary key of table `pg_catalog.pg_attribute` */
 case class PgAttributeId(attrelid: /* oid */ Long, attnum: Int)
 object PgAttributeId {
   implicit def ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))

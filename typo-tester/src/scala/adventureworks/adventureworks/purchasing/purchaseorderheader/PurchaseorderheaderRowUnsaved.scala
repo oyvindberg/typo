@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `purchasing.purchaseorderheader` which has not been persisted yet */
 case class PurchaseorderheaderRowUnsaved(
   revisionnumber: Defaulted[Int],
   status: Defaulted[Int],

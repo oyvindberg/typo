@@ -17,6 +17,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `sales.currency` which has not been persisted yet */
 case class CurrencyRowUnsaved(
   name: NameDomain,
   modifieddate: Defaulted[LocalDateTime]

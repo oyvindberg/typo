@@ -11,6 +11,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `public.AccountNumber`
+  * No constraint
+  */
 case class AccountNumberDomain(value: String) extends AnyVal
 object AccountNumberDomain {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[AccountNumberDomain] = Ordering.by(_.value)

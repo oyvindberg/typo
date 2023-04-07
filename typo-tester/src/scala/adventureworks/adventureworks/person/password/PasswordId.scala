@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `person.password` */
 case class PasswordId(value: Int) extends AnyVal
 object PasswordId {
   implicit val ordering: Ordering[PasswordId] = Ordering.by(_.value)

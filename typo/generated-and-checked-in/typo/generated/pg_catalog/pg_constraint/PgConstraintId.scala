@@ -15,6 +15,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `pg_catalog.pg_constraint` */
 case class PgConstraintId(value: /* oid */ Long) extends AnyVal
 object PgConstraintId {
   implicit val ordering: Ordering[PgConstraintId] = Ordering.by(_.value)

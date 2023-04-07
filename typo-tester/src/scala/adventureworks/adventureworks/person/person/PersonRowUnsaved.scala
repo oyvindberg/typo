@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `person.person` which has not been persisted yet */
 case class PersonRowUnsaved(
   persontype: /* bpchar */ String,
   namestyle: Defaulted[NameStyleDomain],

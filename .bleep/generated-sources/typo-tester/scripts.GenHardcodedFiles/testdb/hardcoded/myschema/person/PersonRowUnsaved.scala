@@ -19,6 +19,7 @@ import testdb.hardcoded.myschema.SectorEnum
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
+/** This class corresponds to a row in table `myschema.person` which has not been persisted yet */
 case class PersonRowUnsaved(
   favouriteFootballClubId: FootballClubId,
   name: String,

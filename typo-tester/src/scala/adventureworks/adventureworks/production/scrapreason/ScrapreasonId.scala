@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.scrapreason` */
 case class ScrapreasonId(value: Int) extends AnyVal
 object ScrapreasonId {
   implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)

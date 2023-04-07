@@ -13,6 +13,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `myschema.person` */
 case class PersonId(value: Long) extends AnyVal
 object PersonId {
   implicit val ordering: Ordering[PersonId] = Ordering.by(_.value)

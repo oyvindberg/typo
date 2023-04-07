@@ -17,6 +17,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `pg_catalog.pg_collation` which has not been persisted yet */
 case class PgCollationRowUnsaved(
   collname: String,
   collnamespace: /* oid */ Long,

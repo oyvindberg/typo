@@ -14,6 +14,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `information_schema.sql_identifier`
+  * No constraint
+  */
 case class SqlIdentifierDomain(value: String) extends AnyVal
 object SqlIdentifierDomain {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[SqlIdentifierDomain] = Ordering.by(_.value)

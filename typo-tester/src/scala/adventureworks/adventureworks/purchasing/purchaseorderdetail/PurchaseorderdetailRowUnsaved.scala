@@ -17,6 +17,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `purchasing.purchaseorderdetail` which has not been persisted yet */
 case class PurchaseorderdetailRowUnsaved(
   duedate: LocalDateTime,
   orderqty: Int,

@@ -11,6 +11,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `information_schema.cardinal_number`
+  * Constraint: CHECK ((VALUE >= 0))
+  */
 case class CardinalNumberDomain(value: Int) extends AnyVal
 object CardinalNumberDomain {
   implicit def ordering(implicit ev: Ordering[Int]): Ordering[CardinalNumberDomain] = Ordering.by(_.value)

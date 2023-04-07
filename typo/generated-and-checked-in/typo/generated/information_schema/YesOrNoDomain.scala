@@ -14,6 +14,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `information_schema.yes_or_no`
+  * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
+  */
 case class YesOrNoDomain(value: String) extends AnyVal
 object YesOrNoDomain {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[YesOrNoDomain] = Ordering.by(_.value)

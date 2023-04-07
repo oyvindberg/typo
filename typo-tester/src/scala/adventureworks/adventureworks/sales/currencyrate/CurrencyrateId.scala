@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `sales.currencyrate` */
 case class CurrencyrateId(value: Int) extends AnyVal
 object CurrencyrateId {
   implicit val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)

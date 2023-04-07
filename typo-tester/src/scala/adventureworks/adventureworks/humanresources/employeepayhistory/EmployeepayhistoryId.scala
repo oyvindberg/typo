@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** Type for the composite primary key of table `humanresources.employeepayhistory` */
 case class EmployeepayhistoryId(businessentityid: BusinessentityId, ratechangedate: LocalDateTime)
 object EmployeepayhistoryId {
   implicit def ordering: Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))

@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `humanresources.employee` which has not been persisted yet */
 case class EmployeeRowUnsaved(
   nationalidnumber: String,
   loginid: String,

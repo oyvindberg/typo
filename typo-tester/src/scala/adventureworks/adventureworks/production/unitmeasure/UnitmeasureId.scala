@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)

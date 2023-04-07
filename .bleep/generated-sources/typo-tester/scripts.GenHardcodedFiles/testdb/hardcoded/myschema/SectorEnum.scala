@@ -17,6 +17,11 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
+/** Enum `myschema.sector`
+  *  - PUBLIC
+  *  - PRIVATE
+  *  - OTHER
+  */
 sealed abstract class SectorEnum(val value: String)
 object SectorEnum {
   case object `_public` extends SectorEnum("PUBLIC")

@@ -7,10 +7,18 @@ object DomainFile {
     val qident = naming.domainName(dom.name)
     val tpe = sc.Type.Qualified(qident)
 
+    val comments = scaladoc(s"Domain `${dom.name.value}`")(
+      dom.constraintDefinition match {
+        case Some(definition) => List(s"Constraint: $definition")
+        case None             => List("No constraint")
+      }
+    )
+
     val underlying: sc.Type = typeMapperScala.domain(dom.tpe)
     // todo: the implicit evidence below is to accommodate scala 2.12.4, which doesn't have an automatic `Ordering[ZonedDateTime]` (and maybe more)
     val str =
-      code"""case class ${qident.name}(value: $underlying) extends AnyVal
+      code"""$comments
+            |case class ${qident.name}(value: $underlying) extends AnyVal
             |object ${qident.name} {
             |  implicit def ordering(implicit ev: ${sc.Type.Ordering.of(underlying)}): ${sc.Type.Ordering.of(tpe)} = ${sc.Type.Ordering}.by(_.value)
             |  ${options.jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}

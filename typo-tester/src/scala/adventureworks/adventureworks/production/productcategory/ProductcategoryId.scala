@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.productcategory` */
 case class ProductcategoryId(value: Int) extends AnyVal
 object ProductcategoryId {
   implicit val ordering: Ordering[ProductcategoryId] = Ordering.by(_.value)

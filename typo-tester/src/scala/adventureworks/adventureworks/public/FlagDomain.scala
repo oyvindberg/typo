@@ -11,6 +11,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `public.Flag`
+  * No constraint
+  */
 case class FlagDomain(value: Boolean) extends AnyVal
 object FlagDomain {
   implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[FlagDomain] = Ordering.by(_.value)

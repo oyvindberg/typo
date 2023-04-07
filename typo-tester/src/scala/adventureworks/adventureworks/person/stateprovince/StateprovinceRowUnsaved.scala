@@ -21,6 +21,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `person.stateprovince` which has not been persisted yet */
 case class StateprovinceRowUnsaved(
   stateprovincecode: /* bpchar */ String,
   countryregioncode: CountryregionId,

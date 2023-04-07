@@ -38,4 +38,15 @@ package object codegen {
   def maybeQuoted(colName: db.ColName): sc.Code =
     if (colName.value.exists(x => !x.isUnicodeIdentifierPart)) sc.StrLit(colName.value) else sc.Code.Str(colName.value)
 
+  def scaladoc(title: String)(lines: List[String]): sc.Code = {
+    lines match {
+      case Nil =>
+        code"""|/** $title */""".stripMargin
+      case nonEmpty =>
+        code"""|/** $title
+               |${nonEmpty.flatMap(_.linesIterator).map(line => code"  * $line").mkCode("\n")}
+               |  */""".stripMargin
+    }
+
+  }
 }

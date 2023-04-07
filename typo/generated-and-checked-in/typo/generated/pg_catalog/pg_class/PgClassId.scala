@@ -15,6 +15,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `pg_catalog.pg_class` */
 case class PgClassId(value: /* oid */ Long) extends AnyVal
 object PgClassId {
   implicit val ordering: Ordering[PgClassId] = Ordering.by(_.value)

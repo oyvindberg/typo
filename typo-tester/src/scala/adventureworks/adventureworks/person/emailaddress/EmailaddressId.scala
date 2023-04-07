@@ -17,6 +17,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** Type for the composite primary key of table `person.emailaddress` */
 case class EmailaddressId(businessentityid: BusinessentityId, emailaddressid: Int)
 object EmailaddressId {
   implicit def ordering: Ordering[EmailaddressId] = Ordering.by(x => (x.businessentityid, x.emailaddressid))

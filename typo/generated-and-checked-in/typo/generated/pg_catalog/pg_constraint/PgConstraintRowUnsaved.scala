@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `pg_catalog.pg_constraint` which has not been persisted yet */
 case class PgConstraintRowUnsaved(
   conname: String,
   connamespace: /* oid */ Long,

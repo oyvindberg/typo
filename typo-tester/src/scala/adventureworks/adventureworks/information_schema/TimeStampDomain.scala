@@ -12,6 +12,9 @@ import anorm.ToStatement
 import java.time.ZonedDateTime
 import play.api.libs.json.Format
 
+/** Domain `information_schema.time_stamp`
+  * No constraint
+  */
 case class TimeStampDomain(value: ZonedDateTime) extends AnyVal
 object TimeStampDomain {
   implicit def ordering(implicit ev: Ordering[ZonedDateTime]): Ordering[TimeStampDomain] = Ordering.by(_.value)

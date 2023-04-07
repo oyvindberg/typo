@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
   implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)

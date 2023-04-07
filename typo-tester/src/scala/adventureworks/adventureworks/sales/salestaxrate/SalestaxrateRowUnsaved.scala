@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `sales.salestaxrate` which has not been persisted yet */
 case class SalestaxrateRowUnsaved(
   stateprovinceid: StateprovinceId,
   taxtype: Int,

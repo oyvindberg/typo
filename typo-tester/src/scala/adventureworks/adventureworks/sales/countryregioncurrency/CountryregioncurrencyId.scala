@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** Type for the composite primary key of table `sales.countryregioncurrency` */
 case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
 object CountryregioncurrencyId {
   implicit def ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))

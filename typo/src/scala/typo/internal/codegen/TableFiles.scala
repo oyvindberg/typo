@@ -8,8 +8,11 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
   val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsNotId).headOption.map { case (qident, colsUnsaved) =>
     val rowType = sc.Type.Qualified(qident)
 
+    val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
+
     val str =
-      code"""|case class ${qident.name}(
+      code"""|$comments
+             |case class ${qident.name}(
              |  ${colsUnsaved.map(_.param.code).mkCode(",\n")}
              |)
              |object ${qident.name} {
@@ -33,8 +36,11 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
       case id: IdComputed.UnaryNormal =>
+        val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`")(Nil)
+
         val str =
-          code"""case class ${id.qident.name}(value: ${id.underlying}) extends AnyVal
+          code"""$comments
+                |case class ${id.qident.name}(value: ${id.underlying}) extends AnyVal
                 |object ${id.qident.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
                 |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
@@ -57,9 +63,11 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
             val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
             code"(implicit ${orderingParams.mkCode(", ")})"
         }
+        val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
 
         val str =
-          code"""case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
+          code"""$comments
+                |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                 |object ${qident.name} {
                 |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
                 |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}

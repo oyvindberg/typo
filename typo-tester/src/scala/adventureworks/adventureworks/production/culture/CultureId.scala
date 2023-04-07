@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.culture` */
 case class CultureId(value: /* bpchar */ String) extends AnyVal
 object CultureId {
   implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)

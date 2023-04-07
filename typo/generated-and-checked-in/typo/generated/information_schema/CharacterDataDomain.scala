@@ -14,6 +14,9 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Domain `information_schema.character_data`
+  * No constraint
+  */
 case class CharacterDataDomain(value: String) extends AnyVal
 object CharacterDataDomain {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[CharacterDataDomain] = Ordering.by(_.value)

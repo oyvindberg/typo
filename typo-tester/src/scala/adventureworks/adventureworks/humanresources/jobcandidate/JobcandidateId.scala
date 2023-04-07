@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `humanresources.jobcandidate` */
 case class JobcandidateId(value: Int) extends AnyVal
 object JobcandidateId {
   implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)

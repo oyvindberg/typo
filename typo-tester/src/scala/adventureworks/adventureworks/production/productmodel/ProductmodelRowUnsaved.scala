@@ -18,6 +18,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
+/** This class corresponds to a row in table `production.productmodel` which has not been persisted yet */
 case class ProductmodelRowUnsaved(
   name: NameDomain,
   catalogdescription: Option[/* xml */ String],

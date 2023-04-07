@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Format
 
+/** Type for the primary key of table `production.workorder` */
 case class WorkorderId(value: Int) extends AnyVal
 object WorkorderId {
   implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
