@@ -9,8 +9,6 @@ package contacttype
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object ContacttypeId {
   implicit val format: Format[ContacttypeId] = implicitly[Format[Int]].bimap(ContacttypeId.apply, _.value)
   implicit val toStatement: ToStatement[ContacttypeId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[ContacttypeId] = implicitly[Column[Int]].map(ContacttypeId.apply)
-  def rowParser(prefix: String): RowParser[ContacttypeId] = SqlParser.get[ContacttypeId](prefix + "contacttypeid")
   implicit val parameterMetadata: ParameterMetaData[ContacttypeId] = new ParameterMetaData[ContacttypeId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -37,7 +38,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           returning currencyrateid
     """
       .on(namedParameters :_*)
-      .executeInsert(CurrencyrateId.rowParser("").single)
+      .executeInsert(SqlParser.get[CurrencyrateId]("currencyrateid").single)
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {

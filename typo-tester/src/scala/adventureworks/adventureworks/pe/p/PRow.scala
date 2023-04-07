@@ -8,6 +8,8 @@ package pe
 package p
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
+import adventureworks.public.NameStyleDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -26,15 +28,15 @@ case class PRow(
   /** Points to [[person.person.PersonRow.persontype]] */
   persontype: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"persontype","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.namestyle]] */
-  namestyle: Boolean /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"namestyle","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"NameStyle","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  namestyle: NameStyleDomain /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"namestyle","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"NameStyle","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"title","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":8,"character_octet_length":32,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"firstname","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  firstname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"firstname","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"middlename","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  middlename: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"middlename","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.lastname]] */
-  lastname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"lastname","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  lastname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"lastname","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.suffix]] */
   suffix: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"suffix","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":10,"character_octet_length":40,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.emailpromotion]] */
@@ -56,11 +58,11 @@ object PRow {
         id = row[Option[Int]](prefix + "id"),
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
         persontype = row[Option[/* bpchar */ String]](prefix + "persontype"),
-        namestyle = row[Boolean](prefix + "namestyle"),
+        namestyle = row[NameStyleDomain](prefix + "namestyle"),
         title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[String]](prefix + "firstname"),
-        middlename = row[Option[String]](prefix + "middlename"),
-        lastname = row[Option[String]](prefix + "lastname"),
+        firstname = row[Option[NameDomain]](prefix + "firstname"),
+        middlename = row[Option[NameDomain]](prefix + "middlename"),
+        lastname = row[Option[NameDomain]](prefix + "lastname"),
         suffix = row[Option[String]](prefix + "suffix"),
         emailpromotion = row[Option[Int]](prefix + "emailpromotion"),
         additionalcontactinfo = row[Option[/* xml */ String]](prefix + "additionalcontactinfo"),
@@ -97,11 +99,11 @@ object PRow {
             id = json.\("id").toOption.map(_.as[Int]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             persontype = json.\("persontype").toOption.map(_.as[/* bpchar */ String]),
-            namestyle = json.\("namestyle").as[Boolean],
+            namestyle = json.\("namestyle").as[NameStyleDomain],
             title = json.\("title").toOption.map(_.as[String]),
-            firstname = json.\("firstname").toOption.map(_.as[String]),
-            middlename = json.\("middlename").toOption.map(_.as[String]),
-            lastname = json.\("lastname").toOption.map(_.as[String]),
+            firstname = json.\("firstname").toOption.map(_.as[NameDomain]),
+            middlename = json.\("middlename").toOption.map(_.as[NameDomain]),
+            lastname = json.\("lastname").toOption.map(_.as[NameDomain]),
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
             additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),

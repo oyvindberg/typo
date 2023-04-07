@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -42,7 +43,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           returning shoppingcartitemid
     """
       .on(namedParameters :_*)
-      .executeInsert(ShoppingcartitemId.rowParser("").single)
+      .executeInsert(SqlParser.get[ShoppingcartitemId]("shoppingcartitemid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {

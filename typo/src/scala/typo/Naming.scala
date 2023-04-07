@@ -18,6 +18,10 @@ class Naming(pkg: sc.QIdent) {
   // enum names
   def enumName(name: db.RelationName): sc.QIdent =
     pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended("Enum")
+
+  def domainName(name: db.RelationName): sc.QIdent =
+    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended("Domain")
+
   def enumValue(name: String): sc.Ident = sc.Ident(name)
 
   // field names

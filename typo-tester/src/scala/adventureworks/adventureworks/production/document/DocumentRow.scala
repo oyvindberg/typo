@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.FlagDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,7 +24,7 @@ case class DocumentRow(
   title: String /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"title","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"owner","ordinal_position":4,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  folderflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"folderflag","ordinal_position":5,"column_default":"false","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  folderflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"folderflag","ordinal_position":5,"column_default":"false","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   filename: String /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"filename","ordinal_position":6,"is_nullable":"NO","data_type":"character varying","character_maximum_length":400,"character_octet_length":1600,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   fileextension: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"fileextension","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":8,"character_octet_length":32,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   revision: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"revision","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":5,"character_octet_length":20,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -42,7 +43,7 @@ object DocumentRow {
       DocumentRow(
         title = row[String](prefix + "title"),
         owner = row[BusinessentityId](prefix + "owner"),
-        folderflag = row[Boolean](prefix + "folderflag"),
+        folderflag = row[FlagDomain](prefix + "folderflag"),
         filename = row[String](prefix + "filename"),
         fileextension = row[Option[String]](prefix + "fileextension"),
         revision = row[/* bpchar */ String](prefix + "revision"),
@@ -81,7 +82,7 @@ object DocumentRow {
           DocumentRow(
             title = json.\("title").as[String],
             owner = json.\("owner").as[BusinessentityId],
-            folderflag = json.\("folderflag").as[Boolean],
+            folderflag = json.\("folderflag").as[FlagDomain],
             filename = json.\("filename").as[String],
             fileextension = json.\("fileextension").toOption.map(_.as[String]),
             revision = json.\("revision").as[/* bpchar */ String],

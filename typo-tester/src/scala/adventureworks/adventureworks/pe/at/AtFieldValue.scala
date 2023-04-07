@@ -8,6 +8,7 @@ package pe
 package at
 
 import adventureworks.person.addresstype.AddresstypeId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,7 +18,7 @@ sealed abstract class AtFieldValue[T](name: String, value: T) extends AtFieldOrI
 object AtFieldValue {
   case class id(override val value: Option[Int]) extends AtFieldValue("id", value)
   case class addresstypeid(override val value: Option[AddresstypeId]) extends AtFieldValue("addresstypeid", value)
-  case class name(override val value: Option[String]) extends AtFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends AtFieldValue("name", value)
   case class rowguid(override val value: Option[UUID]) extends AtFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends AtFieldValue("modifieddate", value)
 }

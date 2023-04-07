@@ -7,6 +7,7 @@ package adventureworks
 package person
 package addresstype
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,7 +16,7 @@ sealed abstract class AddresstypeFieldValue[T](name: String, value: T) extends A
 
 object AddresstypeFieldValue {
   case class addresstypeid(override val value: AddresstypeId) extends AddresstypeFieldOrIdValue("addresstypeid", value)
-  case class name(override val value: String) extends AddresstypeFieldValue("name", value)
+  case class name(override val value: NameDomain) extends AddresstypeFieldValue("name", value)
   case class rowguid(override val value: UUID) extends AddresstypeFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends AddresstypeFieldValue("modifieddate", value)
 }

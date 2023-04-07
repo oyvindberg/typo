@@ -9,8 +9,6 @@ package unitmeasure
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object UnitmeasureId {
   implicit val format: Format[UnitmeasureId] = implicitly[Format[/* bpchar */ String]].bimap(UnitmeasureId.apply, _.value)
   implicit val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
   implicit val column: Column[UnitmeasureId] = implicitly[Column[/* bpchar */ String]].map(UnitmeasureId.apply)
-  def rowParser(prefix: String): RowParser[UnitmeasureId] = SqlParser.get[UnitmeasureId](prefix + "unitmeasurecode")
   implicit val parameterMetadata: ParameterMetaData[UnitmeasureId] = new ParameterMetaData[UnitmeasureId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType

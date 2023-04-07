@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -41,7 +42,7 @@ object LocationRepoImpl extends LocationRepo {
           returning locationid
     """
       .on(namedParameters :_*)
-      .executeInsert(LocationId.rowParser("").single)
+      .executeInsert(SqlParser.get[LocationId]("locationid").single)
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -45,7 +46,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning transactionid
     """
       .on(namedParameters :_*)
-      .executeInsert(TransactionhistoryId.rowParser("").single)
+      .executeInsert(SqlParser.get[TransactionhistoryId]("transactionid").single)
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {

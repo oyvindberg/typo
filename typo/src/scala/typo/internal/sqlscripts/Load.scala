@@ -9,13 +9,13 @@ import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
 object Load {
-  def apply(scriptsPath: Path, enums: Map[String, db.StringEnum])(implicit c: Connection): List[SqlScript] =
+  def apply(scriptsPath: Path, typeMapperDb: TypeMapperDb)(implicit c: Connection): List[SqlScript] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
       try {
         val analyzed = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
-        val maybeScript = parseSqlScript(enums, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, analyzed)
+        val maybeScript = parseSqlScript(typeMapperDb, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, analyzed)
         maybeScript
       } catch {
         case e: PSQLException =>
@@ -38,12 +38,12 @@ object Load {
     found.result()
   }
 
-  def parseSqlScript(enums: Map[String, db.StringEnum], relativePath: RelPath, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): Option[SqlScript] = {
+  def parseSqlScript(typeMapperDb: TypeMapperDb, relativePath: RelPath, decomposedSql: DecomposedSql, jdbcMetadata: JdbcMetadata): Option[SqlScript] = {
     val cols = jdbcMetadata.columns.map { col =>
       val jsonDescription = minimalJson(col)
       db.Col(
         name = col.name,
-        tpe = TypeMapperDb.dbTypeFrom(enums, col.columnTypeName, Some(col.precision)).getOrElse {
+        tpe = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
           System.err.println(s"$relativePath Couldn't translate type from column $jsonDescription")
           db.Type.Text
         },
@@ -60,7 +60,7 @@ object Load {
 
     val params = decomposedSql.paramNamesWithIndices.map { case (maybeName, indices) =>
       val jdbcParam = jdbcMetadata.params(indices.head)
-      val tpe = TypeMapperDb.dbTypeFrom(enums, jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
+      val tpe = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
         System.err.println(s"$relativePath: Couldn't translate type from param $maybeName")
         db.Type.Text
       }

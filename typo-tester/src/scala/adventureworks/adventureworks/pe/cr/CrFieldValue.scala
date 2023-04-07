@@ -8,6 +8,7 @@ package pe
 package cr
 
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 
 sealed abstract class CrFieldOrIdValue[T](val name: String, val value: T)
@@ -15,6 +16,6 @@ sealed abstract class CrFieldValue[T](name: String, value: T) extends CrFieldOrI
 
 object CrFieldValue {
   case class countryregioncode(override val value: Option[CountryregionId]) extends CrFieldValue("countryregioncode", value)
-  case class name(override val value: Option[String]) extends CrFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends CrFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends CrFieldValue("modifieddate", value)
 }

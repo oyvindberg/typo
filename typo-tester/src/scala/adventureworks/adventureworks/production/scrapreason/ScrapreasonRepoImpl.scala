@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -33,7 +34,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning scrapreasonid
     """
       .on(namedParameters :_*)
-      .executeInsert(ScrapreasonId.rowParser("").single)
+      .executeInsert(SqlParser.get[ScrapreasonId]("scrapreasonid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {

@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -25,7 +26,7 @@ case class SalestaxrateRow(
   stateprovinceid: StateprovinceId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"stateprovinceid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   taxtype: Int /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"taxtype","ordinal_position":3,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   taxrate: BigDecimal /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"taxrate","ordinal_position":4,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: String /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"name","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"name","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   rowguid: UUID /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"rowguid","ordinal_position":6,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salestaxrate","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -38,7 +39,7 @@ object SalestaxrateRow {
         stateprovinceid = row[StateprovinceId](prefix + "stateprovinceid"),
         taxtype = row[Int](prefix + "taxtype"),
         taxrate = row[BigDecimal](prefix + "taxrate"),
-        name = row[String](prefix + "name"),
+        name = row[NameDomain](prefix + "name"),
         rowguid = row[UUID](prefix + "rowguid"),
         modifieddate = row[LocalDateTime](prefix + "modifieddate")
       )
@@ -65,7 +66,7 @@ object SalestaxrateRow {
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
             taxtype = json.\("taxtype").as[Int],
             taxrate = json.\("taxrate").as[BigDecimal],
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

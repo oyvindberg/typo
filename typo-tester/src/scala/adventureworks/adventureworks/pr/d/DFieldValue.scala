@@ -9,6 +9,7 @@ package d
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
+import adventureworks.public.FlagDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,7 +19,7 @@ sealed abstract class DFieldValue[T](name: String, value: T) extends DFieldOrIdV
 object DFieldValue {
   case class title(override val value: Option[String]) extends DFieldValue("title", value)
   case class owner(override val value: Option[BusinessentityId]) extends DFieldValue("owner", value)
-  case class folderflag(override val value: Boolean) extends DFieldValue("folderflag", value)
+  case class folderflag(override val value: FlagDomain) extends DFieldValue("folderflag", value)
   case class filename(override val value: Option[String]) extends DFieldValue("filename", value)
   case class fileextension(override val value: Option[String]) extends DFieldValue("fileextension", value)
   case class revision(override val value: Option[/* bpchar */ String]) extends DFieldValue("revision", value)

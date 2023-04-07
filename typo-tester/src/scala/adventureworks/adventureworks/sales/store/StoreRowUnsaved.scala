@@ -9,6 +9,7 @@ package store
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,7 +20,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class StoreRowUnsaved(
-  name: String,
+  name: NameDomain,
   salespersonid: Option[BusinessentityId],
   demographics: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
@@ -40,7 +41,7 @@ object StoreRowUnsaved {
       JsResult.fromTry(
         Try(
           StoreRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

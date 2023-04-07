@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 
 sealed abstract class SalesreasonFieldOrIdValue[T](val name: String, val value: T)
@@ -14,7 +15,7 @@ sealed abstract class SalesreasonFieldValue[T](name: String, value: T) extends S
 
 object SalesreasonFieldValue {
   case class salesreasonid(override val value: SalesreasonId) extends SalesreasonFieldOrIdValue("salesreasonid", value)
-  case class name(override val value: String) extends SalesreasonFieldValue("name", value)
-  case class reasontype(override val value: String) extends SalesreasonFieldValue("reasontype", value)
+  case class name(override val value: NameDomain) extends SalesreasonFieldValue("name", value)
+  case class reasontype(override val value: NameDomain) extends SalesreasonFieldValue("reasontype", value)
   case class modifieddate(override val value: LocalDateTime) extends SalesreasonFieldValue("modifieddate", value)
 }

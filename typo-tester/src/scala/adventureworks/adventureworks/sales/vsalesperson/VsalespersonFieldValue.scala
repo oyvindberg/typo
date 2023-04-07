@@ -8,6 +8,8 @@ package sales
 package vsalesperson
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
+import adventureworks.public.PhoneDomain
 
 sealed abstract class VsalespersonFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VsalespersonFieldValue[T](name: String, value: T) extends VsalespersonFieldOrIdValue(name, value)
@@ -15,22 +17,22 @@ sealed abstract class VsalespersonFieldValue[T](name: String, value: T) extends 
 object VsalespersonFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VsalespersonFieldValue("businessentityid", value)
   case class title(override val value: Option[String]) extends VsalespersonFieldValue("title", value)
-  case class firstname(override val value: Option[String]) extends VsalespersonFieldValue("firstname", value)
-  case class middlename(override val value: Option[String]) extends VsalespersonFieldValue("middlename", value)
-  case class lastname(override val value: Option[String]) extends VsalespersonFieldValue("lastname", value)
+  case class firstname(override val value: Option[NameDomain]) extends VsalespersonFieldValue("firstname", value)
+  case class middlename(override val value: Option[NameDomain]) extends VsalespersonFieldValue("middlename", value)
+  case class lastname(override val value: Option[NameDomain]) extends VsalespersonFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends VsalespersonFieldValue("suffix", value)
   case class jobtitle(override val value: Option[String]) extends VsalespersonFieldValue("jobtitle", value)
-  case class phonenumber(override val value: Option[String]) extends VsalespersonFieldValue("phonenumber", value)
-  case class phonenumbertype(override val value: Option[String]) extends VsalespersonFieldValue("phonenumbertype", value)
+  case class phonenumber(override val value: Option[PhoneDomain]) extends VsalespersonFieldValue("phonenumber", value)
+  case class phonenumbertype(override val value: Option[NameDomain]) extends VsalespersonFieldValue("phonenumbertype", value)
   case class emailaddress(override val value: Option[String]) extends VsalespersonFieldValue("emailaddress", value)
   case class emailpromotion(override val value: Option[Int]) extends VsalespersonFieldValue("emailpromotion", value)
   case class addressline1(override val value: Option[String]) extends VsalespersonFieldValue("addressline1", value)
   case class addressline2(override val value: Option[String]) extends VsalespersonFieldValue("addressline2", value)
   case class city(override val value: Option[String]) extends VsalespersonFieldValue("city", value)
-  case class stateprovincename(override val value: Option[String]) extends VsalespersonFieldValue("stateprovincename", value)
+  case class stateprovincename(override val value: Option[NameDomain]) extends VsalespersonFieldValue("stateprovincename", value)
   case class postalcode(override val value: Option[String]) extends VsalespersonFieldValue("postalcode", value)
-  case class countryregionname(override val value: Option[String]) extends VsalespersonFieldValue("countryregionname", value)
-  case class territoryname(override val value: Option[String]) extends VsalespersonFieldValue("territoryname", value)
+  case class countryregionname(override val value: Option[NameDomain]) extends VsalespersonFieldValue("countryregionname", value)
+  case class territoryname(override val value: Option[NameDomain]) extends VsalespersonFieldValue("territoryname", value)
   case class territorygroup(override val value: Option[String]) extends VsalespersonFieldValue("territorygroup", value)
   case class salesquota(override val value: Option[BigDecimal]) extends VsalespersonFieldValue("salesquota", value)
   case class salesytd(override val value: Option[BigDecimal]) extends VsalespersonFieldValue("salesytd", value)

@@ -8,6 +8,7 @@ package production
 package productsubcategory
 
 import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,7 +18,7 @@ sealed abstract class ProductsubcategoryFieldValue[T](name: String, value: T) ex
 object ProductsubcategoryFieldValue {
   case class productsubcategoryid(override val value: ProductsubcategoryId) extends ProductsubcategoryFieldOrIdValue("productsubcategoryid", value)
   case class productcategoryid(override val value: ProductcategoryId) extends ProductsubcategoryFieldValue("productcategoryid", value)
-  case class name(override val value: String) extends ProductsubcategoryFieldValue("name", value)
+  case class name(override val value: NameDomain) extends ProductsubcategoryFieldValue("name", value)
   case class rowguid(override val value: UUID) extends ProductsubcategoryFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductsubcategoryFieldValue("modifieddate", value)
 }

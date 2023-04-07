@@ -9,6 +9,7 @@ package document
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.FlagDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -21,7 +22,7 @@ import scala.util.Try
 case class DocumentRowUnsaved(
   title: String,
   owner: BusinessentityId,
-  folderflag: Defaulted[Boolean],
+  folderflag: Defaulted[FlagDomain],
   filename: String,
   fileextension: Option[String],
   revision: /* bpchar */ String,
@@ -56,7 +57,7 @@ object DocumentRowUnsaved {
           DocumentRowUnsaved(
             title = json.\("title").as[String],
             owner = json.\("owner").as[BusinessentityId],
-            folderflag = json.\("folderflag").as[Defaulted[Boolean]],
+            folderflag = json.\("folderflag").as[Defaulted[FlagDomain]],
             filename = json.\("filename").as[String],
             fileextension = json.\("fileextension").toOption.map(_.as[String]),
             revision = json.\("revision").as[/* bpchar */ String],

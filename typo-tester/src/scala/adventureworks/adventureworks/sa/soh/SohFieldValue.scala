@@ -9,6 +9,9 @@ package soh
 
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.AccountNumberDomain
+import adventureworks.public.FlagDomain
+import adventureworks.public.OrderNumberDomain
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
@@ -29,9 +32,9 @@ object SohFieldValue {
   case class duedate(override val value: Option[LocalDateTime]) extends SohFieldValue("duedate", value)
   case class shipdate(override val value: Option[LocalDateTime]) extends SohFieldValue("shipdate", value)
   case class status(override val value: Option[Int]) extends SohFieldValue("status", value)
-  case class onlineorderflag(override val value: Boolean) extends SohFieldValue("onlineorderflag", value)
-  case class purchaseordernumber(override val value: Option[String]) extends SohFieldValue("purchaseordernumber", value)
-  case class accountnumber(override val value: Option[String]) extends SohFieldValue("accountnumber", value)
+  case class onlineorderflag(override val value: FlagDomain) extends SohFieldValue("onlineorderflag", value)
+  case class purchaseordernumber(override val value: Option[OrderNumberDomain]) extends SohFieldValue("purchaseordernumber", value)
+  case class accountnumber(override val value: Option[AccountNumberDomain]) extends SohFieldValue("accountnumber", value)
   case class customerid(override val value: Option[CustomerId]) extends SohFieldValue("customerid", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SohFieldValue("salespersonid", value)
   case class territoryid(override val value: Option[SalesterritoryId]) extends SohFieldValue("territoryid", value)

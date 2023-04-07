@@ -8,6 +8,8 @@ package pe
 package p
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
+import adventureworks.public.NameStyleDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,11 +20,11 @@ object PFieldValue {
   case class id(override val value: Option[Int]) extends PFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends PFieldValue("businessentityid", value)
   case class persontype(override val value: Option[/* bpchar */ String]) extends PFieldValue("persontype", value)
-  case class namestyle(override val value: Boolean) extends PFieldValue("namestyle", value)
+  case class namestyle(override val value: NameStyleDomain) extends PFieldValue("namestyle", value)
   case class title(override val value: Option[String]) extends PFieldValue("title", value)
-  case class firstname(override val value: Option[String]) extends PFieldValue("firstname", value)
-  case class middlename(override val value: Option[String]) extends PFieldValue("middlename", value)
-  case class lastname(override val value: Option[String]) extends PFieldValue("lastname", value)
+  case class firstname(override val value: Option[NameDomain]) extends PFieldValue("firstname", value)
+  case class middlename(override val value: Option[NameDomain]) extends PFieldValue("middlename", value)
+  case class lastname(override val value: Option[NameDomain]) extends PFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends PFieldValue("suffix", value)
   case class emailpromotion(override val value: Option[Int]) extends PFieldValue("emailpromotion", value)
   case class additionalcontactinfo(override val value: Option[/* xml */ String]) extends PFieldValue("additionalcontactinfo", value)

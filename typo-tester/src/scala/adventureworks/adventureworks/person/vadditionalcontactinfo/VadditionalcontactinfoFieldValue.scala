@@ -8,6 +8,7 @@ package person
 package vadditionalcontactinfo
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,9 +17,9 @@ sealed abstract class VadditionalcontactinfoFieldValue[T](name: String, value: T
 
 object VadditionalcontactinfoFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VadditionalcontactinfoFieldValue("businessentityid", value)
-  case class firstname(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("firstname", value)
-  case class middlename(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("middlename", value)
-  case class lastname(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("lastname", value)
+  case class firstname(override val value: Option[NameDomain]) extends VadditionalcontactinfoFieldValue("firstname", value)
+  case class middlename(override val value: Option[NameDomain]) extends VadditionalcontactinfoFieldValue("middlename", value)
+  case class lastname(override val value: Option[NameDomain]) extends VadditionalcontactinfoFieldValue("lastname", value)
   case class telephonenumber(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("telephonenumber", value)
   case class telephonespecialinstructions(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("telephonespecialinstructions", value)
   case class street(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("street", value)

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -33,7 +34,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           returning phonenumbertypeid
     """
       .on(namedParameters :_*)
-      .executeInsert(PhonenumbertypeId.rowParser("").single)
+      .executeInsert(SqlParser.get[PhonenumbertypeId]("phonenumbertypeid").single)
   
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -36,7 +37,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
           returning creditcardid
     """
       .on(namedParameters :_*)
-      .executeInsert(CreditcardId.rowParser("").single)
+      .executeInsert(SqlParser.get[CreditcardId]("creditcardid").single)
   
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {

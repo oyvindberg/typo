@@ -27,7 +27,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
       db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), Nullability.Nullable, hasDefault = false, JsNull),
       db.Col(
         db.ColName("sector"),
-        db.Type.StringEnum(db.RelationName(Some("myschema"), "sector")),
+        db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
         Nullability.NoNulls,
         hasDefault = true,
         JsNull
@@ -117,8 +117,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
             },
           header = header
         ),
-        all,
-        enums,
+        relations = all,
+        enums = enums,
+        domains = Nil,
         sqlScripts = Nil,
         Selector.All
       )

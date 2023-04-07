@@ -9,8 +9,10 @@ package stateprovince
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.FlagDomain
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -26,7 +28,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       Some(NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode))),
       unsaved.isonlystateprovinceflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("isonlystateprovinceflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("isonlystateprovinceflag", ParameterValue.from[FlagDomain](value)))
       },
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),
@@ -45,7 +47,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           returning stateprovinceid
     """
       .on(namedParameters :_*)
-      .executeInsert(StateprovinceId.rowParser("").single)
+      .executeInsert(SqlParser.get[StateprovinceId]("stateprovinceid").single)
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {

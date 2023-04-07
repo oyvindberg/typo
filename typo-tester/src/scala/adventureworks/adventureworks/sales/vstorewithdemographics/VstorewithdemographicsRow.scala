@@ -8,6 +8,7 @@ package sales
 package vstorewithdemographics
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import org.postgresql.util.PGmoney
@@ -22,7 +23,7 @@ case class VstorewithdemographicsRow(
   /** Points to [[store.StoreRow.businessentityid]] */
   businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"businessentityid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[store.StoreRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   AnnualSales: Option[PGmoney] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"AnnualSales","ordinal_position":3,"is_nullable":"YES","data_type":"money","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"money","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   AnnualRevenue: Option[PGmoney] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"AnnualRevenue","ordinal_position":4,"is_nullable":"YES","data_type":"money","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"money","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   BankName: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vstorewithdemographics","column_name":"BankName","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -40,7 +41,7 @@ object VstorewithdemographicsRow {
     Success(
       VstorewithdemographicsRow(
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        name = row[Option[String]](prefix + "name"),
+        name = row[Option[NameDomain]](prefix + "name"),
         AnnualSales = row[Option[PGmoney]](prefix + "AnnualSales"),
         AnnualRevenue = row[Option[PGmoney]](prefix + "AnnualRevenue"),
         BankName = row[Option[String]](prefix + "BankName"),
@@ -77,7 +78,7 @@ object VstorewithdemographicsRow {
         Try(
           VstorewithdemographicsRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            name = json.\("name").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
             AnnualSales = json.\("AnnualSales").toOption.map(_.as[PGmoney]),
             AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[PGmoney]),
             BankName = json.\("BankName").toOption.map(_.as[String]),

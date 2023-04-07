@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -56,7 +57,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           returning territoryid
     """
       .on(namedParameters :_*)
-      .executeInsert(SalesterritoryId.rowParser("").single)
+      .executeInsert(SqlParser.get[SalesterritoryId]("territoryid").single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {

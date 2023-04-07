@@ -8,6 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.FlagDomain
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -24,10 +25,10 @@ object EmployeeFieldValue {
   case class maritalstatus(override val value: /* bpchar */ String) extends EmployeeFieldValue("maritalstatus", value)
   case class gender(override val value: /* bpchar */ String) extends EmployeeFieldValue("gender", value)
   case class hiredate(override val value: LocalDate) extends EmployeeFieldValue("hiredate", value)
-  case class salariedflag(override val value: Boolean) extends EmployeeFieldValue("salariedflag", value)
+  case class salariedflag(override val value: FlagDomain) extends EmployeeFieldValue("salariedflag", value)
   case class vacationhours(override val value: Int) extends EmployeeFieldValue("vacationhours", value)
   case class sickleavehours(override val value: Int) extends EmployeeFieldValue("sickleavehours", value)
-  case class currentflag(override val value: Boolean) extends EmployeeFieldValue("currentflag", value)
+  case class currentflag(override val value: FlagDomain) extends EmployeeFieldValue("currentflag", value)
   case class rowguid(override val value: UUID) extends EmployeeFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends EmployeeFieldValue("modifieddate", value)
   case class organizationnode(override val value: Option[String]) extends EmployeeFieldValue("organizationnode", value)

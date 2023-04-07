@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,7 +16,7 @@ sealed abstract class ShipmethodFieldValue[T](name: String, value: T) extends Sh
 
 object ShipmethodFieldValue {
   case class shipmethodid(override val value: ShipmethodId) extends ShipmethodFieldOrIdValue("shipmethodid", value)
-  case class name(override val value: String) extends ShipmethodFieldValue("name", value)
+  case class name(override val value: NameDomain) extends ShipmethodFieldValue("name", value)
   case class shipbase(override val value: BigDecimal) extends ShipmethodFieldValue("shipbase", value)
   case class shiprate(override val value: BigDecimal) extends ShipmethodFieldValue("shiprate", value)
   case class rowguid(override val value: UUID) extends ShipmethodFieldValue("rowguid", value)

@@ -1,5 +1,7 @@
 package scripts
 
+import typo.{Nullability, NullabilityOverride, OverrideFrom, RelPath, db}
+
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
 import java.util
@@ -7,7 +9,7 @@ import java.util
 object GeneratedSources {
   def main(args: Array[String]): Unit = {
     implicit val c: Connection = {
-      val url = "jdbc:postgresql://localhost/postgres"
+      val url = "jdbc:postgresql://localhost:5432/postgres"
       val props = new util.Properties
       props.setProperty("user", "postgres")
       props.setProperty("password", "postgres")
@@ -37,12 +39,21 @@ object GeneratedSources {
       "tables"
     )
 
+    // postgres has problems with a left join in this query
+    val nullabilityOverride: NullabilityOverride = {
+      case (OverrideFrom.SqlScript(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
+        Some(Nullability.Nullable)
+      case (_, _) =>
+        None
+    }
+
     val files: typo.Generated = {
       val options = typo.Options(
         pkg = "typo.generated",
         jsonLib = typo.JsonLibName.PlayJson,
         dbLib = typo.DbLibName.Anorm,
         header = header,
+        nullabilityOverride = nullabilityOverride,
         debugTypes = true
       )
       typo.fromDbAndScripts(options, sqlScriptDir, selector)

@@ -10,6 +10,8 @@ package product
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,10 +25,10 @@ import scala.util.Try
 
 case class ProductRow(
   productid: ProductId /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"productid","ordinal_position":1,"column_default":"nextval('production.product_productid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: String /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   productnumber: String /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"productnumber","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  makeflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"makeflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  finishedgoodsflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"finishedgoodsflag","ordinal_position":5,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  makeflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"makeflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  finishedgoodsflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"finishedgoodsflag","ordinal_position":5,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   color: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"color","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   safetystocklevel: Int /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"safetystocklevel","ordinal_position":7,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   reorderpoint: Int /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"product","column_name":"reorderpoint","ordinal_position":8,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -58,10 +60,10 @@ object ProductRow {
     Success(
       ProductRow(
         productid = row[ProductId](prefix + "productid"),
-        name = row[String](prefix + "name"),
+        name = row[NameDomain](prefix + "name"),
         productnumber = row[String](prefix + "productnumber"),
-        makeflag = row[Boolean](prefix + "makeflag"),
-        finishedgoodsflag = row[Boolean](prefix + "finishedgoodsflag"),
+        makeflag = row[FlagDomain](prefix + "makeflag"),
+        finishedgoodsflag = row[FlagDomain](prefix + "finishedgoodsflag"),
         color = row[Option[String]](prefix + "color"),
         safetystocklevel = row[Int](prefix + "safetystocklevel"),
         reorderpoint = row[Int](prefix + "reorderpoint"),
@@ -121,10 +123,10 @@ object ProductRow {
         Try(
           ProductRow(
             productid = json.\("productid").as[ProductId],
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             productnumber = json.\("productnumber").as[String],
-            makeflag = json.\("makeflag").as[Boolean],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Boolean],
+            makeflag = json.\("makeflag").as[FlagDomain],
+            finishedgoodsflag = json.\("finishedgoodsflag").as[FlagDomain],
             color = json.\("color").toOption.map(_.as[String]),
             safetystocklevel = json.\("safetystocklevel").as[Int],
             reorderpoint = json.\("reorderpoint").as[Int],

@@ -7,14 +7,14 @@
  */
 package typo
 package generated
-package views
-package find_all_views
+package custom
+package view_find_all
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object FindAllViewsRepoImpl extends FindAllViewsRepo {
-  override def apply()(implicit c: Connection): List[FindAllViewsRow] = {
+object ViewFindAllRepoImpl extends ViewFindAllRepo {
+  override def apply()(implicit c: Connection): List[ViewFindAllRow] = {
     val sql = SQL"""SELECT
                   nc.oid as table_oid,
                   nc.nspname::information_schema.sql_identifier         AS table_schema,
@@ -30,7 +30,7 @@ object FindAllViewsRepoImpl extends FindAllViewsRepo {
                 AND c.relkind in ('m'::"char", 'v'::char)
               order by 1,2,3
               """
-    sql.as(FindAllViewsRow.rowParser("").*)
+    sql.as(ViewFindAllRow.rowParser("").*)
   
   }
 }

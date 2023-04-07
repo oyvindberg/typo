@@ -8,6 +8,7 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -18,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ShipmethodRowUnsaved(
-  name: String,
+  name: NameDomain,
   shipbase: Defaulted[BigDecimal],
   shiprate: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
@@ -39,7 +40,7 @@ object ShipmethodRowUnsaved {
       JsResult.fromTry(
         Try(
           ShipmethodRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
             shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

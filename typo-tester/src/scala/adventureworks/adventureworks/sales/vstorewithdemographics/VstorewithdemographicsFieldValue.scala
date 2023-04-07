@@ -8,6 +8,7 @@ package sales
 package vstorewithdemographics
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import org.postgresql.util.PGmoney
 
 sealed abstract class VstorewithdemographicsFieldOrIdValue[T](val name: String, val value: T)
@@ -15,7 +16,7 @@ sealed abstract class VstorewithdemographicsFieldValue[T](name: String, value: T
 
 object VstorewithdemographicsFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VstorewithdemographicsFieldValue("businessentityid", value)
-  case class name(override val value: Option[String]) extends VstorewithdemographicsFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends VstorewithdemographicsFieldValue("name", value)
   case class AnnualSales(override val value: Option[PGmoney]) extends VstorewithdemographicsFieldValue("AnnualSales", value)
   case class AnnualRevenue(override val value: Option[PGmoney]) extends VstorewithdemographicsFieldValue("AnnualRevenue", value)
   case class BankName(override val value: Option[String]) extends VstorewithdemographicsFieldValue("BankName", value)

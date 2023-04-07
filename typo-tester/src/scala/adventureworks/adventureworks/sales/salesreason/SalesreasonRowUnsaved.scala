@@ -8,6 +8,7 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,8 +18,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SalesreasonRowUnsaved(
-  name: String,
-  reasontype: String,
+  name: NameDomain,
+  reasontype: NameDomain,
   modifieddate: Defaulted[LocalDateTime]
 )
 object SalesreasonRowUnsaved {
@@ -34,8 +35,8 @@ object SalesreasonRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesreasonRowUnsaved(
-            name = json.\("name").as[String],
-            reasontype = json.\("reasontype").as[String],
+            name = json.\("name").as[NameDomain],
+            reasontype = json.\("reasontype").as[NameDomain],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

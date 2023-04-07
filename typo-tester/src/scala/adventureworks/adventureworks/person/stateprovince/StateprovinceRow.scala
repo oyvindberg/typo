@@ -8,6 +8,8 @@ package person
 package stateprovince
 
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
@@ -25,8 +27,8 @@ case class StateprovinceRow(
   stateprovincecode: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"stateprovincecode","ordinal_position":2,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"countryregioncode","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  isonlystateprovinceflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"isonlystateprovinceflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: String /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"name","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  isonlystateprovinceflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"isonlystateprovinceflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"name","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"territoryid","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   rowguid: UUID /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"rowguid","ordinal_position":7,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -40,8 +42,8 @@ object StateprovinceRow {
         stateprovinceid = row[StateprovinceId](prefix + "stateprovinceid"),
         stateprovincecode = row[/* bpchar */ String](prefix + "stateprovincecode"),
         countryregioncode = row[CountryregionId](prefix + "countryregioncode"),
-        isonlystateprovinceflag = row[Boolean](prefix + "isonlystateprovinceflag"),
-        name = row[String](prefix + "name"),
+        isonlystateprovinceflag = row[FlagDomain](prefix + "isonlystateprovinceflag"),
+        name = row[NameDomain](prefix + "name"),
         territoryid = row[SalesterritoryId](prefix + "territoryid"),
         rowguid = row[UUID](prefix + "rowguid"),
         modifieddate = row[LocalDateTime](prefix + "modifieddate")
@@ -69,8 +71,8 @@ object StateprovinceRow {
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
             stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Boolean],
-            name = json.\("name").as[String],
+            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[FlagDomain],
+            name = json.\("name").as[NameDomain],
             territoryid = json.\("territoryid").as[SalesterritoryId],
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]

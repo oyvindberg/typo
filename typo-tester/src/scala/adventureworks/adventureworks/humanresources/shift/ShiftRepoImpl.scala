@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -35,7 +36,7 @@ object ShiftRepoImpl extends ShiftRepo {
           returning shiftid
     """
       .on(namedParameters :_*)
-      .executeInsert(ShiftId.rowParser("").single)
+      .executeInsert(SqlParser.get[ShiftId]("shiftid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {

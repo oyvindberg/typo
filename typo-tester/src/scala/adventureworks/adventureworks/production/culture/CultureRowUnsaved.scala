@@ -8,6 +8,7 @@ package production
 package culture
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CultureRowUnsaved(
-  name: String,
+  name: NameDomain,
   modifieddate: Defaulted[LocalDateTime]
 )
 object CultureRowUnsaved {
@@ -32,7 +33,7 @@ object CultureRowUnsaved {
       JsResult.fromTry(
         Try(
           CultureRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

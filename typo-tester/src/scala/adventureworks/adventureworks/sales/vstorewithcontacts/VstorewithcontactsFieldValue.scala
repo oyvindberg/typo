@@ -8,21 +8,23 @@ package sales
 package vstorewithcontacts
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
+import adventureworks.public.PhoneDomain
 
 sealed abstract class VstorewithcontactsFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VstorewithcontactsFieldValue[T](name: String, value: T) extends VstorewithcontactsFieldOrIdValue(name, value)
 
 object VstorewithcontactsFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VstorewithcontactsFieldValue("businessentityid", value)
-  case class name(override val value: Option[String]) extends VstorewithcontactsFieldValue("name", value)
-  case class contacttype(override val value: Option[String]) extends VstorewithcontactsFieldValue("contacttype", value)
+  case class name(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("name", value)
+  case class contacttype(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("contacttype", value)
   case class title(override val value: Option[String]) extends VstorewithcontactsFieldValue("title", value)
-  case class firstname(override val value: Option[String]) extends VstorewithcontactsFieldValue("firstname", value)
-  case class middlename(override val value: Option[String]) extends VstorewithcontactsFieldValue("middlename", value)
-  case class lastname(override val value: Option[String]) extends VstorewithcontactsFieldValue("lastname", value)
+  case class firstname(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("firstname", value)
+  case class middlename(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("middlename", value)
+  case class lastname(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends VstorewithcontactsFieldValue("suffix", value)
-  case class phonenumber(override val value: Option[String]) extends VstorewithcontactsFieldValue("phonenumber", value)
-  case class phonenumbertype(override val value: Option[String]) extends VstorewithcontactsFieldValue("phonenumbertype", value)
+  case class phonenumber(override val value: Option[PhoneDomain]) extends VstorewithcontactsFieldValue("phonenumber", value)
+  case class phonenumbertype(override val value: Option[NameDomain]) extends VstorewithcontactsFieldValue("phonenumbertype", value)
   case class emailaddress(override val value: Option[String]) extends VstorewithcontactsFieldValue("emailaddress", value)
   case class emailpromotion(override val value: Option[Int]) extends VstorewithcontactsFieldValue("emailpromotion", value)
 }

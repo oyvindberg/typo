@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -34,7 +35,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           returning departmentid
     """
       .on(namedParameters :_*)
-      .executeInsert(DepartmentId.rowParser("").single)
+      .executeInsert(SqlParser.get[DepartmentId]("departmentid").single)
   
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {

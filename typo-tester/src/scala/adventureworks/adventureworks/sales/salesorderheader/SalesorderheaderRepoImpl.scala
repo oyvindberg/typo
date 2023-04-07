@@ -9,8 +9,10 @@ package salesorderheader
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.FlagDomain
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -38,7 +40,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       },
       unsaved.onlineorderflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[FlagDomain](value)))
       },
       Some(NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber))),
       Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),
@@ -80,7 +82,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           returning salesorderid
     """
       .on(namedParameters :_*)
-      .executeInsert(SalesorderheaderId.rowParser("").single)
+      .executeInsert(SqlParser.get[SalesorderheaderId]("salesorderid").single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {

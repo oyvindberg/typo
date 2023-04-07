@@ -11,6 +11,8 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -27,13 +29,13 @@ case class PRow(
   /** Points to [[production.product.ProductRow.productid]] */
   productid: Option[ProductId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"productid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.productnumber]] */
   productnumber: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"productnumber","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.makeflag]] */
-  makeflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"makeflag","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  makeflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"makeflag","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.finishedgoodsflag]] */
-  finishedgoodsflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"finishedgoodsflag","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  finishedgoodsflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"finishedgoodsflag","ordinal_position":6,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.color]] */
   color: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"color","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.safetystocklevel]] */
@@ -82,10 +84,10 @@ object PRow {
       PRow(
         id = row[Option[Int]](prefix + "id"),
         productid = row[Option[ProductId]](prefix + "productid"),
-        name = row[Option[String]](prefix + "name"),
+        name = row[Option[NameDomain]](prefix + "name"),
         productnumber = row[Option[String]](prefix + "productnumber"),
-        makeflag = row[Boolean](prefix + "makeflag"),
-        finishedgoodsflag = row[Boolean](prefix + "finishedgoodsflag"),
+        makeflag = row[FlagDomain](prefix + "makeflag"),
+        finishedgoodsflag = row[FlagDomain](prefix + "finishedgoodsflag"),
         color = row[Option[String]](prefix + "color"),
         safetystocklevel = row[Option[Int]](prefix + "safetystocklevel"),
         reorderpoint = row[Option[Int]](prefix + "reorderpoint"),
@@ -147,10 +149,10 @@ object PRow {
           PRow(
             id = json.\("id").toOption.map(_.as[Int]),
             productid = json.\("productid").toOption.map(_.as[ProductId]),
-            name = json.\("name").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
             productnumber = json.\("productnumber").toOption.map(_.as[String]),
-            makeflag = json.\("makeflag").as[Boolean],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Boolean],
+            makeflag = json.\("makeflag").as[FlagDomain],
+            finishedgoodsflag = json.\("finishedgoodsflag").as[FlagDomain],
             color = json.\("color").toOption.map(_.as[String]),
             safetystocklevel = json.\("safetystocklevel").toOption.map(_.as[Int]),
             reorderpoint = json.\("reorderpoint").toOption.map(_.as[Int]),

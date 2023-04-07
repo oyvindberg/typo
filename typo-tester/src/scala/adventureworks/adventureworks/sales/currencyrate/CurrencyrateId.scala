@@ -9,8 +9,6 @@ package currencyrate
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object CurrencyrateId {
   implicit val format: Format[CurrencyrateId] = implicitly[Format[Int]].bimap(CurrencyrateId.apply, _.value)
   implicit val toStatement: ToStatement[CurrencyrateId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[CurrencyrateId] = implicitly[Column[Int]].map(CurrencyrateId.apply)
-  def rowParser(prefix: String): RowParser[CurrencyrateId] = SqlParser.get[CurrencyrateId](prefix + "currencyrateid")
   implicit val parameterMetadata: ParameterMetaData[CurrencyrateId] = new ParameterMetaData[CurrencyrateId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

@@ -8,6 +8,9 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
+import adventureworks.public.AccountNumberDomain
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,11 +20,11 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class VendorRowUnsaved(
-  accountnumber: String,
-  name: String,
+  accountnumber: AccountNumberDomain,
+  name: NameDomain,
   creditrating: Int,
-  preferredvendorstatus: Defaulted[Boolean],
-  activeflag: Defaulted[Boolean],
+  preferredvendorstatus: Defaulted[FlagDomain],
+  activeflag: Defaulted[FlagDomain],
   purchasingwebserviceurl: Option[String],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -42,11 +45,11 @@ object VendorRowUnsaved {
       JsResult.fromTry(
         Try(
           VendorRowUnsaved(
-            accountnumber = json.\("accountnumber").as[String],
-            name = json.\("name").as[String],
+            accountnumber = json.\("accountnumber").as[AccountNumberDomain],
+            name = json.\("name").as[NameDomain],
             creditrating = json.\("creditrating").as[Int],
-            preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Boolean]],
-            activeflag = json.\("activeflag").as[Defaulted[Boolean]],
+            preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[FlagDomain]],
+            activeflag = json.\("activeflag").as[Defaulted[FlagDomain]],
             purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

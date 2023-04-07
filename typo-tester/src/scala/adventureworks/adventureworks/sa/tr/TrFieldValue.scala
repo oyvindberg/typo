@@ -8,6 +8,7 @@ package sa
 package tr
 
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.NameDomain
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,7 +22,7 @@ object TrFieldValue {
   case class stateprovinceid(override val value: Option[StateprovinceId]) extends TrFieldValue("stateprovinceid", value)
   case class taxtype(override val value: Option[Int]) extends TrFieldValue("taxtype", value)
   case class taxrate(override val value: Option[BigDecimal]) extends TrFieldValue("taxrate", value)
-  case class name(override val value: Option[String]) extends TrFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends TrFieldValue("name", value)
   case class rowguid(override val value: Option[UUID]) extends TrFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends TrFieldValue("modifieddate", value)
 }

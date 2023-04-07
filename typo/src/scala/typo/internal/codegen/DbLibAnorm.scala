@@ -54,17 +54,16 @@ object DbLibAnorm extends DbLib {
 
     List(rowParser)
   }
-  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type, colName: db.ColName): List[sc.Code] = {
+  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
     val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
     val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
-    val rowParser = code"def $rowParserIdent(prefix: String): ${RowParser(wrapperType)} = $SqlParser.get[$wrapperType](prefix + ${sc.StrLit(colName.value)})"
     val parameterMetadata =
       code"""|implicit val parameterMetadata: ${ParameterMetaData.of(wrapperType)} = new ${ParameterMetaData.of(wrapperType)} {
              |  override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
              |  override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}
              |""".stripMargin
-    List(toStatement, column, rowParser, parameterMetadata)
+    List(toStatement, column, parameterMetadata)
   }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
@@ -207,13 +206,14 @@ object DbLibAnorm extends DbLib {
                  |""".stripMargin
         )
 
-        // don't remand that user-specified id has a correct rowParser definition when we can trivially infer it
-        val rowParser = id match {
-          case IdComputed.UnaryUserSpecified(col, tpe) =>
-            code"""$SqlParser.get[$tpe](${sc.StrLit(col.dbName.value)})"""
-          case other =>
-            code"""${other.tpe}.$rowParserIdent("")"""
-        }
+        // we share row parser for composite ids, but inline it for unary id types because the may be external, or may be a domain/enum type which is shared
+        val rowParser =
+          id match {
+            case unary: IdComputed.Unary =>
+              code"""$SqlParser.get[${unary.tpe}](${sc.StrLit(unary.col.dbName.value)})"""
+            case other =>
+              code"""${other.tpe}.$rowParserIdent("")"""
+          }
 
         code"""|val namedParameters = List(
                |  ${maybeNamedParameters.mkCode(",\n")}

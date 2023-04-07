@@ -3,8 +3,9 @@ package typo
 import org.postgresql.util.PSQLException
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import typo.generated.views.find_all_views.FindAllViewsRepoImpl
-import typo.generated.views.view_column_dependencies.ViewColumnDependenciesRepoImpl
+import typo.generated.custom.view_find_all.ViewFindAllRepoImpl
+import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesRepoImpl
+import typo.generated.custom.domains.DomainsRepoImpl
 import typo.generated.{information_schema, pg_catalog}
 
 import java.sql.{Connection, DriverManager}
@@ -23,8 +24,9 @@ class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
       println(information_schema.tables.TablesRepoImpl.selectAll.take(1))
       println(pg_catalog.pg_attribute.PgAttributeRepoImpl.selectAll.take(1))
       println(pg_catalog.pg_class.PgClassRepoImpl.selectAll.take(1))
-      println(FindAllViewsRepoImpl().take(1))
+      println(ViewFindAllRepoImpl().take(1))
       println(ViewColumnDependenciesRepoImpl().take(1))
+      println(DomainsRepoImpl().take(1))
     } catch {
       case e: PSQLException =>
         e.printStackTrace()

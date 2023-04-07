@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -40,7 +41,7 @@ object CustomerRepoImpl extends CustomerRepo {
           returning customerid
     """
       .on(namedParameters :_*)
-      .executeInsert(CustomerId.rowParser("").single)
+      .executeInsert(SqlParser.get[CustomerId]("customerid").single)
   
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {

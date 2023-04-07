@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package cu
 
+import adventureworks.public.NameDomain
 import adventureworks.sales.currency.CurrencyId
 import java.time.LocalDateTime
 
@@ -16,6 +17,6 @@ sealed abstract class CuFieldValue[T](name: String, value: T) extends CuFieldOrI
 object CuFieldValue {
   case class id(override val value: Option[/* bpchar */ String]) extends CuFieldValue("id", value)
   case class currencycode(override val value: Option[CurrencyId]) extends CuFieldValue("currencycode", value)
-  case class name(override val value: Option[String]) extends CuFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends CuFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends CuFieldValue("modifieddate", value)
 }

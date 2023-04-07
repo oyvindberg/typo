@@ -9,8 +9,10 @@ package product
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.FlagDomain
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -26,11 +28,11 @@ object ProductRepoImpl extends ProductRepo {
       Some(NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber))),
       unsaved.makeflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[FlagDomain](value)))
       },
       unsaved.finishedgoodsflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[FlagDomain](value)))
       },
       Some(NamedParameter("color", ParameterValue.from(unsaved.color))),
       Some(NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel))),
@@ -65,7 +67,7 @@ object ProductRepoImpl extends ProductRepo {
           returning productid
     """
       .on(namedParameters :_*)
-      .executeInsert(ProductId.rowParser("").single)
+      .executeInsert(SqlParser.get[ProductId]("productid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {

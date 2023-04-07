@@ -9,6 +9,7 @@ package productsubcategory
 
 import adventureworks.Defaulted
 import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -20,7 +21,7 @@ import scala.util.Try
 
 case class ProductsubcategoryRowUnsaved(
   productcategoryid: ProductcategoryId,
-  name: String,
+  name: NameDomain,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -39,7 +40,7 @@ object ProductsubcategoryRowUnsaved {
         Try(
           ProductsubcategoryRowUnsaved(
             productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

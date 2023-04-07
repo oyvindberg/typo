@@ -9,6 +9,7 @@ package salestaxrate
 
 import adventureworks.Defaulted
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -22,7 +23,7 @@ case class SalestaxrateRowUnsaved(
   stateprovinceid: StateprovinceId,
   taxtype: Int,
   taxrate: Defaulted[BigDecimal],
-  name: String,
+  name: NameDomain,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -45,7 +46,7 @@ object SalestaxrateRowUnsaved {
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
             taxtype = json.\("taxtype").as[Int],
             taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

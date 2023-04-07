@@ -7,6 +7,7 @@ package adventureworks
 package person
 package phonenumbertype
 
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -19,7 +20,7 @@ import scala.util.Try
 
 case class PhonenumbertypeRow(
   phonenumbertypeid: PhonenumbertypeId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"phonenumbertype","column_name":"phonenumbertypeid","ordinal_position":1,"column_default":"nextval('person.phonenumbertype_phonenumbertypeid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: String /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"phonenumbertype","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"phonenumbertype","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"phonenumbertype","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
@@ -28,7 +29,7 @@ object PhonenumbertypeRow {
     Success(
       PhonenumbertypeRow(
         phonenumbertypeid = row[PhonenumbertypeId](prefix + "phonenumbertypeid"),
-        name = row[String](prefix + "name"),
+        name = row[NameDomain](prefix + "name"),
         modifieddate = row[LocalDateTime](prefix + "modifieddate")
       )
     )
@@ -47,7 +48,7 @@ object PhonenumbertypeRow {
         Try(
           PhonenumbertypeRow(
             phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

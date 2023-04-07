@@ -14,6 +14,7 @@ object db {
     case object Bytea extends Type
     case object Char extends Type
     case object Date extends Type
+    case class DomainRef(name: RelationName) extends Type
     case object Float4 extends Type
     case object Float8 extends Type
     case object Hstore extends Type
@@ -36,7 +37,7 @@ object db {
     case object PGpoint extends Type
     case object PGpolygon extends Type
     case class PgObject(value: String) extends Type
-    case class StringEnum(name: RelationName) extends Type
+    case class EnumRef(name: RelationName) extends Type
     case object Text extends Type
     case object Time extends Type
     case object Timestamp extends Type
@@ -46,6 +47,7 @@ object db {
     case class VarChar(maxLength: Option[Int]) extends Type
   }
 
+  case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
   case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, jsonDescription: JsValue)

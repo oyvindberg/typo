@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -46,7 +47,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           returning shipmethodid
     """
       .on(namedParameters :_*)
-      .executeInsert(ShipmethodId.rowParser("").single)
+      .executeInsert(SqlParser.get[ShipmethodId]("shipmethodid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {

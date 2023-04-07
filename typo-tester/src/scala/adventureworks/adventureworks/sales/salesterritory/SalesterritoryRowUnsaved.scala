@@ -9,6 +9,7 @@ package salesterritory
 
 import adventureworks.Defaulted
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,7 +20,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SalesterritoryRowUnsaved(
-  name: String,
+  name: NameDomain,
   countryregioncode: CountryregionId,
   group: String,
   salesytd: Defaulted[BigDecimal],
@@ -48,7 +49,7 @@ object SalesterritoryRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesterritoryRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
             group = json.\("group").as[String],
             salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],

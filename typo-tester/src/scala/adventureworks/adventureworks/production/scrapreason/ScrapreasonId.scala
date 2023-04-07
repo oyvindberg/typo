@@ -9,8 +9,6 @@ package scrapreason
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object ScrapreasonId {
   implicit val format: Format[ScrapreasonId] = implicitly[Format[Int]].bimap(ScrapreasonId.apply, _.value)
   implicit val toStatement: ToStatement[ScrapreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[ScrapreasonId] = implicitly[Column[Int]].map(ScrapreasonId.apply)
-  def rowParser(prefix: String): RowParser[ScrapreasonId] = SqlParser.get[ScrapreasonId](prefix + "scrapreasonid")
   implicit val parameterMetadata: ParameterMetaData[ScrapreasonId] = new ParameterMetaData[ScrapreasonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

@@ -9,6 +9,8 @@ package sp
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,8 +23,8 @@ object SpFieldValue {
   case class stateprovinceid(override val value: Option[StateprovinceId]) extends SpFieldValue("stateprovinceid", value)
   case class stateprovincecode(override val value: Option[/* bpchar */ String]) extends SpFieldValue("stateprovincecode", value)
   case class countryregioncode(override val value: Option[CountryregionId]) extends SpFieldValue("countryregioncode", value)
-  case class isonlystateprovinceflag(override val value: Boolean) extends SpFieldValue("isonlystateprovinceflag", value)
-  case class name(override val value: Option[String]) extends SpFieldValue("name", value)
+  case class isonlystateprovinceflag(override val value: FlagDomain) extends SpFieldValue("isonlystateprovinceflag", value)
+  case class name(override val value: Option[NameDomain]) extends SpFieldValue("name", value)
   case class territoryid(override val value: Option[SalesterritoryId]) extends SpFieldValue("territoryid", value)
   case class rowguid(override val value: Option[UUID]) extends SpFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SpFieldValue("modifieddate", value)

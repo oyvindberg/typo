@@ -6,13 +6,13 @@ package typo
   */
 trait NullabilityOverride {
 
-  /** @param relation
-    *   either the relative path of a script, or the name of a relation
+  /** @param from
+    *   inside the ADT you can find the name of the relation of the location of the sql script
     * @param colName
     *   name of column
     * @return
     */
-  def apply(relation: Either[RelPath, db.RelationName], colName: db.ColName): Option[Nullability]
+  def apply(from: OverrideFrom, colName: db.ColName): Option[Nullability]
 }
 
 object NullabilityOverride {

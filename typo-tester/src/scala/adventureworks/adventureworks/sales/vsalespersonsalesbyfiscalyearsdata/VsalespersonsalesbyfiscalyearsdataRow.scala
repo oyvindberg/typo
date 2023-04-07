@@ -8,6 +8,7 @@ package sales
 package vsalespersonsalesbyfiscalyearsdata
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -23,7 +24,7 @@ case class VsalespersonsalesbyfiscalyearsdataRow(
   fullname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"fullname","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
   jobtitle: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"jobtitle","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  salesterritory: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"salesterritory","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  salesterritory: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"salesterritory","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   salestotal: Option[BigDecimal] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"salestotal","ordinal_position":5,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   fiscalyear: Option[BigDecimal] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyearsdata","column_name":"fiscalyear","ordinal_position":6,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
@@ -35,7 +36,7 @@ object VsalespersonsalesbyfiscalyearsdataRow {
         salespersonid = row[Option[BusinessentityId]](prefix + "salespersonid"),
         fullname = row[Option[String]](prefix + "fullname"),
         jobtitle = row[Option[String]](prefix + "jobtitle"),
-        salesterritory = row[Option[String]](prefix + "salesterritory"),
+        salesterritory = row[Option[NameDomain]](prefix + "salesterritory"),
         salestotal = row[Option[BigDecimal]](prefix + "salestotal"),
         fiscalyear = row[Option[BigDecimal]](prefix + "fiscalyear")
       )
@@ -60,7 +61,7 @@ object VsalespersonsalesbyfiscalyearsdataRow {
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             fullname = json.\("fullname").toOption.map(_.as[String]),
             jobtitle = json.\("jobtitle").toOption.map(_.as[String]),
-            salesterritory = json.\("salesterritory").toOption.map(_.as[String]),
+            salesterritory = json.\("salesterritory").toOption.map(_.as[NameDomain]),
             salestotal = json.\("salestotal").toOption.map(_.as[BigDecimal]),
             fiscalyear = json.\("fiscalyear").toOption.map(_.as[BigDecimal])
           )

@@ -22,7 +22,7 @@ case class TableComputed(
       pk.colNames match {
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
-          val underlying = scalaTypeMapper(Right(dbTable.name), dbCol, None)
+          val underlying = scalaTypeMapper.col(OverrideFrom.Table(dbTable.name), dbCol, None)
           val col = ColumnComputed(
             pointsTo = pointsTo.get(dbCol.name),
             name = naming.field(dbCol.name),
@@ -96,7 +96,7 @@ case class TableComputed(
         case _                                                         => None
       }
 
-    val tpe = scalaTypeMapper(Right(dbTable.name), dbCol, typeFromFk.orElse(typeFromId))
+    val tpe = scalaTypeMapper.col(OverrideFrom.Table(dbTable.name), dbCol, typeFromFk.orElse(typeFromId))
 
     tpe
   }

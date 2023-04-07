@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -39,7 +40,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           returning workorderid
     """
       .on(namedParameters :_*)
-      .executeInsert(WorkorderId.rowParser("").single)
+      .executeInsert(SqlParser.get[WorkorderId]("workorderid").single)
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {

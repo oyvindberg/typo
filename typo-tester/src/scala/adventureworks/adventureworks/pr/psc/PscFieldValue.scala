@@ -9,6 +9,7 @@ package psc
 
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,7 +20,7 @@ object PscFieldValue {
   case class id(override val value: Option[Int]) extends PscFieldValue("id", value)
   case class productsubcategoryid(override val value: Option[ProductsubcategoryId]) extends PscFieldValue("productsubcategoryid", value)
   case class productcategoryid(override val value: Option[ProductcategoryId]) extends PscFieldValue("productcategoryid", value)
-  case class name(override val value: Option[String]) extends PscFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends PscFieldValue("name", value)
   case class rowguid(override val value: Option[UUID]) extends PscFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PscFieldValue("modifieddate", value)
 }

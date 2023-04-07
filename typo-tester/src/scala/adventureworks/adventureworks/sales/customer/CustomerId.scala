@@ -9,8 +9,6 @@ package customer
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object CustomerId {
   implicit val format: Format[CustomerId] = implicitly[Format[Int]].bimap(CustomerId.apply, _.value)
   implicit val toStatement: ToStatement[CustomerId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[CustomerId] = implicitly[Column[Int]].map(CustomerId.apply)
-  def rowParser(prefix: String): RowParser[CustomerId] = SqlParser.get[CustomerId](prefix + "customerid")
   implicit val parameterMetadata: ParameterMetaData[CustomerId] = new ParameterMetaData[CustomerId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

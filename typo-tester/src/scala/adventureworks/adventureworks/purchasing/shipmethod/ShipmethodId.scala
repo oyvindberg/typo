@@ -9,8 +9,6 @@ package shipmethod
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object ShipmethodId {
   implicit val format: Format[ShipmethodId] = implicitly[Format[Int]].bimap(ShipmethodId.apply, _.value)
   implicit val toStatement: ToStatement[ShipmethodId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[ShipmethodId] = implicitly[Column[Int]].map(ShipmethodId.apply)
-  def rowParser(prefix: String): RowParser[ShipmethodId] = SqlParser.get[ShipmethodId](prefix + "shipmethodid")
   implicit val parameterMetadata: ParameterMetaData[ShipmethodId] = new ParameterMetaData[ShipmethodId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

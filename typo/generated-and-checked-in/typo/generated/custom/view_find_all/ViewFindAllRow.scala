@@ -7,8 +7,8 @@
  */
 package typo
 package generated
-package views
-package find_all_views
+package custom
+package view_find_all
 
 import anorm.RowParser
 import anorm.Success
@@ -20,7 +20,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 import typo.generated.pg_catalog.pg_namespace.PgNamespaceId
 
-case class FindAllViewsRow(
+case class ViewFindAllRow(
   /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.oid]] */
   tableOid: PgNamespaceId /* {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.Long","columnDisplaySize":10,"columnLabel":"table_oid","columnName":"table_oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_namespace"} */,
   tableSchema: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */,
@@ -30,10 +30,10 @@ case class FindAllViewsRow(
   viewDefinition: /* nullability unknown */ Option[String] /* {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_definition","columnName":"view_definition","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
 )
 
-object FindAllViewsRow {
-  def rowParser(prefix: String): RowParser[FindAllViewsRow] = { row =>
+object ViewFindAllRow {
+  def rowParser(prefix: String): RowParser[ViewFindAllRow] = { row =>
     Success(
-      FindAllViewsRow(
+      ViewFindAllRow(
         tableOid = row[PgNamespaceId](prefix + "table_oid"),
         tableSchema = row[/* nullability unknown */ Option[String]](prefix + "table_schema"),
         tableName = row[/* nullability unknown */ Option[String]](prefix + "table_name"),
@@ -43,8 +43,8 @@ object FindAllViewsRow {
     )
   }
 
-  implicit val oFormat: OFormat[FindAllViewsRow] = new OFormat[FindAllViewsRow]{
-    override def writes(o: FindAllViewsRow): JsObject =
+  implicit val oFormat: OFormat[ViewFindAllRow] = new OFormat[ViewFindAllRow]{
+    override def writes(o: ViewFindAllRow): JsObject =
       Json.obj(
         "table_oid" -> o.tableOid,
         "table_schema" -> o.tableSchema,
@@ -53,10 +53,10 @@ object FindAllViewsRow {
         "view_definition" -> o.viewDefinition
       )
   
-    override def reads(json: JsValue): JsResult[FindAllViewsRow] = {
+    override def reads(json: JsValue): JsResult[ViewFindAllRow] = {
       JsResult.fromTry(
         Try(
-          FindAllViewsRow(
+          ViewFindAllRow(
             tableOid = json.\("table_oid").as[PgNamespaceId],
             tableSchema = json.\("table_schema").toOption.map(_.as[String]),
             tableName = json.\("table_name").toOption.map(_.as[String]),

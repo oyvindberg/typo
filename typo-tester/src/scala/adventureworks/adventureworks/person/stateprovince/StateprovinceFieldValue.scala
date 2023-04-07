@@ -8,6 +8,8 @@ package person
 package stateprovince
 
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,8 +21,8 @@ object StateprovinceFieldValue {
   case class stateprovinceid(override val value: StateprovinceId) extends StateprovinceFieldOrIdValue("stateprovinceid", value)
   case class stateprovincecode(override val value: /* bpchar */ String) extends StateprovinceFieldValue("stateprovincecode", value)
   case class countryregioncode(override val value: CountryregionId) extends StateprovinceFieldValue("countryregioncode", value)
-  case class isonlystateprovinceflag(override val value: Boolean) extends StateprovinceFieldValue("isonlystateprovinceflag", value)
-  case class name(override val value: String) extends StateprovinceFieldValue("name", value)
+  case class isonlystateprovinceflag(override val value: FlagDomain) extends StateprovinceFieldValue("isonlystateprovinceflag", value)
+  case class name(override val value: NameDomain) extends StateprovinceFieldValue("name", value)
   case class territoryid(override val value: SalesterritoryId) extends StateprovinceFieldValue("territoryid", value)
   case class rowguid(override val value: UUID) extends StateprovinceFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends StateprovinceFieldValue("modifieddate", value)

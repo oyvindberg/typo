@@ -8,6 +8,7 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -18,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class AddresstypeRowUnsaved(
-  name: String,
+  name: NameDomain,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -35,7 +36,7 @@ object AddresstypeRowUnsaved {
       JsResult.fromTry(
         Try(
           AddresstypeRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

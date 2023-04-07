@@ -8,6 +8,7 @@ package hr
 package d
 
 import adventureworks.humanresources.department.DepartmentId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,9 +24,9 @@ case class DRow(
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   departmentid: Option[DepartmentId] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"departmentid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.department.DepartmentRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.department.DepartmentRow.groupname]] */
-  groupname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"groupname","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  groupname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"groupname","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.department.DepartmentRow.modifieddate]] */
   modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"d","column_name":"modifieddate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -36,8 +37,8 @@ object DRow {
       DRow(
         id = row[Option[Int]](prefix + "id"),
         departmentid = row[Option[DepartmentId]](prefix + "departmentid"),
-        name = row[Option[String]](prefix + "name"),
-        groupname = row[Option[String]](prefix + "groupname"),
+        name = row[Option[NameDomain]](prefix + "name"),
+        groupname = row[Option[NameDomain]](prefix + "groupname"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
     )
@@ -59,8 +60,8 @@ object DRow {
           DRow(
             id = json.\("id").toOption.map(_.as[Int]),
             departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
-            name = json.\("name").toOption.map(_.as[String]),
-            groupname = json.\("groupname").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
+            groupname = json.\("groupname").toOption.map(_.as[NameDomain]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

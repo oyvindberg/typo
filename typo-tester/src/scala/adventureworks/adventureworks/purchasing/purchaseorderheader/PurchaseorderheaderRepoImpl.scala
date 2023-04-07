@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -60,7 +61,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           returning purchaseorderid
     """
       .on(namedParameters :_*)
-      .executeInsert(PurchaseorderheaderId.rowParser("").single)
+      .executeInsert(SqlParser.get[PurchaseorderheaderId]("purchaseorderid").single)
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {

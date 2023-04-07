@@ -3,9 +3,13 @@ package internal
 
 import typo.generated.information_schema.columns.ColumnsRow
 
-object TypeMapperDb {
-  def dbTypeFrom(enums: Map[String, db.StringEnum], c: ColumnsRow): Option[db.Type] =
-    dbTypeFrom(enums, c.udtName.get, c.characterMaximumLength)
+case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, db.Domain]) {
+  def col(c: ColumnsRow): Option[db.Type] = {
+    val fromDomain: Option[db.Type.DomainRef] =
+      c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema.map(_.value), domainName.value)))
+
+    fromDomain.orElse(dbTypeFrom(c.udtName.get.value, c.characterMaximumLength.map(_.value)))
+  }
 
   val pgObjectTypes = Set(
     "aclitem", // i.e. "postgres=arwdDxt/postgres"
@@ -28,7 +32,7 @@ object TypeMapperDb {
     "xid" // transaction ID
   )
 
-  def dbTypeFrom(enums: Map[String, db.StringEnum], udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {
+  def dbTypeFrom(udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {
     udtName match {
       case "bool"                              => Some(db.Type.Boolean)
       case "box"                               => Some(db.Type.PGbox)
@@ -65,8 +69,12 @@ object TypeMapperDb {
       case "varchar"                           => Some(db.Type.VarChar(characterMaximumLength))
       case "xml"                               => Some(db.Type.Xml)
       case str if pgObjectTypes(str)           => Some(db.Type.PgObject(str))
-      case str if str.startsWith("_")          => dbTypeFrom(enums, udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
-      case typeName                            => enums.get(typeName).map(`enum` => db.Type.StringEnum(`enum`.name))
+      case str if str.startsWith("_")          => dbTypeFrom(udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
+      case typeName =>
+        enums
+          .get(typeName)
+          .map(`enum` => db.Type.EnumRef(`enum`.name))
+          .orElse(domains.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
     }
   }
 }

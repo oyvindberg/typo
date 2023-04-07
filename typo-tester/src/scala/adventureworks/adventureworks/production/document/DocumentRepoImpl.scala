@@ -9,8 +9,10 @@ package document
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.FlagDomain
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -26,7 +28,7 @@ object DocumentRepoImpl extends DocumentRepo {
       Some(NamedParameter("owner", ParameterValue.from(unsaved.owner))),
       unsaved.folderflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[FlagDomain](value)))
       },
       Some(NamedParameter("filename", ParameterValue.from(unsaved.filename))),
       Some(NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension))),
@@ -53,7 +55,7 @@ object DocumentRepoImpl extends DocumentRepo {
           returning documentnode
     """
       .on(namedParameters :_*)
-      .executeInsert(DocumentId.rowParser("").single)
+      .executeInsert(SqlParser.get[DocumentId]("documentnode").single)
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {

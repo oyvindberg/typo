@@ -8,6 +8,7 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
+import adventureworks.public.FlagDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ProductproductphotoRowUnsaved(
-  primary: Defaulted[Boolean],
+  primary: Defaulted[FlagDomain],
   modifieddate: Defaulted[LocalDateTime]
 )
 object ProductproductphotoRowUnsaved {
@@ -32,7 +33,7 @@ object ProductproductphotoRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductproductphotoRowUnsaved(
-            primary = json.\("primary").as[Defaulted[Boolean]],
+            primary = json.\("primary").as[Defaulted[FlagDomain]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

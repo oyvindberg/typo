@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -51,7 +52,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           returning specialofferid
     """
       .on(namedParameters :_*)
-      .executeInsert(SpecialofferId.rowParser("").single)
+      .executeInsert(SqlParser.get[SpecialofferId]("specialofferid").single)
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {

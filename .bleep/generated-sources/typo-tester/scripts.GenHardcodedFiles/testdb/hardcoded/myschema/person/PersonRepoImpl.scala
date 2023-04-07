@@ -10,6 +10,7 @@ package person
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
@@ -46,7 +47,7 @@ object PersonRepoImpl extends PersonRepo {
           returning id
     """
       .on(namedParameters :_*)
-      .executeInsert(PersonId.rowParser("").single)
+      .executeInsert(SqlParser.get[PersonId]("id").single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {

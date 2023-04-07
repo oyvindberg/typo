@@ -8,6 +8,7 @@ package humanresources
 package vemployeedepartment
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.NameDomain
 import java.time.LocalDate
 
 sealed abstract class VemployeedepartmentFieldOrIdValue[T](val name: String, val value: T)
@@ -16,12 +17,12 @@ sealed abstract class VemployeedepartmentFieldValue[T](name: String, value: T) e
 object VemployeedepartmentFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VemployeedepartmentFieldValue("businessentityid", value)
   case class title(override val value: Option[String]) extends VemployeedepartmentFieldValue("title", value)
-  case class firstname(override val value: Option[String]) extends VemployeedepartmentFieldValue("firstname", value)
-  case class middlename(override val value: Option[String]) extends VemployeedepartmentFieldValue("middlename", value)
-  case class lastname(override val value: Option[String]) extends VemployeedepartmentFieldValue("lastname", value)
+  case class firstname(override val value: Option[NameDomain]) extends VemployeedepartmentFieldValue("firstname", value)
+  case class middlename(override val value: Option[NameDomain]) extends VemployeedepartmentFieldValue("middlename", value)
+  case class lastname(override val value: Option[NameDomain]) extends VemployeedepartmentFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends VemployeedepartmentFieldValue("suffix", value)
   case class jobtitle(override val value: Option[String]) extends VemployeedepartmentFieldValue("jobtitle", value)
-  case class department(override val value: Option[String]) extends VemployeedepartmentFieldValue("department", value)
-  case class groupname(override val value: Option[String]) extends VemployeedepartmentFieldValue("groupname", value)
+  case class department(override val value: Option[NameDomain]) extends VemployeedepartmentFieldValue("department", value)
+  case class groupname(override val value: Option[NameDomain]) extends VemployeedepartmentFieldValue("groupname", value)
   case class startdate(override val value: Option[LocalDate]) extends VemployeedepartmentFieldValue("startdate", value)
 }

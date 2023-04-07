@@ -9,8 +9,6 @@ package shift
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object ShiftId {
   implicit val format: Format[ShiftId] = implicitly[Format[Int]].bimap(ShiftId.apply, _.value)
   implicit val toStatement: ToStatement[ShiftId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[ShiftId] = implicitly[Column[Int]].map(ShiftId.apply)
-  def rowParser(prefix: String): RowParser[ShiftId] = SqlParser.get[ShiftId](prefix + "shiftid")
   implicit val parameterMetadata: ParameterMetaData[ShiftId] = new ParameterMetaData[ShiftId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

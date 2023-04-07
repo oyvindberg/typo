@@ -7,11 +7,11 @@
  */
 package typo
 package generated
-package views
-package find_all_views
+package custom
+package domains
 
 import java.sql.Connection
 
-trait FindAllViewsRepo {
-  def apply()(implicit c: Connection): List[FindAllViewsRow]
+trait DomainsRepo {
+  def apply()(implicit c: Connection): List[DomainsRow]
 }

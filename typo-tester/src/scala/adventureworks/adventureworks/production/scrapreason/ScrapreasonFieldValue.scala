@@ -7,6 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 
 sealed abstract class ScrapreasonFieldOrIdValue[T](val name: String, val value: T)
@@ -14,6 +15,6 @@ sealed abstract class ScrapreasonFieldValue[T](name: String, value: T) extends S
 
 object ScrapreasonFieldValue {
   case class scrapreasonid(override val value: ScrapreasonId) extends ScrapreasonFieldOrIdValue("scrapreasonid", value)
-  case class name(override val value: String) extends ScrapreasonFieldValue("name", value)
+  case class name(override val value: NameDomain) extends ScrapreasonFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends ScrapreasonFieldValue("modifieddate", value)
 }

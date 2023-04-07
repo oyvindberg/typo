@@ -39,7 +39,7 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
         case _ => None
       }
 
-    val tpe = scalaTypeMapper(Right(view.name), dbCol, typeFromFk)
+    val tpe = scalaTypeMapper.col(OverrideFrom.View(view.name), dbCol, typeFromFk)
     tpe
   }
 

@@ -8,6 +8,7 @@ package pr
 package l
 
 import adventureworks.production.location.LocationId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,7 +24,7 @@ case class LRow(
   /** Points to [[production.location.LocationRow.locationid]] */
   locationid: Option[LocationId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"l","column_name":"locationid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.location.LocationRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"l","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"l","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.location.LocationRow.costrate]] */
   costrate: Option[BigDecimal] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"l","column_name":"costrate","ordinal_position":4,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.location.LocationRow.availability]] */
@@ -38,7 +39,7 @@ object LRow {
       LRow(
         id = row[Option[Int]](prefix + "id"),
         locationid = row[Option[LocationId]](prefix + "locationid"),
-        name = row[Option[String]](prefix + "name"),
+        name = row[Option[NameDomain]](prefix + "name"),
         costrate = row[Option[BigDecimal]](prefix + "costrate"),
         availability = row[Option[BigDecimal]](prefix + "availability"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -63,7 +64,7 @@ object LRow {
           LRow(
             id = json.\("id").toOption.map(_.as[Int]),
             locationid = json.\("locationid").toOption.map(_.as[LocationId]),
-            name = json.\("name").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
             costrate = json.\("costrate").toOption.map(_.as[BigDecimal]),
             availability = json.\("availability").toOption.map(_.as[BigDecimal]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

@@ -3,7 +3,7 @@ package internal
 package codegen
 
 object StringEnumFile {
-  def stringEnumClass(naming: Naming, options: InternalOptions)(`enum`: db.StringEnum): sc.File = {
+  def apply(naming: Naming, options: InternalOptions)(`enum`: db.StringEnum): sc.File = {
     val qident = naming.enumName(`enum`.name)
     val EnumType = sc.Type.Qualified(qident)
 

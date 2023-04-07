@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -45,7 +46,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning billofmaterialsid
     """
       .on(namedParameters :_*)
-      .executeInsert(BillofmaterialsId.rowParser("").single)
+      .executeInsert(SqlParser.get[BillofmaterialsId]("billofmaterialsid").single)
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {

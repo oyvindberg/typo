@@ -8,6 +8,7 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -18,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ProductmodelRowUnsaved(
-  name: String,
+  name: NameDomain,
   catalogdescription: Option[/* xml */ String],
   instructions: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
@@ -39,7 +40,7 @@ object ProductmodelRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductmodelRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             catalogdescription = json.\("catalogdescription").toOption.map(_.as[/* xml */ String]),
             instructions = json.\("instructions").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -44,7 +45,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning salestaxrateid
     """
       .on(namedParameters :_*)
-      .executeInsert(SalestaxrateId.rowParser("").single)
+      .executeInsert(SqlParser.get[SalestaxrateId]("salestaxrateid").single)
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {

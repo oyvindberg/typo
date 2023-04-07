@@ -9,8 +9,6 @@ package creditcard
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object CreditcardId {
   implicit val format: Format[CreditcardId] = implicitly[Format[Int]].bimap(CreditcardId.apply, _.value)
   implicit val toStatement: ToStatement[CreditcardId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)
-  def rowParser(prefix: String): RowParser[CreditcardId] = SqlParser.get[CreditcardId](prefix + "creditcardid")
   implicit val parameterMetadata: ParameterMetaData[CreditcardId] = new ParameterMetaData[CreditcardId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

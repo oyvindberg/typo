@@ -9,8 +9,6 @@ package transactionhistory
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object TransactionhistoryId {
   implicit val format: Format[TransactionhistoryId] = implicitly[Format[Int]].bimap(TransactionhistoryId.apply, _.value)
   implicit val toStatement: ToStatement[TransactionhistoryId] = implicitly[ToStatement[Int]].contramap(_.value)
   implicit val column: Column[TransactionhistoryId] = implicitly[Column[Int]].map(TransactionhistoryId.apply)
-  def rowParser(prefix: String): RowParser[TransactionhistoryId] = SqlParser.get[TransactionhistoryId](prefix + "transactionid")
   implicit val parameterMetadata: ParameterMetaData[TransactionhistoryId] = new ParameterMetaData[TransactionhistoryId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType

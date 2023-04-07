@@ -10,8 +10,6 @@ package marital_status
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -21,7 +19,6 @@ object MaritalStatusId {
   implicit val format: Format[MaritalStatusId] = implicitly[Format[Long]].bimap(MaritalStatusId.apply, _.value)
   implicit val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
   implicit val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)
-  def rowParser(prefix: String): RowParser[MaritalStatusId] = SqlParser.get[MaritalStatusId](prefix + "id")
   implicit val parameterMetadata: ParameterMetaData[MaritalStatusId] = new ParameterMetaData[MaritalStatusId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType

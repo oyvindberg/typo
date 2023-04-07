@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -41,7 +42,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           returning productreviewid
     """
       .on(namedParameters :_*)
-      .executeInsert(ProductreviewId.rowParser("").single)
+      .executeInsert(SqlParser.get[ProductreviewId]("productreviewid").single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {

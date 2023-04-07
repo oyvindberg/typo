@@ -8,6 +8,7 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,8 +18,8 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class DepartmentRowUnsaved(
-  name: String,
-  groupname: String,
+  name: NameDomain,
+  groupname: NameDomain,
   modifieddate: Defaulted[LocalDateTime]
 )
 object DepartmentRowUnsaved {
@@ -34,8 +35,8 @@ object DepartmentRowUnsaved {
       JsResult.fromTry(
         Try(
           DepartmentRowUnsaved(
-            name = json.\("name").as[String],
-            groupname = json.\("groupname").as[String],
+            name = json.\("name").as[NameDomain],
+            groupname = json.\("groupname").as[NameDomain],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

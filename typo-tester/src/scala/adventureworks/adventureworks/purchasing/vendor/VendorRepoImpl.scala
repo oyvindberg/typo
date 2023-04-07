@@ -9,6 +9,7 @@ package vendor
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.FlagDomain
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -26,11 +27,11 @@ object VendorRepoImpl extends VendorRepo {
       Some(NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating))),
       unsaved.preferredvendorstatus match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("preferredvendorstatus", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("preferredvendorstatus", ParameterValue.from[FlagDomain](value)))
       },
       unsaved.activeflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("activeflag", ParameterValue.from[Boolean](value)))
+        case Provided(value) => Some(NamedParameter("activeflag", ParameterValue.from[FlagDomain](value)))
       },
       Some(NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl))),
       unsaved.modifieddate match {

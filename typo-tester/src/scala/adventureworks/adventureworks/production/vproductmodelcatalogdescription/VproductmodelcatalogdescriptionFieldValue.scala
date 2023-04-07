@@ -8,6 +8,7 @@ package production
 package vproductmodelcatalogdescription
 
 import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,7 +17,7 @@ sealed abstract class VproductmodelcatalogdescriptionFieldValue[T](name: String,
 
 object VproductmodelcatalogdescriptionFieldValue {
   case class productmodelid(override val value: Option[ProductmodelId]) extends VproductmodelcatalogdescriptionFieldValue("productmodelid", value)
-  case class name(override val value: Option[String]) extends VproductmodelcatalogdescriptionFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends VproductmodelcatalogdescriptionFieldValue("name", value)
   case class Summary(override val value: Option[String]) extends VproductmodelcatalogdescriptionFieldValue("Summary", value)
   case class manufacturer(override val value: Option[String]) extends VproductmodelcatalogdescriptionFieldValue("manufacturer", value)
   case class copyright(override val value: Option[String]) extends VproductmodelcatalogdescriptionFieldValue("copyright", value)

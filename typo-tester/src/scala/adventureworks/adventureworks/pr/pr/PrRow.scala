@@ -8,6 +8,7 @@ package pr
 package pr
 
 import adventureworks.production.productreview.ProductreviewId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -25,7 +26,7 @@ case class PrRow(
   /** Points to [[production.productreview.ProductreviewRow.productid]] */
   productid: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pr","column_name":"productid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productreview.ProductreviewRow.reviewername]] */
-  reviewername: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pr","column_name":"reviewername","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  reviewername: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pr","column_name":"reviewername","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productreview.ProductreviewRow.reviewdate]] */
   reviewdate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pr","column_name":"reviewdate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productreview.ProductreviewRow.emailaddress]] */
@@ -45,7 +46,7 @@ object PrRow {
         id = row[Option[Int]](prefix + "id"),
         productreviewid = row[Option[ProductreviewId]](prefix + "productreviewid"),
         productid = row[Option[Int]](prefix + "productid"),
-        reviewername = row[Option[String]](prefix + "reviewername"),
+        reviewername = row[Option[NameDomain]](prefix + "reviewername"),
         reviewdate = row[Option[LocalDateTime]](prefix + "reviewdate"),
         emailaddress = row[Option[String]](prefix + "emailaddress"),
         rating = row[Option[Int]](prefix + "rating"),
@@ -76,7 +77,7 @@ object PrRow {
             id = json.\("id").toOption.map(_.as[Int]),
             productreviewid = json.\("productreviewid").toOption.map(_.as[ProductreviewId]),
             productid = json.\("productid").toOption.map(_.as[Int]),
-            reviewername = json.\("reviewername").toOption.map(_.as[String]),
+            reviewername = json.\("reviewername").toOption.map(_.as[NameDomain]),
             reviewdate = json.\("reviewdate").toOption.map(_.as[LocalDateTime]),
             emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
             rating = json.\("rating").toOption.map(_.as[Int]),

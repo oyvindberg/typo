@@ -7,6 +7,7 @@ package adventureworks
 package production
 package unitmeasure
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 
 sealed abstract class UnitmeasureFieldOrIdValue[T](val name: String, val value: T)
@@ -14,6 +15,6 @@ sealed abstract class UnitmeasureFieldValue[T](name: String, value: T) extends U
 
 object UnitmeasureFieldValue {
   case class unitmeasurecode(override val value: UnitmeasureId) extends UnitmeasureFieldOrIdValue("unitmeasurecode", value)
-  case class name(override val value: String) extends UnitmeasureFieldValue("name", value)
+  case class name(override val value: NameDomain) extends UnitmeasureFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends UnitmeasureFieldValue("modifieddate", value)
 }

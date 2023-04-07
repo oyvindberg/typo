@@ -10,20 +10,20 @@ import scala.collection.immutable.SortedMap
 package object typo {
   def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
     val metadb = MetaDb(MetaDb.Input.fromDb)
-    val enumsByName = metadb.enums.map(e => (e.name.name, e)).toMap
-    val sqlScripts = Load(scriptsPath, enumsByName)
-    fromData(options, metadb.relations, metadb.enums, sqlScripts, selector)
+    val sqlScripts = Load(scriptsPath, metadb.typeMapperDb)
+    fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts, selector)
   }
 
   def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
     val metadb = MetaDb(MetaDb.Input.fromDb)
-    fromData(options, metadb.relations, metadb.enums, sqlScripts = Nil, selector)
+    fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts = Nil, selector)
   }
 
   def fromData(
       publicOptions: Options,
       relations: List[db.Relation],
       enums: List[db.StringEnum],
+      domains: List[db.Domain],
       sqlScripts: List[SqlScript],
       selector: Selector
   ): Generated = {
@@ -66,7 +66,8 @@ package object typo {
     val mostFiles: List[sc.File] =
       List(
         List(DefaultFile(default, options.jsonLib).file),
-        enums.map(StringEnumFile.stringEnumClass(naming, options)),
+        enums.map(StringEnumFile(naming, options)),
+        domains.map(DomainFile(naming, options, scalaTypeMapper)),
         computedRelations.flatMap {
           case Left(viewComputed)   => ViewFiles(viewComputed, options).all
           case Right(tableComputed) => TableFiles(tableComputed, options).all

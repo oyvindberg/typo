@@ -9,6 +9,7 @@ package personphone
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.public.PhoneDomain
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,7 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: String, phonenumbertypeid: PhonenumbertypeId)
+case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: PhoneDomain, phonenumbertypeid: PhonenumbertypeId)
 object PersonphoneId {
   implicit def ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
   implicit val oFormat: OFormat[PersonphoneId] = new OFormat[PersonphoneId]{
@@ -34,7 +35,7 @@ object PersonphoneId {
         Try(
           PersonphoneId(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            phonenumber = json.\("phonenumber").as[String],
+            phonenumber = json.\("phonenumber").as[PhoneDomain],
             phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId]
           )
         )
@@ -45,7 +46,7 @@ object PersonphoneId {
     Success(
       PersonphoneId(
         businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        phonenumber = row[String](prefix + "phonenumber"),
+        phonenumber = row[PhoneDomain](prefix + "phonenumber"),
         phonenumbertypeid = row[PhonenumbertypeId](prefix + "phonenumbertypeid")
       )
     )

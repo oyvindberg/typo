@@ -38,7 +38,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
                 |object ${id.qident.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
                 |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
-                |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying, id.col.dbName).mkCode("\n")}
+                |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
                 |}
 """.stripMargin
 

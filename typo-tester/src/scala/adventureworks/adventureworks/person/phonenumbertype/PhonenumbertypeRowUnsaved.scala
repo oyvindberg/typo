@@ -8,6 +8,7 @@ package person
 package phonenumbertype
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PhonenumbertypeRowUnsaved(
-  name: String,
+  name: NameDomain,
   modifieddate: Defaulted[LocalDateTime]
 )
 object PhonenumbertypeRowUnsaved {
@@ -32,7 +33,7 @@ object PhonenumbertypeRowUnsaved {
       JsResult.fromTry(
         Try(
           PhonenumbertypeRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

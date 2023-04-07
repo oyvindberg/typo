@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -38,7 +39,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           returning addresstypeid
     """
       .on(namedParameters :_*)
-      .executeInsert(AddresstypeId.rowParser("").single)
+      .executeInsert(SqlParser.get[AddresstypeId]("addresstypeid").single)
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {

@@ -8,6 +8,7 @@ package sales
 package currency
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CurrencyRowUnsaved(
-  name: String,
+  name: NameDomain,
   modifieddate: Defaulted[LocalDateTime]
 )
 object CurrencyRowUnsaved {
@@ -32,7 +33,7 @@ object CurrencyRowUnsaved {
       JsResult.fromTry(
         Try(
           CurrencyRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

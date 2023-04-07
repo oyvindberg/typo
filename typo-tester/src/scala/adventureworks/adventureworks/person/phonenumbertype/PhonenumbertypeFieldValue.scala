@@ -7,6 +7,7 @@ package adventureworks
 package person
 package phonenumbertype
 
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 
 sealed abstract class PhonenumbertypeFieldOrIdValue[T](val name: String, val value: T)
@@ -14,6 +15,6 @@ sealed abstract class PhonenumbertypeFieldValue[T](name: String, value: T) exten
 
 object PhonenumbertypeFieldValue {
   case class phonenumbertypeid(override val value: PhonenumbertypeId) extends PhonenumbertypeFieldOrIdValue("phonenumbertypeid", value)
-  case class name(override val value: String) extends PhonenumbertypeFieldValue("name", value)
+  case class name(override val value: NameDomain) extends PhonenumbertypeFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends PhonenumbertypeFieldValue("modifieddate", value)
 }

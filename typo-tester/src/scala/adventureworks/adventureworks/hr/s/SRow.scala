@@ -8,6 +8,7 @@ package hr
 package s
 
 import adventureworks.humanresources.shift.ShiftId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,7 +24,7 @@ case class SRow(
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
   shiftid: Option[ShiftId] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"shiftid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
   starttime: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"starttime","ordinal_position":4,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
@@ -38,7 +39,7 @@ object SRow {
       SRow(
         id = row[Option[Int]](prefix + "id"),
         shiftid = row[Option[ShiftId]](prefix + "shiftid"),
-        name = row[Option[String]](prefix + "name"),
+        name = row[Option[NameDomain]](prefix + "name"),
         starttime = row[Option[LocalDateTime]](prefix + "starttime"),
         endtime = row[Option[LocalDateTime]](prefix + "endtime"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -63,7 +64,7 @@ object SRow {
           SRow(
             id = json.\("id").toOption.map(_.as[Int]),
             shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
-            name = json.\("name").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
             starttime = json.\("starttime").toOption.map(_.as[LocalDateTime]),
             endtime = json.\("endtime").toOption.map(_.as[LocalDateTime]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

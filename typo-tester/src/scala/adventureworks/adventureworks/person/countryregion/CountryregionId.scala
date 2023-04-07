@@ -9,8 +9,6 @@ package countryregion
 
 import anorm.Column
 import anorm.ParameterMetaData
-import anorm.RowParser
-import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
@@ -20,7 +18,6 @@ object CountryregionId {
   implicit val format: Format[CountryregionId] = implicitly[Format[String]].bimap(CountryregionId.apply, _.value)
   implicit val toStatement: ToStatement[CountryregionId] = implicitly[ToStatement[String]].contramap(_.value)
   implicit val column: Column[CountryregionId] = implicitly[Column[String]].map(CountryregionId.apply)
-  def rowParser(prefix: String): RowParser[CountryregionId] = SqlParser.get[CountryregionId](prefix + "countryregioncode")
   implicit val parameterMetadata: ParameterMetaData[CountryregionId] = new ParameterMetaData[CountryregionId] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType

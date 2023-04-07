@@ -9,6 +9,7 @@ package ppp
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
+import adventureworks.public.FlagDomain
 import java.time.LocalDateTime
 
 sealed abstract class PppFieldOrIdValue[T](val name: String, val value: T)
@@ -17,6 +18,6 @@ sealed abstract class PppFieldValue[T](name: String, value: T) extends PppFieldO
 object PppFieldValue {
   case class productid(override val value: Option[ProductId]) extends PppFieldValue("productid", value)
   case class productphotoid(override val value: Option[ProductphotoId]) extends PppFieldValue("productphotoid", value)
-  case class primary(override val value: Boolean) extends PppFieldValue("primary", value)
+  case class primary(override val value: FlagDomain) extends PppFieldValue("primary", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PppFieldValue("modifieddate", value)
 }

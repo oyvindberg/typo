@@ -8,6 +8,7 @@ package hr
 package e
 
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.FlagDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDate
@@ -39,13 +40,13 @@ case class ERow(
   /** Points to [[humanresources.employee.EmployeeRow.hiredate]] */
   hiredate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"hiredate","ordinal_position":9,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.salariedflag]] */
-  salariedflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"salariedflag","ordinal_position":10,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  salariedflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"salariedflag","ordinal_position":10,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.vacationhours]] */
   vacationhours: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"vacationhours","ordinal_position":11,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.sickleavehours]] */
   sickleavehours: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"sickleavehours","ordinal_position":12,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.currentflag]] */
-  currentflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"currentflag","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  currentflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"currentflag","ordinal_position":13,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.rowguid]] */
   rowguid: Option[UUID] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"e","column_name":"rowguid","ordinal_position":14,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employee.EmployeeRow.modifieddate]] */
@@ -67,10 +68,10 @@ object ERow {
         maritalstatus = row[Option[/* bpchar */ String]](prefix + "maritalstatus"),
         gender = row[Option[/* bpchar */ String]](prefix + "gender"),
         hiredate = row[Option[LocalDate]](prefix + "hiredate"),
-        salariedflag = row[Boolean](prefix + "salariedflag"),
+        salariedflag = row[FlagDomain](prefix + "salariedflag"),
         vacationhours = row[Option[Int]](prefix + "vacationhours"),
         sickleavehours = row[Option[Int]](prefix + "sickleavehours"),
-        currentflag = row[Boolean](prefix + "currentflag"),
+        currentflag = row[FlagDomain](prefix + "currentflag"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate"),
         organizationnode = row[Option[String]](prefix + "organizationnode")
@@ -112,10 +113,10 @@ object ERow {
             maritalstatus = json.\("maritalstatus").toOption.map(_.as[/* bpchar */ String]),
             gender = json.\("gender").toOption.map(_.as[/* bpchar */ String]),
             hiredate = json.\("hiredate").toOption.map(_.as[LocalDate]),
-            salariedflag = json.\("salariedflag").as[Boolean],
+            salariedflag = json.\("salariedflag").as[FlagDomain],
             vacationhours = json.\("vacationhours").toOption.map(_.as[Int]),
             sickleavehours = json.\("sickleavehours").toOption.map(_.as[Int]),
-            currentflag = json.\("currentflag").as[Boolean],
+            currentflag = json.\("currentflag").as[FlagDomain],
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime]),
             organizationnode = json.\("organizationnode").toOption.map(_.as[String])

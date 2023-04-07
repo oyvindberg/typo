@@ -8,6 +8,7 @@ package pr
 package pc
 
 import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,7 +18,7 @@ sealed abstract class PcFieldValue[T](name: String, value: T) extends PcFieldOrI
 object PcFieldValue {
   case class id(override val value: Option[Int]) extends PcFieldValue("id", value)
   case class productcategoryid(override val value: Option[ProductcategoryId]) extends PcFieldValue("productcategoryid", value)
-  case class name(override val value: Option[String]) extends PcFieldValue("name", value)
+  case class name(override val value: Option[NameDomain]) extends PcFieldValue("name", value)
   case class rowguid(override val value: Option[UUID]) extends PcFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PcFieldValue("modifieddate", value)
 }

@@ -11,6 +11,7 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -37,7 +38,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           returning businessentityid
     """
       .on(namedParameters :_*)
-      .executeInsert(BusinessentityId.rowParser("").single)
+      .executeInsert(SqlParser.get[BusinessentityId]("businessentityid").single)
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {

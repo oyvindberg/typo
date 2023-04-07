@@ -8,6 +8,8 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
+import adventureworks.public.NameStyleDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,11 +21,11 @@ import scala.util.Try
 
 case class PersonRowUnsaved(
   persontype: /* bpchar */ String,
-  namestyle: Defaulted[Boolean],
+  namestyle: Defaulted[NameStyleDomain],
   title: Option[String],
-  firstname: String,
-  middlename: Option[String],
-  lastname: String,
+  firstname: NameDomain,
+  middlename: Option[NameDomain],
+  lastname: NameDomain,
   suffix: Option[String],
   emailpromotion: Defaulted[Int],
   additionalcontactinfo: Option[/* xml */ String],
@@ -54,11 +56,11 @@ object PersonRowUnsaved {
         Try(
           PersonRowUnsaved(
             persontype = json.\("persontype").as[/* bpchar */ String],
-            namestyle = json.\("namestyle").as[Defaulted[Boolean]],
+            namestyle = json.\("namestyle").as[Defaulted[NameStyleDomain]],
             title = json.\("title").toOption.map(_.as[String]),
-            firstname = json.\("firstname").as[String],
-            middlename = json.\("middlename").toOption.map(_.as[String]),
-            lastname = json.\("lastname").as[String],
+            firstname = json.\("firstname").as[NameDomain],
+            middlename = json.\("middlename").toOption.map(_.as[NameDomain]),
+            lastname = json.\("lastname").as[NameDomain],
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
             additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),

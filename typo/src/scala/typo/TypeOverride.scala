@@ -7,27 +7,26 @@ package typo
   */
 trait TypeOverride {
 
-  /** @param relation
-    *   either the relative path of a script, or the name of a relation
+  /** @param from
+    *   inside the ADT you can find the name of the relation or the location of the sql script
     * @param colName
     *   name of column
     * @return
     */
-  def apply(relation: Either[RelPath, db.RelationName], colName: db.ColName): Option[String]
+  def apply(from: OverrideFrom, colName: db.ColName): Option[String]
 }
 
 object TypeOverride {
   val Empty: TypeOverride = (_, _) => None
 
-  def of(pf: PartialFunction[(Either[RelPath, db.RelationName], db.ColName), String]): TypeOverride =
-    (relation, colName) => pf.lift((relation, colName))
+  def of(pf: PartialFunction[(OverrideFrom, db.ColName), String]): TypeOverride =
+    (from, colName) => pf.lift((from, colName))
 
-  def simplified(pf: PartialFunction[(String, String), String]): TypeOverride =
-    (relation, colName) => {
-      val str = relation match {
-        case Left(relPath)  => relPath.asString
-        case Right(relName) => relName.value
+  def relation(pf: PartialFunction[(String, String), String]): TypeOverride =
+    (from, colName) => {
+      from match {
+        case rel: OverrideFrom.Relation => pf.lift((rel.name.value, colName.value))
+        case _                          => None
       }
-      pf.lift((str, colName.value))
     }
 }

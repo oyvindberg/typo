@@ -8,6 +8,7 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,7 +19,7 @@ import scala.util.Try
 
 case class ProductreviewRowUnsaved(
   productid: Int,
-  reviewername: String,
+  reviewername: NameDomain,
   reviewdate: Defaulted[LocalDateTime],
   emailaddress: String,
   rating: Int,
@@ -43,7 +44,7 @@ object ProductreviewRowUnsaved {
         Try(
           ProductreviewRowUnsaved(
             productid = json.\("productid").as[Int],
-            reviewername = json.\("reviewername").as[String],
+            reviewername = json.\("reviewername").as[NameDomain],
             reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
             emailaddress = json.\("emailaddress").as[String],
             rating = json.\("rating").as[Int],

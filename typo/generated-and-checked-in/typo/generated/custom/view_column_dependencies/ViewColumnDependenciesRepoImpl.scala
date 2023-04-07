@@ -7,7 +7,7 @@
  */
 package typo
 package generated
-package views
+package custom
 package view_column_dependencies
 
 import anorm.SqlStringInterpolation

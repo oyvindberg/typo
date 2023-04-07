@@ -11,6 +11,8 @@ import adventureworks.Defaulted
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.public.FlagDomain
+import adventureworks.public.NameDomain
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -21,10 +23,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ProductRowUnsaved(
-  name: String,
+  name: NameDomain,
   productnumber: String,
-  makeflag: Defaulted[Boolean],
-  finishedgoodsflag: Defaulted[Boolean],
+  makeflag: Defaulted[FlagDomain],
+  finishedgoodsflag: Defaulted[FlagDomain],
   color: Option[String],
   safetystocklevel: Int,
   reorderpoint: Int,
@@ -80,10 +82,10 @@ object ProductRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductRowUnsaved(
-            name = json.\("name").as[String],
+            name = json.\("name").as[NameDomain],
             productnumber = json.\("productnumber").as[String],
-            makeflag = json.\("makeflag").as[Defaulted[Boolean]],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Boolean]],
+            makeflag = json.\("makeflag").as[Defaulted[FlagDomain]],
+            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[FlagDomain]],
             color = json.\("color").toOption.map(_.as[String]),
             safetystocklevel = json.\("safetystocklevel").as[Int],
             reorderpoint = json.\("reorderpoint").as[Int],

@@ -8,6 +8,7 @@ package production
 package vproductmodelinstructions
 
 import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.public.NameDomain
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,7 +24,7 @@ case class VproductmodelinstructionsRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelinstructions","column_name":"productmodelid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[productmodel.ProductmodelRow.name]] */
-  name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelinstructions","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelinstructions","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[productmodel.ProductmodelRow.instructions]] */
   instructions: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelinstructions","column_name":"instructions","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   LocationID: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelinstructions","column_name":"LocationID","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -43,7 +44,7 @@ object VproductmodelinstructionsRow {
     Success(
       VproductmodelinstructionsRow(
         productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        name = row[Option[String]](prefix + "name"),
+        name = row[Option[NameDomain]](prefix + "name"),
         instructions = row[Option[/* xml */ String]](prefix + "instructions"),
         LocationID = row[Option[Int]](prefix + "LocationID"),
         SetupHours = row[Option[BigDecimal]](prefix + "SetupHours"),
@@ -78,7 +79,7 @@ object VproductmodelinstructionsRow {
         Try(
           VproductmodelinstructionsRow(
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[String]),
+            name = json.\("name").toOption.map(_.as[NameDomain]),
             instructions = json.\("instructions").toOption.map(_.as[/* xml */ String]),
             LocationID = json.\("LocationID").toOption.map(_.as[Int]),
             SetupHours = json.\("SetupHours").toOption.map(_.as[BigDecimal]),
