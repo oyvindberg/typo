@@ -8,7 +8,7 @@ package pr
 package pm
 
 import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -25,7 +25,7 @@ case class PmRow(
   /** Points to [[production.productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pm","column_name":"productmodelid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productmodel.ProductmodelRow.name]] */
-  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pm","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pm","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productmodel.ProductmodelRow.catalogdescription]] */
   catalogdescription: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pm","column_name":"catalogdescription","ordinal_position":4,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productmodel.ProductmodelRow.instructions]] */
@@ -42,7 +42,7 @@ object PmRow {
       PmRow(
         id = row[Option[Int]](prefix + "id"),
         productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        name = row[Option[NameDomain]](prefix + "name"),
+        name = row[Option[Name]](prefix + "name"),
         catalogdescription = row[Option[/* xml */ String]](prefix + "catalogdescription"),
         instructions = row[Option[/* xml */ String]](prefix + "instructions"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
@@ -69,7 +69,7 @@ object PmRow {
           PmRow(
             id = json.\("id").toOption.map(_.as[Int]),
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[NameDomain]),
+            name = json.\("name").toOption.map(_.as[Name]),
             catalogdescription = json.\("catalogdescription").toOption.map(_.as[/* xml */ String]),
             instructions = json.\("instructions").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),

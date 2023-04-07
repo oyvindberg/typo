@@ -8,7 +8,7 @@ package sa
 package st
 
 import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,7 +19,7 @@ sealed abstract class StFieldValue[T](name: String, value: T) extends StFieldOrI
 object StFieldValue {
   case class id(override val value: Option[Int]) extends StFieldValue("id", value)
   case class territoryid(override val value: Option[SalesterritoryId]) extends StFieldValue("territoryid", value)
-  case class name(override val value: Option[NameDomain]) extends StFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends StFieldValue("name", value)
   case class countryregioncode(override val value: Option[CountryregionId]) extends StFieldValue("countryregioncode", value)
   case class group(override val value: Option[String]) extends StFieldValue("group", value)
   case class salesytd(override val value: Option[BigDecimal]) extends StFieldValue("salesytd", value)

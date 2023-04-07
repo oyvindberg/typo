@@ -8,7 +8,7 @@ package sales
 package store
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -23,7 +23,7 @@ import scala.util.Try
 case class StoreRow(
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"businessentityid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Name /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[salesperson.SalespersonRow.businessentityid]] */
   salespersonid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"salespersonid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   demographics: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"demographics","ordinal_position":4,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -36,7 +36,7 @@ object StoreRow {
     Success(
       StoreRow(
         businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        name = row[NameDomain](prefix + "name"),
+        name = row[Name](prefix + "name"),
         salespersonid = row[Option[BusinessentityId]](prefix + "salespersonid"),
         demographics = row[Option[/* xml */ String]](prefix + "demographics"),
         rowguid = row[UUID](prefix + "rowguid"),
@@ -61,7 +61,7 @@ object StoreRow {
         Try(
           StoreRow(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[UUID],

@@ -14,13 +14,13 @@ import play.api.libs.json.Format
 /** Domain `information_schema.yes_or_no`
   * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
   */
-case class YesOrNoDomain(value: String) extends AnyVal
-object YesOrNoDomain {
-  implicit def ordering(implicit ev: Ordering[String]): Ordering[YesOrNoDomain] = Ordering.by(_.value)
-  implicit val format: Format[YesOrNoDomain] = implicitly[Format[String]].bimap(YesOrNoDomain.apply, _.value)
-  implicit val toStatement: ToStatement[YesOrNoDomain] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val column: Column[YesOrNoDomain] = implicitly[Column[String]].map(YesOrNoDomain.apply)
-  implicit val parameterMetadata: ParameterMetaData[YesOrNoDomain] = new ParameterMetaData[YesOrNoDomain] {
+case class YesOrNo(value: String) extends AnyVal
+object YesOrNo {
+  implicit def ordering(implicit ev: Ordering[String]): Ordering[YesOrNo] = Ordering.by(_.value)
+  implicit val format: Format[YesOrNo] = implicitly[Format[String]].bimap(YesOrNo.apply, _.value)
+  implicit val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
+  implicit val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }

@@ -3,6 +3,8 @@ package typo
 class Naming(pkg: sc.QIdent) {
   protected def relation(name: db.RelationName, suffix: String): sc.QIdent =
     pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(name.name) / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
+  protected def tpe(name: db.RelationName, suffix: String): sc.QIdent =
+    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
 
   // class names
   def idName(name: db.RelationName): sc.QIdent = relation(name, "Id")
@@ -15,12 +17,11 @@ class Naming(pkg: sc.QIdent) {
   def joinedRow(name: db.RelationName): sc.QIdent = relation(name, "JoinedRow")
   def className(names: List[sc.Ident]): sc.QIdent = pkg / names
 
-  // enum names
   def enumName(name: db.RelationName): sc.QIdent =
-    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended("Enum")
+    tpe(name, "")
 
   def domainName(name: db.RelationName): sc.QIdent =
-    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended("Domain")
+    tpe(name, "")
 
   def enumValue(name: String): sc.Ident = sc.Ident(name)
 

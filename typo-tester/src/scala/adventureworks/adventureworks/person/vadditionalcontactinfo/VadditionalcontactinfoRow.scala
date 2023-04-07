@@ -8,7 +8,7 @@ package person
 package vadditionalcontactinfo
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -24,11 +24,11 @@ case class VadditionalcontactinfoRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"businessentityid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.PersonRow.firstname]] */
-  firstname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"firstname","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  firstname: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"firstname","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.PersonRow.middlename]] */
-  middlename: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"middlename","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  middlename: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"middlename","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.PersonRow.lastname]] */
-  lastname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"lastname","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastname: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"lastname","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   telephonenumber: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"telephonenumber","ordinal_position":5,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   telephonespecialinstructions: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"telephonespecialinstructions","ordinal_position":6,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   street: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"vadditionalcontactinfo","column_name":"street","ordinal_position":7,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -51,9 +51,9 @@ object VadditionalcontactinfoRow {
     Success(
       VadditionalcontactinfoRow(
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        firstname = row[Option[NameDomain]](prefix + "firstname"),
-        middlename = row[Option[NameDomain]](prefix + "middlename"),
-        lastname = row[Option[NameDomain]](prefix + "lastname"),
+        firstname = row[Option[Name]](prefix + "firstname"),
+        middlename = row[Option[Name]](prefix + "middlename"),
+        lastname = row[Option[Name]](prefix + "lastname"),
         telephonenumber = row[Option[/* xml */ String]](prefix + "telephonenumber"),
         telephonespecialinstructions = row[Option[String]](prefix + "telephonespecialinstructions"),
         street = row[Option[/* xml */ String]](prefix + "street"),
@@ -98,9 +98,9 @@ object VadditionalcontactinfoRow {
         Try(
           VadditionalcontactinfoRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            firstname = json.\("firstname").toOption.map(_.as[NameDomain]),
-            middlename = json.\("middlename").toOption.map(_.as[NameDomain]),
-            lastname = json.\("lastname").toOption.map(_.as[NameDomain]),
+            firstname = json.\("firstname").toOption.map(_.as[Name]),
+            middlename = json.\("middlename").toOption.map(_.as[Name]),
+            lastname = json.\("lastname").toOption.map(_.as[Name]),
             telephonenumber = json.\("telephonenumber").toOption.map(_.as[/* xml */ String]),
             telephonespecialinstructions = json.\("telephonespecialinstructions").toOption.map(_.as[String]),
             street = json.\("street").toOption.map(_.as[/* xml */ String]),

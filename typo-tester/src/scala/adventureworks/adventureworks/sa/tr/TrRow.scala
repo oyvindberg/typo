@@ -8,7 +8,7 @@ package sa
 package tr
 
 import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import anorm.RowParser
 import anorm.Success
@@ -32,7 +32,7 @@ case class TrRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.taxrate]] */
   taxrate: Option[BigDecimal] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"tr","column_name":"taxrate","ordinal_position":5,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.name]] */
-  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"tr","column_name":"name","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"tr","column_name":"name","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.rowguid]] */
   rowguid: Option[UUID] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"tr","column_name":"rowguid","ordinal_position":7,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.modifieddate]] */
@@ -48,7 +48,7 @@ object TrRow {
         stateprovinceid = row[Option[StateprovinceId]](prefix + "stateprovinceid"),
         taxtype = row[Option[Int]](prefix + "taxtype"),
         taxrate = row[Option[BigDecimal]](prefix + "taxrate"),
-        name = row[Option[NameDomain]](prefix + "name"),
+        name = row[Option[Name]](prefix + "name"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
@@ -77,7 +77,7 @@ object TrRow {
             stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
             taxtype = json.\("taxtype").toOption.map(_.as[Int]),
             taxrate = json.\("taxrate").toOption.map(_.as[BigDecimal]),
-            name = json.\("name").toOption.map(_.as[NameDomain]),
+            name = json.\("name").toOption.map(_.as[Name]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

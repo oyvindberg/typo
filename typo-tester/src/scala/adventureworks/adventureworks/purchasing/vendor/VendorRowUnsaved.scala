@@ -8,9 +8,9 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
-import adventureworks.public.AccountNumberDomain
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -21,11 +21,11 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.vendor` which has not been persisted yet */
 case class VendorRowUnsaved(
-  accountnumber: AccountNumberDomain,
-  name: NameDomain,
+  accountnumber: AccountNumber,
+  name: Name,
   creditrating: Int,
-  preferredvendorstatus: Defaulted[FlagDomain],
-  activeflag: Defaulted[FlagDomain],
+  preferredvendorstatus: Defaulted[Flag],
+  activeflag: Defaulted[Flag],
   purchasingwebserviceurl: Option[String],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -46,11 +46,11 @@ object VendorRowUnsaved {
       JsResult.fromTry(
         Try(
           VendorRowUnsaved(
-            accountnumber = json.\("accountnumber").as[AccountNumberDomain],
-            name = json.\("name").as[NameDomain],
+            accountnumber = json.\("accountnumber").as[AccountNumber],
+            name = json.\("name").as[Name],
             creditrating = json.\("creditrating").as[Int],
-            preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[FlagDomain]],
-            activeflag = json.\("activeflag").as[Defaulted[FlagDomain]],
+            preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
+            activeflag = json.\("activeflag").as[Defaulted[Flag]],
             purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

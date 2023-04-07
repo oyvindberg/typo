@@ -11,8 +11,8 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -22,10 +22,10 @@ sealed abstract class PFieldValue[T](name: String, value: T) extends PFieldOrIdV
 object PFieldValue {
   case class id(override val value: Option[Int]) extends PFieldValue("id", value)
   case class productid(override val value: Option[ProductId]) extends PFieldValue("productid", value)
-  case class name(override val value: Option[NameDomain]) extends PFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends PFieldValue("name", value)
   case class productnumber(override val value: Option[String]) extends PFieldValue("productnumber", value)
-  case class makeflag(override val value: FlagDomain) extends PFieldValue("makeflag", value)
-  case class finishedgoodsflag(override val value: FlagDomain) extends PFieldValue("finishedgoodsflag", value)
+  case class makeflag(override val value: Flag) extends PFieldValue("makeflag", value)
+  case class finishedgoodsflag(override val value: Flag) extends PFieldValue("finishedgoodsflag", value)
   case class color(override val value: Option[String]) extends PFieldValue("color", value)
   case class safetystocklevel(override val value: Option[Int]) extends PFieldValue("safetystocklevel", value)
   case class reorderpoint(override val value: Option[Int]) extends PFieldValue("reorderpoint", value)

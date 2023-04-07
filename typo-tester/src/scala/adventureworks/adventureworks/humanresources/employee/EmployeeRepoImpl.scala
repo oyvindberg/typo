@@ -9,7 +9,7 @@ package employee
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -32,7 +32,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       Some(NamedParameter("hiredate", ParameterValue.from(unsaved.hiredate))),
       unsaved.salariedflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("salariedflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("salariedflag", ParameterValue.from[Flag](value)))
       },
       unsaved.vacationhours match {
         case UseDefault => None
@@ -44,7 +44,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       },
       unsaved.currentflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("currentflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("currentflag", ParameterValue.from[Flag](value)))
       },
       unsaved.rowguid match {
         case UseDefault => None

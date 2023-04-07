@@ -9,7 +9,7 @@ package productsubcategory
 
 import adventureworks.Defaulted
 import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -22,7 +22,7 @@ import scala.util.Try
 /** This class corresponds to a row in table `production.productsubcategory` which has not been persisted yet */
 case class ProductsubcategoryRowUnsaved(
   productcategoryid: ProductcategoryId,
-  name: NameDomain,
+  name: Name,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -41,7 +41,7 @@ object ProductsubcategoryRowUnsaved {
         Try(
           ProductsubcategoryRowUnsaved(
             productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

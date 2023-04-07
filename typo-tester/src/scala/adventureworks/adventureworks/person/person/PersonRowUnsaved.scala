@@ -8,8 +8,8 @@ package person
 package person
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
-import adventureworks.public.NameStyleDomain
+import adventureworks.public.Name
+import adventureworks.public.NameStyle
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -22,11 +22,11 @@ import scala.util.Try
 /** This class corresponds to a row in table `person.person` which has not been persisted yet */
 case class PersonRowUnsaved(
   persontype: /* bpchar */ String,
-  namestyle: Defaulted[NameStyleDomain],
+  namestyle: Defaulted[NameStyle],
   title: Option[String],
-  firstname: NameDomain,
-  middlename: Option[NameDomain],
-  lastname: NameDomain,
+  firstname: Name,
+  middlename: Option[Name],
+  lastname: Name,
   suffix: Option[String],
   emailpromotion: Defaulted[Int],
   additionalcontactinfo: Option[/* xml */ String],
@@ -57,11 +57,11 @@ object PersonRowUnsaved {
         Try(
           PersonRowUnsaved(
             persontype = json.\("persontype").as[/* bpchar */ String],
-            namestyle = json.\("namestyle").as[Defaulted[NameStyleDomain]],
+            namestyle = json.\("namestyle").as[Defaulted[NameStyle]],
             title = json.\("title").toOption.map(_.as[String]),
-            firstname = json.\("firstname").as[NameDomain],
-            middlename = json.\("middlename").toOption.map(_.as[NameDomain]),
-            lastname = json.\("lastname").as[NameDomain],
+            firstname = json.\("firstname").as[Name],
+            middlename = json.\("middlename").toOption.map(_.as[Name]),
+            lastname = json.\("lastname").as[Name],
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
             additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),

@@ -8,7 +8,7 @@ package humanresources
 package vemployeedepartmenthistory
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDate
@@ -25,17 +25,17 @@ case class VemployeedepartmenthistoryRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"title","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":8,"character_octet_length":32,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"firstname","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  firstname: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"firstname","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"middlename","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  middlename: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"middlename","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.person.PersonRow.lastname]] */
-  lastname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"lastname","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  lastname: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"lastname","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.person.PersonRow.suffix]] */
   suffix: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"suffix","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":10,"character_octet_length":40,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  shift: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"shift","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  department: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"department","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  shift: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"shift","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  department: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"department","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[department.DepartmentRow.groupname]] */
-  groupname: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"groupname","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  groupname: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"groupname","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
   startdate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartmenthistory","column_name":"startdate","ordinal_position":10,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
@@ -48,13 +48,13 @@ object VemployeedepartmenthistoryRow {
       VemployeedepartmenthistoryRow(
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
         title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[NameDomain]](prefix + "firstname"),
-        middlename = row[Option[NameDomain]](prefix + "middlename"),
-        lastname = row[Option[NameDomain]](prefix + "lastname"),
+        firstname = row[Option[Name]](prefix + "firstname"),
+        middlename = row[Option[Name]](prefix + "middlename"),
+        lastname = row[Option[Name]](prefix + "lastname"),
         suffix = row[Option[String]](prefix + "suffix"),
-        shift = row[Option[NameDomain]](prefix + "shift"),
-        department = row[Option[NameDomain]](prefix + "department"),
-        groupname = row[Option[NameDomain]](prefix + "groupname"),
+        shift = row[Option[Name]](prefix + "shift"),
+        department = row[Option[Name]](prefix + "department"),
+        groupname = row[Option[Name]](prefix + "groupname"),
         startdate = row[Option[LocalDate]](prefix + "startdate"),
         enddate = row[Option[LocalDate]](prefix + "enddate")
       )
@@ -83,13 +83,13 @@ object VemployeedepartmenthistoryRow {
           VemployeedepartmenthistoryRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             title = json.\("title").toOption.map(_.as[String]),
-            firstname = json.\("firstname").toOption.map(_.as[NameDomain]),
-            middlename = json.\("middlename").toOption.map(_.as[NameDomain]),
-            lastname = json.\("lastname").toOption.map(_.as[NameDomain]),
+            firstname = json.\("firstname").toOption.map(_.as[Name]),
+            middlename = json.\("middlename").toOption.map(_.as[Name]),
+            lastname = json.\("lastname").toOption.map(_.as[Name]),
             suffix = json.\("suffix").toOption.map(_.as[String]),
-            shift = json.\("shift").toOption.map(_.as[NameDomain]),
-            department = json.\("department").toOption.map(_.as[NameDomain]),
-            groupname = json.\("groupname").toOption.map(_.as[NameDomain]),
+            shift = json.\("shift").toOption.map(_.as[Name]),
+            department = json.\("department").toOption.map(_.as[Name]),
+            groupname = json.\("groupname").toOption.map(_.as[Name]),
             startdate = json.\("startdate").toOption.map(_.as[LocalDate]),
             enddate = json.\("enddate").toOption.map(_.as[LocalDate])
           )

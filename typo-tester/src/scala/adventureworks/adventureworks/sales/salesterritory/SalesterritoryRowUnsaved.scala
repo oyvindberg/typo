@@ -9,7 +9,7 @@ package salesterritory
 
 import adventureworks.Defaulted
 import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -21,7 +21,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesterritory` which has not been persisted yet */
 case class SalesterritoryRowUnsaved(
-  name: NameDomain,
+  name: Name,
   countryregioncode: CountryregionId,
   group: String,
   salesytd: Defaulted[BigDecimal],
@@ -50,7 +50,7 @@ object SalesterritoryRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesterritoryRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
             group = json.\("group").as[String],
             salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],

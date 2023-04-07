@@ -8,7 +8,7 @@ package sales
 package vsalespersonsalesbyfiscalyearsdata
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 
 sealed abstract class VsalespersonsalesbyfiscalyearsdataFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VsalespersonsalesbyfiscalyearsdataFieldValue[T](name: String, value: T) extends VsalespersonsalesbyfiscalyearsdataFieldOrIdValue(name, value)
@@ -17,7 +17,7 @@ object VsalespersonsalesbyfiscalyearsdataFieldValue {
   case class salespersonid(override val value: Option[BusinessentityId]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("salespersonid", value)
   case class fullname(override val value: Option[String]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("fullname", value)
   case class jobtitle(override val value: Option[String]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("jobtitle", value)
-  case class salesterritory(override val value: Option[NameDomain]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("salesterritory", value)
+  case class salesterritory(override val value: Option[Name]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("salesterritory", value)
   case class salestotal(override val value: Option[BigDecimal]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("salestotal", value)
   case class fiscalyear(override val value: Option[BigDecimal]) extends VsalespersonsalesbyfiscalyearsdataFieldValue("fiscalyear", value)
 }

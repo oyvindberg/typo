@@ -9,7 +9,7 @@ package store
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -21,7 +21,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.store` which has not been persisted yet */
 case class StoreRowUnsaved(
-  name: NameDomain,
+  name: Name,
   salespersonid: Option[BusinessentityId],
   demographics: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
@@ -42,7 +42,7 @@ object StoreRowUnsaved {
       JsResult.fromTry(
         Try(
           StoreRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

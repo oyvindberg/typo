@@ -9,7 +9,7 @@ package d
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -27,7 +27,7 @@ case class DRow(
   /** Points to [[production.document.DocumentRow.owner]] */
   owner: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"owner","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.folderflag]] */
-  folderflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"folderflag","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  folderflag: Flag /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"folderflag","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.filename]] */
   filename: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"filename","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":400,"character_octet_length":1600,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.fileextension]] */
@@ -56,7 +56,7 @@ object DRow {
       DRow(
         title = row[Option[String]](prefix + "title"),
         owner = row[Option[BusinessentityId]](prefix + "owner"),
-        folderflag = row[FlagDomain](prefix + "folderflag"),
+        folderflag = row[Flag](prefix + "folderflag"),
         filename = row[Option[String]](prefix + "filename"),
         fileextension = row[Option[String]](prefix + "fileextension"),
         revision = row[Option[/* bpchar */ String]](prefix + "revision"),
@@ -95,7 +95,7 @@ object DRow {
           DRow(
             title = json.\("title").toOption.map(_.as[String]),
             owner = json.\("owner").toOption.map(_.as[BusinessentityId]),
-            folderflag = json.\("folderflag").as[FlagDomain],
+            folderflag = json.\("folderflag").as[Flag],
             filename = json.\("filename").toOption.map(_.as[String]),
             fileextension = json.\("fileextension").toOption.map(_.as[String]),
             revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),

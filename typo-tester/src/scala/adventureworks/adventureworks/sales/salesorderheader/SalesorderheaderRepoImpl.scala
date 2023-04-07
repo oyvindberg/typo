@@ -9,7 +9,7 @@ package salesorderheader
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlParser
@@ -40,7 +40,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       },
       unsaved.onlineorderflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber))),
       Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),

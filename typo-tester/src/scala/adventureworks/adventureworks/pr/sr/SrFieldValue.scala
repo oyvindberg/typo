@@ -8,7 +8,7 @@ package pr
 package sr
 
 import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class SrFieldOrIdValue[T](val name: String, val value: T)
@@ -17,6 +17,6 @@ sealed abstract class SrFieldValue[T](name: String, value: T) extends SrFieldOrI
 object SrFieldValue {
   case class id(override val value: Option[Int]) extends SrFieldValue("id", value)
   case class scrapreasonid(override val value: Option[ScrapreasonId]) extends SrFieldValue("scrapreasonid", value)
-  case class name(override val value: Option[NameDomain]) extends SrFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends SrFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SrFieldValue("modifieddate", value)
 }

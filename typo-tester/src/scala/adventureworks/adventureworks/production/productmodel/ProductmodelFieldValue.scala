@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productmodel
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,7 +16,7 @@ sealed abstract class ProductmodelFieldValue[T](name: String, value: T) extends 
 
 object ProductmodelFieldValue {
   case class productmodelid(override val value: ProductmodelId) extends ProductmodelFieldOrIdValue("productmodelid", value)
-  case class name(override val value: NameDomain) extends ProductmodelFieldValue("name", value)
+  case class name(override val value: Name) extends ProductmodelFieldValue("name", value)
   case class catalogdescription(override val value: Option[/* xml */ String]) extends ProductmodelFieldValue("catalogdescription", value)
   case class instructions(override val value: Option[/* xml */ String]) extends ProductmodelFieldValue("instructions", value)
   case class rowguid(override val value: UUID) extends ProductmodelFieldValue("rowguid", value)

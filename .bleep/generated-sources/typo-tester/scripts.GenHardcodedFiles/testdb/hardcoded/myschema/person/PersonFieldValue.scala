@@ -8,7 +8,7 @@ package hardcoded
 package myschema
 package person
 
-import testdb.hardcoded.myschema.SectorEnum
+import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
@@ -26,5 +26,5 @@ object PersonFieldValue {
   case class likesPizza(override val value: Boolean) extends PersonFieldValue("likes_pizza", value)
   case class maritalStatusId(override val value: MaritalStatusId) extends PersonFieldValue("marital_status_id", value)
   case class workEmail(override val value: Option[String]) extends PersonFieldValue("work_email", value)
-  case class sector(override val value: SectorEnum) extends PersonFieldValue("sector", value)
+  case class sector(override val value: Sector) extends PersonFieldValue("sector", value)
 }

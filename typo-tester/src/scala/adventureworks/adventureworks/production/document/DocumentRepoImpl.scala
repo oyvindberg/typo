@@ -9,7 +9,7 @@ package document
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlParser
@@ -28,7 +28,7 @@ object DocumentRepoImpl extends DocumentRepo {
       Some(NamedParameter("owner", ParameterValue.from(unsaved.owner))),
       unsaved.folderflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("filename", ParameterValue.from(unsaved.filename))),
       Some(NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension))),

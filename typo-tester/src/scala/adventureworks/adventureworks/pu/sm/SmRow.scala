@@ -7,7 +7,7 @@ package adventureworks
 package pu
 package sm
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.RowParser
 import anorm.Success
@@ -25,7 +25,7 @@ case class SmRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: Option[ShipmethodId] /* {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"sm","column_name":"shipmethodid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.name]] */
-  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"sm","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"sm","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipbase]] */
   shipbase: Option[BigDecimal] /* {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"sm","column_name":"shipbase","ordinal_position":4,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shiprate]] */
@@ -42,7 +42,7 @@ object SmRow {
       SmRow(
         id = row[Option[Int]](prefix + "id"),
         shipmethodid = row[Option[ShipmethodId]](prefix + "shipmethodid"),
-        name = row[Option[NameDomain]](prefix + "name"),
+        name = row[Option[Name]](prefix + "name"),
         shipbase = row[Option[BigDecimal]](prefix + "shipbase"),
         shiprate = row[Option[BigDecimal]](prefix + "shiprate"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
@@ -69,7 +69,7 @@ object SmRow {
           SmRow(
             id = json.\("id").toOption.map(_.as[Int]),
             shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
-            name = json.\("name").toOption.map(_.as[NameDomain]),
+            name = json.\("name").toOption.map(_.as[Name]),
             shipbase = json.\("shipbase").toOption.map(_.as[BigDecimal]),
             shiprate = json.\("shiprate").toOption.map(_.as[BigDecimal]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),

@@ -8,7 +8,7 @@ package production
 package document
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,7 +18,7 @@ sealed abstract class DocumentFieldValue[T](name: String, value: T) extends Docu
 object DocumentFieldValue {
   case class title(override val value: String) extends DocumentFieldValue("title", value)
   case class owner(override val value: BusinessentityId) extends DocumentFieldValue("owner", value)
-  case class folderflag(override val value: FlagDomain) extends DocumentFieldValue("folderflag", value)
+  case class folderflag(override val value: Flag) extends DocumentFieldValue("folderflag", value)
   case class filename(override val value: String) extends DocumentFieldValue("filename", value)
   case class fileextension(override val value: Option[String]) extends DocumentFieldValue("fileextension", value)
   case class revision(override val value: /* bpchar */ String) extends DocumentFieldValue("revision", value)

@@ -8,7 +8,7 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,8 +19,8 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesreason` which has not been persisted yet */
 case class SalesreasonRowUnsaved(
-  name: NameDomain,
-  reasontype: NameDomain,
+  name: Name,
+  reasontype: Name,
   modifieddate: Defaulted[LocalDateTime]
 )
 object SalesreasonRowUnsaved {
@@ -36,8 +36,8 @@ object SalesreasonRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesreasonRowUnsaved(
-            name = json.\("name").as[NameDomain],
-            reasontype = json.\("reasontype").as[NameDomain],
+            name = json.\("name").as[Name],
+            reasontype = json.\("reasontype").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

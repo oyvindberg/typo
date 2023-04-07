@@ -7,7 +7,7 @@ package adventureworks
 package person
 package countryregion
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -20,7 +20,7 @@ import scala.util.Try
 
 case class CountryregionRow(
   countryregioncode: CountryregionId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"countryregion","column_name":"countryregioncode","ordinal_position":1,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  name: NameDomain /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"countryregion","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Name /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"countryregion","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"countryregion","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
 
@@ -29,7 +29,7 @@ object CountryregionRow {
     Success(
       CountryregionRow(
         countryregioncode = row[CountryregionId](prefix + "countryregioncode"),
-        name = row[NameDomain](prefix + "name"),
+        name = row[Name](prefix + "name"),
         modifieddate = row[LocalDateTime](prefix + "modifieddate")
       )
     )
@@ -48,7 +48,7 @@ object CountryregionRow {
         Try(
           CountryregionRow(
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

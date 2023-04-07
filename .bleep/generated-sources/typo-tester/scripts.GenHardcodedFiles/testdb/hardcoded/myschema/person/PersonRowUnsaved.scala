@@ -15,7 +15,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 import testdb.hardcoded.Defaulted
-import testdb.hardcoded.myschema.SectorEnum
+import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
@@ -30,7 +30,7 @@ case class PersonRowUnsaved(
   likesPizza: Boolean,
   maritalStatusId: Defaulted[MaritalStatusId],
   workEmail: Option[String],
-  sector: Defaulted[SectorEnum]
+  sector: Defaulted[Sector]
 )
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
@@ -61,7 +61,7 @@ object PersonRowUnsaved {
             likesPizza = json.\("likes_pizza").as[Boolean],
             maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
             workEmail = json.\("work_email").toOption.map(_.as[String]),
-            sector = json.\("sector").as[Defaulted[SectorEnum]]
+            sector = json.\("sector").as[Defaulted[Sector]]
           )
         )
       )

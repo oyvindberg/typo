@@ -8,7 +8,7 @@ package pr
 package l
 
 import adventureworks.production.location.LocationId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class LFieldOrIdValue[T](val name: String, val value: T)
@@ -17,7 +17,7 @@ sealed abstract class LFieldValue[T](name: String, value: T) extends LFieldOrIdV
 object LFieldValue {
   case class id(override val value: Option[Int]) extends LFieldValue("id", value)
   case class locationid(override val value: Option[LocationId]) extends LFieldValue("locationid", value)
-  case class name(override val value: Option[NameDomain]) extends LFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends LFieldValue("name", value)
   case class costrate(override val value: Option[BigDecimal]) extends LFieldValue("costrate", value)
   case class availability(override val value: Option[BigDecimal]) extends LFieldValue("availability", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends LFieldValue("modifieddate", value)

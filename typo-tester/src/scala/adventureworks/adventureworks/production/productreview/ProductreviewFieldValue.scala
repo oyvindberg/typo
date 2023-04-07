@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productreview
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class ProductreviewFieldOrIdValue[T](val name: String, val value: T)
@@ -16,7 +16,7 @@ sealed abstract class ProductreviewFieldValue[T](name: String, value: T) extends
 object ProductreviewFieldValue {
   case class productreviewid(override val value: ProductreviewId) extends ProductreviewFieldOrIdValue("productreviewid", value)
   case class productid(override val value: Int) extends ProductreviewFieldValue("productid", value)
-  case class reviewername(override val value: NameDomain) extends ProductreviewFieldValue("reviewername", value)
+  case class reviewername(override val value: Name) extends ProductreviewFieldValue("reviewername", value)
   case class reviewdate(override val value: LocalDateTime) extends ProductreviewFieldValue("reviewdate", value)
   case class emailaddress(override val value: String) extends ProductreviewFieldValue("emailaddress", value)
   case class rating(override val value: Int) extends ProductreviewFieldValue("rating", value)

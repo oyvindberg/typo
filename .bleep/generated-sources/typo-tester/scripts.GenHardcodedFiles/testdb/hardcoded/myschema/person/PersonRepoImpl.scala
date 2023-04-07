@@ -15,7 +15,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
 import testdb.hardcoded.Defaulted.UseDefault
-import testdb.hardcoded.myschema.SectorEnum
+import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
@@ -38,7 +38,7 @@ object PersonRepoImpl extends PersonRepo {
       Some(NamedParameter("work_email", ParameterValue.from(unsaved.workEmail))),
       unsaved.sector match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("sector", ParameterValue.from[SectorEnum](value)))
+        case Provided(value) => Some(NamedParameter("sector", ParameterValue.from[Sector](value)))
       }
     ).flatten
     

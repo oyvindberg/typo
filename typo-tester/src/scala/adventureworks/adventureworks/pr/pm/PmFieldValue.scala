@@ -8,7 +8,7 @@ package pr
 package pm
 
 import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,7 +18,7 @@ sealed abstract class PmFieldValue[T](name: String, value: T) extends PmFieldOrI
 object PmFieldValue {
   case class id(override val value: Option[Int]) extends PmFieldValue("id", value)
   case class productmodelid(override val value: Option[ProductmodelId]) extends PmFieldValue("productmodelid", value)
-  case class name(override val value: Option[NameDomain]) extends PmFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends PmFieldValue("name", value)
   case class catalogdescription(override val value: Option[/* xml */ String]) extends PmFieldValue("catalogdescription", value)
   case class instructions(override val value: Option[/* xml */ String]) extends PmFieldValue("instructions", value)
   case class rowguid(override val value: Option[UUID]) extends PmFieldValue("rowguid", value)

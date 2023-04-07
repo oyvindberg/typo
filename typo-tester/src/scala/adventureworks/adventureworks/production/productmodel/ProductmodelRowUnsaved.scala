@@ -8,7 +8,7 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -20,7 +20,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productmodel` which has not been persisted yet */
 case class ProductmodelRowUnsaved(
-  name: NameDomain,
+  name: Name,
   catalogdescription: Option[/* xml */ String],
   instructions: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
@@ -41,7 +41,7 @@ object ProductmodelRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductmodelRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             catalogdescription = json.\("catalogdescription").toOption.map(_.as[/* xml */ String]),
             instructions = json.\("instructions").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

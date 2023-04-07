@@ -8,9 +8,9 @@ package pu
 package v
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumberDomain
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class VFieldOrIdValue[T](val name: String, val value: T)
@@ -19,11 +19,11 @@ sealed abstract class VFieldValue[T](name: String, value: T) extends VFieldOrIdV
 object VFieldValue {
   case class id(override val value: Option[Int]) extends VFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends VFieldValue("businessentityid", value)
-  case class accountnumber(override val value: Option[AccountNumberDomain]) extends VFieldValue("accountnumber", value)
-  case class name(override val value: Option[NameDomain]) extends VFieldValue("name", value)
+  case class accountnumber(override val value: Option[AccountNumber]) extends VFieldValue("accountnumber", value)
+  case class name(override val value: Option[Name]) extends VFieldValue("name", value)
   case class creditrating(override val value: Option[Int]) extends VFieldValue("creditrating", value)
-  case class preferredvendorstatus(override val value: FlagDomain) extends VFieldValue("preferredvendorstatus", value)
-  case class activeflag(override val value: FlagDomain) extends VFieldValue("activeflag", value)
+  case class preferredvendorstatus(override val value: Flag) extends VFieldValue("preferredvendorstatus", value)
+  case class activeflag(override val value: Flag) extends VFieldValue("activeflag", value)
   case class purchasingwebserviceurl(override val value: Option[String]) extends VFieldValue("purchasingwebserviceurl", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends VFieldValue("modifieddate", value)
 }

@@ -8,7 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,7 +20,7 @@ object SalestaxrateFieldValue {
   case class stateprovinceid(override val value: StateprovinceId) extends SalestaxrateFieldValue("stateprovinceid", value)
   case class taxtype(override val value: Int) extends SalestaxrateFieldValue("taxtype", value)
   case class taxrate(override val value: BigDecimal) extends SalestaxrateFieldValue("taxrate", value)
-  case class name(override val value: NameDomain) extends SalestaxrateFieldValue("name", value)
+  case class name(override val value: Name) extends SalestaxrateFieldValue("name", value)
   case class rowguid(override val value: UUID) extends SalestaxrateFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends SalestaxrateFieldValue("modifieddate", value)
 }

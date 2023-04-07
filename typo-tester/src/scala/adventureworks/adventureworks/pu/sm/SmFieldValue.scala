@@ -7,7 +7,7 @@ package adventureworks
 package pu
 package sm
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -18,7 +18,7 @@ sealed abstract class SmFieldValue[T](name: String, value: T) extends SmFieldOrI
 object SmFieldValue {
   case class id(override val value: Option[Int]) extends SmFieldValue("id", value)
   case class shipmethodid(override val value: Option[ShipmethodId]) extends SmFieldValue("shipmethodid", value)
-  case class name(override val value: Option[NameDomain]) extends SmFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends SmFieldValue("name", value)
   case class shipbase(override val value: Option[BigDecimal]) extends SmFieldValue("shipbase", value)
   case class shiprate(override val value: Option[BigDecimal]) extends SmFieldValue("shiprate", value)
   case class rowguid(override val value: Option[UUID]) extends SmFieldValue("rowguid", value)

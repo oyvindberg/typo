@@ -9,7 +9,7 @@ package productproductphoto
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import java.time.LocalDateTime
 
 sealed abstract class ProductproductphotoFieldOrIdValue[T](val name: String, val value: T)
@@ -18,6 +18,6 @@ sealed abstract class ProductproductphotoFieldValue[T](name: String, value: T) e
 object ProductproductphotoFieldValue {
   case class productid(override val value: ProductId) extends ProductproductphotoFieldOrIdValue("productid", value)
   case class productphotoid(override val value: ProductphotoId) extends ProductproductphotoFieldOrIdValue("productphotoid", value)
-  case class primary(override val value: FlagDomain) extends ProductproductphotoFieldValue("primary", value)
+  case class primary(override val value: Flag) extends ProductproductphotoFieldValue("primary", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductproductphotoFieldValue("modifieddate", value)
 }

@@ -9,7 +9,7 @@ package ppp
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ case class PppRow(
   /** Points to [[production.productproductphoto.ProductproductphotoRow.productphotoid]] */
   productphotoid: Option[ProductphotoId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"productphotoid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.primary]] */
-  primary: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"primary","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  primary: Flag /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"primary","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.modifieddate]] */
   modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"modifieddate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -37,7 +37,7 @@ object PppRow {
       PppRow(
         productid = row[Option[ProductId]](prefix + "productid"),
         productphotoid = row[Option[ProductphotoId]](prefix + "productphotoid"),
-        primary = row[FlagDomain](prefix + "primary"),
+        primary = row[Flag](prefix + "primary"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
     )
@@ -58,7 +58,7 @@ object PppRow {
           PppRow(
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
-            primary = json.\("primary").as[FlagDomain],
+            primary = json.\("primary").as[Flag],
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

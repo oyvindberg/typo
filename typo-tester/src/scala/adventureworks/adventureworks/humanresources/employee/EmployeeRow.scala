@@ -8,7 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDate
@@ -31,10 +31,10 @@ case class EmployeeRow(
   maritalstatus: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"maritalstatus","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   gender: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"gender","ordinal_position":9,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   hiredate: LocalDate /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"hiredate","ordinal_position":10,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  salariedflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"salariedflag","ordinal_position":11,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  salariedflag: Flag /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"salariedflag","ordinal_position":11,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   vacationhours: Int /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"vacationhours","ordinal_position":12,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   sickleavehours: Int /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"sickleavehours","ordinal_position":13,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  currentflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"currentflag","ordinal_position":14,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  currentflag: Flag /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"currentflag","ordinal_position":14,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   rowguid: UUID /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"rowguid","ordinal_position":15,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"modifieddate","ordinal_position":16,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   organizationnode: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"organizationnode","ordinal_position":17,"column_default":"'/'::character varying","is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
@@ -52,10 +52,10 @@ object EmployeeRow {
         maritalstatus = row[/* bpchar */ String](prefix + "maritalstatus"),
         gender = row[/* bpchar */ String](prefix + "gender"),
         hiredate = row[LocalDate](prefix + "hiredate"),
-        salariedflag = row[FlagDomain](prefix + "salariedflag"),
+        salariedflag = row[Flag](prefix + "salariedflag"),
         vacationhours = row[Int](prefix + "vacationhours"),
         sickleavehours = row[Int](prefix + "sickleavehours"),
-        currentflag = row[FlagDomain](prefix + "currentflag"),
+        currentflag = row[Flag](prefix + "currentflag"),
         rowguid = row[UUID](prefix + "rowguid"),
         modifieddate = row[LocalDateTime](prefix + "modifieddate"),
         organizationnode = row[Option[String]](prefix + "organizationnode")
@@ -95,10 +95,10 @@ object EmployeeRow {
             maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
             gender = json.\("gender").as[/* bpchar */ String],
             hiredate = json.\("hiredate").as[LocalDate],
-            salariedflag = json.\("salariedflag").as[FlagDomain],
+            salariedflag = json.\("salariedflag").as[Flag],
             vacationhours = json.\("vacationhours").as[Int],
             sickleavehours = json.\("sickleavehours").as[Int],
-            currentflag = json.\("currentflag").as[FlagDomain],
+            currentflag = json.\("currentflag").as[Flag],
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime],
             organizationnode = json.\("organizationnode").toOption.map(_.as[String])

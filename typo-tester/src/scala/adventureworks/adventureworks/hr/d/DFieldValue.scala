@@ -8,7 +8,7 @@ package hr
 package d
 
 import adventureworks.humanresources.department.DepartmentId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class DFieldOrIdValue[T](val name: String, val value: T)
@@ -17,7 +17,7 @@ sealed abstract class DFieldValue[T](name: String, value: T) extends DFieldOrIdV
 object DFieldValue {
   case class id(override val value: Option[Int]) extends DFieldValue("id", value)
   case class departmentid(override val value: Option[DepartmentId]) extends DFieldValue("departmentid", value)
-  case class name(override val value: Option[NameDomain]) extends DFieldValue("name", value)
-  case class groupname(override val value: Option[NameDomain]) extends DFieldValue("groupname", value)
+  case class name(override val value: Option[Name]) extends DFieldValue("name", value)
+  case class groupname(override val value: Option[Name]) extends DFieldValue("groupname", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends DFieldValue("modifieddate", value)
 }

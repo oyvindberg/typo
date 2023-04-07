@@ -11,8 +11,8 @@ import adventureworks.Defaulted
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -24,10 +24,10 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.product` which has not been persisted yet */
 case class ProductRowUnsaved(
-  name: NameDomain,
+  name: Name,
   productnumber: String,
-  makeflag: Defaulted[FlagDomain],
-  finishedgoodsflag: Defaulted[FlagDomain],
+  makeflag: Defaulted[Flag],
+  finishedgoodsflag: Defaulted[Flag],
   color: Option[String],
   safetystocklevel: Int,
   reorderpoint: Int,
@@ -83,10 +83,10 @@ object ProductRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             productnumber = json.\("productnumber").as[String],
-            makeflag = json.\("makeflag").as[Defaulted[FlagDomain]],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[FlagDomain]],
+            makeflag = json.\("makeflag").as[Defaulted[Flag]],
+            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Flag]],
             color = json.\("color").toOption.map(_.as[String]),
             safetystocklevel = json.\("safetystocklevel").as[Int],
             reorderpoint = json.\("reorderpoint").as[Int],

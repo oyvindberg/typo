@@ -9,9 +9,9 @@ package salesorderheader
 
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumberDomain
-import adventureworks.public.FlagDomain
-import adventureworks.public.OrderNumberDomain
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
@@ -30,9 +30,9 @@ object SalesorderheaderFieldValue {
   case class duedate(override val value: LocalDateTime) extends SalesorderheaderFieldValue("duedate", value)
   case class shipdate(override val value: Option[LocalDateTime]) extends SalesorderheaderFieldValue("shipdate", value)
   case class status(override val value: Int) extends SalesorderheaderFieldValue("status", value)
-  case class onlineorderflag(override val value: FlagDomain) extends SalesorderheaderFieldValue("onlineorderflag", value)
-  case class purchaseordernumber(override val value: Option[OrderNumberDomain]) extends SalesorderheaderFieldValue("purchaseordernumber", value)
-  case class accountnumber(override val value: Option[AccountNumberDomain]) extends SalesorderheaderFieldValue("accountnumber", value)
+  case class onlineorderflag(override val value: Flag) extends SalesorderheaderFieldValue("onlineorderflag", value)
+  case class purchaseordernumber(override val value: Option[OrderNumber]) extends SalesorderheaderFieldValue("purchaseordernumber", value)
+  case class accountnumber(override val value: Option[AccountNumber]) extends SalesorderheaderFieldValue("accountnumber", value)
   case class customerid(override val value: CustomerId) extends SalesorderheaderFieldValue("customerid", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SalesorderheaderFieldValue("salespersonid", value)
   case class territoryid(override val value: Option[SalesterritoryId]) extends SalesorderheaderFieldValue("territoryid", value)

@@ -9,7 +9,7 @@ package personphone
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.PhoneDomain
+import adventureworks.public.Phone
 import java.time.LocalDateTime
 
 sealed abstract class PersonphoneFieldOrIdValue[T](val name: String, val value: T)
@@ -17,7 +17,7 @@ sealed abstract class PersonphoneFieldValue[T](name: String, value: T) extends P
 
 object PersonphoneFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends PersonphoneFieldOrIdValue("businessentityid", value)
-  case class phonenumber(override val value: PhoneDomain) extends PersonphoneFieldOrIdValue("phonenumber", value)
+  case class phonenumber(override val value: Phone) extends PersonphoneFieldOrIdValue("phonenumber", value)
   case class phonenumbertypeid(override val value: PhonenumbertypeId) extends PersonphoneFieldOrIdValue("phonenumbertypeid", value)
   case class modifieddate(override val value: LocalDateTime) extends PersonphoneFieldValue("modifieddate", value)
 }

@@ -5,7 +5,7 @@ package metadb
 import typo.generated.custom.domains.{DomainsRepoImpl, DomainsRow}
 import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
-import typo.generated.information_schema.YesOrNoDomain
+import typo.generated.information_schema.YesOrNo
 import typo.generated.information_schema.columns.{ColumnsRepoImpl, ColumnsRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageRepoImpl, KeyColumnUsageRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsRepoImpl, ReferentialConstraintsRow}
@@ -103,10 +103,10 @@ object MetaDb {
               name = db.ColName(c.columnName.get.value),
               hasDefault = c.columnDefault.isDefined,
               nullability = c.isNullable match {
-                case Some(YesOrNoDomain("YES")) => Nullability.Nullable
-                case Some(YesOrNoDomain("NO"))  => Nullability.NoNulls
-                case None                       => Nullability.NullableUnknown
-                case other                      => throw new Exception(s"Unknown nullability: $other")
+                case Some(YesOrNo("YES")) => Nullability.Nullable
+                case Some(YesOrNo("NO"))  => Nullability.NoNulls
+                case None                 => Nullability.NullableUnknown
+                case other                => throw new Exception(s"Unknown nullability: $other")
               },
               tpe = typeMapperDb.col(c).getOrElse {
                 System.err.println(s"Couldn't translate type from column $jsonDescription")

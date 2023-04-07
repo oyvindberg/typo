@@ -18,34 +18,34 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import typo.generated.information_schema.CardinalNumberDomain
-import typo.generated.information_schema.SqlIdentifierDomain
+import typo.generated.information_schema.CardinalNumber
+import typo.generated.information_schema.SqlIdentifier
 
 case class KeyColumnUsageRow(
-  constraintCatalog: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  constraintSchema: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  constraintName: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  tableCatalog: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  tableSchema: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_schema","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  tableName: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_name","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  columnName: Option[SqlIdentifierDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"column_name","ordinal_position":7,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  ordinalPosition: Option[CardinalNumberDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"ordinal_position","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  positionInUniqueConstraint: Option[CardinalNumberDomain] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"position_in_unique_constraint","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
+  constraintCatalog: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  constraintSchema: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  constraintName: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"constraint_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tableCatalog: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tableSchema: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_schema","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  tableName: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"table_name","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  columnName: Option[SqlIdentifier] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"column_name","ordinal_position":7,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  ordinalPosition: Option[CardinalNumber] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"ordinal_position","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  positionInUniqueConstraint: Option[CardinalNumber] /* {"table_catalog":"postgres","table_schema":"information_schema","table_name":"key_column_usage","column_name":"position_in_unique_constraint","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object KeyColumnUsageRow {
   def rowParser(prefix: String): RowParser[KeyColumnUsageRow] = { row =>
     Success(
       KeyColumnUsageRow(
-        constraintCatalog = row[Option[SqlIdentifierDomain]](prefix + "constraint_catalog"),
-        constraintSchema = row[Option[SqlIdentifierDomain]](prefix + "constraint_schema"),
-        constraintName = row[Option[SqlIdentifierDomain]](prefix + "constraint_name"),
-        tableCatalog = row[Option[SqlIdentifierDomain]](prefix + "table_catalog"),
-        tableSchema = row[Option[SqlIdentifierDomain]](prefix + "table_schema"),
-        tableName = row[Option[SqlIdentifierDomain]](prefix + "table_name"),
-        columnName = row[Option[SqlIdentifierDomain]](prefix + "column_name"),
-        ordinalPosition = row[Option[CardinalNumberDomain]](prefix + "ordinal_position"),
-        positionInUniqueConstraint = row[Option[CardinalNumberDomain]](prefix + "position_in_unique_constraint")
+        constraintCatalog = row[Option[SqlIdentifier]](prefix + "constraint_catalog"),
+        constraintSchema = row[Option[SqlIdentifier]](prefix + "constraint_schema"),
+        constraintName = row[Option[SqlIdentifier]](prefix + "constraint_name"),
+        tableCatalog = row[Option[SqlIdentifier]](prefix + "table_catalog"),
+        tableSchema = row[Option[SqlIdentifier]](prefix + "table_schema"),
+        tableName = row[Option[SqlIdentifier]](prefix + "table_name"),
+        columnName = row[Option[SqlIdentifier]](prefix + "column_name"),
+        ordinalPosition = row[Option[CardinalNumber]](prefix + "ordinal_position"),
+        positionInUniqueConstraint = row[Option[CardinalNumber]](prefix + "position_in_unique_constraint")
       )
     )
   }
@@ -68,15 +68,15 @@ object KeyColumnUsageRow {
       JsResult.fromTry(
         Try(
           KeyColumnUsageRow(
-            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifierDomain]),
-            constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifierDomain]),
-            constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifierDomain]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifierDomain]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifierDomain]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifierDomain]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifierDomain]),
-            ordinalPosition = json.\("ordinal_position").toOption.map(_.as[CardinalNumberDomain]),
-            positionInUniqueConstraint = json.\("position_in_unique_constraint").toOption.map(_.as[CardinalNumberDomain])
+            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
+            constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
+            constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
+            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier]),
+            ordinalPosition = json.\("ordinal_position").toOption.map(_.as[CardinalNumber]),
+            positionInUniqueConstraint = json.\("position_in_unique_constraint").toOption.map(_.as[CardinalNumber])
           )
         )
       )

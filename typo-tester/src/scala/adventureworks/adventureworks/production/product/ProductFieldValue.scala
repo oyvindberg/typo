@@ -10,8 +10,8 @@ package product
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,10 +20,10 @@ sealed abstract class ProductFieldValue[T](name: String, value: T) extends Produ
 
 object ProductFieldValue {
   case class productid(override val value: ProductId) extends ProductFieldOrIdValue("productid", value)
-  case class name(override val value: NameDomain) extends ProductFieldValue("name", value)
+  case class name(override val value: Name) extends ProductFieldValue("name", value)
   case class productnumber(override val value: String) extends ProductFieldValue("productnumber", value)
-  case class makeflag(override val value: FlagDomain) extends ProductFieldValue("makeflag", value)
-  case class finishedgoodsflag(override val value: FlagDomain) extends ProductFieldValue("finishedgoodsflag", value)
+  case class makeflag(override val value: Flag) extends ProductFieldValue("makeflag", value)
+  case class finishedgoodsflag(override val value: Flag) extends ProductFieldValue("finishedgoodsflag", value)
   case class color(override val value: Option[String]) extends ProductFieldValue("color", value)
   case class safetystocklevel(override val value: Int) extends ProductFieldValue("safetystocklevel", value)
   case class reorderpoint(override val value: Int) extends ProductFieldValue("reorderpoint", value)

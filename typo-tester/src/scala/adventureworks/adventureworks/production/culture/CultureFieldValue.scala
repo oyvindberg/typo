@@ -7,7 +7,7 @@ package adventureworks
 package production
 package culture
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class CultureFieldOrIdValue[T](val name: String, val value: T)
@@ -15,6 +15,6 @@ sealed abstract class CultureFieldValue[T](name: String, value: T) extends Cultu
 
 object CultureFieldValue {
   case class cultureid(override val value: CultureId) extends CultureFieldOrIdValue("cultureid", value)
-  case class name(override val value: NameDomain) extends CultureFieldValue("name", value)
+  case class name(override val value: Name) extends CultureFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends CultureFieldValue("modifieddate", value)
 }

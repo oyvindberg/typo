@@ -8,7 +8,7 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,7 +19,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
 case class ProductproductphotoRowUnsaved(
-  primary: Defaulted[FlagDomain],
+  primary: Defaulted[Flag],
   modifieddate: Defaulted[LocalDateTime]
 )
 object ProductproductphotoRowUnsaved {
@@ -34,7 +34,7 @@ object ProductproductphotoRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductproductphotoRowUnsaved(
-            primary = json.\("primary").as[Defaulted[FlagDomain]],
+            primary = json.\("primary").as[Defaulted[Flag]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

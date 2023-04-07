@@ -2,14 +2,14 @@ package typo
 package internal
 package metadb
 
-import typo.generated.information_schema.CharacterDataDomain
+import typo.generated.information_schema.CharacterData
 import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
 import typo.generated.information_schema.table_constraints.TableConstraintsRow
 
 object PrimaryKeys {
   def apply(tableConstraints: List[TableConstraintsRow], keyColumnUsage: List[KeyColumnUsageRow]): Map[db.RelationName, db.PrimaryKey] = {
     tableConstraints
-      .filter(_.constraintType.contains(CharacterDataDomain("PRIMARY KEY")))
+      .filter(_.constraintType.contains(CharacterData("PRIMARY KEY")))
       .flatMap { tc =>
         val columns = keyColumnUsage
           .filter(kcu =>

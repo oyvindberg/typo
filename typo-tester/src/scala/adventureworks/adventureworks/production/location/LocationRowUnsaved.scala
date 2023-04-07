@@ -8,7 +8,7 @@ package production
 package location
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,7 +19,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.location` which has not been persisted yet */
 case class LocationRowUnsaved(
-  name: NameDomain,
+  name: Name,
   costrate: Defaulted[BigDecimal],
   availability: Defaulted[BigDecimal],
   modifieddate: Defaulted[LocalDateTime]
@@ -38,7 +38,7 @@ object LocationRowUnsaved {
       JsResult.fromTry(
         Try(
           LocationRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             costrate = json.\("costrate").as[Defaulted[BigDecimal]],
             availability = json.\("availability").as[Defaulted[BigDecimal]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

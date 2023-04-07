@@ -9,7 +9,7 @@ package product
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlParser
@@ -28,11 +28,11 @@ object ProductRepoImpl extends ProductRepo {
       Some(NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber))),
       unsaved.makeflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[Flag](value)))
       },
       unsaved.finishedgoodsflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("color", ParameterValue.from(unsaved.color))),
       Some(NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel))),

@@ -8,7 +8,7 @@ package sa
 package s
 
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,7 +18,7 @@ sealed abstract class SFieldValue[T](name: String, value: T) extends SFieldOrIdV
 object SFieldValue {
   case class id(override val value: Option[Int]) extends SFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends SFieldValue("businessentityid", value)
-  case class name(override val value: Option[NameDomain]) extends SFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends SFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SFieldValue("salespersonid", value)
   case class demographics(override val value: Option[/* xml */ String]) extends SFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends SFieldValue("rowguid", value)

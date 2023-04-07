@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productcategory
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,7 +16,7 @@ sealed abstract class ProductcategoryFieldValue[T](name: String, value: T) exten
 
 object ProductcategoryFieldValue {
   case class productcategoryid(override val value: ProductcategoryId) extends ProductcategoryFieldOrIdValue("productcategoryid", value)
-  case class name(override val value: NameDomain) extends ProductcategoryFieldValue("name", value)
+  case class name(override val value: Name) extends ProductcategoryFieldValue("name", value)
   case class rowguid(override val value: UUID) extends ProductcategoryFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductcategoryFieldValue("modifieddate", value)
 }

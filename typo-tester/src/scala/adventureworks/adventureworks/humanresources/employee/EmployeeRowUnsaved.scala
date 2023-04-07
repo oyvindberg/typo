@@ -8,7 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -28,10 +28,10 @@ case class EmployeeRowUnsaved(
   maritalstatus: /* bpchar */ String,
   gender: /* bpchar */ String,
   hiredate: LocalDate,
-  salariedflag: Defaulted[FlagDomain],
+  salariedflag: Defaulted[Flag],
   vacationhours: Defaulted[Int],
   sickleavehours: Defaulted[Int],
-  currentflag: Defaulted[FlagDomain],
+  currentflag: Defaulted[Flag],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime],
   organizationnode: Defaulted[Option[String]]
@@ -67,10 +67,10 @@ object EmployeeRowUnsaved {
             maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
             gender = json.\("gender").as[/* bpchar */ String],
             hiredate = json.\("hiredate").as[LocalDate],
-            salariedflag = json.\("salariedflag").as[Defaulted[FlagDomain]],
+            salariedflag = json.\("salariedflag").as[Defaulted[Flag]],
             vacationhours = json.\("vacationhours").as[Defaulted[Int]],
             sickleavehours = json.\("sickleavehours").as[Defaulted[Int]],
-            currentflag = json.\("currentflag").as[Defaulted[FlagDomain]],
+            currentflag = json.\("currentflag").as[Defaulted[Flag]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]],
             organizationnode = json.\("organizationnode").as[Defaulted[Option[String]]]

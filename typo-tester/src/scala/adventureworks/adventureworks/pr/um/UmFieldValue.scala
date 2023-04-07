@@ -8,7 +8,7 @@ package pr
 package um
 
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class UmFieldOrIdValue[T](val name: String, val value: T)
@@ -17,6 +17,6 @@ sealed abstract class UmFieldValue[T](name: String, value: T) extends UmFieldOrI
 object UmFieldValue {
   case class id(override val value: Option[/* bpchar */ String]) extends UmFieldValue("id", value)
   case class unitmeasurecode(override val value: Option[UnitmeasureId]) extends UmFieldValue("unitmeasurecode", value)
-  case class name(override val value: Option[NameDomain]) extends UmFieldValue("name", value)
+  case class name(override val value: Option[Name]) extends UmFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends UmFieldValue("modifieddate", value)
 }

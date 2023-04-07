@@ -8,7 +8,7 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,8 +19,8 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.department` which has not been persisted yet */
 case class DepartmentRowUnsaved(
-  name: NameDomain,
-  groupname: NameDomain,
+  name: Name,
+  groupname: Name,
   modifieddate: Defaulted[LocalDateTime]
 )
 object DepartmentRowUnsaved {
@@ -36,8 +36,8 @@ object DepartmentRowUnsaved {
       JsResult.fromTry(
         Try(
           DepartmentRowUnsaved(
-            name = json.\("name").as[NameDomain],
-            groupname = json.\("groupname").as[NameDomain],
+            name = json.\("name").as[Name],
+            groupname = json.\("groupname").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

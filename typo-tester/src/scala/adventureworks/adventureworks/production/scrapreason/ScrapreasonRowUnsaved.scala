@@ -8,7 +8,7 @@ package production
 package scrapreason
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,7 +19,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.scrapreason` which has not been persisted yet */
 case class ScrapreasonRowUnsaved(
-  name: NameDomain,
+  name: Name,
   modifieddate: Defaulted[LocalDateTime]
 )
 object ScrapreasonRowUnsaved {
@@ -34,7 +34,7 @@ object ScrapreasonRowUnsaved {
       JsResult.fromTry(
         Try(
           ScrapreasonRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

@@ -9,7 +9,7 @@ package person
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.NameStyleDomain
+import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -26,7 +26,7 @@ object PersonRepoImpl extends PersonRepo {
       Some(NamedParameter("persontype", ParameterValue.from(unsaved.persontype))),
       unsaved.namestyle match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("namestyle", ParameterValue.from[NameStyleDomain](value)))
+        case Provided(value) => Some(NamedParameter("namestyle", ParameterValue.from[NameStyle](value)))
       },
       Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
       Some(NamedParameter("firstname", ParameterValue.from(unsaved.firstname))),

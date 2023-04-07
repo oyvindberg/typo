@@ -8,7 +8,7 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -20,7 +20,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.shipmethod` which has not been persisted yet */
 case class ShipmethodRowUnsaved(
-  name: NameDomain,
+  name: Name,
   shipbase: Defaulted[BigDecimal],
   shiprate: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
@@ -41,7 +41,7 @@ object ShipmethodRowUnsaved {
       JsResult.fromTry(
         Try(
           ShipmethodRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
             shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

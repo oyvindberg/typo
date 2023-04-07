@@ -2,7 +2,7 @@ package typo
 package internal
 package metadb
 
-import typo.generated.information_schema.CharacterDataDomain
+import typo.generated.information_schema.CharacterData
 import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
 import typo.generated.information_schema.table_constraints.TableConstraintsRow
 
@@ -25,7 +25,7 @@ object UniqueKeys {
 
     val allUniqueConstraintsByTable: Map[db.RelationName, List[TableConstraintsRow]] =
       tableConstraints
-        .filter(_.constraintType.contains(CharacterDataDomain("UNIQUE")))
+        .filter(_.constraintType.contains(CharacterData("UNIQUE")))
         .groupBy(uc => db.RelationName(uc.tableSchema.map(_.value), uc.tableName.get.value))
 
     allUniqueConstraintsByTable

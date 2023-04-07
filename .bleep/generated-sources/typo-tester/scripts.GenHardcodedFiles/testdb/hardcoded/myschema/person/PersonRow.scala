@@ -16,7 +16,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
-import testdb.hardcoded.myschema.SectorEnum
+import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
@@ -33,7 +33,7 @@ case class PersonRow(
   /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[String],
-  sector: SectorEnum
+  sector: Sector
 )
 
 object PersonRow {
@@ -50,7 +50,7 @@ object PersonRow {
         likesPizza = row[Boolean](prefix + "likes_pizza"),
         maritalStatusId = row[MaritalStatusId](prefix + "marital_status_id"),
         workEmail = row[Option[String]](prefix + "work_email"),
-        sector = row[SectorEnum](prefix + "sector")
+        sector = row[Sector](prefix + "sector")
       )
     )
   }
@@ -85,7 +85,7 @@ object PersonRow {
             likesPizza = json.\("likes_pizza").as[Boolean],
             maritalStatusId = json.\("marital_status_id").as[MaritalStatusId],
             workEmail = json.\("work_email").toOption.map(_.as[String]),
-            sector = json.\("sector").as[SectorEnum]
+            sector = json.\("sector").as[Sector]
           )
         )
       )

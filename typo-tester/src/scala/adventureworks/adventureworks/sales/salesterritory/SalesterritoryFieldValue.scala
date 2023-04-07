@@ -8,7 +8,7 @@ package sales
 package salesterritory
 
 import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,7 +17,7 @@ sealed abstract class SalesterritoryFieldValue[T](name: String, value: T) extend
 
 object SalesterritoryFieldValue {
   case class territoryid(override val value: SalesterritoryId) extends SalesterritoryFieldOrIdValue("territoryid", value)
-  case class name(override val value: NameDomain) extends SalesterritoryFieldValue("name", value)
+  case class name(override val value: Name) extends SalesterritoryFieldValue("name", value)
   case class countryregioncode(override val value: CountryregionId) extends SalesterritoryFieldValue("countryregioncode", value)
   case class group(override val value: String) extends SalesterritoryFieldValue("group", value)
   case class salesytd(override val value: BigDecimal) extends SalesterritoryFieldValue("salesytd", value)

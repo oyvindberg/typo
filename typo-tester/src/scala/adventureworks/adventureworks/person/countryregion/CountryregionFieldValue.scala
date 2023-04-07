@@ -7,7 +7,7 @@ package adventureworks
 package person
 package countryregion
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class CountryregionFieldOrIdValue[T](val name: String, val value: T)
@@ -15,6 +15,6 @@ sealed abstract class CountryregionFieldValue[T](name: String, value: T) extends
 
 object CountryregionFieldValue {
   case class countryregioncode(override val value: CountryregionId) extends CountryregionFieldOrIdValue("countryregioncode", value)
-  case class name(override val value: NameDomain) extends CountryregionFieldValue("name", value)
+  case class name(override val value: Name) extends CountryregionFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends CountryregionFieldValue("modifieddate", value)
 }

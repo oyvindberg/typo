@@ -8,7 +8,7 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,7 +19,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.contacttype` which has not been persisted yet */
 case class ContacttypeRowUnsaved(
-  name: NameDomain,
+  name: Name,
   modifieddate: Defaulted[LocalDateTime]
 )
 object ContacttypeRowUnsaved {
@@ -34,7 +34,7 @@ object ContacttypeRowUnsaved {
       JsResult.fromTry(
         Try(
           ContacttypeRowUnsaved(
-            name = json.\("name").as[NameDomain],
+            name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

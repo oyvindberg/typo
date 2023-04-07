@@ -2,7 +2,7 @@ package typo
 package internal
 package metadb
 
-import typo.generated.information_schema.CharacterDataDomain
+import typo.generated.information_schema.CharacterData
 import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
 import typo.generated.information_schema.referential_constraints.ReferentialConstraintsRow
 import typo.generated.information_schema.table_constraints.TableConstraintsRow
@@ -66,7 +66,7 @@ object ForeignKeys {
     }
 
     tableConstraints
-      .filter(_.constraintType.contains(CharacterDataDomain("FOREIGN KEY")))
+      .filter(_.constraintType.contains(CharacterData("FOREIGN KEY")))
       .map { fk =>
         (
           db.RelationName(fk.tableSchema.map(_.value), fk.tableName.get.value),

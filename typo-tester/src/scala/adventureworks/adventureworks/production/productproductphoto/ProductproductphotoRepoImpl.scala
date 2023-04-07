@@ -9,7 +9,7 @@ package productproductphoto
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -24,7 +24,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     val namedParameters = List(
       unsaved.primary match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("primary", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("primary", ParameterValue.from[Flag](value)))
       },
       unsaved.modifieddate match {
         case UseDefault => None

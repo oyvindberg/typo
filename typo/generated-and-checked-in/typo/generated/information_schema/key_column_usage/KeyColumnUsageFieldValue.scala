@@ -10,20 +10,20 @@ package generated
 package information_schema
 package key_column_usage
 
-import typo.generated.information_schema.CardinalNumberDomain
-import typo.generated.information_schema.SqlIdentifierDomain
+import typo.generated.information_schema.CardinalNumber
+import typo.generated.information_schema.SqlIdentifier
 
 sealed abstract class KeyColumnUsageFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class KeyColumnUsageFieldValue[T](name: String, value: T) extends KeyColumnUsageFieldOrIdValue(name, value)
 
 object KeyColumnUsageFieldValue {
-  case class constraintCatalog(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("constraint_catalog", value)
-  case class constraintSchema(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("constraint_schema", value)
-  case class constraintName(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("constraint_name", value)
-  case class tableCatalog(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("table_catalog", value)
-  case class tableSchema(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("table_schema", value)
-  case class tableName(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("table_name", value)
-  case class columnName(override val value: Option[SqlIdentifierDomain]) extends KeyColumnUsageFieldValue("column_name", value)
-  case class ordinalPosition(override val value: Option[CardinalNumberDomain]) extends KeyColumnUsageFieldValue("ordinal_position", value)
-  case class positionInUniqueConstraint(override val value: Option[CardinalNumberDomain]) extends KeyColumnUsageFieldValue("position_in_unique_constraint", value)
+  case class constraintCatalog(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("constraint_catalog", value)
+  case class constraintSchema(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("constraint_schema", value)
+  case class constraintName(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("constraint_name", value)
+  case class tableCatalog(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("table_catalog", value)
+  case class tableSchema(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("table_schema", value)
+  case class tableName(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("table_name", value)
+  case class columnName(override val value: Option[SqlIdentifier]) extends KeyColumnUsageFieldValue("column_name", value)
+  case class ordinalPosition(override val value: Option[CardinalNumber]) extends KeyColumnUsageFieldValue("ordinal_position", value)
+  case class positionInUniqueConstraint(override val value: Option[CardinalNumber]) extends KeyColumnUsageFieldValue("position_in_unique_constraint", value)
 }

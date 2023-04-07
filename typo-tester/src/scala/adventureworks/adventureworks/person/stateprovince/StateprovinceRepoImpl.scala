@@ -9,7 +9,7 @@ package stateprovince
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
-import adventureworks.public.FlagDomain
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlParser
@@ -28,7 +28,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       Some(NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode))),
       unsaved.isonlystateprovinceflag match {
         case UseDefault => None
-        case Provided(value) => Some(NamedParameter("isonlystateprovinceflag", ParameterValue.from[FlagDomain](value)))
+        case Provided(value) => Some(NamedParameter("isonlystateprovinceflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),

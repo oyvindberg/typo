@@ -22,26 +22,26 @@ import play.api.libs.json.Writes
   *  - PRIVATE
   *  - OTHER
   */
-sealed abstract class SectorEnum(val value: String)
-object SectorEnum {
-  case object `_public` extends SectorEnum("PUBLIC")
-  case object `_private` extends SectorEnum("PRIVATE")
-  case object `_other` extends SectorEnum("OTHER")
+sealed abstract class Sector(val value: String)
+object Sector {
+  case object `_public` extends Sector("PUBLIC")
+  case object `_private` extends Sector("PRIVATE")
+  case object `_other` extends Sector("OTHER")
 
-  val All: List[SectorEnum] = List(`_public`, `_private`, `_other`)
+  val All: List[Sector] = List(`_public`, `_private`, `_other`)
   val Names: String = All.map(_.value).mkString(", ")
-  val ByName: Map[String, SectorEnum] = All.map(x => (x.value, x)).toMap
+  val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
 
-  implicit val column: Column[SectorEnum] =
+  implicit val column: Column[Sector] =
     implicitly[Column[String]]
       .mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
-  implicit val toStatement: ToStatement[SectorEnum] =
+  implicit val toStatement: ToStatement[Sector] =
     implicitly[ToStatement[String]].contramap(_.value)
-  implicit val parameterMetadata: ParameterMetaData[SectorEnum] = new ParameterMetaData[SectorEnum] {
+  implicit val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[SectorEnum] = (value: JsValue) =>
+  implicit val reads: Reads[Sector] = (value: JsValue) =>
     value.validate[String].flatMap { str =>
       ByName.get(str) match {
         case Some(value) => JsSuccess(value)
@@ -49,5 +49,5 @@ object SectorEnum {
       }
     }
   
-  implicit val writes: Writes[SectorEnum] = value => implicitly[Writes[String]].writes(value.value)
+  implicit val writes: Writes[Sector] = value => implicitly[Writes[String]].writes(value.value)
 }

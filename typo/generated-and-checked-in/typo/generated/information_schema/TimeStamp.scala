@@ -18,13 +18,13 @@ import play.api.libs.json.Format
 /** Domain `information_schema.time_stamp`
   * No constraint
   */
-case class TimeStampDomain(value: ZonedDateTime) extends AnyVal
-object TimeStampDomain {
-  implicit def ordering(implicit ev: Ordering[ZonedDateTime]): Ordering[TimeStampDomain] = Ordering.by(_.value)
-  implicit val format: Format[TimeStampDomain] = implicitly[Format[ZonedDateTime]].bimap(TimeStampDomain.apply, _.value)
-  implicit val toStatement: ToStatement[TimeStampDomain] = implicitly[ToStatement[ZonedDateTime]].contramap(_.value)
-  implicit val column: Column[TimeStampDomain] = implicitly[Column[ZonedDateTime]].map(TimeStampDomain.apply)
-  implicit val parameterMetadata: ParameterMetaData[TimeStampDomain] = new ParameterMetaData[TimeStampDomain] {
+case class TimeStamp(value: ZonedDateTime) extends AnyVal
+object TimeStamp {
+  implicit def ordering(implicit ev: Ordering[ZonedDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
+  implicit val format: Format[TimeStamp] = implicitly[Format[ZonedDateTime]].bimap(TimeStamp.apply, _.value)
+  implicit val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[ZonedDateTime]].contramap(_.value)
+  implicit val column: Column[TimeStamp] = implicitly[Column[ZonedDateTime]].map(TimeStamp.apply)
+  implicit val parameterMetadata: ParameterMetaData[TimeStamp] = new ParameterMetaData[TimeStamp] {
     override def sqlType: String = implicitly[ParameterMetaData[ZonedDateTime]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[ZonedDateTime]].jdbcType
   }

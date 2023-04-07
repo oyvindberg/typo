@@ -10,9 +10,9 @@ package salesorderheader
 import adventureworks.Defaulted
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumberDomain
-import adventureworks.public.FlagDomain
-import adventureworks.public.OrderNumberDomain
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
@@ -34,9 +34,9 @@ case class SalesorderheaderRowUnsaved(
   duedate: LocalDateTime,
   shipdate: Option[LocalDateTime],
   status: Defaulted[Int],
-  onlineorderflag: Defaulted[FlagDomain],
-  purchaseordernumber: Option[OrderNumberDomain],
-  accountnumber: Option[AccountNumberDomain],
+  onlineorderflag: Defaulted[Flag],
+  purchaseordernumber: Option[OrderNumber],
+  accountnumber: Option[AccountNumber],
   customerid: CustomerId,
   salespersonid: Option[BusinessentityId],
   territoryid: Option[SalesterritoryId],
@@ -93,9 +93,9 @@ object SalesorderheaderRowUnsaved {
             duedate = json.\("duedate").as[LocalDateTime],
             shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
             status = json.\("status").as[Defaulted[Int]],
-            onlineorderflag = json.\("onlineorderflag").as[Defaulted[FlagDomain]],
-            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumberDomain]),
-            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumberDomain]),
+            onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
+            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
+            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
             customerid = json.\("customerid").as[CustomerId],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),

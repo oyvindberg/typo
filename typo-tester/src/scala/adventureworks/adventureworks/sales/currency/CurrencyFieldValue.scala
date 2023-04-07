@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package currency
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class CurrencyFieldOrIdValue[T](val name: String, val value: T)
@@ -15,6 +15,6 @@ sealed abstract class CurrencyFieldValue[T](name: String, value: T) extends Curr
 
 object CurrencyFieldValue {
   case class currencycode(override val value: CurrencyId) extends CurrencyFieldOrIdValue("currencycode", value)
-  case class name(override val value: NameDomain) extends CurrencyFieldValue("name", value)
+  case class name(override val value: Name) extends CurrencyFieldValue("name", value)
   case class modifieddate(override val value: LocalDateTime) extends CurrencyFieldValue("modifieddate", value)
 }

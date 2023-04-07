@@ -8,7 +8,7 @@ package production
 package vproductmodelcatalogdescription
 
 import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
@@ -24,7 +24,7 @@ case class VproductmodelcatalogdescriptionRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"productmodelid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[productmodel.ProductmodelRow.name]] */
-  name: Option[NameDomain] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  name: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"name","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   Summary: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"Summary","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   manufacturer: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"manufacturer","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   copyright: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"production","table_name":"vproductmodelcatalogdescription","column_name":"copyright","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -57,7 +57,7 @@ object VproductmodelcatalogdescriptionRow {
     Success(
       VproductmodelcatalogdescriptionRow(
         productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        name = row[Option[NameDomain]](prefix + "name"),
+        name = row[Option[Name]](prefix + "name"),
         Summary = row[Option[String]](prefix + "Summary"),
         manufacturer = row[Option[String]](prefix + "manufacturer"),
         copyright = row[Option[String]](prefix + "copyright"),
@@ -120,7 +120,7 @@ object VproductmodelcatalogdescriptionRow {
         Try(
           VproductmodelcatalogdescriptionRow(
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[NameDomain]),
+            name = json.\("name").toOption.map(_.as[Name]),
             Summary = json.\("Summary").toOption.map(_.as[String]),
             manufacturer = json.\("manufacturer").toOption.map(_.as[String]),
             copyright = json.\("copyright").toOption.map(_.as[String]),

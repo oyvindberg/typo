@@ -9,8 +9,8 @@ package stateprovince
 
 import adventureworks.Defaulted
 import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.FlagDomain
-import adventureworks.public.NameDomain
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -25,8 +25,8 @@ import scala.util.Try
 case class StateprovinceRowUnsaved(
   stateprovincecode: /* bpchar */ String,
   countryregioncode: CountryregionId,
-  isonlystateprovinceflag: Defaulted[FlagDomain],
-  name: NameDomain,
+  isonlystateprovinceflag: Defaulted[Flag],
+  name: Name,
   territoryid: SalesterritoryId,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
@@ -50,8 +50,8 @@ object StateprovinceRowUnsaved {
           StateprovinceRowUnsaved(
             stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[FlagDomain]],
-            name = json.\("name").as[NameDomain],
+            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[Flag]],
+            name = json.\("name").as[Name],
             territoryid = json.\("territoryid").as[SalesterritoryId],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

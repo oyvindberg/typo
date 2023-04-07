@@ -9,9 +9,9 @@ package salesorderheader
 
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumberDomain
-import adventureworks.public.FlagDomain
-import adventureworks.public.OrderNumberDomain
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
@@ -35,9 +35,9 @@ case class SalesorderheaderRow(
   duedate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"duedate","ordinal_position":4,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   shipdate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"shipdate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   status: Int /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"status","ordinal_position":6,"column_default":"1","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  onlineorderflag: FlagDomain /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"onlineorderflag","ordinal_position":7,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  purchaseordernumber: Option[OrderNumberDomain] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"purchaseordernumber","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"OrderNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  accountnumber: Option[AccountNumberDomain] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"accountnumber","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"AccountNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  onlineorderflag: Flag /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"onlineorderflag","ordinal_position":7,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  purchaseordernumber: Option[OrderNumber] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"purchaseordernumber","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"OrderNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  accountnumber: Option[AccountNumber] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"accountnumber","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"AccountNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[customer.CustomerRow.customerid]] */
   customerid: CustomerId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"customerid","ordinal_position":11,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[salesperson.SalespersonRow.businessentityid]] */
@@ -74,9 +74,9 @@ object SalesorderheaderRow {
         duedate = row[LocalDateTime](prefix + "duedate"),
         shipdate = row[Option[LocalDateTime]](prefix + "shipdate"),
         status = row[Int](prefix + "status"),
-        onlineorderflag = row[FlagDomain](prefix + "onlineorderflag"),
-        purchaseordernumber = row[Option[OrderNumberDomain]](prefix + "purchaseordernumber"),
-        accountnumber = row[Option[AccountNumberDomain]](prefix + "accountnumber"),
+        onlineorderflag = row[Flag](prefix + "onlineorderflag"),
+        purchaseordernumber = row[Option[OrderNumber]](prefix + "purchaseordernumber"),
+        accountnumber = row[Option[AccountNumber]](prefix + "accountnumber"),
         customerid = row[CustomerId](prefix + "customerid"),
         salespersonid = row[Option[BusinessentityId]](prefix + "salespersonid"),
         territoryid = row[Option[SalesterritoryId]](prefix + "territoryid"),
@@ -137,9 +137,9 @@ object SalesorderheaderRow {
             duedate = json.\("duedate").as[LocalDateTime],
             shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
             status = json.\("status").as[Int],
-            onlineorderflag = json.\("onlineorderflag").as[FlagDomain],
-            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumberDomain]),
-            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumberDomain]),
+            onlineorderflag = json.\("onlineorderflag").as[Flag],
+            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
+            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
             customerid = json.\("customerid").as[CustomerId],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),

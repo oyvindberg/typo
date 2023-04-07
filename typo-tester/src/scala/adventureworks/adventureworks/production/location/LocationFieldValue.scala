@@ -7,7 +7,7 @@ package adventureworks
 package production
 package location
 
-import adventureworks.public.NameDomain
+import adventureworks.public.Name
 import java.time.LocalDateTime
 
 sealed abstract class LocationFieldOrIdValue[T](val name: String, val value: T)
@@ -15,7 +15,7 @@ sealed abstract class LocationFieldValue[T](name: String, value: T) extends Loca
 
 object LocationFieldValue {
   case class locationid(override val value: LocationId) extends LocationFieldOrIdValue("locationid", value)
-  case class name(override val value: NameDomain) extends LocationFieldValue("name", value)
+  case class name(override val value: Name) extends LocationFieldValue("name", value)
   case class costrate(override val value: BigDecimal) extends LocationFieldValue("costrate", value)
   case class availability(override val value: BigDecimal) extends LocationFieldValue("availability", value)
   case class modifieddate(override val value: LocalDateTime) extends LocationFieldValue("modifieddate", value)
