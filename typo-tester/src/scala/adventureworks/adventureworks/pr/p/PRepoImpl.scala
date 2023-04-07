@@ -38,7 +38,7 @@ object PRepoImpl extends PRepo {
           case PFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
           case PFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
           case PFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case PFieldValue.class(value) => NamedParameter("class", ParameterValue.from(value))
+          case PFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
           case PFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
           case PFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
           case PFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))

@@ -33,7 +33,7 @@ object ProductFieldValue {
   case class weight(override val value: Option[BigDecimal]) extends ProductFieldValue("weight", value)
   case class daystomanufacture(override val value: Int) extends ProductFieldValue("daystomanufacture", value)
   case class productline(override val value: Option[String]) extends ProductFieldValue("productline", value)
-  case class class(override val value: Option[String]) extends ProductFieldValue("class", value)
+  case class `class`(override val value: Option[String]) extends ProductFieldValue("class", value)
   case class style(override val value: Option[String]) extends ProductFieldValue("style", value)
   case class productsubcategoryid(override val value: Option[ProductsubcategoryId]) extends ProductFieldValue("productsubcategoryid", value)
   case class productmodelid(override val value: Option[ProductmodelId]) extends ProductFieldValue("productmodelid", value)

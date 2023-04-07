@@ -43,7 +43,7 @@ object ProductRepoImpl extends ProductRepo {
       Some(NamedParameter("weight", ParameterValue.from(unsaved.weight))),
       Some(NamedParameter("daystomanufacture", ParameterValue.from(unsaved.daystomanufacture))),
       Some(NamedParameter("productline", ParameterValue.from(unsaved.productline))),
-      Some(NamedParameter("class", ParameterValue.from(unsaved.class))),
+      Some(NamedParameter("class", ParameterValue.from(unsaved.`class`))),
       Some(NamedParameter("style", ParameterValue.from(unsaved.style))),
       Some(NamedParameter("productsubcategoryid", ParameterValue.from(unsaved.productsubcategoryid))),
       Some(NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid))),
@@ -92,7 +92,7 @@ object ProductRepoImpl extends ProductRepo {
           case ProductFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
           case ProductFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
           case ProductFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case ProductFieldValue.class(value) => NamedParameter("class", ParameterValue.from(value))
+          case ProductFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
           case ProductFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
           case ProductFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
           case ProductFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
@@ -134,7 +134,7 @@ object ProductRepoImpl extends ProductRepo {
               weight = ${row.weight},
               daystomanufacture = ${row.daystomanufacture},
               productline = ${row.productline},
-              class = ${row.class},
+              class = ${row.`class`},
               style = ${row.style},
               productsubcategoryid = ${row.productsubcategoryid},
               productmodelid = ${row.productmodelid},
@@ -165,7 +165,7 @@ object ProductRepoImpl extends ProductRepo {
           case ProductFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
           case ProductFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
           case ProductFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case ProductFieldValue.class(value) => NamedParameter("class", ParameterValue.from(value))
+          case ProductFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
           case ProductFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
           case ProductFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
           case ProductFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))

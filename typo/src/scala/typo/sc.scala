@@ -159,12 +159,74 @@ object sc {
     }
   }
 
+  val isScalaKeyword: Set[String] =
+    Set(
+      "abstract",
+      "case",
+      "class",
+      "catch",
+      "def",
+      "do",
+      "else",
+      "enum",
+      "extends",
+      "export",
+      "extension",
+      "false",
+      "final",
+      "finally",
+      "for",
+      "forSome",
+      "given",
+      "if",
+      "implicit",
+      "import",
+      "inline",
+      "lazy",
+      "macro",
+      "match",
+      "new",
+      "null",
+      "object",
+      "override",
+      "package",
+      "private",
+      "protected",
+      "return",
+      "sealed",
+      "super",
+      "then",
+      "this",
+      "throw",
+      "trait",
+      "true",
+      "try",
+      "type",
+      "using",
+      "val",
+      "var",
+      "with",
+      "while",
+      "yield",
+      ".",
+      "_",
+      ":",
+      "=",
+      "=>",
+      "<-",
+      "<:",
+      "<%",
+      ">:",
+      "#",
+      "@"
+    )
+
   def renderTree(tree: Tree): String = {
     tree match {
       case Ident(value) =>
         def isValidId(str: String) = str.head.isUnicodeIdentifierStart && str.drop(1).forall(_.isUnicodeIdentifierPart)
         def escape(str: String) = s"`$str`"
-        if (value == "type" || !isValidId(value)) escape(value) else value
+        if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
       case QIdent(value)    => value.map(renderTree).mkString(".")
       case Param(name, tpe) => renderTree(name) + ": " + renderTree(tpe)
       case StrLit(str)      => '"'.toString + str + '"'.toString

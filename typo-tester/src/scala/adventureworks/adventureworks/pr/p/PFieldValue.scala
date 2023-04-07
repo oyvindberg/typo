@@ -35,7 +35,7 @@ object PFieldValue {
   case class weight(override val value: Option[BigDecimal]) extends PFieldValue("weight", value)
   case class daystomanufacture(override val value: Option[Int]) extends PFieldValue("daystomanufacture", value)
   case class productline(override val value: Option[String]) extends PFieldValue("productline", value)
-  case class class(override val value: Option[String]) extends PFieldValue("class", value)
+  case class `class`(override val value: Option[String]) extends PFieldValue("class", value)
   case class style(override val value: Option[String]) extends PFieldValue("style", value)
   case class productsubcategoryid(override val value: Option[ProductsubcategoryId]) extends PFieldValue("productsubcategoryid", value)
   case class productmodelid(override val value: Option[ProductmodelId]) extends PFieldValue("productmodelid", value)
