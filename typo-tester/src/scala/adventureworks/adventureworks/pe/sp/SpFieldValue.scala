@@ -19,7 +19,7 @@ sealed abstract class SpFieldValue[T](name: String, value: T) extends SpFieldOrI
 object SpFieldValue {
   case class id(override val value: Option[Int]) extends SpFieldValue("id", value)
   case class stateprovinceid(override val value: Option[StateprovinceId]) extends SpFieldValue("stateprovinceid", value)
-  case class stateprovincecode(override val value: Option[String]) extends SpFieldValue("stateprovincecode", value)
+  case class stateprovincecode(override val value: Option[/* bpchar */ String]) extends SpFieldValue("stateprovincecode", value)
   case class countryregioncode(override val value: Option[CountryregionId]) extends SpFieldValue("countryregioncode", value)
   case class isonlystateprovinceflag(override val value: Boolean) extends SpFieldValue("isonlystateprovinceflag", value)
   case class name(override val value: Option[String]) extends SpFieldValue("name", value)

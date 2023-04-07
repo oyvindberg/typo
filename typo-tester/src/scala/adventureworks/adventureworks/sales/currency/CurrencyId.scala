@@ -14,16 +14,16 @@ import anorm.SqlParser
 import anorm.ToStatement
 import play.api.libs.json.Format
 
-case class CurrencyId(value: String) extends AnyVal
+case class CurrencyId(value: /* bpchar */ String) extends AnyVal
 object CurrencyId {
   implicit val ordering: Ordering[CurrencyId] = Ordering.by(_.value)
-  implicit val format: Format[CurrencyId] = implicitly[Format[String]].bimap(CurrencyId.apply, _.value)
-  implicit val toStatement: ToStatement[CurrencyId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val column: Column[CurrencyId] = implicitly[Column[String]].map(CurrencyId.apply)
+  implicit val format: Format[CurrencyId] = implicitly[Format[/* bpchar */ String]].bimap(CurrencyId.apply, _.value)
+  implicit val toStatement: ToStatement[CurrencyId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val column: Column[CurrencyId] = implicitly[Column[/* bpchar */ String]].map(CurrencyId.apply)
   def rowParser(prefix: String): RowParser[CurrencyId] = SqlParser.get[CurrencyId](prefix + "currencycode")
   implicit val parameterMetadata: ParameterMetaData[CurrencyId] = new ParameterMetaData[CurrencyId] {
-    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+    override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType
   }
 
 }

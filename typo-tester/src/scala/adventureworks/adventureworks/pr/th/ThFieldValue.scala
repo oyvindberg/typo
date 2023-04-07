@@ -21,7 +21,7 @@ object ThFieldValue {
   case class referenceorderid(override val value: Option[Int]) extends ThFieldValue("referenceorderid", value)
   case class referenceorderlineid(override val value: Option[Int]) extends ThFieldValue("referenceorderlineid", value)
   case class transactiondate(override val value: Option[LocalDateTime]) extends ThFieldValue("transactiondate", value)
-  case class transactiontype(override val value: Option[String]) extends ThFieldValue("transactiontype", value)
+  case class transactiontype(override val value: Option[/* bpchar */ String]) extends ThFieldValue("transactiontype", value)
   case class quantity(override val value: Option[Int]) extends ThFieldValue("quantity", value)
   case class actualcost(override val value: Option[BigDecimal]) extends ThFieldValue("actualcost", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends ThFieldValue("modifieddate", value)

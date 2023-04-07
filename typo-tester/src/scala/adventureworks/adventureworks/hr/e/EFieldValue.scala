@@ -8,6 +8,7 @@ package hr
 package e
 
 import adventureworks.person.businessentity.BusinessentityId
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,10 +21,10 @@ object EFieldValue {
   case class nationalidnumber(override val value: Option[String]) extends EFieldValue("nationalidnumber", value)
   case class loginid(override val value: Option[String]) extends EFieldValue("loginid", value)
   case class jobtitle(override val value: Option[String]) extends EFieldValue("jobtitle", value)
-  case class birthdate(override val value: Option[String]) extends EFieldValue("birthdate", value)
-  case class maritalstatus(override val value: Option[String]) extends EFieldValue("maritalstatus", value)
-  case class gender(override val value: Option[String]) extends EFieldValue("gender", value)
-  case class hiredate(override val value: Option[String]) extends EFieldValue("hiredate", value)
+  case class birthdate(override val value: Option[LocalDate]) extends EFieldValue("birthdate", value)
+  case class maritalstatus(override val value: Option[/* bpchar */ String]) extends EFieldValue("maritalstatus", value)
+  case class gender(override val value: Option[/* bpchar */ String]) extends EFieldValue("gender", value)
+  case class hiredate(override val value: Option[LocalDate]) extends EFieldValue("hiredate", value)
   case class salariedflag(override val value: Boolean) extends EFieldValue("salariedflag", value)
   case class vacationhours(override val value: Option[Int]) extends EFieldValue("vacationhours", value)
   case class sickleavehours(override val value: Option[Int]) extends EFieldValue("sickleavehours", value)

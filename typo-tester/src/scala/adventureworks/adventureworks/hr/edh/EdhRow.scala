@@ -12,6 +12,7 @@ import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -29,9 +30,9 @@ case class EdhRow(
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.shiftid]] */
   shiftid: Option[ShiftId] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"shiftid","ordinal_position":4,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"startdate","ordinal_position":5,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  startdate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"startdate","ordinal_position":5,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"enddate","ordinal_position":6,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  enddate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"enddate","ordinal_position":6,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.modifieddate]] */
   modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"edh","column_name":"modifieddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -44,8 +45,8 @@ object EdhRow {
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
         departmentid = row[Option[DepartmentId]](prefix + "departmentid"),
         shiftid = row[Option[ShiftId]](prefix + "shiftid"),
-        startdate = row[Option[String]](prefix + "startdate"),
-        enddate = row[Option[String]](prefix + "enddate"),
+        startdate = row[Option[LocalDate]](prefix + "startdate"),
+        enddate = row[Option[LocalDate]](prefix + "enddate"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
     )
@@ -71,8 +72,8 @@ object EdhRow {
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
             shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
-            startdate = json.\("startdate").toOption.map(_.as[String]),
-            enddate = json.\("enddate").toOption.map(_.as[String]),
+            startdate = json.\("startdate").toOption.map(_.as[LocalDate]),
+            enddate = json.\("enddate").toOption.map(_.as[LocalDate]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

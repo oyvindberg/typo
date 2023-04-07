@@ -18,7 +18,7 @@ object TransactionhistoryarchiveFieldValue {
   case class referenceorderid(override val value: Int) extends TransactionhistoryarchiveFieldValue("referenceorderid", value)
   case class referenceorderlineid(override val value: Int) extends TransactionhistoryarchiveFieldValue("referenceorderlineid", value)
   case class transactiondate(override val value: LocalDateTime) extends TransactionhistoryarchiveFieldValue("transactiondate", value)
-  case class transactiontype(override val value: String) extends TransactionhistoryarchiveFieldValue("transactiontype", value)
+  case class transactiontype(override val value: /* bpchar */ String) extends TransactionhistoryarchiveFieldValue("transactiontype", value)
   case class quantity(override val value: Int) extends TransactionhistoryarchiveFieldValue("quantity", value)
   case class actualcost(override val value: BigDecimal) extends TransactionhistoryarchiveFieldValue("actualcost", value)
   case class modifieddate(override val value: LocalDateTime) extends TransactionhistoryarchiveFieldValue("modifieddate", value)

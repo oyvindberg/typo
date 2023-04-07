@@ -8,6 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.person.businessentity.BusinessentityId
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,10 +20,10 @@ object EmployeeFieldValue {
   case class nationalidnumber(override val value: String) extends EmployeeFieldValue("nationalidnumber", value)
   case class loginid(override val value: String) extends EmployeeFieldValue("loginid", value)
   case class jobtitle(override val value: String) extends EmployeeFieldValue("jobtitle", value)
-  case class birthdate(override val value: String) extends EmployeeFieldValue("birthdate", value)
-  case class maritalstatus(override val value: String) extends EmployeeFieldValue("maritalstatus", value)
-  case class gender(override val value: String) extends EmployeeFieldValue("gender", value)
-  case class hiredate(override val value: String) extends EmployeeFieldValue("hiredate", value)
+  case class birthdate(override val value: LocalDate) extends EmployeeFieldValue("birthdate", value)
+  case class maritalstatus(override val value: /* bpchar */ String) extends EmployeeFieldValue("maritalstatus", value)
+  case class gender(override val value: /* bpchar */ String) extends EmployeeFieldValue("gender", value)
+  case class hiredate(override val value: LocalDate) extends EmployeeFieldValue("hiredate", value)
   case class salariedflag(override val value: Boolean) extends EmployeeFieldValue("salariedflag", value)
   case class vacationhours(override val value: Int) extends EmployeeFieldValue("vacationhours", value)
   case class sickleavehours(override val value: Int) extends EmployeeFieldValue("sickleavehours", value)

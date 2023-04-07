@@ -32,7 +32,7 @@ case class DRow(
   /** Points to [[production.document.DocumentRow.fileextension]] */
   fileextension: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"fileextension","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":8,"character_octet_length":32,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.revision]] */
-  revision: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"revision","ordinal_position":6,"is_nullable":"YES","data_type":"character","character_maximum_length":5,"character_octet_length":20,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  revision: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"revision","ordinal_position":6,"is_nullable":"YES","data_type":"character","character_maximum_length":5,"character_octet_length":20,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.changenumber]] */
   changenumber: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"d","column_name":"changenumber","ordinal_position":7,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.document.DocumentRow.status]] */
@@ -58,7 +58,7 @@ object DRow {
         folderflag = row[Boolean](prefix + "folderflag"),
         filename = row[Option[String]](prefix + "filename"),
         fileextension = row[Option[String]](prefix + "fileextension"),
-        revision = row[Option[String]](prefix + "revision"),
+        revision = row[Option[/* bpchar */ String]](prefix + "revision"),
         changenumber = row[Option[Int]](prefix + "changenumber"),
         status = row[Option[Int]](prefix + "status"),
         documentsummary = row[Option[String]](prefix + "documentsummary"),
@@ -97,7 +97,7 @@ object DRow {
             folderflag = json.\("folderflag").as[Boolean],
             filename = json.\("filename").toOption.map(_.as[String]),
             fileextension = json.\("fileextension").toOption.map(_.as[String]),
-            revision = json.\("revision").toOption.map(_.as[String]),
+            revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),
             changenumber = json.\("changenumber").toOption.map(_.as[Int]),
             status = json.\("status").toOption.map(_.as[Int]),
             documentsummary = json.\("documentsummary").toOption.map(_.as[String]),

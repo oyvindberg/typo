@@ -22,7 +22,7 @@ case class TransactionhistoryRowUnsaved(
   referenceorderid: Int,
   referenceorderlineid: Defaulted[Int],
   transactiondate: Defaulted[LocalDateTime],
-  transactiontype: String,
+  transactiontype: /* bpchar */ String,
   quantity: Int,
   actualcost: BigDecimal,
   modifieddate: Defaulted[LocalDateTime]
@@ -49,7 +49,7 @@ object TransactionhistoryRowUnsaved {
             referenceorderid = json.\("referenceorderid").as[Int],
             referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
             transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
-            transactiontype = json.\("transactiontype").as[String],
+            transactiontype = json.\("transactiontype").as[/* bpchar */ String],
             quantity = json.\("quantity").as[Int],
             actualcost = json.\("actualcost").as[BigDecimal],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

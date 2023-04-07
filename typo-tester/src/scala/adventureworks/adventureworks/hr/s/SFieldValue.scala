@@ -17,7 +17,7 @@ object SFieldValue {
   case class id(override val value: Option[Int]) extends SFieldValue("id", value)
   case class shiftid(override val value: Option[ShiftId]) extends SFieldValue("shiftid", value)
   case class name(override val value: Option[String]) extends SFieldValue("name", value)
-  case class starttime(override val value: Option[String]) extends SFieldValue("starttime", value)
-  case class endtime(override val value: Option[String]) extends SFieldValue("endtime", value)
+  case class starttime(override val value: Option[LocalDateTime]) extends SFieldValue("starttime", value)
+  case class endtime(override val value: Option[LocalDateTime]) extends SFieldValue("endtime", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SFieldValue("modifieddate", value)
 }

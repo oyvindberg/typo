@@ -21,7 +21,7 @@ object DFieldValue {
   case class folderflag(override val value: Boolean) extends DFieldValue("folderflag", value)
   case class filename(override val value: Option[String]) extends DFieldValue("filename", value)
   case class fileextension(override val value: Option[String]) extends DFieldValue("fileextension", value)
-  case class revision(override val value: Option[String]) extends DFieldValue("revision", value)
+  case class revision(override val value: Option[/* bpchar */ String]) extends DFieldValue("revision", value)
   case class changenumber(override val value: Option[Int]) extends DFieldValue("changenumber", value)
   case class status(override val value: Option[Int]) extends DFieldValue("status", value)
   case class documentsummary(override val value: Option[String]) extends DFieldValue("documentsummary", value)

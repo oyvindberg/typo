@@ -19,7 +19,7 @@ object SFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends SFieldValue("businessentityid", value)
   case class name(override val value: Option[String]) extends SFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SFieldValue("salespersonid", value)
-  case class demographics(override val value: Option[String]) extends SFieldValue("demographics", value)
+  case class demographics(override val value: Option[/* xml */ String]) extends SFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends SFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SFieldValue("modifieddate", value)
 }

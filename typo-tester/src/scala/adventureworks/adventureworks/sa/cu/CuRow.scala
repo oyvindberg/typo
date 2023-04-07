@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CuRow(
-  id: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cu","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  id: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cu","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
   currencycode: Option[CurrencyId] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cu","column_name":"currencycode","ordinal_position":2,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.currency.CurrencyRow.name]] */
@@ -32,7 +32,7 @@ object CuRow {
   def rowParser(prefix: String): RowParser[CuRow] = { row =>
     Success(
       CuRow(
-        id = row[Option[String]](prefix + "id"),
+        id = row[Option[/* bpchar */ String]](prefix + "id"),
         currencycode = row[Option[CurrencyId]](prefix + "currencycode"),
         name = row[Option[String]](prefix + "name"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -53,7 +53,7 @@ object CuRow {
       JsResult.fromTry(
         Try(
           CuRow(
-            id = json.\("id").toOption.map(_.as[String]),
+            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
             currencycode = json.\("currencycode").toOption.map(_.as[CurrencyId]),
             name = json.\("name").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

@@ -18,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PersonRowUnsaved(
-  persontype: String,
+  persontype: /* bpchar */ String,
   namestyle: Defaulted[Boolean],
   title: Option[String],
   firstname: String,
@@ -26,8 +26,8 @@ case class PersonRowUnsaved(
   lastname: String,
   suffix: Option[String],
   emailpromotion: Defaulted[Int],
-  additionalcontactinfo: Option[String],
-  demographics: Option[String],
+  additionalcontactinfo: Option[/* xml */ String],
+  demographics: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -53,7 +53,7 @@ object PersonRowUnsaved {
       JsResult.fromTry(
         Try(
           PersonRowUnsaved(
-            persontype = json.\("persontype").as[String],
+            persontype = json.\("persontype").as[/* bpchar */ String],
             namestyle = json.\("namestyle").as[Defaulted[Boolean]],
             title = json.\("title").toOption.map(_.as[String]),
             firstname = json.\("firstname").as[String],
@@ -61,8 +61,8 @@ object PersonRowUnsaved {
             lastname = json.\("lastname").as[String],
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[String]),
-            demographics = json.\("demographics").toOption.map(_.as[String]),
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),
+            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

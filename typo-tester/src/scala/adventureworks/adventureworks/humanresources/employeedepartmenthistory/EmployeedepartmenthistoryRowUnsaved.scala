@@ -8,6 +8,7 @@ package humanresources
 package employeedepartmenthistory
 
 import adventureworks.Defaulted
+import java.time.LocalDate
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -17,7 +18,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class EmployeedepartmenthistoryRowUnsaved(
-  enddate: Option[String],
+  enddate: Option[LocalDate],
   modifieddate: Defaulted[LocalDateTime]
 )
 object EmployeedepartmenthistoryRowUnsaved {
@@ -32,7 +33,7 @@ object EmployeedepartmenthistoryRowUnsaved {
       JsResult.fromTry(
         Try(
           EmployeedepartmenthistoryRowUnsaved(
-            enddate = json.\("enddate").toOption.map(_.as[String]),
+            enddate = json.\("enddate").toOption.map(_.as[LocalDate]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

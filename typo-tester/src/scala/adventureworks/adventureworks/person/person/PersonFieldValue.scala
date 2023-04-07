@@ -16,7 +16,7 @@ sealed abstract class PersonFieldValue[T](name: String, value: T) extends Person
 
 object PersonFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends PersonFieldOrIdValue("businessentityid", value)
-  case class persontype(override val value: String) extends PersonFieldValue("persontype", value)
+  case class persontype(override val value: /* bpchar */ String) extends PersonFieldValue("persontype", value)
   case class namestyle(override val value: Boolean) extends PersonFieldValue("namestyle", value)
   case class title(override val value: Option[String]) extends PersonFieldValue("title", value)
   case class firstname(override val value: String) extends PersonFieldValue("firstname", value)
@@ -24,8 +24,8 @@ object PersonFieldValue {
   case class lastname(override val value: String) extends PersonFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends PersonFieldValue("suffix", value)
   case class emailpromotion(override val value: Int) extends PersonFieldValue("emailpromotion", value)
-  case class additionalcontactinfo(override val value: Option[String]) extends PersonFieldValue("additionalcontactinfo", value)
-  case class demographics(override val value: Option[String]) extends PersonFieldValue("demographics", value)
+  case class additionalcontactinfo(override val value: Option[/* xml */ String]) extends PersonFieldValue("additionalcontactinfo", value)
+  case class demographics(override val value: Option[/* xml */ String]) extends PersonFieldValue("demographics", value)
   case class rowguid(override val value: UUID) extends PersonFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends PersonFieldValue("modifieddate", value)
 }

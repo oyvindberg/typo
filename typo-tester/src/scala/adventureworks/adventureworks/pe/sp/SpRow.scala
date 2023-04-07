@@ -26,7 +26,7 @@ case class SpRow(
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: Option[StateprovinceId] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"stateprovinceid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
-  stateprovincecode: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"stateprovincecode","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stateprovincecode: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"stateprovincecode","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.stateprovince.StateprovinceRow.countryregioncode]] */
   countryregioncode: Option[CountryregionId] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"countryregioncode","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.stateprovince.StateprovinceRow.isonlystateprovinceflag]] */
@@ -47,7 +47,7 @@ object SpRow {
       SpRow(
         id = row[Option[Int]](prefix + "id"),
         stateprovinceid = row[Option[StateprovinceId]](prefix + "stateprovinceid"),
-        stateprovincecode = row[Option[String]](prefix + "stateprovincecode"),
+        stateprovincecode = row[Option[/* bpchar */ String]](prefix + "stateprovincecode"),
         countryregioncode = row[Option[CountryregionId]](prefix + "countryregioncode"),
         isonlystateprovinceflag = row[Boolean](prefix + "isonlystateprovinceflag"),
         name = row[Option[String]](prefix + "name"),
@@ -78,7 +78,7 @@ object SpRow {
           SpRow(
             id = json.\("id").toOption.map(_.as[Int]),
             stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-            stateprovincecode = json.\("stateprovincecode").toOption.map(_.as[String]),
+            stateprovincecode = json.\("stateprovincecode").toOption.map(_.as[/* bpchar */ String]),
             countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
             isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Boolean],
             name = json.\("name").toOption.map(_.as[String]),

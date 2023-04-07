@@ -55,11 +55,11 @@ case class PRow(
   /** Points to [[production.product.ProductRow.daystomanufacture]] */
   daystomanufacture: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"daystomanufacture","ordinal_position":16,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.productline]] */
-  productline: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"productline","ordinal_position":17,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  productline: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"productline","ordinal_position":17,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.`class`]] */
-  `class`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"class","ordinal_position":18,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  `class`: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"class","ordinal_position":18,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.style]] */
-  style: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"style","ordinal_position":19,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  style: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"style","ordinal_position":19,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.productsubcategoryid]] */
   productsubcategoryid: Option[ProductsubcategoryId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"p","column_name":"productsubcategoryid","ordinal_position":20,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.product.ProductRow.productmodelid]] */
@@ -96,9 +96,9 @@ object PRow {
         weightunitmeasurecode = row[Option[UnitmeasureId]](prefix + "weightunitmeasurecode"),
         weight = row[Option[BigDecimal]](prefix + "weight"),
         daystomanufacture = row[Option[Int]](prefix + "daystomanufacture"),
-        productline = row[Option[String]](prefix + "productline"),
-        `class` = row[Option[String]](prefix + "class"),
-        style = row[Option[String]](prefix + "style"),
+        productline = row[Option[/* bpchar */ String]](prefix + "productline"),
+        `class` = row[Option[/* bpchar */ String]](prefix + "class"),
+        style = row[Option[/* bpchar */ String]](prefix + "style"),
         productsubcategoryid = row[Option[ProductsubcategoryId]](prefix + "productsubcategoryid"),
         productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
         sellstartdate = row[Option[LocalDateTime]](prefix + "sellstartdate"),
@@ -161,9 +161,9 @@ object PRow {
             weightunitmeasurecode = json.\("weightunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             weight = json.\("weight").toOption.map(_.as[BigDecimal]),
             daystomanufacture = json.\("daystomanufacture").toOption.map(_.as[Int]),
-            productline = json.\("productline").toOption.map(_.as[String]),
-            `class` = json.\("class").toOption.map(_.as[String]),
-            style = json.\("style").toOption.map(_.as[String]),
+            productline = json.\("productline").toOption.map(_.as[/* bpchar */ String]),
+            `class` = json.\("class").toOption.map(_.as[/* bpchar */ String]),
+            style = json.\("style").toOption.map(_.as[/* bpchar */ String]),
             productsubcategoryid = json.\("productsubcategoryid").toOption.map(_.as[ProductsubcategoryId]),
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
             sellstartdate = json.\("sellstartdate").toOption.map(_.as[LocalDateTime]),

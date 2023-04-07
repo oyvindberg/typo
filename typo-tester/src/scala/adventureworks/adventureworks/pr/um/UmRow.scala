@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UmRow(
-  id: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  id: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: Option[UnitmeasureId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"unitmeasurecode","ordinal_position":2,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
@@ -32,7 +32,7 @@ object UmRow {
   def rowParser(prefix: String): RowParser[UmRow] = { row =>
     Success(
       UmRow(
-        id = row[Option[String]](prefix + "id"),
+        id = row[Option[/* bpchar */ String]](prefix + "id"),
         unitmeasurecode = row[Option[UnitmeasureId]](prefix + "unitmeasurecode"),
         name = row[Option[String]](prefix + "name"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -53,7 +53,7 @@ object UmRow {
       JsResult.fromTry(
         Try(
           UmRow(
-            id = json.\("id").toOption.map(_.as[String]),
+            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
             unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             name = json.\("name").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

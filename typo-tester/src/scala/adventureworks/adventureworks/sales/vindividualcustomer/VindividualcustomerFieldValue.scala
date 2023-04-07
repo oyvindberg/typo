@@ -30,5 +30,5 @@ object VindividualcustomerFieldValue {
   case class stateprovincename(override val value: Option[String]) extends VindividualcustomerFieldValue("stateprovincename", value)
   case class postalcode(override val value: Option[String]) extends VindividualcustomerFieldValue("postalcode", value)
   case class countryregionname(override val value: Option[String]) extends VindividualcustomerFieldValue("countryregionname", value)
-  case class demographics(override val value: Option[String]) extends VindividualcustomerFieldValue("demographics", value)
+  case class demographics(override val value: Option[/* xml */ String]) extends VindividualcustomerFieldValue("demographics", value)
 }

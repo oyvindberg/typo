@@ -8,6 +8,7 @@ package humanresources
 package vemployeedepartment
 
 import adventureworks.person.businessentity.BusinessentityId
+import java.time.LocalDate
 
 sealed abstract class VemployeedepartmentFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VemployeedepartmentFieldValue[T](name: String, value: T) extends VemployeedepartmentFieldOrIdValue(name, value)
@@ -22,5 +23,5 @@ object VemployeedepartmentFieldValue {
   case class jobtitle(override val value: Option[String]) extends VemployeedepartmentFieldValue("jobtitle", value)
   case class department(override val value: Option[String]) extends VemployeedepartmentFieldValue("department", value)
   case class groupname(override val value: Option[String]) extends VemployeedepartmentFieldValue("groupname", value)
-  case class startdate(override val value: Option[String]) extends VemployeedepartmentFieldValue("startdate", value)
+  case class startdate(override val value: Option[LocalDate]) extends VemployeedepartmentFieldValue("startdate", value)
 }

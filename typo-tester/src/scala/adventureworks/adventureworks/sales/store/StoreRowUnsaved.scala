@@ -21,7 +21,7 @@ import scala.util.Try
 case class StoreRowUnsaved(
   name: String,
   salespersonid: Option[BusinessentityId],
-  demographics: Option[String],
+  demographics: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -42,7 +42,7 @@ object StoreRowUnsaved {
           StoreRowUnsaved(
             name = json.\("name").as[String],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[String]),
+            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

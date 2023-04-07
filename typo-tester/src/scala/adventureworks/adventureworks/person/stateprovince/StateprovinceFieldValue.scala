@@ -17,7 +17,7 @@ sealed abstract class StateprovinceFieldValue[T](name: String, value: T) extends
 
 object StateprovinceFieldValue {
   case class stateprovinceid(override val value: StateprovinceId) extends StateprovinceFieldOrIdValue("stateprovinceid", value)
-  case class stateprovincecode(override val value: String) extends StateprovinceFieldValue("stateprovincecode", value)
+  case class stateprovincecode(override val value: /* bpchar */ String) extends StateprovinceFieldValue("stateprovincecode", value)
   case class countryregioncode(override val value: CountryregionId) extends StateprovinceFieldValue("countryregioncode", value)
   case class isonlystateprovinceflag(override val value: Boolean) extends StateprovinceFieldValue("isonlystateprovinceflag", value)
   case class name(override val value: String) extends StateprovinceFieldValue("name", value)

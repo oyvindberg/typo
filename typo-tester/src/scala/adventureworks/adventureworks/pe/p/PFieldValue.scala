@@ -17,7 +17,7 @@ sealed abstract class PFieldValue[T](name: String, value: T) extends PFieldOrIdV
 object PFieldValue {
   case class id(override val value: Option[Int]) extends PFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends PFieldValue("businessentityid", value)
-  case class persontype(override val value: Option[String]) extends PFieldValue("persontype", value)
+  case class persontype(override val value: Option[/* bpchar */ String]) extends PFieldValue("persontype", value)
   case class namestyle(override val value: Boolean) extends PFieldValue("namestyle", value)
   case class title(override val value: Option[String]) extends PFieldValue("title", value)
   case class firstname(override val value: Option[String]) extends PFieldValue("firstname", value)
@@ -25,8 +25,8 @@ object PFieldValue {
   case class lastname(override val value: Option[String]) extends PFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends PFieldValue("suffix", value)
   case class emailpromotion(override val value: Option[Int]) extends PFieldValue("emailpromotion", value)
-  case class additionalcontactinfo(override val value: Option[String]) extends PFieldValue("additionalcontactinfo", value)
-  case class demographics(override val value: Option[String]) extends PFieldValue("demographics", value)
+  case class additionalcontactinfo(override val value: Option[/* xml */ String]) extends PFieldValue("additionalcontactinfo", value)
+  case class demographics(override val value: Option[/* xml */ String]) extends PFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends PFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PFieldValue("modifieddate", value)
 }

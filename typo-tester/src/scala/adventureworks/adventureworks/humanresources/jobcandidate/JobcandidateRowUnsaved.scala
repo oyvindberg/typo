@@ -19,7 +19,7 @@ import scala.util.Try
 
 case class JobcandidateRowUnsaved(
   businessentityid: Option[BusinessentityId],
-  resume: Option[String],
+  resume: Option[/* xml */ String],
   modifieddate: Defaulted[LocalDateTime]
 )
 object JobcandidateRowUnsaved {
@@ -36,7 +36,7 @@ object JobcandidateRowUnsaved {
         Try(
           JobcandidateRowUnsaved(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            resume = json.\("resume").toOption.map(_.as[String]),
+            resume = json.\("resume").toOption.map(_.as[/* xml */ String]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

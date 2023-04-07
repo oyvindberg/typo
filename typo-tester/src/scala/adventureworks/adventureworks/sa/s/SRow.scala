@@ -28,7 +28,7 @@ case class SRow(
   /** Points to [[sales.store.StoreRow.salespersonid]] */
   salespersonid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"salespersonid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.store.StoreRow.demographics]] */
-  demographics: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"demographics","ordinal_position":5,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  demographics: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"demographics","ordinal_position":5,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: Option[UUID] /* {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"rowguid","ordinal_position":6,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[sales.store.StoreRow.modifieddate]] */
@@ -43,7 +43,7 @@ object SRow {
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
         name = row[Option[String]](prefix + "name"),
         salespersonid = row[Option[BusinessentityId]](prefix + "salespersonid"),
-        demographics = row[Option[String]](prefix + "demographics"),
+        demographics = row[Option[/* xml */ String]](prefix + "demographics"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
@@ -70,7 +70,7 @@ object SRow {
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             name = json.\("name").toOption.map(_.as[String]),
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[String]),
+            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

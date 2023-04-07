@@ -33,39 +33,43 @@ case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
 
   private def baseType(tpe: db.Type): sc.Type = {
     tpe match {
-      case db.Type.PgObject(tpe)    => sc.Type.PGobject.withComment(tpe)
+      case db.Type.Array(_)         => sys.error("no idea what to do with nested array types")
       case db.Type.BigInt           => sc.Type.Long
-      case db.Type.Text             => sc.Type.String
       case db.Type.Boolean          => sc.Type.Boolean
+      case db.Type.Bytea            => sc.Type.Array.of(sc.Type.Byte)
+      case db.Type.Bpchar           => sc.Type.String.withComment("bpchar")
       case db.Type.Char             => sc.Type.String
-      case db.Type.Name             => sc.Type.String
-      case db.Type.StringEnum(name) => sc.Type.Qualified(naming.enumName(name))
-      case db.Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
-      case db.Type.Inet             => sc.Type.PGobject.withComment("inet") // wip
-      case db.Type.Oid              => sc.Type.Long.withComment("oid")
-      case db.Type.VarChar(_)       => sc.Type.String
+      case db.Type.Date             => sc.Type.LocalDate
       case db.Type.Float4           => sc.Type.Float
       case db.Type.Float8           => sc.Type.Double
-      case db.Type.Bytea            => sc.Type.Array.of(sc.Type.Byte)
+      case db.Type.Hstore           => sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
+      case db.Type.Inet             => sc.Type.PGobject.withComment("inet") // wip
       case db.Type.Int2             => sc.Type.Int // jdbc driver seems to return ints instead of floats
       case db.Type.Int4             => sc.Type.Int
       case db.Type.Int8             => sc.Type.Long
       case db.Type.Json             => sc.Type.String // wip
+      case db.Type.Name             => sc.Type.String
       case db.Type.Numeric          => sc.Type.BigDecimal
-      case db.Type.Timestamp        => sc.Type.LocalDateTime
-      case db.Type.TimestampTz      => sc.Type.ZonedDateTime
-      case db.Type.Array(_)         => sys.error("no idea what to do with nested array types")
+      case db.Type.Oid              => sc.Type.Long.withComment("oid")
+      case db.Type.PGInterval       => sc.Type.PGInterval
       case db.Type.PGbox            => sc.Type.PGbox
       case db.Type.PGcircle         => sc.Type.PGcircle
       case db.Type.PGline           => sc.Type.PGline
-      case db.Type.PGlsn            => sc.Type.Long.withComment("pg_lsn")
       case db.Type.PGlseg           => sc.Type.PGlseg
+      case db.Type.PGlsn            => sc.Type.Long.withComment("pg_lsn")
+      case db.Type.PGmoney          => sc.Type.PGmoney
       case db.Type.PGpath           => sc.Type.PGpath
       case db.Type.PGpoint          => sc.Type.PGpoint
       case db.Type.PGpolygon        => sc.Type.PGpolygon
-      case db.Type.PGInterval       => sc.Type.PGInterval
-      case db.Type.PGmoney          => sc.Type.PGmoney
+      case db.Type.PgObject(tpe)    => sc.Type.PGobject.withComment(tpe)
+      case db.Type.StringEnum(name) => sc.Type.Qualified(naming.enumName(name))
+      case db.Type.Text             => sc.Type.String
+      case db.Type.Time             => sc.Type.LocalDateTime
+      case db.Type.Timestamp        => sc.Type.LocalDateTime
+      case db.Type.TimestampTz      => sc.Type.ZonedDateTime
       case db.Type.UUID             => sc.Type.UUID
+      case db.Type.Xml              => sc.Type.String.withComment("xml")
+      case db.Type.VarChar(_)       => sc.Type.String
     }
   }
 

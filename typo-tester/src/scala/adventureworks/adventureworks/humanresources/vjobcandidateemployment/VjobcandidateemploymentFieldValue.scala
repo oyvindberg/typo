@@ -8,14 +8,15 @@ package humanresources
 package vjobcandidateemployment
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import java.time.LocalDate
 
 sealed abstract class VjobcandidateemploymentFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VjobcandidateemploymentFieldValue[T](name: String, value: T) extends VjobcandidateemploymentFieldOrIdValue(name, value)
 
 object VjobcandidateemploymentFieldValue {
   case class jobcandidateid(override val value: Option[JobcandidateId]) extends VjobcandidateemploymentFieldValue("jobcandidateid", value)
-  case class `Emp.StartDate`(override val value: Option[String]) extends VjobcandidateemploymentFieldValue("Emp.StartDate", value)
-  case class `Emp.EndDate`(override val value: Option[String]) extends VjobcandidateemploymentFieldValue("Emp.EndDate", value)
+  case class `Emp.StartDate`(override val value: Option[LocalDate]) extends VjobcandidateemploymentFieldValue("Emp.StartDate", value)
+  case class `Emp.EndDate`(override val value: Option[LocalDate]) extends VjobcandidateemploymentFieldValue("Emp.EndDate", value)
   case class `Emp.OrgName`(override val value: Option[String]) extends VjobcandidateemploymentFieldValue("Emp.OrgName", value)
   case class `Emp.JobTitle`(override val value: Option[String]) extends VjobcandidateemploymentFieldValue("Emp.JobTitle", value)
   case class `Emp.Responsibility`(override val value: Option[String]) extends VjobcandidateemploymentFieldValue("Emp.Responsibility", value)

@@ -19,7 +19,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CRow(
-  id: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"c","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":6,"character_octet_length":24,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  id: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"c","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":6,"character_octet_length":24,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.culture.CultureRow.cultureid]] */
   cultureid: Option[CultureId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"c","column_name":"cultureid","ordinal_position":2,"is_nullable":"YES","data_type":"character","character_maximum_length":6,"character_octet_length":24,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.culture.CultureRow.name]] */
@@ -32,7 +32,7 @@ object CRow {
   def rowParser(prefix: String): RowParser[CRow] = { row =>
     Success(
       CRow(
-        id = row[Option[String]](prefix + "id"),
+        id = row[Option[/* bpchar */ String]](prefix + "id"),
         cultureid = row[Option[CultureId]](prefix + "cultureid"),
         name = row[Option[String]](prefix + "name"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -53,7 +53,7 @@ object CRow {
       JsResult.fromTry(
         Try(
           CRow(
-            id = json.\("id").toOption.map(_.as[String]),
+            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
             cultureid = json.\("cultureid").toOption.map(_.as[CultureId]),
             name = json.\("name").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

@@ -14,7 +14,7 @@ sealed abstract class UmFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class UmFieldValue[T](name: String, value: T) extends UmFieldOrIdValue(name, value)
 
 object UmFieldValue {
-  case class id(override val value: Option[String]) extends UmFieldValue("id", value)
+  case class id(override val value: Option[/* bpchar */ String]) extends UmFieldValue("id", value)
   case class unitmeasurecode(override val value: Option[UnitmeasureId]) extends UmFieldValue("unitmeasurecode", value)
   case class name(override val value: Option[String]) extends UmFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends UmFieldValue("modifieddate", value)

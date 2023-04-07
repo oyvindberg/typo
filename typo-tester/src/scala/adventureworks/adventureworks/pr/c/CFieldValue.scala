@@ -14,7 +14,7 @@ sealed abstract class CFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class CFieldValue[T](name: String, value: T) extends CFieldOrIdValue(name, value)
 
 object CFieldValue {
-  case class id(override val value: Option[String]) extends CFieldValue("id", value)
+  case class id(override val value: Option[/* bpchar */ String]) extends CFieldValue("id", value)
   case class cultureid(override val value: Option[CultureId]) extends CFieldValue("cultureid", value)
   case class name(override val value: Option[String]) extends CFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends CFieldValue("modifieddate", value)

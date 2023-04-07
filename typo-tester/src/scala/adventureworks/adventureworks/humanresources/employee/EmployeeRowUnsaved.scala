@@ -8,6 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -21,10 +22,10 @@ case class EmployeeRowUnsaved(
   nationalidnumber: String,
   loginid: String,
   jobtitle: String,
-  birthdate: String,
-  maritalstatus: String,
-  gender: String,
-  hiredate: String,
+  birthdate: LocalDate,
+  maritalstatus: /* bpchar */ String,
+  gender: /* bpchar */ String,
+  hiredate: LocalDate,
   salariedflag: Defaulted[Boolean],
   vacationhours: Defaulted[Int],
   sickleavehours: Defaulted[Int],
@@ -60,10 +61,10 @@ object EmployeeRowUnsaved {
             nationalidnumber = json.\("nationalidnumber").as[String],
             loginid = json.\("loginid").as[String],
             jobtitle = json.\("jobtitle").as[String],
-            birthdate = json.\("birthdate").as[String],
-            maritalstatus = json.\("maritalstatus").as[String],
-            gender = json.\("gender").as[String],
-            hiredate = json.\("hiredate").as[String],
+            birthdate = json.\("birthdate").as[LocalDate],
+            maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
+            gender = json.\("gender").as[/* bpchar */ String],
+            hiredate = json.\("hiredate").as[LocalDate],
             salariedflag = json.\("salariedflag").as[Defaulted[Boolean]],
             vacationhours = json.\("vacationhours").as[Defaulted[Int]],
             sickleavehours = json.\("sickleavehours").as[Defaulted[Int]],

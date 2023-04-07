@@ -18,8 +18,8 @@ import scala.util.Try
 
 case class ShiftRowUnsaved(
   name: String,
-  starttime: String,
-  endtime: String,
+  starttime: LocalDateTime,
+  endtime: LocalDateTime,
   modifieddate: Defaulted[LocalDateTime]
 )
 object ShiftRowUnsaved {
@@ -37,8 +37,8 @@ object ShiftRowUnsaved {
         Try(
           ShiftRowUnsaved(
             name = json.\("name").as[String],
-            starttime = json.\("starttime").as[String],
-            endtime = json.\("endtime").as[String],
+            starttime = json.\("starttime").as[LocalDateTime],
+            endtime = json.\("endtime").as[LocalDateTime],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

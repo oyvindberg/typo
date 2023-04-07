@@ -8,6 +8,7 @@ package humanresources
 package vjobcandidateeducation
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import java.time.LocalDate
 
 sealed abstract class VjobcandidateeducationFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VjobcandidateeducationFieldValue[T](name: String, value: T) extends VjobcandidateeducationFieldOrIdValue(name, value)
@@ -15,8 +16,8 @@ sealed abstract class VjobcandidateeducationFieldValue[T](name: String, value: T
 object VjobcandidateeducationFieldValue {
   case class jobcandidateid(override val value: Option[JobcandidateId]) extends VjobcandidateeducationFieldValue("jobcandidateid", value)
   case class `Edu.Level`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.Level", value)
-  case class `Edu.StartDate`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.StartDate", value)
-  case class `Edu.EndDate`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.EndDate", value)
+  case class `Edu.StartDate`(override val value: Option[LocalDate]) extends VjobcandidateeducationFieldValue("Edu.StartDate", value)
+  case class `Edu.EndDate`(override val value: Option[LocalDate]) extends VjobcandidateeducationFieldValue("Edu.EndDate", value)
   case class `Edu.Degree`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.Degree", value)
   case class `Edu.Major`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.Major", value)
   case class `Edu.Minor`(override val value: Option[String]) extends VjobcandidateeducationFieldValue("Edu.Minor", value)

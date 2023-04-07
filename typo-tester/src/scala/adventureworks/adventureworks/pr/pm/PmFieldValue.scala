@@ -18,8 +18,8 @@ object PmFieldValue {
   case class id(override val value: Option[Int]) extends PmFieldValue("id", value)
   case class productmodelid(override val value: Option[ProductmodelId]) extends PmFieldValue("productmodelid", value)
   case class name(override val value: Option[String]) extends PmFieldValue("name", value)
-  case class catalogdescription(override val value: Option[String]) extends PmFieldValue("catalogdescription", value)
-  case class instructions(override val value: Option[String]) extends PmFieldValue("instructions", value)
+  case class catalogdescription(override val value: Option[/* xml */ String]) extends PmFieldValue("catalogdescription", value)
+  case class instructions(override val value: Option[/* xml */ String]) extends PmFieldValue("instructions", value)
   case class rowguid(override val value: Option[UUID]) extends PmFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PmFieldValue("modifieddate", value)
 }

@@ -17,7 +17,7 @@ sealed abstract class VproductmodelinstructionsFieldValue[T](name: String, value
 object VproductmodelinstructionsFieldValue {
   case class productmodelid(override val value: Option[ProductmodelId]) extends VproductmodelinstructionsFieldValue("productmodelid", value)
   case class name(override val value: Option[String]) extends VproductmodelinstructionsFieldValue("name", value)
-  case class instructions(override val value: Option[String]) extends VproductmodelinstructionsFieldValue("instructions", value)
+  case class instructions(override val value: Option[/* xml */ String]) extends VproductmodelinstructionsFieldValue("instructions", value)
   case class LocationID(override val value: Option[Int]) extends VproductmodelinstructionsFieldValue("LocationID", value)
   case class SetupHours(override val value: Option[BigDecimal]) extends VproductmodelinstructionsFieldValue("SetupHours", value)
   case class MachineHours(override val value: Option[BigDecimal]) extends VproductmodelinstructionsFieldValue("MachineHours", value)

@@ -10,6 +10,7 @@ package edh
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 sealed abstract class EdhFieldOrIdValue[T](val name: String, val value: T)
@@ -20,7 +21,7 @@ object EdhFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends EdhFieldValue("businessentityid", value)
   case class departmentid(override val value: Option[DepartmentId]) extends EdhFieldValue("departmentid", value)
   case class shiftid(override val value: Option[ShiftId]) extends EdhFieldValue("shiftid", value)
-  case class startdate(override val value: Option[String]) extends EdhFieldValue("startdate", value)
-  case class enddate(override val value: Option[String]) extends EdhFieldValue("enddate", value)
+  case class startdate(override val value: Option[LocalDate]) extends EdhFieldValue("startdate", value)
+  case class enddate(override val value: Option[LocalDate]) extends EdhFieldValue("enddate", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends EdhFieldValue("modifieddate", value)
 }

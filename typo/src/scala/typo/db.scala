@@ -10,8 +10,10 @@ object db {
     case class Array(tpe: Type) extends Type
     case object BigInt extends Type
     case object Boolean extends Type
+    case object Bpchar extends Type // blank padded character
     case object Bytea extends Type
     case object Char extends Type
+    case object Date extends Type
     case object Float4 extends Type
     case object Float8 extends Type
     case object Hstore extends Type
@@ -36,9 +38,11 @@ object db {
     case class PgObject(value: String) extends Type
     case class StringEnum(name: RelationName) extends Type
     case object Text extends Type
+    case object Time extends Type
     case object Timestamp extends Type
     case object TimestampTz extends Type
     case object UUID extends Type
+    case object Xml extends Type
     case class VarChar(maxLength: Option[Int]) extends Type
   }
 

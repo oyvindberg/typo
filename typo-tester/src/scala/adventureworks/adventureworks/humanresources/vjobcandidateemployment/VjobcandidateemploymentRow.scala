@@ -10,6 +10,7 @@ package vjobcandidateemployment
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,8 +21,8 @@ import scala.util.Try
 case class VjobcandidateemploymentRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"jobcandidateid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  `Emp.StartDate`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.StartDate","ordinal_position":2,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  `Emp.EndDate`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.EndDate","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  `Emp.StartDate`: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.StartDate","ordinal_position":2,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  `Emp.EndDate`: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.EndDate","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Emp.OrgName`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.OrgName","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":100,"character_octet_length":400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Emp.JobTitle`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.JobTitle","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":100,"character_octet_length":400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Emp.Responsibility`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateemployment","column_name":"Emp.Responsibility","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -37,8 +38,8 @@ object VjobcandidateemploymentRow {
     Success(
       VjobcandidateemploymentRow(
         jobcandidateid = row[Option[JobcandidateId]](prefix + "jobcandidateid"),
-        `Emp.StartDate` = row[Option[String]](prefix + "Emp.StartDate"),
-        `Emp.EndDate` = row[Option[String]](prefix + "Emp.EndDate"),
+        `Emp.StartDate` = row[Option[LocalDate]](prefix + "Emp.StartDate"),
+        `Emp.EndDate` = row[Option[LocalDate]](prefix + "Emp.EndDate"),
         `Emp.OrgName` = row[Option[String]](prefix + "Emp.OrgName"),
         `Emp.JobTitle` = row[Option[String]](prefix + "Emp.JobTitle"),
         `Emp.Responsibility` = row[Option[String]](prefix + "Emp.Responsibility"),
@@ -72,8 +73,8 @@ object VjobcandidateemploymentRow {
         Try(
           VjobcandidateemploymentRow(
             jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-            `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as[String]),
-            `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as[String]),
+            `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as[LocalDate]),
+            `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as[LocalDate]),
             `Emp.OrgName` = json.\("Emp.OrgName").toOption.map(_.as[String]),
             `Emp.JobTitle` = json.\("Emp.JobTitle").toOption.map(_.as[String]),
             `Emp.Responsibility` = json.\("Emp.Responsibility").toOption.map(_.as[String]),

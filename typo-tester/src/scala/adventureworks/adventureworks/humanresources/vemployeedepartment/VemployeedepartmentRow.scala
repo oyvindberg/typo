@@ -10,6 +10,7 @@ package vemployeedepartment
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -36,7 +37,7 @@ case class VemployeedepartmentRow(
   /** Points to [[department.DepartmentRow.groupname]] */
   groupname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartment","column_name":"groupname","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartment","column_name":"startdate","ordinal_position":10,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
+  startdate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vemployeedepartment","column_name":"startdate","ordinal_position":10,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object VemployeedepartmentRow {
@@ -52,7 +53,7 @@ object VemployeedepartmentRow {
         jobtitle = row[Option[String]](prefix + "jobtitle"),
         department = row[Option[String]](prefix + "department"),
         groupname = row[Option[String]](prefix + "groupname"),
-        startdate = row[Option[String]](prefix + "startdate")
+        startdate = row[Option[LocalDate]](prefix + "startdate")
       )
     )
   }
@@ -85,7 +86,7 @@ object VemployeedepartmentRow {
             jobtitle = json.\("jobtitle").toOption.map(_.as[String]),
             department = json.\("department").toOption.map(_.as[String]),
             groupname = json.\("groupname").toOption.map(_.as[String]),
-            startdate = json.\("startdate").toOption.map(_.as[String])
+            startdate = json.\("startdate").toOption.map(_.as[LocalDate])
           )
         )
       )

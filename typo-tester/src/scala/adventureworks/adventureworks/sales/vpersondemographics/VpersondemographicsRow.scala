@@ -10,6 +10,7 @@ package vpersondemographics
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import org.postgresql.util.PGmoney
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -22,8 +23,8 @@ case class VpersondemographicsRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"businessentityid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   totalpurchaseytd: Option[PGmoney] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"totalpurchaseytd","ordinal_position":2,"is_nullable":"YES","data_type":"money","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"money","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  datefirstpurchase: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"datefirstpurchase","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  birthdate: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"birthdate","ordinal_position":4,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  datefirstpurchase: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"datefirstpurchase","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  birthdate: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"birthdate","ordinal_position":4,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   maritalstatus: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"maritalstatus","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   yearlyincome: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"yearlyincome","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   gender: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vpersondemographics","column_name":"gender","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -41,8 +42,8 @@ object VpersondemographicsRow {
       VpersondemographicsRow(
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
         totalpurchaseytd = row[Option[PGmoney]](prefix + "totalpurchaseytd"),
-        datefirstpurchase = row[Option[String]](prefix + "datefirstpurchase"),
-        birthdate = row[Option[String]](prefix + "birthdate"),
+        datefirstpurchase = row[Option[LocalDate]](prefix + "datefirstpurchase"),
+        birthdate = row[Option[LocalDate]](prefix + "birthdate"),
         maritalstatus = row[Option[String]](prefix + "maritalstatus"),
         yearlyincome = row[Option[String]](prefix + "yearlyincome"),
         gender = row[Option[String]](prefix + "gender"),
@@ -80,8 +81,8 @@ object VpersondemographicsRow {
           VpersondemographicsRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             totalpurchaseytd = json.\("totalpurchaseytd").toOption.map(_.as[PGmoney]),
-            datefirstpurchase = json.\("datefirstpurchase").toOption.map(_.as[String]),
-            birthdate = json.\("birthdate").toOption.map(_.as[String]),
+            datefirstpurchase = json.\("datefirstpurchase").toOption.map(_.as[LocalDate]),
+            birthdate = json.\("birthdate").toOption.map(_.as[LocalDate]),
             maritalstatus = json.\("maritalstatus").toOption.map(_.as[String]),
             yearlyincome = json.\("yearlyincome").toOption.map(_.as[String]),
             gender = json.\("gender").toOption.map(_.as[String]),

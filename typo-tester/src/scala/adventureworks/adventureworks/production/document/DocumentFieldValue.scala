@@ -20,7 +20,7 @@ object DocumentFieldValue {
   case class folderflag(override val value: Boolean) extends DocumentFieldValue("folderflag", value)
   case class filename(override val value: String) extends DocumentFieldValue("filename", value)
   case class fileextension(override val value: Option[String]) extends DocumentFieldValue("fileextension", value)
-  case class revision(override val value: String) extends DocumentFieldValue("revision", value)
+  case class revision(override val value: /* bpchar */ String) extends DocumentFieldValue("revision", value)
   case class changenumber(override val value: Int) extends DocumentFieldValue("changenumber", value)
   case class status(override val value: Int) extends DocumentFieldValue("status", value)
   case class documentsummary(override val value: Option[String]) extends DocumentFieldValue("documentsummary", value)

@@ -22,7 +22,7 @@ import scala.util.Try
 
 case class StateprovinceRow(
   stateprovinceid: StateprovinceId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"stateprovinceid","ordinal_position":1,"column_default":"nextval('person.stateprovince_stateprovinceid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  stateprovincecode: String /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"stateprovincecode","ordinal_position":2,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  stateprovincecode: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"stateprovincecode","ordinal_position":2,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"countryregioncode","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   isonlystateprovinceflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"isonlystateprovinceflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -38,7 +38,7 @@ object StateprovinceRow {
     Success(
       StateprovinceRow(
         stateprovinceid = row[StateprovinceId](prefix + "stateprovinceid"),
-        stateprovincecode = row[String](prefix + "stateprovincecode"),
+        stateprovincecode = row[/* bpchar */ String](prefix + "stateprovincecode"),
         countryregioncode = row[CountryregionId](prefix + "countryregioncode"),
         isonlystateprovinceflag = row[Boolean](prefix + "isonlystateprovinceflag"),
         name = row[String](prefix + "name"),
@@ -67,7 +67,7 @@ object StateprovinceRow {
         Try(
           StateprovinceRow(
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            stateprovincecode = json.\("stateprovincecode").as[String],
+            stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
             isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Boolean],
             name = json.\("name").as[String],

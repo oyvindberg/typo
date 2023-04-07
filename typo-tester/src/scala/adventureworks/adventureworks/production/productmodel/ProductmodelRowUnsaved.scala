@@ -19,8 +19,8 @@ import scala.util.Try
 
 case class ProductmodelRowUnsaved(
   name: String,
-  catalogdescription: Option[String],
-  instructions: Option[String],
+  catalogdescription: Option[/* xml */ String],
+  instructions: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
 )
@@ -40,8 +40,8 @@ object ProductmodelRowUnsaved {
         Try(
           ProductmodelRowUnsaved(
             name = json.\("name").as[String],
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[String]),
-            instructions = json.\("instructions").toOption.map(_.as[String]),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as[/* xml */ String]),
+            instructions = json.\("instructions").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

@@ -14,7 +14,7 @@ sealed abstract class CuFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class CuFieldValue[T](name: String, value: T) extends CuFieldOrIdValue(name, value)
 
 object CuFieldValue {
-  case class id(override val value: Option[String]) extends CuFieldValue("id", value)
+  case class id(override val value: Option[/* bpchar */ String]) extends CuFieldValue("id", value)
   case class currencycode(override val value: Option[CurrencyId]) extends CuFieldValue("currencycode", value)
   case class name(override val value: Option[String]) extends CuFieldValue("name", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends CuFieldValue("modifieddate", value)

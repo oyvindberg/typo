@@ -10,6 +10,7 @@ package employee
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -25,10 +26,10 @@ case class EmployeeRow(
   nationalidnumber: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"nationalidnumber","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   loginid: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"loginid","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":256,"character_octet_length":1024,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   jobtitle: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"jobtitle","ordinal_position":6,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  birthdate: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"birthdate","ordinal_position":7,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  maritalstatus: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"maritalstatus","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  gender: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"gender","ordinal_position":9,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  hiredate: String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"hiredate","ordinal_position":10,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  birthdate: LocalDate /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"birthdate","ordinal_position":7,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  maritalstatus: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"maritalstatus","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  gender: /* bpchar */ String /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"gender","ordinal_position":9,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  hiredate: LocalDate /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"hiredate","ordinal_position":10,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   salariedflag: Boolean /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"salariedflag","ordinal_position":11,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   vacationhours: Int /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"vacationhours","ordinal_position":12,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   sickleavehours: Int /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"sickleavehours","ordinal_position":13,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
@@ -46,10 +47,10 @@ object EmployeeRow {
         nationalidnumber = row[String](prefix + "nationalidnumber"),
         loginid = row[String](prefix + "loginid"),
         jobtitle = row[String](prefix + "jobtitle"),
-        birthdate = row[String](prefix + "birthdate"),
-        maritalstatus = row[String](prefix + "maritalstatus"),
-        gender = row[String](prefix + "gender"),
-        hiredate = row[String](prefix + "hiredate"),
+        birthdate = row[LocalDate](prefix + "birthdate"),
+        maritalstatus = row[/* bpchar */ String](prefix + "maritalstatus"),
+        gender = row[/* bpchar */ String](prefix + "gender"),
+        hiredate = row[LocalDate](prefix + "hiredate"),
         salariedflag = row[Boolean](prefix + "salariedflag"),
         vacationhours = row[Int](prefix + "vacationhours"),
         sickleavehours = row[Int](prefix + "sickleavehours"),
@@ -89,10 +90,10 @@ object EmployeeRow {
             nationalidnumber = json.\("nationalidnumber").as[String],
             loginid = json.\("loginid").as[String],
             jobtitle = json.\("jobtitle").as[String],
-            birthdate = json.\("birthdate").as[String],
-            maritalstatus = json.\("maritalstatus").as[String],
-            gender = json.\("gender").as[String],
-            hiredate = json.\("hiredate").as[String],
+            birthdate = json.\("birthdate").as[LocalDate],
+            maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
+            gender = json.\("gender").as[/* bpchar */ String],
+            hiredate = json.\("hiredate").as[LocalDate],
             salariedflag = json.\("salariedflag").as[Boolean],
             vacationhours = json.\("vacationhours").as[Int],
             sickleavehours = json.\("sickleavehours").as[Int],

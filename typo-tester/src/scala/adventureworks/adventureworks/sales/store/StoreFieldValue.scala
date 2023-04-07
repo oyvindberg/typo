@@ -18,7 +18,7 @@ object StoreFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends StoreFieldOrIdValue("businessentityid", value)
   case class name(override val value: String) extends StoreFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends StoreFieldValue("salespersonid", value)
-  case class demographics(override val value: Option[String]) extends StoreFieldValue("demographics", value)
+  case class demographics(override val value: Option[/* xml */ String]) extends StoreFieldValue("demographics", value)
   case class rowguid(override val value: UUID) extends StoreFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends StoreFieldValue("modifieddate", value)
 }

@@ -15,7 +15,7 @@ sealed abstract class ShiftFieldValue[T](name: String, value: T) extends ShiftFi
 object ShiftFieldValue {
   case class shiftid(override val value: ShiftId) extends ShiftFieldOrIdValue("shiftid", value)
   case class name(override val value: String) extends ShiftFieldValue("name", value)
-  case class starttime(override val value: String) extends ShiftFieldValue("starttime", value)
-  case class endtime(override val value: String) extends ShiftFieldValue("endtime", value)
+  case class starttime(override val value: LocalDateTime) extends ShiftFieldValue("starttime", value)
+  case class endtime(override val value: LocalDateTime) extends ShiftFieldValue("endtime", value)
   case class modifieddate(override val value: LocalDateTime) extends ShiftFieldValue("modifieddate", value)
 }

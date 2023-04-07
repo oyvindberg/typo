@@ -16,6 +16,6 @@ sealed abstract class IFieldValue[T](name: String, value: T) extends IFieldOrIdV
 object IFieldValue {
   case class id(override val value: Option[Int]) extends IFieldValue("id", value)
   case class illustrationid(override val value: Option[IllustrationId]) extends IFieldValue("illustrationid", value)
-  case class diagram(override val value: Option[String]) extends IFieldValue("diagram", value)
+  case class diagram(override val value: Option[/* xml */ String]) extends IFieldValue("diagram", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends IFieldValue("modifieddate", value)
 }

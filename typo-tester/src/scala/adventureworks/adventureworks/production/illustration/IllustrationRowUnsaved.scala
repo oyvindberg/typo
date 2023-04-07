@@ -17,7 +17,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class IllustrationRowUnsaved(
-  diagram: Option[String],
+  diagram: Option[/* xml */ String],
   modifieddate: Defaulted[LocalDateTime]
 )
 object IllustrationRowUnsaved {
@@ -32,7 +32,7 @@ object IllustrationRowUnsaved {
       JsResult.fromTry(
         Try(
           IllustrationRowUnsaved(
-            diagram = json.\("diagram").toOption.map(_.as[String]),
+            diagram = json.\("diagram").toOption.map(_.as[/* xml */ String]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

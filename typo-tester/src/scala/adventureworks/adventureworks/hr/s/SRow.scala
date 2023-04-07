@@ -25,9 +25,9 @@ case class SRow(
   /** Points to [[humanresources.shift.ShiftRow.name]] */
   name: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
-  starttime: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"starttime","ordinal_position":4,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  starttime: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"starttime","ordinal_position":4,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
-  endtime: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"endtime","ordinal_position":5,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  endtime: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"endtime","ordinal_position":5,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]] */
   modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"modifieddate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
 )
@@ -39,8 +39,8 @@ object SRow {
         id = row[Option[Int]](prefix + "id"),
         shiftid = row[Option[ShiftId]](prefix + "shiftid"),
         name = row[Option[String]](prefix + "name"),
-        starttime = row[Option[String]](prefix + "starttime"),
-        endtime = row[Option[String]](prefix + "endtime"),
+        starttime = row[Option[LocalDateTime]](prefix + "starttime"),
+        endtime = row[Option[LocalDateTime]](prefix + "endtime"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
     )
@@ -64,8 +64,8 @@ object SRow {
             id = json.\("id").toOption.map(_.as[Int]),
             shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
             name = json.\("name").toOption.map(_.as[String]),
-            starttime = json.\("starttime").toOption.map(_.as[String]),
-            endtime = json.\("endtime").toOption.map(_.as[String]),
+            starttime = json.\("starttime").toOption.map(_.as[LocalDateTime]),
+            endtime = json.\("endtime").toOption.map(_.as[LocalDateTime]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

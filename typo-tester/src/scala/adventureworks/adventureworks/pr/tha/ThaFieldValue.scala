@@ -20,7 +20,7 @@ object ThaFieldValue {
   case class referenceorderid(override val value: Option[Int]) extends ThaFieldValue("referenceorderid", value)
   case class referenceorderlineid(override val value: Option[Int]) extends ThaFieldValue("referenceorderlineid", value)
   case class transactiondate(override val value: Option[LocalDateTime]) extends ThaFieldValue("transactiondate", value)
-  case class transactiontype(override val value: Option[String]) extends ThaFieldValue("transactiontype", value)
+  case class transactiontype(override val value: Option[/* bpchar */ String]) extends ThaFieldValue("transactiontype", value)
   case class quantity(override val value: Option[Int]) extends ThaFieldValue("quantity", value)
   case class actualcost(override val value: Option[BigDecimal]) extends ThaFieldValue("actualcost", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends ThaFieldValue("modifieddate", value)

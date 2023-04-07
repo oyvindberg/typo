@@ -8,6 +8,7 @@ package humanresources
 package vemployeedepartmenthistory
 
 import adventureworks.person.businessentity.BusinessentityId
+import java.time.LocalDate
 
 sealed abstract class VemployeedepartmenthistoryFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VemployeedepartmenthistoryFieldValue[T](name: String, value: T) extends VemployeedepartmenthistoryFieldOrIdValue(name, value)
@@ -22,6 +23,6 @@ object VemployeedepartmenthistoryFieldValue {
   case class shift(override val value: Option[String]) extends VemployeedepartmenthistoryFieldValue("shift", value)
   case class department(override val value: Option[String]) extends VemployeedepartmenthistoryFieldValue("department", value)
   case class groupname(override val value: Option[String]) extends VemployeedepartmenthistoryFieldValue("groupname", value)
-  case class startdate(override val value: Option[String]) extends VemployeedepartmenthistoryFieldValue("startdate", value)
-  case class enddate(override val value: Option[String]) extends VemployeedepartmenthistoryFieldValue("enddate", value)
+  case class startdate(override val value: Option[LocalDate]) extends VemployeedepartmenthistoryFieldValue("startdate", value)
+  case class enddate(override val value: Option[LocalDate]) extends VemployeedepartmenthistoryFieldValue("enddate", value)
 }

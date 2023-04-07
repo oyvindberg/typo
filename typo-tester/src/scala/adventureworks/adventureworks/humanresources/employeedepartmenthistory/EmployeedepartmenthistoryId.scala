@@ -12,6 +12,7 @@ import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -19,7 +20,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
 
-case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: String, departmentid: DepartmentId, shiftid: ShiftId)
+case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: LocalDate, departmentid: DepartmentId, shiftid: ShiftId)
 object EmployeedepartmenthistoryId {
   implicit def ordering: Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
   implicit val oFormat: OFormat[EmployeedepartmenthistoryId] = new OFormat[EmployeedepartmenthistoryId]{
@@ -36,7 +37,7 @@ object EmployeedepartmenthistoryId {
         Try(
           EmployeedepartmenthistoryId(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            startdate = json.\("startdate").as[String],
+            startdate = json.\("startdate").as[LocalDate],
             departmentid = json.\("departmentid").as[DepartmentId],
             shiftid = json.\("shiftid").as[ShiftId]
           )
@@ -48,7 +49,7 @@ object EmployeedepartmenthistoryId {
     Success(
       EmployeedepartmenthistoryId(
         businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        startdate = row[String](prefix + "startdate"),
+        startdate = row[LocalDate](prefix + "startdate"),
         departmentid = row[DepartmentId](prefix + "departmentid"),
         shiftid = row[ShiftId](prefix + "shiftid")
       )

@@ -49,7 +49,7 @@ case class VindividualcustomerRow(
   postalcode: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vindividualcustomer","column_name":"postalcode","ordinal_position":16,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   countryregionname: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vindividualcustomer","column_name":"countryregionname","ordinal_position":17,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vindividualcustomer","column_name":"demographics","ordinal_position":18,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
+  demographics: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vindividualcustomer","column_name":"demographics","ordinal_position":18,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
 )
 
 object VindividualcustomerRow {
@@ -73,7 +73,7 @@ object VindividualcustomerRow {
         stateprovincename = row[Option[String]](prefix + "stateprovincename"),
         postalcode = row[Option[String]](prefix + "postalcode"),
         countryregionname = row[Option[String]](prefix + "countryregionname"),
-        demographics = row[Option[String]](prefix + "demographics")
+        demographics = row[Option[/* xml */ String]](prefix + "demographics")
       )
     )
   }
@@ -122,7 +122,7 @@ object VindividualcustomerRow {
             stateprovincename = json.\("stateprovincename").toOption.map(_.as[String]),
             postalcode = json.\("postalcode").toOption.map(_.as[String]),
             countryregionname = json.\("countryregionname").toOption.map(_.as[String]),
-            demographics = json.\("demographics").toOption.map(_.as[String])
+            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String])
           )
         )
       )

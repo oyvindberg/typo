@@ -24,7 +24,7 @@ case class PRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.persontype]] */
-  persontype: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"persontype","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  persontype: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"persontype","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":2,"character_octet_length":8,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.namestyle]] */
   namestyle: Boolean /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"namestyle","ordinal_position":4,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"NameStyle","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.title]] */
@@ -40,9 +40,9 @@ case class PRow(
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"emailpromotion","ordinal_position":10,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"additionalcontactinfo","ordinal_position":11,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  additionalcontactinfo: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"additionalcontactinfo","ordinal_position":11,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"demographics","ordinal_position":12,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  demographics: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"demographics","ordinal_position":12,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.rowguid]] */
   rowguid: Option[UUID] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"p","column_name":"rowguid","ordinal_position":13,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[person.person.PersonRow.modifieddate]] */
@@ -55,7 +55,7 @@ object PRow {
       PRow(
         id = row[Option[Int]](prefix + "id"),
         businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        persontype = row[Option[String]](prefix + "persontype"),
+        persontype = row[Option[/* bpchar */ String]](prefix + "persontype"),
         namestyle = row[Boolean](prefix + "namestyle"),
         title = row[Option[String]](prefix + "title"),
         firstname = row[Option[String]](prefix + "firstname"),
@@ -63,8 +63,8 @@ object PRow {
         lastname = row[Option[String]](prefix + "lastname"),
         suffix = row[Option[String]](prefix + "suffix"),
         emailpromotion = row[Option[Int]](prefix + "emailpromotion"),
-        additionalcontactinfo = row[Option[String]](prefix + "additionalcontactinfo"),
-        demographics = row[Option[String]](prefix + "demographics"),
+        additionalcontactinfo = row[Option[/* xml */ String]](prefix + "additionalcontactinfo"),
+        demographics = row[Option[/* xml */ String]](prefix + "demographics"),
         rowguid = row[Option[UUID]](prefix + "rowguid"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
@@ -96,7 +96,7 @@ object PRow {
           PRow(
             id = json.\("id").toOption.map(_.as[Int]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            persontype = json.\("persontype").toOption.map(_.as[String]),
+            persontype = json.\("persontype").toOption.map(_.as[/* bpchar */ String]),
             namestyle = json.\("namestyle").as[Boolean],
             title = json.\("title").toOption.map(_.as[String]),
             firstname = json.\("firstname").toOption.map(_.as[String]),
@@ -104,8 +104,8 @@ object PRow {
             lastname = json.\("lastname").toOption.map(_.as[String]),
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[String]),
-            demographics = json.\("demographics").toOption.map(_.as[String]),
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),
+            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

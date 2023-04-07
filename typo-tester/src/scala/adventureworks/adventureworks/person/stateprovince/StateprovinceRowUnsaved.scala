@@ -20,7 +20,7 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class StateprovinceRowUnsaved(
-  stateprovincecode: String,
+  stateprovincecode: /* bpchar */ String,
   countryregioncode: CountryregionId,
   isonlystateprovinceflag: Defaulted[Boolean],
   name: String,
@@ -45,7 +45,7 @@ object StateprovinceRowUnsaved {
       JsResult.fromTry(
         Try(
           StateprovinceRowUnsaved(
-            stateprovincecode = json.\("stateprovincecode").as[String],
+            stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
             isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[Boolean]],
             name = json.\("name").as[String],

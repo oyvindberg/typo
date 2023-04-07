@@ -10,6 +10,7 @@ package vjobcandidateeducation
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.RowParser
 import anorm.Success
+import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,8 +22,8 @@ case class VjobcandidateeducationRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"jobcandidateid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Edu.Level`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.Level","ordinal_position":2,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  `Edu.StartDate`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.StartDate","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
-  `Edu.EndDate`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.EndDate","ordinal_position":4,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  `Edu.StartDate`: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.StartDate","ordinal_position":3,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
+  `Edu.EndDate`: Option[LocalDate] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.EndDate","ordinal_position":4,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Edu.Degree`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.Degree","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Edu.Major`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.Major","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
   `Edu.Minor`: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidateeducation","column_name":"Edu.Minor","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */,
@@ -40,8 +41,8 @@ object VjobcandidateeducationRow {
       VjobcandidateeducationRow(
         jobcandidateid = row[Option[JobcandidateId]](prefix + "jobcandidateid"),
         `Edu.Level` = row[Option[String]](prefix + "Edu.Level"),
-        `Edu.StartDate` = row[Option[String]](prefix + "Edu.StartDate"),
-        `Edu.EndDate` = row[Option[String]](prefix + "Edu.EndDate"),
+        `Edu.StartDate` = row[Option[LocalDate]](prefix + "Edu.StartDate"),
+        `Edu.EndDate` = row[Option[LocalDate]](prefix + "Edu.EndDate"),
         `Edu.Degree` = row[Option[String]](prefix + "Edu.Degree"),
         `Edu.Major` = row[Option[String]](prefix + "Edu.Major"),
         `Edu.Minor` = row[Option[String]](prefix + "Edu.Minor"),
@@ -79,8 +80,8 @@ object VjobcandidateeducationRow {
           VjobcandidateeducationRow(
             jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
             `Edu.Level` = json.\("Edu.Level").toOption.map(_.as[String]),
-            `Edu.StartDate` = json.\("Edu.StartDate").toOption.map(_.as[String]),
-            `Edu.EndDate` = json.\("Edu.EndDate").toOption.map(_.as[String]),
+            `Edu.StartDate` = json.\("Edu.StartDate").toOption.map(_.as[LocalDate]),
+            `Edu.EndDate` = json.\("Edu.EndDate").toOption.map(_.as[LocalDate]),
             `Edu.Degree` = json.\("Edu.Degree").toOption.map(_.as[String]),
             `Edu.Major` = json.\("Edu.Major").toOption.map(_.as[String]),
             `Edu.Minor` = json.\("Edu.Minor").toOption.map(_.as[String]),

@@ -31,7 +31,7 @@ case class ThaRow(
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
   transactiondate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactiondate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
-  transactiontype: Option[String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactiontype","ordinal_position":7,"is_nullable":"YES","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
+  transactiontype: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactiontype","ordinal_position":7,"is_nullable":"YES","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
   quantity: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"quantity","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */
@@ -50,7 +50,7 @@ object ThaRow {
         referenceorderid = row[Option[Int]](prefix + "referenceorderid"),
         referenceorderlineid = row[Option[Int]](prefix + "referenceorderlineid"),
         transactiondate = row[Option[LocalDateTime]](prefix + "transactiondate"),
-        transactiontype = row[Option[String]](prefix + "transactiontype"),
+        transactiontype = row[Option[/* bpchar */ String]](prefix + "transactiontype"),
         quantity = row[Option[Int]](prefix + "quantity"),
         actualcost = row[Option[BigDecimal]](prefix + "actualcost"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
@@ -83,7 +83,7 @@ object ThaRow {
             referenceorderid = json.\("referenceorderid").toOption.map(_.as[Int]),
             referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as[Int]),
             transactiondate = json.\("transactiondate").toOption.map(_.as[LocalDateTime]),
-            transactiontype = json.\("transactiontype").toOption.map(_.as[String]),
+            transactiontype = json.\("transactiontype").toOption.map(_.as[/* bpchar */ String]),
             quantity = json.\("quantity").toOption.map(_.as[Int]),
             actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
