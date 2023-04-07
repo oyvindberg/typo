@@ -43,9 +43,8 @@ case class SqlScriptComputed(
         case _ => None
       }
 
-    val tpe = typeFromFk.getOrElse {
-      scalaTypeMapper(Left(script.relPath), dbCol, typeFromFk)
-    }
+    val tpe = scalaTypeMapper(Left(script.relPath), dbCol, typeFromFk)
+
     tpe
   }
 
