@@ -51,11 +51,18 @@ case class SqlScriptComputed(
 
   val params: List[SqlScriptComputed.ParamComputed] =
     script.params.map { param =>
-      val name = param.maybeName match {
-        case DecomposedSql.NotNamedParam    => sc.Ident(s"param${param.indices.head}")
-        case DecomposedSql.NamedParam(name) => naming.field(db.ColName(name))
+      val maybeNameInScript: Option[db.ColName] =
+        param.maybeName match {
+          case DecomposedSql.NotNamedParam    => None
+          case DecomposedSql.NamedParam(name) => Some(db.ColName(name))
+        }
+
+      val scalaName = maybeNameInScript match {
+        case None       => sc.Ident(s"param${param.indices.head}")
+        case Some(name) => naming.field(name)
       }
-      SqlScriptComputed.ParamComputed(name, scalaTypeMapper.param(param.tpe, param.nullability), param)
+      val tpe = scalaTypeMapper.param(script.relPath, maybeNameInScript, param.tpe, param.nullability)
+      SqlScriptComputed.ParamComputed(scalaName, tpe, param)
     }
 
   val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }

@@ -6,6 +6,7 @@ case class Options(
     dbLib: DbLibName,
     naming: sc.QIdent => Naming = new Naming(_),
     typeOverride: TypeOverride = TypeOverride.Empty,
+    nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,
     header: String = Options.header,
     debugTypes: Boolean = false
 )

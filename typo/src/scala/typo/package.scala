@@ -42,7 +42,7 @@ package object typo {
       debugTypes = publicOptions.debugTypes
     )
     val naming = options.naming(options.pkg)
-    val scalaTypeMapper = TypeMapperScala(options.typeOverride, naming)
+    val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming)
 
     val default: DefaultComputed =
       DefaultComputed(naming)

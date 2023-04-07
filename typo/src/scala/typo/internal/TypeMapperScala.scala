@@ -1,7 +1,11 @@
 package typo
 package internal
 
-case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
+case class TypeMapperScala(
+    typeOverride: TypeOverride,
+    nullabilityOverride: NullabilityOverride,
+    naming: Naming
+) {
   def apply(relation: Either[RelPath, db.RelationName], col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
       val maybeOverridden = typeOverride(relation, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
@@ -17,18 +21,21 @@ case class TypeMapperScala(typeOverride: TypeOverride, naming: Naming) {
         go(other)
     }
 
-    withNullability(baseTpe, col.nullability)
+    withNullability(baseTpe, nullabilityOverride.apply(relation, col.name).getOrElse(col.nullability))
   }
 
-  def param(dbType: db.Type, nullability: Nullability): sc.Type = {
+  def param(script: RelPath, colName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
     val base = dbType match {
       case db.Type.Array(tpe) =>
         sc.Type.Array.of(baseType(tpe))
       case other =>
         baseType(other)
     }
-
-    withNullability(base, nullability)
+    val nullability1: Nullability = colName match {
+      case Some(name) => nullabilityOverride(Left(script), name).getOrElse(nullability)
+      case None       => nullability
+    }
+    withNullability(base, nullability1)
   }
 
   private def baseType(tpe: db.Type): sc.Type = {
