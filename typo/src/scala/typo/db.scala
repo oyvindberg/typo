@@ -50,7 +50,7 @@ object db {
   case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
-  case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, jsonDescription: JsValue)
+  case class Col(name: ColName, tpe: Type, nullability: Nullability, hasDefault: Boolean, comment: Option[String], jsonDescription: JsValue)
   case class RelationName(schema: Option[String], name: String) {
     def value = s"${schema.map(_ + ".").getOrElse("")}$name"
   }

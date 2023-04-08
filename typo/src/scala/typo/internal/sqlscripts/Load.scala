@@ -48,6 +48,7 @@ object Load {
           db.Type.Text
         },
         hasDefault = col.isAutoIncrement,
+        comment = None,
         jsonDescription = jsonDescription,
         nullability = col.isNullable.toNullability
       )

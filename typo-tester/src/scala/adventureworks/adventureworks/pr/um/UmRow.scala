@@ -20,13 +20,17 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class UmRow(
-  id: Option[/* bpchar */ String] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
-  unitmeasurecode: Option[UnitmeasureId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"unitmeasurecode","ordinal_position":2,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
-  name: Option[Name] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"modifieddate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  id: Option[/* bpchar */ String],
+  /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"unitmeasurecode","ordinal_position":2,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  unitmeasurecode: Option[UnitmeasureId],
+  /** Points to [[production.unitmeasure.UnitmeasureRow.name]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  name: Option[Name],
+  /** Points to [[production.unitmeasure.UnitmeasureRow.modifieddate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"um","column_name":"modifieddate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: Option[LocalDateTime]
 )
 
 object UmRow {

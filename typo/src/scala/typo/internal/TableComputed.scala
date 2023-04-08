@@ -29,6 +29,7 @@ case class TableComputed(
             tpe = underlying,
             dbName = dbCol.name,
             hasDefault = dbCol.hasDefault,
+            comment = dbCol.comment,
             jsonDescription = dbCol.jsonDescription
           )
           if (sc.Type.containsUserDefined(underlying))
@@ -46,6 +47,7 @@ case class TableComputed(
                 tpe = deriveType(dbCol),
                 dbName = dbCol.name,
                 hasDefault = dbCol.hasDefault,
+                comment = dbCol.comment,
                 jsonDescription = dbCol.jsonDescription
               )
             }
@@ -63,6 +65,7 @@ case class TableComputed(
         tpe = tpe,
         dbName = dbCol.name,
         hasDefault = dbCol.hasDefault,
+        comment = dbCol.comment,
         jsonDescription = dbCol.jsonDescription
       )
 

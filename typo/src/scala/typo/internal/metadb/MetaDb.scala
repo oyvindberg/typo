@@ -2,10 +2,11 @@ package typo
 package internal
 package metadb
 
+import typo.generated.custom.comments.{CommentsRepoImpl, CommentsRow}
 import typo.generated.custom.domains.{DomainsRepoImpl, DomainsRow}
 import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
-import typo.generated.information_schema.YesOrNo
+import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
 import typo.generated.information_schema.columns.{ColumnsRepoImpl, ColumnsRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageRepoImpl, KeyColumnUsageRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsRepoImpl, ReferentialConstraintsRow}
@@ -31,7 +32,8 @@ object MetaDb {
       columnsRows: List[ColumnsRow],
       viewRows: List[ViewFindAllRow],
       viewColumnDeps: List[ViewColumnDependenciesRow],
-      domains: List[DomainsRow]
+      domains: List[DomainsRow],
+      comments: List[CommentsRow]
   )
 
   object Input {
@@ -45,7 +47,8 @@ object MetaDb {
         columnsRows = ColumnsRepoImpl.selectAll,
         viewRows = ViewFindAllRepoImpl(),
         viewColumnDeps = ViewColumnDependenciesRepoImpl(),
-        domains = DomainsRepoImpl()
+        domains = DomainsRepoImpl(),
+        comments = CommentsRepoImpl()
       )
     }
   }
@@ -85,6 +88,11 @@ object MetaDb {
       domains.map(e => (e.name.name, e)).toMap
     )
 
+    val comments: Map[(db.RelationName, db.ColName), String] =
+      input.comments.collect { case CommentsRow(maybeSchema, Some(SqlIdentifier(table)), Some(SqlIdentifier(column)), description) =>
+        (db.RelationName(maybeSchema.map(_.value), table), db.ColName(column)) -> description
+      }.toMap
+
     val relations: List[db.Relation] = {
       input.tablesRows.flatMap { table =>
         val relationName = db.RelationName(
@@ -99,8 +107,9 @@ object MetaDb {
         def mappedCols: List[db.Col] =
           columns.map { c =>
             val jsonDescription = minimalJson(c)
+            val colName = db.ColName(c.columnName.get.value)
             db.Col(
-              name = db.ColName(c.columnName.get.value),
+              name = colName,
               hasDefault = c.columnDefault.isDefined,
               nullability = c.isNullable match {
                 case Some(YesOrNo("YES")) => Nullability.Nullable
@@ -112,6 +121,7 @@ object MetaDb {
                 System.err.println(s"Couldn't translate type from column $jsonDescription")
                 db.Type.Text
               },
+              comment = comments.get((relationName, colName)),
               jsonDescription = jsonDescription
             )
           }

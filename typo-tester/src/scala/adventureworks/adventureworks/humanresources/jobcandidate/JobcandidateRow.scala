@@ -19,11 +19,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class JobcandidateRow(
-  jobcandidateid: JobcandidateId /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"jobcandidateid","ordinal_position":1,"column_default":"nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[employee.EmployeeRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  resume: Option[/* xml */ String] /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"resume","ordinal_position":3,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"modifieddate","ordinal_position":4,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for JobCandidate records.
+      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"jobcandidateid","ordinal_position":1,"column_default":"nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  jobcandidateid: JobcandidateId,
+  /** Employee identification number if applicant was hired. Foreign key to Employee.BusinessEntityID.
+      Points to [[employee.EmployeeRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  businessentityid: Option[BusinessentityId],
+  /** RÃ©sumÃ© in XML format.
+      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"resume","ordinal_position":3,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  resume: Option[/* xml */ String],
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"jobcandidate","column_name":"modifieddate","ordinal_position":4,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: LocalDateTime
 )
 
 object JobcandidateRow {

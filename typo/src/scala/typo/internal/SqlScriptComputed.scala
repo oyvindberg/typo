@@ -23,6 +23,7 @@ case class SqlScriptComputed(
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
         hasDefault = dbCol.hasDefault,
+        comment = dbCol.comment,
         jsonDescription = dbCol.jsonDescription
       )
       dbCol -> columnComputed

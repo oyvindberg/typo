@@ -15,8 +15,7 @@ import java.sql.Connection
 
 object ViewColumnDependenciesRepoImpl extends ViewColumnDependenciesRepo {
   override def apply()(implicit c: Connection): List[ViewColumnDependenciesRow] = {
-    val sql = SQL"""
-              SELECT view_class.relnamespace::regnamespace  AS view_schema
+    val sql = SQL"""SELECT view_class.relnamespace::regnamespace  AS view_schema
                    , view_class.relname                     AS view_name
                    , table_class.relnamespace::regnamespace AS table_schema
                    , table_class.relname                    AS table_name

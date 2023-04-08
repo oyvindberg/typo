@@ -21,15 +21,20 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PpRow(
-  id: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
-  phonenumber: Option[Phone] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"phonenumber","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Phone","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]] */
-  phonenumbertypeid: Option[PhonenumbertypeId] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"phonenumbertypeid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[person.personphone.PersonphoneRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"modifieddate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  id: Option[Int],
+  /** Points to [[person.personphone.PersonphoneRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  businessentityid: Option[BusinessentityId],
+  /** Points to [[person.personphone.PersonphoneRow.phonenumber]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"phonenumber","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Phone","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  phonenumber: Option[Phone],
+  /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"phonenumbertypeid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  phonenumbertypeid: Option[PhonenumbertypeId],
+  /** Points to [[person.personphone.PersonphoneRow.modifieddate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"pp","column_name":"modifieddate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: Option[LocalDateTime]
 )
 
 object PpRow {

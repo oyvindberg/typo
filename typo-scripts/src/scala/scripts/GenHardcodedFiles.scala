@@ -15,21 +15,22 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
-      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), Nullability.Nullable, hasDefault = false, JsNull),
-      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), Nullability.Nullable, hasDefault = false, JsNull),
-      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("likes_pizza"), db.Type.Boolean, Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(Some(50)), Nullability.NoNulls, hasDefault = true, JsNull),
-      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), Nullability.Nullable, hasDefault = false, JsNull),
+      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, None, JsNull),
+      db.Col(db.ColName("favourite_football_club_id"), db.Type.VarChar(Some(50)), Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), Nullability.Nullable, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), Nullability.Nullable, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("likes_pizza"), db.Type.Boolean, Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("marital_status_id"), db.Type.VarChar(Some(50)), Nullability.NoNulls, hasDefault = true, None, JsNull),
+      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), Nullability.Nullable, hasDefault = false, None, JsNull),
       db.Col(
         db.ColName("sector"),
         db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
         Nullability.NoNulls,
         hasDefault = true,
+        None,
         JsNull
       )
     ),
@@ -53,8 +54,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val football_club = db.Table(
     name = db.RelationName(Some("myschema"), "football_club"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Nullability.NoNulls, hasDefault = false, None, JsNull)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "football_club_pkey"))),
     Nil,
@@ -63,7 +64,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val marital_status = db.Table(
     name = db.RelationName(Some("myschema"), "marital_status"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, None, JsNull)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "marital_status_pkey"))),
     Nil,
@@ -73,9 +74,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val cpk_person = db.Table(
     name = db.RelationName(Some("compositepk"), "person"), // name clash to ensure we handle it
     cols = NonEmptyList(
-      db.Col(db.ColName("one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
-      db.Col(db.ColName("two"), db.Type.Text, Nullability.Nullable, hasDefault = true, JsNull),
-      db.Col(db.ColName("name"), db.Type.Text, Nullability.Nullable, hasDefault = false, JsNull)
+      db.Col(db.ColName("one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, None, JsNull),
+      db.Col(db.ColName("two"), db.Type.Text, Nullability.Nullable, hasDefault = true, None, JsNull),
+      db.Col(db.ColName("name"), db.Type.Text, Nullability.Nullable, hasDefault = false, None, JsNull)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("one"), db.ColName("two")), db.RelationName(Some("compositepk"), "person_pkey"))),
     Nil,
@@ -84,10 +85,10 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val cpk_bike = db.Table(
     name = db.RelationName(Some("compositepk"), "bike"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, JsNull),
-      db.Col(db.ColName("owner_one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, JsNull),
-      db.Col(db.ColName("owner_two"), db.Type.Text, Nullability.Nullable, hasDefault = false, JsNull),
-      db.Col(db.ColName("bike_name"), db.Type.Text, Nullability.NoNulls, hasDefault = false, JsNull)
+      db.Col(db.ColName("id"), db.Type.BigInt, Nullability.NoNulls, hasDefault = true, None, JsNull),
+      db.Col(db.ColName("owner_one"), db.Type.BigInt, Nullability.NoNulls, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("owner_two"), db.Type.Text, Nullability.Nullable, hasDefault = false, None, JsNull),
+      db.Col(db.ColName("bike_name"), db.Type.Text, Nullability.NoNulls, hasDefault = false, None, JsNull)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("compositepk"), "bike_pkey"))),
     Nil,

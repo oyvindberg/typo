@@ -19,9 +19,13 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class BusinessentityRow(
-  businessentityid: BusinessentityId /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"businessentityid","ordinal_position":1,"column_default":"nextval('person.businessentity_businessentityid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rowguid: UUID /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"rowguid","ordinal_position":2,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for all customers, vendors, and employees.
+      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"businessentityid","ordinal_position":1,"column_default":"nextval('person.businessentity_businessentityid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  businessentityid: BusinessentityId,
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"rowguid","ordinal_position":2,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  rowguid: UUID,
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentity","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: LocalDateTime
 )
 
 object BusinessentityRow {

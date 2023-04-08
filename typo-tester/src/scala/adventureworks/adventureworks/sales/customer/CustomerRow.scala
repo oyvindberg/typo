@@ -21,15 +21,25 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CustomerRow(
-  customerid: CustomerId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"customerid","ordinal_position":1,"column_default":"nextval('sales.customer_customerid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[person.person.PersonRow.businessentityid]] */
-  personid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"personid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[store.StoreRow.businessentityid]] */
-  storeid: Option[BusinessentityId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"storeid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[salesterritory.SalesterritoryRow.territoryid]] */
-  territoryid: Option[SalesterritoryId] /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"territoryid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  rowguid: UUID /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"rowguid","ordinal_position":6,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"customerid","ordinal_position":1,"column_default":"nextval('sales.customer_customerid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  customerid: CustomerId,
+  /** Foreign key to Person.BusinessEntityID
+      Points to [[person.person.PersonRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"personid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  personid: Option[BusinessentityId],
+  /** Foreign key to Store.BusinessEntityID
+      Points to [[store.StoreRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"storeid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  storeid: Option[BusinessentityId],
+  /** ID of the territory in which the customer is located. Foreign key to SalesTerritory.SalesTerritoryID.
+      Points to [[salesterritory.SalesterritoryRow.territoryid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"territoryid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  territoryid: Option[SalesterritoryId],
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"rowguid","ordinal_position":6,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  rowguid: UUID,
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"customer","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: LocalDateTime
 )
 
 object CustomerRow {

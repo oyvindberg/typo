@@ -9,6 +9,7 @@ case class ColumnComputed(
     tpe: sc.Type,
     dbName: db.ColName,
     hasDefault: Boolean,
+    comment: Option[String],
     jsonDescription: JsValue
 ) {
   def param: sc.Param = sc.Param(name, tpe)

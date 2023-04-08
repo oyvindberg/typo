@@ -17,18 +17,27 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
     }
 
     val formattedCols = relation.cols.map { col =>
-      val originComment = col.jsonDescription match {
-        case JsNull => ""
-        case other  => if (options.debugTypes) s" /* ${Json.stringify(other)} */" else ""
+      val commentPieces = List(
+        col.comment,
+        col.pointsTo map { case (relationName, columnName) =>
+          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.idents))
+          s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
+        },
+        col.jsonDescription match {
+          case JsNull => None
+          case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
+        }
+      ).flatten
+
+      val comment = commentPieces match {
+        case Nil => sc.Code.Empty
+        case nonEmpty =>
+          val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
+          code"""|/** ${lines.mkCode("\n")} */
+                 |""".stripMargin
       }
 
-      col.pointsTo match {
-        case Some((relationName, columnName)) =>
-          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.idents))
-          code"""|/** Points to [[${sc.renderTree(shortened)}.${naming.field(columnName)}]] */
-                 |${col.param}$originComment""".stripMargin
-        case None => code"${col.param.code}$originComment"
-      }
+      code"$comment${col.param.code}"
     }
     val str =
       code"""case class ${relation.RowName.name}(

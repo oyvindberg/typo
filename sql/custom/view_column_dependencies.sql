@@ -1,4 +1,3 @@
-
 SELECT view_class.relnamespace::regnamespace  AS view_schema
      , view_class.relname                     AS view_name
      , table_class.relnamespace::regnamespace AS table_schema

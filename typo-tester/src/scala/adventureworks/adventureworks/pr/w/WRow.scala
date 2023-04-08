@@ -21,25 +21,35 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class WRow(
-  id: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.workorderid]] */
-  workorderid: Option[WorkorderId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"workorderid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.productid]] */
-  productid: Option[ProductId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"productid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.orderqty]] */
-  orderqty: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"orderqty","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.scrappedqty]] */
-  scrappedqty: Option[Int] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"scrappedqty","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.startdate]] */
-  startdate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"startdate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.enddate]] */
-  enddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"enddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.duedate]] */
-  duedate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"duedate","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.scrapreasonid]] */
-  scrapreasonid: Option[ScrapreasonId] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"scrapreasonid","ordinal_position":9,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[production.workorder.WorkorderRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime] /* {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"modifieddate","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  id: Option[Int],
+  /** Points to [[production.workorder.WorkorderRow.workorderid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"workorderid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  workorderid: Option[WorkorderId],
+  /** Points to [[production.workorder.WorkorderRow.productid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"productid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  productid: Option[ProductId],
+  /** Points to [[production.workorder.WorkorderRow.orderqty]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"orderqty","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  orderqty: Option[Int],
+  /** Points to [[production.workorder.WorkorderRow.scrappedqty]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"scrappedqty","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  scrappedqty: Option[Int],
+  /** Points to [[production.workorder.WorkorderRow.startdate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"startdate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  startdate: Option[LocalDateTime],
+  /** Points to [[production.workorder.WorkorderRow.enddate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"enddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  enddate: Option[LocalDateTime],
+  /** Points to [[production.workorder.WorkorderRow.duedate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"duedate","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  duedate: Option[LocalDateTime],
+  /** Points to [[production.workorder.WorkorderRow.scrapreasonid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"scrapreasonid","ordinal_position":9,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  scrapreasonid: Option[ScrapreasonId],
+  /** Points to [[production.workorder.WorkorderRow.modifieddate]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"w","column_name":"modifieddate","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: Option[LocalDateTime]
 )
 
 object WRow {

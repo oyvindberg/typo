@@ -19,15 +19,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CurrencyrateRow(
-  currencyrateid: CurrencyrateId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"currencyrateid","ordinal_position":1,"column_default":"nextval('sales.currencyrate_currencyrateid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  currencyratedate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"currencyratedate","ordinal_position":2,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[currency.CurrencyRow.currencycode]] */
-  fromcurrencycode: CurrencyId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"fromcurrencycode","ordinal_position":3,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  /** Points to [[currency.CurrencyRow.currencycode]] */
-  tocurrencycode: CurrencyId /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"tocurrencycode","ordinal_position":4,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  averagerate: BigDecimal /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"averagerate","ordinal_position":5,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  endofdayrate: BigDecimal /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"endofdayrate","ordinal_position":6,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */,
-  modifieddate: LocalDateTime /* {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for CurrencyRate records.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"currencyrateid","ordinal_position":1,"column_default":"nextval('sales.currencyrate_currencyrateid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  currencyrateid: CurrencyrateId,
+  /** Date and time the exchange rate was obtained.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"currencyratedate","ordinal_position":2,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  currencyratedate: LocalDateTime,
+  /** Exchange rate was converted from this currency code.
+      Points to [[currency.CurrencyRow.currencycode]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"fromcurrencycode","ordinal_position":3,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  fromcurrencycode: CurrencyId,
+  /** Exchange rate was converted to this currency code.
+      Points to [[currency.CurrencyRow.currencycode]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"tocurrencycode","ordinal_position":4,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  tocurrencycode: CurrencyId,
+  /** Average exchange rate for the day.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"averagerate","ordinal_position":5,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  averagerate: BigDecimal,
+  /** Final exchange rate for the day.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"endofdayrate","ordinal_position":6,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  endofdayrate: BigDecimal,
+  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  modifieddate: LocalDateTime
 )
 
 object CurrencyrateRow {
