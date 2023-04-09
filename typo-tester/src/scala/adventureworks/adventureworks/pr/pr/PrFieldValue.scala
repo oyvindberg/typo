@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pr
 
+import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
 import java.time.LocalDateTime
@@ -17,7 +18,7 @@ sealed abstract class PrFieldValue[T](name: String, value: T) extends PrFieldOrI
 object PrFieldValue {
   case class id(override val value: Option[Int]) extends PrFieldValue("id", value)
   case class productreviewid(override val value: Option[ProductreviewId]) extends PrFieldValue("productreviewid", value)
-  case class productid(override val value: Option[Int]) extends PrFieldValue("productid", value)
+  case class productid(override val value: Option[ProductId]) extends PrFieldValue("productid", value)
   case class reviewername(override val value: Option[Name]) extends PrFieldValue("reviewername", value)
   case class reviewdate(override val value: Option[LocalDateTime]) extends PrFieldValue("reviewdate", value)
   case class emailaddress(override val value: Option[String]) extends PrFieldValue("emailaddress", value)

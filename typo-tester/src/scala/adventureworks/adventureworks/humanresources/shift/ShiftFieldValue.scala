@@ -9,6 +9,7 @@ package shift
 
 import adventureworks.public.Name
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 sealed abstract class ShiftFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class ShiftFieldValue[T](name: String, value: T) extends ShiftFieldOrIdValue(name, value)
@@ -16,7 +17,7 @@ sealed abstract class ShiftFieldValue[T](name: String, value: T) extends ShiftFi
 object ShiftFieldValue {
   case class shiftid(override val value: ShiftId) extends ShiftFieldOrIdValue("shiftid", value)
   case class name(override val value: Name) extends ShiftFieldValue("name", value)
-  case class starttime(override val value: LocalDateTime) extends ShiftFieldValue("starttime", value)
-  case class endtime(override val value: LocalDateTime) extends ShiftFieldValue("endtime", value)
+  case class starttime(override val value: LocalTime) extends ShiftFieldValue("starttime", value)
+  case class endtime(override val value: LocalTime) extends ShiftFieldValue("endtime", value)
   case class modifieddate(override val value: LocalDateTime) extends ShiftFieldValue("modifieddate", value)
 }

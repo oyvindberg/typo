@@ -12,6 +12,7 @@ import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
 import java.time.LocalDateTime
+import java.time.LocalTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,10 +31,10 @@ case class SRow(
   name: Option[Name],
   /** Points to [[humanresources.shift.ShiftRow.starttime]]
       debug: {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"starttime","ordinal_position":4,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
-  starttime: Option[LocalDateTime],
+  starttime: Option[LocalTime],
   /** Points to [[humanresources.shift.ShiftRow.endtime]]
       debug: {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"endtime","ordinal_position":5,"is_nullable":"YES","data_type":"time without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"time","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
-  endtime: Option[LocalDateTime],
+  endtime: Option[LocalTime],
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]]
       debug: {"table_catalog":"Adventureworks","table_schema":"hr","table_name":"s","column_name":"modifieddate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Option[LocalDateTime]
@@ -46,8 +47,8 @@ object SRow {
         id = row[Option[Int]](prefix + "id"),
         shiftid = row[Option[ShiftId]](prefix + "shiftid"),
         name = row[Option[Name]](prefix + "name"),
-        starttime = row[Option[LocalDateTime]](prefix + "starttime"),
-        endtime = row[Option[LocalDateTime]](prefix + "endtime"),
+        starttime = row[Option[LocalTime]](prefix + "starttime"),
+        endtime = row[Option[LocalTime]](prefix + "endtime"),
         modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
       )
     )
@@ -71,8 +72,8 @@ object SRow {
             id = json.\("id").toOption.map(_.as[Int]),
             shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
             name = json.\("name").toOption.map(_.as[Name]),
-            starttime = json.\("starttime").toOption.map(_.as[LocalDateTime]),
-            endtime = json.\("endtime").toOption.map(_.as[LocalDateTime]),
+            starttime = json.\("starttime").toOption.map(_.as[LocalTime]),
+            endtime = json.\("endtime").toOption.map(_.as[LocalTime]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

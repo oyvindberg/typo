@@ -59,6 +59,7 @@ object sc {
     val LocalDate = sc.Type.Qualified("java.time.LocalDate")
     val LocalDateTime = sc.Type.Qualified("java.time.LocalDateTime")
     val LocalTime = sc.Type.Qualified("java.time.LocalTime")
+    val JavaTime = sc.Type.Qualified("java.sql.Time")
     val AnyVal = sc.Type.Qualified("scala.AnyVal")
     val Any = sc.Type.Qualified("scala.Any")
     val AnyRef = sc.Type.Qualified("scala.AnyRef")

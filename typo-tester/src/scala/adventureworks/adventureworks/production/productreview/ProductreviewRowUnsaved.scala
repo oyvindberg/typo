@@ -8,6 +8,7 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.production.product.ProductId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
@@ -19,7 +20,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productreview` which has not been persisted yet */
 case class ProductreviewRowUnsaved(
-  productid: Int,
+  productid: ProductId,
   reviewername: Name,
   reviewdate: Defaulted[LocalDateTime],
   emailaddress: String,
@@ -44,7 +45,7 @@ object ProductreviewRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductreviewRowUnsaved(
-            productid = json.\("productid").as[Int],
+            productid = json.\("productid").as[ProductId],
             reviewername = json.\("reviewername").as[Name],
             reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
             emailaddress = json.\("emailaddress").as[String],

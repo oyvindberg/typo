@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productreview
 
+import adventureworks.production.product.ProductId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
@@ -23,8 +24,9 @@ case class ProductreviewRow(
       debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"productreviewid","ordinal_position":1,"column_default":"nextval('production.productreview_productreviewid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   productreviewid: ProductreviewId,
   /** Product identification number. Foreign key to Product.ProductID.
+      Points to [[product.ProductRow.productid]]
       debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"productid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
-  productid: Int,
+  productid: ProductId,
   /** Name of the reviewer.
       debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"reviewername","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   reviewername: Name,
@@ -49,7 +51,7 @@ object ProductreviewRow {
     Success(
       ProductreviewRow(
         productreviewid = row[ProductreviewId](prefix + "productreviewid"),
-        productid = row[Int](prefix + "productid"),
+        productid = row[ProductId](prefix + "productid"),
         reviewername = row[Name](prefix + "reviewername"),
         reviewdate = row[LocalDateTime](prefix + "reviewdate"),
         emailaddress = row[String](prefix + "emailaddress"),
@@ -78,7 +80,7 @@ object ProductreviewRow {
         Try(
           ProductreviewRow(
             productreviewid = json.\("productreviewid").as[ProductreviewId],
-            productid = json.\("productid").as[Int],
+            productid = json.\("productid").as[ProductId],
             reviewername = json.\("reviewername").as[Name],
             reviewdate = json.\("reviewdate").as[LocalDateTime],
             emailaddress = json.\("emailaddress").as[String],

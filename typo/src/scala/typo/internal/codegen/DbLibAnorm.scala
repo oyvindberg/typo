@@ -19,6 +19,7 @@ object DbLibAnorm extends DbLib {
   val MetaDataItem = sc.Type.Qualified("anorm.MetaDataItem")
   val SqlRequestError = sc.Type.Qualified("anorm.SqlRequestError")
   val SQL = sc.Type.Qualified("anorm.SQL")
+  val TypeDoesNotMatch = sc.Type.Qualified("anorm.TypeDoesNotMatch")
 
   val rowParserIdent = sc.Ident("rowParser")
   def interpolate(content: sc.Code) =
@@ -349,6 +350,23 @@ object DbLibAnorm extends DbLib {
            |""".stripMargin
     }
 
-    arrayInstances ++ postgresTypes ++ List(hstore, pgObject)
+    val localTime = {
+      val tpe = sc.Type.LocalTime
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val localTimeDb: ${inout(tpe)} = new ${inout(tpe)} {
+           |  override def sqlType: ${sc.Type.String} = "time"
+           |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.TIME
+           |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} =
+           |    s.setObject(index, new java.sql.Time(v.toNanoOfDay / 1000000))
+           |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either =
+           |    v1 match {
+           |      case v: ${sc.Type.JavaTime} => ${sc.Type.Right}(v.toLocalTime)
+           |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of java.sql.Time, got $${other.getClass.getName}"))
+           |    }
+           |}
+           |""".stripMargin
+    }
+
+    arrayInstances ++ postgresTypes ++ List(hstore, pgObject, localTime)
   }
 }

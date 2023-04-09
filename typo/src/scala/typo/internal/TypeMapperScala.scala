@@ -83,7 +83,7 @@ case class TypeMapperScala(
       case db.Type.PgObject(tpe)   => sc.Type.PGobject.withComment(tpe)
       case db.Type.EnumRef(name)   => sc.Type.Qualified(naming.enumName(name))
       case db.Type.Text            => sc.Type.String
-      case db.Type.Time            => sc.Type.LocalDateTime
+      case db.Type.Time            => sc.Type.LocalTime
       case db.Type.Timestamp       => sc.Type.LocalDateTime
       case db.Type.TimestampTz     => sc.Type.ZonedDateTime
       case db.Type.UUID            => sc.Type.UUID

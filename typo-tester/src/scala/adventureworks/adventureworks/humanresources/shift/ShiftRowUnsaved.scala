@@ -10,6 +10,7 @@ package shift
 import adventureworks.Defaulted
 import adventureworks.public.Name
 import java.time.LocalDateTime
+import java.time.LocalTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,8 +21,8 @@ import scala.util.Try
 /** This class corresponds to a row in table `humanresources.shift` which has not been persisted yet */
 case class ShiftRowUnsaved(
   name: Name,
-  starttime: LocalDateTime,
-  endtime: LocalDateTime,
+  starttime: LocalTime,
+  endtime: LocalTime,
   modifieddate: Defaulted[LocalDateTime]
 )
 object ShiftRowUnsaved {
@@ -39,8 +40,8 @@ object ShiftRowUnsaved {
         Try(
           ShiftRowUnsaved(
             name = json.\("name").as[Name],
-            starttime = json.\("starttime").as[LocalDateTime],
-            endtime = json.\("endtime").as[LocalDateTime],
+            starttime = json.\("starttime").as[LocalTime],
+            endtime = json.\("endtime").as[LocalTime],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )
