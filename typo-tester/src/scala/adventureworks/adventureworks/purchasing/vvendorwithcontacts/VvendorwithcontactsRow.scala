@@ -10,8 +10,6 @@ package vvendorwithcontacts
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -57,25 +55,6 @@ case class VvendorwithcontactsRow(
 )
 
 object VvendorwithcontactsRow {
-  def rowParser(prefix: String): RowParser[VvendorwithcontactsRow] = { row =>
-    Success(
-      VvendorwithcontactsRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        name = row[Option[Name]](prefix + "name"),
-        contacttype = row[Option[Name]](prefix + "contacttype"),
-        title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[Name]](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Option[Name]](prefix + "lastname"),
-        suffix = row[Option[String]](prefix + "suffix"),
-        phonenumber = row[Option[Phone]](prefix + "phonenumber"),
-        phonenumbertype = row[Option[Name]](prefix + "phonenumbertype"),
-        emailaddress = row[Option[String]](prefix + "emailaddress"),
-        emailpromotion = row[Option[Int]](prefix + "emailpromotion")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VvendorwithcontactsRow] = new OFormat[VvendorwithcontactsRow]{
     override def writes(o: VvendorwithcontactsRow): JsObject =
       Json.obj(

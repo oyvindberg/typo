@@ -9,9 +9,13 @@ package culture
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -36,7 +40,7 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture""".as(CultureRow.rowParser("").*)
+    SQL"""select cultureid, name, modifieddate from production.culture""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
     fieldValues match {
@@ -52,15 +56,15 @@ object CultureRepoImpl extends CultureRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CultureRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture where cultureid = $cultureid""".as(CultureRow.rowParser("").singleOpt)
+    SQL"""select cultureid, name, modifieddate from production.culture where cultureid = $cultureid""".as(rowParser.singleOpt)
   }
   override def selectByIds(cultureids: List[CultureId])(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture where cultureid in $cultureids""".as(CultureRow.rowParser("").*)
+    SQL"""select cultureid, name, modifieddate from production.culture where cultureid in $cultureids""".as(rowParser.*)
   }
   override def update(cultureid: CultureId, row: CultureRow)(implicit c: Connection): Boolean = {
     SQL"""update production.culture
@@ -87,4 +91,16 @@ object CultureRepoImpl extends CultureRepo {
     }
   
   }
+  val rowParser: RowParser[CultureRow] =
+    RowParser[CultureRow] { row =>
+      Success(
+        CultureRow(
+          cultureid = row[CultureId]("cultureid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[CultureId] =
+    SqlParser.get[CultureId]("cultureid")
 }

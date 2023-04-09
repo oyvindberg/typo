@@ -9,8 +9,6 @@ package vproductmodelcatalogdescription
 
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -78,38 +76,6 @@ case class VproductmodelcatalogdescriptionRow(
 )
 
 object VproductmodelcatalogdescriptionRow {
-  def rowParser(prefix: String): RowParser[VproductmodelcatalogdescriptionRow] = { row =>
-    Success(
-      VproductmodelcatalogdescriptionRow(
-        productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        name = row[Option[Name]](prefix + "name"),
-        Summary = row[Option[String]](prefix + "Summary"),
-        manufacturer = row[Option[String]](prefix + "manufacturer"),
-        copyright = row[Option[String]](prefix + "copyright"),
-        producturl = row[Option[String]](prefix + "producturl"),
-        warrantyperiod = row[Option[String]](prefix + "warrantyperiod"),
-        warrantydescription = row[Option[String]](prefix + "warrantydescription"),
-        noofyears = row[Option[String]](prefix + "noofyears"),
-        maintenancedescription = row[Option[String]](prefix + "maintenancedescription"),
-        wheel = row[Option[String]](prefix + "wheel"),
-        saddle = row[Option[String]](prefix + "saddle"),
-        pedal = row[Option[String]](prefix + "pedal"),
-        bikeframe = row[Option[String]](prefix + "bikeframe"),
-        crankset = row[Option[String]](prefix + "crankset"),
-        pictureangle = row[Option[String]](prefix + "pictureangle"),
-        picturesize = row[Option[String]](prefix + "picturesize"),
-        productphotoid = row[Option[String]](prefix + "productphotoid"),
-        material = row[Option[String]](prefix + "material"),
-        color = row[Option[String]](prefix + "color"),
-        productline = row[Option[String]](prefix + "productline"),
-        style = row[Option[String]](prefix + "style"),
-        riderexperience = row[Option[String]](prefix + "riderexperience"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VproductmodelcatalogdescriptionRow] = new OFormat[VproductmodelcatalogdescriptionRow]{
     override def writes(o: VproductmodelcatalogdescriptionRow): JsObject =
       Json.obj(

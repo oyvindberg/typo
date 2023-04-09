@@ -9,8 +9,6 @@ package e
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -72,29 +70,6 @@ case class ERow(
 )
 
 object ERow {
-  def rowParser(prefix: String): RowParser[ERow] = { row =>
-    Success(
-      ERow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        nationalidnumber = row[Option[String]](prefix + "nationalidnumber"),
-        loginid = row[Option[String]](prefix + "loginid"),
-        jobtitle = row[Option[String]](prefix + "jobtitle"),
-        birthdate = row[Option[LocalDate]](prefix + "birthdate"),
-        maritalstatus = row[Option[/* bpchar */ String]](prefix + "maritalstatus"),
-        gender = row[Option[/* bpchar */ String]](prefix + "gender"),
-        hiredate = row[Option[LocalDate]](prefix + "hiredate"),
-        salariedflag = row[Flag](prefix + "salariedflag"),
-        vacationhours = row[Option[Int]](prefix + "vacationhours"),
-        sickleavehours = row[Option[Int]](prefix + "sickleavehours"),
-        currentflag = row[Flag](prefix + "currentflag"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate"),
-        organizationnode = row[Option[String]](prefix + "organizationnode")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ERow] = new OFormat[ERow]{
     override def writes(o: ERow): JsObject =
       Json.obj(

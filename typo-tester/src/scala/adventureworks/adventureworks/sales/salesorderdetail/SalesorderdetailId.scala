@@ -8,8 +8,6 @@ package sales
 package salesorderdetail
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,13 +37,4 @@ object SalesorderdetailId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[SalesorderdetailId] = { row =>
-    Success(
-      SalesorderdetailId(
-        salesorderid = row[SalesorderheaderId](prefix + "salesorderid"),
-        salesorderdetailid = row[Int](prefix + "salesorderdetailid")
-      )
-    )
-  }
-
 }

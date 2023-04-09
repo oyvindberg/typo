@@ -8,8 +8,6 @@ package sales
 package salesreason
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -33,17 +31,6 @@ case class SalesreasonRow(
 )
 
 object SalesreasonRow {
-  def rowParser(prefix: String): RowParser[SalesreasonRow] = { row =>
-    Success(
-      SalesreasonRow(
-        salesreasonid = row[SalesreasonId](prefix + "salesreasonid"),
-        name = row[Name](prefix + "name"),
-        reasontype = row[Name](prefix + "reasontype"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SalesreasonRow] = new OFormat[SalesreasonRow]{
     override def writes(o: SalesreasonRow): JsObject =
       Json.obj(

@@ -8,8 +8,6 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,13 +37,4 @@ object PurchaseorderdetailId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PurchaseorderdetailId] = { row =>
-    Success(
-      PurchaseorderdetailId(
-        purchaseorderid = row[PurchaseorderheaderId](prefix + "purchaseorderid"),
-        purchaseorderdetailid = row[Int](prefix + "purchaseorderdetailid")
-      )
-    )
-  }
-
 }

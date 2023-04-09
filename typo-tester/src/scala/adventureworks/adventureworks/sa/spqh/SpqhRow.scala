@@ -8,8 +8,6 @@ package sa
 package spqh
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -40,19 +38,6 @@ case class SpqhRow(
 )
 
 object SpqhRow {
-  def rowParser(prefix: String): RowParser[SpqhRow] = { row =>
-    Success(
-      SpqhRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        quotadate = row[Option[LocalDateTime]](prefix + "quotadate"),
-        salesquota = row[Option[BigDecimal]](prefix + "salesquota"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SpqhRow] = new OFormat[SpqhRow]{
     override def writes(o: SpqhRow): JsObject =
       Json.obj(

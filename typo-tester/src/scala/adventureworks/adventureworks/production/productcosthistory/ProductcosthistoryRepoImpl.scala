@@ -9,9 +9,12 @@ package productcosthistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -37,7 +40,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory""".as(ProductcosthistoryRow.rowParser("").*)
+    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow] = {
     fieldValues match {
@@ -55,12 +58,12 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductcosthistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(ProductcosthistoryRow.rowParser("").singleOpt)
+    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductcosthistoryId, row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productcosthistory
@@ -89,4 +92,25 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     }
   
   }
+  val rowParser: RowParser[ProductcosthistoryRow] =
+    RowParser[ProductcosthistoryRow] { row =>
+      Success(
+        ProductcosthistoryRow(
+          productid = row[ProductId]("productid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          standardcost = row[BigDecimal]("standardcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductcosthistoryId] =
+    RowParser[ProductcosthistoryId] { row =>
+      Success(
+        ProductcosthistoryId(
+          productid = row[ProductId]("productid"),
+          startdate = row[LocalDateTime]("startdate")
+        )
+      )
+    }
 }

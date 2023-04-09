@@ -9,10 +9,13 @@ package phonenumbertype
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -34,11 +37,11 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           returning phonenumbertypeid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[PhonenumbertypeId]("phonenumbertypeid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype""".as(PhonenumbertypeRow.rowParser("").*)
+    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow] = {
     fieldValues match {
@@ -54,15 +57,15 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PhonenumbertypeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".as(PhonenumbertypeRow.rowParser("").singleOpt)
+    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".as(rowParser.singleOpt)
   }
   override def selectByIds(phonenumbertypeids: List[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid in $phonenumbertypeids""".as(PhonenumbertypeRow.rowParser("").*)
+    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid in $phonenumbertypeids""".as(rowParser.*)
   }
   override def update(phonenumbertypeid: PhonenumbertypeId, row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     SQL"""update person.phonenumbertype
@@ -89,4 +92,16 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     }
   
   }
+  val rowParser: RowParser[PhonenumbertypeRow] =
+    RowParser[PhonenumbertypeRow] { row =>
+      Success(
+        PhonenumbertypeRow(
+          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PhonenumbertypeId] =
+    SqlParser.get[PhonenumbertypeId]("phonenumbertypeid")
 }

@@ -9,9 +9,12 @@ package salespersonquotahistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,7 +44,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
-    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory""".as(SalespersonquotahistoryRow.rowParser("").*)
+    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     fieldValues match {
@@ -59,12 +62,12 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalespersonquotahistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
-    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".as(SalespersonquotahistoryRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: SalespersonquotahistoryId, row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salespersonquotahistory
@@ -93,4 +96,25 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     }
   
   }
+  val rowParser: RowParser[SalespersonquotahistoryRow] =
+    RowParser[SalespersonquotahistoryRow] { row =>
+      Success(
+        SalespersonquotahistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          quotadate = row[LocalDateTime]("quotadate"),
+          salesquota = row[BigDecimal]("salesquota"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalespersonquotahistoryId] =
+    RowParser[SalespersonquotahistoryId] { row =>
+      Success(
+        SalespersonquotahistoryId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          quotadate = row[LocalDateTime]("quotadate")
+        )
+      )
+    }
 }

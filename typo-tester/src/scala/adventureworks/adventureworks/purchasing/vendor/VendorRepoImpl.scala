@@ -9,10 +9,16 @@ package vendor
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -48,7 +54,7 @@ object VendorRepoImpl extends VendorRepo {
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor""".as(VendorRow.rowParser("").*)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
     fieldValues match {
@@ -69,15 +75,15 @@ object VendorRepoImpl extends VendorRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VendorRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: VendorId)(implicit c: Connection): Option[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".as(VendorRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[VendorId])(implicit c: Connection): List[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid in $businessentityids""".as(VendorRow.rowParser("").*)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: VendorId, row: VendorRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.vendor
@@ -114,4 +120,21 @@ object VendorRepoImpl extends VendorRepo {
     }
   
   }
+  val rowParser: RowParser[VendorRow] =
+    RowParser[VendorRow] { row =>
+      Success(
+        VendorRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          accountnumber = row[AccountNumber]("accountnumber"),
+          name = row[Name]("name"),
+          creditrating = row[Int]("creditrating"),
+          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
+          activeflag = row[Flag]("activeflag"),
+          purchasingwebserviceurl = row[Option[String]]("purchasingwebserviceurl"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[VendorId] =
+    SqlParser.get[VendorId]("businessentityid")
 }

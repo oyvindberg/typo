@@ -9,8 +9,6 @@ package c
 
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class CRow(
 )
 
 object CRow {
-  def rowParser(prefix: String): RowParser[CRow] = { row =>
-    Success(
-      CRow(
-        id = row[Option[/* bpchar */ String]](prefix + "id"),
-        cultureid = row[Option[CultureId]](prefix + "cultureid"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CRow] = new OFormat[CRow]{
     override def writes(o: CRow): JsObject =
       Json.obj(

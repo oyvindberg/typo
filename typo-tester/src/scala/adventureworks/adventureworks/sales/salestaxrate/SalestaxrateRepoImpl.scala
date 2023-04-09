@@ -9,10 +9,14 @@ package salestaxrate
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -45,11 +49,11 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning salestaxrateid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[SalestaxrateId]("salestaxrateid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate""".as(SalestaxrateRow.rowParser("").*)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
     fieldValues match {
@@ -69,15 +73,15 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalestaxrateRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".as(SalestaxrateRow.rowParser("").singleOpt)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".as(rowParser.singleOpt)
   }
   override def selectByIds(salestaxrateids: List[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid in $salestaxrateids""".as(SalestaxrateRow.rowParser("").*)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid in $salestaxrateids""".as(rowParser.*)
   }
   override def update(salestaxrateid: SalestaxrateId, row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salestaxrate
@@ -112,4 +116,20 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
   
   }
+  val rowParser: RowParser[SalestaxrateRow] =
+    RowParser[SalestaxrateRow] { row =>
+      Success(
+        SalestaxrateRow(
+          salestaxrateid = row[SalestaxrateId]("salestaxrateid"),
+          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
+          taxtype = row[Int]("taxtype"),
+          taxrate = row[BigDecimal]("taxrate"),
+          name = row[Name]("name"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalestaxrateId] =
+    SqlParser.get[SalestaxrateId]("salestaxrateid")
 }

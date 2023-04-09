@@ -8,8 +8,6 @@ package hr
 package eph
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -39,19 +37,6 @@ case class EphRow(
 )
 
 object EphRow {
-  def rowParser(prefix: String): RowParser[EphRow] = { row =>
-    Success(
-      EphRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        ratechangedate = row[Option[LocalDateTime]](prefix + "ratechangedate"),
-        rate = row[Option[BigDecimal]](prefix + "rate"),
-        payfrequency = row[Option[Int]](prefix + "payfrequency"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[EphRow] = new OFormat[EphRow]{
     override def writes(o: EphRow): JsObject =
       Json.obj(

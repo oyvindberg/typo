@@ -9,12 +9,16 @@ package shift
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
@@ -36,11 +40,11 @@ object ShiftRepoImpl extends ShiftRepo {
           returning shiftid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ShiftId]("shiftid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift""".as(ShiftRow.rowParser("").*)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
     fieldValues match {
@@ -58,15 +62,15 @@ object ShiftRepoImpl extends ShiftRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ShiftRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".as(ShiftRow.rowParser("").singleOpt)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".as(rowParser.singleOpt)
   }
   override def selectByIds(shiftids: List[ShiftId])(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid in $shiftids""".as(ShiftRow.rowParser("").*)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid in $shiftids""".as(rowParser.*)
   }
   override def update(shiftid: ShiftId, row: ShiftRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.shift
@@ -97,4 +101,18 @@ object ShiftRepoImpl extends ShiftRepo {
     }
   
   }
+  val rowParser: RowParser[ShiftRow] =
+    RowParser[ShiftRow] { row =>
+      Success(
+        ShiftRow(
+          shiftid = row[ShiftId]("shiftid"),
+          name = row[Name]("name"),
+          starttime = row[LocalTime]("starttime"),
+          endtime = row[LocalTime]("endtime"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ShiftId] =
+    SqlParser.get[ShiftId]("shiftid")
 }

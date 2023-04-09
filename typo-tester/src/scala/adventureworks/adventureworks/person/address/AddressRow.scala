@@ -8,8 +8,6 @@ package person
 package address
 
 import adventureworks.person.stateprovince.StateprovinceId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -49,22 +47,6 @@ case class AddressRow(
 )
 
 object AddressRow {
-  def rowParser(prefix: String): RowParser[AddressRow] = { row =>
-    Success(
-      AddressRow(
-        addressid = row[AddressId](prefix + "addressid"),
-        addressline1 = row[String](prefix + "addressline1"),
-        addressline2 = row[Option[String]](prefix + "addressline2"),
-        city = row[String](prefix + "city"),
-        stateprovinceid = row[StateprovinceId](prefix + "stateprovinceid"),
-        postalcode = row[String](prefix + "postalcode"),
-        spatiallocation = row[Option[Array[Byte]]](prefix + "spatiallocation"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[AddressRow] = new OFormat[AddressRow]{
     override def writes(o: AddressRow): JsObject =
       Json.obj(

@@ -9,10 +9,13 @@ package jobcandidate
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,11 +38,11 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           returning jobcandidateid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[JobcandidateId]("jobcandidateid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate""".as(JobcandidateRow.rowParser("").*)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
     fieldValues match {
@@ -56,15 +59,15 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(JobcandidateRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid""".as(JobcandidateRow.rowParser("").singleOpt)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid""".as(rowParser.singleOpt)
   }
   override def selectByIds(jobcandidateids: List[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid in $jobcandidateids""".as(JobcandidateRow.rowParser("").*)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid in $jobcandidateids""".as(rowParser.*)
   }
   override def update(jobcandidateid: JobcandidateId, row: JobcandidateRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.jobcandidate
@@ -93,4 +96,17 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     }
   
   }
+  val rowParser: RowParser[JobcandidateRow] =
+    RowParser[JobcandidateRow] { row =>
+      Success(
+        JobcandidateRow(
+          jobcandidateid = row[JobcandidateId]("jobcandidateid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          resume = row[Option[/* xml */ String]]("resume"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[JobcandidateId] =
+    SqlParser.get[JobcandidateId]("jobcandidateid")
 }

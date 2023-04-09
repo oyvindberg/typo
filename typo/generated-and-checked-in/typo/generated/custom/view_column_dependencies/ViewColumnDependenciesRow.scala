@@ -10,8 +10,6 @@ package generated
 package custom
 package view_column_dependencies
 
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -37,18 +35,6 @@ case class ViewColumnDependenciesRow(
 )
 
 object ViewColumnDependenciesRow {
-  def rowParser(prefix: String): RowParser[ViewColumnDependenciesRow] = { row =>
-    Success(
-      ViewColumnDependenciesRow(
-        viewSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]](prefix + "view_schema"),
-        viewName = row[String](prefix + "view_name"),
-        tableSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]](prefix + "table_schema"),
-        tableName = row[String](prefix + "table_name"),
-        columnName = row[String](prefix + "column_name")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ViewColumnDependenciesRow] = new OFormat[ViewColumnDependenciesRow]{
     override def writes(o: ViewColumnDependenciesRow): JsObject =
       Json.obj(

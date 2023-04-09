@@ -11,7 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -48,7 +51,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive""".as(TransactionhistoryarchiveRow.rowParser("").*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     fieldValues match {
@@ -70,15 +73,15 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(TransactionhistoryarchiveRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Option[TransactionhistoryarchiveRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = $transactionid""".as(TransactionhistoryarchiveRow.rowParser("").singleOpt)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = $transactionid""".as(rowParser.singleOpt)
   }
   override def selectByIds(transactionids: List[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid in $transactionids""".as(TransactionhistoryarchiveRow.rowParser("").*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid in $transactionids""".as(rowParser.*)
   }
   override def update(transactionid: TransactionhistoryarchiveId, row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {
     SQL"""update production.transactionhistoryarchive
@@ -117,4 +120,22 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     }
   
   }
+  val rowParser: RowParser[TransactionhistoryarchiveRow] =
+    RowParser[TransactionhistoryarchiveRow] { row =>
+      Success(
+        TransactionhistoryarchiveRow(
+          transactionid = row[TransactionhistoryarchiveId]("transactionid"),
+          productid = row[Int]("productid"),
+          referenceorderid = row[Int]("referenceorderid"),
+          referenceorderlineid = row[Int]("referenceorderlineid"),
+          transactiondate = row[LocalDateTime]("transactiondate"),
+          transactiontype = row[/* bpchar */ String]("transactiontype"),
+          quantity = row[Int]("quantity"),
+          actualcost = row[BigDecimal]("actualcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[TransactionhistoryarchiveId] =
+    SqlParser.get[TransactionhistoryarchiveId]("transactionid")
 }

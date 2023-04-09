@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_constraint
 
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -74,38 +72,6 @@ case class PgConstraintRow(
 )
 
 object PgConstraintRow {
-  def rowParser(prefix: String): RowParser[PgConstraintRow] = { row =>
-    Success(
-      PgConstraintRow(
-        oid = row[PgConstraintId](prefix + "oid"),
-        conname = row[String](prefix + "conname"),
-        connamespace = row[/* oid */ Long](prefix + "connamespace"),
-        contype = row[String](prefix + "contype"),
-        condeferrable = row[Boolean](prefix + "condeferrable"),
-        condeferred = row[Boolean](prefix + "condeferred"),
-        convalidated = row[Boolean](prefix + "convalidated"),
-        conrelid = row[/* oid */ Long](prefix + "conrelid"),
-        contypid = row[/* oid */ Long](prefix + "contypid"),
-        conindid = row[/* oid */ Long](prefix + "conindid"),
-        conparentid = row[/* oid */ Long](prefix + "conparentid"),
-        confrelid = row[/* oid */ Long](prefix + "confrelid"),
-        confupdtype = row[String](prefix + "confupdtype"),
-        confdeltype = row[String](prefix + "confdeltype"),
-        confmatchtype = row[String](prefix + "confmatchtype"),
-        conislocal = row[Boolean](prefix + "conislocal"),
-        coninhcount = row[Int](prefix + "coninhcount"),
-        connoinherit = row[Boolean](prefix + "connoinherit"),
-        conkey = row[Option[Array[Int]]](prefix + "conkey"),
-        confkey = row[Option[Array[Int]]](prefix + "confkey"),
-        conpfeqop = row[Option[Array[/* oid */ Long]]](prefix + "conpfeqop"),
-        conppeqop = row[Option[Array[/* oid */ Long]]](prefix + "conppeqop"),
-        conffeqop = row[Option[Array[/* oid */ Long]]](prefix + "conffeqop"),
-        conexclop = row[Option[Array[/* oid */ Long]]](prefix + "conexclop"),
-        conbin = row[Option[/* pg_node_tree */ PGobject]](prefix + "conbin")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgConstraintRow] = new OFormat[PgConstraintRow]{
     override def writes(o: PgConstraintRow): JsObject =
       Json.obj(

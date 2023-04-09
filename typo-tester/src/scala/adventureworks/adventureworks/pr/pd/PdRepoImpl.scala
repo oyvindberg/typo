@@ -7,14 +7,19 @@ package adventureworks
 package pr
 package pd
 
+import adventureworks.production.productdescription.ProductdescriptionId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PdRepoImpl extends PdRepo {
   override def selectAll(implicit c: Connection): List[PdRow] = {
-    SQL"""select id, productdescriptionid, description, rowguid, modifieddate from pr.pd""".as(PdRow.rowParser("").*)
+    SQL"""select id, productdescriptionid, description, rowguid, modifieddate from pr.pd""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdFieldOrIdValue[_]])(implicit c: Connection): List[PdRow] = {
     fieldValues match {
@@ -32,8 +37,20 @@ object PdRepoImpl extends PdRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PdRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PdRow] =
+    RowParser[PdRow] { row =>
+      Success(
+        PdRow(
+          id = row[Option[Int]]("id"),
+          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
+          description = row[Option[String]]("description"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

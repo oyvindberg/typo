@@ -9,10 +9,13 @@ package shoppingcartitem
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -43,11 +46,11 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           returning shoppingcartitemid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ShoppingcartitemId]("shoppingcartitemid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem""".as(ShoppingcartitemRow.rowParser("").*)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow] = {
     fieldValues match {
@@ -66,15 +69,15 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ShoppingcartitemRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid""".as(ShoppingcartitemRow.rowParser("").singleOpt)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid""".as(rowParser.singleOpt)
   }
   override def selectByIds(shoppingcartitemids: List[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid in $shoppingcartitemids""".as(ShoppingcartitemRow.rowParser("").*)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid in $shoppingcartitemids""".as(rowParser.*)
   }
   override def update(shoppingcartitemid: ShoppingcartitemId, row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.shoppingcartitem
@@ -107,4 +110,19 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     }
   
   }
+  val rowParser: RowParser[ShoppingcartitemRow] =
+    RowParser[ShoppingcartitemRow] { row =>
+      Success(
+        ShoppingcartitemRow(
+          shoppingcartitemid = row[ShoppingcartitemId]("shoppingcartitemid"),
+          shoppingcartid = row[String]("shoppingcartid"),
+          quantity = row[Int]("quantity"),
+          productid = row[ProductId]("productid"),
+          datecreated = row[LocalDateTime]("datecreated"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ShoppingcartitemId] =
+    SqlParser.get[ShoppingcartitemId]("shoppingcartitemid")
 }

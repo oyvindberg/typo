@@ -7,14 +7,20 @@ package adventureworks
 package pu
 package poh
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PohRepoImpl extends PohRepo {
   override def selectAll(implicit c: Connection): List[PohRow] = {
-    SQL"""select id, purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from pu.poh""".as(PohRow.rowParser("").*)
+    SQL"""select id, purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from pu.poh""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PohFieldOrIdValue[_]])(implicit c: Connection): List[PohRow] = {
     fieldValues match {
@@ -40,8 +46,28 @@ object PohRepoImpl extends PohRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PohRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PohRow] =
+    RowParser[PohRow] { row =>
+      Success(
+        PohRow(
+          id = row[Option[Int]]("id"),
+          purchaseorderid = row[Option[PurchaseorderheaderId]]("purchaseorderid"),
+          revisionnumber = row[Option[Int]]("revisionnumber"),
+          status = row[Option[Int]]("status"),
+          employeeid = row[Option[BusinessentityId]]("employeeid"),
+          vendorid = row[Option[BusinessentityId]]("vendorid"),
+          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
+          orderdate = row[Option[LocalDateTime]]("orderdate"),
+          shipdate = row[Option[LocalDateTime]]("shipdate"),
+          subtotal = row[Option[BigDecimal]]("subtotal"),
+          taxamt = row[Option[BigDecimal]]("taxamt"),
+          freight = row[Option[BigDecimal]]("freight"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

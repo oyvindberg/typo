@@ -11,8 +11,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -51,22 +49,6 @@ case class VRow(
 )
 
 object VRow {
-  def rowParser(prefix: String): RowParser[VRow] = { row =>
-    Success(
-      VRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        accountnumber = row[Option[AccountNumber]](prefix + "accountnumber"),
-        name = row[Option[Name]](prefix + "name"),
-        creditrating = row[Option[Int]](prefix + "creditrating"),
-        preferredvendorstatus = row[Flag](prefix + "preferredvendorstatus"),
-        activeflag = row[Flag](prefix + "activeflag"),
-        purchasingwebserviceurl = row[Option[String]](prefix + "purchasingwebserviceurl"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VRow] = new OFormat[VRow]{
     override def writes(o: VRow): JsObject =
       Json.obj(

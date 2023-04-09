@@ -7,14 +7,20 @@ package adventureworks
 package pu
 package sm
 
+import adventureworks.public.Name
+import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SmRepoImpl extends SmRepo {
   override def selectAll(implicit c: Connection): List[SmRow] = {
-    SQL"""select id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from pu.sm""".as(SmRow.rowParser("").*)
+    SQL"""select id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from pu.sm""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SmFieldOrIdValue[_]])(implicit c: Connection): List[SmRow] = {
     fieldValues match {
@@ -34,8 +40,22 @@ object SmRepoImpl extends SmRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SmRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SmRow] =
+    RowParser[SmRow] { row =>
+      Success(
+        SmRow(
+          id = row[Option[Int]]("id"),
+          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
+          name = row[Option[Name]]("name"),
+          shipbase = row[Option[BigDecimal]]("shipbase"),
+          shiprate = row[Option[BigDecimal]]("shiprate"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

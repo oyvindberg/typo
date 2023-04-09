@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_description
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -33,17 +31,6 @@ case class PgDescriptionRow(
  }
 
 object PgDescriptionRow {
-  def rowParser(prefix: String): RowParser[PgDescriptionRow] = { row =>
-    Success(
-      PgDescriptionRow(
-        objoid = row[/* oid */ Long](prefix + "objoid"),
-        classoid = row[/* oid */ Long](prefix + "classoid"),
-        objsubid = row[Int](prefix + "objsubid"),
-        description = row[String](prefix + "description")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgDescriptionRow] = new OFormat[PgDescriptionRow]{
     override def writes(o: PgDescriptionRow): JsObject =
       Json.obj(

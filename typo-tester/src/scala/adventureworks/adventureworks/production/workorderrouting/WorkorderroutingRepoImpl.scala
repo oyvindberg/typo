@@ -9,9 +9,13 @@ package workorderrouting
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.location.LocationId
+import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -43,7 +47,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
-    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting""".as(WorkorderroutingRow.rowParser("").*)
+    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
     fieldValues match {
@@ -68,12 +72,12 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(WorkorderroutingRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
-    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}""".as(WorkorderroutingRow.rowParser("").singleOpt)
+    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: WorkorderroutingId, row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     SQL"""update production.workorderrouting
@@ -114,4 +118,33 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     }
   
   }
+  val rowParser: RowParser[WorkorderroutingRow] =
+    RowParser[WorkorderroutingRow] { row =>
+      Success(
+        WorkorderroutingRow(
+          workorderid = row[WorkorderId]("workorderid"),
+          productid = row[Int]("productid"),
+          operationsequence = row[Int]("operationsequence"),
+          locationid = row[LocationId]("locationid"),
+          scheduledstartdate = row[LocalDateTime]("scheduledstartdate"),
+          scheduledenddate = row[LocalDateTime]("scheduledenddate"),
+          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
+          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
+          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
+          plannedcost = row[BigDecimal]("plannedcost"),
+          actualcost = row[Option[BigDecimal]]("actualcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[WorkorderroutingId] =
+    RowParser[WorkorderroutingId] { row =>
+      Success(
+        WorkorderroutingId(
+          workorderid = row[WorkorderId]("workorderid"),
+          productid = row[Int]("productid"),
+          operationsequence = row[Int]("operationsequence")
+        )
+      )
+    }
 }

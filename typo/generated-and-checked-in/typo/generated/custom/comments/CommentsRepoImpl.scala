@@ -10,8 +10,11 @@ package generated
 package custom
 package comments
 
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import typo.generated.information_schema.SqlIdentifier
 
 object CommentsRepoImpl extends CommentsRepo {
   override def apply()(implicit c: Connection): List[CommentsRow] = {
@@ -28,7 +31,18 @@ object CommentsRepoImpl extends CommentsRepo {
                           c.table_schema = st.schemaname and
                           c.table_name = st.relname
                   );"""
-    sql.as(CommentsRow.rowParser("").*)
+    sql.as(rowParser.*)
   
   }
+  val rowParser: RowParser[CommentsRow] =
+    RowParser[CommentsRow] { row =>
+      Success(
+        CommentsRow(
+          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
+          tableName = row[Option[SqlIdentifier]]("table_name"),
+          columnName = row[Option[SqlIdentifier]]("column_name"),
+          description = row[String]("description")
+        )
+      )
+    }
 }

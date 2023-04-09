@@ -7,8 +7,6 @@ package adventureworks
 package production
 package illustration
 
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -29,16 +27,6 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
-  def rowParser(prefix: String): RowParser[IllustrationRow] = { row =>
-    Success(
-      IllustrationRow(
-        illustrationid = row[IllustrationId](prefix + "illustrationid"),
-        diagram = row[Option[/* xml */ String]](prefix + "diagram"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[IllustrationRow] = new OFormat[IllustrationRow]{
     override def writes(o: IllustrationRow): JsObject =
       Json.obj(

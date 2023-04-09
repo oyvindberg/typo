@@ -9,8 +9,6 @@ package productinventory
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -47,20 +45,6 @@ case class ProductinventoryRow(
  }
 
 object ProductinventoryRow {
-  def rowParser(prefix: String): RowParser[ProductinventoryRow] = { row =>
-    Success(
-      ProductinventoryRow(
-        productid = row[ProductId](prefix + "productid"),
-        locationid = row[LocationId](prefix + "locationid"),
-        shelf = row[String](prefix + "shelf"),
-        bin = row[Int](prefix + "bin"),
-        quantity = row[Int](prefix + "quantity"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ProductinventoryRow] = new OFormat[ProductinventoryRow]{
     override def writes(o: ProductinventoryRow): JsObject =
       Json.obj(

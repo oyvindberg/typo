@@ -7,14 +7,18 @@ package adventureworks
 package humanresources
 package vjobcandidateeducation
 
+import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
 
 object VjobcandidateeducationRepoImpl extends VjobcandidateeducationRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateeducationRow] = {
-    SQL"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".as(VjobcandidateeducationRow.rowParser("").*)
+    SQL"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateeducationFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateeducationRow] = {
     fieldValues match {
@@ -40,8 +44,28 @@ object VjobcandidateeducationRepoImpl extends VjobcandidateeducationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VjobcandidateeducationRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VjobcandidateeducationRow] =
+    RowParser[VjobcandidateeducationRow] { row =>
+      Success(
+        VjobcandidateeducationRow(
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          `Edu.Level` = row[Option[String]]("Edu.Level"),
+          `Edu.StartDate` = row[Option[LocalDate]]("Edu.StartDate"),
+          `Edu.EndDate` = row[Option[LocalDate]]("Edu.EndDate"),
+          `Edu.Degree` = row[Option[String]]("Edu.Degree"),
+          `Edu.Major` = row[Option[String]]("Edu.Major"),
+          `Edu.Minor` = row[Option[String]]("Edu.Minor"),
+          `Edu.GPA` = row[Option[String]]("Edu.GPA"),
+          `Edu.GPAScale` = row[Option[String]]("Edu.GPAScale"),
+          `Edu.School` = row[Option[String]]("Edu.School"),
+          `Edu.Loc.CountryRegion` = row[Option[String]]("Edu.Loc.CountryRegion"),
+          `Edu.Loc.State` = row[Option[String]]("Edu.Loc.State"),
+          `Edu.Loc.City` = row[Option[String]]("Edu.Loc.City")
+        )
+      )
+    }
 }

@@ -9,9 +9,13 @@ package specialofferproduct
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -40,7 +44,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct""".as(SpecialofferproductRow.rowParser("").*)
+    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferproductRow] = {
     fieldValues match {
@@ -57,12 +61,12 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpecialofferproductRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".as(SpecialofferproductRow.rowParser("").singleOpt)
+    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: SpecialofferproductId, row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.specialofferproduct
@@ -89,4 +93,24 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     }
   
   }
+  val rowParser: RowParser[SpecialofferproductRow] =
+    RowParser[SpecialofferproductRow] { row =>
+      Success(
+        SpecialofferproductRow(
+          specialofferid = row[SpecialofferId]("specialofferid"),
+          productid = row[ProductId]("productid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SpecialofferproductId] =
+    RowParser[SpecialofferproductId] { row =>
+      Success(
+        SpecialofferproductId(
+          specialofferid = row[SpecialofferId]("specialofferid"),
+          productid = row[ProductId]("productid")
+        )
+      )
+    }
 }

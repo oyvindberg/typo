@@ -144,6 +144,18 @@ package object generated {
     override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.util.PGobject): scala.Unit = s.setObject(index, v)
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGobject] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGobject])
   }
+  
+  implicit val localTimeDb: anorm.ToStatement[java.time.LocalTime] with anorm.ParameterMetaData[java.time.LocalTime] with anorm.Column[java.time.LocalTime] = new anorm.ToStatement[java.time.LocalTime] with anorm.ParameterMetaData[java.time.LocalTime] with anorm.Column[java.time.LocalTime] {
+    override def sqlType: java.lang.String = "time"
+    override def jdbcType: scala.Int = java.sql.Types.TIME
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: java.time.LocalTime): scala.Unit =
+      s.setObject(index, new java.sql.Time(v.toNanoOfDay / 1000000))
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, java.time.LocalTime] =
+      v1 match {
+        case v: java.sql.Time => scala.Right(v.toLocalTime)
+        case other => scala.Left(anorm.TypeDoesNotMatch(s"Expected instance of java.sql.Time, got ${other.getClass.getName}"))
+      }
+  }
 
   implicit val PGboxFormat: play.api.libs.json.Format[org.postgresql.geometric.PGbox] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGbox](new org.postgresql.geometric.PGbox(_), _.getValue)
   implicit val PGcircleFormat: play.api.libs.json.Format[org.postgresql.geometric.PGcircle] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGcircle](new org.postgresql.geometric.PGcircle(_), _.getValue)

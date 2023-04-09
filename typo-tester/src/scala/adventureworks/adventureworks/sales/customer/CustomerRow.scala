@@ -9,8 +9,6 @@ package customer
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -43,19 +41,6 @@ case class CustomerRow(
 )
 
 object CustomerRow {
-  def rowParser(prefix: String): RowParser[CustomerRow] = { row =>
-    Success(
-      CustomerRow(
-        customerid = row[CustomerId](prefix + "customerid"),
-        personid = row[Option[BusinessentityId]](prefix + "personid"),
-        storeid = row[Option[BusinessentityId]](prefix + "storeid"),
-        territoryid = row[Option[SalesterritoryId]](prefix + "territoryid"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CustomerRow] = new OFormat[CustomerRow]{
     override def writes(o: CustomerRow): JsObject =
       Json.obj(

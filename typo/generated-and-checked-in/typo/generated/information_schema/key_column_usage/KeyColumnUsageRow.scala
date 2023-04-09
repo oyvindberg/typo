@@ -10,8 +10,6 @@ package generated
 package information_schema
 package key_column_usage
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,22 +41,6 @@ case class KeyColumnUsageRow(
 )
 
 object KeyColumnUsageRow {
-  def rowParser(prefix: String): RowParser[KeyColumnUsageRow] = { row =>
-    Success(
-      KeyColumnUsageRow(
-        constraintCatalog = row[Option[SqlIdentifier]](prefix + "constraint_catalog"),
-        constraintSchema = row[Option[SqlIdentifier]](prefix + "constraint_schema"),
-        constraintName = row[Option[SqlIdentifier]](prefix + "constraint_name"),
-        tableCatalog = row[Option[SqlIdentifier]](prefix + "table_catalog"),
-        tableSchema = row[Option[SqlIdentifier]](prefix + "table_schema"),
-        tableName = row[Option[SqlIdentifier]](prefix + "table_name"),
-        columnName = row[Option[SqlIdentifier]](prefix + "column_name"),
-        ordinalPosition = row[Option[CardinalNumber]](prefix + "ordinal_position"),
-        positionInUniqueConstraint = row[Option[CardinalNumber]](prefix + "position_in_unique_constraint")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[KeyColumnUsageRow] = new OFormat[KeyColumnUsageRow]{
     override def writes(o: KeyColumnUsageRow): JsObject =
       Json.obj(

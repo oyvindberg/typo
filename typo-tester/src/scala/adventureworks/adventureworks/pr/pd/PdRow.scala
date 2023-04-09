@@ -8,8 +8,6 @@ package pr
 package pd
 
 import adventureworks.production.productdescription.ProductdescriptionId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -37,18 +35,6 @@ case class PdRow(
 )
 
 object PdRow {
-  def rowParser(prefix: String): RowParser[PdRow] = { row =>
-    Success(
-      PdRow(
-        id = row[Option[Int]](prefix + "id"),
-        productdescriptionid = row[Option[ProductdescriptionId]](prefix + "productdescriptionid"),
-        description = row[Option[String]](prefix + "description"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PdRow] = new OFormat[PdRow]{
     override def writes(o: PdRow): JsObject =
       Json.obj(

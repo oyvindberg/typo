@@ -7,14 +7,19 @@ package adventureworks
 package pe
 package pa
 
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PaRepoImpl extends PaRepo {
   override def selectAll(implicit c: Connection): List[PaRow] = {
-    SQL"""select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa""".as(PaRow.rowParser("").*)
+    SQL"""select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PaFieldOrIdValue[_]])(implicit c: Connection): List[PaRow] = {
     fieldValues match {
@@ -33,8 +38,21 @@ object PaRepoImpl extends PaRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PaRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PaRow] =
+    RowParser[PaRow] { row =>
+      Success(
+        PaRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          passwordhash = row[Option[String]]("passwordhash"),
+          passwordsalt = row[Option[String]]("passwordsalt"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

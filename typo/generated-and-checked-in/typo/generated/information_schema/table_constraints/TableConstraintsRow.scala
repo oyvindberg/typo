@@ -10,8 +10,6 @@ package generated
 package information_schema
 package table_constraints
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -46,23 +44,6 @@ case class TableConstraintsRow(
 )
 
 object TableConstraintsRow {
-  def rowParser(prefix: String): RowParser[TableConstraintsRow] = { row =>
-    Success(
-      TableConstraintsRow(
-        constraintCatalog = row[Option[SqlIdentifier]](prefix + "constraint_catalog"),
-        constraintSchema = row[Option[SqlIdentifier]](prefix + "constraint_schema"),
-        constraintName = row[Option[SqlIdentifier]](prefix + "constraint_name"),
-        tableCatalog = row[Option[SqlIdentifier]](prefix + "table_catalog"),
-        tableSchema = row[Option[SqlIdentifier]](prefix + "table_schema"),
-        tableName = row[Option[SqlIdentifier]](prefix + "table_name"),
-        constraintType = row[Option[CharacterData]](prefix + "constraint_type"),
-        isDeferrable = row[Option[YesOrNo]](prefix + "is_deferrable"),
-        initiallyDeferred = row[Option[YesOrNo]](prefix + "initially_deferred"),
-        enforced = row[Option[YesOrNo]](prefix + "enforced")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[TableConstraintsRow] = new OFormat[TableConstraintsRow]{
     override def writes(o: TableConstraintsRow): JsObject =
       Json.obj(

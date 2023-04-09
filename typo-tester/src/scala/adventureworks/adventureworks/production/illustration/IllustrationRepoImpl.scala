@@ -11,8 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -34,11 +36,11 @@ object IllustrationRepoImpl extends IllustrationRepo {
           returning illustrationid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[IllustrationId]("illustrationid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration""".as(IllustrationRow.rowParser("").*)
+    SQL"""select illustrationid, diagram, modifieddate from production.illustration""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow] = {
     fieldValues match {
@@ -54,15 +56,15 @@ object IllustrationRepoImpl extends IllustrationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(IllustrationRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid""".as(IllustrationRow.rowParser("").singleOpt)
+    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid""".as(rowParser.singleOpt)
   }
   override def selectByIds(illustrationids: List[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid in $illustrationids""".as(IllustrationRow.rowParser("").*)
+    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid in $illustrationids""".as(rowParser.*)
   }
   override def update(illustrationid: IllustrationId, row: IllustrationRow)(implicit c: Connection): Boolean = {
     SQL"""update production.illustration
@@ -89,4 +91,16 @@ object IllustrationRepoImpl extends IllustrationRepo {
     }
   
   }
+  val rowParser: RowParser[IllustrationRow] =
+    RowParser[IllustrationRow] { row =>
+      Success(
+        IllustrationRow(
+          illustrationid = row[IllustrationId]("illustrationid"),
+          diagram = row[Option[/* xml */ String]]("diagram"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[IllustrationId] =
+    SqlParser.get[IllustrationId]("illustrationid")
 }

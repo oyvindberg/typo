@@ -10,8 +10,6 @@ package businessentityaddress
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,14 +41,4 @@ object BusinessentityaddressId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[BusinessentityaddressId] = { row =>
-    Success(
-      BusinessentityaddressId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        addressid = row[AddressId](prefix + "addressid"),
-        addresstypeid = row[AddresstypeId](prefix + "addresstypeid")
-      )
-    )
-  }
-
 }

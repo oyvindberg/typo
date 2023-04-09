@@ -9,11 +9,16 @@ package stateprovince
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
+import adventureworks.public.Name
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -47,11 +52,11 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           returning stateprovinceid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[StateprovinceId]("stateprovinceid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince""".as(StateprovinceRow.rowParser("").*)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
     fieldValues match {
@@ -72,15 +77,15 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(StateprovinceRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid""".as(StateprovinceRow.rowParser("").singleOpt)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid""".as(rowParser.singleOpt)
   }
   override def selectByIds(stateprovinceids: List[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid in $stateprovinceids""".as(StateprovinceRow.rowParser("").*)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid in $stateprovinceids""".as(rowParser.*)
   }
   override def update(stateprovinceid: StateprovinceId, row: StateprovinceRow)(implicit c: Connection): Boolean = {
     SQL"""update person.stateprovince
@@ -117,4 +122,21 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     }
   
   }
+  val rowParser: RowParser[StateprovinceRow] =
+    RowParser[StateprovinceRow] { row =>
+      Success(
+        StateprovinceRow(
+          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
+          stateprovincecode = row[/* bpchar */ String]("stateprovincecode"),
+          countryregioncode = row[CountryregionId]("countryregioncode"),
+          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
+          name = row[Name]("name"),
+          territoryid = row[SalesterritoryId]("territoryid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[StateprovinceId] =
+    SqlParser.get[StateprovinceId]("stateprovinceid")
 }

@@ -7,14 +7,21 @@ package adventureworks
 package pr
 package psc
 
+import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.production.productsubcategory.ProductsubcategoryId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PscRepoImpl extends PscRepo {
   override def selectAll(implicit c: Connection): List[PscRow] = {
-    SQL"""select id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate from pr.psc""".as(PscRow.rowParser("").*)
+    SQL"""select id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate from pr.psc""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PscFieldOrIdValue[_]])(implicit c: Connection): List[PscRow] = {
     fieldValues match {
@@ -33,8 +40,21 @@ object PscRepoImpl extends PscRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PscRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PscRow] =
+    RowParser[PscRow] { row =>
+      Success(
+        PscRow(
+          id = row[Option[Int]]("id"),
+          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
+          productcategoryid = row[Option[ProductcategoryId]]("productcategoryid"),
+          name = row[Option[Name]]("name"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

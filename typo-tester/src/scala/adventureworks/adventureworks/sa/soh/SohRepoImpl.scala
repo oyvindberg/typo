@@ -7,14 +7,29 @@ package adventureworks
 package sa
 package soh
 
+import adventureworks.person.address.AddressId
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.OrderNumber
+import adventureworks.purchasing.shipmethod.ShipmethodId
+import adventureworks.sales.creditcard.CreditcardId
+import adventureworks.sales.currencyrate.CurrencyrateId
+import adventureworks.sales.customer.CustomerId
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SohRepoImpl extends SohRepo {
   override def selectAll(implicit c: Connection): List[SohRow] = {
-    SQL"""select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sa.soh""".as(SohRow.rowParser("").*)
+    SQL"""select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sa.soh""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohFieldOrIdValue[_]])(implicit c: Connection): List[SohRow] = {
     fieldValues match {
@@ -53,8 +68,41 @@ object SohRepoImpl extends SohRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SohRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SohRow] =
+    RowParser[SohRow] { row =>
+      Success(
+        SohRow(
+          id = row[Option[Int]]("id"),
+          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
+          revisionnumber = row[Option[Int]]("revisionnumber"),
+          orderdate = row[Option[LocalDateTime]]("orderdate"),
+          duedate = row[Option[LocalDateTime]]("duedate"),
+          shipdate = row[Option[LocalDateTime]]("shipdate"),
+          status = row[Option[Int]]("status"),
+          onlineorderflag = row[Flag]("onlineorderflag"),
+          purchaseordernumber = row[Option[OrderNumber]]("purchaseordernumber"),
+          accountnumber = row[Option[AccountNumber]]("accountnumber"),
+          customerid = row[Option[CustomerId]]("customerid"),
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          billtoaddressid = row[Option[AddressId]]("billtoaddressid"),
+          shiptoaddressid = row[Option[AddressId]]("shiptoaddressid"),
+          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
+          creditcardid = row[Option[CreditcardId]]("creditcardid"),
+          creditcardapprovalcode = row[Option[String]]("creditcardapprovalcode"),
+          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
+          subtotal = row[Option[BigDecimal]]("subtotal"),
+          taxamt = row[Option[BigDecimal]]("taxamt"),
+          freight = row[Option[BigDecimal]]("freight"),
+          totaldue = row[Option[BigDecimal]]("totaldue"),
+          comment = row[Option[String]]("comment"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

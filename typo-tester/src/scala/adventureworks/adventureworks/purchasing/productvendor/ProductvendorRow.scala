@@ -10,8 +10,6 @@ package productvendor
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -61,24 +59,6 @@ case class ProductvendorRow(
  }
 
 object ProductvendorRow {
-  def rowParser(prefix: String): RowParser[ProductvendorRow] = { row =>
-    Success(
-      ProductvendorRow(
-        productid = row[ProductId](prefix + "productid"),
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        averageleadtime = row[Int](prefix + "averageleadtime"),
-        standardprice = row[BigDecimal](prefix + "standardprice"),
-        lastreceiptcost = row[Option[BigDecimal]](prefix + "lastreceiptcost"),
-        lastreceiptdate = row[Option[LocalDateTime]](prefix + "lastreceiptdate"),
-        minorderqty = row[Int](prefix + "minorderqty"),
-        maxorderqty = row[Int](prefix + "maxorderqty"),
-        onorderqty = row[Option[Int]](prefix + "onorderqty"),
-        unitmeasurecode = row[UnitmeasureId](prefix + "unitmeasurecode"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ProductvendorRow] = new OFormat[ProductvendorRow]{
     override def writes(o: ProductvendorRow): JsObject =
       Json.obj(

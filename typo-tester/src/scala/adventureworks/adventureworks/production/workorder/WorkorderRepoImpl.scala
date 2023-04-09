@@ -9,10 +9,14 @@ package workorder
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -40,11 +44,11 @@ object WorkorderRepoImpl extends WorkorderRepo {
           returning workorderid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[WorkorderId]("workorderid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder""".as(WorkorderRow.rowParser("").*)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
     fieldValues match {
@@ -66,15 +70,15 @@ object WorkorderRepoImpl extends WorkorderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(WorkorderRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid""".as(WorkorderRow.rowParser("").singleOpt)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid""".as(rowParser.singleOpt)
   }
   override def selectByIds(workorderids: List[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid in $workorderids""".as(WorkorderRow.rowParser("").*)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid in $workorderids""".as(rowParser.*)
   }
   override def update(workorderid: WorkorderId, row: WorkorderRow)(implicit c: Connection): Boolean = {
     SQL"""update production.workorder
@@ -113,4 +117,22 @@ object WorkorderRepoImpl extends WorkorderRepo {
     }
   
   }
+  val rowParser: RowParser[WorkorderRow] =
+    RowParser[WorkorderRow] { row =>
+      Success(
+        WorkorderRow(
+          workorderid = row[WorkorderId]("workorderid"),
+          productid = row[ProductId]("productid"),
+          orderqty = row[Int]("orderqty"),
+          scrappedqty = row[Int]("scrappedqty"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          duedate = row[LocalDateTime]("duedate"),
+          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[WorkorderId] =
+    SqlParser.get[WorkorderId]("workorderid")
 }

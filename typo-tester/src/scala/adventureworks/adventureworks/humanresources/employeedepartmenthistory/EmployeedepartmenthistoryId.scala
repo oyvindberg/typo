@@ -10,8 +10,6 @@ package employeedepartmenthistory
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -46,15 +44,4 @@ object EmployeedepartmenthistoryId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[EmployeedepartmenthistoryId] = { row =>
-    Success(
-      EmployeedepartmenthistoryId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        startdate = row[LocalDate](prefix + "startdate"),
-        departmentid = row[DepartmentId](prefix + "departmentid"),
-        shiftid = row[ShiftId](prefix + "shiftid")
-      )
-    )
-  }
-
 }

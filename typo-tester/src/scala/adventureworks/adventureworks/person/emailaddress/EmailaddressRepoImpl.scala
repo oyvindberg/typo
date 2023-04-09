@@ -9,9 +9,12 @@ package emailaddress
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,7 +44,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress""".as(EmailaddressRow.rowParser("").*)
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow] = {
     fieldValues match {
@@ -59,12 +62,12 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmailaddressRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".as(EmailaddressRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: EmailaddressId, row: EmailaddressRow)(implicit c: Connection): Boolean = {
     SQL"""update person.emailaddress
@@ -93,4 +96,25 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     }
   
   }
+  val rowParser: RowParser[EmailaddressRow] =
+    RowParser[EmailaddressRow] { row =>
+      Success(
+        EmailaddressRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          emailaddressid = row[Int]("emailaddressid"),
+          emailaddress = row[Option[String]]("emailaddress"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[EmailaddressId] =
+    RowParser[EmailaddressId] { row =>
+      Success(
+        EmailaddressId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          emailaddressid = row[Int]("emailaddressid")
+        )
+      )
+    }
 }

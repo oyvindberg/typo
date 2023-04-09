@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_collation
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,23 +41,6 @@ case class PgCollationRow(
 )
 
 object PgCollationRow {
-  def rowParser(prefix: String): RowParser[PgCollationRow] = { row =>
-    Success(
-      PgCollationRow(
-        oid = row[PgCollationId](prefix + "oid"),
-        collname = row[String](prefix + "collname"),
-        collnamespace = row[/* oid */ Long](prefix + "collnamespace"),
-        collowner = row[/* oid */ Long](prefix + "collowner"),
-        collprovider = row[String](prefix + "collprovider"),
-        collisdeterministic = row[Boolean](prefix + "collisdeterministic"),
-        collencoding = row[Int](prefix + "collencoding"),
-        collcollate = row[String](prefix + "collcollate"),
-        collctype = row[String](prefix + "collctype"),
-        collversion = row[Option[String]](prefix + "collversion")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgCollationRow] = new OFormat[PgCollationRow]{
     override def writes(o: PgCollationRow): JsObject =
       Json.obj(

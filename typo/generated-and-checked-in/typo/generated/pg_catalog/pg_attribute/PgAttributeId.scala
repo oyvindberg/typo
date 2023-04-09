@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_attribute
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -41,13 +39,4 @@ object PgAttributeId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PgAttributeId] = { row =>
-    Success(
-      PgAttributeId(
-        attrelid = row[/* oid */ Long](prefix + "attrelid"),
-        attnum = row[Int](prefix + "attnum")
-      )
-    )
-  }
-
 }

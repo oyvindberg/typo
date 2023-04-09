@@ -9,9 +9,13 @@ package productdocument
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.document.DocumentId
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +39,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode from production.productdocument""".as(ProductdocumentRow.rowParser("").*)
+    SQL"""select productid, modifieddate, documentnode from production.productdocument""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow] = {
     fieldValues match {
@@ -51,12 +55,12 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductdocumentRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".as(ProductdocumentRow.rowParser("").singleOpt)
+    SQL"""select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductdocumentId, row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productdocument
@@ -81,4 +85,23 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     }
   
   }
+  val rowParser: RowParser[ProductdocumentRow] =
+    RowParser[ProductdocumentRow] { row =>
+      Success(
+        ProductdocumentRow(
+          productid = row[ProductId]("productid"),
+          modifieddate = row[LocalDateTime]("modifieddate"),
+          documentnode = row[DocumentId]("documentnode")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductdocumentId] =
+    RowParser[ProductdocumentId] { row =>
+      Success(
+        ProductdocumentId(
+          productid = row[ProductId]("productid"),
+          documentnode = row[DocumentId]("documentnode")
+        )
+      )
+    }
 }

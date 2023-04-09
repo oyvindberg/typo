@@ -8,8 +8,6 @@ package humanresources
 package jobcandidate
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class JobcandidateRow(
 )
 
 object JobcandidateRow {
-  def rowParser(prefix: String): RowParser[JobcandidateRow] = { row =>
-    Success(
-      JobcandidateRow(
-        jobcandidateid = row[JobcandidateId](prefix + "jobcandidateid"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        resume = row[Option[/* xml */ String]](prefix + "resume"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[JobcandidateRow] = new OFormat[JobcandidateRow]{
     override def writes(o: JobcandidateRow): JsObject =
       Json.obj(

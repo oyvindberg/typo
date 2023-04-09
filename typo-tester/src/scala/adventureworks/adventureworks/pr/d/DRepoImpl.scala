@@ -7,14 +7,21 @@ package adventureworks
 package pr
 package d
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.production.document.DocumentId
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object DRepoImpl extends DRepo {
   override def selectAll(implicit c: Connection): List[DRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from pr.d""".as(DRow.rowParser("").*)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from pr.d""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DFieldOrIdValue[_]])(implicit c: Connection): List[DRow] = {
     fieldValues match {
@@ -40,8 +47,28 @@ object DRepoImpl extends DRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(DRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[DRow] =
+    RowParser[DRow] { row =>
+      Success(
+        DRow(
+          title = row[Option[String]]("title"),
+          owner = row[Option[BusinessentityId]]("owner"),
+          folderflag = row[Flag]("folderflag"),
+          filename = row[Option[String]]("filename"),
+          fileextension = row[Option[String]]("fileextension"),
+          revision = row[Option[/* bpchar */ String]]("revision"),
+          changenumber = row[Option[Int]]("changenumber"),
+          status = row[Option[Int]]("status"),
+          documentsummary = row[Option[String]]("documentsummary"),
+          document = row[Option[Byte]]("document"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          documentnode = row[Option[DocumentId]]("documentnode")
+        )
+      )
+    }
 }

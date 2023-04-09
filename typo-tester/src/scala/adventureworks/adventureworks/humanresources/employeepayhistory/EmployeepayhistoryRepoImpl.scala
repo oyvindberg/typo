@@ -9,9 +9,12 @@ package employeepayhistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -37,7 +40,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory""".as(EmployeepayhistoryRow.rowParser("").*)
+    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow] = {
     fieldValues match {
@@ -55,12 +58,12 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmployeepayhistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}""".as(EmployeepayhistoryRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: EmployeepayhistoryId, row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.employeepayhistory
@@ -89,4 +92,25 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     }
   
   }
+  val rowParser: RowParser[EmployeepayhistoryRow] =
+    RowParser[EmployeepayhistoryRow] { row =>
+      Success(
+        EmployeepayhistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          ratechangedate = row[LocalDateTime]("ratechangedate"),
+          rate = row[BigDecimal]("rate"),
+          payfrequency = row[Int]("payfrequency"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[EmployeepayhistoryId] =
+    RowParser[EmployeepayhistoryId] { row =>
+      Success(
+        EmployeepayhistoryId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          ratechangedate = row[LocalDateTime]("ratechangedate")
+        )
+      )
+    }
 }

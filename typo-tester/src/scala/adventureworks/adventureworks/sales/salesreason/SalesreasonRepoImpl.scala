@@ -9,10 +9,13 @@ package salesreason
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,11 +38,11 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           returning salesreasonid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[SalesreasonId]("salesreasonid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason""".as(SalesreasonRow.rowParser("").*)
+    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
     fieldValues match {
@@ -56,15 +59,15 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesreasonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".as(SalesreasonRow.rowParser("").singleOpt)
+    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".as(rowParser.singleOpt)
   }
   override def selectByIds(salesreasonids: List[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid in $salesreasonids""".as(SalesreasonRow.rowParser("").*)
+    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid in $salesreasonids""".as(rowParser.*)
   }
   override def update(salesreasonid: SalesreasonId, row: SalesreasonRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesreason
@@ -93,4 +96,17 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     }
   
   }
+  val rowParser: RowParser[SalesreasonRow] =
+    RowParser[SalesreasonRow] { row =>
+      Success(
+        SalesreasonRow(
+          salesreasonid = row[SalesreasonId]("salesreasonid"),
+          name = row[Name]("name"),
+          reasontype = row[Name]("reasontype"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalesreasonId] =
+    SqlParser.get[SalesreasonId]("salesreasonid")
 }

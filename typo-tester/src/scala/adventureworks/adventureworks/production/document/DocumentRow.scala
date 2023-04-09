@@ -9,8 +9,6 @@ package document
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -63,26 +61,6 @@ case class DocumentRow(
 )
 
 object DocumentRow {
-  def rowParser(prefix: String): RowParser[DocumentRow] = { row =>
-    Success(
-      DocumentRow(
-        title = row[String](prefix + "title"),
-        owner = row[BusinessentityId](prefix + "owner"),
-        folderflag = row[Flag](prefix + "folderflag"),
-        filename = row[String](prefix + "filename"),
-        fileextension = row[Option[String]](prefix + "fileextension"),
-        revision = row[/* bpchar */ String](prefix + "revision"),
-        changenumber = row[Int](prefix + "changenumber"),
-        status = row[Int](prefix + "status"),
-        documentsummary = row[Option[String]](prefix + "documentsummary"),
-        document = row[Option[Array[Byte]]](prefix + "document"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate"),
-        documentnode = row[DocumentId](prefix + "documentnode")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[DocumentRow] = new OFormat[DocumentRow]{
     override def writes(o: DocumentRow): JsObject =
       Json.obj(

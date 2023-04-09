@@ -9,8 +9,6 @@ package sm
 
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -44,20 +42,6 @@ case class SmRow(
 )
 
 object SmRow {
-  def rowParser(prefix: String): RowParser[SmRow] = { row =>
-    Success(
-      SmRow(
-        id = row[Option[Int]](prefix + "id"),
-        shipmethodid = row[Option[ShipmethodId]](prefix + "shipmethodid"),
-        name = row[Option[Name]](prefix + "name"),
-        shipbase = row[Option[BigDecimal]](prefix + "shipbase"),
-        shiprate = row[Option[BigDecimal]](prefix + "shiprate"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SmRow] = new OFormat[SmRow]{
     override def writes(o: SmRow): JsObject =
       Json.obj(

@@ -9,10 +9,16 @@ package employeedepartmenthistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.humanresources.department.DepartmentId
+import adventureworks.humanresources.shift.ShiftId
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
@@ -36,7 +42,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
-    SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory""".as(EmployeedepartmenthistoryRow.rowParser("").*)
+    SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     fieldValues match {
@@ -55,12 +61,12 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmployeedepartmenthistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow] = {
-    SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}""".as(EmployeedepartmenthistoryRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: EmployeedepartmenthistoryId, row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.employeedepartmenthistory
@@ -87,4 +93,28 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     }
   
   }
+  val rowParser: RowParser[EmployeedepartmenthistoryRow] =
+    RowParser[EmployeedepartmenthistoryRow] { row =>
+      Success(
+        EmployeedepartmenthistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          departmentid = row[DepartmentId]("departmentid"),
+          shiftid = row[ShiftId]("shiftid"),
+          startdate = row[LocalDate]("startdate"),
+          enddate = row[Option[LocalDate]]("enddate"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[EmployeedepartmenthistoryId] =
+    RowParser[EmployeedepartmenthistoryId] { row =>
+      Success(
+        EmployeedepartmenthistoryId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          startdate = row[LocalDate]("startdate"),
+          departmentid = row[DepartmentId]("departmentid"),
+          shiftid = row[ShiftId]("shiftid")
+        )
+      )
+    }
 }

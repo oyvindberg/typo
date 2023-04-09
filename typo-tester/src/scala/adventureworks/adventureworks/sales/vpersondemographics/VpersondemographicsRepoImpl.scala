@@ -7,14 +7,19 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
+import org.postgresql.util.PGmoney
 
 object VpersondemographicsRepoImpl extends VpersondemographicsRepo {
   override def selectAll(implicit c: Connection): List[VpersondemographicsRow] = {
-    SQL"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned from sales.vpersondemographics""".as(VpersondemographicsRow.rowParser("").*)
+    SQL"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned from sales.vpersondemographics""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VpersondemographicsFieldOrIdValue[_]])(implicit c: Connection): List[VpersondemographicsRow] = {
     fieldValues match {
@@ -40,8 +45,28 @@ object VpersondemographicsRepoImpl extends VpersondemographicsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VpersondemographicsRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VpersondemographicsRow] =
+    RowParser[VpersondemographicsRow] { row =>
+      Success(
+        VpersondemographicsRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          totalpurchaseytd = row[Option[PGmoney]]("totalpurchaseytd"),
+          datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
+          birthdate = row[Option[LocalDate]]("birthdate"),
+          maritalstatus = row[Option[String]]("maritalstatus"),
+          yearlyincome = row[Option[String]]("yearlyincome"),
+          gender = row[Option[String]]("gender"),
+          totalchildren = row[Option[Int]]("totalchildren"),
+          numberchildrenathome = row[Option[Int]]("numberchildrenathome"),
+          education = row[Option[String]]("education"),
+          occupation = row[Option[String]]("occupation"),
+          homeownerflag = row[Option[Boolean]]("homeownerflag"),
+          numbercarsowned = row[Option[Int]]("numbercarsowned")
+        )
+      )
+    }
 }

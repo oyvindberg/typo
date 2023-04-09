@@ -8,8 +8,6 @@ package sa
 package so
 
 import adventureworks.sales.specialoffer.SpecialofferId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -58,25 +56,6 @@ case class SoRow(
 )
 
 object SoRow {
-  def rowParser(prefix: String): RowParser[SoRow] = { row =>
-    Success(
-      SoRow(
-        id = row[Option[Int]](prefix + "id"),
-        specialofferid = row[Option[SpecialofferId]](prefix + "specialofferid"),
-        description = row[Option[String]](prefix + "description"),
-        discountpct = row[Option[BigDecimal]](prefix + "discountpct"),
-        `type` = row[Option[String]](prefix + "type"),
-        category = row[Option[String]](prefix + "category"),
-        startdate = row[Option[LocalDateTime]](prefix + "startdate"),
-        enddate = row[Option[LocalDateTime]](prefix + "enddate"),
-        minqty = row[Option[Int]](prefix + "minqty"),
-        maxqty = row[Option[Int]](prefix + "maxqty"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SoRow] = new OFormat[SoRow]{
     override def writes(o: SoRow): JsObject =
       Json.obj(

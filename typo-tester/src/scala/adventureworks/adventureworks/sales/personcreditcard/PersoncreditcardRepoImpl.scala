@@ -9,9 +9,13 @@ package personcreditcard
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.creditcard.CreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +39,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard""".as(PersoncreditcardRow.rowParser("").*)
+    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]])(implicit c: Connection): List[PersoncreditcardRow] = {
     fieldValues match {
@@ -51,12 +55,12 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersoncreditcardRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".as(PersoncreditcardRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: PersoncreditcardId, row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.personcreditcard
@@ -81,4 +85,23 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     }
   
   }
+  val rowParser: RowParser[PersoncreditcardRow] =
+    RowParser[PersoncreditcardRow] { row =>
+      Success(
+        PersoncreditcardRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          creditcardid = row[CreditcardId]("creditcardid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PersoncreditcardId] =
+    RowParser[PersoncreditcardId] { row =>
+      Success(
+        PersoncreditcardId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          creditcardid = row[CreditcardId]("creditcardid")
+        )
+      )
+    }
 }

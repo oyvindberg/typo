@@ -7,14 +7,19 @@ package adventureworks
 package pe
 package be
 
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object BeRepoImpl extends BeRepo {
   override def selectAll(implicit c: Connection): List[BeRow] = {
-    SQL"""select id, businessentityid, rowguid, modifieddate from pe.be""".as(BeRow.rowParser("").*)
+    SQL"""select id, businessentityid, rowguid, modifieddate from pe.be""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BeFieldOrIdValue[_]])(implicit c: Connection): List[BeRow] = {
     fieldValues match {
@@ -31,8 +36,19 @@ object BeRepoImpl extends BeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[BeRow] =
+    RowParser[BeRow] { row =>
+      Success(
+        BeRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

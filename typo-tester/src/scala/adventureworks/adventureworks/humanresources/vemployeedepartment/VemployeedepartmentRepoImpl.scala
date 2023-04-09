@@ -7,14 +7,19 @@ package adventureworks
 package humanresources
 package vemployeedepartment
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
 
 object VemployeedepartmentRepoImpl extends VemployeedepartmentRepo {
   override def selectAll(implicit c: Connection): List[VemployeedepartmentRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate from humanresources.vemployeedepartment""".as(VemployeedepartmentRow.rowParser("").*)
+    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate from humanresources.vemployeedepartment""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeedepartmentFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmentRow] = {
     fieldValues match {
@@ -37,8 +42,25 @@ object VemployeedepartmentRepoImpl extends VemployeedepartmentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VemployeedepartmentRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VemployeedepartmentRow] =
+    RowParser[VemployeedepartmentRow] { row =>
+      Success(
+        VemployeedepartmentRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          title = row[Option[String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[String]]("suffix"),
+          jobtitle = row[Option[String]]("jobtitle"),
+          department = row[Option[Name]]("department"),
+          groupname = row[Option[Name]]("groupname"),
+          startdate = row[Option[LocalDate]]("startdate")
+        )
+      )
+    }
 }

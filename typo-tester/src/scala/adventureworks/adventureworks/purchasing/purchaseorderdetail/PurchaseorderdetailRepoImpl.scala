@@ -9,9 +9,13 @@ package purchaseorderdetail
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -41,7 +45,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
-    SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail""".as(PurchaseorderdetailRow.rowParser("").*)
+    SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderdetailRow] = {
     fieldValues match {
@@ -63,12 +67,12 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PurchaseorderdetailRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow] = {
-    SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}""".as(PurchaseorderdetailRow.rowParser("").singleOpt)
+    SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: PurchaseorderdetailId, row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.purchaseorderdetail
@@ -105,4 +109,29 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     }
   
   }
+  val rowParser: RowParser[PurchaseorderdetailRow] =
+    RowParser[PurchaseorderdetailRow] { row =>
+      Success(
+        PurchaseorderdetailRow(
+          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
+          purchaseorderdetailid = row[Int]("purchaseorderdetailid"),
+          duedate = row[LocalDateTime]("duedate"),
+          orderqty = row[Int]("orderqty"),
+          productid = row[ProductId]("productid"),
+          unitprice = row[BigDecimal]("unitprice"),
+          receivedqty = row[BigDecimal]("receivedqty"),
+          rejectedqty = row[BigDecimal]("rejectedqty"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PurchaseorderdetailId] =
+    RowParser[PurchaseorderdetailId] { row =>
+      Success(
+        PurchaseorderdetailId(
+          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
+          purchaseorderdetailid = row[Int]("purchaseorderdetailid")
+        )
+      )
+    }
 }

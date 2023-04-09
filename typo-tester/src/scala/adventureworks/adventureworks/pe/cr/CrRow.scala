@@ -9,8 +9,6 @@ package cr
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,16 +30,6 @@ case class CrRow(
 )
 
 object CrRow {
-  def rowParser(prefix: String): RowParser[CrRow] = { row =>
-    Success(
-      CrRow(
-        countryregioncode = row[Option[CountryregionId]](prefix + "countryregioncode"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CrRow] = new OFormat[CrRow]{
     override def writes(o: CrRow): JsObject =
       Json.obj(

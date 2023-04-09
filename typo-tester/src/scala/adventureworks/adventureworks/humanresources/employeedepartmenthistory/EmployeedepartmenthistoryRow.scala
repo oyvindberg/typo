@@ -10,8 +10,6 @@ package employeedepartmenthistory
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
@@ -47,19 +45,6 @@ case class EmployeedepartmenthistoryRow(
  }
 
 object EmployeedepartmenthistoryRow {
-  def rowParser(prefix: String): RowParser[EmployeedepartmenthistoryRow] = { row =>
-    Success(
-      EmployeedepartmenthistoryRow(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        departmentid = row[DepartmentId](prefix + "departmentid"),
-        shiftid = row[ShiftId](prefix + "shiftid"),
-        startdate = row[LocalDate](prefix + "startdate"),
-        enddate = row[Option[LocalDate]](prefix + "enddate"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[EmployeedepartmenthistoryRow] = new OFormat[EmployeedepartmenthistoryRow]{
     override def writes(o: EmployeedepartmenthistoryRow): JsObject =
       Json.obj(

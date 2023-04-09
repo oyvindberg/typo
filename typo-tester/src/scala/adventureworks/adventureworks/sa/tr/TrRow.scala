@@ -10,8 +10,6 @@ package tr
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -48,21 +46,6 @@ case class TrRow(
 )
 
 object TrRow {
-  def rowParser(prefix: String): RowParser[TrRow] = { row =>
-    Success(
-      TrRow(
-        id = row[Option[Int]](prefix + "id"),
-        salestaxrateid = row[Option[SalestaxrateId]](prefix + "salestaxrateid"),
-        stateprovinceid = row[Option[StateprovinceId]](prefix + "stateprovinceid"),
-        taxtype = row[Option[Int]](prefix + "taxtype"),
-        taxrate = row[Option[BigDecimal]](prefix + "taxrate"),
-        name = row[Option[Name]](prefix + "name"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[TrRow] = new OFormat[TrRow]{
     override def writes(o: TrRow): JsObject =
       Json.obj(

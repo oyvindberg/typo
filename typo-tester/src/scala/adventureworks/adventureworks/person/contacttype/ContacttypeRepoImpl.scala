@@ -9,10 +9,13 @@ package contacttype
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -34,11 +37,11 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           returning contacttypeid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ContacttypeId]("contacttypeid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype""".as(ContacttypeRow.rowParser("").*)
+    SQL"""select contacttypeid, name, modifieddate from person.contacttype""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
     fieldValues match {
@@ -54,15 +57,15 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ContacttypeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid""".as(ContacttypeRow.rowParser("").singleOpt)
+    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid""".as(rowParser.singleOpt)
   }
   override def selectByIds(contacttypeids: List[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid in $contacttypeids""".as(ContacttypeRow.rowParser("").*)
+    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid in $contacttypeids""".as(rowParser.*)
   }
   override def update(contacttypeid: ContacttypeId, row: ContacttypeRow)(implicit c: Connection): Boolean = {
     SQL"""update person.contacttype
@@ -89,4 +92,16 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     }
   
   }
+  val rowParser: RowParser[ContacttypeRow] =
+    RowParser[ContacttypeRow] { row =>
+      Success(
+        ContacttypeRow(
+          contacttypeid = row[ContacttypeId]("contacttypeid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ContacttypeId] =
+    SqlParser.get[ContacttypeId]("contacttypeid")
 }

@@ -9,8 +9,6 @@ package pmi
 
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,16 +30,6 @@ case class PmiRow(
 )
 
 object PmiRow {
-  def rowParser(prefix: String): RowParser[PmiRow] = { row =>
-    Success(
-      PmiRow(
-        productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        illustrationid = row[Option[IllustrationId]](prefix + "illustrationid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PmiRow] = new OFormat[PmiRow]{
     override def writes(o: PmiRow): JsObject =
       Json.obj(

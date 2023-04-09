@@ -9,10 +9,13 @@ package productcategory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -39,11 +42,11 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
           returning productcategoryid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ProductcategoryId]("productcategoryid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory""".as(ProductcategoryRow.rowParser("").*)
+    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcategoryRow] = {
     fieldValues match {
@@ -60,15 +63,15 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductcategoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".as(ProductcategoryRow.rowParser("").singleOpt)
+    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".as(rowParser.singleOpt)
   }
   override def selectByIds(productcategoryids: List[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid in $productcategoryids""".as(ProductcategoryRow.rowParser("").*)
+    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid in $productcategoryids""".as(rowParser.*)
   }
   override def update(productcategoryid: ProductcategoryId, row: ProductcategoryRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productcategory
@@ -97,4 +100,17 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     }
   
   }
+  val rowParser: RowParser[ProductcategoryRow] =
+    RowParser[ProductcategoryRow] { row =>
+      Success(
+        ProductcategoryRow(
+          productcategoryid = row[ProductcategoryId]("productcategoryid"),
+          name = row[Name]("name"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductcategoryId] =
+    SqlParser.get[ProductcategoryId]("productcategoryid")
 }

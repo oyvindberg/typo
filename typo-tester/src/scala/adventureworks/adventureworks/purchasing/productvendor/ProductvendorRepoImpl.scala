@@ -9,9 +9,14 @@ package productvendor
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.production.product.ProductId
+import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -43,7 +48,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
-    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor""".as(ProductvendorRow.rowParser("").*)
+    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]])(implicit c: Connection): List[ProductvendorRow] = {
     fieldValues match {
@@ -67,12 +72,12 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductvendorRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
-    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".as(ProductvendorRow.rowParser("").singleOpt)
+    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductvendorId, row: ProductvendorRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.productvendor
@@ -113,4 +118,31 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     }
   
   }
+  val rowParser: RowParser[ProductvendorRow] =
+    RowParser[ProductvendorRow] { row =>
+      Success(
+        ProductvendorRow(
+          productid = row[ProductId]("productid"),
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          averageleadtime = row[Int]("averageleadtime"),
+          standardprice = row[BigDecimal]("standardprice"),
+          lastreceiptcost = row[Option[BigDecimal]]("lastreceiptcost"),
+          lastreceiptdate = row[Option[LocalDateTime]]("lastreceiptdate"),
+          minorderqty = row[Int]("minorderqty"),
+          maxorderqty = row[Int]("maxorderqty"),
+          onorderqty = row[Option[Int]]("onorderqty"),
+          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductvendorId] =
+    RowParser[ProductvendorId] { row =>
+      Success(
+        ProductvendorId(
+          productid = row[ProductId]("productid"),
+          businessentityid = row[BusinessentityId]("businessentityid")
+        )
+      )
+    }
 }

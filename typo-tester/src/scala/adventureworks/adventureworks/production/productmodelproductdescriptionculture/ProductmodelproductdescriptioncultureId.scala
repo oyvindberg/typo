@@ -10,8 +10,6 @@ package productmodelproductdescriptionculture
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,14 +41,4 @@ object ProductmodelproductdescriptioncultureId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[ProductmodelproductdescriptioncultureId] = { row =>
-    Success(
-      ProductmodelproductdescriptioncultureId(
-        productmodelid = row[ProductmodelId](prefix + "productmodelid"),
-        productdescriptionid = row[ProductdescriptionId](prefix + "productdescriptionid"),
-        cultureid = row[CultureId](prefix + "cultureid")
-      )
-    )
-  }
-
 }

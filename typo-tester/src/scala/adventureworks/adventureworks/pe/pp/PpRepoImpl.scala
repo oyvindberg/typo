@@ -7,14 +7,20 @@ package adventureworks
 package pe
 package pp
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PpRepoImpl extends PpRepo {
   override def selectAll(implicit c: Connection): List[PpRow] = {
-    SQL"""select id, businessentityid, phonenumber, phonenumbertypeid, modifieddate from pe.pp""".as(PpRow.rowParser("").*)
+    SQL"""select id, businessentityid, phonenumber, phonenumbertypeid, modifieddate from pe.pp""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PpFieldOrIdValue[_]])(implicit c: Connection): List[PpRow] = {
     fieldValues match {
@@ -32,8 +38,20 @@ object PpRepoImpl extends PpRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PpRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PpRow] =
+    RowParser[PpRow] { row =>
+      Success(
+        PpRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          phonenumber = row[Option[Phone]]("phonenumber"),
+          phonenumbertypeid = row[Option[PhonenumbertypeId]]("phonenumbertypeid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

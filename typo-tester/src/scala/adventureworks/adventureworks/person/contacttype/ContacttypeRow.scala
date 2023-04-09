@@ -8,8 +8,6 @@ package person
 package contacttype
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,16 +28,6 @@ case class ContacttypeRow(
 )
 
 object ContacttypeRow {
-  def rowParser(prefix: String): RowParser[ContacttypeRow] = { row =>
-    Success(
-      ContacttypeRow(
-        contacttypeid = row[ContacttypeId](prefix + "contacttypeid"),
-        name = row[Name](prefix + "name"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ContacttypeRow] = new OFormat[ContacttypeRow]{
     override def writes(o: ContacttypeRow): JsObject =
       Json.obj(

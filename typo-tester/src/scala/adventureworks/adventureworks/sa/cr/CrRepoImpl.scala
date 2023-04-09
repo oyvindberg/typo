@@ -7,14 +7,19 @@ package adventureworks
 package sa
 package cr
 
+import adventureworks.sales.currency.CurrencyId
+import adventureworks.sales.currencyrate.CurrencyrateId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object CrRepoImpl extends CrRepo {
   override def selectAll(implicit c: Connection): List[CrRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sa.cr""".as(CrRow.rowParser("").*)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sa.cr""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CrFieldOrIdValue[_]])(implicit c: Connection): List[CrRow] = {
     fieldValues match {
@@ -34,8 +39,22 @@ object CrRepoImpl extends CrRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CrRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[CrRow] =
+    RowParser[CrRow] { row =>
+      Success(
+        CrRow(
+          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
+          currencyratedate = row[Option[LocalDateTime]]("currencyratedate"),
+          fromcurrencycode = row[Option[CurrencyId]]("fromcurrencycode"),
+          tocurrencycode = row[Option[CurrencyId]]("tocurrencycode"),
+          averagerate = row[Option[BigDecimal]]("averagerate"),
+          endofdayrate = row[Option[BigDecimal]]("endofdayrate"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

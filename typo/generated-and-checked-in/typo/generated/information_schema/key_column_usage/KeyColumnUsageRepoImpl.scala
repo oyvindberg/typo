@@ -12,12 +12,16 @@ package key_column_usage
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import typo.generated.information_schema.CardinalNumber
+import typo.generated.information_schema.SqlIdentifier
 
 object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[KeyColumnUsageRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage""".as(KeyColumnUsageRow.rowParser("").*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[KeyColumnUsageFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageRow] = {
     fieldValues match {
@@ -39,8 +43,24 @@ object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(KeyColumnUsageRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[KeyColumnUsageRow] =
+    RowParser[KeyColumnUsageRow] { row =>
+      Success(
+        KeyColumnUsageRow(
+          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
+          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
+          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
+          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
+          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
+          tableName = row[Option[SqlIdentifier]]("table_name"),
+          columnName = row[Option[SqlIdentifier]]("column_name"),
+          ordinalPosition = row[Option[CardinalNumber]]("ordinal_position"),
+          positionInUniqueConstraint = row[Option[CardinalNumber]]("position_in_unique_constraint")
+        )
+      )
+    }
 }

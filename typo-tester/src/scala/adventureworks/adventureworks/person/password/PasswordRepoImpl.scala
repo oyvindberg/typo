@@ -9,9 +9,13 @@ package password
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -42,7 +46,7 @@ object PasswordRepoImpl extends PasswordRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password""".as(PasswordRow.rowParser("").*)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
     fieldValues match {
@@ -60,15 +64,15 @@ object PasswordRepoImpl extends PasswordRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PasswordRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: PasswordId)(implicit c: Connection): Option[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid""".as(PasswordRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[PasswordId])(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid in $businessentityids""".as(PasswordRow.rowParser("").*)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: PasswordId, row: PasswordRow)(implicit c: Connection): Boolean = {
     SQL"""update person.password
@@ -99,4 +103,18 @@ object PasswordRepoImpl extends PasswordRepo {
     }
   
   }
+  val rowParser: RowParser[PasswordRow] =
+    RowParser[PasswordRow] { row =>
+      Success(
+        PasswordRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          passwordhash = row[String]("passwordhash"),
+          passwordsalt = row[String]("passwordsalt"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PasswordId] =
+    SqlParser.get[PasswordId]("businessentityid")
 }

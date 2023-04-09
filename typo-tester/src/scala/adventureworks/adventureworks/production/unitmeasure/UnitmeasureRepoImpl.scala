@@ -9,9 +9,13 @@ package unitmeasure
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -36,7 +40,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure""".as(UnitmeasureRow.rowParser("").*)
+    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow] = {
     fieldValues match {
@@ -52,15 +56,15 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(UnitmeasureRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".as(UnitmeasureRow.rowParser("").singleOpt)
+    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".as(rowParser.singleOpt)
   }
   override def selectByIds(unitmeasurecodes: List[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode in $unitmeasurecodes""".as(UnitmeasureRow.rowParser("").*)
+    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode in $unitmeasurecodes""".as(rowParser.*)
   }
   override def update(unitmeasurecode: UnitmeasureId, row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     SQL"""update production.unitmeasure
@@ -87,4 +91,16 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     }
   
   }
+  val rowParser: RowParser[UnitmeasureRow] =
+    RowParser[UnitmeasureRow] { row =>
+      Success(
+        UnitmeasureRow(
+          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[UnitmeasureId] =
+    SqlParser.get[UnitmeasureId]("unitmeasurecode")
 }

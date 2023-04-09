@@ -12,8 +12,12 @@ package pg_namespace
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
@@ -34,7 +38,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace""".as(PgNamespaceRow.rowParser("").*)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
@@ -51,15 +55,15 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgNamespaceRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(PgNamespaceRow.rowParser("").singleOpt)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(PgNamespaceRow.rowParser("").*)
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(rowParser.*)
   }
   override def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
     selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption
@@ -91,4 +95,17 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     }
   
   }
+  val rowParser: RowParser[PgNamespaceRow] =
+    RowParser[PgNamespaceRow] { row =>
+      Success(
+        PgNamespaceRow(
+          oid = row[PgNamespaceId]("oid"),
+          nspname = row[String]("nspname"),
+          nspowner = row[/* oid */ Long]("nspowner"),
+          nspacl = row[Option[Array[/* aclitem */ PGobject]]]("nspacl")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgNamespaceId] =
+    SqlParser.get[PgNamespaceId]("oid")
 }

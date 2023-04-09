@@ -10,8 +10,6 @@ package generated
 package information_schema
 package tables
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -50,25 +48,6 @@ case class TablesRow(
 )
 
 object TablesRow {
-  def rowParser(prefix: String): RowParser[TablesRow] = { row =>
-    Success(
-      TablesRow(
-        tableCatalog = row[Option[SqlIdentifier]](prefix + "table_catalog"),
-        tableSchema = row[Option[SqlIdentifier]](prefix + "table_schema"),
-        tableName = row[Option[SqlIdentifier]](prefix + "table_name"),
-        tableType = row[Option[CharacterData]](prefix + "table_type"),
-        selfReferencingColumnName = row[Option[SqlIdentifier]](prefix + "self_referencing_column_name"),
-        referenceGeneration = row[Option[CharacterData]](prefix + "reference_generation"),
-        userDefinedTypeCatalog = row[Option[SqlIdentifier]](prefix + "user_defined_type_catalog"),
-        userDefinedTypeSchema = row[Option[SqlIdentifier]](prefix + "user_defined_type_schema"),
-        userDefinedTypeName = row[Option[SqlIdentifier]](prefix + "user_defined_type_name"),
-        isInsertableInto = row[Option[YesOrNo]](prefix + "is_insertable_into"),
-        isTyped = row[Option[YesOrNo]](prefix + "is_typed"),
-        commitAction = row[Option[CharacterData]](prefix + "commit_action")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[TablesRow] = new OFormat[TablesRow]{
     override def writes(o: TablesRow): JsObject =
       Json.obj(

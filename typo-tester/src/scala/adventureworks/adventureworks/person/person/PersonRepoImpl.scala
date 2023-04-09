@@ -9,10 +9,15 @@ package person
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -57,7 +62,7 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person""".as(PersonRow.rowParser("").*)
+    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -83,15 +88,15 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid""".as(PersonRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid in $businessentityids""".as(PersonRow.rowParser("").*)
+    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
     SQL"""update person.person
@@ -138,4 +143,26 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  val rowParser: RowParser[PersonRow] =
+    RowParser[PersonRow] { row =>
+      Success(
+        PersonRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          persontype = row[/* bpchar */ String]("persontype"),
+          namestyle = row[NameStyle]("namestyle"),
+          title = row[Option[String]]("title"),
+          firstname = row[Name]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Name]("lastname"),
+          suffix = row[Option[String]]("suffix"),
+          emailpromotion = row[Int]("emailpromotion"),
+          additionalcontactinfo = row[Option[/* xml */ String]]("additionalcontactinfo"),
+          demographics = row[Option[/* xml */ String]]("demographics"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PersonId] =
+    SqlParser.get[PersonId]("businessentityid")
 }

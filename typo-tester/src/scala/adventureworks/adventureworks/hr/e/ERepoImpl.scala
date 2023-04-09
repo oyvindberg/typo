@@ -7,14 +7,21 @@ package adventureworks
 package hr
 package e
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 
 object ERepoImpl extends ERepo {
   override def selectAll(implicit c: Connection): List[ERow] = {
-    SQL"""select id, businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from hr.e""".as(ERow.rowParser("").*)
+    SQL"""select id, businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from hr.e""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EFieldOrIdValue[_]])(implicit c: Connection): List[ERow] = {
     fieldValues match {
@@ -43,8 +50,31 @@ object ERepoImpl extends ERepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ERow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[ERow] =
+    RowParser[ERow] { row =>
+      Success(
+        ERow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          nationalidnumber = row[Option[String]]("nationalidnumber"),
+          loginid = row[Option[String]]("loginid"),
+          jobtitle = row[Option[String]]("jobtitle"),
+          birthdate = row[Option[LocalDate]]("birthdate"),
+          maritalstatus = row[Option[/* bpchar */ String]]("maritalstatus"),
+          gender = row[Option[/* bpchar */ String]]("gender"),
+          hiredate = row[Option[LocalDate]]("hiredate"),
+          salariedflag = row[Flag]("salariedflag"),
+          vacationhours = row[Option[Int]]("vacationhours"),
+          sickleavehours = row[Option[Int]]("sickleavehours"),
+          currentflag = row[Flag]("currentflag"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          organizationnode = row[Option[String]]("organizationnode")
+        )
+      )
+    }
 }

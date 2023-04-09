@@ -12,7 +12,9 @@ package pg_description
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
@@ -32,7 +34,7 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description""".as(PgDescriptionRow.rowParser("").*)
+    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgDescriptionFieldOrIdValue[_]])(implicit c: Connection): List[PgDescriptionRow] = {
     fieldValues match {
@@ -49,12 +51,12 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgDescriptionRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(PgDescriptionRow.rowParser("").singleOpt)
+    SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: PgDescriptionId, row: PgDescriptionRow)(implicit c: Connection): Boolean = {
     SQL"""update pg_catalog.pg_description
@@ -79,4 +81,25 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     }
   
   }
+  val rowParser: RowParser[PgDescriptionRow] =
+    RowParser[PgDescriptionRow] { row =>
+      Success(
+        PgDescriptionRow(
+          objoid = row[/* oid */ Long]("objoid"),
+          classoid = row[/* oid */ Long]("classoid"),
+          objsubid = row[Int]("objsubid"),
+          description = row[String]("description")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgDescriptionId] =
+    RowParser[PgDescriptionId] { row =>
+      Success(
+        PgDescriptionId(
+          objoid = row[/* oid */ Long]("objoid"),
+          classoid = row[/* oid */ Long]("classoid"),
+          objsubid = row[Int]("objsubid")
+        )
+      )
+    }
 }

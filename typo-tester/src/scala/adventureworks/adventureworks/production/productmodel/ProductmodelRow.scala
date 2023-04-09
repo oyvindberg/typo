@@ -8,8 +8,6 @@ package production
 package productmodel
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -39,19 +37,6 @@ case class ProductmodelRow(
 )
 
 object ProductmodelRow {
-  def rowParser(prefix: String): RowParser[ProductmodelRow] = { row =>
-    Success(
-      ProductmodelRow(
-        productmodelid = row[ProductmodelId](prefix + "productmodelid"),
-        name = row[Name](prefix + "name"),
-        catalogdescription = row[Option[/* xml */ String]](prefix + "catalogdescription"),
-        instructions = row[Option[/* xml */ String]](prefix + "instructions"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ProductmodelRow] = new OFormat[ProductmodelRow]{
     override def writes(o: ProductmodelRow): JsObject =
       Json.obj(

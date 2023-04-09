@@ -9,8 +9,6 @@ package productreview
 
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -47,21 +45,6 @@ case class ProductreviewRow(
 )
 
 object ProductreviewRow {
-  def rowParser(prefix: String): RowParser[ProductreviewRow] = { row =>
-    Success(
-      ProductreviewRow(
-        productreviewid = row[ProductreviewId](prefix + "productreviewid"),
-        productid = row[ProductId](prefix + "productid"),
-        reviewername = row[Name](prefix + "reviewername"),
-        reviewdate = row[LocalDateTime](prefix + "reviewdate"),
-        emailaddress = row[String](prefix + "emailaddress"),
-        rating = row[Int](prefix + "rating"),
-        comments = row[Option[String]](prefix + "comments"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ProductreviewRow] = new OFormat[ProductreviewRow]{
     override def writes(o: ProductreviewRow): JsObject =
       Json.obj(

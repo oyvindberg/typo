@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_type
 
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -88,45 +86,6 @@ case class PgTypeRow(
 )
 
 object PgTypeRow {
-  def rowParser(prefix: String): RowParser[PgTypeRow] = { row =>
-    Success(
-      PgTypeRow(
-        oid = row[PgTypeId](prefix + "oid"),
-        typname = row[String](prefix + "typname"),
-        typnamespace = row[/* oid */ Long](prefix + "typnamespace"),
-        typowner = row[/* oid */ Long](prefix + "typowner"),
-        typlen = row[Int](prefix + "typlen"),
-        typbyval = row[Boolean](prefix + "typbyval"),
-        typtype = row[String](prefix + "typtype"),
-        typcategory = row[String](prefix + "typcategory"),
-        typispreferred = row[Boolean](prefix + "typispreferred"),
-        typisdefined = row[Boolean](prefix + "typisdefined"),
-        typdelim = row[String](prefix + "typdelim"),
-        typrelid = row[/* oid */ Long](prefix + "typrelid"),
-        typsubscript = row[/* regproc */ PGobject](prefix + "typsubscript"),
-        typelem = row[/* oid */ Long](prefix + "typelem"),
-        typarray = row[/* oid */ Long](prefix + "typarray"),
-        typinput = row[/* regproc */ PGobject](prefix + "typinput"),
-        typoutput = row[/* regproc */ PGobject](prefix + "typoutput"),
-        typreceive = row[/* regproc */ PGobject](prefix + "typreceive"),
-        typsend = row[/* regproc */ PGobject](prefix + "typsend"),
-        typmodin = row[/* regproc */ PGobject](prefix + "typmodin"),
-        typmodout = row[/* regproc */ PGobject](prefix + "typmodout"),
-        typanalyze = row[/* regproc */ PGobject](prefix + "typanalyze"),
-        typalign = row[String](prefix + "typalign"),
-        typstorage = row[String](prefix + "typstorage"),
-        typnotnull = row[Boolean](prefix + "typnotnull"),
-        typbasetype = row[/* oid */ Long](prefix + "typbasetype"),
-        typtypmod = row[Int](prefix + "typtypmod"),
-        typndims = row[Int](prefix + "typndims"),
-        typcollation = row[/* oid */ Long](prefix + "typcollation"),
-        typdefaultbin = row[Option[/* pg_node_tree */ PGobject]](prefix + "typdefaultbin"),
-        typdefault = row[Option[String]](prefix + "typdefault"),
-        typacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "typacl")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgTypeRow] = new OFormat[PgTypeRow]{
     override def writes(o: PgTypeRow): JsObject =
       Json.obj(

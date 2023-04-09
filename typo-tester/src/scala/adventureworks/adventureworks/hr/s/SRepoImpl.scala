@@ -7,14 +7,20 @@ package adventureworks
 package hr
 package s
 
+import adventureworks.humanresources.shift.ShiftId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, shiftid, name, starttime, endtime, modifieddate from hr.s""".as(SRow.rowParser("").*)
+    SQL"""select id, shiftid, name, starttime, endtime, modifieddate from hr.s""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SFieldOrIdValue[_]])(implicit c: Connection): List[SRow] = {
     fieldValues match {
@@ -33,8 +39,21 @@ object SRepoImpl extends SRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SRow] =
+    RowParser[SRow] { row =>
+      Success(
+        SRow(
+          id = row[Option[Int]]("id"),
+          shiftid = row[Option[ShiftId]]("shiftid"),
+          name = row[Option[Name]]("name"),
+          starttime = row[Option[LocalTime]]("starttime"),
+          endtime = row[Option[LocalTime]]("endtime"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

@@ -9,10 +9,13 @@ package addresstype
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -39,11 +42,11 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           returning addresstypeid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[AddresstypeId]("addresstypeid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype""".as(AddresstypeRow.rowParser("").*)
+    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
     fieldValues match {
@@ -60,15 +63,15 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(AddresstypeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".as(AddresstypeRow.rowParser("").singleOpt)
+    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".as(rowParser.singleOpt)
   }
   override def selectByIds(addresstypeids: List[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid in $addresstypeids""".as(AddresstypeRow.rowParser("").*)
+    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid in $addresstypeids""".as(rowParser.*)
   }
   override def update(addresstypeid: AddresstypeId, row: AddresstypeRow)(implicit c: Connection): Boolean = {
     SQL"""update person.addresstype
@@ -97,4 +100,17 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     }
   
   }
+  val rowParser: RowParser[AddresstypeRow] =
+    RowParser[AddresstypeRow] { row =>
+      Success(
+        AddresstypeRow(
+          addresstypeid = row[AddresstypeId]("addresstypeid"),
+          name = row[Name]("name"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[AddresstypeId] =
+    SqlParser.get[AddresstypeId]("addresstypeid")
 }

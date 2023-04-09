@@ -9,8 +9,6 @@ package sop
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -38,18 +36,6 @@ case class SopRow(
 )
 
 object SopRow {
-  def rowParser(prefix: String): RowParser[SopRow] = { row =>
-    Success(
-      SopRow(
-        id = row[Option[Int]](prefix + "id"),
-        specialofferid = row[Option[SpecialofferId]](prefix + "specialofferid"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SopRow] = new OFormat[SopRow]{
     override def writes(o: SopRow): JsObject =
       Json.obj(

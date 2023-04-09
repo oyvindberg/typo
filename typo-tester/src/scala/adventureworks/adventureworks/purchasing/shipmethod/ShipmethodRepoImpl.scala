@@ -9,10 +9,13 @@ package shipmethod
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -47,11 +50,11 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           returning shipmethodid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ShipmethodId]("shipmethodid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod""".as(ShipmethodRow.rowParser("").*)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
     fieldValues match {
@@ -70,15 +73,15 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ShipmethodRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".as(ShipmethodRow.rowParser("").singleOpt)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".as(rowParser.singleOpt)
   }
   override def selectByIds(shipmethodids: List[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid in $shipmethodids""".as(ShipmethodRow.rowParser("").*)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid in $shipmethodids""".as(rowParser.*)
   }
   override def update(shipmethodid: ShipmethodId, row: ShipmethodRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.shipmethod
@@ -111,4 +114,19 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     }
   
   }
+  val rowParser: RowParser[ShipmethodRow] =
+    RowParser[ShipmethodRow] { row =>
+      Success(
+        ShipmethodRow(
+          shipmethodid = row[ShipmethodId]("shipmethodid"),
+          name = row[Name]("name"),
+          shipbase = row[BigDecimal]("shipbase"),
+          shiprate = row[BigDecimal]("shiprate"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ShipmethodId] =
+    SqlParser.get[ShipmethodId]("shipmethodid")
 }

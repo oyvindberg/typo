@@ -9,8 +9,6 @@ package jc
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -37,18 +35,6 @@ case class JcRow(
 )
 
 object JcRow {
-  def rowParser(prefix: String): RowParser[JcRow] = { row =>
-    Success(
-      JcRow(
-        id = row[Option[Int]](prefix + "id"),
-        jobcandidateid = row[Option[JobcandidateId]](prefix + "jobcandidateid"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        resume = row[Option[/* xml */ String]](prefix + "resume"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[JcRow] = new OFormat[JcRow]{
     override def writes(o: JcRow): JsObject =
       Json.obj(

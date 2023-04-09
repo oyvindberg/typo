@@ -9,9 +9,13 @@ package productinventory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.location.LocationId
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -46,7 +50,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
-    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory""".as(ProductinventoryRow.rowParser("").*)
+    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductinventoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductinventoryRow] = {
     fieldValues match {
@@ -66,12 +70,12 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductinventoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductinventoryId)(implicit c: Connection): Option[ProductinventoryRow] = {
-    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}""".as(ProductinventoryRow.rowParser("").singleOpt)
+    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductinventoryId, row: ProductinventoryRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productinventory
@@ -104,4 +108,27 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     }
   
   }
+  val rowParser: RowParser[ProductinventoryRow] =
+    RowParser[ProductinventoryRow] { row =>
+      Success(
+        ProductinventoryRow(
+          productid = row[ProductId]("productid"),
+          locationid = row[LocationId]("locationid"),
+          shelf = row[String]("shelf"),
+          bin = row[Int]("bin"),
+          quantity = row[Int]("quantity"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductinventoryId] =
+    RowParser[ProductinventoryId] { row =>
+      Success(
+        ProductinventoryId(
+          productid = row[ProductId]("productid"),
+          locationid = row[LocationId]("locationid")
+        )
+      )
+    }
 }

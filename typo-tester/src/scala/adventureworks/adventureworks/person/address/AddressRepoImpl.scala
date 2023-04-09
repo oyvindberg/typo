@@ -9,10 +9,13 @@ package address
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.stateprovince.StateprovinceId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -44,11 +47,11 @@ object AddressRepoImpl extends AddressRepo {
           returning addressid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[AddressId]("addressid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address""".as(AddressRow.rowParser("").*)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
     fieldValues match {
@@ -70,15 +73,15 @@ object AddressRepoImpl extends AddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(AddressRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid""".as(AddressRow.rowParser("").singleOpt)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid""".as(rowParser.singleOpt)
   }
   override def selectByIds(addressids: List[AddressId])(implicit c: Connection): List[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid in $addressids""".as(AddressRow.rowParser("").*)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid in $addressids""".as(rowParser.*)
   }
   override def update(addressid: AddressId, row: AddressRow)(implicit c: Connection): Boolean = {
     SQL"""update person.address
@@ -117,4 +120,22 @@ object AddressRepoImpl extends AddressRepo {
     }
   
   }
+  val rowParser: RowParser[AddressRow] =
+    RowParser[AddressRow] { row =>
+      Success(
+        AddressRow(
+          addressid = row[AddressId]("addressid"),
+          addressline1 = row[String]("addressline1"),
+          addressline2 = row[Option[String]]("addressline2"),
+          city = row[String]("city"),
+          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
+          postalcode = row[String]("postalcode"),
+          spatiallocation = row[Option[Array[Byte]]]("spatiallocation"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[AddressId] =
+    SqlParser.get[AddressId]("addressid")
 }

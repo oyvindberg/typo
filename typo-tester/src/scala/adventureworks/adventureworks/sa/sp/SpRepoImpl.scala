@@ -7,14 +7,20 @@ package adventureworks
 package sa
 package sp
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SpRepoImpl extends SpRepo {
   override def selectAll(implicit c: Connection): List[SpRow] = {
-    SQL"""select id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sa.sp""".as(SpRow.rowParser("").*)
+    SQL"""select id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sa.sp""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpFieldOrIdValue[_]])(implicit c: Connection): List[SpRow] = {
     fieldValues match {
@@ -37,8 +43,25 @@ object SpRepoImpl extends SpRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SpRow] =
+    RowParser[SpRow] { row =>
+      Success(
+        SpRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          salesquota = row[Option[BigDecimal]]("salesquota"),
+          bonus = row[Option[BigDecimal]]("bonus"),
+          commissionpct = row[Option[BigDecimal]]("commissionpct"),
+          salesytd = row[Option[BigDecimal]]("salesytd"),
+          saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

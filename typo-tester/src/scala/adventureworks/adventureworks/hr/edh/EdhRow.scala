@@ -10,8 +10,6 @@ package edh
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
@@ -45,20 +43,6 @@ case class EdhRow(
 )
 
 object EdhRow {
-  def rowParser(prefix: String): RowParser[EdhRow] = { row =>
-    Success(
-      EdhRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        departmentid = row[Option[DepartmentId]](prefix + "departmentid"),
-        shiftid = row[Option[ShiftId]](prefix + "shiftid"),
-        startdate = row[Option[LocalDate]](prefix + "startdate"),
-        enddate = row[Option[LocalDate]](prefix + "enddate"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[EdhRow] = new OFormat[EdhRow]{
     override def writes(o: EdhRow): JsObject =
       Json.obj(

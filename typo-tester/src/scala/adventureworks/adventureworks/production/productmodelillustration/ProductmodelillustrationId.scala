@@ -9,8 +9,6 @@ package productmodelillustration
 
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,13 +38,4 @@ object ProductmodelillustrationId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[ProductmodelillustrationId] = { row =>
-    Success(
-      ProductmodelillustrationId(
-        productmodelid = row[ProductmodelId](prefix + "productmodelid"),
-        illustrationid = row[IllustrationId](prefix + "illustrationid")
-      )
-    )
-  }
-
 }

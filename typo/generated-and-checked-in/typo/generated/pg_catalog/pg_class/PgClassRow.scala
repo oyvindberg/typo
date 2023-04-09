@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_class
 
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -90,46 +88,6 @@ case class PgClassRow(
 )
 
 object PgClassRow {
-  def rowParser(prefix: String): RowParser[PgClassRow] = { row =>
-    Success(
-      PgClassRow(
-        oid = row[PgClassId](prefix + "oid"),
-        relname = row[String](prefix + "relname"),
-        relnamespace = row[/* oid */ Long](prefix + "relnamespace"),
-        reltype = row[/* oid */ Long](prefix + "reltype"),
-        reloftype = row[/* oid */ Long](prefix + "reloftype"),
-        relowner = row[/* oid */ Long](prefix + "relowner"),
-        relam = row[/* oid */ Long](prefix + "relam"),
-        relfilenode = row[/* oid */ Long](prefix + "relfilenode"),
-        reltablespace = row[/* oid */ Long](prefix + "reltablespace"),
-        relpages = row[Int](prefix + "relpages"),
-        reltuples = row[Float](prefix + "reltuples"),
-        relallvisible = row[Int](prefix + "relallvisible"),
-        reltoastrelid = row[/* oid */ Long](prefix + "reltoastrelid"),
-        relhasindex = row[Boolean](prefix + "relhasindex"),
-        relisshared = row[Boolean](prefix + "relisshared"),
-        relpersistence = row[String](prefix + "relpersistence"),
-        relkind = row[String](prefix + "relkind"),
-        relnatts = row[Int](prefix + "relnatts"),
-        relchecks = row[Int](prefix + "relchecks"),
-        relhasrules = row[Boolean](prefix + "relhasrules"),
-        relhastriggers = row[Boolean](prefix + "relhastriggers"),
-        relhassubclass = row[Boolean](prefix + "relhassubclass"),
-        relrowsecurity = row[Boolean](prefix + "relrowsecurity"),
-        relforcerowsecurity = row[Boolean](prefix + "relforcerowsecurity"),
-        relispopulated = row[Boolean](prefix + "relispopulated"),
-        relreplident = row[String](prefix + "relreplident"),
-        relispartition = row[Boolean](prefix + "relispartition"),
-        relrewrite = row[/* oid */ Long](prefix + "relrewrite"),
-        relfrozenxid = row[/* xid */ PGobject](prefix + "relfrozenxid"),
-        relminmxid = row[/* xid */ PGobject](prefix + "relminmxid"),
-        relacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "relacl"),
-        reloptions = row[Option[Array[String]]](prefix + "reloptions"),
-        relpartbound = row[Option[/* pg_node_tree */ PGobject]](prefix + "relpartbound")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgClassRow] = new OFormat[PgClassRow]{
     override def writes(o: PgClassRow): JsObject =
       Json.obj(

@@ -9,10 +9,13 @@ package transactionhistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -46,11 +49,11 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning transactionid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[TransactionhistoryId]("transactionid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory""".as(TransactionhistoryRow.rowParser("").*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
     fieldValues match {
@@ -72,15 +75,15 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(TransactionhistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid""".as(TransactionhistoryRow.rowParser("").singleOpt)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid""".as(rowParser.singleOpt)
   }
   override def selectByIds(transactionids: List[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid in $transactionids""".as(TransactionhistoryRow.rowParser("").*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid in $transactionids""".as(rowParser.*)
   }
   override def update(transactionid: TransactionhistoryId, row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update production.transactionhistory
@@ -119,4 +122,22 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     }
   
   }
+  val rowParser: RowParser[TransactionhistoryRow] =
+    RowParser[TransactionhistoryRow] { row =>
+      Success(
+        TransactionhistoryRow(
+          transactionid = row[TransactionhistoryId]("transactionid"),
+          productid = row[ProductId]("productid"),
+          referenceorderid = row[Int]("referenceorderid"),
+          referenceorderlineid = row[Int]("referenceorderlineid"),
+          transactiondate = row[LocalDateTime]("transactiondate"),
+          transactiontype = row[/* bpchar */ String]("transactiontype"),
+          quantity = row[Int]("quantity"),
+          actualcost = row[BigDecimal]("actualcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[TransactionhistoryId] =
+    SqlParser.get[TransactionhistoryId]("transactionid")
 }

@@ -10,8 +10,6 @@ package personphone
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,14 +41,4 @@ object PersonphoneId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PersonphoneId] = { row =>
-    Success(
-      PersonphoneId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        phonenumber = row[Phone](prefix + "phonenumber"),
-        phonenumbertypeid = row[PhonenumbertypeId](prefix + "phonenumbertypeid")
-      )
-    )
-  }
-
 }

@@ -7,14 +7,23 @@ package adventureworks
 package pe
 package sp
 
+import adventureworks.person.countryregion.CountryregionId
+import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.Flag
+import adventureworks.public.Name
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SpRepoImpl extends SpRepo {
   override def selectAll(implicit c: Connection): List[SpRow] = {
-    SQL"""select id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from pe.sp""".as(SpRow.rowParser("").*)
+    SQL"""select id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from pe.sp""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpFieldOrIdValue[_]])(implicit c: Connection): List[SpRow] = {
     fieldValues match {
@@ -36,8 +45,24 @@ object SpRepoImpl extends SpRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SpRow] =
+    RowParser[SpRow] { row =>
+      Success(
+        SpRow(
+          id = row[Option[Int]]("id"),
+          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
+          stateprovincecode = row[Option[/* bpchar */ String]]("stateprovincecode"),
+          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
+          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
+          name = row[Option[Name]]("name"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

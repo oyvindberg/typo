@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package creditcard
 
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -38,19 +36,6 @@ case class CreditcardRow(
 )
 
 object CreditcardRow {
-  def rowParser(prefix: String): RowParser[CreditcardRow] = { row =>
-    Success(
-      CreditcardRow(
-        creditcardid = row[CreditcardId](prefix + "creditcardid"),
-        cardtype = row[String](prefix + "cardtype"),
-        cardnumber = row[String](prefix + "cardnumber"),
-        expmonth = row[Int](prefix + "expmonth"),
-        expyear = row[Int](prefix + "expyear"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CreditcardRow] = new OFormat[CreditcardRow]{
     override def writes(o: CreditcardRow): JsObject =
       Json.obj(

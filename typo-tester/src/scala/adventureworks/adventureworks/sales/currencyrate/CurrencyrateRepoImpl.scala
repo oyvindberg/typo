@@ -9,10 +9,13 @@ package currencyrate
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -38,11 +41,11 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           returning currencyrateid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[CurrencyrateId]("currencyrateid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate""".as(CurrencyrateRow.rowParser("").*)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
     fieldValues match {
@@ -62,15 +65,15 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CurrencyrateRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid""".as(CurrencyrateRow.rowParser("").singleOpt)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid""".as(rowParser.singleOpt)
   }
   override def selectByIds(currencyrateids: List[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid in $currencyrateids""".as(CurrencyrateRow.rowParser("").*)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid in $currencyrateids""".as(rowParser.*)
   }
   override def update(currencyrateid: CurrencyrateId, row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.currencyrate
@@ -105,4 +108,20 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     }
   
   }
+  val rowParser: RowParser[CurrencyrateRow] =
+    RowParser[CurrencyrateRow] { row =>
+      Success(
+        CurrencyrateRow(
+          currencyrateid = row[CurrencyrateId]("currencyrateid"),
+          currencyratedate = row[LocalDateTime]("currencyratedate"),
+          fromcurrencycode = row[CurrencyId]("fromcurrencycode"),
+          tocurrencycode = row[CurrencyId]("tocurrencycode"),
+          averagerate = row[BigDecimal]("averagerate"),
+          endofdayrate = row[BigDecimal]("endofdayrate"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[CurrencyrateId] =
+    SqlParser.get[CurrencyrateId]("currencyrateid")
 }

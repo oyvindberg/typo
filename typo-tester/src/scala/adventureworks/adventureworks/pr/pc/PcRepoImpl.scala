@@ -7,14 +7,20 @@ package adventureworks
 package pr
 package pc
 
+import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PcRepoImpl extends PcRepo {
   override def selectAll(implicit c: Connection): List[PcRow] = {
-    SQL"""select id, productcategoryid, name, rowguid, modifieddate from pr.pc""".as(PcRow.rowParser("").*)
+    SQL"""select id, productcategoryid, name, rowguid, modifieddate from pr.pc""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PcFieldOrIdValue[_]])(implicit c: Connection): List[PcRow] = {
     fieldValues match {
@@ -32,8 +38,20 @@ object PcRepoImpl extends PcRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PcRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PcRow] =
+    RowParser[PcRow] { row =>
+      Success(
+        PcRow(
+          id = row[Option[Int]]("id"),
+          productcategoryid = row[Option[ProductcategoryId]]("productcategoryid"),
+          name = row[Option[Name]]("name"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

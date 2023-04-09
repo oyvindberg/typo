@@ -9,10 +9,14 @@ package purchaseorderheader
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -61,11 +65,11 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           returning purchaseorderid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[PurchaseorderheaderId]("purchaseorderid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader""".as(PurchaseorderheaderRow.rowParser("").*)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     fieldValues match {
@@ -90,15 +94,15 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PurchaseorderheaderRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid""".as(PurchaseorderheaderRow.rowParser("").singleOpt)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid""".as(rowParser.singleOpt)
   }
   override def selectByIds(purchaseorderids: List[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid in $purchaseorderids""".as(PurchaseorderheaderRow.rowParser("").*)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid in $purchaseorderids""".as(rowParser.*)
   }
   override def update(purchaseorderid: PurchaseorderheaderId, row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.purchaseorderheader
@@ -143,4 +147,25 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     }
   
   }
+  val rowParser: RowParser[PurchaseorderheaderRow] =
+    RowParser[PurchaseorderheaderRow] { row =>
+      Success(
+        PurchaseorderheaderRow(
+          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
+          revisionnumber = row[Int]("revisionnumber"),
+          status = row[Int]("status"),
+          employeeid = row[BusinessentityId]("employeeid"),
+          vendorid = row[BusinessentityId]("vendorid"),
+          shipmethodid = row[ShipmethodId]("shipmethodid"),
+          orderdate = row[LocalDateTime]("orderdate"),
+          shipdate = row[Option[LocalDateTime]]("shipdate"),
+          subtotal = row[BigDecimal]("subtotal"),
+          taxamt = row[BigDecimal]("taxamt"),
+          freight = row[BigDecimal]("freight"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PurchaseorderheaderId] =
+    SqlParser.get[PurchaseorderheaderId]("purchaseorderid")
 }

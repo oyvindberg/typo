@@ -9,9 +9,13 @@ package salesorderheadersalesreason
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesreason.SalesreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +39,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason""".as(SalesorderheadersalesreasonRow.rowParser("").*)
+    SQL"""select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderheadersalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
     fieldValues match {
@@ -51,12 +55,12 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesorderheadersalesreasonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}""".as(SalesorderheadersalesreasonRow.rowParser("").singleOpt)
+    SQL"""select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: SalesorderheadersalesreasonId, row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesorderheadersalesreason
@@ -81,4 +85,23 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     }
   
   }
+  val rowParser: RowParser[SalesorderheadersalesreasonRow] =
+    RowParser[SalesorderheadersalesreasonRow] { row =>
+      Success(
+        SalesorderheadersalesreasonRow(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          salesreasonid = row[SalesreasonId]("salesreasonid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalesorderheadersalesreasonId] =
+    RowParser[SalesorderheadersalesreasonId] { row =>
+      Success(
+        SalesorderheadersalesreasonId(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          salesreasonid = row[SalesreasonId]("salesreasonid")
+        )
+      )
+    }
 }

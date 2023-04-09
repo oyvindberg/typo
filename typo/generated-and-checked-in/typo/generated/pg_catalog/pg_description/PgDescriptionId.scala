@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_description
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,14 +41,4 @@ object PgDescriptionId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PgDescriptionId] = { row =>
-    Success(
-      PgDescriptionId(
-        objoid = row[/* oid */ Long](prefix + "objoid"),
-        classoid = row[/* oid */ Long](prefix + "classoid"),
-        objsubid = row[Int](prefix + "objsubid")
-      )
-    )
-  }
-
 }

@@ -9,9 +9,14 @@ package salesorderdetail
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -49,7 +54,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
-    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail""".as(SalesorderdetailRow.rowParser("").*)
+    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderdetailRow] = {
     fieldValues match {
@@ -72,12 +77,12 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesorderdetailRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: SalesorderdetailId)(implicit c: Connection): Option[SalesorderdetailRow] = {
-    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}""".as(SalesorderdetailRow.rowParser("").singleOpt)
+    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: SalesorderdetailId, row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesorderdetail
@@ -116,4 +121,30 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
   
   }
+  val rowParser: RowParser[SalesorderdetailRow] =
+    RowParser[SalesorderdetailRow] { row =>
+      Success(
+        SalesorderdetailRow(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          salesorderdetailid = row[Int]("salesorderdetailid"),
+          carriertrackingnumber = row[Option[String]]("carriertrackingnumber"),
+          orderqty = row[Int]("orderqty"),
+          productid = row[ProductId]("productid"),
+          specialofferid = row[SpecialofferId]("specialofferid"),
+          unitprice = row[BigDecimal]("unitprice"),
+          unitpricediscount = row[BigDecimal]("unitpricediscount"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalesorderdetailId] =
+    RowParser[SalesorderdetailId] { row =>
+      Success(
+        SalesorderdetailId(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          salesorderdetailid = row[Int]("salesorderdetailid")
+        )
+      )
+    }
 }

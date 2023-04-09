@@ -10,8 +10,6 @@ package generated
 package information_schema
 package columns
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -115,57 +113,6 @@ case class ColumnsRow(
 )
 
 object ColumnsRow {
-  def rowParser(prefix: String): RowParser[ColumnsRow] = { row =>
-    Success(
-      ColumnsRow(
-        tableCatalog = row[Option[SqlIdentifier]](prefix + "table_catalog"),
-        tableSchema = row[Option[SqlIdentifier]](prefix + "table_schema"),
-        tableName = row[Option[SqlIdentifier]](prefix + "table_name"),
-        columnName = row[Option[SqlIdentifier]](prefix + "column_name"),
-        ordinalPosition = row[Option[CardinalNumber]](prefix + "ordinal_position"),
-        columnDefault = row[Option[CharacterData]](prefix + "column_default"),
-        isNullable = row[Option[YesOrNo]](prefix + "is_nullable"),
-        dataType = row[Option[CharacterData]](prefix + "data_type"),
-        characterMaximumLength = row[Option[CardinalNumber]](prefix + "character_maximum_length"),
-        characterOctetLength = row[Option[CardinalNumber]](prefix + "character_octet_length"),
-        numericPrecision = row[Option[CardinalNumber]](prefix + "numeric_precision"),
-        numericPrecisionRadix = row[Option[CardinalNumber]](prefix + "numeric_precision_radix"),
-        numericScale = row[Option[CardinalNumber]](prefix + "numeric_scale"),
-        datetimePrecision = row[Option[CardinalNumber]](prefix + "datetime_precision"),
-        intervalType = row[Option[CharacterData]](prefix + "interval_type"),
-        intervalPrecision = row[Option[CardinalNumber]](prefix + "interval_precision"),
-        characterSetCatalog = row[Option[SqlIdentifier]](prefix + "character_set_catalog"),
-        characterSetSchema = row[Option[SqlIdentifier]](prefix + "character_set_schema"),
-        characterSetName = row[Option[SqlIdentifier]](prefix + "character_set_name"),
-        collationCatalog = row[Option[SqlIdentifier]](prefix + "collation_catalog"),
-        collationSchema = row[Option[SqlIdentifier]](prefix + "collation_schema"),
-        collationName = row[Option[SqlIdentifier]](prefix + "collation_name"),
-        domainCatalog = row[Option[SqlIdentifier]](prefix + "domain_catalog"),
-        domainSchema = row[Option[SqlIdentifier]](prefix + "domain_schema"),
-        domainName = row[Option[SqlIdentifier]](prefix + "domain_name"),
-        udtCatalog = row[Option[SqlIdentifier]](prefix + "udt_catalog"),
-        udtSchema = row[Option[SqlIdentifier]](prefix + "udt_schema"),
-        udtName = row[Option[SqlIdentifier]](prefix + "udt_name"),
-        scopeCatalog = row[Option[SqlIdentifier]](prefix + "scope_catalog"),
-        scopeSchema = row[Option[SqlIdentifier]](prefix + "scope_schema"),
-        scopeName = row[Option[SqlIdentifier]](prefix + "scope_name"),
-        maximumCardinality = row[Option[CardinalNumber]](prefix + "maximum_cardinality"),
-        dtdIdentifier = row[Option[SqlIdentifier]](prefix + "dtd_identifier"),
-        isSelfReferencing = row[Option[YesOrNo]](prefix + "is_self_referencing"),
-        isIdentity = row[Option[YesOrNo]](prefix + "is_identity"),
-        identityGeneration = row[Option[CharacterData]](prefix + "identity_generation"),
-        identityStart = row[Option[CharacterData]](prefix + "identity_start"),
-        identityIncrement = row[Option[CharacterData]](prefix + "identity_increment"),
-        identityMaximum = row[Option[CharacterData]](prefix + "identity_maximum"),
-        identityMinimum = row[Option[CharacterData]](prefix + "identity_minimum"),
-        identityCycle = row[Option[YesOrNo]](prefix + "identity_cycle"),
-        isGenerated = row[Option[CharacterData]](prefix + "is_generated"),
-        generationExpression = row[Option[CharacterData]](prefix + "generation_expression"),
-        isUpdatable = row[Option[YesOrNo]](prefix + "is_updatable")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ColumnsRow] = new OFormat[ColumnsRow]{
     override def writes(o: ColumnsRow): JsObject =
       Json.obj(

@@ -11,8 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -39,11 +41,11 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           returning productdescriptionid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ProductdescriptionId]("productdescriptionid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription""".as(ProductdescriptionRow.rowParser("").*)
+    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[ProductdescriptionRow] = {
     fieldValues match {
@@ -60,15 +62,15 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductdescriptionRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Option[ProductdescriptionRow] = {
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid""".as(ProductdescriptionRow.rowParser("").singleOpt)
+    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid""".as(rowParser.singleOpt)
   }
   override def selectByIds(productdescriptionids: List[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid in $productdescriptionids""".as(ProductdescriptionRow.rowParser("").*)
+    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid in $productdescriptionids""".as(rowParser.*)
   }
   override def update(productdescriptionid: ProductdescriptionId, row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productdescription
@@ -97,4 +99,17 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     }
   
   }
+  val rowParser: RowParser[ProductdescriptionRow] =
+    RowParser[ProductdescriptionRow] { row =>
+      Success(
+        ProductdescriptionRow(
+          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
+          description = row[String]("description"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductdescriptionId] =
+    SqlParser.get[ProductdescriptionId]("productdescriptionid")
 }

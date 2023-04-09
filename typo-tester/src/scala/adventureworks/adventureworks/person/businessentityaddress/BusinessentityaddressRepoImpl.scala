@@ -9,9 +9,14 @@ package businessentityaddress
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.address.AddressId
+import adventureworks.person.addresstype.AddresstypeId
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -40,7 +45,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
-    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress""".as(BusinessentityaddressRow.rowParser("").*)
+    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentityaddressFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityaddressRow] = {
     fieldValues match {
@@ -58,12 +63,12 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BusinessentityaddressRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow] = {
-    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}""".as(BusinessentityaddressRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: BusinessentityaddressId, row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     SQL"""update person.businessentityaddress
@@ -90,4 +95,26 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     }
   
   }
+  val rowParser: RowParser[BusinessentityaddressRow] =
+    RowParser[BusinessentityaddressRow] { row =>
+      Success(
+        BusinessentityaddressRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          addressid = row[AddressId]("addressid"),
+          addresstypeid = row[AddresstypeId]("addresstypeid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[BusinessentityaddressId] =
+    RowParser[BusinessentityaddressId] { row =>
+      Success(
+        BusinessentityaddressId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          addressid = row[AddressId]("addressid"),
+          addresstypeid = row[AddresstypeId]("addresstypeid")
+        )
+      )
+    }
 }

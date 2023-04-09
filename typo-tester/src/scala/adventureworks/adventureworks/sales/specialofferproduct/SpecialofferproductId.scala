@@ -9,8 +9,6 @@ package specialofferproduct
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,13 +38,4 @@ object SpecialofferproductId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[SpecialofferproductId] = { row =>
-    Success(
-      SpecialofferproductId(
-        specialofferid = row[SpecialofferId](prefix + "specialofferid"),
-        productid = row[ProductId](prefix + "productid")
-      )
-    )
-  }
-
 }

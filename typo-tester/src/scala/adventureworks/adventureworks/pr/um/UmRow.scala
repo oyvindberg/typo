@@ -9,8 +9,6 @@ package um
 
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class UmRow(
 )
 
 object UmRow {
-  def rowParser(prefix: String): RowParser[UmRow] = { row =>
-    Success(
-      UmRow(
-        id = row[Option[/* bpchar */ String]](prefix + "id"),
-        unitmeasurecode = row[Option[UnitmeasureId]](prefix + "unitmeasurecode"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[UmRow] = new OFormat[UmRow]{
     override def writes(o: UmRow): JsObject =
       Json.obj(

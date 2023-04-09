@@ -8,8 +8,6 @@ package pr
 package i
 
 import adventureworks.production.illustration.IllustrationId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -33,17 +31,6 @@ case class IRow(
 )
 
 object IRow {
-  def rowParser(prefix: String): RowParser[IRow] = { row =>
-    Success(
-      IRow(
-        id = row[Option[Int]](prefix + "id"),
-        illustrationid = row[Option[IllustrationId]](prefix + "illustrationid"),
-        diagram = row[Option[/* xml */ String]](prefix + "diagram"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[IRow] = new OFormat[IRow]{
     override def writes(o: IRow): JsObject =
       Json.obj(

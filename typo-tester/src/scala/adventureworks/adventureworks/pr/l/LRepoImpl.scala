@@ -7,14 +7,19 @@ package adventureworks
 package pr
 package l
 
+import adventureworks.production.location.LocationId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object LRepoImpl extends LRepo {
   override def selectAll(implicit c: Connection): List[LRow] = {
-    SQL"""select id, locationid, name, costrate, availability, modifieddate from pr.l""".as(LRow.rowParser("").*)
+    SQL"""select id, locationid, name, costrate, availability, modifieddate from pr.l""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LFieldOrIdValue[_]])(implicit c: Connection): List[LRow] = {
     fieldValues match {
@@ -33,8 +38,21 @@ object LRepoImpl extends LRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(LRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[LRow] =
+    RowParser[LRow] { row =>
+      Success(
+        LRow(
+          id = row[Option[Int]]("id"),
+          locationid = row[Option[LocationId]]("locationid"),
+          name = row[Option[Name]]("name"),
+          costrate = row[Option[BigDecimal]]("costrate"),
+          availability = row[Option[BigDecimal]]("availability"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

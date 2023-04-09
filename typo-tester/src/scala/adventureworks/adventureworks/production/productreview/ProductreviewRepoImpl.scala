@@ -9,10 +9,14 @@ package productreview
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -42,11 +46,11 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           returning productreviewid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ProductreviewId]("productreviewid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview""".as(ProductreviewRow.rowParser("").*)
+    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow] = {
     fieldValues match {
@@ -67,15 +71,15 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductreviewRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview where productreviewid = $productreviewid""".as(ProductreviewRow.rowParser("").singleOpt)
+    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview where productreviewid = $productreviewid""".as(rowParser.singleOpt)
   }
   override def selectByIds(productreviewids: List[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview where productreviewid in $productreviewids""".as(ProductreviewRow.rowParser("").*)
+    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview where productreviewid in $productreviewids""".as(rowParser.*)
   }
   override def update(productreviewid: ProductreviewId, row: ProductreviewRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productreview
@@ -112,4 +116,21 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     }
   
   }
+  val rowParser: RowParser[ProductreviewRow] =
+    RowParser[ProductreviewRow] { row =>
+      Success(
+        ProductreviewRow(
+          productreviewid = row[ProductreviewId]("productreviewid"),
+          productid = row[ProductId]("productid"),
+          reviewername = row[Name]("reviewername"),
+          reviewdate = row[LocalDateTime]("reviewdate"),
+          emailaddress = row[String]("emailaddress"),
+          rating = row[Int]("rating"),
+          comments = row[Option[String]]("comments"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductreviewId] =
+    SqlParser.get[ProductreviewId]("productreviewid")
 }

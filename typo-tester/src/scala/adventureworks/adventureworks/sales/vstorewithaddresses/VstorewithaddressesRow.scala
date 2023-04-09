@@ -9,8 +9,6 @@ package vstorewithaddresses
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -46,22 +44,6 @@ case class VstorewithaddressesRow(
 )
 
 object VstorewithaddressesRow {
-  def rowParser(prefix: String): RowParser[VstorewithaddressesRow] = { row =>
-    Success(
-      VstorewithaddressesRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        name = row[Option[Name]](prefix + "name"),
-        addresstype = row[Option[Name]](prefix + "addresstype"),
-        addressline1 = row[Option[String]](prefix + "addressline1"),
-        addressline2 = row[Option[String]](prefix + "addressline2"),
-        city = row[Option[String]](prefix + "city"),
-        stateprovincename = row[Option[Name]](prefix + "stateprovincename"),
-        postalcode = row[Option[String]](prefix + "postalcode"),
-        countryregionname = row[Option[Name]](prefix + "countryregionname")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VstorewithaddressesRow] = new OFormat[VstorewithaddressesRow]{
     override def writes(o: VstorewithaddressesRow): JsObject =
       Json.obj(

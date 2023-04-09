@@ -7,14 +7,20 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sa.s""".as(SRow.rowParser("").*)
+    SQL"""select id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sa.s""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SFieldOrIdValue[_]])(implicit c: Connection): List[SRow] = {
     fieldValues match {
@@ -34,8 +40,22 @@ object SRepoImpl extends SRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SRow] =
+    RowParser[SRow] { row =>
+      Success(
+        SRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          demographics = row[Option[/* xml */ String]]("demographics"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

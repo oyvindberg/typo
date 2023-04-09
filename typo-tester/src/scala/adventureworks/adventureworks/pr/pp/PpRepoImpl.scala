@@ -7,14 +7,18 @@ package adventureworks
 package pr
 package pp
 
+import adventureworks.production.productphoto.ProductphotoId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PpRepoImpl extends PpRepo {
   override def selectAll(implicit c: Connection): List[PpRow] = {
-    SQL"""select id, productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from pr.pp""".as(PpRow.rowParser("").*)
+    SQL"""select id, productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from pr.pp""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PpFieldOrIdValue[_]])(implicit c: Connection): List[PpRow] = {
     fieldValues match {
@@ -34,8 +38,22 @@ object PpRepoImpl extends PpRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PpRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PpRow] =
+    RowParser[PpRow] { row =>
+      Success(
+        PpRow(
+          id = row[Option[Int]]("id"),
+          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
+          thumbnailphoto = row[Option[Byte]]("thumbnailphoto"),
+          thumbnailphotofilename = row[Option[String]]("thumbnailphotofilename"),
+          largephoto = row[Option[Byte]]("largephoto"),
+          largephotofilename = row[Option[String]]("largephotofilename"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

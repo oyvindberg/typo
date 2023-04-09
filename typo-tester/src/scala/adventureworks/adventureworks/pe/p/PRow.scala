@@ -10,8 +10,6 @@ package p
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -66,27 +64,6 @@ case class PRow(
 )
 
 object PRow {
-  def rowParser(prefix: String): RowParser[PRow] = { row =>
-    Success(
-      PRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        persontype = row[Option[/* bpchar */ String]](prefix + "persontype"),
-        namestyle = row[NameStyle](prefix + "namestyle"),
-        title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[Name]](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Option[Name]](prefix + "lastname"),
-        suffix = row[Option[String]](prefix + "suffix"),
-        emailpromotion = row[Option[Int]](prefix + "emailpromotion"),
-        additionalcontactinfo = row[Option[/* xml */ String]](prefix + "additionalcontactinfo"),
-        demographics = row[Option[/* xml */ String]](prefix + "demographics"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PRow] = new OFormat[PRow]{
     override def writes(o: PRow): JsObject =
       Json.obj(

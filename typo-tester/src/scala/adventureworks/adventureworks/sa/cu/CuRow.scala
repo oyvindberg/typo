@@ -9,8 +9,6 @@ package cu
 
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class CuRow(
 )
 
 object CuRow {
-  def rowParser(prefix: String): RowParser[CuRow] = { row =>
-    Success(
-      CuRow(
-        id = row[Option[/* bpchar */ String]](prefix + "id"),
-        currencycode = row[Option[CurrencyId]](prefix + "currencycode"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CuRow] = new OFormat[CuRow]{
     override def writes(o: CuRow): JsObject =
       Json.obj(

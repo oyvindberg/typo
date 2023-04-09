@@ -7,14 +7,18 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.production.illustration.IllustrationId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object IRepoImpl extends IRepo {
   override def selectAll(implicit c: Connection): List[IRow] = {
-    SQL"""select id, illustrationid, diagram, modifieddate from pr.i""".as(IRow.rowParser("").*)
+    SQL"""select id, illustrationid, diagram, modifieddate from pr.i""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IFieldOrIdValue[_]])(implicit c: Connection): List[IRow] = {
     fieldValues match {
@@ -31,8 +35,19 @@ object IRepoImpl extends IRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(IRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[IRow] =
+    RowParser[IRow] { row =>
+      Success(
+        IRow(
+          id = row[Option[Int]]("id"),
+          illustrationid = row[Option[IllustrationId]]("illustrationid"),
+          diagram = row[Option[/* xml */ String]]("diagram"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

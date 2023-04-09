@@ -7,14 +7,19 @@ package adventureworks
 package sa
 package sci
 
+import adventureworks.production.product.ProductId
+import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object SciRepoImpl extends SciRepo {
   override def selectAll(implicit c: Connection): List[SciRow] = {
-    SQL"""select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci""".as(SciRow.rowParser("").*)
+    SQL"""select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SciFieldOrIdValue[_]])(implicit c: Connection): List[SciRow] = {
     fieldValues match {
@@ -34,8 +39,22 @@ object SciRepoImpl extends SciRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SciRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SciRow] =
+    RowParser[SciRow] { row =>
+      Success(
+        SciRow(
+          id = row[Option[Int]]("id"),
+          shoppingcartitemid = row[Option[ShoppingcartitemId]]("shoppingcartitemid"),
+          shoppingcartid = row[Option[String]]("shoppingcartid"),
+          quantity = row[Option[Int]]("quantity"),
+          productid = row[Option[ProductId]]("productid"),
+          datecreated = row[Option[LocalDateTime]]("datecreated"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

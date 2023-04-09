@@ -9,9 +9,13 @@ package salesterritoryhistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,7 +45,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory""".as(SalesterritoryhistoryRow.rowParser("").*)
+    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     fieldValues match {
@@ -60,12 +64,12 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesterritoryhistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".as(SalesterritoryhistoryRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: SalesterritoryhistoryId, row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesterritoryhistory
@@ -94,4 +98,27 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     }
   
   }
+  val rowParser: RowParser[SalesterritoryhistoryRow] =
+    RowParser[SalesterritoryhistoryRow] { row =>
+      Success(
+        SalesterritoryhistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          territoryid = row[SalesterritoryId]("territoryid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalesterritoryhistoryId] =
+    RowParser[SalesterritoryhistoryId] { row =>
+      Success(
+        SalesterritoryhistoryId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          startdate = row[LocalDateTime]("startdate"),
+          territoryid = row[SalesterritoryId]("territoryid")
+        )
+      )
+    }
 }

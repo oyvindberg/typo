@@ -8,8 +8,6 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,13 +38,4 @@ object SalespersonquotahistoryId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[SalespersonquotahistoryId] = { row =>
-    Success(
-      SalespersonquotahistoryId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        quotadate = row[LocalDateTime](prefix + "quotadate")
-      )
-    )
-  }
-
 }

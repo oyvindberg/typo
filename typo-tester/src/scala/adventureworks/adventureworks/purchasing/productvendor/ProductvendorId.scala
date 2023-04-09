@@ -9,8 +9,6 @@ package productvendor
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,13 +38,4 @@ object ProductvendorId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[ProductvendorId] = { row =>
-    Success(
-      ProductvendorId(
-        productid = row[ProductId](prefix + "productid"),
-        businessentityid = row[BusinessentityId](prefix + "businessentityid")
-      )
-    )
-  }
-
 }

@@ -7,14 +7,21 @@ package adventureworks
 package sa
 package sod
 
+import adventureworks.production.product.ProductId
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SodRepoImpl extends SodRepo {
   override def selectAll(implicit c: Connection): List[SodRow] = {
-    SQL"""select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sa.sod""".as(SodRow.rowParser("").*)
+    SQL"""select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sa.sod""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SodFieldOrIdValue[_]])(implicit c: Connection): List[SodRow] = {
     fieldValues match {
@@ -38,8 +45,26 @@ object SodRepoImpl extends SodRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SodRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SodRow] =
+    RowParser[SodRow] { row =>
+      Success(
+        SodRow(
+          id = row[Option[Int]]("id"),
+          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
+          salesorderdetailid = row[Option[Int]]("salesorderdetailid"),
+          carriertrackingnumber = row[Option[String]]("carriertrackingnumber"),
+          orderqty = row[Option[Int]]("orderqty"),
+          productid = row[Option[ProductId]]("productid"),
+          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
+          unitprice = row[Option[BigDecimal]]("unitprice"),
+          unitpricediscount = row[Option[BigDecimal]]("unitpricediscount"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

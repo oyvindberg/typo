@@ -8,8 +8,6 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,13 +38,4 @@ object EmployeepayhistoryId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[EmployeepayhistoryId] = { row =>
-    Success(
-      EmployeepayhistoryId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        ratechangedate = row[LocalDateTime](prefix + "ratechangedate")
-      )
-    )
-  }
-
 }

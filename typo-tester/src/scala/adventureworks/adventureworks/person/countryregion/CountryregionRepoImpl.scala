@@ -9,9 +9,13 @@ package countryregion
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -36,7 +40,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion""".as(CountryregionRow.rowParser("").*)
+    SQL"""select countryregioncode, name, modifieddate from person.countryregion""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow] = {
     fieldValues match {
@@ -52,15 +56,15 @@ object CountryregionRepoImpl extends CountryregionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CountryregionRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode""".as(CountryregionRow.rowParser("").singleOpt)
+    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode""".as(rowParser.singleOpt)
   }
   override def selectByIds(countryregioncodes: List[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode in $countryregioncodes""".as(CountryregionRow.rowParser("").*)
+    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode in $countryregioncodes""".as(rowParser.*)
   }
   override def update(countryregioncode: CountryregionId, row: CountryregionRow)(implicit c: Connection): Boolean = {
     SQL"""update person.countryregion
@@ -87,4 +91,16 @@ object CountryregionRepoImpl extends CountryregionRepo {
     }
   
   }
+  val rowParser: RowParser[CountryregionRow] =
+    RowParser[CountryregionRow] { row =>
+      Success(
+        CountryregionRow(
+          countryregioncode = row[CountryregionId]("countryregioncode"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[CountryregionId] =
+    SqlParser.get[CountryregionId]("countryregioncode")
 }

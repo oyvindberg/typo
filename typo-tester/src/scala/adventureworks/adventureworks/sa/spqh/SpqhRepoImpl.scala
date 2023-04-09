@@ -7,14 +7,19 @@ package adventureworks
 package sa
 package spqh
 
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SpqhRepoImpl extends SpqhRepo {
   override def selectAll(implicit c: Connection): List[SpqhRow] = {
-    SQL"""select id, businessentityid, quotadate, salesquota, rowguid, modifieddate from sa.spqh""".as(SpqhRow.rowParser("").*)
+    SQL"""select id, businessentityid, quotadate, salesquota, rowguid, modifieddate from sa.spqh""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpqhFieldOrIdValue[_]])(implicit c: Connection): List[SpqhRow] = {
     fieldValues match {
@@ -33,8 +38,21 @@ object SpqhRepoImpl extends SpqhRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpqhRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SpqhRow] =
+    RowParser[SpqhRow] { row =>
+      Success(
+        SpqhRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          quotadate = row[Option[LocalDateTime]]("quotadate"),
+          salesquota = row[Option[BigDecimal]]("salesquota"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

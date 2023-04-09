@@ -10,8 +10,6 @@ package generated
 package pg_catalog
 package pg_attribute
 
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -78,39 +76,6 @@ case class PgAttributeRow(
  }
 
 object PgAttributeRow {
-  def rowParser(prefix: String): RowParser[PgAttributeRow] = { row =>
-    Success(
-      PgAttributeRow(
-        attrelid = row[/* oid */ Long](prefix + "attrelid"),
-        attname = row[String](prefix + "attname"),
-        atttypid = row[/* oid */ Long](prefix + "atttypid"),
-        attstattarget = row[Int](prefix + "attstattarget"),
-        attlen = row[Int](prefix + "attlen"),
-        attnum = row[Int](prefix + "attnum"),
-        attndims = row[Int](prefix + "attndims"),
-        attcacheoff = row[Int](prefix + "attcacheoff"),
-        atttypmod = row[Int](prefix + "atttypmod"),
-        attbyval = row[Boolean](prefix + "attbyval"),
-        attalign = row[String](prefix + "attalign"),
-        attstorage = row[String](prefix + "attstorage"),
-        attcompression = row[String](prefix + "attcompression"),
-        attnotnull = row[Boolean](prefix + "attnotnull"),
-        atthasdef = row[Boolean](prefix + "atthasdef"),
-        atthasmissing = row[Boolean](prefix + "atthasmissing"),
-        attidentity = row[String](prefix + "attidentity"),
-        attgenerated = row[String](prefix + "attgenerated"),
-        attisdropped = row[Boolean](prefix + "attisdropped"),
-        attislocal = row[Boolean](prefix + "attislocal"),
-        attinhcount = row[Int](prefix + "attinhcount"),
-        attcollation = row[/* oid */ Long](prefix + "attcollation"),
-        attacl = row[Option[Array[/* aclitem */ PGobject]]](prefix + "attacl"),
-        attoptions = row[Option[Array[String]]](prefix + "attoptions"),
-        attfdwoptions = row[Option[Array[String]]](prefix + "attfdwoptions"),
-        attmissingval = row[Option[/* anyarray */ PGobject]](prefix + "attmissingval")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PgAttributeRow] = new OFormat[PgAttributeRow]{
     override def writes(o: PgAttributeRow): JsObject =
       Json.obj(

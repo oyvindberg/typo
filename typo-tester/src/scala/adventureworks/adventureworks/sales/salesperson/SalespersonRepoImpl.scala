@@ -9,9 +9,14 @@ package salesperson
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -58,7 +63,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson""".as(SalespersonRow.rowParser("").*)
+    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow] = {
     fieldValues match {
@@ -80,15 +85,15 @@ object SalespersonRepoImpl extends SalespersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalespersonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: SalespersonId)(implicit c: Connection): Option[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid""".as(SalespersonRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[SalespersonId])(implicit c: Connection): List[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid in $businessentityids""".as(SalespersonRow.rowParser("").*)
+    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: SalespersonId, row: SalespersonRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesperson
@@ -127,4 +132,22 @@ object SalespersonRepoImpl extends SalespersonRepo {
     }
   
   }
+  val rowParser: RowParser[SalespersonRow] =
+    RowParser[SalespersonRow] { row =>
+      Success(
+        SalespersonRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          salesquota = row[Option[BigDecimal]]("salesquota"),
+          bonus = row[BigDecimal]("bonus"),
+          commissionpct = row[BigDecimal]("commissionpct"),
+          salesytd = row[BigDecimal]("salesytd"),
+          saleslastyear = row[BigDecimal]("saleslastyear"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalespersonId] =
+    SqlParser.get[SalespersonId]("businessentityid")
 }

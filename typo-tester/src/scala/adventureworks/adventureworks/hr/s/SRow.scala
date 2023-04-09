@@ -9,8 +9,6 @@ package s
 
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.time.LocalTime
 import play.api.libs.json.JsObject
@@ -41,19 +39,6 @@ case class SRow(
 )
 
 object SRow {
-  def rowParser(prefix: String): RowParser[SRow] = { row =>
-    Success(
-      SRow(
-        id = row[Option[Int]](prefix + "id"),
-        shiftid = row[Option[ShiftId]](prefix + "shiftid"),
-        name = row[Option[Name]](prefix + "name"),
-        starttime = row[Option[LocalTime]](prefix + "starttime"),
-        endtime = row[Option[LocalTime]](prefix + "endtime"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SRow] = new OFormat[SRow]{
     override def writes(o: SRow): JsObject =
       Json.obj(

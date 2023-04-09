@@ -9,8 +9,6 @@ package sci
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -43,20 +41,6 @@ case class SciRow(
 )
 
 object SciRow {
-  def rowParser(prefix: String): RowParser[SciRow] = { row =>
-    Success(
-      SciRow(
-        id = row[Option[Int]](prefix + "id"),
-        shoppingcartitemid = row[Option[ShoppingcartitemId]](prefix + "shoppingcartitemid"),
-        shoppingcartid = row[Option[String]](prefix + "shoppingcartid"),
-        quantity = row[Option[Int]](prefix + "quantity"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        datecreated = row[Option[LocalDateTime]](prefix + "datecreated"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SciRow] = new OFormat[SciRow]{
     override def writes(o: SciRow): JsObject =
       Json.obj(

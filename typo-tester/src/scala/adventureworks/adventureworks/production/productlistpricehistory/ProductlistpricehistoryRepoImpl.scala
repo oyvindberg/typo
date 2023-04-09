@@ -9,9 +9,12 @@ package productlistpricehistory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -37,7 +40,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory""".as(ProductlistpricehistoryRow.rowParser("").*)
+    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductlistpricehistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductlistpricehistoryRow] = {
     fieldValues match {
@@ -55,12 +58,12 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductlistpricehistoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(ProductlistpricehistoryRow.rowParser("").singleOpt)
+    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductlistpricehistoryId, row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productlistpricehistory
@@ -89,4 +92,25 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     }
   
   }
+  val rowParser: RowParser[ProductlistpricehistoryRow] =
+    RowParser[ProductlistpricehistoryRow] { row =>
+      Success(
+        ProductlistpricehistoryRow(
+          productid = row[ProductId]("productid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          listprice = row[BigDecimal]("listprice"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductlistpricehistoryId] =
+    RowParser[ProductlistpricehistoryId] { row =>
+      Success(
+        ProductlistpricehistoryId(
+          productid = row[ProductId]("productid"),
+          startdate = row[LocalDateTime]("startdate")
+        )
+      )
+    }
 }

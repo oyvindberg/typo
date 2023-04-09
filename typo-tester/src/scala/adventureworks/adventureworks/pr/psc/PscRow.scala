@@ -10,8 +10,6 @@ package psc
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -42,19 +40,6 @@ case class PscRow(
 )
 
 object PscRow {
-  def rowParser(prefix: String): RowParser[PscRow] = { row =>
-    Success(
-      PscRow(
-        id = row[Option[Int]](prefix + "id"),
-        productsubcategoryid = row[Option[ProductsubcategoryId]](prefix + "productsubcategoryid"),
-        productcategoryid = row[Option[ProductcategoryId]](prefix + "productcategoryid"),
-        name = row[Option[Name]](prefix + "name"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PscRow] = new OFormat[PscRow]{
     override def writes(o: PscRow): JsObject =
       Json.obj(

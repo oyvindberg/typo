@@ -7,14 +7,18 @@ package adventureworks
 package purchasing
 package vvendorwithaddresses
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object VvendorwithaddressesRepoImpl extends VvendorwithaddressesRepo {
   override def selectAll(implicit c: Connection): List[VvendorwithaddressesRow] = {
-    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from purchasing.vvendorwithaddresses""".as(VvendorwithaddressesRow.rowParser("").*)
+    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from purchasing.vvendorwithaddresses""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VvendorwithaddressesFieldOrIdValue[_]])(implicit c: Connection): List[VvendorwithaddressesRow] = {
     fieldValues match {
@@ -36,8 +40,24 @@ object VvendorwithaddressesRepoImpl extends VvendorwithaddressesRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VvendorwithaddressesRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VvendorwithaddressesRow] =
+    RowParser[VvendorwithaddressesRow] { row =>
+      Success(
+        VvendorwithaddressesRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          addresstype = row[Option[Name]]("addresstype"),
+          addressline1 = row[Option[String]]("addressline1"),
+          addressline2 = row[Option[String]]("addressline2"),
+          city = row[Option[String]]("city"),
+          stateprovincename = row[Option[Name]]("stateprovincename"),
+          postalcode = row[Option[String]]("postalcode"),
+          countryregionname = row[Option[Name]]("countryregionname")
+        )
+      )
+    }
 }

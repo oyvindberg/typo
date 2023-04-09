@@ -9,8 +9,6 @@ package pod
 
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -52,23 +50,6 @@ case class PodRow(
 )
 
 object PodRow {
-  def rowParser(prefix: String): RowParser[PodRow] = { row =>
-    Success(
-      PodRow(
-        id = row[Option[Int]](prefix + "id"),
-        purchaseorderid = row[Option[PurchaseorderheaderId]](prefix + "purchaseorderid"),
-        purchaseorderdetailid = row[Option[Int]](prefix + "purchaseorderdetailid"),
-        duedate = row[Option[LocalDateTime]](prefix + "duedate"),
-        orderqty = row[Option[Int]](prefix + "orderqty"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        unitprice = row[Option[BigDecimal]](prefix + "unitprice"),
-        receivedqty = row[Option[BigDecimal]](prefix + "receivedqty"),
-        rejectedqty = row[Option[BigDecimal]](prefix + "rejectedqty"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PodRow] = new OFormat[PodRow]{
     override def writes(o: PodRow): JsObject =
       Json.obj(

@@ -8,8 +8,6 @@ package purchasing
 package shipmethod
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -39,19 +37,6 @@ case class ShipmethodRow(
 )
 
 object ShipmethodRow {
-  def rowParser(prefix: String): RowParser[ShipmethodRow] = { row =>
-    Success(
-      ShipmethodRow(
-        shipmethodid = row[ShipmethodId](prefix + "shipmethodid"),
-        name = row[Name](prefix + "name"),
-        shipbase = row[BigDecimal](prefix + "shipbase"),
-        shiprate = row[BigDecimal](prefix + "shiprate"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ShipmethodRow] = new OFormat[ShipmethodRow]{
     override def writes(o: ShipmethodRow): JsObject =
       Json.obj(

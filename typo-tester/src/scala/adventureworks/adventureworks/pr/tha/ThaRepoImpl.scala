@@ -7,14 +7,18 @@ package adventureworks
 package pr
 package tha
 
+import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object ThaRepoImpl extends ThaRepo {
   override def selectAll(implicit c: Connection): List[ThaRow] = {
-    SQL"""select id, transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.tha""".as(ThaRow.rowParser("").*)
+    SQL"""select id, transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.tha""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ThaFieldOrIdValue[_]])(implicit c: Connection): List[ThaRow] = {
     fieldValues match {
@@ -37,8 +41,25 @@ object ThaRepoImpl extends ThaRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ThaRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[ThaRow] =
+    RowParser[ThaRow] { row =>
+      Success(
+        ThaRow(
+          id = row[Option[Int]]("id"),
+          transactionid = row[Option[TransactionhistoryarchiveId]]("transactionid"),
+          productid = row[Option[Int]]("productid"),
+          referenceorderid = row[Option[Int]]("referenceorderid"),
+          referenceorderlineid = row[Option[Int]]("referenceorderlineid"),
+          transactiondate = row[Option[LocalDateTime]]("transactiondate"),
+          transactiontype = row[Option[/* bpchar */ String]]("transactiontype"),
+          quantity = row[Option[Int]]("quantity"),
+          actualcost = row[Option[BigDecimal]]("actualcost"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

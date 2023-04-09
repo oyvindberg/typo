@@ -7,14 +7,19 @@ package adventureworks
 package pr
 package pdoc
 
+import adventureworks.production.document.DocumentId
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PdocRepoImpl extends PdocRepo {
   override def selectAll(implicit c: Connection): List[PdocRow] = {
-    SQL"""select id, productid, modifieddate, documentnode from pr.pdoc""".as(PdocRow.rowParser("").*)
+    SQL"""select id, productid, modifieddate, documentnode from pr.pdoc""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdocFieldOrIdValue[_]])(implicit c: Connection): List[PdocRow] = {
     fieldValues match {
@@ -31,8 +36,19 @@ object PdocRepoImpl extends PdocRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PdocRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PdocRow] =
+    RowParser[PdocRow] { row =>
+      Success(
+        PdocRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          documentnode = row[Option[DocumentId]]("documentnode")
+        )
+      )
+    }
 }

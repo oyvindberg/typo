@@ -11,8 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -52,11 +54,11 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           returning specialofferid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[SpecialofferId]("specialofferid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer""".as(SpecialofferRow.rowParser("").*)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow] = {
     fieldValues match {
@@ -80,15 +82,15 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpecialofferRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".as(SpecialofferRow.rowParser("").singleOpt)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".as(rowParser.singleOpt)
   }
   override def selectByIds(specialofferids: List[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid in $specialofferids""".as(SpecialofferRow.rowParser("").*)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid in $specialofferids""".as(rowParser.*)
   }
   override def update(specialofferid: SpecialofferId, row: SpecialofferRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.specialoffer
@@ -131,4 +133,24 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     }
   
   }
+  val rowParser: RowParser[SpecialofferRow] =
+    RowParser[SpecialofferRow] { row =>
+      Success(
+        SpecialofferRow(
+          specialofferid = row[SpecialofferId]("specialofferid"),
+          description = row[String]("description"),
+          discountpct = row[BigDecimal]("discountpct"),
+          `type` = row[String]("type"),
+          category = row[String]("category"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[LocalDateTime]("enddate"),
+          minqty = row[Int]("minqty"),
+          maxqty = row[Option[Int]]("maxqty"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SpecialofferId] =
+    SqlParser.get[SpecialofferId]("specialofferid")
 }

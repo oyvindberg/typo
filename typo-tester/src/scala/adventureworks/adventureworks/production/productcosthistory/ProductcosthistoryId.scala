@@ -8,8 +8,6 @@ package production
 package productcosthistory
 
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,13 +38,4 @@ object ProductcosthistoryId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[ProductcosthistoryId] = { row =>
-    Success(
-      ProductcosthistoryId(
-        productid = row[ProductId](prefix + "productid"),
-        startdate = row[LocalDateTime](prefix + "startdate")
-      )
-    )
-  }
-
 }

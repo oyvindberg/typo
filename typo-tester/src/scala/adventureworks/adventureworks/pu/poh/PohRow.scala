@@ -10,8 +10,6 @@ package poh
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -62,26 +60,6 @@ case class PohRow(
 )
 
 object PohRow {
-  def rowParser(prefix: String): RowParser[PohRow] = { row =>
-    Success(
-      PohRow(
-        id = row[Option[Int]](prefix + "id"),
-        purchaseorderid = row[Option[PurchaseorderheaderId]](prefix + "purchaseorderid"),
-        revisionnumber = row[Option[Int]](prefix + "revisionnumber"),
-        status = row[Option[Int]](prefix + "status"),
-        employeeid = row[Option[BusinessentityId]](prefix + "employeeid"),
-        vendorid = row[Option[BusinessentityId]](prefix + "vendorid"),
-        shipmethodid = row[Option[ShipmethodId]](prefix + "shipmethodid"),
-        orderdate = row[Option[LocalDateTime]](prefix + "orderdate"),
-        shipdate = row[Option[LocalDateTime]](prefix + "shipdate"),
-        subtotal = row[Option[BigDecimal]](prefix + "subtotal"),
-        taxamt = row[Option[BigDecimal]](prefix + "taxamt"),
-        freight = row[Option[BigDecimal]](prefix + "freight"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PohRow] = new OFormat[PohRow]{
     override def writes(o: PohRow): JsObject =
       Json.obj(

@@ -9,8 +9,6 @@ package salesterritoryhistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -43,14 +41,4 @@ object SalesterritoryhistoryId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[SalesterritoryhistoryId] = { row =>
-    Success(
-      SalesterritoryhistoryId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        startdate = row[LocalDateTime](prefix + "startdate"),
-        territoryid = row[SalesterritoryId](prefix + "territoryid")
-      )
-    )
-  }
-
 }

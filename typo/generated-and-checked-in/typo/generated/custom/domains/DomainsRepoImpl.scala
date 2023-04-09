@@ -10,7 +10,9 @@ package generated
 package custom
 package domains
 
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object DomainsRepoImpl extends DomainsRepo {
@@ -29,7 +31,22 @@ object DomainsRepoImpl extends DomainsRepo {
                        left join pg_collation pc on typ.typcollation = pc.oid
                        left JOIN pg_catalog.pg_constraint con ON con.contypid = typ.oid
               """
-    sql.as(DomainsRow.rowParser("").*)
+    sql.as(rowParser.*)
   
   }
+  val rowParser: RowParser[DomainsRow] =
+    RowParser[DomainsRow] { row =>
+      Success(
+        DomainsRow(
+          schema = row[String]("schema"),
+          name = row[String]("name"),
+          `type` = row[String]("type"),
+          collation = row[Option[String]]("collation"),
+          isNotNull = row[Boolean]("isNotNull"),
+          default = row[Option[String]]("default"),
+          constraintName = row[Option[String]]("constraintName"),
+          constraintDefinition = row[/* nullability unknown */ Option[String]]("constraintDefinition")
+        )
+      )
+    }
 }

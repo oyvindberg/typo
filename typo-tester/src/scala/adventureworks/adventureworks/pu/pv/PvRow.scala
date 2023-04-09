@@ -10,8 +10,6 @@ package pv
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -59,25 +57,6 @@ case class PvRow(
 )
 
 object PvRow {
-  def rowParser(prefix: String): RowParser[PvRow] = { row =>
-    Success(
-      PvRow(
-        id = row[Option[Int]](prefix + "id"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        averageleadtime = row[Option[Int]](prefix + "averageleadtime"),
-        standardprice = row[Option[BigDecimal]](prefix + "standardprice"),
-        lastreceiptcost = row[Option[BigDecimal]](prefix + "lastreceiptcost"),
-        lastreceiptdate = row[Option[LocalDateTime]](prefix + "lastreceiptdate"),
-        minorderqty = row[Option[Int]](prefix + "minorderqty"),
-        maxorderqty = row[Option[Int]](prefix + "maxorderqty"),
-        onorderqty = row[Option[Int]](prefix + "onorderqty"),
-        unitmeasurecode = row[Option[UnitmeasureId]](prefix + "unitmeasurecode"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PvRow] = new OFormat[PvRow]{
     override def writes(o: PvRow): JsObject =
       Json.obj(

@@ -9,10 +9,13 @@ package scrapreason
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -34,11 +37,11 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning scrapreasonid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[ScrapreasonId]("scrapreasonid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason""".as(ScrapreasonRow.rowParser("").*)
+    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow] = {
     fieldValues match {
@@ -54,15 +57,15 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ScrapreasonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".as(ScrapreasonRow.rowParser("").singleOpt)
+    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".as(rowParser.singleOpt)
   }
   override def selectByIds(scrapreasonids: List[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid in $scrapreasonids""".as(ScrapreasonRow.rowParser("").*)
+    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid in $scrapreasonids""".as(rowParser.*)
   }
   override def update(scrapreasonid: ScrapreasonId, row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     SQL"""update production.scrapreason
@@ -89,4 +92,16 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     }
   
   }
+  val rowParser: RowParser[ScrapreasonRow] =
+    RowParser[ScrapreasonRow] { row =>
+      Success(
+        ScrapreasonRow(
+          scrapreasonid = row[ScrapreasonId]("scrapreasonid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ScrapreasonId] =
+    SqlParser.get[ScrapreasonId]("scrapreasonid")
 }

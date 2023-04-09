@@ -10,8 +10,11 @@ package generated
 package custom
 package view_column_dependencies
 
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object ViewColumnDependenciesRepoImpl extends ViewColumnDependenciesRepo {
   override def apply()(implicit c: Connection): List[ViewColumnDependenciesRow] = {
@@ -30,7 +33,19 @@ object ViewColumnDependenciesRepoImpl extends ViewColumnDependenciesRepo {
                   AND rewrite.is_instead -- INSTEAD rule
               ;
               """
-    sql.as(ViewColumnDependenciesRow.rowParser("").*)
+    sql.as(rowParser.*)
   
   }
+  val rowParser: RowParser[ViewColumnDependenciesRow] =
+    RowParser[ViewColumnDependenciesRow] { row =>
+      Success(
+        ViewColumnDependenciesRow(
+          viewSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]]("view_schema"),
+          viewName = row[String]("view_name"),
+          tableSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]]("table_schema"),
+          tableName = row[String]("table_name"),
+          columnName = row[String]("column_name")
+        )
+      )
+    }
 }

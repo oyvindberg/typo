@@ -12,12 +12,18 @@ package columns
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import typo.generated.information_schema.CardinalNumber
+import typo.generated.information_schema.CharacterData
+import typo.generated.information_schema.SqlIdentifier
+import typo.generated.information_schema.YesOrNo
 
 object ColumnsRepoImpl extends ColumnsRepo {
   override def selectAll(implicit c: Connection): List[ColumnsRow] = {
-    SQL"""select table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, character_octet_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, domain_catalog, domain_schema, domain_name, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_self_referencing, is_identity, identity_generation, identity_start, identity_increment, identity_maximum, identity_minimum, identity_cycle, is_generated, generation_expression, is_updatable from information_schema.columns""".as(ColumnsRow.rowParser("").*)
+    SQL"""select table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, character_octet_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, domain_catalog, domain_schema, domain_name, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_self_referencing, is_identity, identity_generation, identity_start, identity_increment, identity_maximum, identity_minimum, identity_cycle, is_generated, generation_expression, is_updatable from information_schema.columns""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ColumnsFieldOrIdValue[_]])(implicit c: Connection): List[ColumnsRow] = {
     fieldValues match {
@@ -74,8 +80,59 @@ object ColumnsRepoImpl extends ColumnsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ColumnsRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[ColumnsRow] =
+    RowParser[ColumnsRow] { row =>
+      Success(
+        ColumnsRow(
+          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
+          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
+          tableName = row[Option[SqlIdentifier]]("table_name"),
+          columnName = row[Option[SqlIdentifier]]("column_name"),
+          ordinalPosition = row[Option[CardinalNumber]]("ordinal_position"),
+          columnDefault = row[Option[CharacterData]]("column_default"),
+          isNullable = row[Option[YesOrNo]]("is_nullable"),
+          dataType = row[Option[CharacterData]]("data_type"),
+          characterMaximumLength = row[Option[CardinalNumber]]("character_maximum_length"),
+          characterOctetLength = row[Option[CardinalNumber]]("character_octet_length"),
+          numericPrecision = row[Option[CardinalNumber]]("numeric_precision"),
+          numericPrecisionRadix = row[Option[CardinalNumber]]("numeric_precision_radix"),
+          numericScale = row[Option[CardinalNumber]]("numeric_scale"),
+          datetimePrecision = row[Option[CardinalNumber]]("datetime_precision"),
+          intervalType = row[Option[CharacterData]]("interval_type"),
+          intervalPrecision = row[Option[CardinalNumber]]("interval_precision"),
+          characterSetCatalog = row[Option[SqlIdentifier]]("character_set_catalog"),
+          characterSetSchema = row[Option[SqlIdentifier]]("character_set_schema"),
+          characterSetName = row[Option[SqlIdentifier]]("character_set_name"),
+          collationCatalog = row[Option[SqlIdentifier]]("collation_catalog"),
+          collationSchema = row[Option[SqlIdentifier]]("collation_schema"),
+          collationName = row[Option[SqlIdentifier]]("collation_name"),
+          domainCatalog = row[Option[SqlIdentifier]]("domain_catalog"),
+          domainSchema = row[Option[SqlIdentifier]]("domain_schema"),
+          domainName = row[Option[SqlIdentifier]]("domain_name"),
+          udtCatalog = row[Option[SqlIdentifier]]("udt_catalog"),
+          udtSchema = row[Option[SqlIdentifier]]("udt_schema"),
+          udtName = row[Option[SqlIdentifier]]("udt_name"),
+          scopeCatalog = row[Option[SqlIdentifier]]("scope_catalog"),
+          scopeSchema = row[Option[SqlIdentifier]]("scope_schema"),
+          scopeName = row[Option[SqlIdentifier]]("scope_name"),
+          maximumCardinality = row[Option[CardinalNumber]]("maximum_cardinality"),
+          dtdIdentifier = row[Option[SqlIdentifier]]("dtd_identifier"),
+          isSelfReferencing = row[Option[YesOrNo]]("is_self_referencing"),
+          isIdentity = row[Option[YesOrNo]]("is_identity"),
+          identityGeneration = row[Option[CharacterData]]("identity_generation"),
+          identityStart = row[Option[CharacterData]]("identity_start"),
+          identityIncrement = row[Option[CharacterData]]("identity_increment"),
+          identityMaximum = row[Option[CharacterData]]("identity_maximum"),
+          identityMinimum = row[Option[CharacterData]]("identity_minimum"),
+          identityCycle = row[Option[YesOrNo]]("identity_cycle"),
+          isGenerated = row[Option[CharacterData]]("is_generated"),
+          generationExpression = row[Option[CharacterData]]("generation_expression"),
+          isUpdatable = row[Option[YesOrNo]]("is_updatable")
+        )
+      )
+    }
 }

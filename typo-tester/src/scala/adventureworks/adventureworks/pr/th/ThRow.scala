@@ -9,8 +9,6 @@ package th
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -52,23 +50,6 @@ case class ThRow(
 )
 
 object ThRow {
-  def rowParser(prefix: String): RowParser[ThRow] = { row =>
-    Success(
-      ThRow(
-        id = row[Option[Int]](prefix + "id"),
-        transactionid = row[Option[TransactionhistoryId]](prefix + "transactionid"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        referenceorderid = row[Option[Int]](prefix + "referenceorderid"),
-        referenceorderlineid = row[Option[Int]](prefix + "referenceorderlineid"),
-        transactiondate = row[Option[LocalDateTime]](prefix + "transactiondate"),
-        transactiontype = row[Option[/* bpchar */ String]](prefix + "transactiontype"),
-        quantity = row[Option[Int]](prefix + "quantity"),
-        actualcost = row[Option[BigDecimal]](prefix + "actualcost"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ThRow] = new OFormat[ThRow]{
     override def writes(o: ThRow): JsObject =
       Json.obj(

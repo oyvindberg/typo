@@ -12,8 +12,12 @@ package pg_class
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
@@ -63,7 +67,7 @@ object PgClassRepoImpl extends PgClassRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
-    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class""".as(PgClassRow.rowParser("").*)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgClassFieldOrIdValue[_]])(implicit c: Connection): List[PgClassRow] = {
     fieldValues match {
@@ -109,15 +113,15 @@ object PgClassRepoImpl extends PgClassRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgClassRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow] = {
-    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = $oid""".as(PgClassRow.rowParser("").singleOpt)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = $oid""".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: List[PgClassId])(implicit c: Connection): List[PgClassRow] = {
-    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid in $oids""".as(PgClassRow.rowParser("").*)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid in $oids""".as(rowParser.*)
   }
   override def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow] = {
     selectByFieldValues(List(PgClassFieldValue.relname(relname), PgClassFieldValue.relnamespace(relnamespace))).headOption
@@ -207,4 +211,46 @@ object PgClassRepoImpl extends PgClassRepo {
     }
   
   }
+  val rowParser: RowParser[PgClassRow] =
+    RowParser[PgClassRow] { row =>
+      Success(
+        PgClassRow(
+          oid = row[PgClassId]("oid"),
+          relname = row[String]("relname"),
+          relnamespace = row[/* oid */ Long]("relnamespace"),
+          reltype = row[/* oid */ Long]("reltype"),
+          reloftype = row[/* oid */ Long]("reloftype"),
+          relowner = row[/* oid */ Long]("relowner"),
+          relam = row[/* oid */ Long]("relam"),
+          relfilenode = row[/* oid */ Long]("relfilenode"),
+          reltablespace = row[/* oid */ Long]("reltablespace"),
+          relpages = row[Int]("relpages"),
+          reltuples = row[Float]("reltuples"),
+          relallvisible = row[Int]("relallvisible"),
+          reltoastrelid = row[/* oid */ Long]("reltoastrelid"),
+          relhasindex = row[Boolean]("relhasindex"),
+          relisshared = row[Boolean]("relisshared"),
+          relpersistence = row[String]("relpersistence"),
+          relkind = row[String]("relkind"),
+          relnatts = row[Int]("relnatts"),
+          relchecks = row[Int]("relchecks"),
+          relhasrules = row[Boolean]("relhasrules"),
+          relhastriggers = row[Boolean]("relhastriggers"),
+          relhassubclass = row[Boolean]("relhassubclass"),
+          relrowsecurity = row[Boolean]("relrowsecurity"),
+          relforcerowsecurity = row[Boolean]("relforcerowsecurity"),
+          relispopulated = row[Boolean]("relispopulated"),
+          relreplident = row[String]("relreplident"),
+          relispartition = row[Boolean]("relispartition"),
+          relrewrite = row[/* oid */ Long]("relrewrite"),
+          relfrozenxid = row[/* xid */ PGobject]("relfrozenxid"),
+          relminmxid = row[/* xid */ PGobject]("relminmxid"),
+          relacl = row[Option[Array[/* aclitem */ PGobject]]]("relacl"),
+          reloptions = row[Option[Array[String]]]("reloptions"),
+          relpartbound = row[Option[/* pg_node_tree */ PGobject]]("relpartbound")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgClassId] =
+    SqlParser.get[PgClassId]("oid")
 }

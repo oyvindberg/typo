@@ -10,8 +10,6 @@ package pr
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -50,22 +48,6 @@ case class PrRow(
 )
 
 object PrRow {
-  def rowParser(prefix: String): RowParser[PrRow] = { row =>
-    Success(
-      PrRow(
-        id = row[Option[Int]](prefix + "id"),
-        productreviewid = row[Option[ProductreviewId]](prefix + "productreviewid"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        reviewername = row[Option[Name]](prefix + "reviewername"),
-        reviewdate = row[Option[LocalDateTime]](prefix + "reviewdate"),
-        emailaddress = row[Option[String]](prefix + "emailaddress"),
-        rating = row[Option[Int]](prefix + "rating"),
-        comments = row[Option[String]](prefix + "comments"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PrRow] = new OFormat[PrRow]{
     override def writes(o: PrRow): JsObject =
       Json.obj(

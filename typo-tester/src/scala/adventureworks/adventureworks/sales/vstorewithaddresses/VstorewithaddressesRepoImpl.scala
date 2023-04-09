@@ -7,14 +7,18 @@ package adventureworks
 package sales
 package vstorewithaddresses
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object VstorewithaddressesRepoImpl extends VstorewithaddressesRepo {
   override def selectAll(implicit c: Connection): List[VstorewithaddressesRow] = {
-    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".as(VstorewithaddressesRow.rowParser("").*)
+    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithaddressesFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesRow] = {
     fieldValues match {
@@ -36,8 +40,24 @@ object VstorewithaddressesRepoImpl extends VstorewithaddressesRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VstorewithaddressesRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VstorewithaddressesRow] =
+    RowParser[VstorewithaddressesRow] { row =>
+      Success(
+        VstorewithaddressesRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          addresstype = row[Option[Name]]("addresstype"),
+          addressline1 = row[Option[String]]("addressline1"),
+          addressline2 = row[Option[String]]("addressline2"),
+          city = row[Option[String]]("city"),
+          stateprovincename = row[Option[Name]]("stateprovincename"),
+          postalcode = row[Option[String]]("postalcode"),
+          countryregionname = row[Option[Name]]("countryregionname")
+        )
+      )
+    }
 }

@@ -7,14 +7,18 @@ package adventureworks
 package pr
 package pch
 
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PchRepoImpl extends PchRepo {
   override def selectAll(implicit c: Connection): List[PchRow] = {
-    SQL"""select id, productid, startdate, enddate, standardcost, modifieddate from pr.pch""".as(PchRow.rowParser("").*)
+    SQL"""select id, productid, startdate, enddate, standardcost, modifieddate from pr.pch""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PchFieldOrIdValue[_]])(implicit c: Connection): List[PchRow] = {
     fieldValues match {
@@ -33,8 +37,21 @@ object PchRepoImpl extends PchRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PchRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PchRow] =
+    RowParser[PchRow] { row =>
+      Success(
+        PchRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          startdate = row[Option[LocalDateTime]]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          standardcost = row[Option[BigDecimal]]("standardcost"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

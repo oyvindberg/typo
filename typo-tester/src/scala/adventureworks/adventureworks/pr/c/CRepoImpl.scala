@@ -7,14 +7,19 @@ package adventureworks
 package pr
 package c
 
+import adventureworks.production.culture.CultureId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object CRepoImpl extends CRepo {
   override def selectAll(implicit c: Connection): List[CRow] = {
-    SQL"""select id, cultureid, name, modifieddate from pr.c""".as(CRow.rowParser("").*)
+    SQL"""select id, cultureid, name, modifieddate from pr.c""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CFieldOrIdValue[_]])(implicit c: Connection): List[CRow] = {
     fieldValues match {
@@ -31,8 +36,19 @@ object CRepoImpl extends CRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[CRow] =
+    RowParser[CRow] { row =>
+      Success(
+        CRow(
+          id = row[Option[/* bpchar */ String]]("id"),
+          cultureid = row[Option[CultureId]]("cultureid"),
+          name = row[Option[Name]]("name"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

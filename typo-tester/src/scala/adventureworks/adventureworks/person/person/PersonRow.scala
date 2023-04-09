@@ -10,8 +10,6 @@ package person
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -63,26 +61,6 @@ case class PersonRow(
 )
 
 object PersonRow {
-  def rowParser(prefix: String): RowParser[PersonRow] = { row =>
-    Success(
-      PersonRow(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        persontype = row[/* bpchar */ String](prefix + "persontype"),
-        namestyle = row[NameStyle](prefix + "namestyle"),
-        title = row[Option[String]](prefix + "title"),
-        firstname = row[Name](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Name](prefix + "lastname"),
-        suffix = row[Option[String]](prefix + "suffix"),
-        emailpromotion = row[Int](prefix + "emailpromotion"),
-        additionalcontactinfo = row[Option[/* xml */ String]](prefix + "additionalcontactinfo"),
-        demographics = row[Option[/* xml */ String]](prefix + "demographics"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
     override def writes(o: PersonRow): JsObject =
       Json.obj(

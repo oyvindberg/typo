@@ -9,8 +9,6 @@ package vstorewithdemographics
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import org.postgresql.util.PGmoney
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -49,25 +47,6 @@ case class VstorewithdemographicsRow(
 )
 
 object VstorewithdemographicsRow {
-  def rowParser(prefix: String): RowParser[VstorewithdemographicsRow] = { row =>
-    Success(
-      VstorewithdemographicsRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        name = row[Option[Name]](prefix + "name"),
-        AnnualSales = row[Option[PGmoney]](prefix + "AnnualSales"),
-        AnnualRevenue = row[Option[PGmoney]](prefix + "AnnualRevenue"),
-        BankName = row[Option[String]](prefix + "BankName"),
-        BusinessType = row[Option[String]](prefix + "BusinessType"),
-        YearOpened = row[Option[Int]](prefix + "YearOpened"),
-        Specialty = row[Option[String]](prefix + "Specialty"),
-        SquareFeet = row[Option[Int]](prefix + "SquareFeet"),
-        Brands = row[Option[String]](prefix + "Brands"),
-        Internet = row[Option[String]](prefix + "Internet"),
-        NumberEmployees = row[Option[Int]](prefix + "NumberEmployees")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VstorewithdemographicsRow] = new OFormat[VstorewithdemographicsRow]{
     override def writes(o: VstorewithdemographicsRow): JsObject =
       Json.obj(

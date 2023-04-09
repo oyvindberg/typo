@@ -7,14 +7,19 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
+import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
   override def selectAll(implicit c: Connection): List[VindividualcustomerRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics from sales.vindividualcustomer""".as(VindividualcustomerRow.rowParser("").*)
+    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics from sales.vindividualcustomer""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VindividualcustomerFieldOrIdValue[_]])(implicit c: Connection): List[VindividualcustomerRow] = {
     fieldValues match {
@@ -45,8 +50,33 @@ object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VindividualcustomerRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VindividualcustomerRow] =
+    RowParser[VindividualcustomerRow] { row =>
+      Success(
+        VindividualcustomerRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          title = row[Option[String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[String]]("suffix"),
+          phonenumber = row[Option[Phone]]("phonenumber"),
+          phonenumbertype = row[Option[Name]]("phonenumbertype"),
+          emailaddress = row[Option[String]]("emailaddress"),
+          emailpromotion = row[Option[Int]]("emailpromotion"),
+          addresstype = row[Option[Name]]("addresstype"),
+          addressline1 = row[Option[String]]("addressline1"),
+          addressline2 = row[Option[String]]("addressline2"),
+          city = row[Option[String]]("city"),
+          stateprovincename = row[Option[Name]]("stateprovincename"),
+          postalcode = row[Option[String]]("postalcode"),
+          countryregionname = row[Option[Name]]("countryregionname"),
+          demographics = row[Option[/* xml */ String]]("demographics")
+        )
+      )
+    }
 }

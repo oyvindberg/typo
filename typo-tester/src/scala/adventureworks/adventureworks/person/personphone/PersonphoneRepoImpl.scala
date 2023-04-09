@@ -9,9 +9,14 @@ package personphone
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +40,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone""".as(PersonphoneRow.rowParser("").*)
+    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow] = {
     fieldValues match {
@@ -52,12 +57,12 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonphoneRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".as(PersonphoneRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: PersonphoneId, row: PersonphoneRow)(implicit c: Connection): Boolean = {
     SQL"""update person.personphone
@@ -82,4 +87,25 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     }
   
   }
+  val rowParser: RowParser[PersonphoneRow] =
+    RowParser[PersonphoneRow] { row =>
+      Success(
+        PersonphoneRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          phonenumber = row[Phone]("phonenumber"),
+          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[PersonphoneId] =
+    RowParser[PersonphoneId] { row =>
+      Success(
+        PersonphoneId(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          phonenumber = row[Phone]("phonenumber"),
+          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid")
+        )
+      )
+    }
 }

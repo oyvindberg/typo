@@ -12,8 +12,12 @@ package pg_constraint
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
@@ -55,7 +59,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint""".as(PgConstraintRow.rowParser("").*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgConstraintFieldOrIdValue[_]])(implicit c: Connection): List[PgConstraintRow] = {
     fieldValues match {
@@ -93,15 +97,15 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgConstraintRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid""".as(PgConstraintRow.rowParser("").singleOpt)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid""".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid in $oids""".as(PgConstraintRow.rowParser("").*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid in $oids""".as(rowParser.*)
   }
   override def selectByUniqueConrelidContypidConname(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
     selectByFieldValues(List(PgConstraintFieldValue.conrelid(conrelid), PgConstraintFieldValue.contypid(contypid), PgConstraintFieldValue.conname(conname))).headOption
@@ -175,4 +179,38 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     }
   
   }
+  val rowParser: RowParser[PgConstraintRow] =
+    RowParser[PgConstraintRow] { row =>
+      Success(
+        PgConstraintRow(
+          oid = row[PgConstraintId]("oid"),
+          conname = row[String]("conname"),
+          connamespace = row[/* oid */ Long]("connamespace"),
+          contype = row[String]("contype"),
+          condeferrable = row[Boolean]("condeferrable"),
+          condeferred = row[Boolean]("condeferred"),
+          convalidated = row[Boolean]("convalidated"),
+          conrelid = row[/* oid */ Long]("conrelid"),
+          contypid = row[/* oid */ Long]("contypid"),
+          conindid = row[/* oid */ Long]("conindid"),
+          conparentid = row[/* oid */ Long]("conparentid"),
+          confrelid = row[/* oid */ Long]("confrelid"),
+          confupdtype = row[String]("confupdtype"),
+          confdeltype = row[String]("confdeltype"),
+          confmatchtype = row[String]("confmatchtype"),
+          conislocal = row[Boolean]("conislocal"),
+          coninhcount = row[Int]("coninhcount"),
+          connoinherit = row[Boolean]("connoinherit"),
+          conkey = row[Option[Array[Int]]]("conkey"),
+          confkey = row[Option[Array[Int]]]("confkey"),
+          conpfeqop = row[Option[Array[/* oid */ Long]]]("conpfeqop"),
+          conppeqop = row[Option[Array[/* oid */ Long]]]("conppeqop"),
+          conffeqop = row[Option[Array[/* oid */ Long]]]("conffeqop"),
+          conexclop = row[Option[Array[/* oid */ Long]]]("conexclop"),
+          conbin = row[Option[/* pg_node_tree */ PGobject]]("conbin")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgConstraintId] =
+    SqlParser.get[PgConstraintId]("oid")
 }

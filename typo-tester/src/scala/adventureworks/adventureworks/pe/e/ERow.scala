@@ -8,8 +8,6 @@ package pe
 package e
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -40,19 +38,6 @@ case class ERow(
 )
 
 object ERow {
-  def rowParser(prefix: String): RowParser[ERow] = { row =>
-    Success(
-      ERow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        emailaddressid = row[Option[Int]](prefix + "emailaddressid"),
-        emailaddress = row[Option[String]](prefix + "emailaddress"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ERow] = new OFormat[ERow]{
     override def writes(o: ERow): JsObject =
       Json.obj(

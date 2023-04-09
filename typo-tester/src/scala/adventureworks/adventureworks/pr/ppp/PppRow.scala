@@ -10,8 +10,6 @@ package ppp
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -36,17 +34,6 @@ case class PppRow(
 )
 
 object PppRow {
-  def rowParser(prefix: String): RowParser[PppRow] = { row =>
-    Success(
-      PppRow(
-        productid = row[Option[ProductId]](prefix + "productid"),
-        productphotoid = row[Option[ProductphotoId]](prefix + "productphotoid"),
-        primary = row[Flag](prefix + "primary"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PppRow] = new OFormat[PppRow]{
     override def writes(o: PppRow): JsObject =
       Json.obj(

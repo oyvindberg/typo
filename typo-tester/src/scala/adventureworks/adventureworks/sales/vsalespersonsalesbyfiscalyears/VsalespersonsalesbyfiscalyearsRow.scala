@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -34,20 +32,6 @@ case class VsalespersonsalesbyfiscalyearsRow(
 )
 
 object VsalespersonsalesbyfiscalyearsRow {
-  def rowParser(prefix: String): RowParser[VsalespersonsalesbyfiscalyearsRow] = { row =>
-    Success(
-      VsalespersonsalesbyfiscalyearsRow(
-        SalesPersonID = row[Option[Int]](prefix + "SalesPersonID"),
-        FullName = row[Option[String]](prefix + "FullName"),
-        JobTitle = row[Option[String]](prefix + "JobTitle"),
-        SalesTerritory = row[Option[String]](prefix + "SalesTerritory"),
-        `2012` = row[Option[BigDecimal]](prefix + "2012"),
-        `2013` = row[Option[BigDecimal]](prefix + "2013"),
-        `2014` = row[Option[BigDecimal]](prefix + "2014")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VsalespersonsalesbyfiscalyearsRow] = new OFormat[VsalespersonsalesbyfiscalyearsRow]{
     override def writes(o: VsalespersonsalesbyfiscalyearsRow): JsObject =
       Json.obj(

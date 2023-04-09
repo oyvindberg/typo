@@ -7,14 +7,18 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyearsdata
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object VsalespersonsalesbyfiscalyearsdataRepoImpl extends VsalespersonsalesbyfiscalyearsdataRepo {
   override def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsdataRow] = {
-    SQL"""select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear from sales.vsalespersonsalesbyfiscalyearsdata""".as(VsalespersonsalesbyfiscalyearsdataRow.rowParser("").*)
+    SQL"""select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear from sales.vsalespersonsalesbyfiscalyearsdata""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsdataFieldOrIdValue[_]])(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsdataRow] = {
     fieldValues match {
@@ -33,8 +37,21 @@ object VsalespersonsalesbyfiscalyearsdataRepoImpl extends Vsalespersonsalesbyfis
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VsalespersonsalesbyfiscalyearsdataRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VsalespersonsalesbyfiscalyearsdataRow] =
+    RowParser[VsalespersonsalesbyfiscalyearsdataRow] { row =>
+      Success(
+        VsalespersonsalesbyfiscalyearsdataRow(
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          fullname = row[Option[String]]("fullname"),
+          jobtitle = row[Option[String]]("jobtitle"),
+          salesterritory = row[Option[Name]]("salesterritory"),
+          salestotal = row[Option[BigDecimal]]("salestotal"),
+          fiscalyear = row[Option[BigDecimal]]("fiscalyear")
+        )
+      )
+    }
 }

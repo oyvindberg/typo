@@ -9,8 +9,6 @@ package ct
 
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class CtRow(
 )
 
 object CtRow {
-  def rowParser(prefix: String): RowParser[CtRow] = { row =>
-    Success(
-      CtRow(
-        id = row[Option[Int]](prefix + "id"),
-        contacttypeid = row[Option[ContacttypeId]](prefix + "contacttypeid"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CtRow] = new OFormat[CtRow]{
     override def writes(o: CtRow): JsObject =
       Json.obj(

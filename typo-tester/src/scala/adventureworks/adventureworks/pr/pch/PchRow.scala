@@ -8,8 +8,6 @@ package pr
 package pch
 
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -39,19 +37,6 @@ case class PchRow(
 )
 
 object PchRow {
-  def rowParser(prefix: String): RowParser[PchRow] = { row =>
-    Success(
-      PchRow(
-        id = row[Option[Int]](prefix + "id"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        startdate = row[Option[LocalDateTime]](prefix + "startdate"),
-        enddate = row[Option[LocalDateTime]](prefix + "enddate"),
-        standardcost = row[Option[BigDecimal]](prefix + "standardcost"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PchRow] = new OFormat[PchRow]{
     override def writes(o: PchRow): JsObject =
       Json.obj(

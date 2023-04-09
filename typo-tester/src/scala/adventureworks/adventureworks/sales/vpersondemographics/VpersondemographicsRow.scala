@@ -8,8 +8,6 @@ package sales
 package vpersondemographics
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import org.postgresql.util.PGmoney
 import play.api.libs.json.JsObject
@@ -50,26 +48,6 @@ case class VpersondemographicsRow(
 )
 
 object VpersondemographicsRow {
-  def rowParser(prefix: String): RowParser[VpersondemographicsRow] = { row =>
-    Success(
-      VpersondemographicsRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        totalpurchaseytd = row[Option[PGmoney]](prefix + "totalpurchaseytd"),
-        datefirstpurchase = row[Option[LocalDate]](prefix + "datefirstpurchase"),
-        birthdate = row[Option[LocalDate]](prefix + "birthdate"),
-        maritalstatus = row[Option[String]](prefix + "maritalstatus"),
-        yearlyincome = row[Option[String]](prefix + "yearlyincome"),
-        gender = row[Option[String]](prefix + "gender"),
-        totalchildren = row[Option[Int]](prefix + "totalchildren"),
-        numberchildrenathome = row[Option[Int]](prefix + "numberchildrenathome"),
-        education = row[Option[String]](prefix + "education"),
-        occupation = row[Option[String]](prefix + "occupation"),
-        homeownerflag = row[Option[Boolean]](prefix + "homeownerflag"),
-        numbercarsowned = row[Option[Int]](prefix + "numbercarsowned")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VpersondemographicsRow] = new OFormat[VpersondemographicsRow]{
     override def writes(o: VpersondemographicsRow): JsObject =
       Json.obj(

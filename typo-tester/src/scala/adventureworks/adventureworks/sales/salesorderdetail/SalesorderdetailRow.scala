@@ -10,8 +10,6 @@ package salesorderdetail
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -58,23 +56,6 @@ case class SalesorderdetailRow(
  }
 
 object SalesorderdetailRow {
-  def rowParser(prefix: String): RowParser[SalesorderdetailRow] = { row =>
-    Success(
-      SalesorderdetailRow(
-        salesorderid = row[SalesorderheaderId](prefix + "salesorderid"),
-        salesorderdetailid = row[Int](prefix + "salesorderdetailid"),
-        carriertrackingnumber = row[Option[String]](prefix + "carriertrackingnumber"),
-        orderqty = row[Int](prefix + "orderqty"),
-        productid = row[ProductId](prefix + "productid"),
-        specialofferid = row[SpecialofferId](prefix + "specialofferid"),
-        unitprice = row[BigDecimal](prefix + "unitprice"),
-        unitpricediscount = row[BigDecimal](prefix + "unitpricediscount"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[SalesorderdetailRow] = new OFormat[SalesorderdetailRow]{
     override def writes(o: SalesorderdetailRow): JsObject =
       Json.obj(

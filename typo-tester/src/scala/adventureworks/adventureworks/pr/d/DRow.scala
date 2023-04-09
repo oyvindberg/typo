@@ -10,8 +10,6 @@ package d
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -64,26 +62,6 @@ case class DRow(
 )
 
 object DRow {
-  def rowParser(prefix: String): RowParser[DRow] = { row =>
-    Success(
-      DRow(
-        title = row[Option[String]](prefix + "title"),
-        owner = row[Option[BusinessentityId]](prefix + "owner"),
-        folderflag = row[Flag](prefix + "folderflag"),
-        filename = row[Option[String]](prefix + "filename"),
-        fileextension = row[Option[String]](prefix + "fileextension"),
-        revision = row[Option[/* bpchar */ String]](prefix + "revision"),
-        changenumber = row[Option[Int]](prefix + "changenumber"),
-        status = row[Option[Int]](prefix + "status"),
-        documentsummary = row[Option[String]](prefix + "documentsummary"),
-        document = row[Option[Byte]](prefix + "document"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate"),
-        documentnode = row[Option[DocumentId]](prefix + "documentnode")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[DRow] = new OFormat[DRow]{
     override def writes(o: DRow): JsObject =
       Json.obj(

@@ -8,8 +8,6 @@ package production
 package transactionhistory
 
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -49,22 +47,6 @@ case class TransactionhistoryRow(
 )
 
 object TransactionhistoryRow {
-  def rowParser(prefix: String): RowParser[TransactionhistoryRow] = { row =>
-    Success(
-      TransactionhistoryRow(
-        transactionid = row[TransactionhistoryId](prefix + "transactionid"),
-        productid = row[ProductId](prefix + "productid"),
-        referenceorderid = row[Int](prefix + "referenceorderid"),
-        referenceorderlineid = row[Int](prefix + "referenceorderlineid"),
-        transactiondate = row[LocalDateTime](prefix + "transactiondate"),
-        transactiontype = row[/* bpchar */ String](prefix + "transactiontype"),
-        quantity = row[Int](prefix + "quantity"),
-        actualcost = row[BigDecimal](prefix + "actualcost"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[TransactionhistoryRow] = new OFormat[TransactionhistoryRow]{
     override def writes(o: TransactionhistoryRow): JsObject =
       Json.obj(

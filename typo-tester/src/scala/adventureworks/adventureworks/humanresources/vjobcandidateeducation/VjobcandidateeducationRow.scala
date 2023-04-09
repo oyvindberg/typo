@@ -8,8 +8,6 @@ package humanresources
 package vjobcandidateeducation
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -49,26 +47,6 @@ case class VjobcandidateeducationRow(
 )
 
 object VjobcandidateeducationRow {
-  def rowParser(prefix: String): RowParser[VjobcandidateeducationRow] = { row =>
-    Success(
-      VjobcandidateeducationRow(
-        jobcandidateid = row[Option[JobcandidateId]](prefix + "jobcandidateid"),
-        `Edu.Level` = row[Option[String]](prefix + "Edu.Level"),
-        `Edu.StartDate` = row[Option[LocalDate]](prefix + "Edu.StartDate"),
-        `Edu.EndDate` = row[Option[LocalDate]](prefix + "Edu.EndDate"),
-        `Edu.Degree` = row[Option[String]](prefix + "Edu.Degree"),
-        `Edu.Major` = row[Option[String]](prefix + "Edu.Major"),
-        `Edu.Minor` = row[Option[String]](prefix + "Edu.Minor"),
-        `Edu.GPA` = row[Option[String]](prefix + "Edu.GPA"),
-        `Edu.GPAScale` = row[Option[String]](prefix + "Edu.GPAScale"),
-        `Edu.School` = row[Option[String]](prefix + "Edu.School"),
-        `Edu.Loc.CountryRegion` = row[Option[String]](prefix + "Edu.Loc.CountryRegion"),
-        `Edu.Loc.State` = row[Option[String]](prefix + "Edu.Loc.State"),
-        `Edu.Loc.City` = row[Option[String]](prefix + "Edu.Loc.City")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VjobcandidateeducationRow] = new OFormat[VjobcandidateeducationRow]{
     override def writes(o: VjobcandidateeducationRow): JsObject =
       Json.obj(

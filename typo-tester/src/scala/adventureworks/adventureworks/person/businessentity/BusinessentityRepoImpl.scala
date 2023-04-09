@@ -11,8 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -38,11 +40,11 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           returning businessentityid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[BusinessentityId]("businessentityid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity""".as(BusinessentityRow.rowParser("").*)
+    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityRow] = {
     fieldValues match {
@@ -58,15 +60,15 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BusinessentityRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid""".as(BusinessentityRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid in $businessentityids""".as(BusinessentityRow.rowParser("").*)
+    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: BusinessentityId, row: BusinessentityRow)(implicit c: Connection): Boolean = {
     SQL"""update person.businessentity
@@ -93,4 +95,16 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     }
   
   }
+  val rowParser: RowParser[BusinessentityRow] =
+    RowParser[BusinessentityRow] { row =>
+      Success(
+        BusinessentityRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

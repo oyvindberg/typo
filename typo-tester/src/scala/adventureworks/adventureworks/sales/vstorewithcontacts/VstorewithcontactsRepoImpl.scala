@@ -7,14 +7,19 @@ package adventureworks
 package sales
 package vstorewithcontacts
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
+import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object VstorewithcontactsRepoImpl extends VstorewithcontactsRepo {
   override def selectAll(implicit c: Connection): List[VstorewithcontactsRow] = {
-    SQL"""select businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion from sales.vstorewithcontacts""".as(VstorewithcontactsRow.rowParser("").*)
+    SQL"""select businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion from sales.vstorewithcontacts""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithcontactsFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithcontactsRow] = {
     fieldValues match {
@@ -39,8 +44,27 @@ object VstorewithcontactsRepoImpl extends VstorewithcontactsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VstorewithcontactsRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VstorewithcontactsRow] =
+    RowParser[VstorewithcontactsRow] { row =>
+      Success(
+        VstorewithcontactsRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          contacttype = row[Option[Name]]("contacttype"),
+          title = row[Option[String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[String]]("suffix"),
+          phonenumber = row[Option[Phone]]("phonenumber"),
+          phonenumbertype = row[Option[Name]]("phonenumbertype"),
+          emailaddress = row[Option[String]]("emailaddress"),
+          emailpromotion = row[Option[Int]]("emailpromotion")
+        )
+      )
+    }
 }

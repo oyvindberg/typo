@@ -7,14 +7,20 @@ package adventureworks
 package pr
 package pr
 
+import adventureworks.production.product.ProductId
+import adventureworks.production.productreview.ProductreviewId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PrRepoImpl extends PrRepo {
   override def selectAll(implicit c: Connection): List[PrRow] = {
-    SQL"""select id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from pr.pr""".as(PrRow.rowParser("").*)
+    SQL"""select id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from pr.pr""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PrFieldOrIdValue[_]])(implicit c: Connection): List[PrRow] = {
     fieldValues match {
@@ -36,8 +42,24 @@ object PrRepoImpl extends PrRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PrRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PrRow] =
+    RowParser[PrRow] { row =>
+      Success(
+        PrRow(
+          id = row[Option[Int]]("id"),
+          productreviewid = row[Option[ProductreviewId]]("productreviewid"),
+          productid = row[Option[ProductId]]("productid"),
+          reviewername = row[Option[Name]]("reviewername"),
+          reviewdate = row[Option[LocalDateTime]]("reviewdate"),
+          emailaddress = row[Option[String]]("emailaddress"),
+          rating = row[Option[Int]]("rating"),
+          comments = row[Option[String]]("comments"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

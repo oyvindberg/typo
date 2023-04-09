@@ -9,8 +9,6 @@ package countryregioncurrency
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,13 +38,4 @@ object CountryregioncurrencyId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[CountryregioncurrencyId] = { row =>
-    Success(
-      CountryregioncurrencyId(
-        countryregioncode = row[CountryregionId](prefix + "countryregioncode"),
-        currencycode = row[CurrencyId](prefix + "currencycode")
-      )
-    )
-  }
-
 }

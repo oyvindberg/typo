@@ -7,14 +7,20 @@ package adventureworks
 package pu
 package pv
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.production.product.ProductId
+import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object PvRepoImpl extends PvRepo {
   override def selectAll(implicit c: Connection): List[PvRow] = {
-    SQL"""select id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from pu.pv""".as(PvRow.rowParser("").*)
+    SQL"""select id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from pu.pv""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PvFieldOrIdValue[_]])(implicit c: Connection): List[PvRow] = {
     fieldValues match {
@@ -39,8 +45,27 @@ object PvRepoImpl extends PvRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PvRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PvRow] =
+    RowParser[PvRow] { row =>
+      Success(
+        PvRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          averageleadtime = row[Option[Int]]("averageleadtime"),
+          standardprice = row[Option[BigDecimal]]("standardprice"),
+          lastreceiptcost = row[Option[BigDecimal]]("lastreceiptcost"),
+          lastreceiptdate = row[Option[LocalDateTime]]("lastreceiptdate"),
+          minorderqty = row[Option[Int]]("minorderqty"),
+          maxorderqty = row[Option[Int]]("maxorderqty"),
+          onorderqty = row[Option[Int]]("onorderqty"),
+          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

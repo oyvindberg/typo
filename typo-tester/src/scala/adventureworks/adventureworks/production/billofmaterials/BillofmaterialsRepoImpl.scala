@@ -9,10 +9,14 @@ package billofmaterials
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.product.ProductId
+import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -46,11 +50,11 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning billofmaterialsid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[BillofmaterialsId]("billofmaterialsid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials""".as(BillofmaterialsRow.rowParser("").*)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow] = {
     fieldValues match {
@@ -72,15 +76,15 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BillofmaterialsRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid""".as(BillofmaterialsRow.rowParser("").singleOpt)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid""".as(rowParser.singleOpt)
   }
   override def selectByIds(billofmaterialsids: List[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid in $billofmaterialsids""".as(BillofmaterialsRow.rowParser("").*)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid in $billofmaterialsids""".as(rowParser.*)
   }
   override def update(billofmaterialsid: BillofmaterialsId, row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     SQL"""update production.billofmaterials
@@ -119,4 +123,22 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     }
   
   }
+  val rowParser: RowParser[BillofmaterialsRow] =
+    RowParser[BillofmaterialsRow] { row =>
+      Success(
+        BillofmaterialsRow(
+          billofmaterialsid = row[BillofmaterialsId]("billofmaterialsid"),
+          productassemblyid = row[Option[ProductId]]("productassemblyid"),
+          componentid = row[ProductId]("componentid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
+          bomlevel = row[Int]("bomlevel"),
+          perassemblyqty = row[BigDecimal]("perassemblyqty"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[BillofmaterialsId] =
+    SqlParser.get[BillofmaterialsId]("billofmaterialsid")
 }

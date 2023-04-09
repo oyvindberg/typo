@@ -7,14 +7,20 @@ package adventureworks
 package production
 package vproductmodelcatalogdescription
 
+import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object VproductmodelcatalogdescriptionRepoImpl extends VproductmodelcatalogdescriptionRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
-    SQL"""select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription""".as(VproductmodelcatalogdescriptionRow.rowParser("").*)
+    SQL"""select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
     fieldValues match {
@@ -52,8 +58,40 @@ object VproductmodelcatalogdescriptionRepoImpl extends Vproductmodelcatalogdescr
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VproductmodelcatalogdescriptionRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VproductmodelcatalogdescriptionRow] =
+    RowParser[VproductmodelcatalogdescriptionRow] { row =>
+      Success(
+        VproductmodelcatalogdescriptionRow(
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          name = row[Option[Name]]("name"),
+          Summary = row[Option[String]]("Summary"),
+          manufacturer = row[Option[String]]("manufacturer"),
+          copyright = row[Option[String]]("copyright"),
+          producturl = row[Option[String]]("producturl"),
+          warrantyperiod = row[Option[String]]("warrantyperiod"),
+          warrantydescription = row[Option[String]]("warrantydescription"),
+          noofyears = row[Option[String]]("noofyears"),
+          maintenancedescription = row[Option[String]]("maintenancedescription"),
+          wheel = row[Option[String]]("wheel"),
+          saddle = row[Option[String]]("saddle"),
+          pedal = row[Option[String]]("pedal"),
+          bikeframe = row[Option[String]]("bikeframe"),
+          crankset = row[Option[String]]("crankset"),
+          pictureangle = row[Option[String]]("pictureangle"),
+          picturesize = row[Option[String]]("picturesize"),
+          productphotoid = row[Option[String]]("productphotoid"),
+          material = row[Option[String]]("material"),
+          color = row[Option[String]]("color"),
+          productline = row[Option[String]]("productline"),
+          style = row[Option[String]]("style"),
+          riderexperience = row[Option[String]]("riderexperience"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

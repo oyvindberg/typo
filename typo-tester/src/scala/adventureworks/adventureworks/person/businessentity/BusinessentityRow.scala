@@ -7,8 +7,6 @@ package adventureworks
 package person
 package businessentity
 
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -29,16 +27,6 @@ case class BusinessentityRow(
 )
 
 object BusinessentityRow {
-  def rowParser(prefix: String): RowParser[BusinessentityRow] = { row =>
-    Success(
-      BusinessentityRow(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[BusinessentityRow] = new OFormat[BusinessentityRow]{
     override def writes(o: BusinessentityRow): JsObject =
       Json.obj(

@@ -9,8 +9,6 @@ package vemployeedepartment
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -52,23 +50,6 @@ case class VemployeedepartmentRow(
 )
 
 object VemployeedepartmentRow {
-  def rowParser(prefix: String): RowParser[VemployeedepartmentRow] = { row =>
-    Success(
-      VemployeedepartmentRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[Name]](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Option[Name]](prefix + "lastname"),
-        suffix = row[Option[String]](prefix + "suffix"),
-        jobtitle = row[Option[String]](prefix + "jobtitle"),
-        department = row[Option[Name]](prefix + "department"),
-        groupname = row[Option[Name]](prefix + "groupname"),
-        startdate = row[Option[LocalDate]](prefix + "startdate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VemployeedepartmentRow] = new OFormat[VemployeedepartmentRow]{
     override def writes(o: VemployeedepartmentRow): JsObject =
       Json.obj(

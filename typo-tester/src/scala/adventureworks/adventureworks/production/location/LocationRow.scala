@@ -8,8 +8,6 @@ package production
 package location
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -36,18 +34,6 @@ case class LocationRow(
 )
 
 object LocationRow {
-  def rowParser(prefix: String): RowParser[LocationRow] = { row =>
-    Success(
-      LocationRow(
-        locationid = row[LocationId](prefix + "locationid"),
-        name = row[Name](prefix + "name"),
-        costrate = row[BigDecimal](prefix + "costrate"),
-        availability = row[BigDecimal](prefix + "availability"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[LocationRow] = new OFormat[LocationRow]{
     override def writes(o: LocationRow): JsObject =
       Json.obj(

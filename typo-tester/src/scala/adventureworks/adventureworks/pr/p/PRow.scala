@@ -13,8 +13,6 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -105,39 +103,6 @@ case class PRow(
 )
 
 object PRow {
-  def rowParser(prefix: String): RowParser[PRow] = { row =>
-    Success(
-      PRow(
-        id = row[Option[Int]](prefix + "id"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        name = row[Option[Name]](prefix + "name"),
-        productnumber = row[Option[String]](prefix + "productnumber"),
-        makeflag = row[Flag](prefix + "makeflag"),
-        finishedgoodsflag = row[Flag](prefix + "finishedgoodsflag"),
-        color = row[Option[String]](prefix + "color"),
-        safetystocklevel = row[Option[Int]](prefix + "safetystocklevel"),
-        reorderpoint = row[Option[Int]](prefix + "reorderpoint"),
-        standardcost = row[Option[BigDecimal]](prefix + "standardcost"),
-        listprice = row[Option[BigDecimal]](prefix + "listprice"),
-        size = row[Option[String]](prefix + "size"),
-        sizeunitmeasurecode = row[Option[UnitmeasureId]](prefix + "sizeunitmeasurecode"),
-        weightunitmeasurecode = row[Option[UnitmeasureId]](prefix + "weightunitmeasurecode"),
-        weight = row[Option[BigDecimal]](prefix + "weight"),
-        daystomanufacture = row[Option[Int]](prefix + "daystomanufacture"),
-        productline = row[Option[/* bpchar */ String]](prefix + "productline"),
-        `class` = row[Option[/* bpchar */ String]](prefix + "class"),
-        style = row[Option[/* bpchar */ String]](prefix + "style"),
-        productsubcategoryid = row[Option[ProductsubcategoryId]](prefix + "productsubcategoryid"),
-        productmodelid = row[Option[ProductmodelId]](prefix + "productmodelid"),
-        sellstartdate = row[Option[LocalDateTime]](prefix + "sellstartdate"),
-        sellenddate = row[Option[LocalDateTime]](prefix + "sellenddate"),
-        discontinueddate = row[Option[LocalDateTime]](prefix + "discontinueddate"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PRow] = new OFormat[PRow]{
     override def writes(o: PRow): JsObject =
       Json.obj(

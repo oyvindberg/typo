@@ -9,8 +9,6 @@ package pc
 
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -38,18 +36,6 @@ case class PcRow(
 )
 
 object PcRow {
-  def rowParser(prefix: String): RowParser[PcRow] = { row =>
-    Success(
-      PcRow(
-        id = row[Option[Int]](prefix + "id"),
-        productcategoryid = row[Option[ProductcategoryId]](prefix + "productcategoryid"),
-        name = row[Option[Name]](prefix + "name"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PcRow] = new OFormat[PcRow]{
     override def writes(o: PcRow): JsObject =
       Json.obj(

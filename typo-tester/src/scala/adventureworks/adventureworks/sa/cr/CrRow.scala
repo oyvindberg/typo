@@ -9,8 +9,6 @@ package cr
 
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -44,20 +42,6 @@ case class CrRow(
 )
 
 object CrRow {
-  def rowParser(prefix: String): RowParser[CrRow] = { row =>
-    Success(
-      CrRow(
-        currencyrateid = row[Option[CurrencyrateId]](prefix + "currencyrateid"),
-        currencyratedate = row[Option[LocalDateTime]](prefix + "currencyratedate"),
-        fromcurrencycode = row[Option[CurrencyId]](prefix + "fromcurrencycode"),
-        tocurrencycode = row[Option[CurrencyId]](prefix + "tocurrencycode"),
-        averagerate = row[Option[BigDecimal]](prefix + "averagerate"),
-        endofdayrate = row[Option[BigDecimal]](prefix + "endofdayrate"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[CrRow] = new OFormat[CrRow]{
     override def writes(o: CrRow): JsObject =
       Json.obj(

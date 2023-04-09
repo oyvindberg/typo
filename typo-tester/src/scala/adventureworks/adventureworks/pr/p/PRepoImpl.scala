@@ -7,14 +7,24 @@ package adventureworks
 package pr
 package p
 
+import adventureworks.production.product.ProductId
+import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.production.productsubcategory.ProductsubcategoryId
+import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PRepoImpl extends PRepo {
   override def selectAll(implicit c: Connection): List[PRow] = {
-    SQL"""select id, productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from pr.p""".as(PRow.rowParser("").*)
+    SQL"""select id, productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from pr.p""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PFieldOrIdValue[_]])(implicit c: Connection): List[PRow] = {
     fieldValues match {
@@ -53,8 +63,41 @@ object PRepoImpl extends PRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PRow] =
+    RowParser[PRow] { row =>
+      Success(
+        PRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          name = row[Option[Name]]("name"),
+          productnumber = row[Option[String]]("productnumber"),
+          makeflag = row[Flag]("makeflag"),
+          finishedgoodsflag = row[Flag]("finishedgoodsflag"),
+          color = row[Option[String]]("color"),
+          safetystocklevel = row[Option[Int]]("safetystocklevel"),
+          reorderpoint = row[Option[Int]]("reorderpoint"),
+          standardcost = row[Option[BigDecimal]]("standardcost"),
+          listprice = row[Option[BigDecimal]]("listprice"),
+          size = row[Option[String]]("size"),
+          sizeunitmeasurecode = row[Option[UnitmeasureId]]("sizeunitmeasurecode"),
+          weightunitmeasurecode = row[Option[UnitmeasureId]]("weightunitmeasurecode"),
+          weight = row[Option[BigDecimal]]("weight"),
+          daystomanufacture = row[Option[Int]]("daystomanufacture"),
+          productline = row[Option[/* bpchar */ String]]("productline"),
+          `class` = row[Option[/* bpchar */ String]]("class"),
+          style = row[Option[/* bpchar */ String]]("style"),
+          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          sellstartdate = row[Option[LocalDateTime]]("sellstartdate"),
+          sellenddate = row[Option[LocalDateTime]]("sellenddate"),
+          discontinueddate = row[Option[LocalDateTime]]("discontinueddate"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

@@ -7,14 +7,19 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGmoney
 
 object VstorewithdemographicsRepoImpl extends VstorewithdemographicsRepo {
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsRow] = {
-    SQL"""select businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics""".as(VstorewithdemographicsRow.rowParser("").*)
+    SQL"""select businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithdemographicsFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithdemographicsRow] = {
     fieldValues match {
@@ -39,8 +44,27 @@ object VstorewithdemographicsRepoImpl extends VstorewithdemographicsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VstorewithdemographicsRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VstorewithdemographicsRow] =
+    RowParser[VstorewithdemographicsRow] { row =>
+      Success(
+        VstorewithdemographicsRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          AnnualSales = row[Option[PGmoney]]("AnnualSales"),
+          AnnualRevenue = row[Option[PGmoney]]("AnnualRevenue"),
+          BankName = row[Option[String]]("BankName"),
+          BusinessType = row[Option[String]]("BusinessType"),
+          YearOpened = row[Option[Int]]("YearOpened"),
+          Specialty = row[Option[String]]("Specialty"),
+          SquareFeet = row[Option[Int]]("SquareFeet"),
+          Brands = row[Option[String]]("Brands"),
+          Internet = row[Option[String]]("Internet"),
+          NumberEmployees = row[Option[Int]]("NumberEmployees")
+        )
+      )
+    }
 }

@@ -9,10 +9,13 @@ package location
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -42,11 +45,11 @@ object LocationRepoImpl extends LocationRepo {
           returning locationid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[LocationId]("locationid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location""".as(LocationRow.rowParser("").*)
+    SQL"""select locationid, name, costrate, availability, modifieddate from production.location""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
     fieldValues match {
@@ -64,15 +67,15 @@ object LocationRepoImpl extends LocationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(LocationRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid = $locationid""".as(LocationRow.rowParser("").singleOpt)
+    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid = $locationid""".as(rowParser.singleOpt)
   }
   override def selectByIds(locationids: List[LocationId])(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid in $locationids""".as(LocationRow.rowParser("").*)
+    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid in $locationids""".as(rowParser.*)
   }
   override def update(locationid: LocationId, row: LocationRow)(implicit c: Connection): Boolean = {
     SQL"""update production.location
@@ -103,4 +106,18 @@ object LocationRepoImpl extends LocationRepo {
     }
   
   }
+  val rowParser: RowParser[LocationRow] =
+    RowParser[LocationRow] { row =>
+      Success(
+        LocationRow(
+          locationid = row[LocationId]("locationid"),
+          name = row[Name]("name"),
+          costrate = row[BigDecimal]("costrate"),
+          availability = row[BigDecimal]("availability"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[LocationId] =
+    SqlParser.get[LocationId]("locationid")
 }

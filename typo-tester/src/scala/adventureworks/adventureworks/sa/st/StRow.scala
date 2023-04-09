@@ -10,8 +10,6 @@ package st
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -57,24 +55,6 @@ case class StRow(
 )
 
 object StRow {
-  def rowParser(prefix: String): RowParser[StRow] = { row =>
-    Success(
-      StRow(
-        id = row[Option[Int]](prefix + "id"),
-        territoryid = row[Option[SalesterritoryId]](prefix + "territoryid"),
-        name = row[Option[Name]](prefix + "name"),
-        countryregioncode = row[Option[CountryregionId]](prefix + "countryregioncode"),
-        group = row[Option[String]](prefix + "group"),
-        salesytd = row[Option[BigDecimal]](prefix + "salesytd"),
-        saleslastyear = row[Option[BigDecimal]](prefix + "saleslastyear"),
-        costytd = row[Option[BigDecimal]](prefix + "costytd"),
-        costlastyear = row[Option[BigDecimal]](prefix + "costlastyear"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[StRow] = new OFormat[StRow]{
     override def writes(o: StRow): JsObject =
       Json.obj(

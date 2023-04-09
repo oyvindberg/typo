@@ -9,8 +9,6 @@ package vjobcandidate
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -58,29 +56,6 @@ case class VjobcandidateRow(
 )
 
 object VjobcandidateRow {
-  def rowParser(prefix: String): RowParser[VjobcandidateRow] = { row =>
-    Success(
-      VjobcandidateRow(
-        jobcandidateid = row[Option[JobcandidateId]](prefix + "jobcandidateid"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        `Name.Prefix` = row[Option[String]](prefix + "Name.Prefix"),
-        `Name.First` = row[Option[String]](prefix + "Name.First"),
-        `Name.Middle` = row[Option[String]](prefix + "Name.Middle"),
-        `Name.Last` = row[Option[String]](prefix + "Name.Last"),
-        `Name.Suffix` = row[Option[String]](prefix + "Name.Suffix"),
-        Skills = row[Option[String]](prefix + "Skills"),
-        `Addr.Type` = row[Option[String]](prefix + "Addr.Type"),
-        `Addr.Loc.CountryRegion` = row[Option[String]](prefix + "Addr.Loc.CountryRegion"),
-        `Addr.Loc.State` = row[Option[String]](prefix + "Addr.Loc.State"),
-        `Addr.Loc.City` = row[Option[String]](prefix + "Addr.Loc.City"),
-        `Addr.PostalCode` = row[Option[String]](prefix + "Addr.PostalCode"),
-        EMail = row[Option[String]](prefix + "EMail"),
-        WebSite = row[Option[String]](prefix + "WebSite"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VjobcandidateRow] = new OFormat[VjobcandidateRow]{
     override def writes(o: VjobcandidateRow): JsObject =
       Json.obj(

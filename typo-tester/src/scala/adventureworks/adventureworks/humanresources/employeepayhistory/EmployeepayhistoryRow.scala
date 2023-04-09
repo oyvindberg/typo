@@ -8,8 +8,6 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -39,18 +37,6 @@ case class EmployeepayhistoryRow(
  }
 
 object EmployeepayhistoryRow {
-  def rowParser(prefix: String): RowParser[EmployeepayhistoryRow] = { row =>
-    Success(
-      EmployeepayhistoryRow(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        ratechangedate = row[LocalDateTime](prefix + "ratechangedate"),
-        rate = row[BigDecimal](prefix + "rate"),
-        payfrequency = row[Int](prefix + "payfrequency"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[EmployeepayhistoryRow] = new OFormat[EmployeepayhistoryRow]{
     override def writes(o: EmployeepayhistoryRow): JsObject =
       Json.obj(

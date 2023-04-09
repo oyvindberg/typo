@@ -9,8 +9,6 @@ package pnt
 
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class PntRow(
 )
 
 object PntRow {
-  def rowParser(prefix: String): RowParser[PntRow] = { row =>
-    Success(
-      PntRow(
-        id = row[Option[Int]](prefix + "id"),
-        phonenumbertypeid = row[Option[PhonenumbertypeId]](prefix + "phonenumbertypeid"),
-        name = row[Option[Name]](prefix + "name"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PntRow] = new OFormat[PntRow]{
     override def writes(o: PntRow): JsObject =
       Json.obj(

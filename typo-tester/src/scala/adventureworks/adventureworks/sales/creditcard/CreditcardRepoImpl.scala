@@ -11,8 +11,10 @@ import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -37,11 +39,11 @@ object CreditcardRepoImpl extends CreditcardRepo {
           returning creditcardid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[CreditcardId]("creditcardid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard""".as(CreditcardRow.rowParser("").*)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]])(implicit c: Connection): List[CreditcardRow] = {
     fieldValues match {
@@ -60,15 +62,15 @@ object CreditcardRepoImpl extends CreditcardRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CreditcardRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid""".as(CreditcardRow.rowParser("").singleOpt)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid""".as(rowParser.singleOpt)
   }
   override def selectByIds(creditcardids: List[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid in $creditcardids""".as(CreditcardRow.rowParser("").*)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid in $creditcardids""".as(rowParser.*)
   }
   override def update(creditcardid: CreditcardId, row: CreditcardRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.creditcard
@@ -101,4 +103,19 @@ object CreditcardRepoImpl extends CreditcardRepo {
     }
   
   }
+  val rowParser: RowParser[CreditcardRow] =
+    RowParser[CreditcardRow] { row =>
+      Success(
+        CreditcardRow(
+          creditcardid = row[CreditcardId]("creditcardid"),
+          cardtype = row[String]("cardtype"),
+          cardnumber = row[String]("cardnumber"),
+          expmonth = row[Int]("expmonth"),
+          expyear = row[Int]("expyear"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[CreditcardId] =
+    SqlParser.get[CreditcardId]("creditcardid")
 }

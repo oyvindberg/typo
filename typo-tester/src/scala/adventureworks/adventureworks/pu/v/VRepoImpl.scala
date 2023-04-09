@@ -7,14 +7,21 @@ package adventureworks
 package pu
 package v
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.AccountNumber
+import adventureworks.public.Flag
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object VRepoImpl extends VRepo {
   override def selectAll(implicit c: Connection): List[VRow] = {
-    SQL"""select id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from pu.v""".as(VRow.rowParser("").*)
+    SQL"""select id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from pu.v""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VFieldOrIdValue[_]])(implicit c: Connection): List[VRow] = {
     fieldValues match {
@@ -36,8 +43,24 @@ object VRepoImpl extends VRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VRow] =
+    RowParser[VRow] { row =>
+      Success(
+        VRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          accountnumber = row[Option[AccountNumber]]("accountnumber"),
+          name = row[Option[Name]]("name"),
+          creditrating = row[Option[Int]]("creditrating"),
+          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
+          activeflag = row[Flag]("activeflag"),
+          purchasingwebserviceurl = row[Option[String]]("purchasingwebserviceurl"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

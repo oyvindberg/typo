@@ -10,8 +10,6 @@ package personphone
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -39,17 +37,6 @@ case class PersonphoneRow(
  }
 
 object PersonphoneRow {
-  def rowParser(prefix: String): RowParser[PersonphoneRow] = { row =>
-    Success(
-      PersonphoneRow(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        phonenumber = row[Phone](prefix + "phonenumber"),
-        phonenumbertypeid = row[PhonenumbertypeId](prefix + "phonenumbertypeid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PersonphoneRow] = new OFormat[PersonphoneRow]{
     override def writes(o: PersonphoneRow): JsObject =
       Json.obj(

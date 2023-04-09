@@ -9,8 +9,6 @@ package vadditionalcontactinfo
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -64,30 +62,6 @@ case class VadditionalcontactinfoRow(
 )
 
 object VadditionalcontactinfoRow {
-  def rowParser(prefix: String): RowParser[VadditionalcontactinfoRow] = { row =>
-    Success(
-      VadditionalcontactinfoRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        firstname = row[Option[Name]](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Option[Name]](prefix + "lastname"),
-        telephonenumber = row[Option[/* xml */ String]](prefix + "telephonenumber"),
-        telephonespecialinstructions = row[Option[String]](prefix + "telephonespecialinstructions"),
-        street = row[Option[/* xml */ String]](prefix + "street"),
-        city = row[Option[/* xml */ String]](prefix + "city"),
-        stateprovince = row[Option[/* xml */ String]](prefix + "stateprovince"),
-        postalcode = row[Option[/* xml */ String]](prefix + "postalcode"),
-        countryregion = row[Option[/* xml */ String]](prefix + "countryregion"),
-        homeaddressspecialinstructions = row[Option[/* xml */ String]](prefix + "homeaddressspecialinstructions"),
-        emailaddress = row[Option[/* xml */ String]](prefix + "emailaddress"),
-        emailspecialinstructions = row[Option[String]](prefix + "emailspecialinstructions"),
-        emailtelephonenumber = row[Option[/* xml */ String]](prefix + "emailtelephonenumber"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VadditionalcontactinfoRow] = new OFormat[VadditionalcontactinfoRow]{
     override def writes(o: VadditionalcontactinfoRow): JsObject =
       Json.obj(

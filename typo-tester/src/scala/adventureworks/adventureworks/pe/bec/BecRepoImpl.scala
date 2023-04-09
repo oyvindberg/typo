@@ -7,14 +7,20 @@ package adventureworks
 package pe
 package bec
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.contacttype.ContacttypeId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object BecRepoImpl extends BecRepo {
   override def selectAll(implicit c: Connection): List[BecRow] = {
-    SQL"""select id, businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec""".as(BecRow.rowParser("").*)
+    SQL"""select id, businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BecFieldOrIdValue[_]])(implicit c: Connection): List[BecRow] = {
     fieldValues match {
@@ -33,8 +39,21 @@ object BecRepoImpl extends BecRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BecRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[BecRow] =
+    RowParser[BecRow] { row =>
+      Success(
+        BecRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          personid = row[Option[BusinessentityId]]("personid"),
+          contacttypeid = row[Option[ContacttypeId]]("contacttypeid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

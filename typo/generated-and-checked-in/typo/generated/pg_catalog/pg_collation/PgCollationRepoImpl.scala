@@ -12,7 +12,10 @@ package pg_collation
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object PgCollationRepoImpl extends PgCollationRepo {
@@ -40,7 +43,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(PgCollationRow.rowParser("").*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgCollationFieldOrIdValue[_]])(implicit c: Connection): List[PgCollationRow] = {
     fieldValues match {
@@ -63,15 +66,15 @@ object PgCollationRepoImpl extends PgCollationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgCollationRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(PgCollationRow.rowParser("").singleOpt)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: List[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(PgCollationRow.rowParser("").*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(rowParser.*)
   }
   override def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
     selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption
@@ -115,4 +118,23 @@ object PgCollationRepoImpl extends PgCollationRepo {
     }
   
   }
+  val rowParser: RowParser[PgCollationRow] =
+    RowParser[PgCollationRow] { row =>
+      Success(
+        PgCollationRow(
+          oid = row[PgCollationId]("oid"),
+          collname = row[String]("collname"),
+          collnamespace = row[/* oid */ Long]("collnamespace"),
+          collowner = row[/* oid */ Long]("collowner"),
+          collprovider = row[String]("collprovider"),
+          collisdeterministic = row[Boolean]("collisdeterministic"),
+          collencoding = row[Int]("collencoding"),
+          collcollate = row[String]("collcollate"),
+          collctype = row[String]("collctype"),
+          collversion = row[Option[String]]("collversion")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgCollationId] =
+    SqlParser.get[PgCollationId]("oid")
 }

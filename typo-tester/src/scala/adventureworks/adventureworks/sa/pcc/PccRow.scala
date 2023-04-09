@@ -9,8 +9,6 @@ package pcc
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,17 +32,6 @@ case class PccRow(
 )
 
 object PccRow {
-  def rowParser(prefix: String): RowParser[PccRow] = { row =>
-    Success(
-      PccRow(
-        id = row[Option[Int]](prefix + "id"),
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        creditcardid = row[Option[CreditcardId]](prefix + "creditcardid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PccRow] = new OFormat[PccRow]{
     override def writes(o: PccRow): JsObject =
       Json.obj(

@@ -7,14 +7,19 @@ package adventureworks
 package humanresources
 package vjobcandidate
 
+import adventureworks.humanresources.jobcandidate.JobcandidateId
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
 
 object VjobcandidateRepoImpl extends VjobcandidateRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate from humanresources.vjobcandidate""".as(VjobcandidateRow.rowParser("").*)
+    SQL"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate from humanresources.vjobcandidate""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateRow] = {
     fieldValues match {
@@ -43,8 +48,31 @@ object VjobcandidateRepoImpl extends VjobcandidateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VjobcandidateRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VjobcandidateRow] =
+    RowParser[VjobcandidateRow] { row =>
+      Success(
+        VjobcandidateRow(
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          `Name.Prefix` = row[Option[String]]("Name.Prefix"),
+          `Name.First` = row[Option[String]]("Name.First"),
+          `Name.Middle` = row[Option[String]]("Name.Middle"),
+          `Name.Last` = row[Option[String]]("Name.Last"),
+          `Name.Suffix` = row[Option[String]]("Name.Suffix"),
+          Skills = row[Option[String]]("Skills"),
+          `Addr.Type` = row[Option[String]]("Addr.Type"),
+          `Addr.Loc.CountryRegion` = row[Option[String]]("Addr.Loc.CountryRegion"),
+          `Addr.Loc.State` = row[Option[String]]("Addr.Loc.State"),
+          `Addr.Loc.City` = row[Option[String]]("Addr.Loc.City"),
+          `Addr.PostalCode` = row[Option[String]]("Addr.PostalCode"),
+          EMail = row[Option[String]]("EMail"),
+          WebSite = row[Option[String]]("WebSite"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

@@ -9,10 +9,14 @@ package customer
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,11 +45,11 @@ object CustomerRepoImpl extends CustomerRepo {
           returning customerid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[CustomerId]("customerid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer""".as(CustomerRow.rowParser("").*)
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow] = {
     fieldValues match {
@@ -64,15 +68,15 @@ object CustomerRepoImpl extends CustomerRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CustomerRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid""".as(CustomerRow.rowParser("").singleOpt)
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid""".as(rowParser.singleOpt)
   }
   override def selectByIds(customerids: List[CustomerId])(implicit c: Connection): List[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid in $customerids""".as(CustomerRow.rowParser("").*)
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid in $customerids""".as(rowParser.*)
   }
   override def update(customerid: CustomerId, row: CustomerRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.customer
@@ -105,4 +109,19 @@ object CustomerRepoImpl extends CustomerRepo {
     }
   
   }
+  val rowParser: RowParser[CustomerRow] =
+    RowParser[CustomerRow] { row =>
+      Success(
+        CustomerRow(
+          customerid = row[CustomerId]("customerid"),
+          personid = row[Option[BusinessentityId]]("personid"),
+          storeid = row[Option[BusinessentityId]]("storeid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[CustomerId] =
+    SqlParser.get[CustomerId]("customerid")
 }

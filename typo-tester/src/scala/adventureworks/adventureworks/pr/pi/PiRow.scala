@@ -9,8 +9,6 @@ package pi
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -47,21 +45,6 @@ case class PiRow(
 )
 
 object PiRow {
-  def rowParser(prefix: String): RowParser[PiRow] = { row =>
-    Success(
-      PiRow(
-        id = row[Option[Int]](prefix + "id"),
-        productid = row[Option[ProductId]](prefix + "productid"),
-        locationid = row[Option[LocationId]](prefix + "locationid"),
-        shelf = row[Option[String]](prefix + "shelf"),
-        bin = row[Option[Int]](prefix + "bin"),
-        quantity = row[Option[Int]](prefix + "quantity"),
-        rowguid = row[Option[UUID]](prefix + "rowguid"),
-        modifieddate = row[Option[LocalDateTime]](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PiRow] = new OFormat[PiRow]{
     override def writes(o: PiRow): JsObject =
       Json.obj(

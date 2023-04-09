@@ -7,8 +7,6 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -47,22 +45,6 @@ case class TransactionhistoryarchiveRow(
 )
 
 object TransactionhistoryarchiveRow {
-  def rowParser(prefix: String): RowParser[TransactionhistoryarchiveRow] = { row =>
-    Success(
-      TransactionhistoryarchiveRow(
-        transactionid = row[TransactionhistoryarchiveId](prefix + "transactionid"),
-        productid = row[Int](prefix + "productid"),
-        referenceorderid = row[Int](prefix + "referenceorderid"),
-        referenceorderlineid = row[Int](prefix + "referenceorderlineid"),
-        transactiondate = row[LocalDateTime](prefix + "transactiondate"),
-        transactiontype = row[/* bpchar */ String](prefix + "transactiontype"),
-        quantity = row[Int](prefix + "quantity"),
-        actualcost = row[BigDecimal](prefix + "actualcost"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[TransactionhistoryarchiveRow] = new OFormat[TransactionhistoryarchiveRow]{
     override def writes(o: TransactionhistoryarchiveRow): JsObject =
       Json.obj(

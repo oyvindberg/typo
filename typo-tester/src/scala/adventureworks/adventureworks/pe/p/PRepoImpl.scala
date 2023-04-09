@@ -7,14 +7,21 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
+import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PRepoImpl extends PRepo {
   override def selectAll(implicit c: Connection): List[PRow] = {
-    SQL"""select id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe.p""".as(PRow.rowParser("").*)
+    SQL"""select id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe.p""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PFieldOrIdValue[_]])(implicit c: Connection): List[PRow] = {
     fieldValues match {
@@ -41,8 +48,29 @@ object PRepoImpl extends PRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PRow] =
+    RowParser[PRow] { row =>
+      Success(
+        PRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          persontype = row[Option[/* bpchar */ String]]("persontype"),
+          namestyle = row[NameStyle]("namestyle"),
+          title = row[Option[String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[String]]("suffix"),
+          emailpromotion = row[Option[Int]]("emailpromotion"),
+          additionalcontactinfo = row[Option[/* xml */ String]]("additionalcontactinfo"),
+          demographics = row[Option[/* xml */ String]]("demographics"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

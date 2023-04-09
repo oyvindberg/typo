@@ -7,14 +7,21 @@ package adventureworks
 package pe
 package bea
 
+import adventureworks.person.address.AddressId
+import adventureworks.person.addresstype.AddresstypeId
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object BeaRepoImpl extends BeaRepo {
   override def selectAll(implicit c: Connection): List[BeaRow] = {
-    SQL"""select id, businessentityid, addressid, addresstypeid, rowguid, modifieddate from pe.bea""".as(BeaRow.rowParser("").*)
+    SQL"""select id, businessentityid, addressid, addresstypeid, rowguid, modifieddate from pe.bea""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BeaFieldOrIdValue[_]])(implicit c: Connection): List[BeaRow] = {
     fieldValues match {
@@ -33,8 +40,21 @@ object BeaRepoImpl extends BeaRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BeaRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[BeaRow] =
+    RowParser[BeaRow] { row =>
+      Success(
+        BeaRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          addressid = row[Option[AddressId]]("addressid"),
+          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

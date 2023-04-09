@@ -10,8 +10,6 @@ package productmodelproductdescriptionculture
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,17 +38,6 @@ case class ProductmodelproductdescriptioncultureRow(
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  def rowParser(prefix: String): RowParser[ProductmodelproductdescriptioncultureRow] = { row =>
-    Success(
-      ProductmodelproductdescriptioncultureRow(
-        productmodelid = row[ProductmodelId](prefix + "productmodelid"),
-        productdescriptionid = row[ProductdescriptionId](prefix + "productdescriptionid"),
-        cultureid = row[CultureId](prefix + "cultureid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ProductmodelproductdescriptioncultureRow] = new OFormat[ProductmodelproductdescriptioncultureRow]{
     override def writes(o: ProductmodelproductdescriptioncultureRow): JsObject =
       Json.obj(

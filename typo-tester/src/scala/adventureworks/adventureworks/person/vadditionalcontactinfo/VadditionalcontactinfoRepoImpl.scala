@@ -7,14 +7,20 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoRow] = {
-    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo""".as(VadditionalcontactinfoRow.rowParser("").*)
+    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoFieldOrIdValue[_]])(implicit c: Connection): List[VadditionalcontactinfoRow] = {
     fieldValues match {
@@ -44,8 +50,32 @@ object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VadditionalcontactinfoRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[VadditionalcontactinfoRow] =
+    RowParser[VadditionalcontactinfoRow] { row =>
+      Success(
+        VadditionalcontactinfoRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          telephonenumber = row[Option[/* xml */ String]]("telephonenumber"),
+          telephonespecialinstructions = row[Option[String]]("telephonespecialinstructions"),
+          street = row[Option[/* xml */ String]]("street"),
+          city = row[Option[/* xml */ String]]("city"),
+          stateprovince = row[Option[/* xml */ String]]("stateprovince"),
+          postalcode = row[Option[/* xml */ String]]("postalcode"),
+          countryregion = row[Option[/* xml */ String]]("countryregion"),
+          homeaddressspecialinstructions = row[Option[/* xml */ String]]("homeaddressspecialinstructions"),
+          emailaddress = row[Option[/* xml */ String]]("emailaddress"),
+          emailspecialinstructions = row[Option[String]]("emailspecialinstructions"),
+          emailtelephonenumber = row[Option[/* xml */ String]]("emailtelephonenumber"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

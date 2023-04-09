@@ -7,14 +7,20 @@ package adventureworks
 package pr
 package pi
 
+import adventureworks.production.location.LocationId
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object PiRepoImpl extends PiRepo {
   override def selectAll(implicit c: Connection): List[PiRow] = {
-    SQL"""select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi""".as(PiRow.rowParser("").*)
+    SQL"""select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PiFieldOrIdValue[_]])(implicit c: Connection): List[PiRow] = {
     fieldValues match {
@@ -35,8 +41,23 @@ object PiRepoImpl extends PiRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PiRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[PiRow] =
+    RowParser[PiRow] { row =>
+      Success(
+        PiRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          locationid = row[Option[LocationId]]("locationid"),
+          shelf = row[Option[String]]("shelf"),
+          bin = row[Option[Int]]("bin"),
+          quantity = row[Option[Int]]("quantity"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

@@ -8,8 +8,6 @@ package production
 package workorderrouting
 
 import adventureworks.production.workorder.WorkorderId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -41,14 +39,4 @@ object WorkorderroutingId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[WorkorderroutingId] = { row =>
-    Success(
-      WorkorderroutingId(
-        workorderid = row[WorkorderId](prefix + "workorderid"),
-        productid = row[Int](prefix + "productid"),
-        operationsequence = row[Int](prefix + "operationsequence")
-      )
-    )
-  }
-
 }

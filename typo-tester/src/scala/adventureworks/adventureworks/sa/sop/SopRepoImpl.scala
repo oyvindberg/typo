@@ -7,14 +7,20 @@ package adventureworks
 package sa
 package sop
 
+import adventureworks.production.product.ProductId
+import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SopRepoImpl extends SopRepo {
   override def selectAll(implicit c: Connection): List[SopRow] = {
-    SQL"""select id, specialofferid, productid, rowguid, modifieddate from sa.sop""".as(SopRow.rowParser("").*)
+    SQL"""select id, specialofferid, productid, rowguid, modifieddate from sa.sop""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SopFieldOrIdValue[_]])(implicit c: Connection): List[SopRow] = {
     fieldValues match {
@@ -32,8 +38,20 @@ object SopRepoImpl extends SopRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SopRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SopRow] =
+    RowParser[SopRow] { row =>
+      Success(
+        SopRow(
+          id = row[Option[Int]]("id"),
+          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
+          productid = row[Option[ProductId]]("productid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

@@ -9,11 +9,16 @@ package employee
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -68,7 +73,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
-    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee""".as(EmployeeRow.rowParser("").*)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]])(implicit c: Connection): List[EmployeeRow] = {
     fieldValues match {
@@ -96,15 +101,15 @@ object EmployeeRepoImpl extends EmployeeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmployeeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(businessentityid: EmployeeId)(implicit c: Connection): Option[EmployeeRow] = {
-    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid""".as(EmployeeRow.rowParser("").singleOpt)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: List[EmployeeId])(implicit c: Connection): List[EmployeeRow] = {
-    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids""".as(EmployeeRow.rowParser("").*)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids""".as(rowParser.*)
   }
   override def update(businessentityid: EmployeeId, row: EmployeeRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.employee
@@ -155,4 +160,28 @@ object EmployeeRepoImpl extends EmployeeRepo {
     }
   
   }
+  val rowParser: RowParser[EmployeeRow] =
+    RowParser[EmployeeRow] { row =>
+      Success(
+        EmployeeRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          nationalidnumber = row[String]("nationalidnumber"),
+          loginid = row[String]("loginid"),
+          jobtitle = row[String]("jobtitle"),
+          birthdate = row[LocalDate]("birthdate"),
+          maritalstatus = row[/* bpchar */ String]("maritalstatus"),
+          gender = row[/* bpchar */ String]("gender"),
+          hiredate = row[LocalDate]("hiredate"),
+          salariedflag = row[Flag]("salariedflag"),
+          vacationhours = row[Int]("vacationhours"),
+          sickleavehours = row[Int]("sickleavehours"),
+          currentflag = row[Flag]("currentflag"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate"),
+          organizationnode = row[Option[String]]("organizationnode")
+        )
+      )
+    }
+  val idRowParser: RowParser[EmployeeId] =
+    SqlParser.get[EmployeeId]("businessentityid")
 }

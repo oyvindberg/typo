@@ -7,14 +7,20 @@ package adventureworks
 package sa
 package sth
 
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object SthRepoImpl extends SthRepo {
   override def selectAll(implicit c: Connection): List[SthRow] = {
-    SQL"""select id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sa.sth""".as(SthRow.rowParser("").*)
+    SQL"""select id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sa.sth""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SthFieldOrIdValue[_]])(implicit c: Connection): List[SthRow] = {
     fieldValues match {
@@ -34,8 +40,22 @@ object SthRepoImpl extends SthRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SthRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[SthRow] =
+    RowParser[SthRow] { row =>
+      Success(
+        SthRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          startdate = row[Option[LocalDateTime]]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

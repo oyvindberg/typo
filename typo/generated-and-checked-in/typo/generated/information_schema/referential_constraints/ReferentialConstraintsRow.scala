@@ -10,8 +10,6 @@ package generated
 package information_schema
 package referential_constraints
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,22 +41,6 @@ case class ReferentialConstraintsRow(
 )
 
 object ReferentialConstraintsRow {
-  def rowParser(prefix: String): RowParser[ReferentialConstraintsRow] = { row =>
-    Success(
-      ReferentialConstraintsRow(
-        constraintCatalog = row[Option[SqlIdentifier]](prefix + "constraint_catalog"),
-        constraintSchema = row[Option[SqlIdentifier]](prefix + "constraint_schema"),
-        constraintName = row[Option[SqlIdentifier]](prefix + "constraint_name"),
-        uniqueConstraintCatalog = row[Option[SqlIdentifier]](prefix + "unique_constraint_catalog"),
-        uniqueConstraintSchema = row[Option[SqlIdentifier]](prefix + "unique_constraint_schema"),
-        uniqueConstraintName = row[Option[SqlIdentifier]](prefix + "unique_constraint_name"),
-        matchOption = row[Option[CharacterData]](prefix + "match_option"),
-        updateRule = row[Option[CharacterData]](prefix + "update_rule"),
-        deleteRule = row[Option[CharacterData]](prefix + "delete_rule")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[ReferentialConstraintsRow] = new OFormat[ReferentialConstraintsRow]{
     override def writes(o: ReferentialConstraintsRow): JsObject =
       Json.obj(

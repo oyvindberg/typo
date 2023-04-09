@@ -9,8 +9,6 @@ package personcreditcard
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,13 +38,4 @@ object PersoncreditcardId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PersoncreditcardId] = { row =>
-    Success(
-      PersoncreditcardId(
-        businessentityid = row[BusinessentityId](prefix + "businessentityid"),
-        creditcardid = row[CreditcardId](prefix + "creditcardid")
-      )
-    )
-  }
-
 }

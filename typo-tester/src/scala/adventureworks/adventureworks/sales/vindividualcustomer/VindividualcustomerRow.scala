@@ -10,8 +10,6 @@ package vindividualcustomer
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -73,31 +71,6 @@ case class VindividualcustomerRow(
 )
 
 object VindividualcustomerRow {
-  def rowParser(prefix: String): RowParser[VindividualcustomerRow] = { row =>
-    Success(
-      VindividualcustomerRow(
-        businessentityid = row[Option[BusinessentityId]](prefix + "businessentityid"),
-        title = row[Option[String]](prefix + "title"),
-        firstname = row[Option[Name]](prefix + "firstname"),
-        middlename = row[Option[Name]](prefix + "middlename"),
-        lastname = row[Option[Name]](prefix + "lastname"),
-        suffix = row[Option[String]](prefix + "suffix"),
-        phonenumber = row[Option[Phone]](prefix + "phonenumber"),
-        phonenumbertype = row[Option[Name]](prefix + "phonenumbertype"),
-        emailaddress = row[Option[String]](prefix + "emailaddress"),
-        emailpromotion = row[Option[Int]](prefix + "emailpromotion"),
-        addresstype = row[Option[Name]](prefix + "addresstype"),
-        addressline1 = row[Option[String]](prefix + "addressline1"),
-        addressline2 = row[Option[String]](prefix + "addressline2"),
-        city = row[Option[String]](prefix + "city"),
-        stateprovincename = row[Option[Name]](prefix + "stateprovincename"),
-        postalcode = row[Option[String]](prefix + "postalcode"),
-        countryregionname = row[Option[Name]](prefix + "countryregionname"),
-        demographics = row[Option[/* xml */ String]](prefix + "demographics")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[VindividualcustomerRow] = new OFormat[VindividualcustomerRow]{
     override def writes(o: VindividualcustomerRow): JsObject =
       Json.obj(

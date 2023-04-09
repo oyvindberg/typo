@@ -9,9 +9,14 @@ package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.culture.CultureId
+import adventureworks.production.productdescription.ProductdescriptionId
+import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +40,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture""".as(ProductmodelproductdescriptioncultureRow.rowParser("").*)
+    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelproductdescriptioncultureFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     fieldValues match {
@@ -52,12 +57,12 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductmodelproductdescriptioncultureRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".as(ProductmodelproductdescriptioncultureRow.rowParser("").singleOpt)
+    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductmodelproductdescriptioncultureId, row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productmodelproductdescriptionculture
@@ -82,4 +87,25 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     }
   
   }
+  val rowParser: RowParser[ProductmodelproductdescriptioncultureRow] =
+    RowParser[ProductmodelproductdescriptioncultureRow] { row =>
+      Success(
+        ProductmodelproductdescriptioncultureRow(
+          productmodelid = row[ProductmodelId]("productmodelid"),
+          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
+          cultureid = row[CultureId]("cultureid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductmodelproductdescriptioncultureId] =
+    RowParser[ProductmodelproductdescriptioncultureId] { row =>
+      Success(
+        ProductmodelproductdescriptioncultureId(
+          productmodelid = row[ProductmodelId]("productmodelid"),
+          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
+          cultureid = row[CultureId]("cultureid")
+        )
+      )
+    }
 }

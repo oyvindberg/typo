@@ -8,8 +8,6 @@ package person
 package addresstype
 
 import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -33,17 +31,6 @@ case class AddresstypeRow(
 )
 
 object AddresstypeRow {
-  def rowParser(prefix: String): RowParser[AddresstypeRow] = { row =>
-    Success(
-      AddresstypeRow(
-        addresstypeid = row[AddresstypeId](prefix + "addresstypeid"),
-        name = row[Name](prefix + "name"),
-        rowguid = row[UUID](prefix + "rowguid"),
-        modifieddate = row[LocalDateTime](prefix + "modifieddate")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[AddresstypeRow] = new OFormat[AddresstypeRow]{
     override def writes(o: AddresstypeRow): JsObject =
       Json.obj(

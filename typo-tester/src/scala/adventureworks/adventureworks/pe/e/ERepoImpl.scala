@@ -7,14 +7,19 @@ package adventureworks
 package pe
 package e
 
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.UUID
 
 object ERepoImpl extends ERepo {
   override def selectAll(implicit c: Connection): List[ERow] = {
-    SQL"""select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e""".as(ERow.rowParser("").*)
+    SQL"""select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EFieldOrIdValue[_]])(implicit c: Connection): List[ERow] = {
     fieldValues match {
@@ -33,8 +38,21 @@ object ERepoImpl extends ERepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ERow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
+  val rowParser: RowParser[ERow] =
+    RowParser[ERow] { row =>
+      Success(
+        ERow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          emailaddressid = row[Option[Int]]("emailaddressid"),
+          emailaddress = row[Option[String]]("emailaddress"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
 }

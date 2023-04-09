@@ -12,8 +12,11 @@ package pg_attribute
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
+import org.postgresql.util.PGobject
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
@@ -55,7 +58,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute""".as(PgAttributeRow.rowParser("").*)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgAttributeFieldOrIdValue[_]])(implicit c: Connection): List[PgAttributeRow] = {
     fieldValues match {
@@ -94,12 +97,12 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgAttributeRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(PgAttributeRow.rowParser("").singleOpt)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".as(rowParser.singleOpt)
   }
   override def selectByUniqueAttrelidAttname(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
     selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
@@ -173,4 +176,46 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     }
   
   }
+  val rowParser: RowParser[PgAttributeRow] =
+    RowParser[PgAttributeRow] { row =>
+      Success(
+        PgAttributeRow(
+          attrelid = row[/* oid */ Long]("attrelid"),
+          attname = row[String]("attname"),
+          atttypid = row[/* oid */ Long]("atttypid"),
+          attstattarget = row[Int]("attstattarget"),
+          attlen = row[Int]("attlen"),
+          attnum = row[Int]("attnum"),
+          attndims = row[Int]("attndims"),
+          attcacheoff = row[Int]("attcacheoff"),
+          atttypmod = row[Int]("atttypmod"),
+          attbyval = row[Boolean]("attbyval"),
+          attalign = row[String]("attalign"),
+          attstorage = row[String]("attstorage"),
+          attcompression = row[String]("attcompression"),
+          attnotnull = row[Boolean]("attnotnull"),
+          atthasdef = row[Boolean]("atthasdef"),
+          atthasmissing = row[Boolean]("atthasmissing"),
+          attidentity = row[String]("attidentity"),
+          attgenerated = row[String]("attgenerated"),
+          attisdropped = row[Boolean]("attisdropped"),
+          attislocal = row[Boolean]("attislocal"),
+          attinhcount = row[Int]("attinhcount"),
+          attcollation = row[/* oid */ Long]("attcollation"),
+          attacl = row[Option[Array[/* aclitem */ PGobject]]]("attacl"),
+          attoptions = row[Option[Array[String]]]("attoptions"),
+          attfdwoptions = row[Option[Array[String]]]("attfdwoptions"),
+          attmissingval = row[Option[/* anyarray */ PGobject]]("attmissingval")
+        )
+      )
+    }
+  val idRowParser: RowParser[PgAttributeId] =
+    RowParser[PgAttributeId] { row =>
+      Success(
+        PgAttributeId(
+          attrelid = row[/* oid */ Long]("attrelid"),
+          attnum = row[Int]("attnum")
+        )
+      )
+    }
 }

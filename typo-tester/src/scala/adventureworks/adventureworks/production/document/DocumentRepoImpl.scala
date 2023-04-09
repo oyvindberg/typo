@@ -9,11 +9,14 @@ package document
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -55,11 +58,11 @@ object DocumentRepoImpl extends DocumentRepo {
           returning documentnode
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[DocumentId]("documentnode").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document""".as(DocumentRow.rowParser("").*)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
     fieldValues match {
@@ -85,15 +88,15 @@ object DocumentRepoImpl extends DocumentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(DocumentRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode""".as(DocumentRow.rowParser("").singleOpt)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode""".as(rowParser.singleOpt)
   }
   override def selectByIds(documentnodes: List[DocumentId])(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode in $documentnodes""".as(DocumentRow.rowParser("").*)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode in $documentnodes""".as(rowParser.*)
   }
   override def selectByUniqueRowguid(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
     selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).headOption
@@ -143,4 +146,26 @@ object DocumentRepoImpl extends DocumentRepo {
     }
   
   }
+  val rowParser: RowParser[DocumentRow] =
+    RowParser[DocumentRow] { row =>
+      Success(
+        DocumentRow(
+          title = row[String]("title"),
+          owner = row[BusinessentityId]("owner"),
+          folderflag = row[Flag]("folderflag"),
+          filename = row[String]("filename"),
+          fileextension = row[Option[String]]("fileextension"),
+          revision = row[/* bpchar */ String]("revision"),
+          changenumber = row[Int]("changenumber"),
+          status = row[Int]("status"),
+          documentsummary = row[Option[String]]("documentsummary"),
+          document = row[Option[Array[Byte]]]("document"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate"),
+          documentnode = row[DocumentId]("documentnode")
+        )
+      )
+    }
+  val idRowParser: RowParser[DocumentId] =
+    SqlParser.get[DocumentId]("documentnode")
 }

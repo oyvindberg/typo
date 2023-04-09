@@ -9,10 +9,14 @@ package salesterritory
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -57,11 +61,11 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           returning territoryid
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[SalesterritoryId]("territoryid").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory""".as(SalesterritoryRow.rowParser("").*)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryRow] = {
     fieldValues match {
@@ -84,15 +88,15 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesterritoryRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid""".as(SalesterritoryRow.rowParser("").singleOpt)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid""".as(rowParser.singleOpt)
   }
   override def selectByIds(territoryids: List[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid in $territoryids""".as(SalesterritoryRow.rowParser("").*)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid in $territoryids""".as(rowParser.*)
   }
   override def update(territoryid: SalesterritoryId, row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesterritory
@@ -133,4 +137,23 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     }
   
   }
+  val rowParser: RowParser[SalesterritoryRow] =
+    RowParser[SalesterritoryRow] { row =>
+      Success(
+        SalesterritoryRow(
+          territoryid = row[SalesterritoryId]("territoryid"),
+          name = row[Name]("name"),
+          countryregioncode = row[CountryregionId]("countryregioncode"),
+          group = row[String]("group"),
+          salesytd = row[BigDecimal]("salesytd"),
+          saleslastyear = row[BigDecimal]("saleslastyear"),
+          costytd = row[BigDecimal]("costytd"),
+          costlastyear = row[BigDecimal]("costlastyear"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[SalesterritoryId] =
+    SqlParser.get[SalesterritoryId]("territoryid")
 }

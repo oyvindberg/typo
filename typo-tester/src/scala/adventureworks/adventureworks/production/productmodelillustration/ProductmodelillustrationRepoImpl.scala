@@ -9,9 +9,13 @@ package productmodelillustration
 
 import adventureworks.Defaulted.Provided
 import adventureworks.Defaulted.UseDefault
+import adventureworks.production.illustration.IllustrationId
+import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -35,7 +39,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration""".as(ProductmodelillustrationRow.rowParser("").*)
+    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelillustrationRow] = {
     fieldValues match {
@@ -51,12 +55,12 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductmodelillustrationRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}""".as(ProductmodelillustrationRow.rowParser("").singleOpt)
+    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: ProductmodelillustrationId, row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     SQL"""update production.productmodelillustration
@@ -81,4 +85,23 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     }
   
   }
+  val rowParser: RowParser[ProductmodelillustrationRow] =
+    RowParser[ProductmodelillustrationRow] { row =>
+      Success(
+        ProductmodelillustrationRow(
+          productmodelid = row[ProductmodelId]("productmodelid"),
+          illustrationid = row[IllustrationId]("illustrationid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
+  val idRowParser: RowParser[ProductmodelillustrationId] =
+    RowParser[ProductmodelillustrationId] { row =>
+      Success(
+        ProductmodelillustrationId(
+          productmodelid = row[ProductmodelId]("productmodelid"),
+          illustrationid = row[IllustrationId]("illustrationid")
+        )
+      )
+    }
 }
