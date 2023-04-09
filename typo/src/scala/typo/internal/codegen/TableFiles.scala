@@ -71,7 +71,6 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
                 |object ${qident.name} {
                 |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
                 |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}
-                |  ${options.dbLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}
                 |}
 """.stripMargin
         Some(sc.File(id.tpe, str, secondaryTypes = Nil))

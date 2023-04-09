@@ -8,8 +8,6 @@ package hardcoded
 package compositepk
 package person
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -26,16 +24,6 @@ case class PersonRow(
  }
 
 object PersonRow {
-  def rowParser(prefix: String): RowParser[PersonRow] = { row =>
-    Success(
-      PersonRow(
-        one = row[Long](prefix + "one"),
-        two = row[Option[String]](prefix + "two"),
-        name = row[Option[String]](prefix + "name")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
     override def writes(o: PersonRow): JsObject =
       Json.obj(

@@ -8,8 +8,6 @@ package hardcoded
 package myschema
 package person
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -37,24 +35,6 @@ case class PersonRow(
 )
 
 object PersonRow {
-  def rowParser(prefix: String): RowParser[PersonRow] = { row =>
-    Success(
-      PersonRow(
-        id = row[PersonId](prefix + "id"),
-        favouriteFootballClubId = row[FootballClubId](prefix + "favourite_football_club_id"),
-        name = row[String](prefix + "name"),
-        nickName = row[Option[String]](prefix + "nick_name"),
-        blogUrl = row[Option[String]](prefix + "blog_url"),
-        email = row[String](prefix + "email"),
-        phone = row[String](prefix + "phone"),
-        likesPizza = row[Boolean](prefix + "likes_pizza"),
-        maritalStatusId = row[MaritalStatusId](prefix + "marital_status_id"),
-        workEmail = row[Option[String]](prefix + "work_email"),
-        sector = row[Sector](prefix + "sector")
-      )
-    )
-  }
-
   implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
     override def writes(o: PersonRow): JsObject =
       Json.obj(

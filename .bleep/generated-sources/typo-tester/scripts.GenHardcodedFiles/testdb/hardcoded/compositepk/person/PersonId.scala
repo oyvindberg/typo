@@ -8,8 +8,6 @@ package hardcoded
 package compositepk
 package person
 
-import anorm.RowParser
-import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,13 +37,4 @@ object PersonId {
       )
     }
   }
-  def rowParser(prefix: String): RowParser[PersonId] = { row =>
-    Success(
-      PersonId(
-        one = row[Long](prefix + "one"),
-        two = row[Option[String]](prefix + "two")
-      )
-    )
-  }
-
 }

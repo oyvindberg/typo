@@ -45,7 +45,6 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |)$compositeId
             |
             |object ${relation.RowName.name} {
-            |  ${options.dbLib.instances(rowType, relation.cols).mkCode("\n")}
             |  ${options.jsonLib.instances(rowType, relation.cols).mkCode("\n")}
             |}
             |""".stripMargin
@@ -92,10 +91,12 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
              |  ${options.dbLib.repoImpl(relation, repoMethod)}
              |}""".stripMargin
     }
+    val allMethods = renderedMethods ++
+      options.dbLib.repoAdditionalMembers(relation.maybeId, sc.Type.Qualified(relation.RowName), relation.cols)
 
     val str =
       code"""|object ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
-             |  ${renderedMethods.mkCode("\n")}
+             |  ${allMethods.mkCode("\n")}
              |}
              |""".stripMargin
 

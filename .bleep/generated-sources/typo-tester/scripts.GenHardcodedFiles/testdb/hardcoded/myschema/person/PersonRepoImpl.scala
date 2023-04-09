@@ -10,12 +10,15 @@ package person
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import testdb.hardcoded.Defaulted.Provided
 import testdb.hardcoded.Defaulted.UseDefault
 import testdb.hardcoded.myschema.Sector
+import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
@@ -47,11 +50,11 @@ object PersonRepoImpl extends PersonRepo {
           returning id
     """
       .on(namedParameters :_*)
-      .executeInsert(SqlParser.get[PersonId]("id").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".as(PersonRow.rowParser("").*)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -75,15 +78,15 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id""".as(PersonRow.rowParser("").singleOpt)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id""".as(rowParser.singleOpt)
   }
   override def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(PersonRow.rowParser("").*)
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(rowParser.*)
   }
   override def update(id: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
     SQL"""update myschema.person
@@ -126,4 +129,24 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  val rowParser: RowParser[PersonRow] =
+    RowParser[PersonRow] { row =>
+      Success(
+        PersonRow(
+          id = row[PersonId]("id"),
+          favouriteFootballClubId = row[FootballClubId]("favourite_football_club_id"),
+          name = row[String]("name"),
+          nickName = row[Option[String]]("nick_name"),
+          blogUrl = row[Option[String]]("blog_url"),
+          email = row[String]("email"),
+          phone = row[String]("phone"),
+          likesPizza = row[Boolean]("likes_pizza"),
+          maritalStatusId = row[MaritalStatusId]("marital_status_id"),
+          workEmail = row[Option[String]]("work_email"),
+          sector = row[Sector]("sector")
+        )
+      )
+    }
+  val idRowParser: RowParser[PersonId] =
+    SqlParser.get[PersonId]("id")
 }

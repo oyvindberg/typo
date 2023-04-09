@@ -22,6 +22,7 @@ object DbLibAnorm extends DbLib {
   val TypeDoesNotMatch = sc.Type.Qualified("anorm.TypeDoesNotMatch")
 
   val rowParserIdent = sc.Ident("rowParser")
+  val idRowParserIdent = sc.Ident("idRowParser")
   def interpolate(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
@@ -42,19 +43,6 @@ object DbLibAnorm extends DbLib {
     List(column, toStatement, parameterMetadata)
   }
 
-  override def instances(tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
-    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](prefix + ${sc.StrLit(x.dbName.value)})" }
-    val rowParser = code"""|def $rowParserIdent(prefix: String): ${RowParser(tpe)} = { row =>
-                           |  $Success(
-                           |    $tpe(
-                           |      ${mappedValues.mkCode(",\n")}
-                           |    )
-                           |  )
-                           |}
-                           |""".stripMargin
-
-    List(rowParser)
-  }
   override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
     val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
     val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
@@ -115,17 +103,17 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.SelectAll(_) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
+        code"""$sql.as($rowParserIdent.*)"""
 
       case RepoMethod.SelectById(id, _) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchId(id)}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent("").singleOpt)"""
+        code"""$sql.as($rowParserIdent.singleOpt)"""
 
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
-        code"""$sql.as(${table.RowName}.$rowParserIdent("").*)"""
+        code"""$sql.as($rowParserIdent.*)"""
 
       case RepoMethod.SelectByUnique(params, _) =>
         val args = params.map { param => code"${table.FieldValueName}.${param.name}(${param.name})" }.mkCode(", ")
@@ -151,7 +139,7 @@ object DbLibAnorm extends DbLib {
               |    import anorm._
               |    SQL(q)
               |      .on(namedParams: _*)
-              |      .as(${table.RowName}.$rowParserIdent("").*)
+              |      .as($rowParserIdent.*)
               |}
               |""".stripMargin
 
@@ -207,22 +195,13 @@ object DbLibAnorm extends DbLib {
                  |""".stripMargin
         )
 
-        // we share row parser for composite ids, but inline it for unary id types because the may be external, or may be a domain/enum type which is shared
-        val rowParser =
-          id match {
-            case unary: IdComputed.Unary =>
-              code"""$SqlParser.get[${unary.tpe}](${sc.StrLit(unary.col.dbName.value)})"""
-            case other =>
-              code"""${other.tpe}.$rowParserIdent("")"""
-          }
-
         code"""|val namedParameters = List(
                |  ${maybeNamedParameters.mkCode(",\n")}
                |).flatten
                |
                |$sql
                |  .on(namedParameters :_*)
-               |  .executeInsert($rowParser.single)
+               |  .executeInsert($idRowParserIdent.single)
                |"""
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
@@ -285,7 +264,7 @@ object DbLibAnorm extends DbLib {
           s"$$${param.name.value}"
         }
         code"""|val sql = ${interpolate(renderedScript)}
-               |sql.as(${sc.Type.Qualified(sqlScript.relation.RowName)}.$rowParserIdent("").*)
+               |sql.as($rowParserIdent.*)
                |""".stripMargin
     }
 
@@ -368,5 +347,36 @@ object DbLibAnorm extends DbLib {
     }
 
     arrayInstances ++ postgresTypes ++ List(hstore, pgObject, localTime)
+  }
+
+  def mkRowParserImpl(tpe: sc.Type, cols: NonEmptyList[ColumnComputed], prefix: String): sc.Code = {
+    val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(prefix + x.dbName.value)})" }
+    code"""|${RowParser(tpe)} { row =>
+           |  $Success(
+           |    $tpe(
+           |      ${mappedValues.mkCode(",\n")}
+           |    )
+           |  )
+           |}""".stripMargin
+  }
+
+  def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
+    val rowParser =
+      code"""|val $rowParserIdent: ${RowParser(tpe)} =
+             |  ${mkRowParserImpl(tpe, cols, "")}"""
+
+    val maybeIdRowParser: Option[sc.Code] =
+      maybeId.map { id =>
+        val impl = id match {
+          case unary: IdComputed.Unary =>
+            code"""$SqlParser.get[${unary.tpe}](${sc.StrLit(unary.col.dbName.value)})"""
+          case composite: IdComputed.Composite =>
+            mkRowParserImpl(composite.tpe, composite.cols, "")
+        }
+        code"""|val $idRowParserIdent: ${RowParser(id.tpe)} =
+               |  $impl"""
+      }
+
+    List(rowParser) ++ maybeIdRowParser.toList
   }
 }

@@ -10,7 +10,9 @@ package person
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
@@ -27,11 +29,11 @@ object PersonRepoImpl extends PersonRepo {
           returning one, two
     """
       .on(namedParameters :_*)
-      .executeInsert(PersonId.rowParser("").single)
+      .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person""".as(PersonRow.rowParser("").*)
+    SQL"""select one, two, name from compositepk.person""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -47,12 +49,12 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(PersonRow.rowParser("").singleOpt)
+    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(rowParser.singleOpt)
   }
   override def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
     SQL"""update compositepk.person
@@ -77,4 +79,23 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  val rowParser: RowParser[PersonRow] =
+    RowParser[PersonRow] { row =>
+      Success(
+        PersonRow(
+          one = row[Long]("one"),
+          two = row[Option[String]]("two"),
+          name = row[Option[String]]("name")
+        )
+      )
+    }
+  val idRowParser: RowParser[PersonId] =
+    RowParser[PersonId] { row =>
+      Success(
+        PersonId(
+          one = row[Long]("one"),
+          two = row[Option[String]]("two")
+        )
+      )
+    }
 }

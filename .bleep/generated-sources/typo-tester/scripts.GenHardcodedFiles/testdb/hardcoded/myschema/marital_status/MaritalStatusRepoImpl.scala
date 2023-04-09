@@ -10,7 +10,10 @@ package marital_status
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
@@ -23,7 +26,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     """.execute()
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status""".as(MaritalStatusRow.rowParser("").*)
+    SQL"""select id from myschema.marital_status""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -37,14 +40,24 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(MaritalStatusRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status where id = $id""".as(MaritalStatusRow.rowParser("").singleOpt)
+    SQL"""select id from myschema.marital_status where id = $id""".as(rowParser.singleOpt)
   }
   override def selectByIds(ids: List[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id from myschema.marital_status where id in $ids""".as(MaritalStatusRow.rowParser("").*)
+    SQL"""select id from myschema.marital_status where id in $ids""".as(rowParser.*)
   }
+  val rowParser: RowParser[MaritalStatusRow] =
+    RowParser[MaritalStatusRow] { row =>
+      Success(
+        MaritalStatusRow(
+          id = row[MaritalStatusId]("id")
+        )
+      )
+    }
+  val idRowParser: RowParser[MaritalStatusId] =
+    SqlParser.get[MaritalStatusId]("id")
 }

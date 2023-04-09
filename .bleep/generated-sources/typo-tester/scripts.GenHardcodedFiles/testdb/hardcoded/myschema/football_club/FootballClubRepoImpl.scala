@@ -10,7 +10,10 @@ package football_club
 
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SqlParser
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 
 object FootballClubRepoImpl extends FootballClubRepo {
@@ -30,7 +33,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
   
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club""".as(FootballClubRow.rowParser("").*)
+    SQL"""select id, name from myschema.football_club""".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
@@ -45,15 +48,15 @@ object FootballClubRepoImpl extends FootballClubRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(FootballClubRow.rowParser("").*)
+          .as(rowParser.*)
     }
   
   }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club where id = $id""".as(FootballClubRow.rowParser("").singleOpt)
+    SQL"""select id, name from myschema.football_club where id = $id""".as(rowParser.singleOpt)
   }
   override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club where id in $ids""".as(FootballClubRow.rowParser("").*)
+    SQL"""select id, name from myschema.football_club where id in $ids""".as(rowParser.*)
   }
   override def update(id: FootballClubId, row: FootballClubRow)(implicit c: Connection): Boolean = {
     SQL"""update myschema.football_club
@@ -78,4 +81,15 @@ object FootballClubRepoImpl extends FootballClubRepo {
     }
   
   }
+  val rowParser: RowParser[FootballClubRow] =
+    RowParser[FootballClubRow] { row =>
+      Success(
+        FootballClubRow(
+          id = row[FootballClubId]("id"),
+          name = row[String]("name")
+        )
+      )
+    }
+  val idRowParser: RowParser[FootballClubId] =
+    SqlParser.get[FootballClubId]("id")
 }
