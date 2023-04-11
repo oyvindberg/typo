@@ -58,7 +58,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select id, name from myschema.football_club where id in $ids""".as(rowParser.*)
   }
-  override def update(id: FootballClubId, row: FootballClubRow)(implicit c: Connection): Boolean = {
+  override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
+    val id = row.id
     SQL"""update myschema.football_club
           set name = ${row.name}
           where id = $id""".executeUpdate() > 0

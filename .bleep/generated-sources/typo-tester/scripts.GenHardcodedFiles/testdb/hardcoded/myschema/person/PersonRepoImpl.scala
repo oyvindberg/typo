@@ -87,7 +87,8 @@ object PersonRepoImpl extends PersonRepo {
   override def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
     SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(rowParser.*)
   }
-  override def update(id: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+    val id = row.id
     SQL"""update myschema.person
           set favourite_football_club_id = ${row.favouriteFootballClubId},
               name = ${row.name},

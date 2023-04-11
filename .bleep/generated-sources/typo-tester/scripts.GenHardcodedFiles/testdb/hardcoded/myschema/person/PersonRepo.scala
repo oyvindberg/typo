@@ -17,6 +17,6 @@ trait PersonRepo {
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow]
   def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow]
   def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow]
-  def update(id: PersonId, row: PersonRow)(implicit c: Connection): Boolean
+  def update(row: PersonRow)(implicit c: Connection): Boolean
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean
 }

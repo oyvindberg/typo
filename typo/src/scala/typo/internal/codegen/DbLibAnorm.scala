@@ -69,8 +69,8 @@ object DbLibAnorm extends DbLib {
       code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.UpdateFieldValues(id, param, _) =>
       code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
-    case RepoMethod.Update(id, param, _) =>
-      code"def update(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
+    case RepoMethod.Update(_, param, _) =>
+      code"def update($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.InsertDbGeneratedKey(id, _, unsavedParam, _) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): ${id.tpe}"
     case RepoMethod.InsertProvidedKey(id, _, unsavedParam, _) =>
@@ -91,8 +91,8 @@ object DbLibAnorm extends DbLib {
     id match {
       case id: IdComputed.Unary =>
         code"${maybeQuoted(id.col.dbName)} = $$${id.paramName}"
-      case compositive: IdComputed.Composite =>
-        code"${compositive.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${compositive.paramName}.${cc.name}}").mkCode(", ")}"
+      case composite: IdComputed.Composite =>
+        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(", ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
@@ -175,7 +175,8 @@ object DbLibAnorm extends DbLib {
                 |      set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
                 |      where ${matchId(id)}""".stripMargin
         )
-        code"""$sql.executeUpdate() > 0"""
+        code"""|val ${id.paramName} = ${param.name}.${id.paramName}
+               |$sql.executeUpdate() > 0"""
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {

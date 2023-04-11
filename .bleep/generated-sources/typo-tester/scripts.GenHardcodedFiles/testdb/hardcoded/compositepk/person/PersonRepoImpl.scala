@@ -56,7 +56,8 @@ object PersonRepoImpl extends PersonRepo {
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update compositepk.person
           set name = ${row.name}
           where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
