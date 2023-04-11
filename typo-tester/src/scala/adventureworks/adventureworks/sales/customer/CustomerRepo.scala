@@ -16,6 +16,6 @@ trait CustomerRepo {
   def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow]
   def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow]
   def selectByIds(customerids: List[CustomerId])(implicit c: Connection): List[CustomerRow]
-  def update(customerid: CustomerId, row: CustomerRow)(implicit c: Connection): Boolean
+  def update(row: CustomerRow)(implicit c: Connection): Boolean
   def updateFieldValues(customerid: CustomerId, fieldValues: List[CustomerFieldValue[_]])(implicit c: Connection): Boolean
 }

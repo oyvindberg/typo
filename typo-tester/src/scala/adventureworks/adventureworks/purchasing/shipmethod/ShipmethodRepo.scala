@@ -16,6 +16,6 @@ trait ShipmethodRepo {
   def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow]
   def selectByIds(shipmethodids: List[ShipmethodId])(implicit c: Connection): List[ShipmethodRow]
-  def update(shipmethodid: ShipmethodId, row: ShipmethodRow)(implicit c: Connection): Boolean
+  def update(row: ShipmethodRow)(implicit c: Connection): Boolean
   def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]])(implicit c: Connection): Boolean
 }

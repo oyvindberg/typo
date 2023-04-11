@@ -16,6 +16,6 @@ trait PurchaseorderheaderRepo {
   def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow]
   def selectByIds(purchaseorderids: List[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow]
-  def update(purchaseorderid: PurchaseorderheaderId, row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
+  def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
   def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]])(implicit c: Connection): Boolean
 }

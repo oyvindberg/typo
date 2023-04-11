@@ -63,7 +63,8 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductmodelproductdescriptioncultureId, row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.productmodelproductdescriptionculture
           set modifieddate = ${row.modifieddate}
           where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".executeUpdate() > 0

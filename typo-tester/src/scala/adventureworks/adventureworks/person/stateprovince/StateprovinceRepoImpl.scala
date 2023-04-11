@@ -86,7 +86,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   override def selectByIds(stateprovinceids: List[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid in $stateprovinceids""".as(rowParser.*)
   }
-  override def update(stateprovinceid: StateprovinceId, row: StateprovinceRow)(implicit c: Connection): Boolean = {
+  override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
+    val stateprovinceid = row.stateprovinceid
     SQL"""update person.stateprovince
           set stateprovincecode = ${row.stateprovincecode},
               countryregioncode = ${row.countryregioncode},

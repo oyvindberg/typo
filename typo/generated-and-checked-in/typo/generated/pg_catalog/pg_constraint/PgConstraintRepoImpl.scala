@@ -110,7 +110,8 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectByUniqueConrelidContypidConname(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
     selectByFieldValues(List(PgConstraintFieldValue.conrelid(conrelid), PgConstraintFieldValue.contypid(contypid), PgConstraintFieldValue.conname(conname))).headOption
   }
-  override def update(oid: PgConstraintId, row: PgConstraintRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgConstraintRow)(implicit c: Connection): Boolean = {
+    val oid = row.oid
     SQL"""update pg_catalog.pg_constraint
           set conname = ${row.conname},
               connamespace = ${row.connamespace},

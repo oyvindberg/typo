@@ -68,7 +68,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def selectByIds(salesreasonids: List[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid in $salesreasonids""".as(rowParser.*)
   }
-  override def update(salesreasonid: SalesreasonId, row: SalesreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
+    val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
           set name = ${row.name},
               reasontype = ${row.reasontype},

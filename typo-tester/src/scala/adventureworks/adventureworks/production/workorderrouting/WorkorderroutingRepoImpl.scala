@@ -78,7 +78,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: WorkorderroutingId, row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
+  override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.workorderrouting
           set locationid = ${row.locationid},
               scheduledstartdate = ${row.scheduledstartdate},

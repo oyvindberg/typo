@@ -79,7 +79,8 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
     selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption
   }
-  override def update(oid: PgCollationId, row: PgCollationRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
+    val oid = row.oid
     SQL"""update pg_catalog.pg_collation
           set collname = ${row.collname},
               collnamespace = ${row.collnamespace},

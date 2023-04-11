@@ -16,6 +16,6 @@ trait SalesorderheaderRepo {
   def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId)(implicit c: Connection): Option[SalesorderheaderRow]
   def selectByIds(salesorderids: List[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow]
-  def update(salesorderid: SalesorderheaderId, row: SalesorderheaderRow)(implicit c: Connection): Boolean
+  def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean
   def updateFieldValues(salesorderid: SalesorderheaderId, fieldValues: List[SalesorderheaderFieldValue[_]])(implicit c: Connection): Boolean
 }

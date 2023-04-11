@@ -15,6 +15,6 @@ trait PersonphoneRepo {
   def selectAll(implicit c: Connection): List[PersonphoneRow]
   def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow]
   def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow]
-  def update(compositeId: PersonphoneId, row: PersonphoneRow)(implicit c: Connection): Boolean
+  def update(row: PersonphoneRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: PersonphoneId, fieldValues: List[PersonphoneFieldValue[_]])(implicit c: Connection): Boolean
 }

@@ -61,7 +61,8 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: SalesorderheadersalesreasonId, row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.salesorderheadersalesreason
           set modifieddate = ${row.modifieddate}
           where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}""".executeUpdate() > 0

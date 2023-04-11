@@ -68,7 +68,8 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
     selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption
   }
-  override def update(oid: PgNamespaceId, row: PgNamespaceRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
+    val oid = row.oid
     SQL"""update pg_catalog.pg_namespace
           set nspname = ${row.nspname},
               nspowner = ${row.nspowner},

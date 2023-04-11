@@ -124,7 +124,8 @@ object ProductRepoImpl extends ProductRepo {
   override def selectByIds(productids: List[ProductId])(implicit c: Connection): List[ProductRow] = {
     SQL"""select productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid in $productids""".as(rowParser.*)
   }
-  override def update(productid: ProductId, row: ProductRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductRow)(implicit c: Connection): Boolean = {
+    val productid = row.productid
     SQL"""update production.product
           set name = ${row.name},
               productnumber = ${row.productnumber},

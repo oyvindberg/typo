@@ -79,7 +79,8 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def selectByIds(workorderids: List[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid in $workorderids""".as(rowParser.*)
   }
-  override def update(workorderid: WorkorderId, row: WorkorderRow)(implicit c: Connection): Boolean = {
+  override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
+    val workorderid = row.workorderid
     SQL"""update production.workorder
           set productid = ${row.productid},
               orderqty = ${row.orderqty},

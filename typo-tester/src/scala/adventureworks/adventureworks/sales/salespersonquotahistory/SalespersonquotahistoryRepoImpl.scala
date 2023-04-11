@@ -68,7 +68,8 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: SalespersonquotahistoryId, row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory
           set salesquota = ${row.salesquota},
               rowguid = ${row.rowguid},

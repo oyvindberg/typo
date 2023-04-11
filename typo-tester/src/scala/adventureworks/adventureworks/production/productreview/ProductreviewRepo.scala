@@ -16,6 +16,6 @@ trait ProductreviewRepo {
   def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow]
   def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow]
   def selectByIds(productreviewids: List[ProductreviewId])(implicit c: Connection): List[ProductreviewRow]
-  def update(productreviewid: ProductreviewId, row: ProductreviewRow)(implicit c: Connection): Boolean
+  def update(row: ProductreviewRow)(implicit c: Connection): Boolean
   def updateFieldValues(productreviewid: ProductreviewId, fieldValues: List[ProductreviewFieldValue[_]])(implicit c: Connection): Boolean
 }

@@ -67,7 +67,8 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
     SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: SpecialofferproductId, row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
+  override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct
           set rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}

@@ -73,7 +73,8 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: PurchaseorderdetailId, row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
+  override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update purchasing.purchaseorderdetail
           set duedate = ${row.duedate},
               orderqty = ${row.orderqty},

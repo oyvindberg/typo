@@ -64,7 +64,8 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
     SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductlistpricehistoryId, row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.productlistpricehistory
           set enddate = ${row.enddate},
               listprice = ${row.listprice},

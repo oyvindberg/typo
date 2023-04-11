@@ -68,7 +68,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: EmailaddressId, row: EmailaddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update person.emailaddress
           set emailaddress = ${row.emailaddress},
               rowguid = ${row.rowguid},

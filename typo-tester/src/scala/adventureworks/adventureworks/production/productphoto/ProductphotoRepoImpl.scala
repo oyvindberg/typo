@@ -71,7 +71,8 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def selectByIds(productphotoids: List[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid in $productphotoids""".as(rowParser.*)
   }
-  override def update(productphotoid: ProductphotoId, row: ProductphotoRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
+    val productphotoid = row.productphotoid
     SQL"""update production.productphoto
           set thumbnailphoto = ${row.thumbnailphoto},
               thumbnailphotofilename = ${row.thumbnailphotofilename},

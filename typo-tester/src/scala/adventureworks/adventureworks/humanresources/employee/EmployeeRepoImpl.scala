@@ -110,7 +110,8 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: BusinessentityId, row: EmployeeRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
+    val businessentityid = row.businessentityid
     SQL"""update humanresources.employee
           set nationalidnumber = ${row.nationalidnumber},
               loginid = ${row.loginid},

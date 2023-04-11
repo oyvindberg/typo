@@ -16,6 +16,6 @@ trait ScrapreasonRepo {
   def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow]
   def selectByIds(scrapreasonids: List[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow]
-  def update(scrapreasonid: ScrapreasonId, row: ScrapreasonRow)(implicit c: Connection): Boolean
+  def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]])(implicit c: Connection): Boolean
 }

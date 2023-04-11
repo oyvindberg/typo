@@ -103,7 +103,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectByIds(purchaseorderids: List[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid in $purchaseorderids""".as(rowParser.*)
   }
-  override def update(purchaseorderid: PurchaseorderheaderId, row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
+  override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
+    val purchaseorderid = row.purchaseorderid
     SQL"""update purchasing.purchaseorderheader
           set revisionnumber = ${row.revisionnumber},
               status = ${row.status},

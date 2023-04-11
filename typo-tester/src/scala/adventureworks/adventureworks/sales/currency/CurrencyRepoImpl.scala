@@ -65,7 +65,8 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def selectByIds(currencycodes: List[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     SQL"""select currencycode, name, modifieddate from sales.currency where currencycode in $currencycodes""".as(rowParser.*)
   }
-  override def update(currencycode: CurrencyId, row: CurrencyRow)(implicit c: Connection): Boolean = {
+  override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
+    val currencycode = row.currencycode
     SQL"""update sales.currency
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

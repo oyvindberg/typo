@@ -85,7 +85,8 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def selectByIds(billofmaterialsids: List[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid in $billofmaterialsids""".as(rowParser.*)
   }
-  override def update(billofmaterialsid: BillofmaterialsId, row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
+  override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
+    val billofmaterialsid = row.billofmaterialsid
     SQL"""update production.billofmaterials
           set productassemblyid = ${row.productassemblyid},
               componentid = ${row.componentid},

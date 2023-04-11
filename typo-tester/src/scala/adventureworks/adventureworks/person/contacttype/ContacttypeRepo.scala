@@ -16,6 +16,6 @@ trait ContacttypeRepo {
   def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow]
   def selectByIds(contacttypeids: List[ContacttypeId])(implicit c: Connection): List[ContacttypeRow]
-  def update(contacttypeid: ContacttypeId, row: ContacttypeRow)(implicit c: Connection): Boolean
+  def update(row: ContacttypeRow)(implicit c: Connection): Boolean
   def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]])(implicit c: Connection): Boolean
 }

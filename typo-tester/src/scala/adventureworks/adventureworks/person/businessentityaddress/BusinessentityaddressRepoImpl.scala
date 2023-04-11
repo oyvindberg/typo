@@ -69,7 +69,8 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow] = {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: BusinessentityaddressId, row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update person.businessentityaddress
           set rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}

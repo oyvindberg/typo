@@ -84,7 +84,8 @@ object VendorRepoImpl extends VendorRepo {
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: BusinessentityId, row: VendorRow)(implicit c: Connection): Boolean = {
+  override def update(row: VendorRow)(implicit c: Connection): Boolean = {
+    val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
           set accountnumber = ${row.accountnumber},
               name = ${row.name},

@@ -58,7 +58,8 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow] = {
     SQL"""select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: PgDescriptionId, row: PgDescriptionRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgDescriptionRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_description
           set description = ${row.description}
           where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".executeUpdate() > 0

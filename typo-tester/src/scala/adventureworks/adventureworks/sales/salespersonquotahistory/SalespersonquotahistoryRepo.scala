@@ -15,6 +15,6 @@ trait SalespersonquotahistoryRepo {
   def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow]
   def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow]
-  def update(compositeId: SalespersonquotahistoryId, row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean
+  def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: SalespersonquotahistoryId, fieldValues: List[SalespersonquotahistoryFieldValue[_]])(implicit c: Connection): Boolean
 }

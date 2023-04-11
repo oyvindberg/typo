@@ -16,6 +16,6 @@ trait BusinessentityRepo {
   def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow]
   def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[BusinessentityRow]
-  def update(businessentityid: BusinessentityId, row: BusinessentityRow)(implicit c: Connection): Boolean
+  def update(row: BusinessentityRow)(implicit c: Connection): Boolean
   def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[BusinessentityFieldValue[_]])(implicit c: Connection): Boolean
 }

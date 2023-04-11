@@ -82,7 +82,8 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def selectByIds(salestaxrateids: List[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid in $salestaxrateids""".as(rowParser.*)
   }
-  override def update(salestaxrateid: SalestaxrateId, row: SalestaxrateRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
+    val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
           set stateprovinceid = ${row.stateprovinceid},
               taxtype = ${row.taxtype},

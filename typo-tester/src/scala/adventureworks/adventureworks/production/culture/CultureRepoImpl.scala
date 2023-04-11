@@ -65,7 +65,8 @@ object CultureRepoImpl extends CultureRepo {
   override def selectByIds(cultureids: List[CultureId])(implicit c: Connection): List[CultureRow] = {
     SQL"""select cultureid, name, modifieddate from production.culture where cultureid in $cultureids""".as(rowParser.*)
   }
-  override def update(cultureid: CultureId, row: CultureRow)(implicit c: Connection): Boolean = {
+  override def update(row: CultureRow)(implicit c: Connection): Boolean = {
+    val cultureid = row.cultureid
     SQL"""update production.culture
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

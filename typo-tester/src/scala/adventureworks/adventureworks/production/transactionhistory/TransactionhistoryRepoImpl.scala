@@ -84,7 +84,8 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectByIds(transactionids: List[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid in $transactionids""".as(rowParser.*)
   }
-  override def update(transactionid: TransactionhistoryId, row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
+    val transactionid = row.transactionid
     SQL"""update production.transactionhistory
           set productid = ${row.productid},
               referenceorderid = ${row.referenceorderid},

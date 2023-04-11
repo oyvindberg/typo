@@ -80,7 +80,8 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def selectByIds(productreviewids: List[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from production.productreview where productreviewid in $productreviewids""".as(rowParser.*)
   }
-  override def update(productreviewid: ProductreviewId, row: ProductreviewRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
+    val productreviewid = row.productreviewid
     SQL"""update production.productreview
           set productid = ${row.productid},
               reviewername = ${row.reviewername},

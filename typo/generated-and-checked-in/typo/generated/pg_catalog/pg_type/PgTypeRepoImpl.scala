@@ -124,7 +124,8 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
     selectByFieldValues(List(PgTypeFieldValue.typname(typname), PgTypeFieldValue.typnamespace(typnamespace))).headOption
   }
-  override def update(oid: PgTypeId, row: PgTypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgTypeRow)(implicit c: Connection): Boolean = {
+    val oid = row.oid
     SQL"""update pg_catalog.pg_type
           set typname = ${row.typname},
               typnamespace = ${row.typnamespace},

@@ -107,7 +107,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def selectByUniqueAttrelidAttname(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
     selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
   }
-  override def update(compositeId: PgAttributeId, row: PgAttributeRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgAttributeRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_attribute
           set attname = ${row.attname},
               atttypid = ${row.atttypid},

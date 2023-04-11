@@ -73,7 +73,8 @@ object PasswordRepoImpl extends PasswordRepo {
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: BusinessentityId, row: PasswordRow)(implicit c: Connection): Boolean = {
+  override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
+    val businessentityid = row.businessentityid
     SQL"""update person.password
           set passwordhash = ${row.passwordhash},
               passwordsalt = ${row.passwordsalt},

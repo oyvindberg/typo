@@ -20,6 +20,6 @@ trait PgConstraintRepo {
   def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow]
   def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow]
   def selectByUniqueConrelidContypidConname(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow]
-  def update(oid: PgConstraintId, row: PgConstraintRow)(implicit c: Connection): Boolean
+  def update(row: PgConstraintRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgConstraintId, fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): Boolean
 }

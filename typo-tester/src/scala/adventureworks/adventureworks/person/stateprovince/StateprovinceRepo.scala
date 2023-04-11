@@ -16,6 +16,6 @@ trait StateprovinceRepo {
   def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow]
   def selectByIds(stateprovinceids: List[StateprovinceId])(implicit c: Connection): List[StateprovinceRow]
-  def update(stateprovinceid: StateprovinceId, row: StateprovinceRow)(implicit c: Connection): Boolean
+  def update(row: StateprovinceRow)(implicit c: Connection): Boolean
   def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]])(implicit c: Connection): Boolean
 }

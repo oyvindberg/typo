@@ -61,7 +61,8 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
     SQL"""select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductdocumentId, row: ProductdocumentRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.productdocument
           set modifieddate = ${row.modifieddate}
           where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".executeUpdate() > 0

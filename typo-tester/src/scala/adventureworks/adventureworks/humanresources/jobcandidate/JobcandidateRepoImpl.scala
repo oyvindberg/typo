@@ -68,7 +68,8 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def selectByIds(jobcandidateids: List[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid in $jobcandidateids""".as(rowParser.*)
   }
-  override def update(jobcandidateid: JobcandidateId, row: JobcandidateRow)(implicit c: Connection): Boolean = {
+  override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
+    val jobcandidateid = row.jobcandidateid
     SQL"""update humanresources.jobcandidate
           set businessentityid = ${row.businessentityid},
               resume = ${row.resume},

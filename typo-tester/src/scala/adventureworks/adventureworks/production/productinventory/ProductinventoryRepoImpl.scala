@@ -76,7 +76,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def selectById(compositeId: ProductinventoryId)(implicit c: Connection): Option[ProductinventoryRow] = {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductinventoryId, row: ProductinventoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.productinventory
           set shelf = ${row.shelf},
               bin = ${row.bin},

@@ -71,7 +71,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def selectByIds(creditcardids: List[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid in $creditcardids""".as(rowParser.*)
   }
-  override def update(creditcardid: CreditcardId, row: CreditcardRow)(implicit c: Connection): Boolean = {
+  override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
+    val creditcardid = row.creditcardid
     SQL"""update sales.creditcard
           set cardtype = ${row.cardtype},
               cardnumber = ${row.cardnumber},

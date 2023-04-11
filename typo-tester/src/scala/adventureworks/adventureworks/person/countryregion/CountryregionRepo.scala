@@ -16,6 +16,6 @@ trait CountryregionRepo {
   def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow]
   def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow]
   def selectByIds(countryregioncodes: List[CountryregionId])(implicit c: Connection): List[CountryregionRow]
-  def update(countryregioncode: CountryregionId, row: CountryregionRow)(implicit c: Connection): Boolean
+  def update(row: CountryregionRow)(implicit c: Connection): Boolean
   def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]])(implicit c: Connection): Boolean
 }

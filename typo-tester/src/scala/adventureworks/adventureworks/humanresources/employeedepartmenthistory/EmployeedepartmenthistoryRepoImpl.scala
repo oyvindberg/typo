@@ -67,7 +67,8 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow] = {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: EmployeedepartmenthistoryId, row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update humanresources.employeedepartmenthistory
           set enddate = ${row.enddate},
               modifieddate = ${row.modifieddate}

@@ -15,6 +15,6 @@ trait EmailaddressRepo {
   def selectAll(implicit c: Connection): List[EmailaddressRow]
   def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow]
   def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow]
-  def update(compositeId: EmailaddressId, row: EmailaddressRow)(implicit c: Connection): Boolean
+  def update(row: EmailaddressRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: EmailaddressId, fieldValues: List[EmailaddressFieldValue[_]])(implicit c: Connection): Boolean
 }

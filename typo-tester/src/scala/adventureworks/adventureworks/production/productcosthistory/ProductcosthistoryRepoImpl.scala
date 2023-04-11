@@ -64,7 +64,8 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
     SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductcosthistoryId, row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update production.productcosthistory
           set enddate = ${row.enddate},
               standardcost = ${row.standardcost},

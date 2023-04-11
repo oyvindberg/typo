@@ -15,6 +15,6 @@ trait ProductmodelillustrationRepo {
   def selectAll(implicit c: Connection): List[ProductmodelillustrationRow]
   def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelillustrationRow]
   def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow]
-  def update(compositeId: ProductmodelillustrationId, row: ProductmodelillustrationRow)(implicit c: Connection): Boolean
+  def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: ProductmodelillustrationId, fieldValues: List[ProductmodelillustrationFieldValue[_]])(implicit c: Connection): Boolean
 }

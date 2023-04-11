@@ -16,6 +16,6 @@ trait ShoppingcartitemRepo {
   def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow]
   def selectByIds(shoppingcartitemids: List[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow]
-  def update(shoppingcartitemid: ShoppingcartitemId, row: ShoppingcartitemRow)(implicit c: Connection): Boolean
+  def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean
   def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]])(implicit c: Connection): Boolean
 }

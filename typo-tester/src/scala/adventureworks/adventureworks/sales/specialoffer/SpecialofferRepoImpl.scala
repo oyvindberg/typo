@@ -91,7 +91,8 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectByIds(specialofferids: List[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid in $specialofferids""".as(rowParser.*)
   }
-  override def update(specialofferid: SpecialofferId, row: SpecialofferRow)(implicit c: Connection): Boolean = {
+  override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
+    val specialofferid = row.specialofferid
     SQL"""update sales.specialoffer
           set description = ${row.description},
               discountpct = ${row.discountpct},

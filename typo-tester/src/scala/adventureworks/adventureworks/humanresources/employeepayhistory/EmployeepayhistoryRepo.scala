@@ -15,6 +15,6 @@ trait EmployeepayhistoryRepo {
   def selectAll(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow]
-  def update(compositeId: EmployeepayhistoryId, row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
+  def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: EmployeepayhistoryId, fieldValues: List[EmployeepayhistoryFieldValue[_]])(implicit c: Connection): Boolean
 }

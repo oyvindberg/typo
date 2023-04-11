@@ -78,7 +78,8 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectByIds(shoppingcartitemids: List[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid in $shoppingcartitemids""".as(rowParser.*)
   }
-  override def update(shoppingcartitemid: ShoppingcartitemId, row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
+    val shoppingcartitemid = row.shoppingcartitemid
     SQL"""update sales.shoppingcartitem
           set shoppingcartid = ${row.shoppingcartid},
               quantity = ${row.quantity},

@@ -126,7 +126,8 @@ object PgClassRepoImpl extends PgClassRepo {
   override def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow] = {
     selectByFieldValues(List(PgClassFieldValue.relname(relname), PgClassFieldValue.relnamespace(relnamespace))).headOption
   }
-  override def update(oid: PgClassId, row: PgClassRow)(implicit c: Connection): Boolean = {
+  override def update(row: PgClassRow)(implicit c: Connection): Boolean = {
+    val oid = row.oid
     SQL"""update pg_catalog.pg_class
           set relname = ${row.relname},
               relnamespace = ${row.relnamespace},

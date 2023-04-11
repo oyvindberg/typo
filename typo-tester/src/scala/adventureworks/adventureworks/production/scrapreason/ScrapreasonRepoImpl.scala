@@ -66,7 +66,8 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectByIds(scrapreasonids: List[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
     SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid in $scrapreasonids""".as(rowParser.*)
   }
-  override def update(scrapreasonid: ScrapreasonId, row: ScrapreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
+    val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

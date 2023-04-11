@@ -66,7 +66,8 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectByIds(phonenumbertypeids: List[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid in $phonenumbertypeids""".as(rowParser.*)
   }
-  override def update(phonenumbertypeid: PhonenumbertypeId, row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
+    val phonenumbertypeid = row.phonenumbertypeid
     SQL"""update person.phonenumbertype
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

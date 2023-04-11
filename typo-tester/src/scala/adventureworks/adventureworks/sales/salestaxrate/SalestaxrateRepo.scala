@@ -16,6 +16,6 @@ trait SalestaxrateRepo {
   def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow]
   def selectByIds(salestaxrateids: List[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow]
-  def update(salestaxrateid: SalestaxrateId, row: SalestaxrateRow)(implicit c: Connection): Boolean
+  def update(row: SalestaxrateRow)(implicit c: Connection): Boolean
   def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]])(implicit c: Connection): Boolean
 }

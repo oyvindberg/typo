@@ -18,6 +18,6 @@ trait PgDescriptionRepo {
   def selectAll(implicit c: Connection): List[PgDescriptionRow]
   def selectByFieldValues(fieldValues: List[PgDescriptionFieldOrIdValue[_]])(implicit c: Connection): List[PgDescriptionRow]
   def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow]
-  def update(compositeId: PgDescriptionId, row: PgDescriptionRow)(implicit c: Connection): Boolean
+  def update(row: PgDescriptionRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: PgDescriptionId, fieldValues: List[PgDescriptionFieldValue[_]])(implicit c: Connection): Boolean
 }

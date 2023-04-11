@@ -76,7 +76,8 @@ object LocationRepoImpl extends LocationRepo {
   override def selectByIds(locationids: List[LocationId])(implicit c: Connection): List[LocationRow] = {
     SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid in $locationids""".as(rowParser.*)
   }
-  override def update(locationid: LocationId, row: LocationRow)(implicit c: Connection): Boolean = {
+  override def update(row: LocationRow)(implicit c: Connection): Boolean = {
+    val locationid = row.locationid
     SQL"""update production.location
           set name = ${row.name},
               costrate = ${row.costrate},

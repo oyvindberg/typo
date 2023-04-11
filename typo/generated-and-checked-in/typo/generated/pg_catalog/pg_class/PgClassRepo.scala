@@ -20,6 +20,6 @@ trait PgClassRepo {
   def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow]
   def selectByIds(oids: List[PgClassId])(implicit c: Connection): List[PgClassRow]
   def selectByUniqueRelnameRelnamespace(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow]
-  def update(oid: PgClassId, row: PgClassRow)(implicit c: Connection): Boolean
+  def update(row: PgClassRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Boolean
 }

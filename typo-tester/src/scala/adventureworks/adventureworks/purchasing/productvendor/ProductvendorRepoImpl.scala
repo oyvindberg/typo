@@ -78,7 +78,8 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: ProductvendorId, row: ProductvendorRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update purchasing.productvendor
           set averageleadtime = ${row.averageleadtime},
               standardprice = ${row.standardprice},

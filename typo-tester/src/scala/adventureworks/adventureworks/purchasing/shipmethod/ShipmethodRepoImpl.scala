@@ -82,7 +82,8 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectByIds(shipmethodids: List[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid in $shipmethodids""".as(rowParser.*)
   }
-  override def update(shipmethodid: ShipmethodId, row: ShipmethodRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
+    val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
           set name = ${row.name},
               shipbase = ${row.shipbase},

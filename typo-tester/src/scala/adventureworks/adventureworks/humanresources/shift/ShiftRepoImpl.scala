@@ -71,7 +71,8 @@ object ShiftRepoImpl extends ShiftRepo {
   override def selectByIds(shiftids: List[ShiftId])(implicit c: Connection): List[ShiftRow] = {
     SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid in $shiftids""".as(rowParser.*)
   }
-  override def update(shiftid: ShiftId, row: ShiftRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
+    val shiftid = row.shiftid
     SQL"""update humanresources.shift
           set name = ${row.name},
               starttime = ${row.starttime},

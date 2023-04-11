@@ -16,6 +16,6 @@ trait WorkorderRepo {
   def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow]
   def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow]
   def selectByIds(workorderids: List[WorkorderId])(implicit c: Connection): List[WorkorderRow]
-  def update(workorderid: WorkorderId, row: WorkorderRow)(implicit c: Connection): Boolean
+  def update(row: WorkorderRow)(implicit c: Connection): Boolean
   def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]])(implicit c: Connection): Boolean
 }

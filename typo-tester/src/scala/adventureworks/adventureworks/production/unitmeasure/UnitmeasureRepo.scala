@@ -16,6 +16,6 @@ trait UnitmeasureRepo {
   def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow]
   def selectByIds(unitmeasurecodes: List[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow]
-  def update(unitmeasurecode: UnitmeasureId, row: UnitmeasureRow)(implicit c: Connection): Boolean
+  def update(row: UnitmeasureRow)(implicit c: Connection): Boolean
   def updateFieldValues(unitmeasurecode: UnitmeasureId, fieldValues: List[UnitmeasureFieldValue[_]])(implicit c: Connection): Boolean
 }

@@ -16,6 +16,6 @@ trait CultureRepo {
   def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow]
   def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow]
   def selectByIds(cultureids: List[CultureId])(implicit c: Connection): List[CultureRow]
-  def update(cultureid: CultureId, row: CultureRow)(implicit c: Connection): Boolean
+  def update(row: CultureRow)(implicit c: Connection): Boolean
   def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]])(implicit c: Connection): Boolean
 }

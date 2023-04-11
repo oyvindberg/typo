@@ -18,6 +18,6 @@ trait DocumentRepo {
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]
   def selectByIds(documentnodes: List[DocumentId])(implicit c: Connection): List[DocumentRow]
   def selectByUniqueRowguid(rowguid: UUID)(implicit c: Connection): Option[DocumentRow]
-  def update(documentnode: DocumentId, row: DocumentRow)(implicit c: Connection): Boolean
+  def update(row: DocumentRow)(implicit c: Connection): Boolean
   def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]])(implicit c: Connection): Boolean
 }

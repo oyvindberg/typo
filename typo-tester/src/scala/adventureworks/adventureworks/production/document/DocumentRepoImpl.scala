@@ -100,7 +100,8 @@ object DocumentRepoImpl extends DocumentRepo {
   override def selectByUniqueRowguid(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
     selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).headOption
   }
-  override def update(documentnode: DocumentId, row: DocumentRow)(implicit c: Connection): Boolean = {
+  override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
+    val documentnode = row.documentnode
     SQL"""update production.document
           set title = ${row.title},
               owner = ${row.owner},

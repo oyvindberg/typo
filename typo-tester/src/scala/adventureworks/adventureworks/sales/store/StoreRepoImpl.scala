@@ -76,7 +76,8 @@ object StoreRepoImpl extends StoreRepo {
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: BusinessentityId, row: StoreRow)(implicit c: Connection): Boolean = {
+  override def update(row: StoreRow)(implicit c: Connection): Boolean = {
+    val businessentityid = row.businessentityid
     SQL"""update sales.store
           set name = ${row.name},
               salespersonid = ${row.salespersonid},

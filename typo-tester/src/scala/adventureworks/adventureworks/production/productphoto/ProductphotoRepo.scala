@@ -16,6 +16,6 @@ trait ProductphotoRepo {
   def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow]
   def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow]
   def selectByIds(productphotoids: List[ProductphotoId])(implicit c: Connection): List[ProductphotoRow]
-  def update(productphotoid: ProductphotoId, row: ProductphotoRow)(implicit c: Connection): Boolean
+  def update(row: ProductphotoRow)(implicit c: Connection): Boolean
   def updateFieldValues(productphotoid: ProductphotoId, fieldValues: List[ProductphotoFieldValue[_]])(implicit c: Connection): Boolean
 }

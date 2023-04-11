@@ -61,7 +61,8 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: PersoncreditcardId, row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
           set modifieddate = ${row.modifieddate}
           where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".executeUpdate() > 0

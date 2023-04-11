@@ -61,7 +61,8 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: CountryregioncurrencyId, row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
+  override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency
           set modifieddate = ${row.modifieddate}
           where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}""".executeUpdate() > 0

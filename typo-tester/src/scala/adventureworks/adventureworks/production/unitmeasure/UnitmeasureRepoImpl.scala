@@ -65,7 +65,8 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectByIds(unitmeasurecodes: List[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode in $unitmeasurecodes""".as(rowParser.*)
   }
-  override def update(unitmeasurecode: UnitmeasureId, row: UnitmeasureRow)(implicit c: Connection): Boolean = {
+  override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
+    val unitmeasurecode = row.unitmeasurecode
     SQL"""update production.unitmeasure
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

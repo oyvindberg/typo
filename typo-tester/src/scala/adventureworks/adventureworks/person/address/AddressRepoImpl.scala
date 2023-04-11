@@ -82,7 +82,8 @@ object AddressRepoImpl extends AddressRepo {
   override def selectByIds(addressids: List[AddressId])(implicit c: Connection): List[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid in $addressids""".as(rowParser.*)
   }
-  override def update(addressid: AddressId, row: AddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: AddressRow)(implicit c: Connection): Boolean = {
+    val addressid = row.addressid
     SQL"""update person.address
           set addressline1 = ${row.addressline1},
               addressline2 = ${row.addressline2},

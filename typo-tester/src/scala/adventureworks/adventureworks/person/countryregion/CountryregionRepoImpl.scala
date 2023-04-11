@@ -65,7 +65,8 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def selectByIds(countryregioncodes: List[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode in $countryregioncodes""".as(rowParser.*)
   }
-  override def update(countryregioncode: CountryregionId, row: CountryregionRow)(implicit c: Connection): Boolean = {
+  override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
+    val countryregioncode = row.countryregioncode
     SQL"""update person.countryregion
           set name = ${row.name},
               modifieddate = ${row.modifieddate}

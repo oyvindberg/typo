@@ -77,7 +77,8 @@ object CustomerRepoImpl extends CustomerRepo {
   override def selectByIds(customerids: List[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid in $customerids""".as(rowParser.*)
   }
-  override def update(customerid: CustomerId, row: CustomerRow)(implicit c: Connection): Boolean = {
+  override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
+    val customerid = row.customerid
     SQL"""update sales.customer
           set personid = ${row.personid},
               storeid = ${row.storeid},

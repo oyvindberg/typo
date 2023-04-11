@@ -97,7 +97,8 @@ object PersonRepoImpl extends PersonRepo {
   override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: BusinessentityId, row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+    val businessentityid = row.businessentityid
     SQL"""update person.person
           set persontype = ${row.persontype},
               namestyle = ${row.namestyle},

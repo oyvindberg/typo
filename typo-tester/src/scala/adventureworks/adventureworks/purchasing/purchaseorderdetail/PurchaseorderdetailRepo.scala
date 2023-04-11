@@ -15,6 +15,6 @@ trait PurchaseorderdetailRepo {
   def selectAll(implicit c: Connection): List[PurchaseorderdetailRow]
   def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow]
-  def update(compositeId: PurchaseorderdetailId, row: PurchaseorderdetailRow)(implicit c: Connection): Boolean
+  def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: PurchaseorderdetailId, fieldValues: List[PurchaseorderdetailFieldValue[_]])(implicit c: Connection): Boolean
 }

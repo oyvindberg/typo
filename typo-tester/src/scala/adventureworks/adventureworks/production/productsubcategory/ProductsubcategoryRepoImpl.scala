@@ -75,7 +75,8 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def selectByIds(productsubcategoryids: List[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid in $productsubcategoryids""".as(rowParser.*)
   }
-  override def update(productsubcategoryid: ProductsubcategoryId, row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
+    val productsubcategoryid = row.productsubcategoryid
     SQL"""update production.productsubcategory
           set productcategoryid = ${row.productcategoryid},
               name = ${row.name},

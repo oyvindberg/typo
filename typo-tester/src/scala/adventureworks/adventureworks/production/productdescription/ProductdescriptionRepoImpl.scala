@@ -71,7 +71,8 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def selectByIds(productdescriptionids: List[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid in $productdescriptionids""".as(rowParser.*)
   }
-  override def update(productdescriptionid: ProductdescriptionId, row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
+    val productdescriptionid = row.productdescriptionid
     SQL"""update production.productdescription
           set description = ${row.description},
               rowguid = ${row.rowguid},

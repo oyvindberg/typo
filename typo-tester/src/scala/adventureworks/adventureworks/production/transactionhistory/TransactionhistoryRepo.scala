@@ -16,6 +16,6 @@ trait TransactionhistoryRepo {
   def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow]
   def selectByIds(transactionids: List[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow]
-  def update(transactionid: TransactionhistoryId, row: TransactionhistoryRow)(implicit c: Connection): Boolean
+  def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]])(implicit c: Connection): Boolean
 }

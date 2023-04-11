@@ -63,7 +63,8 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: PersonphoneId, row: PersonphoneRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update person.personphone
           set modifieddate = ${row.modifieddate}
           where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".executeUpdate() > 0

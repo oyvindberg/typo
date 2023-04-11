@@ -16,6 +16,6 @@ trait DepartmentRepo {
   def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow]
   def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow]
   def selectByIds(departmentids: List[DepartmentId])(implicit c: Connection): List[DepartmentRow]
-  def update(departmentid: DepartmentId, row: DepartmentRow)(implicit c: Connection): Boolean
+  def update(row: DepartmentRow)(implicit c: Connection): Boolean
   def updateFieldValues(departmentid: DepartmentId, fieldValues: List[DepartmentFieldValue[_]])(implicit c: Connection): Boolean
 }

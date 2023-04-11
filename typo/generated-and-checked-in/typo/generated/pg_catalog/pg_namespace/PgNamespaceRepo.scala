@@ -20,6 +20,6 @@ trait PgNamespaceRepo {
   def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow]
   def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow]
   def selectByUniqueNspname(nspname: String)(implicit c: Connection): Option[PgNamespaceRow]
-  def update(oid: PgNamespaceId, row: PgNamespaceRow)(implicit c: Connection): Boolean
+  def update(row: PgNamespaceRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Boolean
 }

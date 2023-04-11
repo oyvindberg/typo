@@ -70,7 +70,8 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".as(rowParser.singleOpt)
   }
-  override def update(compositeId: SalesterritoryhistoryId, row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
+    val compositeId = row.compositeId
     SQL"""update sales.salesterritoryhistory
           set enddate = ${row.enddate},
               rowguid = ${row.rowguid},

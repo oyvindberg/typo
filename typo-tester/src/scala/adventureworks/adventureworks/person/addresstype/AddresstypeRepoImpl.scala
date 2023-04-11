@@ -72,7 +72,8 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def selectByIds(addresstypeids: List[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid in $addresstypeids""".as(rowParser.*)
   }
-  override def update(addresstypeid: AddresstypeId, row: AddresstypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
+    val addresstypeid = row.addresstypeid
     SQL"""update person.addresstype
           set name = ${row.name},
               rowguid = ${row.rowguid},

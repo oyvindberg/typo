@@ -65,7 +65,8 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def selectByIds(illustrationids: List[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid in $illustrationids""".as(rowParser.*)
   }
-  override def update(illustrationid: IllustrationId, row: IllustrationRow)(implicit c: Connection): Boolean = {
+  override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
+    val illustrationid = row.illustrationid
     SQL"""update production.illustration
           set diagram = ${row.diagram},
               modifieddate = ${row.modifieddate}

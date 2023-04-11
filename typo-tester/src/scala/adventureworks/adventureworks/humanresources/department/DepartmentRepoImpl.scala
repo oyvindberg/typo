@@ -68,7 +68,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def selectByIds(departmentids: List[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, name, groupname, modifieddate from humanresources.department where departmentid in $departmentids""".as(rowParser.*)
   }
-  override def update(departmentid: DepartmentId, row: DepartmentRow)(implicit c: Connection): Boolean = {
+  override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
+    val departmentid = row.departmentid
     SQL"""update humanresources.department
           set name = ${row.name},
               groupname = ${row.groupname},

@@ -16,6 +16,6 @@ trait BillofmaterialsRepo {
   def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow]
   def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow]
   def selectByIds(billofmaterialsids: List[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow]
-  def update(billofmaterialsid: BillofmaterialsId, row: BillofmaterialsRow)(implicit c: Connection): Boolean
+  def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean
   def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]])(implicit c: Connection): Boolean
 }
