@@ -29,7 +29,34 @@ case class SpecialofferRowUnsaved(
   maxqty: Option[Int],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(specialofferid: SpecialofferId): SpecialofferRow =
+    SpecialofferRow(
+      specialofferid = specialofferid,
+      description = description,
+      discountpct = discountpct match {
+                      case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                      case Defaulted.Provided(value) => value
+                    },
+      `type` = `type`,
+      category = category,
+      startdate = startdate,
+      enddate = enddate,
+      minqty = minqty match {
+                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.Provided(value) => value
+               },
+      maxqty = maxqty,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SpecialofferRowUnsaved {
   implicit val oFormat: OFormat[SpecialofferRowUnsaved] = new OFormat[SpecialofferRowUnsaved]{
     override def writes(o: SpecialofferRowUnsaved): JsObject =

@@ -23,7 +23,21 @@ case class AddresstypeRowUnsaved(
   name: Name,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(addresstypeid: AddresstypeId): AddresstypeRow =
+    AddresstypeRow(
+      addresstypeid = addresstypeid,
+      name = name,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object AddresstypeRowUnsaved {
   implicit val oFormat: OFormat[AddresstypeRowUnsaved] = new OFormat[AddresstypeRowUnsaved]{
     override def writes(o: AddresstypeRowUnsaved): JsObject =

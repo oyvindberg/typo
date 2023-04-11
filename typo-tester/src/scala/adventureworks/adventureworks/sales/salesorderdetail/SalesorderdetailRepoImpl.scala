@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesorderdetail
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -33,16 +32,16 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       Some(NamedParameter("specialofferid", ParameterValue.from(unsaved.specialofferid))),
       Some(NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice))),
       unsaved.unitpricediscount match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("unitpricediscount", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("unitpricediscount", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

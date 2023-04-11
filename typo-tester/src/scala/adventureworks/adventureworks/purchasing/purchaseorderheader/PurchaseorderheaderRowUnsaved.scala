@@ -31,7 +31,44 @@ case class PurchaseorderheaderRowUnsaved(
   taxamt: Defaulted[BigDecimal],
   freight: Defaulted[BigDecimal],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(purchaseorderid: PurchaseorderheaderId): PurchaseorderheaderRow =
+    PurchaseorderheaderRow(
+      purchaseorderid = purchaseorderid,
+      revisionnumber = revisionnumber match {
+                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.Provided(value) => value
+                       },
+      status = status match {
+                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.Provided(value) => value
+               },
+      employeeid = employeeid,
+      vendorid = vendorid,
+      shipmethodid = shipmethodid,
+      orderdate = orderdate match {
+                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                    case Defaulted.Provided(value) => value
+                  },
+      shipdate = shipdate,
+      subtotal = subtotal match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      taxamt = taxamt match {
+                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.Provided(value) => value
+               },
+      freight = freight match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object PurchaseorderheaderRowUnsaved {
   implicit val oFormat: OFormat[PurchaseorderheaderRowUnsaved] = new OFormat[PurchaseorderheaderRowUnsaved]{
     override def writes(o: PurchaseorderheaderRowUnsaved): JsObject =

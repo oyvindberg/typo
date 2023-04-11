@@ -21,7 +21,19 @@ case class ProductcosthistoryRowUnsaved(
   enddate: Option[LocalDateTime],
   standardcost: BigDecimal,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: ProductcosthistoryId): ProductcosthistoryRow =
+    ProductcosthistoryRow(
+      productid = compositeId.productid,
+      startdate = compositeId.startdate,
+      enddate = enddate,
+      standardcost = standardcost,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductcosthistoryRowUnsaved {
   implicit val oFormat: OFormat[ProductcosthistoryRowUnsaved] = new OFormat[ProductcosthistoryRowUnsaved]{
     override def writes(o: ProductcosthistoryRowUnsaved): JsObject =

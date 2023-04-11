@@ -31,7 +31,28 @@ case class PersonRowUnsaved(
   maritalStatusId: Defaulted[MaritalStatusId],
   workEmail: Option[String],
   sector: Defaulted[Sector]
-)
+) {
+  def unsafeToRow(id: PersonId): PersonRow =
+    PersonRow(
+      id = id,
+      favouriteFootballClubId = favouriteFootballClubId,
+      name = name,
+      nickName = nickName,
+      blogUrl = blogUrl,
+      email = email,
+      phone = phone,
+      likesPizza = likesPizza,
+      maritalStatusId = maritalStatusId match {
+                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                          case Defaulted.Provided(value) => value
+                        },
+      workEmail = workEmail,
+      sector = sector match {
+                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.Provided(value) => value
+               }
+    )
+}
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
     override def writes(o: PersonRowUnsaved): JsObject =

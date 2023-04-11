@@ -7,8 +7,7 @@ package adventureworks
 package person
 package personphone
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
@@ -27,8 +26,8 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def insert(compositeId: PersonphoneId, unsaved: PersonphoneRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

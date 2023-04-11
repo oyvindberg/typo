@@ -27,7 +27,27 @@ case class SalestaxrateRowUnsaved(
   name: Name,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(salestaxrateid: SalestaxrateId): SalestaxrateRow =
+    SalestaxrateRow(
+      salestaxrateid = salestaxrateid,
+      stateprovinceid = stateprovinceid,
+      taxtype = taxtype,
+      taxrate = taxrate match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      name = name,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalestaxrateRowUnsaved {
   implicit val oFormat: OFormat[SalestaxrateRowUnsaved] = new OFormat[SalestaxrateRowUnsaved]{
     override def writes(o: SalestaxrateRowUnsaved): JsObject =

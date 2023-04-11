@@ -7,8 +7,7 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -27,19 +26,19 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
       Some(NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid))),
       unsaved.referenceorderlineid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)))
       },
       unsaved.transactiondate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)))
       },
       Some(NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype))),
       Some(NamedParameter("quantity", ParameterValue.from(unsaved.quantity))),
       Some(NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

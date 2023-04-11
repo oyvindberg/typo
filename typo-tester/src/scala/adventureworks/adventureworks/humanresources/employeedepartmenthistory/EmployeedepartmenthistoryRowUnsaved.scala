@@ -21,7 +21,20 @@ import scala.util.Try
 case class EmployeedepartmenthistoryRowUnsaved(
   enddate: Option[LocalDate],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: EmployeedepartmenthistoryId): EmployeedepartmenthistoryRow =
+    EmployeedepartmenthistoryRow(
+      businessentityid = compositeId.businessentityid,
+      departmentid = compositeId.departmentid,
+      shiftid = compositeId.shiftid,
+      startdate = compositeId.startdate,
+      enddate = enddate,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object EmployeedepartmenthistoryRowUnsaved {
   implicit val oFormat: OFormat[EmployeedepartmenthistoryRowUnsaved] = new OFormat[EmployeedepartmenthistoryRowUnsaved]{
     override def writes(o: EmployeedepartmenthistoryRowUnsaved): JsObject =

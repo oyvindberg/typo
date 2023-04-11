@@ -7,8 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -28,20 +27,20 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.shipbase match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("shipbase", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("shipbase", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.shiprate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("shiprate", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("shiprate", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

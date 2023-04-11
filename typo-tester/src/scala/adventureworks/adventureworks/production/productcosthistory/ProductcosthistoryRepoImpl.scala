@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productcosthistory
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -27,8 +26,8 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
       Some(NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

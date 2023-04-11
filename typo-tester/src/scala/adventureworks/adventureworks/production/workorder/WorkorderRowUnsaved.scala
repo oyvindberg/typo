@@ -28,7 +28,23 @@ case class WorkorderRowUnsaved(
   duedate: LocalDateTime,
   scrapreasonid: Option[ScrapreasonId],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(workorderid: WorkorderId): WorkorderRow =
+    WorkorderRow(
+      workorderid = workorderid,
+      productid = productid,
+      orderqty = orderqty,
+      scrappedqty = scrappedqty,
+      startdate = startdate,
+      enddate = enddate,
+      duedate = duedate,
+      scrapreasonid = scrapreasonid,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object WorkorderRowUnsaved {
   implicit val oFormat: OFormat[WorkorderRowUnsaved] = new OFormat[WorkorderRowUnsaved]{
     override def writes(o: WorkorderRowUnsaved): JsObject =

@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productphoto
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -29,8 +28,8 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       Some(NamedParameter("largephoto", ParameterValue.from(unsaved.largephoto))),
       Some(NamedParameter("largephotofilename", ParameterValue.from(unsaved.largephotofilename))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

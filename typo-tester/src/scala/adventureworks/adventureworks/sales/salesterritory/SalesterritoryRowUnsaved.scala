@@ -30,7 +30,39 @@ case class SalesterritoryRowUnsaved(
   costlastyear: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(territoryid: SalesterritoryId): SalesterritoryRow =
+    SalesterritoryRow(
+      territoryid = territoryid,
+      name = name,
+      countryregioncode = countryregioncode,
+      group = group,
+      salesytd = salesytd match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      saleslastyear = saleslastyear match {
+                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.Provided(value) => value
+                      },
+      costytd = costytd match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      costlastyear = costlastyear match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalesterritoryRowUnsaved {
   implicit val oFormat: OFormat[SalesterritoryRowUnsaved] = new OFormat[SalesterritoryRowUnsaved]{
     override def writes(o: SalesterritoryRowUnsaved): JsObject =

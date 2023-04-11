@@ -25,7 +25,21 @@ case class CurrencyrateRowUnsaved(
   averagerate: BigDecimal,
   endofdayrate: BigDecimal,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(currencyrateid: CurrencyrateId): CurrencyrateRow =
+    CurrencyrateRow(
+      currencyrateid = currencyrateid,
+      currencyratedate = currencyratedate,
+      fromcurrencycode = fromcurrencycode,
+      tocurrencycode = tocurrencycode,
+      averagerate = averagerate,
+      endofdayrate = endofdayrate,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object CurrencyrateRowUnsaved {
   implicit val oFormat: OFormat[CurrencyrateRowUnsaved] = new OFormat[CurrencyrateRowUnsaved]{
     override def writes(o: CurrencyrateRowUnsaved): JsObject =

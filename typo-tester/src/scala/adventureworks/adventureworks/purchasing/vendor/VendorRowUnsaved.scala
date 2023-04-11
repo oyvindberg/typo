@@ -8,6 +8,7 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
@@ -28,7 +29,28 @@ case class VendorRowUnsaved(
   activeflag: Defaulted[Flag],
   purchasingwebserviceurl: Option[String],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(businessentityid: BusinessentityId): VendorRow =
+    VendorRow(
+      businessentityid = businessentityid,
+      accountnumber = accountnumber,
+      name = name,
+      creditrating = creditrating,
+      preferredvendorstatus = preferredvendorstatus match {
+                                case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                                case Defaulted.Provided(value) => value
+                              },
+      activeflag = activeflag match {
+                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                     case Defaulted.Provided(value) => value
+                   },
+      purchasingwebserviceurl = purchasingwebserviceurl,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object VendorRowUnsaved {
   implicit val oFormat: OFormat[VendorRowUnsaved] = new OFormat[VendorRowUnsaved]{
     override def writes(o: VendorRowUnsaved): JsObject =

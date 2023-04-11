@@ -18,7 +18,14 @@ import scala.util.Try
 /** This class corresponds to a row in table `compositepk.person` which has not been persisted yet */
 case class PersonRowUnsaved(
   name: Option[String]
-)
+) {
+  def unsafeToRow(compositeId: PersonId): PersonRow =
+    PersonRow(
+      one = compositeId.one,
+      two = compositeId.two,
+      name = name
+    )
+}
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
     override def writes(o: PersonRowUnsaved): JsObject =

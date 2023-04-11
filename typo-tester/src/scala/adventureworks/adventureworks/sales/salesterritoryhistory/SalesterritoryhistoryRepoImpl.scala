@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
@@ -28,12 +27,12 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     val namedParameters = List(
       Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

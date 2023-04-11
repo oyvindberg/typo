@@ -7,15 +7,16 @@ package adventureworks
 package sales
 package salesperson
 
+import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
 
 trait SalespersonRepo {
-  def delete(businessentityid: SalespersonId)(implicit c: Connection): Boolean
-  def insert(businessentityid: SalespersonId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean
+  def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def insert(businessentityid: BusinessentityId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean
   def selectAll(implicit c: Connection): List[SalespersonRow]
   def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow]
-  def selectById(businessentityid: SalespersonId)(implicit c: Connection): Option[SalespersonRow]
-  def selectByIds(businessentityids: List[SalespersonId])(implicit c: Connection): List[SalespersonRow]
-  def update(businessentityid: SalespersonId, row: SalespersonRow)(implicit c: Connection): Boolean
-  def updateFieldValues(businessentityid: SalespersonId, fieldValues: List[SalespersonFieldValue[_]])(implicit c: Connection): Boolean
+  def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow]
+  def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[SalespersonRow]
+  def update(businessentityid: BusinessentityId, row: SalespersonRow)(implicit c: Connection): Boolean
+  def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[SalespersonFieldValue[_]])(implicit c: Connection): Boolean
 }

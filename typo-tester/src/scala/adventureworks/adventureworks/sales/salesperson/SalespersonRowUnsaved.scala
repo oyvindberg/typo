@@ -8,6 +8,7 @@ package sales
 package salesperson
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -28,7 +29,38 @@ case class SalespersonRowUnsaved(
   saleslastyear: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(businessentityid: BusinessentityId): SalespersonRow =
+    SalespersonRow(
+      businessentityid = businessentityid,
+      territoryid = territoryid,
+      salesquota = salesquota,
+      bonus = bonus match {
+                case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                case Defaulted.Provided(value) => value
+              },
+      commissionpct = commissionpct match {
+                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.Provided(value) => value
+                      },
+      salesytd = salesytd match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      saleslastyear = saleslastyear match {
+                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.Provided(value) => value
+                      },
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalespersonRowUnsaved {
   implicit val oFormat: OFormat[SalespersonRowUnsaved] = new OFormat[SalespersonRowUnsaved]{
     override def writes(o: SalespersonRowUnsaved): JsObject =

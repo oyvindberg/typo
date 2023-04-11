@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package currencyrate
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -31,8 +30,8 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       Some(NamedParameter("averagerate", ParameterValue.from(unsaved.averagerate))),
       Some(NamedParameter("endofdayrate", ParameterValue.from(unsaved.endofdayrate))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

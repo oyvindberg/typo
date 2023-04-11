@@ -21,7 +21,17 @@ import scala.util.Try
 case class PhonenumbertypeRowUnsaved(
   name: Name,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(phonenumbertypeid: PhonenumbertypeId): PhonenumbertypeRow =
+    PhonenumbertypeRow(
+      phonenumbertypeid = phonenumbertypeid,
+      name = name,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object PhonenumbertypeRowUnsaved {
   implicit val oFormat: OFormat[PhonenumbertypeRowUnsaved] = new OFormat[PhonenumbertypeRowUnsaved]{
     override def writes(o: PhonenumbertypeRowUnsaved): JsObject =

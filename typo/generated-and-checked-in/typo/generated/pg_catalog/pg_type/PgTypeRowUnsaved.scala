@@ -51,7 +51,43 @@ case class PgTypeRowUnsaved(
   typdefaultbin: Option[/* pg_node_tree */ PGobject],
   typdefault: Option[String],
   typacl: Option[Array[/* aclitem */ PGobject]]
-)
+) {
+  def toRow(oid: PgTypeId): PgTypeRow =
+    PgTypeRow(
+      oid = oid,
+      typname = typname,
+      typnamespace = typnamespace,
+      typowner = typowner,
+      typlen = typlen,
+      typbyval = typbyval,
+      typtype = typtype,
+      typcategory = typcategory,
+      typispreferred = typispreferred,
+      typisdefined = typisdefined,
+      typdelim = typdelim,
+      typrelid = typrelid,
+      typsubscript = typsubscript,
+      typelem = typelem,
+      typarray = typarray,
+      typinput = typinput,
+      typoutput = typoutput,
+      typreceive = typreceive,
+      typsend = typsend,
+      typmodin = typmodin,
+      typmodout = typmodout,
+      typanalyze = typanalyze,
+      typalign = typalign,
+      typstorage = typstorage,
+      typnotnull = typnotnull,
+      typbasetype = typbasetype,
+      typtypmod = typtypmod,
+      typndims = typndims,
+      typcollation = typcollation,
+      typdefaultbin = typdefaultbin,
+      typdefault = typdefault,
+      typacl = typacl
+    )
+}
 object PgTypeRowUnsaved {
   implicit val oFormat: OFormat[PgTypeRowUnsaved] = new OFormat[PgTypeRowUnsaved]{
     override def writes(o: PgTypeRowUnsaved): JsObject =

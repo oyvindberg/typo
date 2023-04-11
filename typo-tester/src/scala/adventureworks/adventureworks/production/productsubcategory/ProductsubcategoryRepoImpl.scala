@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productsubcategory
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -30,12 +29,12 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       Some(NamedParameter("productcategoryid", ParameterValue.from(unsaved.productcategoryid))),
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

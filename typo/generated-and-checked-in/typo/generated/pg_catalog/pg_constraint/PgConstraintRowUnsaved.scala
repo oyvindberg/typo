@@ -44,7 +44,36 @@ case class PgConstraintRowUnsaved(
   conffeqop: Option[Array[/* oid */ Long]],
   conexclop: Option[Array[/* oid */ Long]],
   conbin: Option[/* pg_node_tree */ PGobject]
-)
+) {
+  def toRow(oid: PgConstraintId): PgConstraintRow =
+    PgConstraintRow(
+      oid = oid,
+      conname = conname,
+      connamespace = connamespace,
+      contype = contype,
+      condeferrable = condeferrable,
+      condeferred = condeferred,
+      convalidated = convalidated,
+      conrelid = conrelid,
+      contypid = contypid,
+      conindid = conindid,
+      conparentid = conparentid,
+      confrelid = confrelid,
+      confupdtype = confupdtype,
+      confdeltype = confdeltype,
+      confmatchtype = confmatchtype,
+      conislocal = conislocal,
+      coninhcount = coninhcount,
+      connoinherit = connoinherit,
+      conkey = conkey,
+      confkey = confkey,
+      conpfeqop = conpfeqop,
+      conppeqop = conppeqop,
+      conffeqop = conffeqop,
+      conexclop = conexclop,
+      conbin = conbin
+    )
+}
 object PgConstraintRowUnsaved {
   implicit val oFormat: OFormat[PgConstraintRowUnsaved] = new OFormat[PgConstraintRowUnsaved]{
     override def writes(o: PgConstraintRowUnsaved): JsObject =

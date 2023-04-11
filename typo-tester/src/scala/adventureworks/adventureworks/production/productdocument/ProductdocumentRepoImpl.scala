@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productdocument
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
@@ -26,8 +25,8 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

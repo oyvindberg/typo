@@ -30,7 +30,28 @@ case class StateprovinceRowUnsaved(
   territoryid: SalesterritoryId,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(stateprovinceid: StateprovinceId): StateprovinceRow =
+    StateprovinceRow(
+      stateprovinceid = stateprovinceid,
+      stateprovincecode = stateprovincecode,
+      countryregioncode = countryregioncode,
+      isonlystateprovinceflag = isonlystateprovinceflag match {
+                                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                                  case Defaulted.Provided(value) => value
+                                },
+      name = name,
+      territoryid = territoryid,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object StateprovinceRowUnsaved {
   implicit val oFormat: OFormat[StateprovinceRowUnsaved] = new OFormat[StateprovinceRowUnsaved]{
     override def writes(o: StateprovinceRowUnsaved): JsObject =

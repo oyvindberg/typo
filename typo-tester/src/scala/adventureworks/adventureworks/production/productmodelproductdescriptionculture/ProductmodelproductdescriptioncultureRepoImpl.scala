@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productmodelproductdescriptionculture
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
@@ -27,8 +26,8 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def insert(compositeId: ProductmodelproductdescriptioncultureId, unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

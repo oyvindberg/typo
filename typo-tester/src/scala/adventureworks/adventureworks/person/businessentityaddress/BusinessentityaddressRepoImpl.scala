@@ -7,8 +7,7 @@ package adventureworks
 package person
 package businessentityaddress
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
@@ -28,12 +27,12 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def insert(compositeId: BusinessentityaddressId, unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

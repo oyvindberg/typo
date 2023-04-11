@@ -7,8 +7,7 @@ package adventureworks
 package production
 package workorderrouting
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
@@ -34,8 +33,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       Some(NamedParameter("plannedcost", ParameterValue.from(unsaved.plannedcost))),
       Some(NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

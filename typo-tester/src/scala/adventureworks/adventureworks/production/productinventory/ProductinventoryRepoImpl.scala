@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productinventory
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
@@ -29,16 +28,16 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       Some(NamedParameter("shelf", ParameterValue.from(unsaved.shelf))),
       Some(NamedParameter("bin", ParameterValue.from(unsaved.bin))),
       unsaved.quantity match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

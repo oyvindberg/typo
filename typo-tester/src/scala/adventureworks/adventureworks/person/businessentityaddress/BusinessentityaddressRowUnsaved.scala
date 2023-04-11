@@ -21,7 +21,22 @@ import scala.util.Try
 case class BusinessentityaddressRowUnsaved(
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: BusinessentityaddressId): BusinessentityaddressRow =
+    BusinessentityaddressRow(
+      businessentityid = compositeId.businessentityid,
+      addressid = compositeId.addressid,
+      addresstypeid = compositeId.addresstypeid,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object BusinessentityaddressRowUnsaved {
   implicit val oFormat: OFormat[BusinessentityaddressRowUnsaved] = new OFormat[BusinessentityaddressRowUnsaved]{
     override def writes(o: BusinessentityaddressRowUnsaved): JsObject =

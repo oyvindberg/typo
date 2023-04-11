@@ -18,16 +18,16 @@ object JsonLibPlay extends JsonLib {
   val JsObject = sc.Type.Qualified("play.api.libs.json.JsObject")
   val JsResult = sc.Type.Qualified("play.api.libs.json.JsResult")
 
-  override def defaultedInstance(defaulted: sc.QIdent, provided: sc.QIdent, useDefault: sc.QIdent): List[sc.Code] = {
+  override def defaultedInstance(defaulted: sc.Type.Qualified, provided: sc.Ident, useDefault: sc.Ident): List[sc.Code] = {
     val T = sc.Type.Abstract(sc.Ident("T"))
-    val defaultOfT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(T))
-    val defaultOfOptT = sc.Type.TApply(sc.Type.Qualified(defaulted), List(sc.Type.Option.of(T)))
+    val defaultOfT = sc.Type.TApply(defaulted, List(T))
+    val defaultOfOptT = sc.Type.TApply(defaulted, List(sc.Type.Option.of(T)))
     val reader =
       code"""|implicit def reads[$T: $ReadsName]: ${Reads(defaultOfT)} = {
              |  case $JsString("defaulted") =>
-             |    $JsSuccess($useDefault)
+             |    $JsSuccess($defaulted.$useDefault)
              |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-             |    $Json.fromJson[T](providedJson).map($provided.apply)
+             |    $Json.fromJson[T](providedJson).map($defaulted.$provided.apply)
              |  case _ =>
              |    $JsError(s"Expected `$defaulted` json object structure")
              |}
@@ -35,11 +35,11 @@ object JsonLibPlay extends JsonLib {
     val readerOpt =
       code"""|implicit def readsOpt[$T: $ReadsName]: ${Reads(defaultOfOptT)} = {
              |  case $JsString("defaulted") =>
-             |    $JsSuccess($useDefault)
+             |    $JsSuccess($defaulted.$useDefault)
              |  case $JsObject(Seq(("provided", $JsNull))) =>
-             |    $JsSuccess($provided(${sc.Type.None}))
+             |    $JsSuccess($defaulted.$provided(${sc.Type.None}))
              |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-             |    $Json.fromJson[T](providedJson).map(x => $provided(${sc.Type.Some}(x)))
+             |    $Json.fromJson[T](providedJson).map(x => $defaulted.$provided(${sc.Type.Some}(x)))
              |  case _ =>
              |    $JsError(s"Expected `$defaulted` json object structure")
              |}
@@ -47,8 +47,8 @@ object JsonLibPlay extends JsonLib {
 
     val writer =
       code"""|implicit def writes[$T: $WritesName]: ${Writes(defaultOfT)} = {
-             |  case $provided(value) => $Json.obj("provided" -> implicitly[${Writes(T)}].writes(value))
-             |  case $useDefault      => $JsString("defaulted")
+             |  case $defaulted.$provided(value) => $Json.obj("provided" -> implicitly[${Writes(T)}].writes(value))
+             |  case $defaulted.$useDefault      => $JsString("defaulted")
              |}
              |""".stripMargin
 

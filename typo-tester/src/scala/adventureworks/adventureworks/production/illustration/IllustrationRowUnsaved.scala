@@ -20,7 +20,17 @@ import scala.util.Try
 case class IllustrationRowUnsaved(
   diagram: Option[/* xml */ String],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(illustrationid: IllustrationId): IllustrationRow =
+    IllustrationRow(
+      illustrationid = illustrationid,
+      diagram = diagram,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object IllustrationRowUnsaved {
   implicit val oFormat: OFormat[IllustrationRowUnsaved] = new OFormat[IllustrationRowUnsaved]{
     override def writes(o: IllustrationRowUnsaved): JsObject =

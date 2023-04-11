@@ -48,7 +48,48 @@ case class ProductRowUnsaved(
   discontinueddate: Option[LocalDateTime],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(productid: ProductId): ProductRow =
+    ProductRow(
+      productid = productid,
+      name = name,
+      productnumber = productnumber,
+      makeflag = makeflag match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      finishedgoodsflag = finishedgoodsflag match {
+                            case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                            case Defaulted.Provided(value) => value
+                          },
+      color = color,
+      safetystocklevel = safetystocklevel,
+      reorderpoint = reorderpoint,
+      standardcost = standardcost,
+      listprice = listprice,
+      size = size,
+      sizeunitmeasurecode = sizeunitmeasurecode,
+      weightunitmeasurecode = weightunitmeasurecode,
+      weight = weight,
+      daystomanufacture = daystomanufacture,
+      productline = productline,
+      `class` = `class`,
+      style = style,
+      productsubcategoryid = productsubcategoryid,
+      productmodelid = productmodelid,
+      sellstartdate = sellstartdate,
+      sellenddate = sellenddate,
+      discontinueddate = discontinueddate,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductRowUnsaved {
   implicit val oFormat: OFormat[ProductRowUnsaved] = new OFormat[ProductRowUnsaved]{
     override def writes(o: ProductRowUnsaved): JsObject =

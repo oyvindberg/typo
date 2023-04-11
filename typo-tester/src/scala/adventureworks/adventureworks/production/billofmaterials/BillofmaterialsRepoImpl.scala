@@ -7,8 +7,7 @@ package adventureworks
 package production
 package billofmaterials
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
@@ -29,19 +28,19 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       Some(NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid))),
       Some(NamedParameter("componentid", ParameterValue.from(unsaved.componentid))),
       unsaved.startdate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("startdate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("startdate", ParameterValue.from[LocalDateTime](value)))
       },
       Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
       Some(NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode))),
       Some(NamedParameter("bomlevel", ParameterValue.from(unsaved.bomlevel))),
       unsaved.perassemblyqty match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("perassemblyqty", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("perassemblyqty", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

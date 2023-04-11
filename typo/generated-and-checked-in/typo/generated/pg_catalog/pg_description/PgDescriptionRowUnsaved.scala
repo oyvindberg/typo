@@ -20,7 +20,15 @@ import scala.util.Try
 /** This class corresponds to a row in table `pg_catalog.pg_description` which has not been persisted yet */
 case class PgDescriptionRowUnsaved(
   description: String
-)
+) {
+  def toRow(compositeId: PgDescriptionId): PgDescriptionRow =
+    PgDescriptionRow(
+      objoid = compositeId.objoid,
+      classoid = compositeId.classoid,
+      objsubid = compositeId.objsubid,
+      description = description
+    )
+}
 object PgDescriptionRowUnsaved {
   implicit val oFormat: OFormat[PgDescriptionRowUnsaved] = new OFormat[PgDescriptionRowUnsaved]{
     override def writes(o: PgDescriptionRowUnsaved): JsObject =

@@ -23,7 +23,25 @@ case class LocationRowUnsaved(
   costrate: Defaulted[BigDecimal],
   availability: Defaulted[BigDecimal],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(locationid: LocationId): LocationRow =
+    LocationRow(
+      locationid = locationid,
+      name = name,
+      costrate = costrate match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      availability = availability match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object LocationRowUnsaved {
   implicit val oFormat: OFormat[LocationRowUnsaved] = new OFormat[LocationRowUnsaved]{
     override def writes(o: LocationRowUnsaved): JsObject =

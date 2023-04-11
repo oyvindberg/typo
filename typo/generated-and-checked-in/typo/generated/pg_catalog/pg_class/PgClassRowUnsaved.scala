@@ -52,7 +52,44 @@ case class PgClassRowUnsaved(
   relacl: Option[Array[/* aclitem */ PGobject]],
   reloptions: Option[Array[String]],
   relpartbound: Option[/* pg_node_tree */ PGobject]
-)
+) {
+  def toRow(oid: PgClassId): PgClassRow =
+    PgClassRow(
+      oid = oid,
+      relname = relname,
+      relnamespace = relnamespace,
+      reltype = reltype,
+      reloftype = reloftype,
+      relowner = relowner,
+      relam = relam,
+      relfilenode = relfilenode,
+      reltablespace = reltablespace,
+      relpages = relpages,
+      reltuples = reltuples,
+      relallvisible = relallvisible,
+      reltoastrelid = reltoastrelid,
+      relhasindex = relhasindex,
+      relisshared = relisshared,
+      relpersistence = relpersistence,
+      relkind = relkind,
+      relnatts = relnatts,
+      relchecks = relchecks,
+      relhasrules = relhasrules,
+      relhastriggers = relhastriggers,
+      relhassubclass = relhassubclass,
+      relrowsecurity = relrowsecurity,
+      relforcerowsecurity = relforcerowsecurity,
+      relispopulated = relispopulated,
+      relreplident = relreplident,
+      relispartition = relispartition,
+      relrewrite = relrewrite,
+      relfrozenxid = relfrozenxid,
+      relminmxid = relminmxid,
+      relacl = relacl,
+      reloptions = reloptions,
+      relpartbound = relpartbound
+    )
+}
 object PgClassRowUnsaved {
   implicit val oFormat: OFormat[PgClassRowUnsaved] = new OFormat[PgClassRowUnsaved]{
     override def writes(o: PgClassRowUnsaved): JsObject =

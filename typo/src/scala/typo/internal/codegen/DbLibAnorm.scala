@@ -84,7 +84,7 @@ object DbLibAnorm extends DbLib {
         case Nil      => sc.Code.Empty
         case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe).code }.mkCode(",\n")
       }
-      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sc.Type.Qualified(sqlScript.relation.RowName))}"
+      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sqlScript.relation.RowName)}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -179,10 +179,12 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbName, _, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
-                   |  case ${default.UseDefault} => None
-                   |  case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
+                   |  case ${default.Defaulted}.${default.UseDefault} => None
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(
+                dbName.value
+              )}, $ParameterValue.from[$tpe](value)))
                    |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
@@ -206,10 +208,12 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.DefaultedType, List(tpe)), dbName, _, _, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbName, _, _, _) =>
             code"""|${unsavedParam.name}.$ident match {
-                   |  case ${default.UseDefault} => None
-                   |  case ${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(dbName.value)}, $ParameterValue.from[$tpe](value)))
+                   |  case ${default.Defaulted}.${default.UseDefault} => None
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(
+                dbName.value
+              )}, $ParameterValue.from[$tpe](value)))
                    |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""

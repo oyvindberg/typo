@@ -28,7 +28,29 @@ case class BillofmaterialsRowUnsaved(
   bomlevel: Int,
   perassemblyqty: Defaulted[BigDecimal],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(billofmaterialsid: BillofmaterialsId): BillofmaterialsRow =
+    BillofmaterialsRow(
+      billofmaterialsid = billofmaterialsid,
+      productassemblyid = productassemblyid,
+      componentid = componentid,
+      startdate = startdate match {
+                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                    case Defaulted.Provided(value) => value
+                  },
+      enddate = enddate,
+      unitmeasurecode = unitmeasurecode,
+      bomlevel = bomlevel,
+      perassemblyqty = perassemblyqty match {
+                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.Provided(value) => value
+                       },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object BillofmaterialsRowUnsaved {
   implicit val oFormat: OFormat[BillofmaterialsRowUnsaved] = new OFormat[BillofmaterialsRowUnsaved]{
     override def writes(o: BillofmaterialsRowUnsaved): JsObject =

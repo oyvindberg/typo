@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -27,17 +26,17 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     val namedParameters = List(
       Some(NamedParameter("shoppingcartid", ParameterValue.from(unsaved.shoppingcartid))),
       unsaved.quantity match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
       },
       Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
       unsaved.datecreated match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

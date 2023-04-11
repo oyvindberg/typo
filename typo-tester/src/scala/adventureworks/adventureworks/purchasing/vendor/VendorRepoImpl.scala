@@ -7,8 +7,7 @@ package adventureworks
 package purchasing
 package vendor
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -23,26 +22,26 @@ import java.sql.Connection
 import java.time.LocalDateTime
 
 object VendorRepoImpl extends VendorRepo {
-  override def delete(businessentityid: VendorId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.vendor where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: VendorId, unsaved: VendorRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating))),
       unsaved.preferredvendorstatus match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)))
       },
       unsaved.activeflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("activeflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("activeflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     
@@ -79,13 +78,13 @@ object VendorRepoImpl extends VendorRepo {
     }
   
   }
-  override def selectById(businessentityid: VendorId)(implicit c: Connection): Option[VendorRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
     SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[VendorId])(implicit c: Connection): List[VendorRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: VendorId, row: VendorRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: VendorRow)(implicit c: Connection): Boolean = {
     SQL"""update purchasing.vendor
           set accountnumber = ${row.accountnumber},
               name = ${row.name},
@@ -96,7 +95,7 @@ object VendorRepoImpl extends VendorRepo {
               modifieddate = ${row.modifieddate}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: VendorId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -135,6 +134,6 @@ object VendorRepoImpl extends VendorRepo {
         )
       )
     }
-  val idRowParser: RowParser[VendorId] =
-    SqlParser.get[VendorId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

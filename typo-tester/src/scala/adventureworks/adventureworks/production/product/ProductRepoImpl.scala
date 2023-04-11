@@ -7,8 +7,7 @@ package adventureworks
 package production
 package product
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -33,12 +32,12 @@ object ProductRepoImpl extends ProductRepo {
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber))),
       unsaved.makeflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[Flag](value)))
       },
       unsaved.finishedgoodsflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("color", ParameterValue.from(unsaved.color))),
       Some(NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel))),
@@ -59,12 +58,12 @@ object ProductRepoImpl extends ProductRepo {
       Some(NamedParameter("sellenddate", ParameterValue.from(unsaved.sellenddate))),
       Some(NamedParameter("discontinueddate", ParameterValue.from(unsaved.discontinueddate))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

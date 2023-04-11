@@ -23,7 +23,20 @@ case class ProductphotoRowUnsaved(
   largephoto: Option[Array[Byte]],
   largephotofilename: Option[String],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(productphotoid: ProductphotoId): ProductphotoRow =
+    ProductphotoRow(
+      productphotoid = productphotoid,
+      thumbnailphoto = thumbnailphoto,
+      thumbnailphotofilename = thumbnailphotofilename,
+      largephoto = largephoto,
+      largephotofilename = largephotofilename,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductphotoRowUnsaved {
   implicit val oFormat: OFormat[ProductphotoRowUnsaved] = new OFormat[ProductphotoRowUnsaved]{
     override def writes(o: ProductphotoRowUnsaved): JsObject =

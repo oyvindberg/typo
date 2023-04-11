@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package specialoffer
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -27,25 +26,25 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     val namedParameters = List(
       Some(NamedParameter("description", ParameterValue.from(unsaved.description))),
       unsaved.discountpct match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("discountpct", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("discountpct", ParameterValue.from[BigDecimal](value)))
       },
       Some(NamedParameter("type", ParameterValue.from(unsaved.`type`))),
       Some(NamedParameter("category", ParameterValue.from(unsaved.category))),
       Some(NamedParameter("startdate", ParameterValue.from(unsaved.startdate))),
       Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
       unsaved.minqty match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("minqty", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("minqty", ParameterValue.from[Int](value)))
       },
       Some(NamedParameter("maxqty", ParameterValue.from(unsaved.maxqty))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

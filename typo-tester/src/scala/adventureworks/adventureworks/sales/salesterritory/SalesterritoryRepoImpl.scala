@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesterritory
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -31,28 +30,28 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       Some(NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode))),
       Some(NamedParameter("group", ParameterValue.from(unsaved.group))),
       unsaved.salesytd match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.saleslastyear match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.costytd match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("costytd", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("costytd", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.costlastyear match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("costlastyear", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("costlastyear", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

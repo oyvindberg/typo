@@ -33,7 +33,36 @@ case class DocumentRowUnsaved(
   document: Option[Array[Byte]],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(documentnode: DocumentId): DocumentRow =
+    DocumentRow(
+      title = title,
+      owner = owner,
+      folderflag = folderflag match {
+                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                     case Defaulted.Provided(value) => value
+                   },
+      filename = filename,
+      fileextension = fileextension,
+      revision = revision,
+      changenumber = changenumber match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      status = status,
+      documentsummary = documentsummary,
+      document = document,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      documentnode = documentnode
+    )
+}
 object DocumentRowUnsaved {
   implicit val oFormat: OFormat[DocumentRowUnsaved] = new OFormat[DocumentRowUnsaved]{
     override def writes(o: DocumentRowUnsaved): JsObject =

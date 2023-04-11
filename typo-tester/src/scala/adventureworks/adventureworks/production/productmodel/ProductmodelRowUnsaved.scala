@@ -25,7 +25,23 @@ case class ProductmodelRowUnsaved(
   instructions: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(productmodelid: ProductmodelId): ProductmodelRow =
+    ProductmodelRow(
+      productmodelid = productmodelid,
+      name = name,
+      catalogdescription = catalogdescription,
+      instructions = instructions,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductmodelRowUnsaved {
   implicit val oFormat: OFormat[ProductmodelRowUnsaved] = new OFormat[ProductmodelRowUnsaved]{
     override def writes(o: ProductmodelRowUnsaved): JsObject =

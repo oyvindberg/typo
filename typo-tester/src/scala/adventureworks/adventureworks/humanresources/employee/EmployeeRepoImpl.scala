@@ -7,8 +7,7 @@ package adventureworks
 package humanresources
 package employee
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
@@ -23,10 +22,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object EmployeeRepoImpl extends EmployeeRepo {
-  override def delete(businessentityid: EmployeeId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.employee where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: EmployeeId, unsaved: EmployeeRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: EmployeeRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("nationalidnumber", ParameterValue.from(unsaved.nationalidnumber))),
       Some(NamedParameter("loginid", ParameterValue.from(unsaved.loginid))),
@@ -36,32 +35,32 @@ object EmployeeRepoImpl extends EmployeeRepo {
       Some(NamedParameter("gender", ParameterValue.from(unsaved.gender))),
       Some(NamedParameter("hiredate", ParameterValue.from(unsaved.hiredate))),
       unsaved.salariedflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("salariedflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("salariedflag", ParameterValue.from[Flag](value)))
       },
       unsaved.vacationhours match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("vacationhours", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("vacationhours", ParameterValue.from[Int](value)))
       },
       unsaved.sickleavehours match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("sickleavehours", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("sickleavehours", ParameterValue.from[Int](value)))
       },
       unsaved.currentflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("currentflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("currentflag", ParameterValue.from[Flag](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       },
       unsaved.organizationnode match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)))
       }
     ).flatten
     
@@ -105,13 +104,13 @@ object EmployeeRepoImpl extends EmployeeRepo {
     }
   
   }
-  override def selectById(businessentityid: EmployeeId)(implicit c: Connection): Option[EmployeeRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[EmployeeId])(implicit c: Connection): List[EmployeeRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: EmployeeId, row: EmployeeRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: EmployeeRow)(implicit c: Connection): Boolean = {
     SQL"""update humanresources.employee
           set nationalidnumber = ${row.nationalidnumber},
               loginid = ${row.loginid},
@@ -129,7 +128,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
               organizationnode = ${row.organizationnode}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: EmployeeId, fieldValues: List[EmployeeFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -182,6 +181,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
         )
       )
     }
-  val idRowParser: RowParser[EmployeeId] =
-    SqlParser.get[EmployeeId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

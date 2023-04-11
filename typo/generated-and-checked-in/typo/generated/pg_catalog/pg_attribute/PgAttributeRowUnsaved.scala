@@ -44,7 +44,37 @@ case class PgAttributeRowUnsaved(
   attoptions: Option[Array[String]],
   attfdwoptions: Option[Array[String]],
   attmissingval: Option[/* anyarray */ PGobject]
-)
+) {
+  def toRow(compositeId: PgAttributeId): PgAttributeRow =
+    PgAttributeRow(
+      attrelid = compositeId.attrelid,
+      attname = attname,
+      atttypid = atttypid,
+      attstattarget = attstattarget,
+      attlen = attlen,
+      attnum = compositeId.attnum,
+      attndims = attndims,
+      attcacheoff = attcacheoff,
+      atttypmod = atttypmod,
+      attbyval = attbyval,
+      attalign = attalign,
+      attstorage = attstorage,
+      attcompression = attcompression,
+      attnotnull = attnotnull,
+      atthasdef = atthasdef,
+      atthasmissing = atthasmissing,
+      attidentity = attidentity,
+      attgenerated = attgenerated,
+      attisdropped = attisdropped,
+      attislocal = attislocal,
+      attinhcount = attinhcount,
+      attcollation = attcollation,
+      attacl = attacl,
+      attoptions = attoptions,
+      attfdwoptions = attfdwoptions,
+      attmissingval = attmissingval
+    )
+}
 object PgAttributeRowUnsaved {
   implicit val oFormat: OFormat[PgAttributeRowUnsaved] = new OFormat[PgAttributeRowUnsaved]{
     override def writes(o: PgAttributeRowUnsaved): JsObject =

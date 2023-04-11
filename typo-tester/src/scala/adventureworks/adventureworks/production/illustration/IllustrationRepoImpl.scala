@@ -7,8 +7,7 @@ package adventureworks
 package production
 package illustration
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -26,8 +25,8 @@ object IllustrationRepoImpl extends IllustrationRepo {
     val namedParameters = List(
       Some(NamedParameter("diagram", ParameterValue.from(unsaved.diagram))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

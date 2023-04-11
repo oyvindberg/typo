@@ -24,7 +24,19 @@ case class ShiftRowUnsaved(
   starttime: LocalTime,
   endtime: LocalTime,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(shiftid: ShiftId): ShiftRow =
+    ShiftRow(
+      shiftid = shiftid,
+      name = name,
+      starttime = starttime,
+      endtime = endtime,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ShiftRowUnsaved {
   implicit val oFormat: OFormat[ShiftRowUnsaved] = new OFormat[ShiftRowUnsaved]{
     override def writes(o: ShiftRowUnsaved): JsObject =

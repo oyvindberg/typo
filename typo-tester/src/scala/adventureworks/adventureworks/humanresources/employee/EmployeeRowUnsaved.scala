@@ -8,6 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,7 +36,47 @@ case class EmployeeRowUnsaved(
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime],
   organizationnode: Defaulted[Option[String]]
-)
+) {
+  def unsafeToRow(businessentityid: BusinessentityId): EmployeeRow =
+    EmployeeRow(
+      businessentityid = businessentityid,
+      nationalidnumber = nationalidnumber,
+      loginid = loginid,
+      jobtitle = jobtitle,
+      birthdate = birthdate,
+      maritalstatus = maritalstatus,
+      gender = gender,
+      hiredate = hiredate,
+      salariedflag = salariedflag match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      vacationhours = vacationhours match {
+                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.Provided(value) => value
+                      },
+      sickleavehours = sickleavehours match {
+                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.Provided(value) => value
+                       },
+      currentflag = currentflag match {
+                      case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                      case Defaulted.Provided(value) => value
+                    },
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     },
+      organizationnode = organizationnode match {
+                           case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                           case Defaulted.Provided(value) => value
+                         }
+    )
+}
 object EmployeeRowUnsaved {
   implicit val oFormat: OFormat[EmployeeRowUnsaved] = new OFormat[EmployeeRowUnsaved]{
     override def writes(o: EmployeeRowUnsaved): JsObject =

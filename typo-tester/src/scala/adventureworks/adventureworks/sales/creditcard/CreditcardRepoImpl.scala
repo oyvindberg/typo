@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -29,8 +28,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
       Some(NamedParameter("expmonth", ParameterValue.from(unsaved.expmonth))),
       Some(NamedParameter("expyear", ParameterValue.from(unsaved.expyear))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

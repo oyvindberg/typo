@@ -19,7 +19,17 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.personcreditcard` which has not been persisted yet */
 case class PersoncreditcardRowUnsaved(
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: PersoncreditcardId): PersoncreditcardRow =
+    PersoncreditcardRow(
+      businessentityid = compositeId.businessentityid,
+      creditcardid = compositeId.creditcardid,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object PersoncreditcardRowUnsaved {
   implicit val oFormat: OFormat[PersoncreditcardRowUnsaved] = new OFormat[PersoncreditcardRowUnsaved]{
     override def writes(o: PersoncreditcardRowUnsaved): JsObject =

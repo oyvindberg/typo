@@ -7,8 +7,7 @@ package adventureworks
 package person
 package person
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -23,15 +22,15 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object PersonRepoImpl extends PersonRepo {
-  override def delete(businessentityid: PersonId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.person where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: PersonId, unsaved: PersonRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: PersonRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("persontype", ParameterValue.from(unsaved.persontype))),
       unsaved.namestyle match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("namestyle", ParameterValue.from[NameStyle](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("namestyle", ParameterValue.from[NameStyle](value)))
       },
       Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
       Some(NamedParameter("firstname", ParameterValue.from(unsaved.firstname))),
@@ -39,18 +38,18 @@ object PersonRepoImpl extends PersonRepo {
       Some(NamedParameter("lastname", ParameterValue.from(unsaved.lastname))),
       Some(NamedParameter("suffix", ParameterValue.from(unsaved.suffix))),
       unsaved.emailpromotion match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("emailpromotion", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("emailpromotion", ParameterValue.from[Int](value)))
       },
       Some(NamedParameter("additionalcontactinfo", ParameterValue.from(unsaved.additionalcontactinfo))),
       Some(NamedParameter("demographics", ParameterValue.from(unsaved.demographics))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     
@@ -92,13 +91,13 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
-  override def selectById(businessentityid: PersonId)(implicit c: Connection): Option[PersonRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: PersonId, row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: PersonRow)(implicit c: Connection): Boolean = {
     SQL"""update person.person
           set persontype = ${row.persontype},
               namestyle = ${row.namestyle},
@@ -114,7 +113,7 @@ object PersonRepoImpl extends PersonRepo {
               modifieddate = ${row.modifieddate}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -163,6 +162,6 @@ object PersonRepoImpl extends PersonRepo {
         )
       )
     }
-  val idRowParser: RowParser[PersonId] =
-    SqlParser.get[PersonId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

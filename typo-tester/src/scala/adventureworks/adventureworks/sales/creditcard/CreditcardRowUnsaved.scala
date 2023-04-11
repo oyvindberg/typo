@@ -23,7 +23,20 @@ case class CreditcardRowUnsaved(
   expmonth: Int,
   expyear: Int,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(creditcardid: CreditcardId): CreditcardRow =
+    CreditcardRow(
+      creditcardid = creditcardid,
+      cardtype = cardtype,
+      cardnumber = cardnumber,
+      expmonth = expmonth,
+      expyear = expyear,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object CreditcardRowUnsaved {
   implicit val oFormat: OFormat[CreditcardRowUnsaved] = new OFormat[CreditcardRowUnsaved]{
     override def writes(o: CreditcardRowUnsaved): JsObject =

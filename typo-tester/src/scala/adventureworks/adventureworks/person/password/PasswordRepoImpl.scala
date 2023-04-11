@@ -7,8 +7,7 @@ package adventureworks
 package person
 package password
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -21,20 +20,20 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object PasswordRepoImpl extends PasswordRepo {
-  override def delete(businessentityid: PasswordId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.password where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: PasswordId, unsaved: PasswordRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: PasswordRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("passwordhash", ParameterValue.from(unsaved.passwordhash))),
       Some(NamedParameter("passwordsalt", ParameterValue.from(unsaved.passwordsalt))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     
@@ -68,13 +67,13 @@ object PasswordRepoImpl extends PasswordRepo {
     }
   
   }
-  override def selectById(businessentityid: PasswordId)(implicit c: Connection): Option[PasswordRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[PasswordId])(implicit c: Connection): List[PasswordRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: PasswordId, row: PasswordRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: PasswordRow)(implicit c: Connection): Boolean = {
     SQL"""update person.password
           set passwordhash = ${row.passwordhash},
               passwordsalt = ${row.passwordsalt},
@@ -82,7 +81,7 @@ object PasswordRepoImpl extends PasswordRepo {
               modifieddate = ${row.modifieddate}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: PasswordId, fieldValues: List[PasswordFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -115,6 +114,6 @@ object PasswordRepoImpl extends PasswordRepo {
         )
       )
     }
-  val idRowParser: RowParser[PasswordId] =
-    SqlParser.get[PasswordId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

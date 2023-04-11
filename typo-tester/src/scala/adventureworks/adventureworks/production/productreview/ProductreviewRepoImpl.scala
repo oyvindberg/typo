@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productreview
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -29,15 +28,15 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
       Some(NamedParameter("reviewername", ParameterValue.from(unsaved.reviewername))),
       unsaved.reviewdate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("reviewdate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("reviewdate", ParameterValue.from[LocalDateTime](value)))
       },
       Some(NamedParameter("emailaddress", ParameterValue.from(unsaved.emailaddress))),
       Some(NamedParameter("rating", ParameterValue.from(unsaved.rating))),
       Some(NamedParameter("comments", ParameterValue.from(unsaved.comments))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

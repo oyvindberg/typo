@@ -21,7 +21,19 @@ case class EmployeepayhistoryRowUnsaved(
   rate: BigDecimal,
   payfrequency: Int,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: EmployeepayhistoryId): EmployeepayhistoryRow =
+    EmployeepayhistoryRow(
+      businessentityid = compositeId.businessentityid,
+      ratechangedate = compositeId.ratechangedate,
+      rate = rate,
+      payfrequency = payfrequency,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object EmployeepayhistoryRowUnsaved {
   implicit val oFormat: OFormat[EmployeepayhistoryRowUnsaved] = new OFormat[EmployeepayhistoryRowUnsaved]{
     override def writes(o: EmployeepayhistoryRowUnsaved): JsObject =

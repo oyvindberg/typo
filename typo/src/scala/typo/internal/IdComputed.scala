@@ -17,9 +17,13 @@ object IdComputed {
   }
 
   // normal generated code for a normal single-column id
-  case class UnaryNormal(col: ColumnComputed, qident: sc.QIdent) extends Unary {
+  case class UnaryNormal(col: ColumnComputed, tpe: sc.Type.Qualified) extends Unary {
     def underlying: sc.Type = col.tpe
-    def tpe: sc.Type.Qualified = sc.Type.Qualified(qident)
+  }
+
+  // normal generated code for a normal single-column id
+  case class UnaryInherited(col: ColumnComputed, tpe: sc.Type) extends Unary {
+    def underlying: sc.Type = col.tpe
   }
 
   // if user supplied a type override for an id column
@@ -27,7 +31,8 @@ object IdComputed {
     override def paramName: sc.Ident = col.name
   }
 
-  case class Composite(cols: NonEmptyList[ColumnComputed], qident: sc.QIdent, paramName: sc.Ident) extends IdComputed {
-    final def tpe: sc.Type.Qualified = sc.Type.Qualified(qident)
+  case class Composite(cols: NonEmptyList[ColumnComputed], tpe: sc.Type.Qualified, paramName: sc.Ident) extends IdComputed {
+    val colByName: Map[sc.Ident, ColumnComputed] =
+      cols.map(c => c.name -> c).toMap
   }
 }

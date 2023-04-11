@@ -21,7 +21,17 @@ import scala.util.Try
 case class CountryregionRowUnsaved(
   name: Name,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(countryregioncode: CountryregionId): CountryregionRow =
+    CountryregionRow(
+      countryregioncode = countryregioncode,
+      name = name,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object CountryregionRowUnsaved {
   implicit val oFormat: OFormat[CountryregionRowUnsaved] = new OFormat[CountryregionRowUnsaved]{
     override def writes(o: CountryregionRowUnsaved): JsObject =

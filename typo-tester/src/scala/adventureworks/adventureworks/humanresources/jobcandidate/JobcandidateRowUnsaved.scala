@@ -22,7 +22,18 @@ case class JobcandidateRowUnsaved(
   businessentityid: Option[BusinessentityId],
   resume: Option[/* xml */ String],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(jobcandidateid: JobcandidateId): JobcandidateRow =
+    JobcandidateRow(
+      jobcandidateid = jobcandidateid,
+      businessentityid = businessentityid,
+      resume = resume,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object JobcandidateRowUnsaved {
   implicit val oFormat: OFormat[JobcandidateRowUnsaved] = new OFormat[JobcandidateRowUnsaved]{
     override def writes(o: JobcandidateRowUnsaved): JsObject =

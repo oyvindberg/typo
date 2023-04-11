@@ -5,17 +5,42 @@ package codegen
 case class TableFiles(table: TableComputed, options: InternalOptions) {
   val relation = RelationFiles(table.naming, table.relation, options)
 
-  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsNotId).headOption.map { case (qident, colsUnsaved) =>
-    val rowType = sc.Type.Qualified(qident)
-
+  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsNotId).zip(table.maybeId).headOption.map { case ((rowType, colsUnsaved), id) =>
     val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
 
+    val maybeToRow: sc.Code = {
+      val keyValues = table.cols.map { col =>
+        val ref: sc.Code = id match {
+          case unary: IdComputed.Unary if unary.col.name == col.name =>
+            sc.QIdent.of(unary.paramName)
+          case composite: IdComputed.Composite if composite.colByName.contains(col.name) =>
+            sc.QIdent.of(composite.paramName, composite.colByName(col.name).name)
+          case _ =>
+            if (col.hasDefault) {
+              code"""|${col.name} match {
+                     |  case ${table.default.Defaulted}.${table.default.UseDefault} => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                     |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
+                     |}""".stripMargin
+            } else sc.QIdent.of(col.name)
+        }
+
+        col.name -> ref
+      }
+      val name = if (table.cols.exists(_.hasDefault)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
+
+      code"""|def $name(${id.param}): ${table.relation.RowName} =
+             |  ${table.relation.RowName}(
+             |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
+             |  )""".stripMargin
+    }
     val str =
       code"""|$comments
-             |case class ${qident.name}(
+             |case class ${rowType.name}(
              |  ${colsUnsaved.map(_.param.code).mkCode(",\n")}
-             |)
-             |object ${qident.name} {
+             |) {
+             |  $maybeToRow
+             |}
+             |object ${rowType.name} {
              |  ${options.jsonLib.instances(rowType, colsUnsaved).mkCode("\n")}
              |}
              |""".stripMargin
@@ -40,8 +65,8 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
         val str =
           code"""$comments
-                |case class ${id.qident.name}(value: ${id.underlying}) extends AnyVal
-                |object ${id.qident.name} {
+                |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
+                |object ${id.tpe.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
                 |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
                 |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
@@ -52,7 +77,8 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
       case _: IdComputed.UnaryUserSpecified =>
         None
-
+      case _: IdComputed.UnaryInherited =>
+        None
       case id @ IdComputed.Composite(cols, qident, _) =>
         val ordering = sc.Type.Ordering.of(id.tpe)
 

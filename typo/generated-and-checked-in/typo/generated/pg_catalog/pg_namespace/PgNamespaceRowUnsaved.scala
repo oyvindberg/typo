@@ -23,7 +23,15 @@ case class PgNamespaceRowUnsaved(
   nspname: String,
   nspowner: /* oid */ Long,
   nspacl: Option[Array[/* aclitem */ PGobject]]
-)
+) {
+  def toRow(oid: PgNamespaceId): PgNamespaceRow =
+    PgNamespaceRow(
+      oid = oid,
+      nspname = nspname,
+      nspowner = nspowner,
+      nspacl = nspacl
+    )
+}
 object PgNamespaceRowUnsaved {
   implicit val oFormat: OFormat[PgNamespaceRowUnsaved] = new OFormat[PgNamespaceRowUnsaved]{
     override def writes(o: PgNamespaceRowUnsaved): JsObject =

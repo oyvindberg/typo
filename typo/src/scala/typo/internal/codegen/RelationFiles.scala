@@ -6,8 +6,6 @@ import play.api.libs.json.{JsNull, Json}
 
 case class RelationFiles(naming: Naming, relation: RelationComputed, options: InternalOptions) {
   val RowFile: sc.File = {
-    val rowType = sc.Type.Qualified(relation.RowName)
-
     val compositeId = relation.maybeId match {
       case Some(x: IdComputed.Composite) =>
         code"""|{
@@ -20,7 +18,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       val commentPieces = List(
         col.comment,
         col.pointsTo map { case (relationName, columnName) =>
-          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.idents))
+          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
         },
         col.jsonDescription match {
@@ -45,20 +43,17 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |)$compositeId
             |
             |object ${relation.RowName.name} {
-            |  ${options.jsonLib.instances(rowType, relation.cols).mkCode("\n")}
+            |  ${options.jsonLib.instances(relation.RowName, relation.cols).mkCode("\n")}
             |}
             |""".stripMargin
 
-    sc.File(rowType, str, secondaryTypes = Nil)
+    sc.File(relation.RowName, str, secondaryTypes = Nil)
   }
 
   val FieldValueFile: sc.File = {
-    val fieldValueType = sc.Type.Qualified(relation.FieldValueName)
-    val fieldValueIdType = sc.Type.Qualified(relation.FieldOrIdValueName)
-
     val members = {
       relation.cols.map { col =>
-        val parent = if (relation.isIdColumn(col.dbName)) fieldValueIdType else fieldValueType
+        val parent = if (relation.isIdColumn(col.dbName)) relation.FieldOrIdValueName else relation.FieldValueName
         code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
       }
     }
@@ -66,23 +61,22 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       code"""sealed abstract class ${relation.FieldOrIdValueName.name}[T](val name: String, val value: T)
             |sealed abstract class ${relation.FieldValueName.name}[T](name: String, value: T) extends ${relation.FieldOrIdValueName.name}(name, value)
             |
-            |object ${relation.FieldValueName} {
+            |object ${relation.FieldValueName.name} {
             |  ${members.mkCode("\n")}
             |}
             |""".stripMargin
 
-    sc.File(fieldValueType, str, secondaryTypes = List(fieldValueIdType))
+    sc.File(relation.FieldValueName, str, secondaryTypes = List(relation.FieldOrIdValueName))
   }
 
   def RepoTraitFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val tpe = sc.Type.Qualified(relation.RepoName)
     val str =
       code"""trait ${relation.RepoName.name} {
             |  ${repoMethods.sortedBy(options.dbLib.repoSig).map(options.dbLib.repoSig).mkCode("\n")}
             |}
             |""".stripMargin
 
-    sc.File(tpe, str, secondaryTypes = Nil)
+    sc.File(relation.RepoName, str, secondaryTypes = Nil)
   }
 
   def RepoImplFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
@@ -92,15 +86,15 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
              |}""".stripMargin
     }
     val allMethods = renderedMethods ++
-      options.dbLib.repoAdditionalMembers(relation.maybeId, sc.Type.Qualified(relation.RowName), relation.cols)
+      options.dbLib.repoAdditionalMembers(relation.maybeId, relation.RowName, relation.cols)
 
     val str =
-      code"""|object ${relation.RepoImplName.name} extends ${sc.Type.Qualified(relation.RepoName)} {
+      code"""|object ${relation.RepoImplName.name} extends ${relation.RepoName} {
              |  ${allMethods.mkCode("\n")}
              |}
              |""".stripMargin
 
-    sc.File(sc.Type.Qualified(relation.RepoImplName), str, secondaryTypes = Nil)
+    sc.File(relation.RepoImplName, str, secondaryTypes = Nil)
   }
 
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =

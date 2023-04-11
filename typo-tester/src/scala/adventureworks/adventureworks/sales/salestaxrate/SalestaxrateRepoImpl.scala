@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salestaxrate
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -30,17 +29,17 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       Some(NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid))),
       Some(NamedParameter("taxtype", ParameterValue.from(unsaved.taxtype))),
       unsaved.taxrate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("taxrate", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("taxrate", ParameterValue.from[BigDecimal](value)))
       },
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

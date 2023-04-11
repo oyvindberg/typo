@@ -22,7 +22,22 @@ case class EmailaddressRowUnsaved(
   emailaddress: Option[String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: EmailaddressId): EmailaddressRow =
+    EmailaddressRow(
+      businessentityid = compositeId.businessentityid,
+      emailaddressid = compositeId.emailaddressid,
+      emailaddress = emailaddress,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object EmailaddressRowUnsaved {
   implicit val oFormat: OFormat[EmailaddressRowUnsaved] = new OFormat[EmailaddressRowUnsaved]{
     override def writes(o: EmailaddressRowUnsaved): JsObject =

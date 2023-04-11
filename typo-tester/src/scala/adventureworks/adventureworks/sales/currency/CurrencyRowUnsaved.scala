@@ -21,7 +21,17 @@ import scala.util.Try
 case class CurrencyRowUnsaved(
   name: Name,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(currencycode: CurrencyId): CurrencyRow =
+    CurrencyRow(
+      currencycode = currencycode,
+      name = name,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object CurrencyRowUnsaved {
   implicit val oFormat: OFormat[CurrencyRowUnsaved] = new OFormat[CurrencyRowUnsaved]{
     override def writes(o: CurrencyRowUnsaved): JsObject =

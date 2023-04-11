@@ -26,7 +26,29 @@ case class TransactionhistoryarchiveRowUnsaved(
   quantity: Int,
   actualcost: BigDecimal,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(transactionid: TransactionhistoryarchiveId): TransactionhistoryarchiveRow =
+    TransactionhistoryarchiveRow(
+      transactionid = transactionid,
+      productid = productid,
+      referenceorderid = referenceorderid,
+      referenceorderlineid = referenceorderlineid match {
+                               case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                               case Defaulted.Provided(value) => value
+                             },
+      transactiondate = transactiondate match {
+                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                          case Defaulted.Provided(value) => value
+                        },
+      transactiontype = transactiontype,
+      quantity = quantity,
+      actualcost = actualcost,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object TransactionhistoryarchiveRowUnsaved {
   implicit val oFormat: OFormat[TransactionhistoryarchiveRowUnsaved] = new OFormat[TransactionhistoryarchiveRowUnsaved]{
     override def writes(o: TransactionhistoryarchiveRowUnsaved): JsObject =

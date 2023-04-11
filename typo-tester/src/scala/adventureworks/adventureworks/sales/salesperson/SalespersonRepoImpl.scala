@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesperson
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
@@ -22,36 +21,36 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object SalespersonRepoImpl extends SalespersonRepo {
-  override def delete(businessentityid: SalespersonId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesperson where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: SalespersonId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),
       Some(NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota))),
       unsaved.bonus match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("bonus", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("bonus", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.commissionpct match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("commissionpct", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("commissionpct", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.salesytd match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.saleslastyear match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     
@@ -89,13 +88,13 @@ object SalespersonRepoImpl extends SalespersonRepo {
     }
   
   }
-  override def selectById(businessentityid: SalespersonId)(implicit c: Connection): Option[SalespersonRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[SalespersonId])(implicit c: Connection): List[SalespersonRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: SalespersonId, row: SalespersonRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: SalespersonRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.salesperson
           set territoryid = ${row.territoryid},
               salesquota = ${row.salesquota},
@@ -107,7 +106,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
               modifieddate = ${row.modifieddate}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: SalespersonId, fieldValues: List[SalespersonFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[SalespersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -148,6 +147,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
         )
       )
     }
-  val idRowParser: RowParser[SalespersonId] =
-    SqlParser.get[SalespersonId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

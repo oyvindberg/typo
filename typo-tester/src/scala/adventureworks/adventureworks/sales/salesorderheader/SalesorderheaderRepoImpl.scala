@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesorderheader
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -36,22 +35,22 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderId = {
     val namedParameters = List(
       unsaved.revisionnumber match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("revisionnumber", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("revisionnumber", ParameterValue.from[Int](value)))
       },
       unsaved.orderdate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)))
       },
       Some(NamedParameter("duedate", ParameterValue.from(unsaved.duedate))),
       Some(NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate))),
       unsaved.status match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("status", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("status", ParameterValue.from[Int](value)))
       },
       unsaved.onlineorderflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber))),
       Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),
@@ -65,26 +64,26 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       Some(NamedParameter("creditcardapprovalcode", ParameterValue.from(unsaved.creditcardapprovalcode))),
       Some(NamedParameter("currencyrateid", ParameterValue.from(unsaved.currencyrateid))),
       unsaved.subtotal match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.taxamt match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("taxamt", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("taxamt", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.freight match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("freight", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("freight", ParameterValue.from[BigDecimal](value)))
       },
       Some(NamedParameter("totaldue", ParameterValue.from(unsaved.totaldue))),
       Some(NamedParameter("comment", ParameterValue.from(unsaved.comment))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

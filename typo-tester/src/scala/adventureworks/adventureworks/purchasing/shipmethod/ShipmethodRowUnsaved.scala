@@ -25,7 +25,29 @@ case class ShipmethodRowUnsaved(
   shiprate: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(shipmethodid: ShipmethodId): ShipmethodRow =
+    ShipmethodRow(
+      shipmethodid = shipmethodid,
+      name = name,
+      shipbase = shipbase match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      shiprate = shiprate match {
+                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.Provided(value) => value
+                 },
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ShipmethodRowUnsaved {
   implicit val oFormat: OFormat[ShipmethodRowUnsaved] = new OFormat[ShipmethodRowUnsaved]{
     override def writes(o: ShipmethodRowUnsaved): JsObject =

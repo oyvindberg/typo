@@ -18,7 +18,7 @@ case class TableComputed(
 
   val maybeId: Option[IdComputed] =
     dbTable.primaryKey.flatMap { pk =>
-      val qident = naming.idName(dbTable.name)
+      val tpe = sc.Type.Qualified(naming.idName(dbTable.name))
       pk.colNames match {
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
@@ -32,10 +32,21 @@ case class TableComputed(
             comment = dbCol.comment,
             jsonDescription = dbCol.jsonDescription
           )
-          if (sc.Type.containsUserDefined(underlying))
-            Some(IdComputed.UnaryUserSpecified(col, underlying))
-          else
-            Some(IdComputed.UnaryNormal(col, qident))
+          col.pointsTo match {
+            case Some((relationName, colName)) =>
+              val cols = eval(relationName).forceGet match {
+                case Left(view)   => view.cols
+                case Right(table) => table.cols
+              }
+              val tpe = cols.find(_.dbName == colName).get.tpe
+              Some(IdComputed.UnaryInherited(col, tpe))
+            case None =>
+              if (sc.Type.containsUserDefined(underlying))
+                Some(IdComputed.UnaryUserSpecified(col, underlying))
+              else
+                Some(IdComputed.UnaryNormal(col, tpe))
+
+          }
 
         case colNames =>
           val cols: NonEmptyList[ColumnComputed] =
@@ -51,7 +62,7 @@ case class TableComputed(
                 jsonDescription = dbCol.jsonDescription
               )
             }
-          Some(IdComputed.Composite(cols, qident, paramName = sc.Ident("compositeId")))
+          Some(IdComputed.Composite(cols, tpe, paramName = sc.Ident("compositeId")))
       }
     }
 
@@ -113,14 +124,14 @@ case class TableComputed(
       val all = dbColsAndCols.toList
         .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
         .map { case (dbCol, col) =>
-          val newType = if (dbCol.hasDefault) sc.Type.TApply(default.DefaultedType, List(col.tpe)) else col.tpe
+          val newType = if (dbCol.hasDefault) sc.Type.TApply(default.Defaulted, List(col.tpe)) else col.tpe
           col.copy(tpe = newType)
         }
       NonEmptyList.fromList(all)
     }
 
-  val RowUnsavedName: Option[sc.QIdent] =
-    colsNotId.map(_ => naming.rowUnsaved(dbTable.name))
+  val RowUnsavedName: Option[sc.Type.Qualified] =
+    colsNotId.map(_ => sc.Type.Qualified(naming.rowUnsaved(dbTable.name)))
 
   val RowJoined: Option[RowJoinedComputed] =
     if (dbTable.foreignKeys.nonEmpty) {
@@ -131,7 +142,7 @@ case class TableComputed(
         case fk =>
           eval(fk.otherTable).get match {
             case Some(Right(nonCircularTable)) =>
-              val tpe = sc.Type.Qualified(nonCircularTable.relation.RowName)
+              val tpe = nonCircularTable.relation.RowName
               val fkContainsNullableRow = fk.cols.exists { colName =>
                 dbColsByName(colName).nullability != Nullability.NoNulls
               }
@@ -154,18 +165,18 @@ case class TableComputed(
           }
       }
       NonEmptyList.fromList(maybeParams).map { params =>
-        val thisParam = RowJoinedComputed.Param(sc.Ident("value"), sc.Type.Qualified(relation.RowName), isOptional = false, table = this)
+        val thisParam = RowJoinedComputed.Param(sc.Ident("value"), relation.RowName, isOptional = false, table = this)
         RowJoinedComputed(name, thisParam :: params)
       }
 
     } else None
 
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
-    val RowType = sc.Type.Qualified(relation.RowName)
+    val RowType = relation.RowName
 
     val fieldValueOrIdsParam = sc.Param(
       sc.Ident("fieldValues"),
-      sc.Type.List.of(sc.Type.Qualified(relation.FieldOrIdValueName).of(sc.Type.Wildcard))
+      sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard))
     )
 
     val maybeMethods = List(
@@ -174,7 +185,7 @@ case class TableComputed(
           val insertMethod = RowUnsavedName
             .zip(colsNotId)
             .map { case (unsaved, colsUnsaved) =>
-              val unsavedParam = sc.Param(sc.Ident("unsaved"), sc.Type.Qualified(unsaved))
+              val unsavedParam = sc.Param(sc.Ident("unsaved"), unsaved)
 
               if (id.cols.forall(_.hasDefault))
                 RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
@@ -200,7 +211,7 @@ case class TableComputed(
                 id,
                 sc.Param(
                   sc.Ident("fieldValues"),
-                  sc.Type.List.of(sc.Type.Qualified(relation.FieldValueName).of(sc.Type.Wildcard))
+                  sc.Type.List.of(relation.FieldValueName.of(sc.Type.Wildcard))
                 ),
                 colsNotId
               )

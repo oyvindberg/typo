@@ -21,7 +21,17 @@ import scala.util.Try
 case class ScrapreasonRowUnsaved(
   name: Name,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(scrapreasonid: ScrapreasonId): ScrapreasonRow =
+    ScrapreasonRow(
+      scrapreasonid = scrapreasonid,
+      name = name,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ScrapreasonRowUnsaved {
   implicit val oFormat: OFormat[ScrapreasonRowUnsaved] = new OFormat[ScrapreasonRowUnsaved]{
     override def writes(o: ScrapreasonRowUnsaved): JsObject =

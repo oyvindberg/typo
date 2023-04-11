@@ -27,7 +27,25 @@ case class ProductreviewRowUnsaved(
   rating: Int,
   comments: Option[String],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(productreviewid: ProductreviewId): ProductreviewRow =
+    ProductreviewRow(
+      productreviewid = productreviewid,
+      productid = productid,
+      reviewername = reviewername,
+      reviewdate = reviewdate match {
+                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                     case Defaulted.Provided(value) => value
+                   },
+      emailaddress = emailaddress,
+      rating = rating,
+      comments = comments,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductreviewRowUnsaved {
   implicit val oFormat: OFormat[ProductreviewRowUnsaved] = new OFormat[ProductreviewRowUnsaved]{
     override def writes(o: ProductreviewRowUnsaved): JsObject =

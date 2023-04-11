@@ -8,6 +8,7 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import java.time.LocalDateTime
@@ -33,7 +34,36 @@ case class PersonRowUnsaved(
   demographics: Option[/* xml */ String],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(businessentityid: BusinessentityId): PersonRow =
+    PersonRow(
+      businessentityid = businessentityid,
+      persontype = persontype,
+      namestyle = namestyle match {
+                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                    case Defaulted.Provided(value) => value
+                  },
+      title = title,
+      firstname = firstname,
+      middlename = middlename,
+      lastname = lastname,
+      suffix = suffix,
+      emailpromotion = emailpromotion match {
+                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.Provided(value) => value
+                       },
+      additionalcontactinfo = additionalcontactinfo,
+      demographics = demographics,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
     override def writes(o: PersonRowUnsaved): JsObject =

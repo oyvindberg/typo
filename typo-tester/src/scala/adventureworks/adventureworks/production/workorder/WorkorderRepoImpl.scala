@@ -7,8 +7,7 @@ package adventureworks
 package production
 package workorder
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
@@ -34,8 +33,8 @@ object WorkorderRepoImpl extends WorkorderRepo {
       Some(NamedParameter("duedate", ParameterValue.from(unsaved.duedate))),
       Some(NamedParameter("scrapreasonid", ParameterValue.from(unsaved.scrapreasonid))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

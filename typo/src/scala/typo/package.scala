@@ -75,9 +75,9 @@ package object typo {
         computedScripts.flatMap(x => SqlScriptFiles(x, naming, options).all)
       ).flatten
 
-    val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.QIdent]] =
+    val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
       mostFiles.groupBy(_.pkg).map { case (pkg, files) =>
-        (pkg, files.flatMap(f => (f.name, f.tpe.value) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe.value))).toMap)
+        (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
       }
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.

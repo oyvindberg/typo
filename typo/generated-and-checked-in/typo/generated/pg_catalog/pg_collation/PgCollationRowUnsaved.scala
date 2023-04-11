@@ -28,7 +28,21 @@ case class PgCollationRowUnsaved(
   collcollate: String,
   collctype: String,
   collversion: Option[String]
-)
+) {
+  def toRow(oid: PgCollationId): PgCollationRow =
+    PgCollationRow(
+      oid = oid,
+      collname = collname,
+      collnamespace = collnamespace,
+      collowner = collowner,
+      collprovider = collprovider,
+      collisdeterministic = collisdeterministic,
+      collencoding = collencoding,
+      collcollate = collcollate,
+      collctype = collctype,
+      collversion = collversion
+    )
+}
 object PgCollationRowUnsaved {
   implicit val oFormat: OFormat[PgCollationRowUnsaved] = new OFormat[PgCollationRowUnsaved]{
     override def writes(o: PgCollationRowUnsaved): JsObject =

@@ -29,7 +29,30 @@ case class SalesorderdetailRowUnsaved(
   unitpricediscount: Defaulted[BigDecimal],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: SalesorderdetailId): SalesorderdetailRow =
+    SalesorderdetailRow(
+      salesorderid = compositeId.salesorderid,
+      salesorderdetailid = compositeId.salesorderdetailid,
+      carriertrackingnumber = carriertrackingnumber,
+      orderqty = orderqty,
+      productid = productid,
+      specialofferid = specialofferid,
+      unitprice = unitprice,
+      unitpricediscount = unitpricediscount match {
+                            case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                            case Defaulted.Provided(value) => value
+                          },
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalesorderdetailRowUnsaved {
   implicit val oFormat: OFormat[SalesorderdetailRowUnsaved] = new OFormat[SalesorderdetailRowUnsaved]{
     override def writes(o: SalesorderdetailRowUnsaved): JsObject =

@@ -7,8 +7,7 @@ package adventureworks
 package purchasing
 package purchaseorderdetail
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
@@ -32,8 +31,8 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       Some(NamedParameter("receivedqty", ParameterValue.from(unsaved.receivedqty))),
       Some(NamedParameter("rejectedqty", ParameterValue.from(unsaved.rejectedqty))),
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

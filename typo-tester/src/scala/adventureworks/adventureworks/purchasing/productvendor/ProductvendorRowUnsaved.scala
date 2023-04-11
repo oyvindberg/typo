@@ -28,7 +28,25 @@ case class ProductvendorRowUnsaved(
   onorderqty: Option[Int],
   unitmeasurecode: UnitmeasureId,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: ProductvendorId): ProductvendorRow =
+    ProductvendorRow(
+      productid = compositeId.productid,
+      businessentityid = compositeId.businessentityid,
+      averageleadtime = averageleadtime,
+      standardprice = standardprice,
+      lastreceiptcost = lastreceiptcost,
+      lastreceiptdate = lastreceiptdate,
+      minorderqty = minorderqty,
+      maxorderqty = maxorderqty,
+      onorderqty = onorderqty,
+      unitmeasurecode = unitmeasurecode,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object ProductvendorRowUnsaved {
   implicit val oFormat: OFormat[ProductvendorRowUnsaved] = new OFormat[ProductvendorRowUnsaved]{
     override def writes(o: ProductvendorRowUnsaved): JsObject =

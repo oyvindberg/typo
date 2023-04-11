@@ -22,7 +22,18 @@ case class DepartmentRowUnsaved(
   name: Name,
   groupname: Name,
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(departmentid: DepartmentId): DepartmentRow =
+    DepartmentRow(
+      departmentid = departmentid,
+      name = name,
+      groupname = groupname,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object DepartmentRowUnsaved {
   implicit val oFormat: OFormat[DepartmentRowUnsaved] = new OFormat[DepartmentRowUnsaved]{
     override def writes(o: DepartmentRowUnsaved): JsObject =

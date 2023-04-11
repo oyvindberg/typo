@@ -7,8 +7,7 @@ package adventureworks
 package production
 package productproductphoto
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
@@ -27,12 +26,12 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def insert(compositeId: ProductproductphotoId, unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       unsaved.primary match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("primary", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("primary", ParameterValue.from[Flag](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

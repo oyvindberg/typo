@@ -7,8 +7,7 @@ package adventureworks
 package production
 package location
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -27,16 +26,16 @@ object LocationRepoImpl extends LocationRepo {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.costrate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("costrate", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("costrate", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.availability match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("availability", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("availability", ParameterValue.from[BigDecimal](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

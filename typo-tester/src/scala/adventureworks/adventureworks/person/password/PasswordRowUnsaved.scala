@@ -8,6 +8,7 @@ package person
 package password
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -23,7 +24,22 @@ case class PasswordRowUnsaved(
   passwordsalt: String,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(businessentityid: BusinessentityId): PasswordRow =
+    PasswordRow(
+      businessentityid = businessentityid,
+      passwordhash = passwordhash,
+      passwordsalt = passwordsalt,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object PasswordRowUnsaved {
   implicit val oFormat: OFormat[PasswordRowUnsaved] = new OFormat[PasswordRowUnsaved]{
     override def writes(o: PasswordRowUnsaved): JsObject =

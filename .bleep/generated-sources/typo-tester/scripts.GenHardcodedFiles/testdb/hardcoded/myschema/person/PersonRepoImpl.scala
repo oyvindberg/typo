@@ -15,8 +15,7 @@ import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
-import testdb.hardcoded.Defaulted.Provided
-import testdb.hardcoded.Defaulted.UseDefault
+import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -35,13 +34,13 @@ object PersonRepoImpl extends PersonRepo {
       Some(NamedParameter("phone", ParameterValue.from(unsaved.phone))),
       Some(NamedParameter("likes_pizza", ParameterValue.from(unsaved.likesPizza))),
       unsaved.maritalStatusId match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)))
       },
       Some(NamedParameter("work_email", ParameterValue.from(unsaved.workEmail))),
       unsaved.sector match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("sector", ParameterValue.from[Sector](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("sector", ParameterValue.from[Sector](value)))
       }
     ).flatten
     

@@ -28,7 +28,26 @@ case class WorkorderroutingRowUnsaved(
   plannedcost: BigDecimal,
   actualcost: Option[BigDecimal],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: WorkorderroutingId): WorkorderroutingRow =
+    WorkorderroutingRow(
+      workorderid = compositeId.workorderid,
+      productid = compositeId.productid,
+      operationsequence = compositeId.operationsequence,
+      locationid = locationid,
+      scheduledstartdate = scheduledstartdate,
+      scheduledenddate = scheduledenddate,
+      actualstartdate = actualstartdate,
+      actualenddate = actualenddate,
+      actualresourcehrs = actualresourcehrs,
+      plannedcost = plannedcost,
+      actualcost = actualcost,
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object WorkorderroutingRowUnsaved {
   implicit val oFormat: OFormat[WorkorderroutingRowUnsaved] = new OFormat[WorkorderroutingRowUnsaved]{
     override def writes(o: WorkorderroutingRowUnsaved): JsObject =

@@ -25,10 +25,9 @@ object sc {
     def /(ident: Ident): QIdent = QIdent(idents :+ ident)
     def /(newIdents: List[Ident]): QIdent = QIdent(idents ++ newIdents)
     def name = idents.last
-    def assertInScope = QIdent(List(idents.last))
   }
   object QIdent {
-    implicit val ordering: Ordering[QIdent] = Ordering.by(renderTree)
+    def of(idents: Ident*): QIdent = QIdent(idents.toList)
   }
   case class Param(name: Ident, tpe: Type) extends Tree
 
@@ -43,12 +42,16 @@ object sc {
   object Type {
     case object Wildcard extends Type
     case class TApply(underlying: Type, targs: List[Type]) extends Type
-    case class Qualified(value: QIdent) extends Type
+    case class Qualified(value: QIdent) extends Type {
+      def name = value.name
+    }
     case class Abstract(value: Ident) extends Type
     case class Commented(underlying: Type, comment: String) extends Type
     case class UserDefined(underlying: Type) extends Type
 
     object Qualified {
+      implicit val ordering: Ordering[Qualified] = scala.Ordering.by(renderTree)
+
       def apply(value: String): Qualified =
         Qualified(QIdent(value.split('.').toList.map(Ident.apply)))
       def apply(value: Ident): Qualified =
@@ -108,7 +111,7 @@ object sc {
     val PGmoney = Qualified("org.postgresql.util.PGmoney")
 
     // don't generate imports for these
-    val BuiltIn: Map[Ident, QIdent] =
+    val BuiltIn: Map[Ident, Type.Qualified] =
       Set(
         Any,
         AnyRef,
@@ -135,7 +138,7 @@ object sc {
         StringContext,
         Unit
       )
-        .map(x => (x.value.name, x.value))
+        .map(x => (x.value.name, x))
         .toMap
 
     object Optional {

@@ -18,7 +18,13 @@ import scala.util.Try
 /** This class corresponds to a row in table `myschema.football_club` which has not been persisted yet */
 case class FootballClubRowUnsaved(
   name: String
-)
+) {
+  def toRow(id: FootballClubId): FootballClubRow =
+    FootballClubRow(
+      id = id,
+      name = name
+    )
+}
 object FootballClubRowUnsaved {
   implicit val oFormat: OFormat[FootballClubRowUnsaved] = new OFormat[FootballClubRowUnsaved]{
     override def writes(o: FootballClubRowUnsaved): JsObject =

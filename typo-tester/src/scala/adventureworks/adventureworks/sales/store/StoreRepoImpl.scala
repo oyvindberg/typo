@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package store
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -22,21 +21,21 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object StoreRepoImpl extends StoreRepo {
-  override def delete(businessentityid: StoreId)(implicit c: Connection): Boolean = {
+  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.store where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: StoreId, unsaved: StoreRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: StoreRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid))),
       Some(NamedParameter("demographics", ParameterValue.from(unsaved.demographics))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     
@@ -71,13 +70,13 @@ object StoreRepoImpl extends StoreRepo {
     }
   
   }
-  override def selectById(businessentityid: StoreId)(implicit c: Connection): Option[StoreRow] = {
+  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
     SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[StoreId])(implicit c: Connection): List[StoreRow] = {
+  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid in $businessentityids""".as(rowParser.*)
   }
-  override def update(businessentityid: StoreId, row: StoreRow)(implicit c: Connection): Boolean = {
+  override def update(businessentityid: BusinessentityId, row: StoreRow)(implicit c: Connection): Boolean = {
     SQL"""update sales.store
           set name = ${row.name},
               salespersonid = ${row.salespersonid},
@@ -86,7 +85,7 @@ object StoreRepoImpl extends StoreRepo {
               modifieddate = ${row.modifieddate}
           where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def updateFieldValues(businessentityid: StoreId, fieldValues: List[StoreFieldValue[_]])(implicit c: Connection): Boolean = {
+  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
       case Nil => false
       case nonEmpty =>
@@ -121,6 +120,6 @@ object StoreRepoImpl extends StoreRepo {
         )
       )
     }
-  val idRowParser: RowParser[StoreId] =
-    SqlParser.get[StoreId]("businessentityid")
+  val idRowParser: RowParser[BusinessentityId] =
+    SqlParser.get[BusinessentityId]("businessentityid")
 }

@@ -7,8 +7,7 @@ package adventureworks
 package production
 package document
 
-import adventureworks.Defaulted.Provided
-import adventureworks.Defaulted.UseDefault
+import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
@@ -30,26 +29,26 @@ object DocumentRepoImpl extends DocumentRepo {
       Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
       Some(NamedParameter("owner", ParameterValue.from(unsaved.owner))),
       unsaved.folderflag match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[Flag](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[Flag](value)))
       },
       Some(NamedParameter("filename", ParameterValue.from(unsaved.filename))),
       Some(NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension))),
       Some(NamedParameter("revision", ParameterValue.from(unsaved.revision))),
       unsaved.changenumber match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("changenumber", ParameterValue.from[Int](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("changenumber", ParameterValue.from[Int](value)))
       },
       Some(NamedParameter("status", ParameterValue.from(unsaved.status))),
       Some(NamedParameter("documentsummary", ParameterValue.from(unsaved.documentsummary))),
       Some(NamedParameter("document", ParameterValue.from(unsaved.document))),
       unsaved.rowguid match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
       },
       unsaved.modifieddate match {
-        case UseDefault => None
-        case Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
       }
     ).flatten
     

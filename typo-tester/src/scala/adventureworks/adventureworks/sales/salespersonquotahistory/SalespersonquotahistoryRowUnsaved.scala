@@ -22,7 +22,22 @@ case class SalespersonquotahistoryRowUnsaved(
   salesquota: BigDecimal,
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: SalespersonquotahistoryId): SalespersonquotahistoryRow =
+    SalespersonquotahistoryRow(
+      businessentityid = compositeId.businessentityid,
+      quotadate = compositeId.quotadate,
+      salesquota = salesquota,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalespersonquotahistoryRowUnsaved {
   implicit val oFormat: OFormat[SalespersonquotahistoryRowUnsaved] = new OFormat[SalespersonquotahistoryRowUnsaved]{
     override def writes(o: SalespersonquotahistoryRowUnsaved): JsObject =

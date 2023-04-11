@@ -22,7 +22,23 @@ case class SalesterritoryhistoryRowUnsaved(
   enddate: Option[LocalDateTime],
   rowguid: Defaulted[UUID],
   modifieddate: Defaulted[LocalDateTime]
-)
+) {
+  def unsafeToRow(compositeId: SalesterritoryhistoryId): SalesterritoryhistoryRow =
+    SalesterritoryhistoryRow(
+      businessentityid = compositeId.businessentityid,
+      territoryid = compositeId.territoryid,
+      startdate = compositeId.startdate,
+      enddate = enddate,
+      rowguid = rowguid match {
+                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.Provided(value) => value
+                },
+      modifieddate = modifieddate match {
+                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.Provided(value) => value
+                     }
+    )
+}
 object SalesterritoryhistoryRowUnsaved {
   implicit val oFormat: OFormat[SalesterritoryhistoryRowUnsaved] = new OFormat[SalesterritoryhistoryRowUnsaved]{
     override def writes(o: SalesterritoryhistoryRowUnsaved): JsObject =
