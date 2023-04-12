@@ -68,9 +68,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
              |) {
              |  $maybeToRow
              |}
-             |object ${rowType.name} {
-             |  ${options.jsonLib.instances(rowType, colsUnsaved).mkCode("\n")}
-             |}
+             |${obj(rowType.name, options.jsonLib.instances(rowType, colsUnsaved))}
              |""".stripMargin
 
     sc.File(rowType, str, secondaryTypes = Nil)

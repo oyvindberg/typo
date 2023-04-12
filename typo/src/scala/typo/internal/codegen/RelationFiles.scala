@@ -42,9 +42,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |object ${relation.RowName.name} {
-            |  ${options.jsonLib.instances(relation.RowName, relation.cols).mkCode("\n")}
-            |}
+            |${obj(relation.RowName.name, options.jsonLib.instances(relation.RowName, relation.cols))}
             |""".stripMargin
 
     sc.File(relation.RowName, str, secondaryTypes = Nil)
@@ -61,9 +59,7 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       code"""sealed abstract class ${relation.FieldOrIdValueName.name}[T](val name: String, val value: T)
             |sealed abstract class ${relation.FieldValueName.name}[T](name: String, value: T) extends ${relation.FieldOrIdValueName.name}(name, value)
             |
-            |object ${relation.FieldValueName.name} {
-            |  ${members.mkCode("\n")}
-            |}
+            |${obj(relation.FieldValueName.name, members.toList)}
             |""".stripMargin
 
     sc.File(relation.FieldValueName, str, secondaryTypes = List(relation.FieldOrIdValueName))
