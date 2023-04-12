@@ -18,8 +18,14 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productlistpricehistory` which has not been persisted yet */
 case class ProductlistpricehistoryRowUnsaved(
+  /** List price end date
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productlistpricehistory","column_name":"enddate","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   enddate: Option[LocalDateTime],
+  /** Product list price.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productlistpricehistory","column_name":"listprice","ordinal_position":4,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   listprice: BigDecimal,
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productlistpricehistory","column_name":"modifieddate","ordinal_position":5,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(compositeId: ProductlistpricehistoryId): ProductlistpricehistoryRow =

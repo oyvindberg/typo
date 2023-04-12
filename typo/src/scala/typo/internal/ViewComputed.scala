@@ -11,7 +11,7 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
-        hasDefault = dbCol.hasDefault,
+        columnDefault = dbCol.columnDefault,
         comment = dbCol.comment,
         jsonDescription = dbCol.jsonDescription
       )

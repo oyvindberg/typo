@@ -19,6 +19,7 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `pg_catalog.pg_description` which has not been persisted yet */
 case class PgDescriptionRowUnsaved(
+  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_description","column_name":"description","ordinal_position":4,"is_nullable":"NO","data_type":"text","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   description: String
 ) {
   def toRow(compositeId: PgDescriptionId): PgDescriptionRow =

@@ -21,6 +21,7 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 /** This class corresponds to a row in table `myschema.person` which has not been persisted yet */
 case class PersonRowUnsaved(
+  /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
   name: String,
   nickName: Option[String],
@@ -28,8 +29,11 @@ case class PersonRowUnsaved(
   email: String,
   phone: String,
   likesPizza: Boolean,
+  /** Default: some-value
+      Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: Defaulted[MaritalStatusId],
   workEmail: Option[String],
+  /** Default: PUBLIC */
   sector: Defaulted[Sector]
 ) {
   def unsafeToRow(id: PersonId): PersonRow =

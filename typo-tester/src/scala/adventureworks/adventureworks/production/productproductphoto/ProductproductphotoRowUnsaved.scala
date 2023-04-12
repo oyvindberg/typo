@@ -19,7 +19,12 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
 case class ProductproductphotoRowUnsaved(
+  /** Default: false
+      0 = Photo is not the principal image. 1 = Photo is the principal image.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productproductphoto","column_name":"primary","ordinal_position":3,"column_default":"false","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   primary: Defaulted[Flag],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productproductphoto","column_name":"modifieddate","ordinal_position":4,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(compositeId: ProductproductphotoId): ProductproductphotoRow =

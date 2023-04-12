@@ -19,14 +19,33 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.productvendor` which has not been persisted yet */
 case class ProductvendorRowUnsaved(
+  /** The average span of time (in days) between placing an order with the vendor and receiving the purchased product.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"averageleadtime","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   averageleadtime: Int,
+  /** The vendor's usual selling price.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"standardprice","ordinal_position":4,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   standardprice: BigDecimal,
+  /** The selling price when last purchased.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"lastreceiptcost","ordinal_position":5,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   lastreceiptcost: Option[BigDecimal],
+  /** Date the product was last received by the vendor.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"lastreceiptdate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   lastreceiptdate: Option[LocalDateTime],
+  /** The maximum quantity that should be ordered.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"minorderqty","ordinal_position":7,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   minorderqty: Int,
+  /** The minimum quantity that should be ordered.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"maxorderqty","ordinal_position":8,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   maxorderqty: Int,
+  /** The quantity currently on order.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"onorderqty","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   onorderqty: Option[Int],
+  /** The product's unit of measure.
+      Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"unitmeasurecode","ordinal_position":10,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   unitmeasurecode: UnitmeasureId,
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"productvendor","column_name":"modifieddate","ordinal_position":11,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(compositeId: ProductvendorId): ProductvendorRow =

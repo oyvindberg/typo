@@ -20,12 +20,28 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productreview` which has not been persisted yet */
 case class ProductreviewRowUnsaved(
+  /** Product identification number. Foreign key to Product.ProductID.
+      Points to [[product.ProductRow.productid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"productid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   productid: ProductId,
+  /** Name of the reviewer.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"reviewername","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   reviewername: Name,
+  /** Default: now()
+      Date review was submitted.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"reviewdate","ordinal_position":4,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   reviewdate: Defaulted[LocalDateTime],
+  /** Reviewer's e-mail address.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"emailaddress","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   emailaddress: String,
+  /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"rating","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rating: Int,
+  /** Reviewer's comments
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"comments","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3850,"character_octet_length":15400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   comments: Option[String],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productreview","column_name":"modifieddate","ordinal_position":8,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(productreviewid: ProductreviewId): ProductreviewRow =

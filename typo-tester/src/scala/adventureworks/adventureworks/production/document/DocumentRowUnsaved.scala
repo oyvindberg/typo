@@ -21,17 +21,45 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.document` which has not been persisted yet */
 case class DocumentRowUnsaved(
+  /** Title of the document.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"title","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   title: String,
+  /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
+      Points to [[humanresources.employee.EmployeeRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"owner","ordinal_position":4,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   owner: BusinessentityId,
+  /** Default: false
+      0 = This is a folder, 1 = This is a document.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"folderflag","ordinal_position":5,"column_default":"false","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   folderflag: Defaulted[Flag],
+  /** File name of the document
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"filename","ordinal_position":6,"is_nullable":"NO","data_type":"character varying","character_maximum_length":400,"character_octet_length":1600,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   filename: String,
+  /** File extension indicating the document type. For example, .doc or .txt.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"fileextension","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":8,"character_octet_length":32,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   fileextension: Option[String],
+  /** Revision number of the document.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"revision","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":5,"character_octet_length":20,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   revision: /* bpchar */ String,
+  /** Default: 0
+      Engineering change approval number.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"changenumber","ordinal_position":9,"column_default":"0","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   changenumber: Defaulted[Int],
+  /** 1 = Pending approval, 2 = Approved, 3 = Obsolete
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"status","ordinal_position":10,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   status: Int,
+  /** Document abstract.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"documentsummary","ordinal_position":11,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   documentsummary: Option[String],
+  /** Complete document.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"document","ordinal_position":12,"is_nullable":"YES","data_type":"bytea","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   document: Option[Array[Byte]],
+  /** Default: uuid_generate_v1()
+      ROWGUIDCOL number uniquely identifying the record. Required for FileStream.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"rowguid","ordinal_position":13,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rowguid: Defaulted[UUID],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"document","column_name":"modifieddate","ordinal_position":14,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(documentnode: DocumentId): DocumentRow =

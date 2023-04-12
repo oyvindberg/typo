@@ -8,7 +8,7 @@ case class ColumnComputed(
     name: sc.Ident,
     tpe: sc.Type,
     dbName: db.ColName,
-    hasDefault: Boolean,
+    columnDefault: Option[String],
     comment: Option[String],
     jsonDescription: JsValue
 ) {

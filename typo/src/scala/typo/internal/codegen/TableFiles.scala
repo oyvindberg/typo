@@ -2,6 +2,8 @@ package typo
 package internal
 package codegen
 
+import play.api.libs.json.{JsNull, Json}
+
 case class TableFiles(table: TableComputed, options: InternalOptions) {
   val relation = RelationFiles(table.naming, table.relation, options)
 
@@ -16,7 +18,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
           case composite: IdComputed.Composite if composite.colByName.contains(col.name) =>
             sc.QIdent.of(composite.paramName, composite.colByName(col.name).name)
           case _ =>
-            if (col.hasDefault) {
+            if (col.columnDefault.isDefined) {
               code"""|${col.name} match {
                      |  case ${table.default.Defaulted}.${table.default.UseDefault} => sys.error("cannot produce row when you depend on a value which is defaulted in database")
                      |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
@@ -26,17 +28,43 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
         col.name -> ref
       }
-      val name = if (table.cols.exists(_.hasDefault)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
+      val name = if (table.cols.exists(_.columnDefault.isDefined)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
 
       code"""|def $name(${id.param}): ${table.relation.RowName} =
              |  ${table.relation.RowName}(
              |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
              |  )""".stripMargin
     }
+
+    val formattedCols = colsUnsaved.map { col =>
+      val commentPieces = List(
+        col.columnDefault.map(x => s"Default: $x"),
+        col.comment,
+        col.pointsTo map { case (relationName, columnName) =>
+          val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, relation.RowFile.tpe.value.idents))
+          s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
+        },
+        col.jsonDescription match {
+          case JsNull => None
+          case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
+        }
+      ).flatten
+
+      val comment = commentPieces match {
+        case Nil => sc.Code.Empty
+        case nonEmpty =>
+          val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
+          code"""|/** ${lines.mkCode("\n")} */
+                 |""".stripMargin
+      }
+
+      code"$comment${col.param.code}"
+    }
+
     val str =
       code"""|$comments
              |case class ${rowType.name}(
-             |  ${colsUnsaved.map(_.param.code).mkCode(",\n")}
+             |  ${formattedCols.mkCode(",\n")}
              |) {
              |  $maybeToRow
              |}

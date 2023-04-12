@@ -18,10 +18,20 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productphoto` which has not been persisted yet */
 case class ProductphotoRowUnsaved(
+  /** Small image of the product.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"thumbnailphoto","ordinal_position":2,"is_nullable":"YES","data_type":"bytea","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   thumbnailphoto: Option[Array[Byte]],
+  /** Small image file name.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"thumbnailphotofilename","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   thumbnailphotofilename: Option[String],
+  /** Large image of the product.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"largephoto","ordinal_position":4,"is_nullable":"YES","data_type":"bytea","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   largephoto: Option[Array[Byte]],
+  /** Large image file name.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"largephotofilename","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   largephotofilename: Option[String],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"modifieddate","ordinal_position":6,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(productphotoid: ProductphotoId): ProductphotoRow =

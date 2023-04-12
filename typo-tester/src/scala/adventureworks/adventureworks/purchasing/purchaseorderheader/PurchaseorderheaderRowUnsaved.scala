@@ -20,16 +20,47 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.purchaseorderheader` which has not been persisted yet */
 case class PurchaseorderheaderRowUnsaved(
+  /** Default: 0
+      Incremental number to track changes to the purchase order over time.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"revisionnumber","ordinal_position":2,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   revisionnumber: Defaulted[Int],
+  /** Default: 1
+      Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"status","ordinal_position":3,"column_default":"1","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   status: Defaulted[Int],
+  /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
+      Points to [[humanresources.employee.EmployeeRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"employeeid","ordinal_position":4,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   employeeid: BusinessentityId,
+  /** Vendor with whom the purchase order is placed. Foreign key to Vendor.BusinessEntityID.
+      Points to [[vendor.VendorRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"vendorid","ordinal_position":5,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   vendorid: BusinessentityId,
+  /** Shipping method. Foreign key to ShipMethod.ShipMethodID.
+      Points to [[shipmethod.ShipmethodRow.shipmethodid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"shipmethodid","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   shipmethodid: ShipmethodId,
+  /** Default: now()
+      Purchase order creation date.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"orderdate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   orderdate: Defaulted[LocalDateTime],
+  /** Estimated shipment date from the vendor.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"shipdate","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   shipdate: Option[LocalDateTime],
+  /** Default: 0.00
+      Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"subtotal","ordinal_position":9,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   subtotal: Defaulted[BigDecimal],
+  /** Default: 0.00
+      Tax amount.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"taxamt","ordinal_position":10,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   taxamt: Defaulted[BigDecimal],
+  /** Default: 0.00
+      Shipping cost.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"freight","ordinal_position":11,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   freight: Defaulted[BigDecimal],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderheader","column_name":"modifieddate","ordinal_position":13,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(purchaseorderid: PurchaseorderheaderId): PurchaseorderheaderRow =

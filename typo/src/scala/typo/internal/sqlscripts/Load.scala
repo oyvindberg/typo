@@ -47,7 +47,7 @@ object Load {
           System.err.println(s"$relativePath Couldn't translate type from column $jsonDescription")
           db.Type.Text
         },
-        hasDefault = col.isAutoIncrement,
+        columnDefault = if (col.isAutoIncrement) Some("auto-increment") else None,
         comment = None,
         jsonDescription = jsonDescription,
         nullability = col.isNullable.toNullability

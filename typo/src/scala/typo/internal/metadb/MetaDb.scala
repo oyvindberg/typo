@@ -110,7 +110,7 @@ object MetaDb {
             val colName = db.ColName(c.columnName.get.value)
             db.Col(
               name = colName,
-              hasDefault = c.columnDefault.isDefined,
+              columnDefault = c.columnDefault.map(_.value),
               nullability = c.isNullable match {
                 case Some(YesOrNo("YES")) => Nullability.Nullable
                 case Some(YesOrNo("NO"))  => Nullability.NoNulls

@@ -28,7 +28,7 @@ case class TableComputed(
             name = naming.field(dbCol.name),
             tpe = underlying,
             dbName = dbCol.name,
-            hasDefault = dbCol.hasDefault,
+            columnDefault = dbCol.columnDefault,
             comment = dbCol.comment,
             jsonDescription = dbCol.jsonDescription
           )
@@ -57,7 +57,7 @@ case class TableComputed(
                 name = naming.field(colName),
                 tpe = deriveType(dbCol),
                 dbName = dbCol.name,
-                hasDefault = dbCol.hasDefault,
+                columnDefault = dbCol.columnDefault,
                 comment = dbCol.comment,
                 jsonDescription = dbCol.jsonDescription
               )
@@ -75,7 +75,7 @@ case class TableComputed(
         name = naming.field(dbCol.name),
         tpe = tpe,
         dbName = dbCol.name,
-        hasDefault = dbCol.hasDefault,
+        columnDefault = dbCol.columnDefault,
         comment = dbCol.comment,
         jsonDescription = dbCol.jsonDescription
       )
@@ -124,7 +124,7 @@ case class TableComputed(
       val all = dbColsAndCols.toList
         .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
         .map { case (dbCol, col) =>
-          val newType = if (dbCol.hasDefault) sc.Type.TApply(default.Defaulted, List(col.tpe)) else col.tpe
+          val newType = if (dbCol.columnDefault.isDefined) sc.Type.TApply(default.Defaulted, List(col.tpe)) else col.tpe
           col.copy(tpe = newType)
         }
       NonEmptyList.fromList(all)
@@ -187,7 +187,7 @@ case class TableComputed(
             .map { case (unsaved, colsUnsaved) =>
               val unsavedParam = sc.Param(sc.Ident("unsaved"), unsaved)
 
-              if (id.cols.forall(_.hasDefault))
+              if (id.cols.forall(_.columnDefault.isDefined))
                 RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
               else
                 RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)

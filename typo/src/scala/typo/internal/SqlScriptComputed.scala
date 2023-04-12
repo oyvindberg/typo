@@ -22,7 +22,7 @@ case class SqlScriptComputed(
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
-        hasDefault = dbCol.hasDefault,
+        columnDefault = dbCol.columnDefault,
         comment = dbCol.comment,
         jsonDescription = dbCol.jsonDescription
       )

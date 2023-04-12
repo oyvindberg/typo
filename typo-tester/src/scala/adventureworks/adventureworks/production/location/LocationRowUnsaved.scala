@@ -19,9 +19,19 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.location` which has not been persisted yet */
 case class LocationRowUnsaved(
+  /** Location description.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"location","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   name: Name,
+  /** Default: 0.00
+      Standard hourly cost of the manufacturing location.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"location","column_name":"costrate","ordinal_position":3,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   costrate: Defaulted[BigDecimal],
+  /** Default: 0.00
+      Work capacity (in hours) of the manufacturing location.
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"location","column_name":"availability","ordinal_position":4,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   availability: Defaulted[BigDecimal],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"location","column_name":"modifieddate","ordinal_position":5,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(locationid: LocationId): LocationRow =

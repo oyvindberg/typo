@@ -21,10 +21,21 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.store` which has not been persisted yet */
 case class StoreRowUnsaved(
+  /** Name of the store.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   name: Name,
+  /** ID of the sales person assigned to the customer. Foreign key to SalesPerson.BusinessEntityID.
+      Points to [[salesperson.SalespersonRow.businessentityid]]
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"salespersonid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   salespersonid: Option[BusinessentityId],
+  /** Demographic informationg about the store such as the number of employees, annual sales and store type.
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"demographics","ordinal_position":4,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   demographics: Option[/* xml */ String],
+  /** Default: uuid_generate_v1()
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"rowguid","ordinal_position":5,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rowguid: Defaulted[UUID],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"store","column_name":"modifieddate","ordinal_position":6,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(businessentityid: BusinessentityId): StoreRow =

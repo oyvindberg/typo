@@ -22,12 +22,28 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.vendor` which has not been persisted yet */
 case class VendorRowUnsaved(
+  /** Vendor account (identification) number.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"accountnumber","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"AccountNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   accountnumber: AccountNumber,
+  /** Company name.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"name","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   name: Name,
+  /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"creditrating","ordinal_position":4,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   creditrating: Int,
+  /** Default: true
+      0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"preferredvendorstatus","ordinal_position":5,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   preferredvendorstatus: Defaulted[Flag],
+  /** Default: true
+      0 = Vendor no longer used. 1 = Vendor is actively used.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"activeflag","ordinal_position":6,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   activeflag: Defaulted[Flag],
+  /** Vendor URL.
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"purchasingwebserviceurl","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":1024,"character_octet_length":4096,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   purchasingwebserviceurl: Option[String],
+  /** Default: now()
+      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"vendor","column_name":"modifieddate","ordinal_position":8,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(businessentityid: BusinessentityId): VendorRow =
