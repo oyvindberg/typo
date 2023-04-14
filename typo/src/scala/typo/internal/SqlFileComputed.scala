@@ -2,23 +2,23 @@ package typo
 package internal
 
 import typo.internal.rewriteDependentData.Eval
-import typo.internal.sqlscripts.{DecomposedSql, SqlScript}
+import typo.internal.sqlfiles.{DecomposedSql, SqlFile}
 
-case class SqlScriptComputed(
-    script: SqlScript,
+case class SqlFileComputed(
+    sqlFile: SqlFile,
     pkg0: sc.QIdent,
     mkNaming: sc.QIdent => Naming,
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]
 ) {
-  val pathSegments: List[sc.Ident] = script.relPath.segments.map(sc.Ident.apply)
+  val pathSegments: List[sc.Ident] = sqlFile.relPath.segments.map(sc.Ident.apply)
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 
   val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
-    script.cols.map { dbCol =>
+    sqlFile.cols.map { dbCol =>
       val columnComputed = ColumnComputed(
-        pointsTo = script.dependencies.get(dbCol.name),
+        pointsTo = sqlFile.dependencies.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbName = dbCol.name,
@@ -33,7 +33,7 @@ case class SqlScriptComputed(
   def deriveType(dbCol: db.Col): sc.Type = {
     // we let types flow through constraints down to this column, the point is to reuse id types downstream
     val typeFromFk: Option[sc.Type] =
-      script.dependencies.get(dbCol.name) match {
+      sqlFile.dependencies.get(dbCol.name) match {
         case Some((otherTableName, otherColName)) =>
           val otherTable = eval(otherTableName).forceGet
           val cols = otherTable match {
@@ -44,15 +44,15 @@ case class SqlScriptComputed(
         case _ => None
       }
 
-    val tpe = scalaTypeMapper.col(OverrideFrom.SqlScript(script.relPath), dbCol, typeFromFk)
+    val tpe = scalaTypeMapper.col(OverrideFrom.SqlFile(sqlFile.relPath), dbCol, typeFromFk)
 
     tpe
   }
 
-  val params: List[SqlScriptComputed.ParamComputed] = {
-    val from = OverrideFrom.SqlFileParam(script.relPath)
+  val params: List[SqlFileComputed.ParamComputed] = {
+    val from = OverrideFrom.SqlFileParam(sqlFile.relPath)
 
-    script.params.map { param =>
+    sqlFile.params.map { param =>
       val maybeNameInScript: Option[db.ColName] =
         param.maybeName match {
           case DecomposedSql.NotNamedParam    => None
@@ -64,7 +64,7 @@ case class SqlScriptComputed(
         case Some(name) => naming.field(name)
       }
       val tpe = scalaTypeMapper.param(from, maybeNameInScript, param.tpe, param.nullability)
-      SqlScriptComputed.ParamComputed(scalaName, tpe, param)
+      SqlFileComputed.ParamComputed(scalaName, tpe, param)
     }
   }
 
@@ -73,11 +73,11 @@ case class SqlScriptComputed(
 
   val repoMethods: NonEmptyList[RepoMethod] = {
     NonEmptyList(
-      RepoMethod.SqlScript(this)
+      RepoMethod.SqlFile(this)
     )
   }
 }
 
-object SqlScriptComputed {
-  case class ParamComputed(name: sc.Ident, tpe: sc.Type, underlying: SqlScript.Param)
+object SqlFileComputed {
+  case class ParamComputed(name: sc.Ident, tpe: sc.Type, underlying: SqlFile.Param)
 }

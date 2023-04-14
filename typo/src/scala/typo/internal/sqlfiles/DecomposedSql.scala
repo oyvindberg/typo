@@ -1,6 +1,4 @@
-package typo
-package internal
-package sqlscripts
+package typo.internal.sqlfiles
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val sqlWithQuestionMarks: String = render(_ => "?")

@@ -33,11 +33,11 @@ object TypeOverride {
       }
     }
 
-  def sqlScript(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
+  def sqlFile(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
     (from, colName) => {
       from match {
-        case sql: OverrideFrom.SqlScript => pf.lift((sql.relPath, colName.value))
-        case _                           => None
+        case sql: OverrideFrom.SqlFile => pf.lift((sql.relPath, colName.value))
+        case _                         => None
       }
     }
 

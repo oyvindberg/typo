@@ -1,7 +1,7 @@
 import typo.internal.*
 import typo.internal.codegen.*
 import typo.internal.metadb.MetaDb
-import typo.internal.sqlscripts.{Load, SqlScript}
+import typo.internal.sqlfiles.SqlFile
 
 import java.nio.file.Path
 import java.sql.Connection
@@ -10,7 +10,7 @@ import scala.collection.immutable.SortedMap
 package object typo {
   def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
     val metadb = MetaDb(MetaDb.Input.fromDb)
-    val sqlScripts = Load(scriptsPath, metadb.typeMapperDb)
+    val sqlScripts = sqlfiles.Load(scriptsPath, metadb.typeMapperDb)
     fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts, selector)
   }
 
@@ -24,7 +24,7 @@ package object typo {
       relations: List[db.Relation],
       enums: List[db.StringEnum],
       domains: List[db.Domain],
-      sqlScripts: List[SqlScript],
+      sqlScripts: List[SqlFile],
       selector: Selector
   ): Generated = {
     val options = InternalOptions(
@@ -56,7 +56,7 @@ package object typo {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedScripts = sqlScripts.map(sqlScript => SqlScriptComputed(sqlScript, options.pkg, options.naming, scalaTypeMapper, computeds.apply))
+    val computedScripts = sqlScripts.map(sqlScript => SqlFileComputed(sqlScript, options.pkg, options.naming, scalaTypeMapper, computeds.apply))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.forceGet
     }
@@ -72,7 +72,7 @@ package object typo {
           case Left(viewComputed)   => ViewFiles(viewComputed, options).all
           case Right(tableComputed) => TableFiles(tableComputed, options).all
         },
-        computedScripts.flatMap(x => SqlScriptFiles(x, naming, options).all)
+        computedScripts.flatMap(x => SqlFileFiles(x, naming, options).all)
       ).flatten
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =

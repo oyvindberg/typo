@@ -1,6 +1,6 @@
 package typo
 package internal
-package sqlscripts
+package sqlfiles
 
 import java.sql.{Connection, PreparedStatement}
 
@@ -18,11 +18,11 @@ object JdbcMetadata {
       case metadata: org.postgresql.jdbc.PgParameterMetaData =>
         0.until(metadata.getParameterCount).map(_ + 1).map { n =>
           MetadataParameterColumn(
-            isNullable = sqlscripts.ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
+            isNullable = ParameterNullable.fromInt(metadata.isNullable(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.isNullable($n) = ${metadata.isNullable(n)}")
             },
             isSigned = metadata.isSigned(n),
-            parameterMode = sqlscripts.ParameterMode.fromInt(metadata.getParameterMode(n)).getOrElse {
+            parameterMode = ParameterMode.fromInt(metadata.getParameterMode(n)).getOrElse {
               sys.error(s"Couldn't understand metadata.getParameterMode($n) = ${metadata.getParameterMode(n)}")
             },
             parameterType = JdbcType.fromInt(metadata.getParameterType(n)),
@@ -46,7 +46,7 @@ object JdbcMetadata {
             columnDisplaySize = metadata.getColumnDisplaySize(n),
             columnLabel = db.ColName(metadata.getColumnLabel(n)),
             columnName = db.ColName(metadata.getColumnName(n)),
-            columnType = sqlscripts.JdbcType.fromInt(metadata.getColumnType(n)),
+            columnType = sqlfiles.JdbcType.fromInt(metadata.getColumnType(n)),
             columnTypeName = metadata.getColumnTypeName(n),
             format = metadata.getFormat(n),
             isAutoIncrement = metadata.isAutoIncrement(n),

@@ -1,6 +1,4 @@
-package typo
-package internal
-package sqlscripts
+package typo.internal.sqlfiles
 
 /** Analyzed from postgres metadata for prepared statements through jdbc
   */

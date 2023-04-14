@@ -1,15 +1,15 @@
-package typo
-package internal
-package sqlscripts
+package typo.internal.sqlfiles
 
-case class SqlScript(
+import typo.{NonEmptyList, Nullability, RelPath, db}
+
+case class SqlFile(
     relPath: RelPath,
     decomposedSql: DecomposedSql,
-    params: List[SqlScript.Param],
+    params: List[SqlFile.Param],
     cols: NonEmptyList[db.Col],
     dependencies: Map[db.ColName, (db.RelationName, db.ColName)]
 )
 
-object SqlScript {
+object SqlFile {
   case class Param(maybeName: DecomposedSql.Param, indices: List[Int], tpe: db.Type, nullability: Nullability)
 }

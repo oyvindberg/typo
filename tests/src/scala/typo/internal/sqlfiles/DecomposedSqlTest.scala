@@ -1,4 +1,4 @@
-package typo.internal.sqlscripts
+package typo.internal.sqlfiles
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite

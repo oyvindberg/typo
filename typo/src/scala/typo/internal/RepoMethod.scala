@@ -16,5 +16,5 @@ object RepoMethod {
   case class InsertProvidedKey(id: IdComputed, colsUnsaved: NonEmptyList[ColumnComputed], unsavedParam: sc.Param, default: DefaultComputed) extends RepoMethod
   case class InsertOnlyKey(id: IdComputed) extends RepoMethod
   case class Delete(id: IdComputed) extends RepoMethod
-  case class SqlScript(sqlScript: SqlScriptComputed) extends RepoMethod
+  case class SqlFile(sqlFile: SqlFileComputed) extends RepoMethod
 }

@@ -39,9 +39,9 @@ object GeneratedSources {
       "tables"
     )
 
-    // postgres has problems with a left join in this query
     val nullabilityOverride: NullabilityOverride = {
-      case (OverrideFrom.SqlScript(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
+      // postgres has problems with a left join in this query
+      case (OverrideFrom.SqlFile(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
         Some(Nullability.Nullable)
       case (_, _) =>
         None

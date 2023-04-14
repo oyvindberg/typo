@@ -32,11 +32,11 @@ object NullabilityOverride {
       }
     }
 
-  def sqlScript(pf: PartialFunction[(RelPath, /* column name */ String), Nullability]): NullabilityOverride =
+  def sqlFile(pf: PartialFunction[(RelPath, /* column name */ String), Nullability]): NullabilityOverride =
     (from, colName) => {
       from match {
-        case OverrideFrom.SqlScript(relPath) => pf.lift((relPath, colName.value))
-        case _                               => None
+        case OverrideFrom.SqlFile(relPath) => pf.lift((relPath, colName.value))
+        case _                             => None
       }
     }
 

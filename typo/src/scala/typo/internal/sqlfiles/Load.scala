@@ -1,17 +1,17 @@
-package typo
-package internal
-package sqlscripts
+package typo.internal.sqlfiles
 
-import anorm._
+import anorm.*
 import org.postgresql.util.PSQLException
 import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesRepoImpl
+import typo.internal.{TypeMapperDb, minimalJson}
+import typo.{NonEmptyList, RelPath, db}
 
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
 object Load {
-  def apply(scriptsPath: Path, typeMapperDb: TypeMapperDb)(implicit c: Connection): List[SqlScript] =
+  def apply(scriptsPath: Path, typeMapperDb: TypeMapperDb)(implicit c: Connection): List[SqlFile] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
@@ -30,7 +30,7 @@ object Load {
         val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
           readDepsFromTemporaryView(sqlFile, decomposedSql, relativePath)
 
-        parseSqlScript(
+        parseSqlFile(
           typeMapperDb,
           RelPath.relativeTo(scriptsPath, sqlFile),
           decomposedSql,
@@ -79,13 +79,13 @@ object Load {
     found.result()
   }
 
-  def parseSqlScript(
+  def parseSqlFile(
       typeMapperDb: TypeMapperDb,
       relativePath: RelPath,
       decomposedSql: DecomposedSql,
       jdbcMetadata: JdbcMetadata,
       depsFromView: Map[db.ColName, (db.RelationName, db.ColName)]
-  ): Option[SqlScript] = {
+  ): Option[SqlFile] = {
     val columns = jdbcMetadata.columns
 
     val cols = columns.map { col =>
@@ -114,11 +114,11 @@ object Load {
         System.err.println(s"$relativePath: Couldn't translate type from param $maybeName")
         db.Type.Text
       }
-      SqlScript.Param(maybeName, indices, tpe, jdbcParam.isNullable.toNullability)
+      SqlFile.Param(maybeName, indices, tpe, jdbcParam.isNullable.toNullability)
     }
 
     for {
       cols <- NonEmptyList.fromList(cols)
-    } yield SqlScript(relativePath, decomposedSql, params, cols, deps)
+    } yield SqlFile(relativePath, decomposedSql, params, cols, deps)
   }
 }
