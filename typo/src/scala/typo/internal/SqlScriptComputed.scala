@@ -49,7 +49,9 @@ case class SqlScriptComputed(
     tpe
   }
 
-  val params: List[SqlScriptComputed.ParamComputed] =
+  val params: List[SqlScriptComputed.ParamComputed] = {
+    val from = OverrideFrom.SqlFileParam(script.relPath)
+
     script.params.map { param =>
       val maybeNameInScript: Option[db.ColName] =
         param.maybeName match {
@@ -61,9 +63,10 @@ case class SqlScriptComputed(
         case None       => sc.Ident(s"param${param.indices.head}")
         case Some(name) => naming.field(name)
       }
-      val tpe = scalaTypeMapper.param(script.relPath, maybeNameInScript, param.tpe, param.nullability)
+      val tpe = scalaTypeMapper.param(from, maybeNameInScript, param.tpe, param.nullability)
       SqlScriptComputed.ParamComputed(scalaName, tpe, param)
     }
+  }
 
   val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)

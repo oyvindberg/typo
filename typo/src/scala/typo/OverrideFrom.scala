@@ -8,4 +8,5 @@ object OverrideFrom {
   case class Table(name: db.RelationName) extends Relation
   case class View(name: db.RelationName) extends Relation
   case class SqlScript(relPath: RelPath) extends OverrideFrom
+  case class SqlFileParam(relPath: RelPath) extends OverrideFrom
 }

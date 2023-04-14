@@ -24,16 +24,26 @@ case class TypeMapperScala(
     withNullability(baseTpe, nullabilityOverride.apply(from, col.name).getOrElse(col.nullability))
   }
 
-  def param(script: RelPath, maybeColName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
+  def param(from: OverrideFrom.SqlFileParam, maybeColName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
+    def go(tpe: db.Type): sc.Type = {
+      val maybeOverridden = {
+        for {
+          colName <- maybeColName
+          overriddenString <- typeOverride(from, colName)
+        } yield sc.Type.UserDefined(sc.Type.Qualified(overriddenString))
+      }
+      maybeOverridden.getOrElse(baseType(tpe))
+    }
+
     val base = dbType match {
       case db.Type.Array(tpe) =>
-        sc.Type.Array.of(baseType(tpe))
+        sc.Type.Array.of(go(tpe))
       case other =>
-        baseType(other)
+        go(other)
     }
     val nullability1: Nullability =
       maybeColName
-        .flatMap(colName => nullabilityOverride(OverrideFrom.SqlScript(script), colName))
+        .flatMap(colName => nullabilityOverride(from, colName))
         .getOrElse(nullability)
 
     withNullability(base, nullability1)
