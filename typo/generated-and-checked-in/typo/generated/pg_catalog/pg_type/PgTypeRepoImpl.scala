@@ -121,7 +121,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def selectByIds(oids: List[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid in $oids""".as(rowParser.*)
   }
-  override def selectByUniqueTypnameTypnamespace(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
+  override def selectByUnique(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
     selectByFieldValues(List(PgTypeFieldValue.typname(typname), PgTypeFieldValue.typnamespace(typnamespace))).headOption
   }
   override def update(row: PgTypeRow)(implicit c: Connection): Boolean = {

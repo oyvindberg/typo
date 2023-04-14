@@ -19,7 +19,7 @@ trait PgConstraintRepo {
   def selectByFieldValues(fieldValues: List[PgConstraintFieldOrIdValue[_]])(implicit c: Connection): List[PgConstraintRow]
   def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow]
   def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow]
-  def selectByUniqueConrelidContypidConname(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow]
+  def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow]
   def update(row: PgConstraintRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgConstraintId, fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): Boolean
 }

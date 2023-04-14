@@ -97,7 +97,7 @@ object DocumentRepoImpl extends DocumentRepo {
   override def selectByIds(documentnodes: List[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode in $documentnodes""".as(rowParser.*)
   }
-  override def selectByUniqueRowguid(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
+  override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
     selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).headOption
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {

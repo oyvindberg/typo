@@ -226,10 +226,12 @@ case class TableComputed(
             RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)
           )
       },
-      dbTable.uniqueKeys.map { uk =>
-        val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
-        RepoMethod.SelectByUnique(params, RowType)
-      }
+      dbTable.uniqueKeys
+        .map { uk =>
+          val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
+          RepoMethod.SelectByUnique(params, RowType)
+        }
+        .distinctBy(x => x.params.map(_.tpe)) // avoid erasure clashes
     )
     NonEmptyList.fromList(maybeMethods.flatten)
   }

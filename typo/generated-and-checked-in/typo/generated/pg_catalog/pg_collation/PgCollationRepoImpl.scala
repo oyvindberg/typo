@@ -76,7 +76,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def selectByIds(oids: List[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(rowParser.*)
   }
-  override def selectByUniqueCollnameCollencodingCollnamespace(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
+  override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
     selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption
   }
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {

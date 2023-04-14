@@ -18,7 +18,7 @@ trait PgAttributeRepo {
   def selectAll(implicit c: Connection): List[PgAttributeRow]
   def selectByFieldValues(fieldValues: List[PgAttributeFieldOrIdValue[_]])(implicit c: Connection): List[PgAttributeRow]
   def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow]
-  def selectByUniqueAttrelidAttname(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow]
+  def selectByUnique(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow]
   def update(row: PgAttributeRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Boolean
 }
