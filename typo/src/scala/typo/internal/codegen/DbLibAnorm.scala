@@ -5,12 +5,11 @@ package codegen
 object DbLibAnorm extends DbLib {
   implicit val tableName: ToCode[db.RelationName] = _.value
 
-  def Column(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("anorm.Column"), List(t))
-  val ToStatementName = sc.Type.Qualified("anorm.ToStatement")
-  def ToStatement(t: sc.Type) = sc.Type.TApply(ToStatementName, List(t))
+  val Column = sc.Type.Qualified("anorm.Column")
+  val ToStatement = sc.Type.Qualified("anorm.ToStatement")
   val NamedParameter = sc.Type.Qualified("anorm.NamedParameter")
   val ParameterValue = sc.Type.Qualified("anorm.ParameterValue")
-  def RowParser(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("anorm.RowParser"), List(t))
+  val RowParser = sc.Type.Qualified("anorm.RowParser")
   val Success = sc.Type.Qualified("anorm.Success")
   val SqlMappingError = sc.Type.Qualified("anorm.SqlMappingError")
   val SqlStringInterpolation = sc.Type.Qualified("anorm.SqlStringInterpolation")
@@ -28,12 +27,12 @@ object DbLibAnorm extends DbLib {
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     val column =
-      code"""|implicit val column: ${Column(wrapperType)} =
-             |  implicitly[${Column(underlying)}]
+      code"""|implicit val column: ${Column.of(wrapperType)} =
+             |  implicitly[${Column.of(underlying)}]
              |    .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin
     val toStatement =
-      code"""|implicit val toStatement: ${ToStatement(wrapperType)} =
-             |  implicitly[${ToStatement(underlying)}].contramap(_.value)""".stripMargin
+      code"""|implicit val toStatement: ${ToStatement.of(wrapperType)} =
+             |  implicitly[${ToStatement.of(underlying)}].contramap(_.value)""".stripMargin
 
     val parameterMetadata =
       code"""|implicit val parameterMetadata: $ParameterMetaData[$wrapperType] = new $ParameterMetaData[$wrapperType] {
@@ -44,8 +43,8 @@ object DbLibAnorm extends DbLib {
   }
 
   override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
-    val toStatement = code"""implicit val toStatement: ${ToStatement(wrapperType)} = implicitly[${ToStatement(underlying)}].contramap(_.value)"""
-    val column = code"""implicit val column: ${Column(wrapperType)} = implicitly[${Column(underlying)}].map($wrapperType.apply)"""
+    val toStatement = code"""implicit val toStatement: ${ToStatement.of(wrapperType)} = implicitly[${ToStatement.of(underlying)}].contramap(_.value)"""
+    val column = code"""implicit val column: ${Column.of(wrapperType)} = implicitly[${Column.of(underlying)}].map($wrapperType.apply)"""
     val parameterMetadata =
       code"""|implicit val parameterMetadata: ${ParameterMetaData.of(wrapperType)} = new ${ParameterMetaData.of(wrapperType)} {
              |  override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
@@ -275,8 +274,8 @@ object DbLibAnorm extends DbLib {
     }
 
   override def missingInstances: List[sc.Code] = {
-    def inout(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column(tpe)}"
-    def out(tpe: sc.Type) = code"${ToStatement(tpe)} with ${ParameterMetaData.of(tpe)}"
+    def inout(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column.of(tpe)}"
+    def out(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)}"
 
     val arrayTypes = List[(sc.Type.Qualified, sc.Type, sc.StrLit)](
       (sc.Type.String, sc.Type.AnyRef, sc.StrLit("_varchar")),
@@ -357,7 +356,7 @@ object DbLibAnorm extends DbLib {
 
   def mkRowParserImpl(tpe: sc.Type, cols: NonEmptyList[ColumnComputed], prefix: String): sc.Code = {
     val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(prefix + x.dbName.value)})" }
-    code"""|${RowParser(tpe)} { row =>
+    code"""|${RowParser.of(tpe)} { row =>
            |  $Success(
            |    $tpe(
            |      ${mappedValues.mkCode(",\n")}
@@ -368,7 +367,7 @@ object DbLibAnorm extends DbLib {
 
   def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
     val rowParser =
-      code"""|val $rowParserIdent: ${RowParser(tpe)} =
+      code"""|val $rowParserIdent: ${RowParser.of(tpe)} =
              |  ${mkRowParserImpl(tpe, cols, "")}"""
 
     val maybeIdRowParser: Option[sc.Code] =
@@ -379,7 +378,7 @@ object DbLibAnorm extends DbLib {
           case composite: IdComputed.Composite =>
             mkRowParserImpl(composite.tpe, composite.cols, "")
         }
-        code"""|val $idRowParserIdent: ${RowParser(id.tpe)} =
+        code"""|val $idRowParserIdent: ${RowParser.of(id.tpe)} =
                |  $impl"""
       }
 
