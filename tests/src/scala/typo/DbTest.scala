@@ -25,7 +25,7 @@ class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
       println(pg_catalog.pg_attribute.PgAttributeRepoImpl.selectAll.take(1))
       println(pg_catalog.pg_class.PgClassRepoImpl.selectAll.take(1))
       println(ViewFindAllRepoImpl().take(1))
-      println(ViewColumnDependenciesRepoImpl().take(1))
+      println(ViewColumnDependenciesRepoImpl(None).take(1))
       println(DomainsRepoImpl().take(1))
     } catch {
       case e: PSQLException =>

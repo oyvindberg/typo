@@ -11,4 +11,5 @@ FROM pg_class table_class
     AND dep.classid = 'pg_rewrite'::regclass -- it's a view
     AND rewrite.ev_type = '1' -- only SELECT
     AND rewrite.is_instead -- INSTEAD rule
-;
+    AND view_class.relname = coalesce(:view_name, view_class.relname)
+

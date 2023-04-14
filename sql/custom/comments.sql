@@ -10,4 +10,4 @@ from pg_catalog.pg_statio_all_tables as st
             pgd.objsubid = c.ordinal_position and
             c.table_schema = st.schemaname and
             c.table_name = st.relname
-    );
+    )

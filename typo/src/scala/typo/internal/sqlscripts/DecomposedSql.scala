@@ -4,6 +4,7 @@ package sqlscripts
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val sqlWithQuestionMarks: String = render(_ => "?")
+  val sqlWithNulls: String = render(_ => "null")
 
   def render(f: Int => String): String = {
     var paramNum = 0

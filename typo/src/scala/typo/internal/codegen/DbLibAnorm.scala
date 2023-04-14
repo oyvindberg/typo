@@ -268,7 +268,8 @@ object DbLibAnorm extends DbLib {
           val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
           s"$$${param.name.value}"
         }
-        code"""|val sql = ${interpolate(renderedScript)}
+        code"""|val sql =
+               |  ${interpolate(renderedScript)}
                |sql.as($rowParserIdent.*)
                |""".stripMargin
     }

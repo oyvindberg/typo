@@ -13,5 +13,5 @@ package view_column_dependencies
 import java.sql.Connection
 
 trait ViewColumnDependenciesRepo {
-  def apply()(implicit c: Connection): List[ViewColumnDependenciesRow]
+  def apply(viewName: /* nullability unknown */ Option[String])(implicit c: Connection): List[ViewColumnDependenciesRow]
 }

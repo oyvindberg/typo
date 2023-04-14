@@ -46,7 +46,7 @@ object MetaDb {
         tablesRows = TablesRepoImpl.selectAll,
         columnsRows = ColumnsRepoImpl.selectAll,
         viewRows = ViewFindAllRepoImpl(),
-        viewColumnDeps = ViewColumnDependenciesRepoImpl(),
+        viewColumnDeps = ViewColumnDependenciesRepoImpl(None),
         domains = DomainsRepoImpl(),
         comments = CommentsRepoImpl()
       )
