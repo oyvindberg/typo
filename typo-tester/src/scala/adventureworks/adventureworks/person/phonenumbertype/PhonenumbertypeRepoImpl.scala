@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
@@ -63,8 +67,14 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
     SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(phonenumbertypeids: List[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid in $phonenumbertypeids""".as(rowParser.*)
+  override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
+    implicit val arrayToSql: ToSql[Array[PhonenumbertypeId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PhonenumbertypeId]] =
+      (s: PreparedStatement, index: Int, v: Array[PhonenumbertypeId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = ANY($phonenumbertypeids)""".as(rowParser.*)
+  
   }
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     val phonenumbertypeid = row.phonenumbertypeid

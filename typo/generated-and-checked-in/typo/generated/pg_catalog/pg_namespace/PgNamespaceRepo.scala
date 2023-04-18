@@ -18,7 +18,7 @@ trait PgNamespaceRepo {
   def selectAll(implicit c: Connection): List[PgNamespaceRow]
   def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow]
   def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow]
-  def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow]
+  def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow]
   def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow]
   def update(row: PgNamespaceRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Boolean

@@ -14,7 +14,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
@@ -84,8 +87,14 @@ object PersonRepoImpl extends PersonRepo {
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id""".as(rowParser.singleOpt)
   }
-  override def selectByIds(ids: List[PersonId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id in $ids""".as(rowParser.*)
+  override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
+    implicit val arrayToSql: ToSql[Array[PersonId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PersonId]] =
+      (s: PreparedStatement, index: Int, v: Array[PersonId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = ANY($ids)""".as(rowParser.*)
+  
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val id = row.id

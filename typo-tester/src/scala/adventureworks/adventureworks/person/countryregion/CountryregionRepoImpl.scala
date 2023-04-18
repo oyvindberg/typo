@@ -15,7 +15,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
@@ -62,8 +65,14 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
     SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode""".as(rowParser.singleOpt)
   }
-  override def selectByIds(countryregioncodes: List[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode in $countryregioncodes""".as(rowParser.*)
+  override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
+    implicit val arrayToSql: ToSql[Array[CountryregionId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[CountryregionId]] =
+      (s: PreparedStatement, index: Int, v: Array[CountryregionId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
+    
+    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)""".as(rowParser.*)
+  
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode

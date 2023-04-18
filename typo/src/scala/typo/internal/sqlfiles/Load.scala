@@ -96,6 +96,7 @@ object Load {
           System.err.println(s"$relativePath Couldn't translate type from column $jsonDescription")
           db.Type.Text
         },
+        udtName = None,
         columnDefault = if (col.isAutoIncrement) Some("auto-increment") else None,
         comment = None,
         jsonDescription = jsonDescription,

@@ -15,7 +15,7 @@ trait IllustrationRepo {
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]
-  def selectByIds(illustrationids: List[IllustrationId])(implicit c: Connection): List[IllustrationRow]
+  def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
   def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]])(implicit c: Connection): Boolean
 }

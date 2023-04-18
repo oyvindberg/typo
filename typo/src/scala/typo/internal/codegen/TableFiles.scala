@@ -18,7 +18,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
           case composite: IdComputed.Composite if composite.colByName.contains(col.name) =>
             sc.QIdent.of(composite.paramName, composite.colByName(col.name).name)
           case _ =>
-            if (col.columnDefault.isDefined) {
+            if (col.dbCol.columnDefault.isDefined) {
               code"""|${col.name} match {
                      |  case ${table.default.Defaulted}.${table.default.UseDefault} => sys.error("cannot produce row when you depend on a value which is defaulted in database")
                      |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
@@ -28,7 +28,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
         col.name -> ref
       }
-      val name = if (table.cols.exists(_.columnDefault.isDefined)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
+      val name = if (table.cols.exists(_.dbCol.columnDefault.isDefined)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
 
       code"""|def $name(${id.param}): ${table.relation.RowName} =
              |  ${table.relation.RowName}(
@@ -38,13 +38,13 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
     val formattedCols = colsUnsaved.map { col =>
       val commentPieces = List(
-        col.columnDefault.map(x => s"Default: $x"),
-        col.comment,
+        col.dbCol.columnDefault.map(x => s"Default: $x"),
+        col.dbCol.comment,
         col.pointsTo map { case (relationName, columnName) =>
           val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, relation.RowFile.tpe.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
         },
-        col.jsonDescription match {
+        col.dbCol.jsonDescription match {
           case JsNull => None
           case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
         }

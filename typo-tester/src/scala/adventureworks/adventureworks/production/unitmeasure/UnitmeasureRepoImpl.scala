@@ -15,7 +15,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
@@ -62,8 +65,14 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".as(rowParser.singleOpt)
   }
-  override def selectByIds(unitmeasurecodes: List[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode in $unitmeasurecodes""".as(rowParser.*)
+  override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
+    implicit val arrayToSql: ToSql[Array[UnitmeasureId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[UnitmeasureId]] =
+      (s: PreparedStatement, index: Int, v: Array[UnitmeasureId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
+    
+    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = ANY($unitmeasurecodes)""".as(rowParser.*)
+  
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode

@@ -16,12 +16,12 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
 
     val formattedCols = relation.cols.map { col =>
       val commentPieces = List(
-        col.comment,
+        col.dbCol.comment,
         col.pointsTo map { case (relationName, columnName) =>
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
         },
-        col.jsonDescription match {
+        col.dbCol.jsonDescription match {
           case JsNull => None
           case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
         }

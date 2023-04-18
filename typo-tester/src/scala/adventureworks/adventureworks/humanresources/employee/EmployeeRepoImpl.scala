@@ -16,7 +16,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -107,8 +111,14 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
-    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids""".as(rowParser.*)
+  override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
+    implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[BusinessentityId]] =
+      (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+  
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid

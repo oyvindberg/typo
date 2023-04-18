@@ -16,7 +16,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -94,8 +98,14 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
     SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(territoryids: List[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid in $territoryids""".as(rowParser.*)
+  override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
+    implicit val arrayToSql: ToSql[Array[SalesterritoryId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[SalesterritoryId]] =
+      (s: PreparedStatement, index: Int, v: Array[SalesterritoryId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = ANY($territoryids)""".as(rowParser.*)
+  
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid

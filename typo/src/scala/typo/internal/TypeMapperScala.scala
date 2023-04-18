@@ -62,7 +62,6 @@ case class TypeMapperScala(
   private def baseType(tpe: db.Type): sc.Type = {
     tpe match {
       case db.Type.Array(_)        => sys.error("no idea what to do with nested array types")
-      case db.Type.BigInt          => sc.Type.Long
       case db.Type.Boolean         => sc.Type.Boolean
       case db.Type.Bytea           => sc.Type.Array.of(sc.Type.Byte)
       case db.Type.Bpchar          => sc.Type.String.withComment("bpchar")

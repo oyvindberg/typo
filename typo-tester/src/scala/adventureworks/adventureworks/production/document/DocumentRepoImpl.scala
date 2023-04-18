@@ -16,7 +16,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -94,8 +97,14 @@ object DocumentRepoImpl extends DocumentRepo {
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
     SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode""".as(rowParser.singleOpt)
   }
-  override def selectByIds(documentnodes: List[DocumentId])(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode in $documentnodes""".as(rowParser.*)
+  override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
+    implicit val arrayToSql: ToSql[Array[DocumentId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[DocumentId]] =
+      (s: PreparedStatement, index: Int, v: Array[DocumentId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
+    
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = ANY($documentnodes)""".as(rowParser.*)
+  
   }
   override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
     selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).headOption

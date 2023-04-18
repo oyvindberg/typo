@@ -16,7 +16,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import org.postgresql.util.PGobject
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
@@ -104,8 +107,14 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(oids: List[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid in $oids""".as(rowParser.*)
+  override def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
+    implicit val arrayToSql: ToSql[Array[PgConstraintId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PgConstraintId]] =
+      (s: PreparedStatement, index: Int, v: Array[PgConstraintId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY($oids)""".as(rowParser.*)
+  
   }
   override def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
     selectByFieldValues(List(PgConstraintFieldValue.conrelid(conrelid), PgConstraintFieldValue.contypid(contypid), PgConstraintFieldValue.conname(conname))).headOption

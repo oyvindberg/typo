@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -69,8 +73,14 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow] = {
     SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(productcategoryids: List[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid in $productcategoryids""".as(rowParser.*)
+  override def selectByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
+    implicit val arrayToSql: ToSql[Array[ProductcategoryId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[ProductcategoryId]] =
+      (s: PreparedStatement, index: Int, v: Array[ProductcategoryId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = ANY($productcategoryids)""".as(rowParser.*)
+  
   }
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
     val productcategoryid = row.productcategoryid

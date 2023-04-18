@@ -15,7 +15,7 @@ trait ProductsubcategoryRepo {
   def selectAll(implicit c: Connection): List[ProductsubcategoryRow]
   def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductsubcategoryRow]
   def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow]
-  def selectByIds(productsubcategoryids: List[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow]
+  def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow]
   def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(productsubcategoryid: ProductsubcategoryId, fieldValues: List[ProductsubcategoryFieldValue[_]])(implicit c: Connection): Boolean
 }

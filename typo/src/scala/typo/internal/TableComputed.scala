@@ -28,10 +28,7 @@ case class TableComputed(
             pointsTo = pointsTo.get(dbCol.name),
             name = naming.field(dbCol.name),
             tpe = underlying,
-            dbName = dbCol.name,
-            columnDefault = dbCol.columnDefault,
-            comment = dbCol.comment,
-            jsonDescription = dbCol.jsonDescription
+            dbCol = dbCol
           )
           col.pointsTo match {
             case Some((relationName, colName)) =>
@@ -57,10 +54,7 @@ case class TableComputed(
                 pointsTo = None,
                 name = naming.field(colName),
                 tpe = deriveType(dbCol),
-                dbName = dbCol.name,
-                columnDefault = dbCol.columnDefault,
-                comment = dbCol.comment,
-                jsonDescription = dbCol.jsonDescription
+                dbCol = dbCol
               )
             }
           Some(IdComputed.Composite(cols, tpe, paramName = sc.Ident("compositeId")))
@@ -75,10 +69,7 @@ case class TableComputed(
         pointsTo = pointsTo.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = tpe,
-        dbName = dbCol.name,
-        columnDefault = dbCol.columnDefault,
-        comment = dbCol.comment,
-        jsonDescription = dbCol.jsonDescription
+        dbCol = dbCol
       )
 
       dbCol -> computed
@@ -188,7 +179,7 @@ case class TableComputed(
             .map { case (unsaved, colsUnsaved) =>
               val unsavedParam = sc.Param(sc.Ident("unsaved"), unsaved)
 
-              if (id.cols.forall(_.columnDefault.isDefined))
+              if (id.cols.forall(_.dbCol.columnDefault.isDefined))
                 RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
               else
                 RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
@@ -201,7 +192,7 @@ case class TableComputed(
             Some(RepoMethod.SelectById(id, RowType)),
             id match {
               case unary: IdComputed.Unary =>
-                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.List.of(id.tpe)), RowType))
+                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe)), RowType))
               case IdComputed.Composite(_, _, _) =>
                 // todo: support composite ids
                 None

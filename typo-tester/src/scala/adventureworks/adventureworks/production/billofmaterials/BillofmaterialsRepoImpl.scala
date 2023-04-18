@@ -16,7 +16,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
@@ -82,8 +86,14 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(billofmaterialsids: List[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid in $billofmaterialsids""".as(rowParser.*)
+  override def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
+    implicit val arrayToSql: ToSql[Array[BillofmaterialsId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[BillofmaterialsId]] =
+      (s: PreparedStatement, index: Int, v: Array[BillofmaterialsId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)""".as(rowParser.*)
+  
   }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     val billofmaterialsid = row.billofmaterialsid

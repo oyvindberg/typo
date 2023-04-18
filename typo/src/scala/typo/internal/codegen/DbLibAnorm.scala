@@ -7,6 +7,7 @@ object DbLibAnorm extends DbLib {
 
   val Column = sc.Type.Qualified("anorm.Column")
   val ToStatement = sc.Type.Qualified("anorm.ToStatement")
+  val ToSql = sc.Type.Qualified("anorm.ToSql")
   val NamedParameter = sc.Type.Qualified("anorm.NamedParameter")
   val ParameterValue = sc.Type.Qualified("anorm.ParameterValue")
   val RowParser = sc.Type.Qualified("anorm.RowParser")
@@ -51,6 +52,7 @@ object DbLibAnorm extends DbLib {
              |  override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}
              |""".stripMargin
+
     List(toStatement, column, parameterMetadata)
   }
 
@@ -59,8 +61,13 @@ object DbLibAnorm extends DbLib {
       code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectById(id, rowType) =>
       code"def selectById(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
-    case RepoMethod.SelectAllByIds(_, idsParam, rowType) =>
-      code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+    case RepoMethod.SelectAllByIds(unaryId, idsParam, rowType) =>
+      unaryId match {
+        case IdComputed.UnaryUserSpecified(_, tpe) =>
+          code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}, toStatement: ${ToStatement.of(sc.Type.Array.of(tpe))}): ${sc.Type.List.of(rowType)}"
+        case _ =>
+          code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+      }
     case RepoMethod.SelectByUnique(params, rowType) =>
       val ident = Naming.camelCase(Array("selectByUnique"))
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
@@ -95,7 +102,7 @@ object DbLibAnorm extends DbLib {
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${maybeQuoted(x.col.dbName)} in $$${idsParam.name}"
+    code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
   override def repoImpl(table: RelationComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
@@ -112,7 +119,24 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
         val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
-        code"""$sql.as($rowParserIdent.*)"""
+        val maybeToStatement = unaryId match {
+          case IdComputed.UnaryUserSpecified(_, _) =>
+            sc.Code.Empty
+          case id =>
+            val boxedType = sc.Type.boxedType(id.col.tpe) match {
+              case Some(boxed) => code": $boxed"
+              case None        => sc.Code.Empty
+            }
+            code"""|implicit val toStatement: ${ToStatement.of(sc.Type.Array.of(id.tpe))} =
+                   |  (s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: ${sc.Type.Array.of(id.tpe)}) =>
+                   |    s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(id.col.dbCol.udtName.get)}, v.map(x => x.value$boxedType)))
+                   |""".stripMargin
+        }
+
+        code"""|implicit val arrayToSql: ${ToSql.of(sc.Type.Array.of(unaryId.tpe))} = _ => ("?", 1) // fix wrong instance from anorm
+               |$maybeToStatement
+               |$sql.as($rowParserIdent.*)
+               |""".stripMargin
 
       case RepoMethod.SelectByUnique(params, _) =>
         val args = params.map { param => code"${table.FieldValueName}.${param.name}(${param.name})" }.mkCode(", ")
@@ -179,12 +203,11 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbName, _, _, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbCol) =>
+            val dbName = sc.StrLit(dbCol.name.value)
             code"""|${unsavedParam.name}.$ident match {
                    |  case ${default.Defaulted}.${default.UseDefault} => None
-                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(
-                dbName.value
-              )}, $ParameterValue.from[$tpe](value)))
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter($dbName, $ParameterValue.from[$tpe](value)))
                    |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
@@ -208,12 +231,11 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbName, _, _, _) =>
+          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbCol) =>
+            val dbName = sc.StrLit(dbCol.name.value)
             code"""|${unsavedParam.name}.$ident match {
                    |  case ${default.Defaulted}.${default.UseDefault} => None
-                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter(${sc.StrLit(
-                dbName.value
-              )}, $ParameterValue.from[$tpe](value)))
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter($dbName, $ParameterValue.from[$tpe](value)))
                    |}"""
           case col =>
             code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
@@ -277,25 +299,27 @@ object DbLibAnorm extends DbLib {
     def inout(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column.of(tpe)}"
     def out(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)}"
 
-    val arrayTypes = List[(sc.Type.Qualified, sc.Type, sc.StrLit)](
-      (sc.Type.String, sc.Type.AnyRef, sc.StrLit("_varchar")),
-      (sc.Type.Float, sc.Type.JavaFloat, sc.StrLit("_float4")),
-      (sc.Type.Short, sc.Type.JavaShort, sc.StrLit("_int2")),
-      (sc.Type.Int, sc.Type.JavaInteger, sc.StrLit("_int4")),
-      (sc.Type.Long, sc.Type.JavaLong, sc.StrLit("_int8")),
-      (sc.Type.Boolean, sc.Type.JavaBoolean, sc.StrLit("_bool")),
-      (sc.Type.Double, sc.Type.JavaDouble, sc.StrLit("_float8")),
-      (sc.Type.UUID, sc.Type.AnyRef, sc.StrLit("_uuid")),
-      (sc.Type.BigDecimal, sc.Type.AnyRef, sc.StrLit("_decimal")),
-      (sc.Type.PGobject, sc.Type.AnyRef, sc.StrLit("_aclitem"))
+    val arrayTypes = List[(sc.Type.Qualified, sc.StrLit)](
+      (sc.Type.String, sc.StrLit("_varchar")),
+      (sc.Type.Float, sc.StrLit("_float4")),
+      (sc.Type.Short, sc.StrLit("_int2")),
+      (sc.Type.Int, sc.StrLit("_int4")),
+      (sc.Type.Long, sc.StrLit("_int8")),
+      (sc.Type.Boolean, sc.StrLit("_bool")),
+      (sc.Type.Double, sc.StrLit("_float8")),
+      (sc.Type.UUID, sc.StrLit("_uuid")),
+      (sc.Type.BigDecimal, sc.StrLit("_decimal")),
+      (sc.Type.PGobject, sc.StrLit("_aclitem"))
     )
 
-    val arrayInstances = arrayTypes.map { case (tpe, anyRefType, elemType) =>
+    val arrayInstances = arrayTypes.map { case (tpe, elemType) =>
       val arrayType = sc.Type.Array.of(tpe)
+      val boxedType = sc.Type.boxedType(tpe).getOrElse(sc.Type.AnyRef)
       code"""|implicit val ${tpe.value.name}Array: ${out(arrayType)} = new ${out(arrayType)} {
              |  override def sqlType: ${sc.Type.String} = $elemType
              |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-             |  override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} = ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $anyRefType)))
+             |  override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} =
+             |    ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $boxedType)))
              |}
              |""".stripMargin
     }

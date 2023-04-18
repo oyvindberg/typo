@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
@@ -71,8 +75,14 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(currencyrateids: List[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid in $currencyrateids""".as(rowParser.*)
+  override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
+    implicit val arrayToSql: ToSql[Array[CurrencyrateId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[CurrencyrateId]] =
+      (s: PreparedStatement, index: Int, v: Array[CurrencyrateId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)""".as(rowParser.*)
+  
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     val currencyrateid = row.currencyrateid

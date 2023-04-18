@@ -16,7 +16,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
@@ -73,8 +76,14 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(oids: List[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid in $oids""".as(rowParser.*)
+  override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
+    implicit val arrayToSql: ToSql[Array[PgCollationId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PgCollationId]] =
+      (s: PreparedStatement, index: Int, v: Array[PgCollationId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY($oids)""".as(rowParser.*)
+  
   }
   override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
     selectByFieldValues(List(PgCollationFieldValue.collname(collname), PgCollationFieldValue.collencoding(collencoding), PgCollationFieldValue.collnamespace(collnamespace))).headOption

@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -79,8 +83,14 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
     SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(shipmethodids: List[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid in $shipmethodids""".as(rowParser.*)
+  override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
+    implicit val arrayToSql: ToSql[Array[ShipmethodId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[ShipmethodId]] =
+      (s: PreparedStatement, index: Int, v: Array[ShipmethodId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)""".as(rowParser.*)
+  
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid

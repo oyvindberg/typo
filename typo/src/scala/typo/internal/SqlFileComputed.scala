@@ -21,10 +21,7 @@ case class SqlFileComputed(
         pointsTo = sqlFile.dependencies.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
-        dbName = dbCol.name,
-        columnDefault = dbCol.columnDefault,
-        comment = dbCol.comment,
-        jsonDescription = dbCol.jsonDescription
+        dbCol = dbCol
       )
       dbCol -> columnComputed
     }

@@ -15,7 +15,7 @@ trait LocationRepo {
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow]
   def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow]
-  def selectByIds(locationids: List[LocationId])(implicit c: Connection): List[LocationRow]
+  def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow]
   def update(row: LocationRow)(implicit c: Connection): Boolean
   def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]])(implicit c: Connection): Boolean
 }

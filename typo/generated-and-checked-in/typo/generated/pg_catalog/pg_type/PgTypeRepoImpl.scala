@@ -16,7 +16,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import org.postgresql.util.PGobject
 
 object PgTypeRepoImpl extends PgTypeRepo {
@@ -118,8 +121,14 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def selectById(oid: PgTypeId)(implicit c: Connection): Option[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = $oid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(oids: List[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
-    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid in $oids""".as(rowParser.*)
+  override def selectByIds(oids: Array[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
+    implicit val arrayToSql: ToSql[Array[PgTypeId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PgTypeId]] =
+      (s: PreparedStatement, index: Int, v: Array[PgTypeId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY($oids)""".as(rowParser.*)
+  
   }
   override def selectByUnique(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
     selectByFieldValues(List(PgTypeFieldValue.typname(typname), PgTypeFieldValue.typnamespace(typnamespace))).headOption

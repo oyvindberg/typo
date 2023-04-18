@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
@@ -63,8 +67,14 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
     SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(scrapreasonids: List[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid in $scrapreasonids""".as(rowParser.*)
+  override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
+    implicit val arrayToSql: ToSql[Array[ScrapreasonId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[ScrapreasonId]] =
+      (s: PreparedStatement, index: Int, v: Array[ScrapreasonId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = ANY($scrapreasonids)""".as(rowParser.*)
+  
   }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid

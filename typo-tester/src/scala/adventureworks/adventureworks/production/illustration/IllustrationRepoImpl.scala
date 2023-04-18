@@ -14,7 +14,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
@@ -62,8 +66,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(illustrationids: List[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid in $illustrationids""".as(rowParser.*)
+  override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
+    implicit val arrayToSql: ToSql[Array[IllustrationId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[IllustrationId]] =
+      (s: PreparedStatement, index: Int, v: Array[IllustrationId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)""".as(rowParser.*)
+  
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid

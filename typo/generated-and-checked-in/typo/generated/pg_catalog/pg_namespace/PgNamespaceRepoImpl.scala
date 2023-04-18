@@ -16,7 +16,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import org.postgresql.util.PGobject
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
@@ -62,8 +65,14 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(oids: List[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid in $oids""".as(rowParser.*)
+  override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
+    implicit val arrayToSql: ToSql[Array[PgNamespaceId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PgNamespaceId]] =
+      (s: PreparedStatement, index: Int, v: Array[PgNamespaceId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY($oids)""".as(rowParser.*)
+  
   }
   override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
     selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption

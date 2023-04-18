@@ -15,7 +15,7 @@ trait PhonenumbertypeRepo {
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
   def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow]
-  def selectByIds(phonenumbertypeids: List[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow]
+  def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow]
   def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean
   def updateFieldValues(phonenumbertypeid: PhonenumbertypeId, fieldValues: List[PhonenumbertypeFieldValue[_]])(implicit c: Connection): Boolean
 }

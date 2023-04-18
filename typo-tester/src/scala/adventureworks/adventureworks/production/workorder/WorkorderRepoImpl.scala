@@ -16,7 +16,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
@@ -76,8 +80,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(workorderids: List[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid in $workorderids""".as(rowParser.*)
+  override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
+    implicit val arrayToSql: ToSql[Array[WorkorderId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[WorkorderId]] =
+      (s: PreparedStatement, index: Int, v: Array[WorkorderId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)""".as(rowParser.*)
+  
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid

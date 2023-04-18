@@ -18,7 +18,7 @@ trait PgCollationRepo {
   def selectAll(implicit c: Connection): List[PgCollationRow]
   def selectByFieldValues(fieldValues: List[PgCollationFieldOrIdValue[_]])(implicit c: Connection): List[PgCollationRow]
   def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow]
-  def selectByIds(oids: List[PgCollationId])(implicit c: Connection): List[PgCollationRow]
+  def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow]
   def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow]
   def update(row: PgCollationRow)(implicit c: Connection): Boolean
   def updateFieldValues(oid: PgCollationId, fieldValues: List[PgCollationFieldValue[_]])(implicit c: Connection): Boolean

@@ -121,6 +121,7 @@ object MetaDb {
                 System.err.println(s"Couldn't translate type from column $jsonDescription")
                 db.Type.Text
               },
+              udtName = c.udtName.map(_.value),
               comment = comments.get((relationName, colName)),
               jsonDescription = jsonDescription
             )

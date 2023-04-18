@@ -15,7 +15,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CultureRepoImpl extends CultureRepo {
@@ -62,8 +65,14 @@ object CultureRepoImpl extends CultureRepo {
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
     SQL"""select cultureid, name, modifieddate from production.culture where cultureid = $cultureid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(cultureids: List[CultureId])(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture where cultureid in $cultureids""".as(rowParser.*)
+  override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
+    implicit val arrayToSql: ToSql[Array[CultureId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[CultureId]] =
+      (s: PreparedStatement, index: Int, v: Array[CultureId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
+    
+    SQL"""select cultureid, name, modifieddate from production.culture where cultureid = ANY($cultureids)""".as(rowParser.*)
+  
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid

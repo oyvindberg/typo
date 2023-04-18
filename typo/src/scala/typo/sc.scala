@@ -68,8 +68,11 @@ object sc {
     val AnyRef = sc.Type.Qualified("scala.AnyRef")
     val BigDecimal = sc.Type.Qualified("scala.math.BigDecimal")
     val Byte = sc.Type.Qualified("scala.Byte")
+    val Char = sc.Type.Qualified("scala.Char")
+    val JavaCharacter = sc.Type.Qualified("java.lang.Character")
     val Short = sc.Type.Qualified("scala.Short")
     val JavaShort = sc.Type.Qualified("java.lang.Short")
+    val JavaByte = sc.Type.Qualified("java.lang.Byte")
     val Array = sc.Type.Qualified("scala.Array")
     val Ordering = sc.Type.Qualified("scala.math.Ordering")
     val Connection = sc.Type.Qualified("java.sql.Connection")
@@ -152,6 +155,21 @@ object sc {
         case UserDefined(underlying)         => unapply(underlying)
       }
     }
+
+    def boxedType(tpe: sc.Type): Option[Qualified] =
+      tpe match {
+        case Int                      => scala.Some(JavaInteger)
+        case Long                     => scala.Some(JavaLong)
+        case Float                    => scala.Some(JavaFloat)
+        case Double                   => scala.Some(JavaDouble)
+        case Boolean                  => scala.Some(JavaBoolean)
+        case Short                    => scala.Some(JavaShort)
+        case Byte                     => scala.Some(JavaByte)
+        case Char                     => scala.Some(JavaCharacter)
+        case Commented(underlying, _) => boxedType(underlying)
+        case UserDefined(underlying)  => boxedType(underlying)
+        case _                        => scala.None
+      }
 
     def containsUserDefined(tpe: sc.Type): Boolean = tpe match {
       case Wildcard                  => false

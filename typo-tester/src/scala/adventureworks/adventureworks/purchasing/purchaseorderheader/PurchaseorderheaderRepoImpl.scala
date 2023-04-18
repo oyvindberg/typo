@@ -16,7 +16,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
@@ -100,8 +104,14 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(purchaseorderids: List[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid in $purchaseorderids""".as(rowParser.*)
+  override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
+    implicit val arrayToSql: ToSql[Array[PurchaseorderheaderId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[PurchaseorderheaderId]] =
+      (s: PreparedStatement, index: Int, v: Array[PurchaseorderheaderId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)""".as(rowParser.*)
+  
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     val purchaseorderid = row.purchaseorderid

@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -70,8 +74,14 @@ object PasswordRepoImpl extends PasswordRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid in $businessentityids""".as(rowParser.*)
+  override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
+    implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[BusinessentityId]] =
+      (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+  
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid

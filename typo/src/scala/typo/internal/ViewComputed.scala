@@ -10,10 +10,7 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
         pointsTo = view.dependencies.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
-        dbName = dbCol.name,
-        columnDefault = dbCol.columnDefault,
-        comment = dbCol.comment,
-        jsonDescription = dbCol.jsonDescription
+        dbCol = dbCol
       )
 
       dbCol -> columnComputed

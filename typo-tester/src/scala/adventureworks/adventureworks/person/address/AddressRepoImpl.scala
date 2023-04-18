@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -79,8 +83,14 @@ object AddressRepoImpl extends AddressRepo {
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(addressids: List[AddressId])(implicit c: Connection): List[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid in $addressids""".as(rowParser.*)
+  override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
+    implicit val arrayToSql: ToSql[Array[AddressId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[AddressId]] =
+      (s: PreparedStatement, index: Int, v: Array[AddressId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)""".as(rowParser.*)
+  
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     val addressid = row.addressid

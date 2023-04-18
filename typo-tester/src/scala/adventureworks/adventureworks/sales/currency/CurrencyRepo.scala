@@ -15,7 +15,7 @@ trait CurrencyRepo {
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]
-  def selectByIds(currencycodes: List[CurrencyId])(implicit c: Connection): List[CurrencyRow]
+  def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
   def update(row: CurrencyRow)(implicit c: Connection): Boolean
   def updateFieldValues(currencycode: CurrencyId, fieldValues: List[CurrencyFieldValue[_]])(implicit c: Connection): Boolean
 }

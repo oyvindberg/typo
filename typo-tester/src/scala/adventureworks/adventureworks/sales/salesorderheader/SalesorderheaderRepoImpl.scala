@@ -24,7 +24,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -141,8 +145,14 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def selectById(salesorderid: SalesorderheaderId)(implicit c: Connection): Option[SalesorderheaderRow] = {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = $salesorderid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(salesorderids: List[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
-    SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid in $salesorderids""".as(rowParser.*)
+  override def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
+    implicit val arrayToSql: ToSql[Array[SalesorderheaderId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[SalesorderheaderId]] =
+      (s: PreparedStatement, index: Int, v: Array[SalesorderheaderId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = ANY($salesorderids)""".as(rowParser.*)
+  
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
     val salesorderid = row.salesorderid

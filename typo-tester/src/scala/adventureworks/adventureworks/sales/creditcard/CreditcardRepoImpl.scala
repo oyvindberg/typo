@@ -14,7 +14,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CreditcardRepoImpl extends CreditcardRepo {
@@ -68,8 +72,14 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(creditcardids: List[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid in $creditcardids""".as(rowParser.*)
+  override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
+    implicit val arrayToSql: ToSql[Array[CreditcardId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[CreditcardId]] =
+      (s: PreparedStatement, index: Int, v: Array[CreditcardId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = ANY($creditcardids)""".as(rowParser.*)
+  
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
     val creditcardid = row.creditcardid

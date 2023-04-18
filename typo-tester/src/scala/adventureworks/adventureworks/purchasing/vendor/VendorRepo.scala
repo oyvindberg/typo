@@ -16,7 +16,7 @@ trait VendorRepo {
   def selectAll(implicit c: Connection): List[VendorRow]
   def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow]
-  def selectByIds(businessentityids: List[BusinessentityId])(implicit c: Connection): List[VendorRow]
+  def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow]
   def update(row: VendorRow)(implicit c: Connection): Boolean
   def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean
 }

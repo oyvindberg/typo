@@ -14,7 +14,10 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
 import java.sql.Connection
+import java.sql.PreparedStatement
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
@@ -55,8 +58,14 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     SQL"""select id, name from myschema.football_club where id = $id""".as(rowParser.singleOpt)
   }
-  override def selectByIds(ids: List[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select id, name from myschema.football_club where id in $ids""".as(rowParser.*)
+  override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
+    implicit val arrayToSql: ToSql[Array[FootballClubId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[FootballClubId]] =
+      (s: PreparedStatement, index: Int, v: Array[FootballClubId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
+    
+    SQL"""select id, name from myschema.football_club where id = ANY($ids)""".as(rowParser.*)
+  
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     val id = row.id

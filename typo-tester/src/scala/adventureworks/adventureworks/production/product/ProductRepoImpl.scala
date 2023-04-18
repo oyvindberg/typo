@@ -19,7 +19,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -121,8 +125,14 @@ object ProductRepoImpl extends ProductRepo {
   override def selectById(productid: ProductId)(implicit c: Connection): Option[ProductRow] = {
     SQL"""select productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid = $productid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(productids: List[ProductId])(implicit c: Connection): List[ProductRow] = {
-    SQL"""select productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid in $productids""".as(rowParser.*)
+  override def selectByIds(productids: Array[ProductId])(implicit c: Connection): List[ProductRow] = {
+    implicit val arrayToSql: ToSql[Array[ProductId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[ProductId]] =
+      (s: PreparedStatement, index: Int, v: Array[ProductId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, class, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid = ANY($productids)""".as(rowParser.*)
+  
   }
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
     val productid = row.productid

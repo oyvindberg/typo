@@ -14,7 +14,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -88,8 +92,14 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(specialofferids: List[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid in $specialofferids""".as(rowParser.*)
+  override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
+    implicit val arrayToSql: ToSql[Array[SpecialofferId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[SpecialofferId]] =
+      (s: PreparedStatement, index: Int, v: Array[SpecialofferId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = ANY($specialofferids)""".as(rowParser.*)
+  
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
     val specialofferid = row.specialofferid

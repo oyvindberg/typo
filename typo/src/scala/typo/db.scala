@@ -8,7 +8,6 @@ object db {
   sealed trait Type
   object Type {
     case class Array(tpe: Type) extends Type
-    case object BigInt extends Type
     case object Boolean extends Type
     case object Bpchar extends Type // blank padded character
     case object Bytea extends Type
@@ -50,7 +49,15 @@ object db {
   case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
-  case class Col(name: ColName, tpe: Type, nullability: Nullability, columnDefault: Option[String], comment: Option[String], jsonDescription: JsValue)
+  case class Col(
+      name: ColName,
+      tpe: Type,
+      udtName: Option[String],
+      nullability: Nullability,
+      columnDefault: Option[String],
+      comment: Option[String],
+      jsonDescription: JsValue
+  )
   case class RelationName(schema: Option[String], name: String) {
     def value = s"${schema.map(_ + ".").getOrElse("")}$name"
   }

@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
@@ -81,8 +85,14 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(transactionids: List[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid in $transactionids""".as(rowParser.*)
+  override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
+    implicit val arrayToSql: ToSql[Array[TransactionhistoryId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[TransactionhistoryId]] =
+      (s: PreparedStatement, index: Int, v: Array[TransactionhistoryId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = ANY($transactionids)""".as(rowParser.*)
+  
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid

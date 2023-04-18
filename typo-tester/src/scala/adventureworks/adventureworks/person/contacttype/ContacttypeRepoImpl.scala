@@ -15,7 +15,11 @@ import anorm.RowParser
 import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
+import anorm.ToSql
+import anorm.ToStatement
+import java.lang.Integer
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
@@ -63,8 +67,14 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
     SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid""".as(rowParser.singleOpt)
   }
-  override def selectByIds(contacttypeids: List[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid in $contacttypeids""".as(rowParser.*)
+  override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
+    implicit val arrayToSql: ToSql[Array[ContacttypeId]] = _ => ("?", 1) // fix wrong instance from anorm
+    implicit val toStatement: ToStatement[Array[ContacttypeId]] =
+      (s: PreparedStatement, index: Int, v: Array[ContacttypeId]) =>
+        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
+    
+    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)""".as(rowParser.*)
+  
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
