@@ -104,6 +104,12 @@ object DbLibAnorm extends DbLib {
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
     code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
+  def cast(c: ColumnComputed) = c.dbCol.tpe match {
+    case db.Type.EnumRef(name) => code"::${name.value}"
+    case db.Type.DomainRef(name) => code"::${name.value}"
+    case _ => sc.Code.Empty
+  }
+
   override def repoImpl(table: RelationComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectAll(_) =>
@@ -202,9 +208,12 @@ object DbLibAnorm extends DbLib {
                |$sql.executeUpdate() > 0"""
 
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, _) if colsUnsaved.forall(_.dbCol.columnDefault.isEmpty) =>
+        val values = colsUnsaved.map { c =>
+          code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
+        }
         val sql = interpolate(
           code"""|insert into ${table.relationName}(${colsUnsaved.map(c => maybeQuoted(c.dbName)).mkCode(", ")})
-                 |      values (${colsUnsaved.map(c => code"$${${unsavedParam.name}.${c.name}}").mkCode(", ")})
+                 |      values (${values.mkCode(", ")})
                  |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
                  |""".stripMargin
         )
@@ -247,10 +256,10 @@ object DbLibAnorm extends DbLib {
 
         val idValues: NonEmptyList[sc.Code] =
           id match {
-            case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
-            case id: IdComputed.Composite => id.cols.map(c => code"$${${id.paramName}.${c.name}}")
+            case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}${cast(id.col)}")
+            case id: IdComputed.Composite => id.cols.map(c => code"$${${id.paramName}.${c.name}}${cast(c)}")
           }
-        val unsavedValues = colsUnsaved.map(c => code"$${${unsavedParam.name}.${c.name}}")
+        val unsavedValues = colsUnsaved.map(c => code"$${${unsavedParam.name}.${c.name}}${cast(c)}")
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}(${joinedIdColNames.mkCode(", ")}, ${joinedUnsavedColNames.mkCode(", ")})
