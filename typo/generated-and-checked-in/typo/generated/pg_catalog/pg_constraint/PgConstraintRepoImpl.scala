@@ -27,38 +27,9 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     SQL"""delete from pg_catalog.pg_constraint where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("conname", ParameterValue.from(unsaved.conname))),
-      Some(NamedParameter("connamespace", ParameterValue.from(unsaved.connamespace))),
-      Some(NamedParameter("contype", ParameterValue.from(unsaved.contype))),
-      Some(NamedParameter("condeferrable", ParameterValue.from(unsaved.condeferrable))),
-      Some(NamedParameter("condeferred", ParameterValue.from(unsaved.condeferred))),
-      Some(NamedParameter("convalidated", ParameterValue.from(unsaved.convalidated))),
-      Some(NamedParameter("conrelid", ParameterValue.from(unsaved.conrelid))),
-      Some(NamedParameter("contypid", ParameterValue.from(unsaved.contypid))),
-      Some(NamedParameter("conindid", ParameterValue.from(unsaved.conindid))),
-      Some(NamedParameter("conparentid", ParameterValue.from(unsaved.conparentid))),
-      Some(NamedParameter("confrelid", ParameterValue.from(unsaved.confrelid))),
-      Some(NamedParameter("confupdtype", ParameterValue.from(unsaved.confupdtype))),
-      Some(NamedParameter("confdeltype", ParameterValue.from(unsaved.confdeltype))),
-      Some(NamedParameter("confmatchtype", ParameterValue.from(unsaved.confmatchtype))),
-      Some(NamedParameter("conislocal", ParameterValue.from(unsaved.conislocal))),
-      Some(NamedParameter("coninhcount", ParameterValue.from(unsaved.coninhcount))),
-      Some(NamedParameter("connoinherit", ParameterValue.from(unsaved.connoinherit))),
-      Some(NamedParameter("conkey", ParameterValue.from(unsaved.conkey))),
-      Some(NamedParameter("confkey", ParameterValue.from(unsaved.confkey))),
-      Some(NamedParameter("conpfeqop", ParameterValue.from(unsaved.conpfeqop))),
-      Some(NamedParameter("conppeqop", ParameterValue.from(unsaved.conppeqop))),
-      Some(NamedParameter("conffeqop", ParameterValue.from(unsaved.conffeqop))),
-      Some(NamedParameter("conexclop", ParameterValue.from(unsaved.conexclop))),
-      Some(NamedParameter("conbin", ParameterValue.from(unsaved.conbin)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_constraint(oid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
+          values (${oid}, ${unsaved.conname}, ${unsaved.connamespace}, ${unsaved.contype}, ${unsaved.condeferrable}, ${unsaved.condeferred}, ${unsaved.convalidated}, ${unsaved.conrelid}, ${unsaved.contypid}, ${unsaved.conindid}, ${unsaved.conparentid}, ${unsaved.confrelid}, ${unsaved.confupdtype}, ${unsaved.confdeltype}, ${unsaved.confmatchtype}, ${unsaved.conislocal}, ${unsaved.coninhcount}, ${unsaved.connoinherit}, ${unsaved.conkey}, ${unsaved.confkey}, ${unsaved.conpfeqop}, ${unsaved.conppeqop}, ${unsaved.conffeqop}, ${unsaved.conexclop}, ${unsaved.conbin})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {

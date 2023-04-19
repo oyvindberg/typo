@@ -27,45 +27,9 @@ object PgTypeRepoImpl extends PgTypeRepo {
     SQL"""delete from pg_catalog.pg_type where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("typname", ParameterValue.from(unsaved.typname))),
-      Some(NamedParameter("typnamespace", ParameterValue.from(unsaved.typnamespace))),
-      Some(NamedParameter("typowner", ParameterValue.from(unsaved.typowner))),
-      Some(NamedParameter("typlen", ParameterValue.from(unsaved.typlen))),
-      Some(NamedParameter("typbyval", ParameterValue.from(unsaved.typbyval))),
-      Some(NamedParameter("typtype", ParameterValue.from(unsaved.typtype))),
-      Some(NamedParameter("typcategory", ParameterValue.from(unsaved.typcategory))),
-      Some(NamedParameter("typispreferred", ParameterValue.from(unsaved.typispreferred))),
-      Some(NamedParameter("typisdefined", ParameterValue.from(unsaved.typisdefined))),
-      Some(NamedParameter("typdelim", ParameterValue.from(unsaved.typdelim))),
-      Some(NamedParameter("typrelid", ParameterValue.from(unsaved.typrelid))),
-      Some(NamedParameter("typsubscript", ParameterValue.from(unsaved.typsubscript))),
-      Some(NamedParameter("typelem", ParameterValue.from(unsaved.typelem))),
-      Some(NamedParameter("typarray", ParameterValue.from(unsaved.typarray))),
-      Some(NamedParameter("typinput", ParameterValue.from(unsaved.typinput))),
-      Some(NamedParameter("typoutput", ParameterValue.from(unsaved.typoutput))),
-      Some(NamedParameter("typreceive", ParameterValue.from(unsaved.typreceive))),
-      Some(NamedParameter("typsend", ParameterValue.from(unsaved.typsend))),
-      Some(NamedParameter("typmodin", ParameterValue.from(unsaved.typmodin))),
-      Some(NamedParameter("typmodout", ParameterValue.from(unsaved.typmodout))),
-      Some(NamedParameter("typanalyze", ParameterValue.from(unsaved.typanalyze))),
-      Some(NamedParameter("typalign", ParameterValue.from(unsaved.typalign))),
-      Some(NamedParameter("typstorage", ParameterValue.from(unsaved.typstorage))),
-      Some(NamedParameter("typnotnull", ParameterValue.from(unsaved.typnotnull))),
-      Some(NamedParameter("typbasetype", ParameterValue.from(unsaved.typbasetype))),
-      Some(NamedParameter("typtypmod", ParameterValue.from(unsaved.typtypmod))),
-      Some(NamedParameter("typndims", ParameterValue.from(unsaved.typndims))),
-      Some(NamedParameter("typcollation", ParameterValue.from(unsaved.typcollation))),
-      Some(NamedParameter("typdefaultbin", ParameterValue.from(unsaved.typdefaultbin))),
-      Some(NamedParameter("typdefault", ParameterValue.from(unsaved.typdefault))),
-      Some(NamedParameter("typacl", ParameterValue.from(unsaved.typacl)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_type(oid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
+          values (${oid}, ${unsaved.typname}, ${unsaved.typnamespace}, ${unsaved.typowner}, ${unsaved.typlen}, ${unsaved.typbyval}, ${unsaved.typtype}, ${unsaved.typcategory}, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}, ${unsaved.typrelid}, ${unsaved.typsubscript}, ${unsaved.typelem}, ${unsaved.typarray}, ${unsaved.typinput}, ${unsaved.typoutput}, ${unsaved.typreceive}, ${unsaved.typsend}, ${unsaved.typmodin}, ${unsaved.typmodout}, ${unsaved.typanalyze}, ${unsaved.typalign}, ${unsaved.typstorage}, ${unsaved.typnotnull}, ${unsaved.typbasetype}, ${unsaved.typtypmod}, ${unsaved.typndims}, ${unsaved.typcollation}, ${unsaved.typdefaultbin}, ${unsaved.typdefault}, ${unsaved.typacl})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {

@@ -20,15 +20,10 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
-    val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
-    ).flatten
-    
-    SQL"""insert into compositepk.person(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+    SQL"""insert into compositepk.person(name)
+          values (${unsaved.name})
           returning one, two
     """
-      .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }

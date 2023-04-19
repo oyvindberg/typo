@@ -22,15 +22,9 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     SQL"""delete from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}""".executeUpdate() > 0
   }
   override def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("description", ParameterValue.from(unsaved.description)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.objoid}, ${compositeId.classoid}, ${compositeId.objsubid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
+          values (${compositeId.objoid}, ${compositeId.classoid}, ${compositeId.objsubid}, ${unsaved.description})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {

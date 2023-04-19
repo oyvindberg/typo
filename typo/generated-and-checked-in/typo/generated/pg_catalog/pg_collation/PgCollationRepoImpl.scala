@@ -26,23 +26,9 @@ object PgCollationRepoImpl extends PgCollationRepo {
     SQL"""delete from pg_catalog.pg_collation where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("collname", ParameterValue.from(unsaved.collname))),
-      Some(NamedParameter("collnamespace", ParameterValue.from(unsaved.collnamespace))),
-      Some(NamedParameter("collowner", ParameterValue.from(unsaved.collowner))),
-      Some(NamedParameter("collprovider", ParameterValue.from(unsaved.collprovider))),
-      Some(NamedParameter("collisdeterministic", ParameterValue.from(unsaved.collisdeterministic))),
-      Some(NamedParameter("collencoding", ParameterValue.from(unsaved.collencoding))),
-      Some(NamedParameter("collcollate", ParameterValue.from(unsaved.collcollate))),
-      Some(NamedParameter("collctype", ParameterValue.from(unsaved.collctype))),
-      Some(NamedParameter("collversion", ParameterValue.from(unsaved.collversion)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_collation(oid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
+          values (${oid}, ${unsaved.collname}, ${unsaved.collnamespace}, ${unsaved.collowner}, ${unsaved.collprovider}, ${unsaved.collisdeterministic}, ${unsaved.collencoding}, ${unsaved.collcollate}, ${unsaved.collctype}, ${unsaved.collversion})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {

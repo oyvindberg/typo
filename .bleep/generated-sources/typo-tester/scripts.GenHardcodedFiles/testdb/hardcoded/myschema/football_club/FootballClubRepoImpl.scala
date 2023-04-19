@@ -24,15 +24,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
     SQL"""delete from myschema.football_club where id = $id""".executeUpdate() > 0
   }
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name)))
-    ).flatten
-    
-    SQL"""insert into myschema.football_club(id, ${namedParameters.map(_.name).mkString(", ")})
-          values (${id}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into myschema.football_club(id, name)
+          values (${id}, ${unsaved.name})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {

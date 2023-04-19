@@ -201,6 +201,18 @@ object DbLibAnorm extends DbLib {
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
                |$sql.executeUpdate() > 0"""
 
+      case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, _) if colsUnsaved.forall(_.dbCol.columnDefault.isEmpty) =>
+        val sql = interpolate(
+          code"""|insert into ${table.relationName}(${colsUnsaved.map(c => maybeQuoted(c.dbName)).mkCode(", ")})
+                 |      values (${colsUnsaved.map(c => code"$${${unsavedParam.name}.${c.name}}").mkCode(", ")})
+                 |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
+                 |""".stripMargin
+        )
+
+        code"""|$sql
+               |  .executeInsert($idRowParserIdent.single)
+               |"""
+
       case RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default) =>
         val maybeNamedParameters = colsUnsaved.map {
           case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbCol) =>
@@ -227,6 +239,26 @@ object DbLibAnorm extends DbLib {
                |$sql
                |  .on(namedParameters :_*)
                |  .executeInsert($idRowParserIdent.single)
+               |"""
+
+      case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, _) if colsUnsaved.forall(_.dbCol.columnDefault.isEmpty) =>
+        val joinedIdColNames = id.cols.map(c => maybeQuoted(c.dbName))
+        val joinedUnsavedColNames = colsUnsaved.map(c => maybeQuoted(c.dbName))
+
+        val idValues: NonEmptyList[sc.Code] =
+          id match {
+            case id: IdComputed.Unary     => NonEmptyList(code"$${${id.paramName}}")
+            case id: IdComputed.Composite => id.cols.map(c => code"$${${id.paramName}.${c.name}}")
+          }
+        val unsavedValues = colsUnsaved.map(c => code"$${${unsavedParam.name}.${c.name}}")
+
+        val sql = interpolate(
+          code"""|insert into ${table.relationName}(${joinedIdColNames.mkCode(", ")}, ${joinedUnsavedColNames.mkCode(", ")})
+                 |      values (${idValues.mkCode(", ")}, ${unsavedValues.mkCode(", ")})
+                 |""".stripMargin
+        )
+
+        code"""|$sql.execute()
                |"""
 
       case RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default) =>

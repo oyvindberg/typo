@@ -27,17 +27,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""delete from pg_catalog.pg_namespace where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("nspname", ParameterValue.from(unsaved.nspname))),
-      Some(NamedParameter("nspowner", ParameterValue.from(unsaved.nspowner))),
-      Some(NamedParameter("nspacl", ParameterValue.from(unsaved.nspacl)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_namespace(oid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
+          values (${oid}, ${unsaved.nspname}, ${unsaved.nspowner}, ${unsaved.nspacl})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {

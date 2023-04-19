@@ -13,6 +13,7 @@ object GeneratedSources {
       val props = new util.Properties
       props.setProperty("user", "postgres")
       props.setProperty("password", "postgres")
+      props.setProperty("port", "6432")
       DriverManager.getConnection(url, props)
     }
 
@@ -36,7 +37,8 @@ object GeneratedSources {
       "pg_namespace",
       "referential_constraints",
       "table_constraints",
-      "tables"
+      "tables",
+      "foo"
     )
 
     val nullabilityOverride: NullabilityOverride = {

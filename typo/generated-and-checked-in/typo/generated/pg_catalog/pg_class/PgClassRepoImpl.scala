@@ -27,46 +27,9 @@ object PgClassRepoImpl extends PgClassRepo {
     SQL"""delete from pg_catalog.pg_class where oid = $oid""".executeUpdate() > 0
   }
   override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
-    val namedParameters = List(
-      Some(NamedParameter("relname", ParameterValue.from(unsaved.relname))),
-      Some(NamedParameter("relnamespace", ParameterValue.from(unsaved.relnamespace))),
-      Some(NamedParameter("reltype", ParameterValue.from(unsaved.reltype))),
-      Some(NamedParameter("reloftype", ParameterValue.from(unsaved.reloftype))),
-      Some(NamedParameter("relowner", ParameterValue.from(unsaved.relowner))),
-      Some(NamedParameter("relam", ParameterValue.from(unsaved.relam))),
-      Some(NamedParameter("relfilenode", ParameterValue.from(unsaved.relfilenode))),
-      Some(NamedParameter("reltablespace", ParameterValue.from(unsaved.reltablespace))),
-      Some(NamedParameter("relpages", ParameterValue.from(unsaved.relpages))),
-      Some(NamedParameter("reltuples", ParameterValue.from(unsaved.reltuples))),
-      Some(NamedParameter("relallvisible", ParameterValue.from(unsaved.relallvisible))),
-      Some(NamedParameter("reltoastrelid", ParameterValue.from(unsaved.reltoastrelid))),
-      Some(NamedParameter("relhasindex", ParameterValue.from(unsaved.relhasindex))),
-      Some(NamedParameter("relisshared", ParameterValue.from(unsaved.relisshared))),
-      Some(NamedParameter("relpersistence", ParameterValue.from(unsaved.relpersistence))),
-      Some(NamedParameter("relkind", ParameterValue.from(unsaved.relkind))),
-      Some(NamedParameter("relnatts", ParameterValue.from(unsaved.relnatts))),
-      Some(NamedParameter("relchecks", ParameterValue.from(unsaved.relchecks))),
-      Some(NamedParameter("relhasrules", ParameterValue.from(unsaved.relhasrules))),
-      Some(NamedParameter("relhastriggers", ParameterValue.from(unsaved.relhastriggers))),
-      Some(NamedParameter("relhassubclass", ParameterValue.from(unsaved.relhassubclass))),
-      Some(NamedParameter("relrowsecurity", ParameterValue.from(unsaved.relrowsecurity))),
-      Some(NamedParameter("relforcerowsecurity", ParameterValue.from(unsaved.relforcerowsecurity))),
-      Some(NamedParameter("relispopulated", ParameterValue.from(unsaved.relispopulated))),
-      Some(NamedParameter("relreplident", ParameterValue.from(unsaved.relreplident))),
-      Some(NamedParameter("relispartition", ParameterValue.from(unsaved.relispartition))),
-      Some(NamedParameter("relrewrite", ParameterValue.from(unsaved.relrewrite))),
-      Some(NamedParameter("relfrozenxid", ParameterValue.from(unsaved.relfrozenxid))),
-      Some(NamedParameter("relminmxid", ParameterValue.from(unsaved.relminmxid))),
-      Some(NamedParameter("relacl", ParameterValue.from(unsaved.relacl))),
-      Some(NamedParameter("reloptions", ParameterValue.from(unsaved.reloptions))),
-      Some(NamedParameter("relpartbound", ParameterValue.from(unsaved.relpartbound)))
-    ).flatten
-    
-    SQL"""insert into pg_catalog.pg_class(oid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${oid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
-      .on(namedParameters :_*)
-      .execute()
+    SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
+          values (${oid}, ${unsaved.relname}, ${unsaved.relnamespace}, ${unsaved.reltype}, ${unsaved.reloftype}, ${unsaved.relowner}, ${unsaved.relam}, ${unsaved.relfilenode}, ${unsaved.reltablespace}, ${unsaved.relpages}, ${unsaved.reltuples}, ${unsaved.relallvisible}, ${unsaved.reltoastrelid}, ${unsaved.relhasindex}, ${unsaved.relisshared}, ${unsaved.relpersistence}, ${unsaved.relkind}, ${unsaved.relnatts}, ${unsaved.relchecks}, ${unsaved.relhasrules}, ${unsaved.relhastriggers}, ${unsaved.relhassubclass}, ${unsaved.relrowsecurity}, ${unsaved.relforcerowsecurity}, ${unsaved.relispopulated}, ${unsaved.relreplident}, ${unsaved.relispartition}, ${unsaved.relrewrite}, ${unsaved.relfrozenxid}, ${unsaved.relminmxid}, ${unsaved.relacl}, ${unsaved.reloptions}, ${unsaved.relpartbound})
+    """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
