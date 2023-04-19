@@ -25,7 +25,7 @@ import java.util.UUID
 
 object AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.address where addressid = $addressid""".executeUpdate() > 0
+    SQL"delete from person.address where addressid = $addressid".executeUpdate() > 0
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressId = {
     val namedParameters = List(
@@ -54,7 +54,7 @@ object AddressRepoImpl extends AddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address""".as(rowParser.*)
+    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object AddressRepoImpl extends AddressRepo {
   
   }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid""".as(rowParser.singleOpt)
+    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid".as(rowParser.singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     implicit val arrayToSql: ToSql[Array[AddressId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +89,7 @@ object AddressRepoImpl extends AddressRepo {
       (s: PreparedStatement, index: Int, v: Array[AddressId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)""".as(rowParser.*)
+    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)".as(rowParser.*)
   
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {

@@ -22,7 +22,7 @@ import typo.generated.information_schema.YesOrNo
 
 object TablesRepoImpl extends TablesRepo {
   override def selectAll(implicit c: Connection): List[TablesRow] = {
-    SQL"""select table_catalog, table_schema, table_name, table_type, self_referencing_column_name, reference_generation, user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, is_insertable_into, is_typed, commit_action from information_schema.tables""".as(rowParser.*)
+    SQL"select table_catalog, table_schema, table_name, table_type, self_referencing_column_name, reference_generation, user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, is_insertable_into, is_typed, commit_action from information_schema.tables".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TablesFieldOrIdValue[_]])(implicit c: Connection): List[TablesRow] = {
     fieldValues match {

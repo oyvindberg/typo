@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.culture where cultureid = $cultureid""".executeUpdate() > 0
+    SQL"delete from production.culture where cultureid = $cultureid".executeUpdate() > 0
   }
   override def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -42,7 +42,7 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture""".as(rowParser.*)
+    SQL"select cultureid, name, modifieddate from production.culture".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
     fieldValues match {
@@ -63,7 +63,7 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate from production.culture where cultureid = $cultureid""".as(rowParser.singleOpt)
+    SQL"select cultureid, name, modifieddate from production.culture where cultureid = $cultureid".as(rowParser.singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     implicit val arrayToSql: ToSql[Array[CultureId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +71,7 @@ object CultureRepoImpl extends CultureRepo {
       (s: PreparedStatement, index: Int, v: Array[CultureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"""select cultureid, name, modifieddate from production.culture where cultureid = ANY($cultureids)""".as(rowParser.*)
+    SQL"select cultureid, name, modifieddate from production.culture where cultureid = ANY($cultureids)".as(rowParser.*)
   
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {

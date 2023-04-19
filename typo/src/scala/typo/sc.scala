@@ -263,7 +263,9 @@ object sc {
         }
       case StringInterpolate(_, prefix, content) =>
         val Quote = '"'.toString
-        s"${renderTree(prefix)}${Quote * 3}${content.render}${Quote * 3}"
+        val rendered = content.render
+        val maybeTripleQuote = if (rendered.contains(Quote) || rendered.contains("\n")) Quote * 3 else Quote
+        s"${renderTree(prefix)}$maybeTripleQuote$rendered$maybeTripleQuote"
     }
   }
 

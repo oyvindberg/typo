@@ -24,7 +24,7 @@ import java.util.UUID
 
 object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.businessentity where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"delete from person.businessentity where businessentityid = $businessentityid".executeUpdate() > 0
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityId = {
     val namedParameters = List(
@@ -47,7 +47,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity""".as(rowParser.*)
+    SQL"select businessentityid, rowguid, modifieddate from person.businessentity".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityRow] = {
     fieldValues match {
@@ -68,7 +68,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid""".as(rowParser.singleOpt)
+    SQL"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[BusinessentityRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -76,7 +76,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+    SQL"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = ANY($businessentityids)".as(rowParser.*)
   
   }
   override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {

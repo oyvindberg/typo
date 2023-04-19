@@ -24,7 +24,7 @@ import java.util.UUID
 
 object SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.specialoffer where specialofferid = $specialofferid""".executeUpdate() > 0
+    SQL"delete from sales.specialoffer where specialofferid = $specialofferid".executeUpdate() > 0
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferId = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer""".as(rowParser.*)
+    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow] = {
     fieldValues match {
@@ -90,7 +90,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   
   }
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".as(rowParser.singleOpt)
+    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid".as(rowParser.singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     implicit val arrayToSql: ToSql[Array[SpecialofferId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -98,7 +98,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       (s: PreparedStatement, index: Int, v: Array[SpecialofferId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = ANY($specialofferids)""".as(rowParser.*)
+    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = ANY($specialofferids)".as(rowParser.*)
   
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {

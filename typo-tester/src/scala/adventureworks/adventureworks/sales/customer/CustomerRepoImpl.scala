@@ -26,7 +26,7 @@ import java.util.UUID
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.customer where customerid = $customerid""".executeUpdate() > 0
+    SQL"delete from sales.customer where customerid = $customerid".executeUpdate() > 0
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerId = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object CustomerRepoImpl extends CustomerRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer""".as(rowParser.*)
+    SQL"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow] = {
     fieldValues match {
@@ -76,7 +76,7 @@ object CustomerRepoImpl extends CustomerRepo {
   
   }
   override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid""".as(rowParser.singleOpt)
+    SQL"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid".as(rowParser.singleOpt)
   }
   override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     implicit val arrayToSql: ToSql[Array[CustomerId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -84,7 +84,7 @@ object CustomerRepoImpl extends CustomerRepo {
       (s: PreparedStatement, index: Int, v: Array[CustomerId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = ANY($customerids)""".as(rowParser.*)
+    SQL"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = ANY($customerids)".as(rowParser.*)
   
   }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {

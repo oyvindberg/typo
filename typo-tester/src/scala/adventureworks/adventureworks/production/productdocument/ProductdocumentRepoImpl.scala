@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".executeUpdate() > 0
+    SQL"delete from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -38,7 +38,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode from production.productdocument""".as(rowParser.*)
+    SQL"select productid, modifieddate, documentnode from production.productdocument".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow] = {
     fieldValues match {
@@ -59,7 +59,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".as(rowParser.singleOpt)
+    SQL"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".as(rowParser.singleOpt)
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

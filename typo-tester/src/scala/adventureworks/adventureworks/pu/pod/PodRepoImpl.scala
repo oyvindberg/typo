@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PodRepoImpl extends PodRepo {
   override def selectAll(implicit c: Connection): List[PodRow] = {
-    SQL"""select id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from pu.pod""".as(rowParser.*)
+    SQL"select id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from pu.pod".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PodFieldOrIdValue[_]])(implicit c: Connection): List[PodRow] = {
     fieldValues match {

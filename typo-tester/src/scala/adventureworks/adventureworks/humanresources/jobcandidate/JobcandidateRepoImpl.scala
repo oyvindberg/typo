@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid""".executeUpdate() > 0
+    SQL"delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".executeUpdate() > 0
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateId = {
     val namedParameters = List(
@@ -45,7 +45,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate""".as(rowParser.*)
+    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
     fieldValues match {
@@ -67,7 +67,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   
   }
   override def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow] = {
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid""".as(rowParser.singleOpt)
+    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".as(rowParser.singleOpt)
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     implicit val arrayToSql: ToSql[Array[JobcandidateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -75,7 +75,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       (s: PreparedStatement, index: Int, v: Array[JobcandidateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = ANY($jobcandidateids)""".as(rowParser.*)
+    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = ANY($jobcandidateids)".as(rowParser.*)
   
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {

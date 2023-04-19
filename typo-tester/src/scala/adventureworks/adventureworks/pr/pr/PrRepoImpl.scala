@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PrRepoImpl extends PrRepo {
   override def selectAll(implicit c: Connection): List[PrRow] = {
-    SQL"""select id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from pr.pr""".as(rowParser.*)
+    SQL"select id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate from pr.pr".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PrFieldOrIdValue[_]])(implicit c: Connection): List[PrRow] = {
     fieldValues match {

@@ -19,7 +19,7 @@ import java.util.UUID
 
 object PdRepoImpl extends PdRepo {
   override def selectAll(implicit c: Connection): List[PdRow] = {
-    SQL"""select id, productdescriptionid, description, rowguid, modifieddate from pr.pd""".as(rowParser.*)
+    SQL"select id, productdescriptionid, description, rowguid, modifieddate from pr.pd".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdFieldOrIdValue[_]])(implicit c: Connection): List[PdRow] = {
     fieldValues match {

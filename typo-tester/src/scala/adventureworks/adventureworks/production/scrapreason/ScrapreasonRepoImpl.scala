@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.scrapreason where scrapreasonid = $scrapreasonid""".executeUpdate() > 0
+    SQL"delete from production.scrapreason where scrapreasonid = $scrapreasonid".executeUpdate() > 0
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonId = {
     val namedParameters = List(
@@ -44,7 +44,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason""".as(rowParser.*)
+    SQL"select scrapreasonid, name, modifieddate from production.scrapreason".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".as(rowParser.singleOpt)
+    SQL"select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid".as(rowParser.singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
     implicit val arrayToSql: ToSql[Array[ScrapreasonId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -73,7 +73,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[ScrapreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = ANY($scrapreasonids)""".as(rowParser.*)
+    SQL"select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = ANY($scrapreasonids)".as(rowParser.*)
   
   }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {

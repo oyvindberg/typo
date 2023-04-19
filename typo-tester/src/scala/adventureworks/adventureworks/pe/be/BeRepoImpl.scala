@@ -19,7 +19,7 @@ import java.util.UUID
 
 object BeRepoImpl extends BeRepo {
   override def selectAll(implicit c: Connection): List[BeRow] = {
-    SQL"""select id, businessentityid, rowguid, modifieddate from pe.be""".as(rowParser.*)
+    SQL"select id, businessentityid, rowguid, modifieddate from pe.be".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BeFieldOrIdValue[_]])(implicit c: Connection): List[BeRow] = {
     fieldValues match {

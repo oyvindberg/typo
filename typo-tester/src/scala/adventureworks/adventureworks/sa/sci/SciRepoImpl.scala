@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object SciRepoImpl extends SciRepo {
   override def selectAll(implicit c: Connection): List[SciRow] = {
-    SQL"""select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci""".as(rowParser.*)
+    SQL"select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SciFieldOrIdValue[_]])(implicit c: Connection): List[SciRow] = {
     fieldValues match {

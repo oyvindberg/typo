@@ -25,7 +25,7 @@ import java.util.UUID
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.document where documentnode = $documentnode""".executeUpdate() > 0
+    SQL"delete from production.document where documentnode = $documentnode".executeUpdate() > 0
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentId = {
     val namedParameters = List(
@@ -64,7 +64,7 @@ object DocumentRepoImpl extends DocumentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document""".as(rowParser.*)
+    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
     fieldValues match {
@@ -95,7 +95,7 @@ object DocumentRepoImpl extends DocumentRepo {
   
   }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode""".as(rowParser.singleOpt)
+    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode".as(rowParser.singleOpt)
   }
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     implicit val arrayToSql: ToSql[Array[DocumentId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -103,7 +103,7 @@ object DocumentRepoImpl extends DocumentRepo {
       (s: PreparedStatement, index: Int, v: Array[DocumentId]) =>
         s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
     
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = ANY($documentnodes)""".as(rowParser.*)
+    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = ANY($documentnodes)".as(rowParser.*)
   
   }
   override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {

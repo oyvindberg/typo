@@ -28,7 +28,7 @@ import java.util.UUID
 
 object StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.stateprovince where stateprovinceid = $stateprovinceid""".executeUpdate() > 0
+    SQL"delete from person.stateprovince where stateprovinceid = $stateprovinceid".executeUpdate() > 0
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceId = {
     val namedParameters = List(
@@ -59,7 +59,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince""".as(rowParser.*)
+    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
     fieldValues match {
@@ -85,7 +85,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   
   }
   override def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid""".as(rowParser.singleOpt)
+    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid".as(rowParser.singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     implicit val arrayToSql: ToSql[Array[StateprovinceId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -93,7 +93,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       (s: PreparedStatement, index: Int, v: Array[StateprovinceId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = ANY($stateprovinceids)""".as(rowParser.*)
+    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = ANY($stateprovinceids)".as(rowParser.*)
   
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {

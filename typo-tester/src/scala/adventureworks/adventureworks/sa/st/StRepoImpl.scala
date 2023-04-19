@@ -21,7 +21,7 @@ import java.util.UUID
 
 object StRepoImpl extends StRepo {
   override def selectAll(implicit c: Connection): List[StRow] = {
-    SQL"""select id, territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sa.st""".as(rowParser.*)
+    SQL"select id, territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sa.st".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StFieldOrIdValue[_]])(implicit c: Connection): List[StRow] = {
     fieldValues match {

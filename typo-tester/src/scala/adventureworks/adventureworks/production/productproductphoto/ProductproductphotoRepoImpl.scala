@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}""".executeUpdate() > 0
+    SQL"delete from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductproductphotoId, unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
-    SQL"""select productid, productphotoid, primary, modifieddate from production.productproductphoto""".as(rowParser.*)
+    SQL"select productid, productphotoid, primary, modifieddate from production.productproductphoto".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductproductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductproductphotoRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   
   }
   override def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow] = {
-    SQL"""select productid, productphotoid, primary, modifieddate from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}""".as(rowParser.singleOpt)
+    SQL"select productid, productphotoid, primary, modifieddate from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}".as(rowParser.singleOpt)
   }
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

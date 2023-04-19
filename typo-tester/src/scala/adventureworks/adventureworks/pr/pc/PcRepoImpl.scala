@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PcRepoImpl extends PcRepo {
   override def selectAll(implicit c: Connection): List[PcRow] = {
-    SQL"""select id, productcategoryid, name, rowguid, modifieddate from pr.pc""".as(rowParser.*)
+    SQL"select id, productcategoryid, name, rowguid, modifieddate from pr.pc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PcFieldOrIdValue[_]])(implicit c: Connection): List[PcRow] = {
     fieldValues match {

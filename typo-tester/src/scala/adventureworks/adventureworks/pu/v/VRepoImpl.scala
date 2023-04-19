@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object VRepoImpl extends VRepo {
   override def selectAll(implicit c: Connection): List[VRow] = {
-    SQL"""select id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from pu.v""".as(rowParser.*)
+    SQL"select id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from pu.v".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VFieldOrIdValue[_]])(implicit c: Connection): List[VRow] = {
     fieldValues match {

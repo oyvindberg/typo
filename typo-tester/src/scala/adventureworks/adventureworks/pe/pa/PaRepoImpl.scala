@@ -19,7 +19,7 @@ import java.util.UUID
 
 object PaRepoImpl extends PaRepo {
   override def selectAll(implicit c: Connection): List[PaRow] = {
-    SQL"""select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa""".as(rowParser.*)
+    SQL"select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PaFieldOrIdValue[_]])(implicit c: Connection): List[PaRow] = {
     fieldValues match {

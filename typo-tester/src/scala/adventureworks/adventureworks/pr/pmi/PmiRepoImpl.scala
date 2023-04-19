@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PmiRepoImpl extends PmiRepo {
   override def selectAll(implicit c: Connection): List[PmiRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate from pr.pmi""".as(rowParser.*)
+    SQL"select productmodelid, illustrationid, modifieddate from pr.pmi".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmiFieldOrIdValue[_]])(implicit c: Connection): List[PmiRow] = {
     fieldValues match {

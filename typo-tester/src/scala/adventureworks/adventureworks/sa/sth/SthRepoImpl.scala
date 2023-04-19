@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SthRepoImpl extends SthRepo {
   override def selectAll(implicit c: Connection): List[SthRow] = {
-    SQL"""select id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sa.sth""".as(rowParser.*)
+    SQL"select id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sa.sth".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SthFieldOrIdValue[_]])(implicit c: Connection): List[SthRow] = {
     fieldValues match {

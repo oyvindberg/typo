@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CrRepoImpl extends CrRepo {
   override def selectAll(implicit c: Connection): List[CrRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sa.cr""".as(rowParser.*)
+    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sa.cr".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CrFieldOrIdValue[_]])(implicit c: Connection): List[CrRow] = {
     fieldValues match {

@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".executeUpdate() > 0
+    SQL"delete from production.unitmeasure where unitmeasurecode = $unitmeasurecode".executeUpdate() > 0
   }
   override def insert(unitmeasurecode: UnitmeasureId, unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -42,7 +42,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure""".as(rowParser.*)
+    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow] = {
     fieldValues match {
@@ -63,7 +63,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   
   }
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".as(rowParser.singleOpt)
+    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode".as(rowParser.singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     implicit val arrayToSql: ToSql[Array[UnitmeasureId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +71,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       (s: PreparedStatement, index: Int, v: Array[UnitmeasureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"""select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = ANY($unitmeasurecodes)""".as(rowParser.*)
+    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = ANY($unitmeasurecodes)".as(rowParser.*)
   
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {

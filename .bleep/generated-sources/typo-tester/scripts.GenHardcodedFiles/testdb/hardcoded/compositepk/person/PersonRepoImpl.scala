@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
+    SQL"delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
     SQL"""insert into compositepk.person(name)
@@ -28,7 +28,7 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person""".as(rowParser.*)
+    SQL"select one, two, name from compositepk.person".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -49,7 +49,7 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}""".as(rowParser.singleOpt)
+    SQL"select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}".as(rowParser.singleOpt)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

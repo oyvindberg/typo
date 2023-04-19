@@ -19,7 +19,7 @@ import java.sql.Connection
 
 object FooRepoImpl extends FooRepo {
   override def selectAll(implicit c: Connection): List[FooRow] = {
-    SQL"""select array_agg from public.foo""".as(rowParser.*)
+    SQL"select array_agg from public.foo".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[FooFieldOrIdValue[_]])(implicit c: Connection): List[FooRow] = {
     fieldValues match {

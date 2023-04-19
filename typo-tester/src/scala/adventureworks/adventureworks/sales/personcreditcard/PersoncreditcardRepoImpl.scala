@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".executeUpdate() > 0
+    SQL"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".executeUpdate() > 0
   }
   override def insert(compositeId: PersoncreditcardId, unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -38,7 +38,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard""".as(rowParser.*)
+    SQL"select businessentityid, creditcardid, modifieddate from sales.personcreditcard".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]])(implicit c: Connection): List[PersoncreditcardRow] = {
     fieldValues match {
@@ -59,7 +59,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   
   }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".as(rowParser.singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

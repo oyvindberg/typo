@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CrcRepoImpl extends CrcRepo {
   override def selectAll(implicit c: Connection): List[CrcRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate from sa.crc""".as(rowParser.*)
+    SQL"select countryregioncode, currencycode, modifieddate from sa.crc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CrcFieldOrIdValue[_]])(implicit c: Connection): List[CrcRow] = {
     fieldValues match {

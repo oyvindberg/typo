@@ -19,7 +19,7 @@ import java.time.LocalDate
 
 object VemployeedepartmenthistoryRepoImpl extends VemployeedepartmenthistoryRepo {
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate from humanresources.vemployeedepartmenthistory""".as(rowParser.*)
+    SQL"select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate from humanresources.vemployeedepartmenthistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmenthistoryRow] = {
     fieldValues match {

@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PmpdcRepoImpl extends PmpdcRepo {
   override def selectAll(implicit c: Connection): List[PmpdcRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from pr.pmpdc""".as(rowParser.*)
+    SQL"select productmodelid, productdescriptionid, cultureid, modifieddate from pr.pmpdc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmpdcFieldOrIdValue[_]])(implicit c: Connection): List[PmpdcRow] = {
     fieldValues match {

@@ -26,7 +26,7 @@ import java.util.UUID
 
 object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesperson where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"delete from sales.salesperson where businessentityid = $businessentityid".executeUpdate() > 0
   }
   override def insert(businessentityid: BusinessentityId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -66,7 +66,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson""".as(rowParser.*)
+    SQL"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow] = {
     fieldValues match {
@@ -93,7 +93,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid""".as(rowParser.singleOpt)
+    SQL"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -101,7 +101,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+    SQL"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = ANY($businessentityids)".as(rowParser.*)
   
   }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {

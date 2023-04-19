@@ -21,7 +21,7 @@ import java.util.UUID
 
 object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.businessentitycontact where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}""".executeUpdate() > 0
+    SQL"delete from person.businessentitycontact where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}".executeUpdate() > 0
   }
   override def insert(compositeId: BusinessentitycontactId, unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentitycontactRow] = {
-    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact""".as(rowParser.*)
+    SQL"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentitycontactRow] = {
     fieldValues match {
@@ -66,7 +66,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   
   }
   override def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow] = {
-    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}".as(rowParser.singleOpt)
   }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

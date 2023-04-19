@@ -19,7 +19,7 @@ import java.util.UUID
 
 object SpqhRepoImpl extends SpqhRepo {
   override def selectAll(implicit c: Connection): List[SpqhRow] = {
-    SQL"""select id, businessentityid, quotadate, salesquota, rowguid, modifieddate from sa.spqh""".as(rowParser.*)
+    SQL"select id, businessentityid, quotadate, salesquota, rowguid, modifieddate from sa.spqh".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpqhFieldOrIdValue[_]])(implicit c: Connection): List[SpqhRow] = {
     fieldValues match {

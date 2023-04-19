@@ -21,7 +21,7 @@ import java.util.UUID
 
 object BeaRepoImpl extends BeaRepo {
   override def selectAll(implicit c: Connection): List[BeaRow] = {
-    SQL"""select id, businessentityid, addressid, addresstypeid, rowguid, modifieddate from pe.bea""".as(rowParser.*)
+    SQL"select id, businessentityid, addressid, addresstypeid, rowguid, modifieddate from pe.bea".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BeaFieldOrIdValue[_]])(implicit c: Connection): List[BeaRow] = {
     fieldValues match {

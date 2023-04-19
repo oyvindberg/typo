@@ -21,7 +21,7 @@ import java.util.UUID
 
 object PscRepoImpl extends PscRepo {
   override def selectAll(implicit c: Connection): List[PscRow] = {
-    SQL"""select id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate from pr.psc""".as(rowParser.*)
+    SQL"select id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate from pr.psc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PscFieldOrIdValue[_]])(implicit c: Connection): List[PscRow] = {
     fieldValues match {

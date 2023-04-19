@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PppRepoImpl extends PppRepo {
   override def selectAll(implicit c: Connection): List[PppRow] = {
-    SQL"""select productid, productphotoid, primary, modifieddate from pr.ppp""".as(rowParser.*)
+    SQL"select productid, productphotoid, primary, modifieddate from pr.ppp".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PppFieldOrIdValue[_]])(implicit c: Connection): List[PppRow] = {
     fieldValues match {

@@ -19,7 +19,7 @@ import org.postgresql.util.PGmoney
 
 object VstorewithdemographicsRepoImpl extends VstorewithdemographicsRepo {
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsRow] = {
-    SQL"""select businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics""".as(rowParser.*)
+    SQL"select businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithdemographicsFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithdemographicsRow] = {
     fieldValues match {

@@ -20,7 +20,7 @@ import java.util.UUID
 
 object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoRow] = {
-    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo""".as(rowParser.*)
+    SQL"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoFieldOrIdValue[_]])(implicit c: Connection): List[VadditionalcontactinfoRow] = {
     fieldValues match {

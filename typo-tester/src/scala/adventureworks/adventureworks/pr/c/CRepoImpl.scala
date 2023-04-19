@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CRepoImpl extends CRepo {
   override def selectAll(implicit c: Connection): List[CRow] = {
-    SQL"""select id, cultureid, name, modifieddate from pr.c""".as(rowParser.*)
+    SQL"select id, cultureid, name, modifieddate from pr.c".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CFieldOrIdValue[_]])(implicit c: Connection): List[CRow] = {
     fieldValues match {

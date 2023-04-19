@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PntRepoImpl extends PntRepo {
   override def selectAll(implicit c: Connection): List[PntRow] = {
-    SQL"""select id, phonenumbertypeid, name, modifieddate from pe.pnt""".as(rowParser.*)
+    SQL"select id, phonenumbertypeid, name, modifieddate from pe.pnt".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PntFieldOrIdValue[_]])(implicit c: Connection): List[PntRow] = {
     fieldValues match {

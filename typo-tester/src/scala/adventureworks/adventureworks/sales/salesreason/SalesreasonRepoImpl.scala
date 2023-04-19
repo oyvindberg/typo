@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesreason where salesreasonid = $salesreasonid""".executeUpdate() > 0
+    SQL"delete from sales.salesreason where salesreasonid = $salesreasonid".executeUpdate() > 0
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonId = {
     val namedParameters = List(
@@ -45,7 +45,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason""".as(rowParser.*)
+    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
     fieldValues match {
@@ -67,7 +67,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".as(rowParser.singleOpt)
+    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid".as(rowParser.singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     implicit val arrayToSql: ToSql[Array[SalesreasonId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -75,7 +75,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = ANY($salesreasonids)""".as(rowParser.*)
+    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = ANY($salesreasonids)".as(rowParser.*)
   
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {

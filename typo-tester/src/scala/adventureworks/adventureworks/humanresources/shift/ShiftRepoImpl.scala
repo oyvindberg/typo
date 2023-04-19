@@ -25,7 +25,7 @@ import java.time.LocalTime
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.shift where shiftid = $shiftid""".executeUpdate() > 0
+    SQL"delete from humanresources.shift where shiftid = $shiftid".executeUpdate() > 0
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftId = {
     val namedParameters = List(
@@ -47,7 +47,7 @@ object ShiftRepoImpl extends ShiftRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift""".as(rowParser.*)
+    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
     fieldValues match {
@@ -70,7 +70,7 @@ object ShiftRepoImpl extends ShiftRepo {
   
   }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".as(rowParser.singleOpt)
+    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid".as(rowParser.singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
     implicit val arrayToSql: ToSql[Array[ShiftId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -78,7 +78,7 @@ object ShiftRepoImpl extends ShiftRepo {
       (s: PreparedStatement, index: Int, v: Array[ShiftId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = ANY($shiftids)""".as(rowParser.*)
+    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = ANY($shiftids)".as(rowParser.*)
   
   }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {

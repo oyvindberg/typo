@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PiRepoImpl extends PiRepo {
   override def selectAll(implicit c: Connection): List[PiRow] = {
-    SQL"""select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi""".as(rowParser.*)
+    SQL"select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PiFieldOrIdValue[_]])(implicit c: Connection): List[PiRow] = {
     fieldValues match {

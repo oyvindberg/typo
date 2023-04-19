@@ -26,7 +26,7 @@ import java.util.UUID
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.store where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"delete from sales.store where businessentityid = $businessentityid".executeUpdate() > 0
   }
   override def insert(businessentityid: BusinessentityId, unsaved: StoreRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -51,7 +51,7 @@ object StoreRepoImpl extends StoreRepo {
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store""".as(rowParser.*)
+    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]])(implicit c: Connection): List[StoreRow] = {
     fieldValues match {
@@ -75,7 +75,7 @@ object StoreRepoImpl extends StoreRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid""".as(rowParser.singleOpt)
+    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -83,7 +83,7 @@ object StoreRepoImpl extends StoreRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = ANY($businessentityids)".as(rowParser.*)
   
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {

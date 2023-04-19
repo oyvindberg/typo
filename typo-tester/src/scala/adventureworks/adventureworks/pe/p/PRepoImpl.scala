@@ -21,7 +21,7 @@ import java.util.UUID
 
 object PRepoImpl extends PRepo {
   override def selectAll(implicit c: Connection): List[PRow] = {
-    SQL"""select id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe.p""".as(rowParser.*)
+    SQL"select id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe.p".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PFieldOrIdValue[_]])(implicit c: Connection): List[PRow] = {
     fieldValues match {

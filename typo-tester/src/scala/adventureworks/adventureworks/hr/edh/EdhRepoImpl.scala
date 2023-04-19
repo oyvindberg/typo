@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object EdhRepoImpl extends EdhRepo {
   override def selectAll(implicit c: Connection): List[EdhRow] = {
-    SQL"""select id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from hr.edh""".as(rowParser.*)
+    SQL"select id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from hr.edh".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EdhFieldOrIdValue[_]])(implicit c: Connection): List[EdhRow] = {
     fieldValues match {

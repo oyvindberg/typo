@@ -29,7 +29,7 @@ import java.util.UUID
 
 object SohRepoImpl extends SohRepo {
   override def selectAll(implicit c: Connection): List[SohRow] = {
-    SQL"""select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sa.soh""".as(rowParser.*)
+    SQL"select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sa.soh".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohFieldOrIdValue[_]])(implicit c: Connection): List[SohRow] = {
     fieldValues match {

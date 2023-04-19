@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.currencyrate where currencyrateid = $currencyrateid""".executeUpdate() > 0
+    SQL"delete from sales.currencyrate where currencyrateid = $currencyrateid".executeUpdate() > 0
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateId = {
     val namedParameters = List(
@@ -48,7 +48,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate""".as(rowParser.*)
+    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
     fieldValues match {
@@ -73,7 +73,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   
   }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid""".as(rowParser.singleOpt)
+    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid".as(rowParser.singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
     implicit val arrayToSql: ToSql[Array[CurrencyrateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -81,7 +81,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       (s: PreparedStatement, index: Int, v: Array[CurrencyrateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)""".as(rowParser.*)
+    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)".as(rowParser.*)
   
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {

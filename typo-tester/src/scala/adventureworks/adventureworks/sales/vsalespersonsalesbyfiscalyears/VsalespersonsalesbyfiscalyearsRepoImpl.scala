@@ -16,7 +16,7 @@ import java.sql.Connection
 
 object VsalespersonsalesbyfiscalyearsRepoImpl extends VsalespersonsalesbyfiscalyearsRepo {
   override def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsRow] = {
-    SQL"""select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014 from sales.vsalespersonsalesbyfiscalyears""".as(rowParser.*)
+    SQL"select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014 from sales.vsalespersonsalesbyfiscalyears".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsFieldOrIdValue[_]])(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsRow] = {
     fieldValues match {

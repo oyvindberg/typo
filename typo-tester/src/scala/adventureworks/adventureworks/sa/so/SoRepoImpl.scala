@@ -19,7 +19,7 @@ import java.util.UUID
 
 object SoRepoImpl extends SoRepo {
   override def selectAll(implicit c: Connection): List[SoRow] = {
-    SQL"""select id, specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sa.so""".as(rowParser.*)
+    SQL"select id, specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sa.so".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SoFieldOrIdValue[_]])(implicit c: Connection): List[SoRow] = {
     fieldValues match {

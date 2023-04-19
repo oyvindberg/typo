@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SmRepoImpl extends SmRepo {
   override def selectAll(implicit c: Connection): List[SmRow] = {
-    SQL"""select id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from pu.sm""".as(rowParser.*)
+    SQL"select id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from pu.sm".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SmFieldOrIdValue[_]])(implicit c: Connection): List[SmRow] = {
     fieldValues match {

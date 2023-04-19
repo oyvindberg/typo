@@ -26,7 +26,7 @@ import java.util.UUID
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salestaxrate where salestaxrateid = $salestaxrateid""".executeUpdate() > 0
+    SQL"delete from sales.salestaxrate where salestaxrateid = $salestaxrateid".executeUpdate() > 0
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateId = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate""".as(rowParser.*)
+    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".as(rowParser.singleOpt)
+    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid".as(rowParser.singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     implicit val arrayToSql: ToSql[Array[SalestaxrateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +89,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       (s: PreparedStatement, index: Int, v: Array[SalestaxrateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = ANY($salestaxrateids)""".as(rowParser.*)
+    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = ANY($salestaxrateids)".as(rowParser.*)
   
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {

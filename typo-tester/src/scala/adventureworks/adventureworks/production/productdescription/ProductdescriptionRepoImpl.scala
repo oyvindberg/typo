@@ -24,7 +24,7 @@ import java.util.UUID
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productdescription where productdescriptionid = $productdescriptionid""".executeUpdate() > 0
+    SQL"delete from production.productdescription where productdescriptionid = $productdescriptionid".executeUpdate() > 0
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionId = {
     val namedParameters = List(
@@ -48,7 +48,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription""".as(rowParser.*)
+    SQL"select productdescriptionid, description, rowguid, modifieddate from production.productdescription".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[ProductdescriptionRow] = {
     fieldValues match {
@@ -70,7 +70,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   
   }
   override def selectById(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Option[ProductdescriptionRow] = {
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid""".as(rowParser.singleOpt)
+    SQL"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid".as(rowParser.singleOpt)
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
     implicit val arrayToSql: ToSql[Array[ProductdescriptionId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -78,7 +78,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductdescriptionId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = ANY($productdescriptionids)""".as(rowParser.*)
+    SQL"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = ANY($productdescriptionids)".as(rowParser.*)
   
   }
   override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {

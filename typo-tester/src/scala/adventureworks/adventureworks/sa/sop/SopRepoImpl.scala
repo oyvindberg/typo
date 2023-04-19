@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SopRepoImpl extends SopRepo {
   override def selectAll(implicit c: Connection): List[SopRow] = {
-    SQL"""select id, specialofferid, productid, rowguid, modifieddate from sa.sop""".as(rowParser.*)
+    SQL"select id, specialofferid, productid, rowguid, modifieddate from sa.sop".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SopFieldOrIdValue[_]])(implicit c: Connection): List[SopRow] = {
     fieldValues match {

@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
-    SQL"""delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid""".executeUpdate() > 0
+    SQL"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".executeUpdate() > 0
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderId = {
     val namedParameters = List(
@@ -72,7 +72,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader""".as(rowParser.*)
+    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     fieldValues match {
@@ -102,7 +102,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid""".as(rowParser.singleOpt)
+    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".as(rowParser.singleOpt)
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     implicit val arrayToSql: ToSql[Array[PurchaseorderheaderId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -110,7 +110,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       (s: PreparedStatement, index: Int, v: Array[PurchaseorderheaderId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)""".as(rowParser.*)
+    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)".as(rowParser.*)
   
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {

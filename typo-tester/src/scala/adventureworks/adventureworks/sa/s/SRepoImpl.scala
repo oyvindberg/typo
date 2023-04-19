@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sa.s""".as(rowParser.*)
+    SQL"select id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sa.s".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SFieldOrIdValue[_]])(implicit c: Connection): List[SRow] = {
     fieldValues match {

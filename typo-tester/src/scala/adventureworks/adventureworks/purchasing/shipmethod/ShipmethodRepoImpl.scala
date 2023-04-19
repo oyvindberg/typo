@@ -25,7 +25,7 @@ import java.util.UUID
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
-    SQL"""delete from purchasing.shipmethod where shipmethodid = $shipmethodid""".executeUpdate() > 0
+    SQL"delete from purchasing.shipmethod where shipmethodid = $shipmethodid".executeUpdate() > 0
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodId = {
     val namedParameters = List(
@@ -57,7 +57,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod""".as(rowParser.*)
+    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".as(rowParser.singleOpt)
+    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid".as(rowParser.singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     implicit val arrayToSql: ToSql[Array[ShipmethodId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +89,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       (s: PreparedStatement, index: Int, v: Array[ShipmethodId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)""".as(rowParser.*)
+    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)".as(rowParser.*)
   
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {

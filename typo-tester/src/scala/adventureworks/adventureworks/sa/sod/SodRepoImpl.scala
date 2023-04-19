@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SodRepoImpl extends SodRepo {
   override def selectAll(implicit c: Connection): List[SodRow] = {
-    SQL"""select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sa.sod""".as(rowParser.*)
+    SQL"select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sa.sod".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SodFieldOrIdValue[_]])(implicit c: Connection): List[SodRow] = {
     fieldValues match {

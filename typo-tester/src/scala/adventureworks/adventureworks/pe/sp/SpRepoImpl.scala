@@ -23,7 +23,7 @@ import java.util.UUID
 
 object SpRepoImpl extends SpRepo {
   override def selectAll(implicit c: Connection): List[SpRow] = {
-    SQL"""select id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from pe.sp""".as(rowParser.*)
+    SQL"select id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from pe.sp".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpFieldOrIdValue[_]])(implicit c: Connection): List[SpRow] = {
     fieldValues match {

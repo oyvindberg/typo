@@ -21,7 +21,7 @@ import java.util.UUID
 
 object CRepoImpl extends CRepo {
   override def selectAll(implicit c: Connection): List[CRow] = {
-    SQL"""select id, customerid, personid, storeid, territoryid, rowguid, modifieddate from sa.c""".as(rowParser.*)
+    SQL"select id, customerid, personid, storeid, territoryid, rowguid, modifieddate from sa.c".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CFieldOrIdValue[_]])(implicit c: Connection): List[CRow] = {
     fieldValues match {

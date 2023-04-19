@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".executeUpdate() > 0
+    SQL"delete from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}".executeUpdate() > 0
   }
   override def insert(compositeId: PersonphoneId, unsaved: PersonphoneRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -39,7 +39,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone""".as(rowParser.*)
+    SQL"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow] = {
     fieldValues match {
@@ -61,7 +61,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   
   }
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}".as(rowParser.singleOpt)
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

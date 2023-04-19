@@ -20,7 +20,7 @@ import java.util.UUID
 
 object VproductmodelcatalogdescriptionRepoImpl extends VproductmodelcatalogdescriptionRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
-    SQL"""select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription""".as(rowParser.*)
+    SQL"select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
     fieldValues match {

@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.transactionhistoryarchive where transactionid = $transactionid""".executeUpdate() > 0
+    SQL"delete from production.transactionhistoryarchive where transactionid = $transactionid".executeUpdate() > 0
   }
   override def insert(transactionid: TransactionhistoryarchiveId, unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -54,7 +54,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive""".as(rowParser.*)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   
   }
   override def selectById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Option[TransactionhistoryarchiveRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = $transactionid""".as(rowParser.singleOpt)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = $transactionid".as(rowParser.singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     implicit val arrayToSql: ToSql[Array[TransactionhistoryarchiveId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +89,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       (s: PreparedStatement, index: Int, v: Array[TransactionhistoryarchiveId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = ANY($transactionids)""".as(rowParser.*)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = ANY($transactionids)".as(rowParser.*)
   
   }
   override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {

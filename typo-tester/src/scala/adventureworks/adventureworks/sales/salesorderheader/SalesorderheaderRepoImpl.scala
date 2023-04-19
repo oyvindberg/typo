@@ -34,7 +34,7 @@ import java.util.UUID
 
 object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesorderheader where salesorderid = $salesorderid""".executeUpdate() > 0
+    SQL"delete from sales.salesorderheader where salesorderid = $salesorderid".executeUpdate() > 0
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderId = {
     val namedParameters = List(
@@ -100,7 +100,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
-    SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader""".as(rowParser.*)
+    SQL"select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheaderRow] = {
     fieldValues match {
@@ -143,7 +143,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   
   }
   override def selectById(salesorderid: SalesorderheaderId)(implicit c: Connection): Option[SalesorderheaderRow] = {
-    SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = $salesorderid""".as(rowParser.singleOpt)
+    SQL"select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = $salesorderid".as(rowParser.singleOpt)
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
     implicit val arrayToSql: ToSql[Array[SalesorderheaderId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -151,7 +151,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesorderheaderId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = ANY($salesorderids)""".as(rowParser.*)
+    SQL"select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sales.salesorderheader where salesorderid = ANY($salesorderids)".as(rowParser.*)
   
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {

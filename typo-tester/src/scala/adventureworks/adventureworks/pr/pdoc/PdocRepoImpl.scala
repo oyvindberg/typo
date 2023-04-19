@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PdocRepoImpl extends PdocRepo {
   override def selectAll(implicit c: Connection): List[PdocRow] = {
-    SQL"""select id, productid, modifieddate, documentnode from pr.pdoc""".as(rowParser.*)
+    SQL"select id, productid, modifieddate, documentnode from pr.pdoc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdocFieldOrIdValue[_]])(implicit c: Connection): List[PdocRow] = {
     fieldValues match {

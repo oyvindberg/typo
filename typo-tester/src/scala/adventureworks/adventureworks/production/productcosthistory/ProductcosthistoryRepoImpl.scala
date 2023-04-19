@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".executeUpdate() > 0
+    SQL"delete from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductcosthistoryId, unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -39,7 +39,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory""".as(rowParser.*)
+    SQL"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow] = {
     fieldValues match {
@@ -62,7 +62,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   
   }
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
+    SQL"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".as(rowParser.singleOpt)
   }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

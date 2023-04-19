@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object BomRepoImpl extends BomRepo {
   override def selectAll(implicit c: Connection): List[BomRow] = {
-    SQL"""select id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr.bom""".as(rowParser.*)
+    SQL"select id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr.bom".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BomFieldOrIdValue[_]])(implicit c: Connection): List[BomRow] = {
     fieldValues match {

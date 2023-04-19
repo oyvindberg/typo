@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}""".executeUpdate() > 0
+    SQL"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductmodelillustrationId, unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -38,7 +38,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration""".as(rowParser.*)
+    SQL"select productmodelid, illustrationid, modifieddate from production.productmodelillustration".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelillustrationRow] = {
     fieldValues match {
@@ -59,7 +59,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}""".as(rowParser.singleOpt)
+    SQL"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".as(rowParser.singleOpt)
   }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

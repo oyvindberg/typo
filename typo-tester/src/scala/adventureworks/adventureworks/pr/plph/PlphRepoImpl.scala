@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object PlphRepoImpl extends PlphRepo {
   override def selectAll(implicit c: Connection): List[PlphRow] = {
-    SQL"""select id, productid, startdate, enddate, listprice, modifieddate from pr.plph""".as(rowParser.*)
+    SQL"select id, productid, startdate, enddate, listprice, modifieddate from pr.plph".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PlphFieldOrIdValue[_]])(implicit c: Connection): List[PlphRow] = {
     fieldValues match {

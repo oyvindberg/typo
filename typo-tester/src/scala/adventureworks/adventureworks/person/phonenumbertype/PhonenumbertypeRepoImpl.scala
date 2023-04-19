@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".executeUpdate() > 0
+    SQL"delete from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid".executeUpdate() > 0
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeId = {
     val namedParameters = List(
@@ -44,7 +44,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype""".as(rowParser.*)
+    SQL"select phonenumbertypeid, name, modifieddate from person.phonenumbertype".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".as(rowParser.singleOpt)
+    SQL"select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid".as(rowParser.singleOpt)
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
     implicit val arrayToSql: ToSql[Array[PhonenumbertypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -73,7 +73,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       (s: PreparedStatement, index: Int, v: Array[PhonenumbertypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = ANY($phonenumbertypeids)""".as(rowParser.*)
+    SQL"select phonenumbertypeid, name, modifieddate from person.phonenumbertype where phonenumbertypeid = ANY($phonenumbertypeids)".as(rowParser.*)
   
   }
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {

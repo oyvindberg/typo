@@ -24,7 +24,7 @@ import org.postgresql.util.PGobject
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_namespace where oid = $oid""".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_namespace where oid = $oid".executeUpdate() > 0
   }
   override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
@@ -33,7 +33,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace""".as(rowParser.*)
+    SQL"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
@@ -55,7 +55,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   
   }
   override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid""".as(rowParser.singleOpt)
+    SQL"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
     implicit val arrayToSql: ToSql[Array[PgNamespaceId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -63,7 +63,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
       (s: PreparedStatement, index: Int, v: Array[PgNamespaceId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"""select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY($oids)""".as(rowParser.*)
+    SQL"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY($oids)".as(rowParser.*)
   
   }
   override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {

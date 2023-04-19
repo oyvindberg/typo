@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.contacttype where contacttypeid = $contacttypeid""".executeUpdate() > 0
+    SQL"delete from person.contacttype where contacttypeid = $contacttypeid".executeUpdate() > 0
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeId = {
     val namedParameters = List(
@@ -44,7 +44,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype""".as(rowParser.*)
+    SQL"select contacttypeid, name, modifieddate from person.contacttype".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid""".as(rowParser.singleOpt)
+    SQL"select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid".as(rowParser.singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
     implicit val arrayToSql: ToSql[Array[ContacttypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -73,7 +73,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       (s: PreparedStatement, index: Int, v: Array[ContacttypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)""".as(rowParser.*)
+    SQL"select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)".as(rowParser.*)
   
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {

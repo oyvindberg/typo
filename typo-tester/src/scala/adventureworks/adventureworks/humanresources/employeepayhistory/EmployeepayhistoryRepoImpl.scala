@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}""".executeUpdate() > 0
+    SQL"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".executeUpdate() > 0
   }
   override def insert(compositeId: EmployeepayhistoryId, unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -39,7 +39,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory""".as(rowParser.*)
+    SQL"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow] = {
     fieldValues match {
@@ -62,7 +62,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".as(rowParser.singleOpt)
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

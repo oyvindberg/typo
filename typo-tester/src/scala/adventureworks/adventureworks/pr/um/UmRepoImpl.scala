@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object UmRepoImpl extends UmRepo {
   override def selectAll(implicit c: Connection): List[UmRow] = {
-    SQL"""select id, unitmeasurecode, name, modifieddate from pr.um""".as(rowParser.*)
+    SQL"select id, unitmeasurecode, name, modifieddate from pr.um".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UmFieldOrIdValue[_]])(implicit c: Connection): List[UmRow] = {
     fieldValues match {

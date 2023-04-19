@@ -25,7 +25,7 @@ import java.util.UUID
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.addresstype where addresstypeid = $addresstypeid""".executeUpdate() > 0
+    SQL"delete from person.addresstype where addresstypeid = $addresstypeid".executeUpdate() > 0
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeId = {
     val namedParameters = List(
@@ -49,7 +49,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype""".as(rowParser.*)
+    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
     fieldValues match {
@@ -71,7 +71,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   
   }
   override def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".as(rowParser.singleOpt)
+    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid".as(rowParser.singleOpt)
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     implicit val arrayToSql: ToSql[Array[AddresstypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -79,7 +79,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       (s: PreparedStatement, index: Int, v: Array[AddresstypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = ANY($addresstypeids)""".as(rowParser.*)
+    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = ANY($addresstypeids)".as(rowParser.*)
   
   }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {

@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object JcRepoImpl extends JcRepo {
   override def selectAll(implicit c: Connection): List[JcRow] = {
-    SQL"""select id, jobcandidateid, businessentityid, resume, modifieddate from hr.jc""".as(rowParser.*)
+    SQL"select id, jobcandidateid, businessentityid, resume, modifieddate from hr.jc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JcFieldOrIdValue[_]])(implicit c: Connection): List[JcRow] = {
     fieldValues match {

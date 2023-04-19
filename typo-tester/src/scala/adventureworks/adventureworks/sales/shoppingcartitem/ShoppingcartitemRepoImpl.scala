@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid""".executeUpdate() > 0
+    SQL"delete from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".executeUpdate() > 0
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemId = {
     val namedParameters = List(
@@ -53,7 +53,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem""".as(rowParser.*)
+    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow] = {
     fieldValues match {
@@ -77,7 +77,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid""".as(rowParser.singleOpt)
+    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".as(rowParser.singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     implicit val arrayToSql: ToSql[Array[ShoppingcartitemId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -85,7 +85,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       (s: PreparedStatement, index: Int, v: Array[ShoppingcartitemId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = ANY($shoppingcartitemids)""".as(rowParser.*)
+    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = ANY($shoppingcartitemids)".as(rowParser.*)
   
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {

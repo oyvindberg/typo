@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.workorder where workorderid = $workorderid""".executeUpdate() > 0
+    SQL"delete from production.workorder where workorderid = $workorderid".executeUpdate() > 0
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderId = {
     val namedParameters = List(
@@ -51,7 +51,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder""".as(rowParser.*)
+    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
     fieldValues match {
@@ -78,7 +78,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   
   }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid""".as(rowParser.singleOpt)
+    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid".as(rowParser.singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     implicit val arrayToSql: ToSql[Array[WorkorderId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -86,7 +86,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
       (s: PreparedStatement, index: Int, v: Array[WorkorderId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)""".as(rowParser.*)
+    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)".as(rowParser.*)
   
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {

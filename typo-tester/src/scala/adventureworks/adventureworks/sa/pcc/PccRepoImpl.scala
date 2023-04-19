@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PccRepoImpl extends PccRepo {
   override def selectAll(implicit c: Connection): List[PccRow] = {
-    SQL"""select id, businessentityid, creditcardid, modifieddate from sa.pcc""".as(rowParser.*)
+    SQL"select id, businessentityid, creditcardid, modifieddate from sa.pcc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PccFieldOrIdValue[_]])(implicit c: Connection): List[PccRow] = {
     fieldValues match {

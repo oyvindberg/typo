@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".executeUpdate() > 0
+    SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductmodelproductdescriptioncultureId, unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -39,7 +39,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture""".as(rowParser.*)
+    SQL"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelproductdescriptioncultureFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     fieldValues match {
@@ -61,7 +61,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".as(rowParser.singleOpt)
+    SQL"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".as(rowParser.singleOpt)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

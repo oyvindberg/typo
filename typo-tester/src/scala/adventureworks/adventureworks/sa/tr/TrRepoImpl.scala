@@ -21,7 +21,7 @@ import java.util.UUID
 
 object TrRepoImpl extends TrRepo {
   override def selectAll(implicit c: Connection): List[TrRow] = {
-    SQL"""select id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sa.tr""".as(rowParser.*)
+    SQL"select id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sa.tr".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TrFieldOrIdValue[_]])(implicit c: Connection): List[TrRow] = {
     fieldValues match {

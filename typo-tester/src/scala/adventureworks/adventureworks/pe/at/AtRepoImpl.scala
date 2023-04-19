@@ -20,7 +20,7 @@ import java.util.UUID
 
 object AtRepoImpl extends AtRepo {
   override def selectAll(implicit c: Connection): List[AtRow] = {
-    SQL"""select id, addresstypeid, name, rowguid, modifieddate from pe.at""".as(rowParser.*)
+    SQL"select id, addresstypeid, name, rowguid, modifieddate from pe.at".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AtFieldOrIdValue[_]])(implicit c: Connection): List[AtRow] = {
     fieldValues match {

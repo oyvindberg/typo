@@ -18,7 +18,7 @@ import java.sql.Connection
 
 object VstorewithaddressesRepoImpl extends VstorewithaddressesRepo {
   override def selectAll(implicit c: Connection): List[VstorewithaddressesRow] = {
-    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".as(rowParser.*)
+    SQL"select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithaddressesFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesRow] = {
     fieldValues match {

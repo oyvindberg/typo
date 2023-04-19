@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".executeUpdate() > 0
+    SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".executeUpdate() > 0
   }
   override def insert(compositeId: SpecialofferproductId, unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct""".as(rowParser.*)
+    SQL"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferproductRow] = {
     fieldValues match {
@@ -65,7 +65,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".as(rowParser.singleOpt)
+    SQL"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".as(rowParser.singleOpt)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

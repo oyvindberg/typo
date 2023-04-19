@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object ThRepoImpl extends ThRepo {
   override def selectAll(implicit c: Connection): List[ThRow] = {
-    SQL"""select id, transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.th""".as(rowParser.*)
+    SQL"select id, transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.th".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ThFieldOrIdValue[_]])(implicit c: Connection): List[ThRow] = {
     fieldValues match {

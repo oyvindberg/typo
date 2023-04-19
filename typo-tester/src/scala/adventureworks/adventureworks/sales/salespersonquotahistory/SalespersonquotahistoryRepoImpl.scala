@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".executeUpdate() > 0
+    SQL"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".executeUpdate() > 0
   }
   override def insert(compositeId: SalespersonquotahistoryId, unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
-    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory""".as(rowParser.*)
+    SQL"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     fieldValues match {
@@ -66,7 +66,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   
   }
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
-    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".as(rowParser.singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

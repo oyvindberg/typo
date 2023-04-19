@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
-    SQL"""delete from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".executeUpdate() > 0
+    SQL"delete from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductvendorId, unsaved: ProductvendorRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -47,7 +47,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
-    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor""".as(rowParser.*)
+    SQL"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]])(implicit c: Connection): List[ProductvendorRow] = {
     fieldValues match {
@@ -76,7 +76,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   
   }
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
-    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".as(rowParser.singleOpt)
+    SQL"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".as(rowParser.singleOpt)
   }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

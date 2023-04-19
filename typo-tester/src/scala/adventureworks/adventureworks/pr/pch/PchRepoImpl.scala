@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object PchRepoImpl extends PchRepo {
   override def selectAll(implicit c: Connection): List[PchRow] = {
-    SQL"""select id, productid, startdate, enddate, standardcost, modifieddate from pr.pch""".as(rowParser.*)
+    SQL"select id, productid, startdate, enddate, standardcost, modifieddate from pr.pch".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PchFieldOrIdValue[_]])(implicit c: Connection): List[PchRow] = {
     fieldValues match {

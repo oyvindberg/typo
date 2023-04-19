@@ -19,7 +19,7 @@ import java.sql.Connection
 
 object VvendorwithcontactsRepoImpl extends VvendorwithcontactsRepo {
   override def selectAll(implicit c: Connection): List[VvendorwithcontactsRow] = {
-    SQL"""select businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion from purchasing.vvendorwithcontacts""".as(rowParser.*)
+    SQL"select businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion from purchasing.vvendorwithcontacts".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VvendorwithcontactsFieldOrIdValue[_]])(implicit c: Connection): List[VvendorwithcontactsRow] = {
     fieldValues match {

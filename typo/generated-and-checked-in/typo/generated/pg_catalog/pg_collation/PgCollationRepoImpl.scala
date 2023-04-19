@@ -23,7 +23,7 @@ import java.sql.PreparedStatement
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_collation where oid = $oid""".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_collation where oid = $oid".executeUpdate() > 0
   }
   override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
@@ -32,7 +32,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation""".as(rowParser.*)
+    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgCollationFieldOrIdValue[_]])(implicit c: Connection): List[PgCollationRow] = {
     fieldValues match {
@@ -60,7 +60,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   
   }
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid""".as(rowParser.singleOpt)
+    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid".as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
     implicit val arrayToSql: ToSql[Array[PgCollationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -68,7 +68,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
       (s: PreparedStatement, index: Int, v: Array[PgCollationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY($oids)""".as(rowParser.*)
+    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY($oids)".as(rowParser.*)
   
   }
   override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {

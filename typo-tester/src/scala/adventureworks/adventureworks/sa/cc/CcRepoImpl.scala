@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object CcRepoImpl extends CcRepo {
   override def selectAll(implicit c: Connection): List[CcRow] = {
-    SQL"""select id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sa.cc""".as(rowParser.*)
+    SQL"select id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sa.cc".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CcFieldOrIdValue[_]])(implicit c: Connection): List[CcRow] = {
     fieldValues match {

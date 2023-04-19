@@ -26,7 +26,7 @@ import java.util.UUID
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productsubcategory where productsubcategoryid = $productsubcategoryid""".executeUpdate() > 0
+    SQL"delete from production.productsubcategory where productsubcategoryid = $productsubcategoryid".executeUpdate() > 0
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryId = {
     val namedParameters = List(
@@ -51,7 +51,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
-    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory""".as(rowParser.*)
+    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductsubcategoryRow] = {
     fieldValues match {
@@ -74,7 +74,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow] = {
-    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = $productsubcategoryid""".as(rowParser.singleOpt)
+    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = $productsubcategoryid".as(rowParser.singleOpt)
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
     implicit val arrayToSql: ToSql[Array[ProductsubcategoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -82,7 +82,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductsubcategoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = ANY($productsubcategoryids)""".as(rowParser.*)
+    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = ANY($productsubcategoryids)".as(rowParser.*)
   
   }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {

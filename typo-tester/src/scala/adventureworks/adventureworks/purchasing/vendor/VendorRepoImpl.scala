@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from purchasing.vendor where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"delete from purchasing.vendor where businessentityid = $businessentityid".executeUpdate() > 0
   }
   override def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -57,7 +57,7 @@ object VendorRepoImpl extends VendorRepo {
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor""".as(rowParser.*)
+    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
     fieldValues match {
@@ -83,7 +83,7 @@ object VendorRepoImpl extends VendorRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".as(rowParser.singleOpt)
+    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -91,7 +91,7 @@ object VendorRepoImpl extends VendorRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = ANY($businessentityids)".as(rowParser.*)
   
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {

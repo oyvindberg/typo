@@ -25,7 +25,7 @@ import java.util.UUID
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.password where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"delete from person.password where businessentityid = $businessentityid".executeUpdate() > 0
   }
   override def insert(businessentityid: BusinessentityId, unsaved: PasswordRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -49,7 +49,7 @@ object PasswordRepoImpl extends PasswordRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password""".as(rowParser.*)
+    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
     fieldValues match {
@@ -72,7 +72,7 @@ object PasswordRepoImpl extends PasswordRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid""".as(rowParser.singleOpt)
+    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid".as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -80,7 +80,7 @@ object PasswordRepoImpl extends PasswordRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = ANY($businessentityids)""".as(rowParser.*)
+    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = ANY($businessentityids)".as(rowParser.*)
   
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {

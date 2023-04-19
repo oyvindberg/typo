@@ -19,7 +19,7 @@ import java.util.UUID
 
 object ERepoImpl extends ERepo {
   override def selectAll(implicit c: Connection): List[ERow] = {
-    SQL"""select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e""".as(rowParser.*)
+    SQL"select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EFieldOrIdValue[_]])(implicit c: Connection): List[ERow] = {
     fieldValues match {

@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object DRepoImpl extends DRepo {
   override def selectAll(implicit c: Connection): List[DRow] = {
-    SQL"""select id, departmentid, name, groupname, modifieddate from hr.d""".as(rowParser.*)
+    SQL"select id, departmentid, name, groupname, modifieddate from hr.d".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DFieldOrIdValue[_]])(implicit c: Connection): List[DRow] = {
     fieldValues match {

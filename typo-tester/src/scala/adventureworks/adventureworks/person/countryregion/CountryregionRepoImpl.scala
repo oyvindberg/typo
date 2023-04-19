@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.countryregion where countryregioncode = $countryregioncode""".executeUpdate() > 0
+    SQL"delete from person.countryregion where countryregioncode = $countryregioncode".executeUpdate() > 0
   }
   override def insert(countryregioncode: CountryregionId, unsaved: CountryregionRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -42,7 +42,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion""".as(rowParser.*)
+    SQL"select countryregioncode, name, modifieddate from person.countryregion".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow] = {
     fieldValues match {
@@ -63,7 +63,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
   
   }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode""".as(rowParser.singleOpt)
+    SQL"select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode".as(rowParser.singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     implicit val arrayToSql: ToSql[Array[CountryregionId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +71,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
       (s: PreparedStatement, index: Int, v: Array[CountryregionId]) =>
         s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
     
-    SQL"""select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)""".as(rowParser.*)
+    SQL"select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)".as(rowParser.*)
   
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {

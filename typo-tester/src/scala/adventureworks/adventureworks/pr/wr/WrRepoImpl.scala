@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object WrRepoImpl extends WrRepo {
   override def selectAll(implicit c: Connection): List[WrRow] = {
-    SQL"""select id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from pr.wr""".as(rowParser.*)
+    SQL"select id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from pr.wr".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WrFieldOrIdValue[_]])(implicit c: Connection): List[WrRow] = {
     fieldValues match {

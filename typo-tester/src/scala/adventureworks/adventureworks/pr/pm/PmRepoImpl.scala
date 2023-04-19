@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PmRepoImpl extends PmRepo {
   override def selectAll(implicit c: Connection): List[PmRow] = {
-    SQL"""select id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from pr.pm""".as(rowParser.*)
+    SQL"select id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from pr.pm".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmFieldOrIdValue[_]])(implicit c: Connection): List[PmRow] = {
     fieldValues match {

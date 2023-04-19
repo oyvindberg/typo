@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.department where departmentid = $departmentid""".executeUpdate() > 0
+    SQL"delete from humanresources.department where departmentid = $departmentid".executeUpdate() > 0
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentId = {
     val namedParameters = List(
@@ -45,7 +45,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
-    SQL"""select departmentid, name, groupname, modifieddate from humanresources.department""".as(rowParser.*)
+    SQL"select departmentid, name, groupname, modifieddate from humanresources.department".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow] = {
     fieldValues match {
@@ -67,7 +67,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
   
   }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
-    SQL"""select departmentid, name, groupname, modifieddate from humanresources.department where departmentid = $departmentid""".as(rowParser.singleOpt)
+    SQL"select departmentid, name, groupname, modifieddate from humanresources.department where departmentid = $departmentid".as(rowParser.singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     implicit val arrayToSql: ToSql[Array[DepartmentId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -75,7 +75,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
       (s: PreparedStatement, index: Int, v: Array[DepartmentId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select departmentid, name, groupname, modifieddate from humanresources.department where departmentid = ANY($departmentids)""".as(rowParser.*)
+    SQL"select departmentid, name, groupname, modifieddate from humanresources.department where departmentid = ANY($departmentids)".as(rowParser.*)
   
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {

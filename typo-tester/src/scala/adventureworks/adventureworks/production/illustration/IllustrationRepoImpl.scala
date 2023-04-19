@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.illustration where illustrationid = $illustrationid""".executeUpdate() > 0
+    SQL"delete from production.illustration where illustrationid = $illustrationid".executeUpdate() > 0
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationId = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration""".as(rowParser.*)
+    SQL"select illustrationid, diagram, modifieddate from production.illustration".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow] = {
     fieldValues match {
@@ -64,7 +64,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
   
   }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid""".as(rowParser.singleOpt)
+    SQL"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid".as(rowParser.singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     implicit val arrayToSql: ToSql[Array[IllustrationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -72,7 +72,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
       (s: PreparedStatement, index: Int, v: Array[IllustrationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)""".as(rowParser.*)
+    SQL"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)".as(rowParser.*)
   
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {

@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.currency where currencycode = $currencycode""".executeUpdate() > 0
+    SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
   }
   override def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -42,7 +42,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
-    SQL"""select currencycode, name, modifieddate from sales.currency""".as(rowParser.*)
+    SQL"select currencycode, name, modifieddate from sales.currency".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow] = {
     fieldValues match {
@@ -63,7 +63,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   
   }
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
-    SQL"""select currencycode, name, modifieddate from sales.currency where currencycode = $currencycode""".as(rowParser.singleOpt)
+    SQL"select currencycode, name, modifieddate from sales.currency where currencycode = $currencycode".as(rowParser.singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     implicit val arrayToSql: ToSql[Array[CurrencyId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +71,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
       (s: PreparedStatement, index: Int, v: Array[CurrencyId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"""select currencycode, name, modifieddate from sales.currency where currencycode = ANY($currencycodes)""".as(rowParser.*)
+    SQL"select currencycode, name, modifieddate from sales.currency where currencycode = ANY($currencycodes)".as(rowParser.*)
   
   }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {

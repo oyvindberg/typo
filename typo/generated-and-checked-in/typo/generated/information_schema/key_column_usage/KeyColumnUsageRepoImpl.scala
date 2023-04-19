@@ -21,7 +21,7 @@ import typo.generated.information_schema.SqlIdentifier
 
 object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[KeyColumnUsageRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage""".as(rowParser.*)
+    SQL"select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[KeyColumnUsageFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageRow] = {
     fieldValues match {

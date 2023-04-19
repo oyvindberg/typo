@@ -22,7 +22,7 @@ import java.util.UUID
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}""".executeUpdate() > 0
+    SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
   }
   override def insert(compositeId: SalesorderdetailId, unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -53,7 +53,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
-    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail""".as(rowParser.*)
+    SQL"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderdetailRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   
   }
   override def selectById(compositeId: SalesorderdetailId)(implicit c: Connection): Option[SalesorderdetailRow] = {
-    SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}""".as(rowParser.singleOpt)
+    SQL"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".as(rowParser.singleOpt)
   }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

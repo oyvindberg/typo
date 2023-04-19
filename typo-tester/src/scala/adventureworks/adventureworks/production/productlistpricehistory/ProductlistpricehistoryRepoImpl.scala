@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".executeUpdate() > 0
+    SQL"delete from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductlistpricehistoryId, unsaved: ProductlistpricehistoryRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -39,7 +39,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory""".as(rowParser.*)
+    SQL"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductlistpricehistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductlistpricehistoryRow] = {
     fieldValues match {
@@ -62,7 +62,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   
   }
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".as(rowParser.singleOpt)
+    SQL"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".as(rowParser.singleOpt)
   }
   override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

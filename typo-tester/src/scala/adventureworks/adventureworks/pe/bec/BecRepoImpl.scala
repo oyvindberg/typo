@@ -20,7 +20,7 @@ import java.util.UUID
 
 object BecRepoImpl extends BecRepo {
   override def selectAll(implicit c: Connection): List[BecRow] = {
-    SQL"""select id, businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec""".as(rowParser.*)
+    SQL"select id, businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BecFieldOrIdValue[_]])(implicit c: Connection): List[BecRow] = {
     fieldValues match {

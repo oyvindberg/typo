@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CuRepoImpl extends CuRepo {
   override def selectAll(implicit c: Connection): List[CuRow] = {
-    SQL"""select id, currencycode, name, modifieddate from sa.cu""".as(rowParser.*)
+    SQL"select id, currencycode, name, modifieddate from sa.cu".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CuFieldOrIdValue[_]])(implicit c: Connection): List[CuRow] = {
     fieldValues match {

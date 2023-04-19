@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.transactionhistory where transactionid = $transactionid""".executeUpdate() > 0
+    SQL"delete from production.transactionhistory where transactionid = $transactionid".executeUpdate() > 0
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryId = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory""".as(rowParser.*)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
     fieldValues match {
@@ -83,7 +83,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   
   }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid""".as(rowParser.singleOpt)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid".as(rowParser.singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
     implicit val arrayToSql: ToSql[Array[TransactionhistoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -91,7 +91,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       (s: PreparedStatement, index: Int, v: Array[TransactionhistoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = ANY($transactionids)""".as(rowParser.*)
+    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = ANY($transactionids)".as(rowParser.*)
   
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {

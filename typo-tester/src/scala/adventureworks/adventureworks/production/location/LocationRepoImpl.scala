@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.location where locationid = $locationid""".executeUpdate() > 0
+    SQL"delete from production.location where locationid = $locationid".executeUpdate() > 0
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationId = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object LocationRepoImpl extends LocationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location""".as(rowParser.*)
+    SQL"select locationid, name, costrate, availability, modifieddate from production.location".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
     fieldValues match {
@@ -75,7 +75,7 @@ object LocationRepoImpl extends LocationRepo {
   
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid = $locationid""".as(rowParser.singleOpt)
+    SQL"select locationid, name, costrate, availability, modifieddate from production.location where locationid = $locationid".as(rowParser.singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     implicit val arrayToSql: ToSql[Array[LocationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -83,7 +83,7 @@ object LocationRepoImpl extends LocationRepo {
       (s: PreparedStatement, index: Int, v: Array[LocationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select locationid, name, costrate, availability, modifieddate from production.location where locationid = ANY($locationids)""".as(rowParser.*)
+    SQL"select locationid, name, costrate, availability, modifieddate from production.location where locationid = ANY($locationids)".as(rowParser.*)
   
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {

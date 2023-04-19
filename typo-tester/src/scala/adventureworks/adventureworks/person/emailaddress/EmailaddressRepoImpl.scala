@@ -20,7 +20,7 @@ import java.util.UUID
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".executeUpdate() > 0
+    SQL"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".executeUpdate() > 0
   }
   override def insert(compositeId: EmailaddressId, unsaved: EmailaddressRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -43,7 +43,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress""".as(rowParser.*)
+    SQL"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow] = {
     fieldValues match {
@@ -66,7 +66,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".as(rowParser.singleOpt)
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

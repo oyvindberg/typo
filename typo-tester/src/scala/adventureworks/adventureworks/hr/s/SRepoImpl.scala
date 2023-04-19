@@ -20,7 +20,7 @@ import java.time.LocalTime
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, shiftid, name, starttime, endtime, modifieddate from hr.s""".as(rowParser.*)
+    SQL"select id, shiftid, name, starttime, endtime, modifieddate from hr.s".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SFieldOrIdValue[_]])(implicit c: Connection): List[SRow] = {
     fieldValues match {

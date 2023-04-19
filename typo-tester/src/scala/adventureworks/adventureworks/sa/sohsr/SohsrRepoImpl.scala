@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object SohsrRepoImpl extends SohsrRepo {
   override def selectAll(implicit c: Connection): List[SohsrRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate from sa.sohsr""".as(rowParser.*)
+    SQL"select salesorderid, salesreasonid, modifieddate from sa.sohsr".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohsrFieldOrIdValue[_]])(implicit c: Connection): List[SohsrRow] = {
     fieldValues match {

@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object EphRepoImpl extends EphRepo {
   override def selectAll(implicit c: Connection): List[EphRow] = {
-    SQL"""select id, businessentityid, ratechangedate, rate, payfrequency, modifieddate from hr.eph""".as(rowParser.*)
+    SQL"select id, businessentityid, ratechangedate, rate, payfrequency, modifieddate from hr.eph".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EphFieldOrIdValue[_]])(implicit c: Connection): List[EphRow] = {
     fieldValues match {

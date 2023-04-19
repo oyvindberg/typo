@@ -25,7 +25,7 @@ import java.util.UUID
 
 object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productcategory where productcategoryid = $productcategoryid""".executeUpdate() > 0
+    SQL"delete from production.productcategory where productcategoryid = $productcategoryid".executeUpdate() > 0
   }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryId = {
     val namedParameters = List(
@@ -49,7 +49,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory""".as(rowParser.*)
+    SQL"select productcategoryid, name, rowguid, modifieddate from production.productcategory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcategoryRow] = {
     fieldValues match {
@@ -71,7 +71,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   
   }
   override def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow] = {
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".as(rowParser.singleOpt)
+    SQL"select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid".as(rowParser.singleOpt)
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
     implicit val arrayToSql: ToSql[Array[ProductcategoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -79,7 +79,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductcategoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = ANY($productcategoryids)""".as(rowParser.*)
+    SQL"select productcategoryid, name, rowguid, modifieddate from production.productcategory where productcategoryid = ANY($productcategoryids)".as(rowParser.*)
   
   }
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {

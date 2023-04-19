@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object LRepoImpl extends LRepo {
   override def selectAll(implicit c: Connection): List[LRow] = {
-    SQL"""select id, locationid, name, costrate, availability, modifieddate from pr.l""".as(rowParser.*)
+    SQL"select id, locationid, name, costrate, availability, modifieddate from pr.l".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LFieldOrIdValue[_]])(implicit c: Connection): List[LRow] = {
     fieldValues match {

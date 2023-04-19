@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productphoto where productphotoid = $productphotoid""".executeUpdate() > 0
+    SQL"delete from production.productphoto where productphotoid = $productphotoid".executeUpdate() > 0
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoId = {
     val namedParameters = List(
@@ -46,7 +46,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto""".as(rowParser.*)
+    SQL"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow] = {
     fieldValues match {
@@ -70,7 +70,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   
   }
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = $productphotoid""".as(rowParser.singleOpt)
+    SQL"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = $productphotoid".as(rowParser.singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     implicit val arrayToSql: ToSql[Array[ProductphotoId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -78,7 +78,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductphotoId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = ANY($productphotoids)""".as(rowParser.*)
+    SQL"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = ANY($productphotoids)".as(rowParser.*)
   
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {

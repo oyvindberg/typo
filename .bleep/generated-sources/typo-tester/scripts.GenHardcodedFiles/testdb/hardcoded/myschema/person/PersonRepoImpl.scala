@@ -25,7 +25,7 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.person where id = $id""".executeUpdate() > 0
+    SQL"delete from myschema.person where id = $id".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".as(rowParser.*)
+    SQL"select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -85,7 +85,7 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id""".as(rowParser.singleOpt)
+    SQL"select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = $id".as(rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
     implicit val arrayToSql: ToSql[Array[PersonId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -93,7 +93,7 @@ object PersonRepoImpl extends PersonRepo {
       (s: PreparedStatement, index: Int, v: Array[PersonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
     
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = ANY($ids)""".as(rowParser.*)
+    SQL"select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where id = ANY($ids)".as(rowParser.*)
   
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {

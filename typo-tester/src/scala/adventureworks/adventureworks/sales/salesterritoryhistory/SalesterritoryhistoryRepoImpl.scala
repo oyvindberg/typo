@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".executeUpdate() > 0
+    SQL"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".executeUpdate() > 0
   }
   override def insert(compositeId: SalesterritoryhistoryId, unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): Boolean = {
     val namedParameters = List(
@@ -44,7 +44,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory""".as(rowParser.*)
+    SQL"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     fieldValues match {
@@ -68,7 +68,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".as(rowParser.singleOpt)
+    SQL"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".as(rowParser.singleOpt)
   }
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

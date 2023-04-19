@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid""".executeUpdate() > 0
+    SQL"delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid".executeUpdate() > 0
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsId = {
     val namedParameters = List(
@@ -57,7 +57,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials""".as(rowParser.*)
+    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow] = {
     fieldValues match {
@@ -84,7 +84,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   
   }
   override def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow] = {
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid""".as(rowParser.singleOpt)
+    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid".as(rowParser.singleOpt)
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
     implicit val arrayToSql: ToSql[Array[BillofmaterialsId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -92,7 +92,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       (s: PreparedStatement, index: Int, v: Array[BillofmaterialsId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)""".as(rowParser.*)
+    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)".as(rowParser.*)
   
   }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {

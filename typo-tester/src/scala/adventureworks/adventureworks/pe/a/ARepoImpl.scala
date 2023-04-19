@@ -20,7 +20,7 @@ import java.util.UUID
 
 object ARepoImpl extends ARepo {
   override def selectAll(implicit c: Connection): List[ARow] = {
-    SQL"""select id, addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from pe.a""".as(rowParser.*)
+    SQL"select id, addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from pe.a".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AFieldOrIdValue[_]])(implicit c: Connection): List[ARow] = {
     fieldValues match {

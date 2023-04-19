@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CtRepoImpl extends CtRepo {
   override def selectAll(implicit c: Connection): List[CtRow] = {
-    SQL"""select id, contacttypeid, name, modifieddate from pe.ct""".as(rowParser.*)
+    SQL"select id, contacttypeid, name, modifieddate from pe.ct".as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CtFieldOrIdValue[_]])(implicit c: Connection): List[CtRow] = {
     fieldValues match {
