@@ -13,6 +13,9 @@ case class RelPath(segments: List[String]) {
   def filter(f: String => Boolean): RelPath =
     RelPath(segments.filter(f))
 
+  def startsWith(segments: List[String]): Boolean =
+    this.segments.startsWith(segments)
+
   def withLast(f: String => String): RelPath =
     segments match {
       case init :+ last => new RelPath(init :+ f(last))

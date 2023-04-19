@@ -38,6 +38,8 @@ object FileSync {
   def syncStrings(folder: Path, fileRelMap: Map[RelPath, String], deleteUnknowns: DeleteUnknowns, soft: Boolean): Map[Path, Synced] =
     syncBytes(folder, fileRelMap.map { case (k, v) => (k, v.getBytes(StandardCharsets.UTF_8)) }, deleteUnknowns, soft)
 
+  val longestFirst: Ordering[Path] = Ordering.by[Path, Int](_.getNameCount).reverse
+
   /** @param soft
     *   compare to existing content in order to not change timestamps. tooling may care a lot about this
     */
@@ -52,10 +54,15 @@ object FileSync {
           case None           => Files.walk(folder)
         }
 
-        stream.forEach {
+        stream.sorted(longestFirst).forEach {
           case p if Files.isRegularFile(p) && !fileMap.contains(p) =>
             Files.delete(p)
             ret(p) = Synced.Deleted
+          case p if Files.isDirectory(p) && !fileMap.keys.exists(_.startsWith(p)) =>
+            try Files.delete(p)
+            catch {
+              case _: java.nio.file.DirectoryNotEmptyException => ()
+            }
           case _ => ()
         }
 
