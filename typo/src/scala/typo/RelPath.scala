@@ -13,6 +13,9 @@ case class RelPath(segments: List[String]) {
   def filter(f: String => Boolean): RelPath =
     RelPath(segments.filter(f))
 
+  def mapSegments(f: List[String] => List[String]): RelPath =
+    RelPath(f(segments))
+
   def startsWith(segments: List[String]): Boolean =
     this.segments.startsWith(segments)
 

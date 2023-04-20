@@ -84,7 +84,7 @@ object GeneratedAdventureWorks {
         val files: typo.Generated =
           typo.fromDb(options, selector)
 
-        files.overwriteFolder(typoSources, soft = true)
+        files.overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
 
         cli(
           "add files to git",
