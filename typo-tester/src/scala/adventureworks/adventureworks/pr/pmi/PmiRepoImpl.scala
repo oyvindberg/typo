@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object PmiRepoImpl extends PmiRepo {
   override def selectAll(implicit c: Connection): List[PmiRow] = {
-    SQL"select productmodelid, illustrationid, modifieddate from pr.pmi".as(rowParser.*)
+    SQL"""select productmodelid, illustrationid, modifieddate
+          from pr.pmi
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmiFieldOrIdValue[_]])(implicit c: Connection): List[PmiRow] = {
     fieldValues match {
@@ -30,7 +32,10 @@ object PmiRepoImpl extends PmiRepo {
           case PmiFieldValue.illustrationid(value) => NamedParameter("illustrationid", ParameterValue.from(value))
           case PmiFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.pmi where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.pmi
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -32,13 +32,15 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.creditcardid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
-    SQL"select businessentityid, creditcardid, modifieddate from sales.personcreditcard".as(rowParser.*)
+    SQL"""select businessentityid, creditcardid, modifieddate
+          from sales.personcreditcard
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]])(implicit c: Connection): List[PersoncreditcardRow] = {
     fieldValues match {
@@ -49,7 +51,10 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           case PersoncreditcardFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
           case PersoncreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.personcreditcard where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.personcreditcard
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -59,13 +64,17 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   
   }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
-    SQL"select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, creditcardid, modifieddate
+          from sales.personcreditcard
+          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
           set modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PersoncreditcardId, fieldValues: List[PersoncreditcardFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -76,7 +85,8 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         }
         val q = s"""update sales.personcreditcard
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}"""
+                    where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

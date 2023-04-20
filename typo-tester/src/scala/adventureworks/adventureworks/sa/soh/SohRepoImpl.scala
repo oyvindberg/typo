@@ -29,7 +29,9 @@ import java.util.UUID
 
 object SohRepoImpl extends SohRepo {
   override def selectAll(implicit c: Connection): List[SohRow] = {
-    SQL"select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate from sa.soh".as(rowParser.*)
+    SQL"""select id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate
+          from sa.soh
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohFieldOrIdValue[_]])(implicit c: Connection): List[SohRow] = {
     fieldValues match {
@@ -63,7 +65,10 @@ object SohRepoImpl extends SohRepo {
           case SohFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SohFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.soh where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.soh
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

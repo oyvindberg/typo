@@ -53,13 +53,15 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""insert into person.stateprovince(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning stateprovinceid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince".as(rowParser.*)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate
+          from person.stateprovince
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
     fieldValues match {
@@ -75,7 +77,10 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           case StateprovinceFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case StateprovinceFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.stateprovince where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.stateprovince
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -85,7 +90,10 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   
   }
   override def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow] = {
-    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid".as(rowParser.singleOpt)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate
+          from person.stateprovince
+          where stateprovinceid = $stateprovinceid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     implicit val arrayToSql: ToSql[Array[StateprovinceId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -93,7 +101,10 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       (s: PreparedStatement, index: Int, v: Array[StateprovinceId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = ANY($stateprovinceids)".as(rowParser.*)
+    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate
+          from person.stateprovince
+          where stateprovinceid = ANY($stateprovinceids)
+       """.as(rowParser.*)
   
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
@@ -106,7 +117,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
               territoryid = ${row.territoryid},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where stateprovinceid = $stateprovinceid""".executeUpdate() > 0
+          where stateprovinceid = $stateprovinceid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -123,7 +135,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         }
         val q = s"""update person.stateprovince
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where stateprovinceid = $stateprovinceid"""
+                    where stateprovinceid = $stateprovinceid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

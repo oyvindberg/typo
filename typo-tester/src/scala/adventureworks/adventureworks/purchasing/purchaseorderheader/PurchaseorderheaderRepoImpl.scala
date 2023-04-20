@@ -66,13 +66,15 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SQL"""insert into purchasing.purchaseorderheader(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning purchaseorderid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader".as(rowParser.*)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+          from purchasing.purchaseorderheader
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     fieldValues match {
@@ -92,7 +94,10 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           case PurchaseorderheaderFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
           case PurchaseorderheaderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from purchasing.purchaseorderheader where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from purchasing.purchaseorderheader
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -102,7 +107,10 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
-    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".as(rowParser.singleOpt)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+          from purchasing.purchaseorderheader
+          where purchaseorderid = $purchaseorderid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     implicit val arrayToSql: ToSql[Array[PurchaseorderheaderId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -110,7 +118,10 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       (s: PreparedStatement, index: Int, v: Array[PurchaseorderheaderId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)".as(rowParser.*)
+    SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+          from purchasing.purchaseorderheader
+          where purchaseorderid = ANY($purchaseorderids)
+       """.as(rowParser.*)
   
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
@@ -127,7 +138,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               taxamt = ${row.taxamt},
               freight = ${row.freight},
               modifieddate = ${row.modifieddate}
-          where purchaseorderid = $purchaseorderid""".executeUpdate() > 0
+          where purchaseorderid = $purchaseorderid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -148,7 +160,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         }
         val q = s"""update purchasing.purchaseorderheader
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where purchaseorderid = $purchaseorderid"""
+                    where purchaseorderid = $purchaseorderid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

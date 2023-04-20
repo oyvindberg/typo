@@ -19,7 +19,9 @@ import java.sql.Connection
 
 object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
   override def selectAll(implicit c: Connection): List[VindividualcustomerRow] = {
-    SQL"select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics from sales.vindividualcustomer".as(rowParser.*)
+    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics
+          from sales.vindividualcustomer
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VindividualcustomerFieldOrIdValue[_]])(implicit c: Connection): List[VindividualcustomerRow] = {
     fieldValues match {
@@ -45,7 +47,10 @@ object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
           case VindividualcustomerFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
           case VindividualcustomerFieldValue.demographics(value) => NamedParameter("demographics", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.vindividualcustomer where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.vindividualcustomer
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

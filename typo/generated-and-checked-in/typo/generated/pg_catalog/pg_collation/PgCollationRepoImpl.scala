@@ -28,11 +28,13 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
           values (${oid}, ${unsaved.collname}, ${unsaved.collnamespace}, ${unsaved.collowner}, ${unsaved.collprovider}, ${unsaved.collisdeterministic}, ${unsaved.collencoding}, ${unsaved.collcollate}, ${unsaved.collctype}, ${unsaved.collversion})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
-    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".as(rowParser.*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
+          from pg_catalog.pg_collation
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgCollationFieldOrIdValue[_]])(implicit c: Connection): List[PgCollationRow] = {
     fieldValues match {
@@ -50,7 +52,10 @@ object PgCollationRepoImpl extends PgCollationRepo {
           case PgCollationFieldValue.collctype(value) => NamedParameter("collctype", ParameterValue.from(value))
           case PgCollationFieldValue.collversion(value) => NamedParameter("collversion", ParameterValue.from(value))
         }
-        val q = s"""select * from pg_catalog.pg_collation where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pg_catalog.pg_collation
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -60,7 +65,10 @@ object PgCollationRepoImpl extends PgCollationRepo {
   
   }
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
-    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid".as(rowParser.singleOpt)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
+          from pg_catalog.pg_collation
+          where oid = $oid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
     implicit val arrayToSql: ToSql[Array[PgCollationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -68,7 +76,10 @@ object PgCollationRepoImpl extends PgCollationRepo {
       (s: PreparedStatement, index: Int, v: Array[PgCollationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY($oids)".as(rowParser.*)
+    SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
+          from pg_catalog.pg_collation
+          where oid = ANY($oids)
+       """.as(rowParser.*)
   
   }
   override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
@@ -86,7 +97,8 @@ object PgCollationRepoImpl extends PgCollationRepo {
               collcollate = ${row.collcollate},
               collctype = ${row.collctype},
               collversion = ${row.collversion}
-          where oid = $oid""".executeUpdate() > 0
+          where oid = $oid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(oid: PgCollationId, fieldValues: List[PgCollationFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -105,7 +117,8 @@ object PgCollationRepoImpl extends PgCollationRepo {
         }
         val q = s"""update pg_catalog.pg_collation
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid"""
+                    where oid = $oid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

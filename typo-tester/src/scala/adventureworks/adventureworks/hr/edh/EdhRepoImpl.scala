@@ -21,7 +21,9 @@ import java.time.LocalDateTime
 
 object EdhRepoImpl extends EdhRepo {
   override def selectAll(implicit c: Connection): List[EdhRow] = {
-    SQL"select id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from hr.edh".as(rowParser.*)
+    SQL"""select id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
+          from hr.edh
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EdhFieldOrIdValue[_]])(implicit c: Connection): List[EdhRow] = {
     fieldValues match {
@@ -36,7 +38,10 @@ object EdhRepoImpl extends EdhRepo {
           case EdhFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
           case EdhFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from hr.edh where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from hr.edh
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

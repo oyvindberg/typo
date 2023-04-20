@@ -40,13 +40,15 @@ object CreditcardRepoImpl extends CreditcardRepo {
     SQL"""insert into sales.creditcard(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning creditcardid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
-    SQL"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard".as(rowParser.*)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          from sales.creditcard
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]])(implicit c: Connection): List[CreditcardRow] = {
     fieldValues match {
@@ -60,7 +62,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
           case CreditcardFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
           case CreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.creditcard where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.creditcard
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -70,7 +75,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
   
   }
   override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
-    SQL"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid".as(rowParser.singleOpt)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          from sales.creditcard
+          where creditcardid = $creditcardid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
     implicit val arrayToSql: ToSql[Array[CreditcardId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -78,7 +86,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
       (s: PreparedStatement, index: Int, v: Array[CreditcardId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = ANY($creditcardids)".as(rowParser.*)
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          from sales.creditcard
+          where creditcardid = ANY($creditcardids)
+       """.as(rowParser.*)
   
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
@@ -89,7 +100,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
               expmonth = ${row.expmonth},
               expyear = ${row.expyear},
               modifieddate = ${row.modifieddate}
-          where creditcardid = $creditcardid""".executeUpdate() > 0
+          where creditcardid = $creditcardid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(creditcardid: CreditcardId, fieldValues: List[CreditcardFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -104,7 +116,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
         }
         val q = s"""update sales.creditcard
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where creditcardid = $creditcardid"""
+                    where creditcardid = $creditcardid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

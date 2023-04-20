@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object UmRepoImpl extends UmRepo {
   override def selectAll(implicit c: Connection): List[UmRow] = {
-    SQL"select id, unitmeasurecode, name, modifieddate from pr.um".as(rowParser.*)
+    SQL"""select id, unitmeasurecode, name, modifieddate
+          from pr.um
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UmFieldOrIdValue[_]])(implicit c: Connection): List[UmRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object UmRepoImpl extends UmRepo {
           case UmFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case UmFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.um where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.um
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

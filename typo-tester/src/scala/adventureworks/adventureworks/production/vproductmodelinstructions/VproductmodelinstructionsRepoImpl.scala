@@ -20,7 +20,9 @@ import java.util.UUID
 
 object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsRow] = {
-    SQL"select productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate from production.vproductmodelinstructions".as(rowParser.*)
+    SQL"""select productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
+          from production.vproductmodelinstructions
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelinstructionsFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelinstructionsRow] = {
     fieldValues match {
@@ -39,7 +41,10 @@ object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
           case VproductmodelinstructionsFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VproductmodelinstructionsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.vproductmodelinstructions where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.vproductmodelinstructions
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

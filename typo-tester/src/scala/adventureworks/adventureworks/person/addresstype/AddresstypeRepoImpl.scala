@@ -43,13 +43,15 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""insert into person.addresstype(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning addresstypeid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
-    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype".as(rowParser.*)
+    SQL"""select addresstypeid, name, rowguid, modifieddate
+          from person.addresstype
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
     fieldValues match {
@@ -61,7 +63,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           case AddresstypeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AddresstypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.addresstype where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.addresstype
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -71,7 +76,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   
   }
   override def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow] = {
-    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid".as(rowParser.singleOpt)
+    SQL"""select addresstypeid, name, rowguid, modifieddate
+          from person.addresstype
+          where addresstypeid = $addresstypeid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     implicit val arrayToSql: ToSql[Array[AddresstypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -79,7 +87,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       (s: PreparedStatement, index: Int, v: Array[AddresstypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select addresstypeid, name, rowguid, modifieddate from person.addresstype where addresstypeid = ANY($addresstypeids)".as(rowParser.*)
+    SQL"""select addresstypeid, name, rowguid, modifieddate
+          from person.addresstype
+          where addresstypeid = ANY($addresstypeids)
+       """.as(rowParser.*)
   
   }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
@@ -88,7 +99,8 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           set name = ${row.name},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where addresstypeid = $addresstypeid""".executeUpdate() > 0
+          where addresstypeid = $addresstypeid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(addresstypeid: AddresstypeId, fieldValues: List[AddresstypeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -101,7 +113,8 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         }
         val q = s"""update person.addresstype
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where addresstypeid = $addresstypeid"""
+                    where addresstypeid = $addresstypeid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

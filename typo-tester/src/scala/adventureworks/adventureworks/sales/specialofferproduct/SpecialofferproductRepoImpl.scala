@@ -37,13 +37,15 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     
     SQL"""insert into sales.specialofferproduct(specialofferid, productid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.specialofferid}, ${compositeId.productid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
-    SQL"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct".as(rowParser.*)
+    SQL"""select specialofferid, productid, rowguid, modifieddate
+          from sales.specialofferproduct
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferproductRow] = {
     fieldValues match {
@@ -55,7 +57,10 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           case SpecialofferproductFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpecialofferproductFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.specialofferproduct where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.specialofferproduct
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -65,14 +70,18 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
-    SQL"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".as(rowParser.singleOpt)
+    SQL"""select specialofferid, productid, rowguid, modifieddate
+          from sales.specialofferproduct
+          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct
           set rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}""".executeUpdate() > 0
+          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SpecialofferproductId, fieldValues: List[SpecialofferproductFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -84,7 +93,8 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         }
         val q = s"""update sales.specialofferproduct
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}"""
+                    where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

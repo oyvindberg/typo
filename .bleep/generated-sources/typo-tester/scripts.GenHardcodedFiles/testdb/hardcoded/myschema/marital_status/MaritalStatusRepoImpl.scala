@@ -26,10 +26,12 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def insert(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     SQL"""insert into myschema.marital_status(id)
           values (${id})
-    """.execute()
+       """.execute()
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"select id from myschema.marital_status".as(rowParser.*)
+    SQL"""select id
+          from myschema.marital_status
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        val q = s"""select * from myschema.marital_status where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from myschema.marital_status
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -48,7 +53,10 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
-    SQL"select id from myschema.marital_status where id = $id".as(rowParser.singleOpt)
+    SQL"""select id
+          from myschema.marital_status
+          where id = $id
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     implicit val arrayToSql: ToSql[Array[MaritalStatusId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -56,7 +64,10 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
       (s: PreparedStatement, index: Int, v: Array[MaritalStatusId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select id from myschema.marital_status where id = ANY($ids)".as(rowParser.*)
+    SQL"""select id
+          from myschema.marital_status
+          where id = ANY($ids)
+       """.as(rowParser.*)
   
   }
   val rowParser: RowParser[MaritalStatusRow] =

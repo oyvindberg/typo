@@ -41,13 +41,15 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     
     SQL"""insert into purchasing.productvendor(productid, businessentityid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.productid}, ${compositeId.businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
-    SQL"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor".as(rowParser.*)
+    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+          from purchasing.productvendor
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]])(implicit c: Connection): List[ProductvendorRow] = {
     fieldValues match {
@@ -66,7 +68,10 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           case ProductvendorFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
           case ProductvendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from purchasing.productvendor where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from purchasing.productvendor
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -76,7 +81,10 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   
   }
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
-    SQL"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".as(rowParser.singleOpt)
+    SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+          from purchasing.productvendor
+          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -90,7 +98,8 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
               onorderqty = ${row.onorderqty},
               unitmeasurecode = ${row.unitmeasurecode},
               modifieddate = ${row.modifieddate}
-          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}""".executeUpdate() > 0
+          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductvendorId, fieldValues: List[ProductvendorFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -109,7 +118,8 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         }
         val q = s"""update purchasing.productvendor
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}"""
+                    where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

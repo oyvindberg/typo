@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object SohsrRepoImpl extends SohsrRepo {
   override def selectAll(implicit c: Connection): List[SohsrRow] = {
-    SQL"select salesorderid, salesreasonid, modifieddate from sa.sohsr".as(rowParser.*)
+    SQL"""select salesorderid, salesreasonid, modifieddate
+          from sa.sohsr
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohsrFieldOrIdValue[_]])(implicit c: Connection): List[SohsrRow] = {
     fieldValues match {
@@ -30,7 +32,10 @@ object SohsrRepoImpl extends SohsrRepo {
           case SohsrFieldValue.salesreasonid(value) => NamedParameter("salesreasonid", ParameterValue.from(value))
           case SohsrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.sohsr where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.sohsr
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

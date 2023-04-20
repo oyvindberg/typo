@@ -51,13 +51,15 @@ object VendorRepoImpl extends VendorRepo {
     
     SQL"""insert into purchasing.vendor(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
           values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
-    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor".as(rowParser.*)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+          from purchasing.vendor
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
     fieldValues match {
@@ -73,7 +75,10 @@ object VendorRepoImpl extends VendorRepo {
           case VendorFieldValue.purchasingwebserviceurl(value) => NamedParameter("purchasingwebserviceurl", ParameterValue.from(value))
           case VendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from purchasing.vendor where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from purchasing.vendor
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -83,7 +88,10 @@ object VendorRepoImpl extends VendorRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
-    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid".as(rowParser.singleOpt)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+          from purchasing.vendor
+          where businessentityid = $businessentityid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -91,7 +99,10 @@ object VendorRepoImpl extends VendorRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = ANY($businessentityids)".as(rowParser.*)
+    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+          from purchasing.vendor
+          where businessentityid = ANY($businessentityids)
+       """.as(rowParser.*)
   
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
@@ -104,7 +115,8 @@ object VendorRepoImpl extends VendorRepo {
               activeflag = ${row.activeflag},
               purchasingwebserviceurl = ${row.purchasingwebserviceurl},
               modifieddate = ${row.modifieddate}
-          where businessentityid = $businessentityid""".executeUpdate() > 0
+          where businessentityid = $businessentityid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -121,7 +133,8 @@ object VendorRepoImpl extends VendorRepo {
         }
         val q = s"""update purchasing.vendor
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid"""
+                    where businessentityid = $businessentityid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

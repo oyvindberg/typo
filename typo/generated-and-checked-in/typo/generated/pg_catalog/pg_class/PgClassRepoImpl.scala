@@ -29,11 +29,13 @@ object PgClassRepoImpl extends PgClassRepo {
   override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
           values (${oid}, ${unsaved.relname}, ${unsaved.relnamespace}, ${unsaved.reltype}, ${unsaved.reloftype}, ${unsaved.relowner}, ${unsaved.relam}, ${unsaved.relfilenode}, ${unsaved.reltablespace}, ${unsaved.relpages}, ${unsaved.reltuples}, ${unsaved.relallvisible}, ${unsaved.reltoastrelid}, ${unsaved.relhasindex}, ${unsaved.relisshared}, ${unsaved.relpersistence}, ${unsaved.relkind}, ${unsaved.relnatts}, ${unsaved.relchecks}, ${unsaved.relhasrules}, ${unsaved.relhastriggers}, ${unsaved.relhassubclass}, ${unsaved.relrowsecurity}, ${unsaved.relforcerowsecurity}, ${unsaved.relispopulated}, ${unsaved.relreplident}, ${unsaved.relispartition}, ${unsaved.relrewrite}, ${unsaved.relfrozenxid}, ${unsaved.relminmxid}, ${unsaved.relacl}, ${unsaved.reloptions}, ${unsaved.relpartbound})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
-    SQL"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class".as(rowParser.*)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
+          from pg_catalog.pg_class
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgClassFieldOrIdValue[_]])(implicit c: Connection): List[PgClassRow] = {
     fieldValues match {
@@ -74,7 +76,10 @@ object PgClassRepoImpl extends PgClassRepo {
           case PgClassFieldValue.reloptions(value) => NamedParameter("reloptions", ParameterValue.from(value))
           case PgClassFieldValue.relpartbound(value) => NamedParameter("relpartbound", ParameterValue.from(value))
         }
-        val q = s"""select * from pg_catalog.pg_class where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pg_catalog.pg_class
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -84,7 +89,10 @@ object PgClassRepoImpl extends PgClassRepo {
   
   }
   override def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow] = {
-    SQL"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = $oid".as(rowParser.singleOpt)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
+          from pg_catalog.pg_class
+          where oid = $oid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgClassId])(implicit c: Connection): List[PgClassRow] = {
     implicit val arrayToSql: ToSql[Array[PgClassId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -92,7 +100,10 @@ object PgClassRepoImpl extends PgClassRepo {
       (s: PreparedStatement, index: Int, v: Array[PgClassId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = ANY($oids)".as(rowParser.*)
+    SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
+          from pg_catalog.pg_class
+          where oid = ANY($oids)
+       """.as(rowParser.*)
   
   }
   override def selectByUnique(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow] = {
@@ -133,7 +144,8 @@ object PgClassRepoImpl extends PgClassRepo {
               relacl = ${row.relacl},
               reloptions = ${row.reloptions},
               relpartbound = ${row.relpartbound}
-          where oid = $oid""".executeUpdate() > 0
+          where oid = $oid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(oid: PgClassId, fieldValues: List[PgClassFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -175,7 +187,8 @@ object PgClassRepoImpl extends PgClassRepo {
         }
         val q = s"""update pg_catalog.pg_class
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid"""
+                    where oid = $oid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

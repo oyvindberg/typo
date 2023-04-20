@@ -37,13 +37,15 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     
     SQL"""insert into person.emailaddress(businessentityid, emailaddressid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.emailaddressid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
-    SQL"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress".as(rowParser.*)
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          from person.emailaddress
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow] = {
     fieldValues match {
@@ -56,7 +58,10 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           case EmailaddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case EmailaddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.emailaddress where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.emailaddress
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -66,7 +71,10 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
-    SQL"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          from person.emailaddress
+          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -74,7 +82,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           set emailaddress = ${row.emailaddress},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: EmailaddressId, fieldValues: List[EmailaddressFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -87,7 +96,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         }
         val q = s"""update person.emailaddress
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}"""
+                    where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

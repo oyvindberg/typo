@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object CtRepoImpl extends CtRepo {
   override def selectAll(implicit c: Connection): List[CtRow] = {
-    SQL"select id, contacttypeid, name, modifieddate from pe.ct".as(rowParser.*)
+    SQL"""select id, contacttypeid, name, modifieddate
+          from pe.ct
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CtFieldOrIdValue[_]])(implicit c: Connection): List[CtRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object CtRepoImpl extends CtRepo {
           case CtFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CtFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pe.ct where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pe.ct
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

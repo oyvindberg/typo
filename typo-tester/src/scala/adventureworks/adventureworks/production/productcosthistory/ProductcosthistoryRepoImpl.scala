@@ -33,13 +33,15 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     
     SQL"""insert into production.productcosthistory(productid, startdate, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.productid}, ${compositeId.startdate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
-    SQL"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory".as(rowParser.*)
+    SQL"""select productid, startdate, enddate, standardcost, modifieddate
+          from production.productcosthistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow] = {
     fieldValues match {
@@ -52,7 +54,10 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           case ProductcosthistoryFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
           case ProductcosthistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productcosthistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productcosthistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -62,7 +67,10 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   
   }
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
-    SQL"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".as(rowParser.singleOpt)
+    SQL"""select productid, startdate, enddate, standardcost, modifieddate
+          from production.productcosthistory
+          where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -70,7 +78,8 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           set enddate = ${row.enddate},
               standardcost = ${row.standardcost},
               modifieddate = ${row.modifieddate}
-          where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}""".executeUpdate() > 0
+          where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductcosthistoryId, fieldValues: List[ProductcosthistoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -83,7 +92,8 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         }
         val q = s"""update production.productcosthistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}"""
+                    where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

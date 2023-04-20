@@ -41,13 +41,15 @@ object ShiftRepoImpl extends ShiftRepo {
     SQL"""insert into humanresources.shift(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning shiftid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
-    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift".as(rowParser.*)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate
+          from humanresources.shift
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
     fieldValues match {
@@ -60,7 +62,10 @@ object ShiftRepoImpl extends ShiftRepo {
           case ShiftFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
           case ShiftFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from humanresources.shift where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from humanresources.shift
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -70,7 +75,10 @@ object ShiftRepoImpl extends ShiftRepo {
   
   }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
-    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid".as(rowParser.singleOpt)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate
+          from humanresources.shift
+          where shiftid = $shiftid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
     implicit val arrayToSql: ToSql[Array[ShiftId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -78,7 +86,10 @@ object ShiftRepoImpl extends ShiftRepo {
       (s: PreparedStatement, index: Int, v: Array[ShiftId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select shiftid, name, starttime, endtime, modifieddate from humanresources.shift where shiftid = ANY($shiftids)".as(rowParser.*)
+    SQL"""select shiftid, name, starttime, endtime, modifieddate
+          from humanresources.shift
+          where shiftid = ANY($shiftids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
@@ -88,7 +99,8 @@ object ShiftRepoImpl extends ShiftRepo {
               starttime = ${row.starttime},
               endtime = ${row.endtime},
               modifieddate = ${row.modifieddate}
-          where shiftid = $shiftid""".executeUpdate() > 0
+          where shiftid = $shiftid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -102,7 +114,8 @@ object ShiftRepoImpl extends ShiftRepo {
         }
         val q = s"""update humanresources.shift
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shiftid = $shiftid"""
+                    where shiftid = $shiftid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

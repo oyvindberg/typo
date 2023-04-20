@@ -255,9 +255,22 @@ object sc {
         }
       case StringInterpolate(_, prefix, content) =>
         val Quote = '"'.toString
-        val rendered = content.render
-        val maybeTripleQuote = if (rendered.contains(Quote) || rendered.contains("\n")) Quote * 3 else Quote
-        s"${renderTree(prefix)}$maybeTripleQuote$rendered$maybeTripleQuote"
+        val TripleQuote = Quote * 3
+
+        content.render.linesIterator.toList match {
+          case List(one) if content.render.contains(Quote) =>
+            s"${renderTree(prefix)}$TripleQuote$one$TripleQuote"
+          case List(one) =>
+            s"${renderTree(prefix)}$Quote$one$Quote"
+          case more =>
+            val renderedPrefix = renderTree(prefix)
+            val pre = s"$renderedPrefix$TripleQuote"
+            more.mkString(
+              pre,
+              s"\n${" " * pre.length}",
+              s"\n${" " * renderedPrefix.length}$TripleQuote"
+            )
+        }
     }
   }
 

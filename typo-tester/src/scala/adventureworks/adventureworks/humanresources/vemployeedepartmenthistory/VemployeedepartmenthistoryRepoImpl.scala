@@ -19,7 +19,9 @@ import java.time.LocalDate
 
 object VemployeedepartmenthistoryRepoImpl extends VemployeedepartmenthistoryRepo {
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryRow] = {
-    SQL"select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate from humanresources.vemployeedepartmenthistory".as(rowParser.*)
+    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate
+          from humanresources.vemployeedepartmenthistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmenthistoryRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object VemployeedepartmenthistoryRepoImpl extends VemployeedepartmenthistoryRepo
           case VemployeedepartmenthistoryFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
           case VemployeedepartmenthistoryFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
         }
-        val q = s"""select * from humanresources.vemployeedepartmenthistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from humanresources.vemployeedepartmenthistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

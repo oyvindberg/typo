@@ -29,11 +29,13 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
           values (${oid}, ${unsaved.typname}, ${unsaved.typnamespace}, ${unsaved.typowner}, ${unsaved.typlen}, ${unsaved.typbyval}, ${unsaved.typtype}, ${unsaved.typcategory}, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}, ${unsaved.typrelid}, ${unsaved.typsubscript}, ${unsaved.typelem}, ${unsaved.typarray}, ${unsaved.typinput}, ${unsaved.typoutput}, ${unsaved.typreceive}, ${unsaved.typsend}, ${unsaved.typmodin}, ${unsaved.typmodout}, ${unsaved.typanalyze}, ${unsaved.typalign}, ${unsaved.typstorage}, ${unsaved.typnotnull}, ${unsaved.typbasetype}, ${unsaved.typtypmod}, ${unsaved.typndims}, ${unsaved.typcollation}, ${unsaved.typdefaultbin}, ${unsaved.typdefault}, ${unsaved.typacl})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {
-    SQL"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type".as(rowParser.*)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
+          from pg_catalog.pg_type
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgTypeFieldOrIdValue[_]])(implicit c: Connection): List[PgTypeRow] = {
     fieldValues match {
@@ -73,7 +75,10 @@ object PgTypeRepoImpl extends PgTypeRepo {
           case PgTypeFieldValue.typdefault(value) => NamedParameter("typdefault", ParameterValue.from(value))
           case PgTypeFieldValue.typacl(value) => NamedParameter("typacl", ParameterValue.from(value))
         }
-        val q = s"""select * from pg_catalog.pg_type where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pg_catalog.pg_type
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -83,7 +88,10 @@ object PgTypeRepoImpl extends PgTypeRepo {
   
   }
   override def selectById(oid: PgTypeId)(implicit c: Connection): Option[PgTypeRow] = {
-    SQL"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = $oid".as(rowParser.singleOpt)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
+          from pg_catalog.pg_type
+          where oid = $oid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
     implicit val arrayToSql: ToSql[Array[PgTypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -91,7 +99,10 @@ object PgTypeRepoImpl extends PgTypeRepo {
       (s: PreparedStatement, index: Int, v: Array[PgTypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY($oids)".as(rowParser.*)
+    SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
+          from pg_catalog.pg_type
+          where oid = ANY($oids)
+       """.as(rowParser.*)
   
   }
   override def selectByUnique(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
@@ -131,7 +142,8 @@ object PgTypeRepoImpl extends PgTypeRepo {
               typdefaultbin = ${row.typdefaultbin},
               typdefault = ${row.typdefault},
               typacl = ${row.typacl}
-          where oid = $oid""".executeUpdate() > 0
+          where oid = $oid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(oid: PgTypeId, fieldValues: List[PgTypeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -172,7 +184,8 @@ object PgTypeRepoImpl extends PgTypeRepo {
         }
         val q = s"""update pg_catalog.pg_type
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid"""
+                    where oid = $oid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -25,11 +25,13 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, attname, atttypid, attstattarget, attlen, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
           values (${compositeId.attrelid}, ${compositeId.attnum}, ${unsaved.attname}, ${unsaved.atttypid}, ${unsaved.attstattarget}, ${unsaved.attlen}, ${unsaved.attndims}, ${unsaved.attcacheoff}, ${unsaved.atttypmod}, ${unsaved.attbyval}, ${unsaved.attalign}, ${unsaved.attstorage}, ${unsaved.attcompression}, ${unsaved.attnotnull}, ${unsaved.atthasdef}, ${unsaved.atthasmissing}, ${unsaved.attidentity}, ${unsaved.attgenerated}, ${unsaved.attisdropped}, ${unsaved.attislocal}, ${unsaved.attinhcount}, ${unsaved.attcollation}, ${unsaved.attacl}, ${unsaved.attoptions}, ${unsaved.attfdwoptions}, ${unsaved.attmissingval})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
-    SQL"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute".as(rowParser.*)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+          from pg_catalog.pg_attribute
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgAttributeFieldOrIdValue[_]])(implicit c: Connection): List[PgAttributeRow] = {
     fieldValues match {
@@ -63,7 +65,10 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attfdwoptions(value) => NamedParameter("attfdwoptions", ParameterValue.from(value))
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
-        val q = s"""select * from pg_catalog.pg_attribute where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pg_catalog.pg_attribute
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -73,7 +78,10 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   
   }
   override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}".as(rowParser.singleOpt)
+    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+          from pg_catalog.pg_attribute
+          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+       """.as(rowParser.singleOpt)
   }
   override def selectByUnique(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
     selectByFieldValues(List(PgAttributeFieldValue.attrelid(attrelid), PgAttributeFieldValue.attname(attname))).headOption
@@ -105,7 +113,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
               attoptions = ${row.attoptions},
               attfdwoptions = ${row.attfdwoptions},
               attmissingval = ${row.attmissingval}
-          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}""".executeUpdate() > 0
+          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -139,7 +148,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         }
         val q = s"""update pg_catalog.pg_attribute
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}"""
+                    where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -18,7 +18,9 @@ import java.sql.Connection
 
 object VstorewithaddressesRepoImpl extends VstorewithaddressesRepo {
   override def selectAll(implicit c: Connection): List[VstorewithaddressesRow] = {
-    SQL"select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses".as(rowParser.*)
+    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
+          from sales.vstorewithaddresses
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithaddressesFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesRow] = {
     fieldValues match {
@@ -35,7 +37,10 @@ object VstorewithaddressesRepoImpl extends VstorewithaddressesRepo {
           case VstorewithaddressesFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
           case VstorewithaddressesFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.vstorewithaddresses where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.vstorewithaddresses
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

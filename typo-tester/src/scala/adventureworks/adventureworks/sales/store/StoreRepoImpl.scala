@@ -45,13 +45,15 @@ object StoreRepoImpl extends StoreRepo {
     
     SQL"""insert into sales.store(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
           values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
-    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store".as(rowParser.*)
+    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+          from sales.store
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]])(implicit c: Connection): List[StoreRow] = {
     fieldValues match {
@@ -65,7 +67,10 @@ object StoreRepoImpl extends StoreRepo {
           case StoreFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case StoreFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.store where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.store
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -75,7 +80,10 @@ object StoreRepoImpl extends StoreRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
-    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid".as(rowParser.singleOpt)
+    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+          from sales.store
+          where businessentityid = $businessentityid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -83,7 +91,10 @@ object StoreRepoImpl extends StoreRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select businessentityid, name, salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = ANY($businessentityids)".as(rowParser.*)
+    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+          from sales.store
+          where businessentityid = ANY($businessentityids)
+       """.as(rowParser.*)
   
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
@@ -94,7 +105,8 @@ object StoreRepoImpl extends StoreRepo {
               demographics = ${row.demographics},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = $businessentityid""".executeUpdate() > 0
+          where businessentityid = $businessentityid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -109,7 +121,8 @@ object StoreRepoImpl extends StoreRepo {
         }
         val q = s"""update sales.store
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid"""
+                    where businessentityid = $businessentityid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

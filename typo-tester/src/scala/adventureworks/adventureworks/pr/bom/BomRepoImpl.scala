@@ -20,7 +20,9 @@ import java.time.LocalDateTime
 
 object BomRepoImpl extends BomRepo {
   override def selectAll(implicit c: Connection): List[BomRow] = {
-    SQL"select id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr.bom".as(rowParser.*)
+    SQL"""select id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          from pr.bom
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BomFieldOrIdValue[_]])(implicit c: Connection): List[BomRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object BomRepoImpl extends BomRepo {
           case BomFieldValue.perassemblyqty(value) => NamedParameter("perassemblyqty", ParameterValue.from(value))
           case BomFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.bom where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.bom
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

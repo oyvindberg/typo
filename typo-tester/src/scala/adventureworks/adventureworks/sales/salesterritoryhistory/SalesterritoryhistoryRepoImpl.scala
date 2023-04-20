@@ -38,13 +38,15 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     
     SQL"""insert into sales.salesterritoryhistory(businessentityid, startdate, territoryid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.startdate}, ${compositeId.territoryid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
-    SQL"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory".as(rowParser.*)
+    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          from sales.salesterritoryhistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     fieldValues match {
@@ -58,7 +60,10 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           case SalesterritoryhistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalesterritoryhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.salesterritoryhistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.salesterritoryhistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -68,7 +73,10 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
-    SQL"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          from sales.salesterritoryhistory
+          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -76,7 +84,8 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           set enddate = ${row.enddate},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SalesterritoryhistoryId, fieldValues: List[SalesterritoryhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -89,7 +98,8 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         }
         val q = s"""update sales.salesterritoryhistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}"""
+                    where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

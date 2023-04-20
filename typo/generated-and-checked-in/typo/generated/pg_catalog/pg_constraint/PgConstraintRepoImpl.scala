@@ -29,11 +29,13 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
           values (${oid}, ${unsaved.conname}, ${unsaved.connamespace}, ${unsaved.contype}, ${unsaved.condeferrable}, ${unsaved.condeferred}, ${unsaved.convalidated}, ${unsaved.conrelid}, ${unsaved.contypid}, ${unsaved.conindid}, ${unsaved.conparentid}, ${unsaved.confrelid}, ${unsaved.confupdtype}, ${unsaved.confdeltype}, ${unsaved.confmatchtype}, ${unsaved.conislocal}, ${unsaved.coninhcount}, ${unsaved.connoinherit}, ${unsaved.conkey}, ${unsaved.confkey}, ${unsaved.conpfeqop}, ${unsaved.conppeqop}, ${unsaved.conffeqop}, ${unsaved.conexclop}, ${unsaved.conbin})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
-    SQL"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint".as(rowParser.*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
+          from pg_catalog.pg_constraint
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgConstraintFieldOrIdValue[_]])(implicit c: Connection): List[PgConstraintRow] = {
     fieldValues match {
@@ -66,7 +68,10 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           case PgConstraintFieldValue.conexclop(value) => NamedParameter("conexclop", ParameterValue.from(value))
           case PgConstraintFieldValue.conbin(value) => NamedParameter("conbin", ParameterValue.from(value))
         }
-        val q = s"""select * from pg_catalog.pg_constraint where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pg_catalog.pg_constraint
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -76,7 +81,10 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   
   }
   override def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow] = {
-    SQL"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid".as(rowParser.singleOpt)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
+          from pg_catalog.pg_constraint
+          where oid = $oid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
     implicit val arrayToSql: ToSql[Array[PgConstraintId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -84,7 +92,10 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
       (s: PreparedStatement, index: Int, v: Array[PgConstraintId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY($oids)".as(rowParser.*)
+    SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
+          from pg_catalog.pg_constraint
+          where oid = ANY($oids)
+       """.as(rowParser.*)
   
   }
   override def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
@@ -117,7 +128,8 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
               conffeqop = ${row.conffeqop},
               conexclop = ${row.conexclop},
               conbin = ${row.conbin}
-          where oid = $oid""".executeUpdate() > 0
+          where oid = $oid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(oid: PgConstraintId, fieldValues: List[PgConstraintFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -151,7 +163,8 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
         }
         val q = s"""update pg_catalog.pg_constraint
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid"""
+                    where oid = $oid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

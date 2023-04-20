@@ -39,13 +39,15 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""insert into sales.salesreason(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning salesreasonid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason".as(rowParser.*)
+    SQL"""select salesreasonid, name, reasontype, modifieddate
+          from sales.salesreason
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
     fieldValues match {
@@ -57,7 +59,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           case SalesreasonFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
           case SalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.salesreason where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.salesreason
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -67,7 +72,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid".as(rowParser.singleOpt)
+    SQL"""select salesreasonid, name, reasontype, modifieddate
+          from sales.salesreason
+          where salesreasonid = $salesreasonid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     implicit val arrayToSql: ToSql[Array[SalesreasonId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -75,7 +83,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select salesreasonid, name, reasontype, modifieddate from sales.salesreason where salesreasonid = ANY($salesreasonids)".as(rowParser.*)
+    SQL"""select salesreasonid, name, reasontype, modifieddate
+          from sales.salesreason
+          where salesreasonid = ANY($salesreasonids)
+       """.as(rowParser.*)
   
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
@@ -84,7 +95,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           set name = ${row.name},
               reasontype = ${row.reasontype},
               modifieddate = ${row.modifieddate}
-          where salesreasonid = $salesreasonid""".executeUpdate() > 0
+          where salesreasonid = $salesreasonid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -97,7 +109,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         }
         val q = s"""update sales.salesreason
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salesreasonid = $salesreasonid"""
+                    where salesreasonid = $salesreasonid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

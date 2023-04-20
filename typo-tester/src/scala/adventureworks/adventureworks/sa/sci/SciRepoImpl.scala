@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object SciRepoImpl extends SciRepo {
   override def selectAll(implicit c: Connection): List[SciRow] = {
-    SQL"select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci".as(rowParser.*)
+    SQL"""select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          from sa.sci
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SciFieldOrIdValue[_]])(implicit c: Connection): List[SciRow] = {
     fieldValues match {
@@ -34,7 +36,10 @@ object SciRepoImpl extends SciRepo {
           case SciFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
           case SciFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.sci where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.sci
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

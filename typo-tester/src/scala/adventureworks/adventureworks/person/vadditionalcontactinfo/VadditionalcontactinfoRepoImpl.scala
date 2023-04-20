@@ -20,7 +20,9 @@ import java.util.UUID
 
 object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoRow] = {
-    SQL"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo".as(rowParser.*)
+    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
+          from person.vadditionalcontactinfo
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoFieldOrIdValue[_]])(implicit c: Connection): List[VadditionalcontactinfoRow] = {
     fieldValues match {
@@ -45,7 +47,10 @@ object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
           case VadditionalcontactinfoFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VadditionalcontactinfoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.vadditionalcontactinfo where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.vadditionalcontactinfo
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

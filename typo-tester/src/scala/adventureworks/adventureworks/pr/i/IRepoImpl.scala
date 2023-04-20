@@ -18,7 +18,9 @@ import java.time.LocalDateTime
 
 object IRepoImpl extends IRepo {
   override def selectAll(implicit c: Connection): List[IRow] = {
-    SQL"select id, illustrationid, diagram, modifieddate from pr.i".as(rowParser.*)
+    SQL"""select id, illustrationid, diagram, modifieddate
+          from pr.i
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IFieldOrIdValue[_]])(implicit c: Connection): List[IRow] = {
     fieldValues match {
@@ -30,7 +32,10 @@ object IRepoImpl extends IRepo {
           case IFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
           case IFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.i where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.i
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object SrRepoImpl extends SrRepo {
   override def selectAll(implicit c: Connection): List[SrRow] = {
-    SQL"select id, salesreasonid, name, reasontype, modifieddate from sa.sr".as(rowParser.*)
+    SQL"""select id, salesreasonid, name, reasontype, modifieddate
+          from sa.sr
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SrFieldOrIdValue[_]])(implicit c: Connection): List[SrRow] = {
     fieldValues match {
@@ -32,7 +34,10 @@ object SrRepoImpl extends SrRepo {
           case SrFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
           case SrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.sr where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.sr
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

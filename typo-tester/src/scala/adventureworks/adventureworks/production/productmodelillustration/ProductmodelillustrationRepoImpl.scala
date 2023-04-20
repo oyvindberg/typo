@@ -32,13 +32,15 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.productmodelid}, ${compositeId.illustrationid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
-    SQL"select productmodelid, illustrationid, modifieddate from production.productmodelillustration".as(rowParser.*)
+    SQL"""select productmodelid, illustrationid, modifieddate
+          from production.productmodelillustration
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelillustrationRow] = {
     fieldValues match {
@@ -49,7 +51,10 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           case ProductmodelillustrationFieldValue.illustrationid(value) => NamedParameter("illustrationid", ParameterValue.from(value))
           case ProductmodelillustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productmodelillustration where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productmodelillustration
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -59,13 +64,17 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
-    SQL"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".as(rowParser.singleOpt)
+    SQL"""select productmodelid, illustrationid, modifieddate
+          from production.productmodelillustration
+          where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelillustration
           set modifieddate = ${row.modifieddate}
-          where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}""".executeUpdate() > 0
+          where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductmodelillustrationId, fieldValues: List[ProductmodelillustrationFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -76,7 +85,8 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
         }
         val q = s"""update production.productmodelillustration
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}"""
+                    where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

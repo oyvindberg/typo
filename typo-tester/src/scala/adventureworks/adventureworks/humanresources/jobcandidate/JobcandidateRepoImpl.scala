@@ -39,13 +39,15 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""insert into humanresources.jobcandidate(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning jobcandidateid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
-    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate".as(rowParser.*)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate
+          from humanresources.jobcandidate
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
     fieldValues match {
@@ -57,7 +59,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           case JobcandidateFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
           case JobcandidateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from humanresources.jobcandidate where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from humanresources.jobcandidate
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -67,7 +72,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   
   }
   override def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow] = {
-    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".as(rowParser.singleOpt)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate
+          from humanresources.jobcandidate
+          where jobcandidateid = $jobcandidateid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     implicit val arrayToSql: ToSql[Array[JobcandidateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -75,7 +83,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       (s: PreparedStatement, index: Int, v: Array[JobcandidateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = ANY($jobcandidateids)".as(rowParser.*)
+    SQL"""select jobcandidateid, businessentityid, resume, modifieddate
+          from humanresources.jobcandidate
+          where jobcandidateid = ANY($jobcandidateids)
+       """.as(rowParser.*)
   
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
@@ -84,7 +95,8 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           set businessentityid = ${row.businessentityid},
               resume = ${row.resume},
               modifieddate = ${row.modifieddate}
-          where jobcandidateid = $jobcandidateid""".executeUpdate() > 0
+          where jobcandidateid = $jobcandidateid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(jobcandidateid: JobcandidateId, fieldValues: List[JobcandidateFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -97,7 +109,8 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         }
         val q = s"""update humanresources.jobcandidate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where jobcandidateid = $jobcandidateid"""
+                    where jobcandidateid = $jobcandidateid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

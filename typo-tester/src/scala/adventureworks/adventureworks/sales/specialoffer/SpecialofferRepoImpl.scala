@@ -55,13 +55,15 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     SQL"""insert into sales.specialoffer(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning specialofferid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
-    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer".as(rowParser.*)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+          from sales.specialoffer
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow] = {
     fieldValues match {
@@ -80,7 +82,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           case SpecialofferFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpecialofferFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.specialoffer where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.specialoffer
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -90,7 +95,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   
   }
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
-    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid".as(rowParser.singleOpt)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+          from sales.specialoffer
+          where specialofferid = $specialofferid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     implicit val arrayToSql: ToSql[Array[SpecialofferId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -98,7 +106,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       (s: PreparedStatement, index: Int, v: Array[SpecialofferId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = ANY($specialofferids)".as(rowParser.*)
+    SQL"""select specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+          from sales.specialoffer
+          where specialofferid = ANY($specialofferids)
+       """.as(rowParser.*)
   
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
@@ -114,7 +125,8 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
               maxqty = ${row.maxqty},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where specialofferid = $specialofferid""".executeUpdate() > 0
+          where specialofferid = $specialofferid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(specialofferid: SpecialofferId, fieldValues: List[SpecialofferFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -134,7 +146,8 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         }
         val q = s"""update sales.specialoffer
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where specialofferid = $specialofferid"""
+                    where specialofferid = $specialofferid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

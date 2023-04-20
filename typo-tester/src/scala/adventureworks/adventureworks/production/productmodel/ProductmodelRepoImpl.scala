@@ -45,13 +45,15 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     SQL"""insert into production.productmodel(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning productmodelid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
-    SQL"select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from production.productmodel".as(rowParser.*)
+    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+          from production.productmodel
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelRow] = {
     fieldValues match {
@@ -65,7 +67,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           case ProductmodelFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductmodelFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productmodel where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productmodel
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -75,7 +80,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   
   }
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
-    SQL"select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid = $productmodelid".as(rowParser.singleOpt)
+    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+          from production.productmodel
+          where productmodelid = $productmodelid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): List[ProductmodelRow] = {
     implicit val arrayToSql: ToSql[Array[ProductmodelId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -83,7 +91,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductmodelId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid = ANY($productmodelids)".as(rowParser.*)
+    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+          from production.productmodel
+          where productmodelid = ANY($productmodelids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
@@ -94,7 +105,8 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
               instructions = ${row.instructions},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where productmodelid = $productmodelid""".executeUpdate() > 0
+          where productmodelid = $productmodelid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(productmodelid: ProductmodelId, fieldValues: List[ProductmodelFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -109,7 +121,8 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         }
         val q = s"""update production.productmodel
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = $productmodelid"""
+                    where productmodelid = $productmodelid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

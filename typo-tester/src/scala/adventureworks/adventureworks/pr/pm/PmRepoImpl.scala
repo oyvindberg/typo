@@ -20,7 +20,9 @@ import java.util.UUID
 
 object PmRepoImpl extends PmRepo {
   override def selectAll(implicit c: Connection): List[PmRow] = {
-    SQL"select id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate from pr.pm".as(rowParser.*)
+    SQL"""select id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+          from pr.pm
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmFieldOrIdValue[_]])(implicit c: Connection): List[PmRow] = {
     fieldValues match {
@@ -35,7 +37,10 @@ object PmRepoImpl extends PmRepo {
           case PmFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PmFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.pm where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.pm
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

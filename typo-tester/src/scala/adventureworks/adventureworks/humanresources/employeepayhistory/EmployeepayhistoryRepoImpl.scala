@@ -33,13 +33,15 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     
     SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.ratechangedate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
-    SQL"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory".as(rowParser.*)
+    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          from humanresources.employeepayhistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow] = {
     fieldValues match {
@@ -52,7 +54,10 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           case EmployeepayhistoryFieldValue.payfrequency(value) => NamedParameter("payfrequency", ParameterValue.from(value))
           case EmployeepayhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from humanresources.employeepayhistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from humanresources.employeepayhistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -62,7 +67,10 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
-    SQL"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          from humanresources.employeepayhistory
+          where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -70,7 +78,8 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           set rate = ${row.rate},
               payfrequency = ${row.payfrequency},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: EmployeepayhistoryId, fieldValues: List[EmployeepayhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -83,7 +92,8 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         }
         val q = s"""update humanresources.employeepayhistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}"""
+                    where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

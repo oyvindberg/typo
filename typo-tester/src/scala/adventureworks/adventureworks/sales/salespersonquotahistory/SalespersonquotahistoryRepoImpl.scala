@@ -37,13 +37,15 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     
     SQL"""insert into sales.salespersonquotahistory(businessentityid, quotadate, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.quotadate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
-    SQL"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory".as(rowParser.*)
+    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
+          from sales.salespersonquotahistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     fieldValues match {
@@ -56,7 +58,10 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           case SalespersonquotahistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalespersonquotahistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.salespersonquotahistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.salespersonquotahistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -66,7 +71,10 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   
   }
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
-    SQL"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
+          from sales.salespersonquotahistory
+          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -74,7 +82,8 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           set salesquota = ${row.salesquota},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SalespersonquotahistoryId, fieldValues: List[SalespersonquotahistoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -87,7 +96,8 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         }
         val q = s"""update sales.salespersonquotahistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}"""
+                    where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -21,7 +21,9 @@ import typo.generated.information_schema.SqlIdentifier
 
 object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
   override def selectAll(implicit c: Connection): List[KeyColumnUsageRow] = {
-    SQL"select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint from information_schema.key_column_usage".as(rowParser.*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint
+          from information_schema.key_column_usage
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[KeyColumnUsageFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
           case KeyColumnUsageFieldValue.ordinalPosition(value) => NamedParameter("ordinal_position", ParameterValue.from(value))
           case KeyColumnUsageFieldValue.positionInUniqueConstraint(value) => NamedParameter("position_in_unique_constraint", ParameterValue.from(value))
         }
-        val q = s"""select * from information_schema.key_column_usage where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from information_schema.key_column_usage
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

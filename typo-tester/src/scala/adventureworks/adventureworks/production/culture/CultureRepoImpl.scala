@@ -36,13 +36,15 @@ object CultureRepoImpl extends CultureRepo {
     
     SQL"""insert into production.culture(cultureid, ${namedParameters.map(_.name).mkString(", ")})
           values (${cultureid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"select cultureid, name, modifieddate from production.culture".as(rowParser.*)
+    SQL"""select cultureid, name, modifieddate
+          from production.culture
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
     fieldValues match {
@@ -53,7 +55,10 @@ object CultureRepoImpl extends CultureRepo {
           case CultureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.culture where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.culture
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -63,7 +68,10 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"select cultureid, name, modifieddate from production.culture where cultureid = $cultureid".as(rowParser.singleOpt)
+    SQL"""select cultureid, name, modifieddate
+          from production.culture
+          where cultureid = $cultureid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     implicit val arrayToSql: ToSql[Array[CultureId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +79,10 @@ object CultureRepoImpl extends CultureRepo {
       (s: PreparedStatement, index: Int, v: Array[CultureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"select cultureid, name, modifieddate from production.culture where cultureid = ANY($cultureids)".as(rowParser.*)
+    SQL"""select cultureid, name, modifieddate
+          from production.culture
+          where cultureid = ANY($cultureids)
+       """.as(rowParser.*)
   
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
@@ -79,7 +90,8 @@ object CultureRepoImpl extends CultureRepo {
     SQL"""update production.culture
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where cultureid = $cultureid""".executeUpdate() > 0
+          where cultureid = $cultureid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -91,7 +103,8 @@ object CultureRepoImpl extends CultureRepo {
         }
         val q = s"""update production.culture
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where cultureid = $cultureid"""
+                    where cultureid = $cultureid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

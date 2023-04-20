@@ -50,13 +50,15 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     SQL"""insert into production.transactionhistory(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning transactionid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory".as(rowParser.*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+          from production.transactionhistory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
     fieldValues match {
@@ -73,7 +75,10 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           case TransactionhistoryFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case TransactionhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.transactionhistory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.transactionhistory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -83,7 +88,10 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   
   }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
-    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid".as(rowParser.singleOpt)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+          from production.transactionhistory
+          where transactionid = $transactionid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
     implicit val arrayToSql: ToSql[Array[TransactionhistoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -91,7 +99,10 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       (s: PreparedStatement, index: Int, v: Array[TransactionhistoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = ANY($transactionids)".as(rowParser.*)
+    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+          from production.transactionhistory
+          where transactionid = ANY($transactionids)
+       """.as(rowParser.*)
   
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
@@ -105,7 +116,8 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
               quantity = ${row.quantity},
               actualcost = ${row.actualcost},
               modifieddate = ${row.modifieddate}
-          where transactionid = $transactionid""".executeUpdate() > 0
+          where transactionid = $transactionid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -123,7 +135,8 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         }
         val q = s"""update production.transactionhistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where transactionid = $transactionid"""
+                    where transactionid = $transactionid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

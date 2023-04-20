@@ -21,7 +21,9 @@ import java.util.UUID
 
 object TrRepoImpl extends TrRepo {
   override def selectAll(implicit c: Connection): List[TrRow] = {
-    SQL"select id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sa.tr".as(rowParser.*)
+    SQL"""select id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+          from sa.tr
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TrFieldOrIdValue[_]])(implicit c: Connection): List[TrRow] = {
     fieldValues match {
@@ -37,7 +39,10 @@ object TrRepoImpl extends TrRepo {
           case TrFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case TrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.tr where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.tr
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

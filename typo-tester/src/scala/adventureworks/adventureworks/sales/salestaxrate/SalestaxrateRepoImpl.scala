@@ -50,13 +50,15 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SQL"""insert into sales.salestaxrate(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning salestaxrateid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate".as(rowParser.*)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+          from sales.salestaxrate
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
     fieldValues match {
@@ -71,7 +73,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           case SalestaxrateFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalestaxrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.salestaxrate where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.salestaxrate
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -81,7 +86,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid".as(rowParser.singleOpt)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+          from sales.salestaxrate
+          where salestaxrateid = $salestaxrateid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     implicit val arrayToSql: ToSql[Array[SalestaxrateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +97,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       (s: PreparedStatement, index: Int, v: Array[SalestaxrateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate from sales.salestaxrate where salestaxrateid = ANY($salestaxrateids)".as(rowParser.*)
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+          from sales.salestaxrate
+          where salestaxrateid = ANY($salestaxrateids)
+       """.as(rowParser.*)
   
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
@@ -101,7 +112,8 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
               name = ${row.name},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where salestaxrateid = $salestaxrateid""".executeUpdate() > 0
+          where salestaxrateid = $salestaxrateid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -117,7 +129,8 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         }
         val q = s"""update sales.salestaxrate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salestaxrateid = $salestaxrateid"""
+                    where salestaxrateid = $salestaxrateid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

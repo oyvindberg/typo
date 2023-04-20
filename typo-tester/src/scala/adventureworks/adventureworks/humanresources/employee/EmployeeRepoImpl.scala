@@ -70,13 +70,15 @@ object EmployeeRepoImpl extends EmployeeRepo {
     
     SQL"""insert into humanresources.employee(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
           values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
-    SQL"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee".as(rowParser.*)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+          from humanresources.employee
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]])(implicit c: Connection): List[EmployeeRow] = {
     fieldValues match {
@@ -99,7 +101,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
           case EmployeeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case EmployeeFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
         }
-        val q = s"""select * from humanresources.employee where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from humanresources.employee
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -109,7 +114,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
-    SQL"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid".as(rowParser.singleOpt)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+          from humanresources.employee
+          where businessentityid = $businessentityid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -117,7 +125,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = ANY($businessentityids)".as(rowParser.*)
+    SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+          from humanresources.employee
+          where businessentityid = ANY($businessentityids)
+       """.as(rowParser.*)
   
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
@@ -137,7 +148,8 @@ object EmployeeRepoImpl extends EmployeeRepo {
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate},
               organizationnode = ${row.organizationnode}
-          where businessentityid = $businessentityid""".executeUpdate() > 0
+          where businessentityid = $businessentityid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -161,7 +173,8 @@ object EmployeeRepoImpl extends EmployeeRepo {
         }
         val q = s"""update humanresources.employee
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid"""
+                    where businessentityid = $businessentityid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

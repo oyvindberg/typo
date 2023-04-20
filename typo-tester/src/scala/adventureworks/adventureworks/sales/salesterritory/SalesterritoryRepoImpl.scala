@@ -62,13 +62,15 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""insert into sales.salesterritory(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning territoryid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory".as(rowParser.*)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+          from sales.salesterritory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryRow] = {
     fieldValues match {
@@ -86,7 +88,10 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           case SalesterritoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalesterritoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.salesterritory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.salesterritory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -96,7 +101,10 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   
   }
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
-    SQL"select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid".as(rowParser.singleOpt)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+          from sales.salesterritory
+          where territoryid = $territoryid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     implicit val arrayToSql: ToSql[Array[SalesterritoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -104,7 +112,10 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesterritoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = ANY($territoryids)".as(rowParser.*)
+    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+          from sales.salesterritory
+          where territoryid = ANY($territoryids)
+       """.as(rowParser.*)
   
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
@@ -119,7 +130,8 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
               costlastyear = ${row.costlastyear},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where territoryid = $territoryid""".executeUpdate() > 0
+          where territoryid = $territoryid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(territoryid: SalesterritoryId, fieldValues: List[SalesterritoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -138,7 +150,8 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         }
         val q = s"""update sales.salesterritory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where territoryid = $territoryid"""
+                    where territoryid = $territoryid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -51,13 +51,15 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""insert into purchasing.shipmethod(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning shipmethodid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod".as(rowParser.*)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+          from purchasing.shipmethod
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
     fieldValues match {
@@ -71,7 +73,10 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           case ShipmethodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ShipmethodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from purchasing.shipmethod where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from purchasing.shipmethod
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -81,7 +86,10 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid".as(rowParser.singleOpt)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+          from purchasing.shipmethod
+          where shipmethodid = $shipmethodid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     implicit val arrayToSql: ToSql[Array[ShipmethodId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +97,10 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       (s: PreparedStatement, index: Int, v: Array[ShipmethodId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)".as(rowParser.*)
+    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+          from purchasing.shipmethod
+          where shipmethodid = ANY($shipmethodids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
@@ -100,7 +111,8 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
               shiprate = ${row.shiprate},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where shipmethodid = $shipmethodid""".executeUpdate() > 0
+          where shipmethodid = $shipmethodid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -115,7 +127,8 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         }
         val q = s"""update purchasing.shipmethod
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shipmethodid = $shipmethodid"""
+                    where shipmethodid = $shipmethodid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

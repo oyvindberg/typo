@@ -19,7 +19,9 @@ import java.sql.Connection
 
 object FooRepoImpl extends FooRepo {
   override def selectAll(implicit c: Connection): List[FooRow] = {
-    SQL"select array_agg from public.foo".as(rowParser.*)
+    SQL"""select array_agg
+          from public.foo
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[FooFieldOrIdValue[_]])(implicit c: Connection): List[FooRow] = {
     fieldValues match {
@@ -28,7 +30,10 @@ object FooRepoImpl extends FooRepo {
         val namedParams = nonEmpty.map{
           case FooFieldValue.arrayAgg(value) => NamedParameter("array_agg", ParameterValue.from(value))
         }
-        val q = s"""select * from public.foo where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from public.foo
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

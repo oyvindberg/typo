@@ -19,7 +19,9 @@ import java.util.UUID
 
 object ERepoImpl extends ERepo {
   override def selectAll(implicit c: Connection): List[ERow] = {
-    SQL"select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e".as(rowParser.*)
+    SQL"""select id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          from pe.e
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EFieldOrIdValue[_]])(implicit c: Connection): List[ERow] = {
     fieldValues match {
@@ -33,7 +35,10 @@ object ERepoImpl extends ERepo {
           case EFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case EFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pe.e where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pe.e
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -22,7 +22,9 @@ import typo.generated.information_schema.YesOrNo
 
 object TableConstraintsRepoImpl extends TableConstraintsRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsRow] = {
-    SQL"select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced from information_schema.table_constraints".as(rowParser.*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced
+          from information_schema.table_constraints
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TableConstraintsFieldOrIdValue[_]])(implicit c: Connection): List[TableConstraintsRow] = {
     fieldValues match {
@@ -40,7 +42,10 @@ object TableConstraintsRepoImpl extends TableConstraintsRepo {
           case TableConstraintsFieldValue.initiallyDeferred(value) => NamedParameter("initially_deferred", ParameterValue.from(value))
           case TableConstraintsFieldValue.enforced(value) => NamedParameter("enforced", ParameterValue.from(value))
         }
-        val q = s"""select * from information_schema.table_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from information_schema.table_constraints
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

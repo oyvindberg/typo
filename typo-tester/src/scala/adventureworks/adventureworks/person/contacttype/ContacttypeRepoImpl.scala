@@ -38,13 +38,15 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""insert into person.contacttype(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning contacttypeid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"select contacttypeid, name, modifieddate from person.contacttype".as(rowParser.*)
+    SQL"""select contacttypeid, name, modifieddate
+          from person.contacttype
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
     fieldValues match {
@@ -55,7 +57,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           case ContacttypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case ContacttypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.contacttype where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.contacttype
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -65,7 +70,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
-    SQL"select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = $contacttypeid".as(rowParser.singleOpt)
+    SQL"""select contacttypeid, name, modifieddate
+          from person.contacttype
+          where contacttypeid = $contacttypeid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
     implicit val arrayToSql: ToSql[Array[ContacttypeId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -73,7 +81,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       (s: PreparedStatement, index: Int, v: Array[ContacttypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select contacttypeid, name, modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)".as(rowParser.*)
+    SQL"""select contacttypeid, name, modifieddate
+          from person.contacttype
+          where contacttypeid = ANY($contacttypeids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
@@ -81,7 +92,8 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""update person.contacttype
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where contacttypeid = $contacttypeid""".executeUpdate() > 0
+          where contacttypeid = $contacttypeid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -93,7 +105,8 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         }
         val q = s"""update person.contacttype
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where contacttypeid = $contacttypeid"""
+                    where contacttypeid = $contacttypeid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

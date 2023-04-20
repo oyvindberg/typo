@@ -45,13 +45,15 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""insert into production.workorder(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning workorderid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
-    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder".as(rowParser.*)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          from production.workorder
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
     fieldValues match {
@@ -68,7 +70,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
           case WorkorderFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
           case WorkorderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.workorder where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.workorder
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -78,7 +83,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
   
   }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
-    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid".as(rowParser.singleOpt)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          from production.workorder
+          where workorderid = $workorderid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     implicit val arrayToSql: ToSql[Array[WorkorderId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -86,7 +94,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
       (s: PreparedStatement, index: Int, v: Array[WorkorderId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)".as(rowParser.*)
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          from production.workorder
+          where workorderid = ANY($workorderids)
+       """.as(rowParser.*)
   
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
@@ -100,7 +111,8 @@ object WorkorderRepoImpl extends WorkorderRepo {
               duedate = ${row.duedate},
               scrapreasonid = ${row.scrapreasonid},
               modifieddate = ${row.modifieddate}
-          where workorderid = $workorderid""".executeUpdate() > 0
+          where workorderid = $workorderid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -118,7 +130,8 @@ object WorkorderRepoImpl extends WorkorderRepo {
         }
         val q = s"""update production.workorder
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where workorderid = $workorderid"""
+                    where workorderid = $workorderid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

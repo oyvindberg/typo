@@ -36,13 +36,15 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     
     SQL"""insert into production.unitmeasure(unitmeasurecode, ${namedParameters.map(_.name).mkString(", ")})
           values (${unitmeasurecode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure".as(rowParser.*)
+    SQL"""select unitmeasurecode, name, modifieddate
+          from production.unitmeasure
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow] = {
     fieldValues match {
@@ -53,7 +55,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           case UnitmeasureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case UnitmeasureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.unitmeasure where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.unitmeasure
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -63,7 +68,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   
   }
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
-    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode".as(rowParser.singleOpt)
+    SQL"""select unitmeasurecode, name, modifieddate
+          from production.unitmeasure
+          where unitmeasurecode = $unitmeasurecode
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     implicit val arrayToSql: ToSql[Array[UnitmeasureId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +79,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       (s: PreparedStatement, index: Int, v: Array[UnitmeasureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"select unitmeasurecode, name, modifieddate from production.unitmeasure where unitmeasurecode = ANY($unitmeasurecodes)".as(rowParser.*)
+    SQL"""select unitmeasurecode, name, modifieddate
+          from production.unitmeasure
+          where unitmeasurecode = ANY($unitmeasurecodes)
+       """.as(rowParser.*)
   
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
@@ -79,7 +90,8 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     SQL"""update production.unitmeasure
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where unitmeasurecode = $unitmeasurecode""".executeUpdate() > 0
+          where unitmeasurecode = $unitmeasurecode
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(unitmeasurecode: UnitmeasureId, fieldValues: List[UnitmeasureFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -91,7 +103,8 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         }
         val q = s"""update production.unitmeasure
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where unitmeasurecode = $unitmeasurecode"""
+                    where unitmeasurecode = $unitmeasurecode
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -36,13 +36,15 @@ object CurrencyRepoImpl extends CurrencyRepo {
     
     SQL"""insert into sales.currency(currencycode, ${namedParameters.map(_.name).mkString(", ")})
           values (${currencycode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
-    SQL"select currencycode, name, modifieddate from sales.currency".as(rowParser.*)
+    SQL"""select currencycode, name, modifieddate
+          from sales.currency
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow] = {
     fieldValues match {
@@ -53,7 +55,10 @@ object CurrencyRepoImpl extends CurrencyRepo {
           case CurrencyFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.currency where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.currency
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -63,7 +68,10 @@ object CurrencyRepoImpl extends CurrencyRepo {
   
   }
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
-    SQL"select currencycode, name, modifieddate from sales.currency where currencycode = $currencycode".as(rowParser.singleOpt)
+    SQL"""select currencycode, name, modifieddate
+          from sales.currency
+          where currencycode = $currencycode
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     implicit val arrayToSql: ToSql[Array[CurrencyId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +79,10 @@ object CurrencyRepoImpl extends CurrencyRepo {
       (s: PreparedStatement, index: Int, v: Array[CurrencyId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"select currencycode, name, modifieddate from sales.currency where currencycode = ANY($currencycodes)".as(rowParser.*)
+    SQL"""select currencycode, name, modifieddate
+          from sales.currency
+          where currencycode = ANY($currencycodes)
+       """.as(rowParser.*)
   
   }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
@@ -79,7 +90,8 @@ object CurrencyRepoImpl extends CurrencyRepo {
     SQL"""update sales.currency
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where currencycode = $currencycode""".executeUpdate() > 0
+          where currencycode = $currencycode
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(currencycode: CurrencyId, fieldValues: List[CurrencyFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -91,7 +103,8 @@ object CurrencyRepoImpl extends CurrencyRepo {
         }
         val q = s"""update sales.currency
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where currencycode = $currencycode"""
+                    where currencycode = $currencycode
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

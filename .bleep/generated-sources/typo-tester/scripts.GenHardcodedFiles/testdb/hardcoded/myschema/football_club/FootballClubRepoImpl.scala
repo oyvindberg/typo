@@ -26,11 +26,13 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean = {
     SQL"""insert into myschema.football_club(id, name)
           values (${id}, ${unsaved.name})
-    """.execute()
+       """.execute()
   
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
-    SQL"select id, name from myschema.football_club".as(rowParser.*)
+    SQL"""select id, name
+          from myschema.football_club
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
@@ -40,7 +42,10 @@ object FootballClubRepoImpl extends FootballClubRepo {
           case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        val q = s"""select * from myschema.football_club where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from myschema.football_club
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -50,7 +55,10 @@ object FootballClubRepoImpl extends FootballClubRepo {
   
   }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
-    SQL"select id, name from myschema.football_club where id = $id".as(rowParser.singleOpt)
+    SQL"""select id, name
+          from myschema.football_club
+          where id = $id
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     implicit val arrayToSql: ToSql[Array[FootballClubId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -58,14 +66,18 @@ object FootballClubRepoImpl extends FootballClubRepo {
       (s: PreparedStatement, index: Int, v: Array[FootballClubId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
     
-    SQL"select id, name from myschema.football_club where id = ANY($ids)".as(rowParser.*)
+    SQL"""select id, name
+          from myschema.football_club
+          where id = ANY($ids)
+       """.as(rowParser.*)
   
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     val id = row.id
     SQL"""update myschema.football_club
           set name = ${row.name}
-          where id = $id""".executeUpdate() > 0
+          where id = $id
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -76,7 +88,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
         }
         val q = s"""update myschema.football_club
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where id = $id"""
+                    where id = $id
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -19,7 +19,9 @@ import java.util.UUID
 
 object BeRepoImpl extends BeRepo {
   override def selectAll(implicit c: Connection): List[BeRow] = {
-    SQL"select id, businessentityid, rowguid, modifieddate from pe.be".as(rowParser.*)
+    SQL"""select id, businessentityid, rowguid, modifieddate
+          from pe.be
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BeFieldOrIdValue[_]])(implicit c: Connection): List[BeRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object BeRepoImpl extends BeRepo {
           case BeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case BeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pe.be where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pe.be
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

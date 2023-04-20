@@ -20,7 +20,9 @@ import java.time.LocalTime
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"select id, shiftid, name, starttime, endtime, modifieddate from hr.s".as(rowParser.*)
+    SQL"""select id, shiftid, name, starttime, endtime, modifieddate
+          from hr.s
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SFieldOrIdValue[_]])(implicit c: Connection): List[SRow] = {
     fieldValues match {
@@ -34,7 +36,10 @@ object SRepoImpl extends SRepo {
           case SFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
           case SFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from hr.s where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from hr.s
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

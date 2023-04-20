@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object PdocRepoImpl extends PdocRepo {
   override def selectAll(implicit c: Connection): List[PdocRow] = {
-    SQL"select id, productid, modifieddate, documentnode from pr.pdoc".as(rowParser.*)
+    SQL"""select id, productid, modifieddate, documentnode
+          from pr.pdoc
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdocFieldOrIdValue[_]])(implicit c: Connection): List[PdocRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object PdocRepoImpl extends PdocRepo {
           case PdocFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case PdocFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.pdoc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.pdoc
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

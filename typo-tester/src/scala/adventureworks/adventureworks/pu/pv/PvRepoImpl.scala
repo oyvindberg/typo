@@ -20,7 +20,9 @@ import java.time.LocalDateTime
 
 object PvRepoImpl extends PvRepo {
   override def selectAll(implicit c: Connection): List[PvRow] = {
-    SQL"select id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from pu.pv".as(rowParser.*)
+    SQL"""select id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+          from pu.pv
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PvFieldOrIdValue[_]])(implicit c: Connection): List[PvRow] = {
     fieldValues match {
@@ -40,7 +42,10 @@ object PvRepoImpl extends PvRepo {
           case PvFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
           case PvFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pu.pv where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pu.pv
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

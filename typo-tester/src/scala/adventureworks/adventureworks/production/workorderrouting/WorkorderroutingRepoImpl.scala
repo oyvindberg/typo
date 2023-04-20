@@ -40,13 +40,15 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     
     SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.workorderid}, ${compositeId.productid}, ${compositeId.operationsequence}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
-    SQL"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting".as(rowParser.*)
+    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+          from production.workorderrouting
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
     fieldValues match {
@@ -66,7 +68,10 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           case WorkorderroutingFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.workorderrouting where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.workorderrouting
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -76,7 +81,10 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   
   }
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
-    SQL"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}".as(rowParser.singleOpt)
+    SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+          from production.workorderrouting
+          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -90,7 +98,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               plannedcost = ${row.plannedcost},
               actualcost = ${row.actualcost},
               modifieddate = ${row.modifieddate}
-          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}""".executeUpdate() > 0
+          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -109,7 +118,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         }
         val q = s"""update production.workorderrouting
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}"""
+                    where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

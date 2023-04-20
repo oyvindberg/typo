@@ -37,13 +37,15 @@ object IllustrationRepoImpl extends IllustrationRepo {
     SQL"""insert into production.illustration(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning illustrationid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
-    SQL"select illustrationid, diagram, modifieddate from production.illustration".as(rowParser.*)
+    SQL"""select illustrationid, diagram, modifieddate
+          from production.illustration
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow] = {
     fieldValues match {
@@ -54,7 +56,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
           case IllustrationFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
           case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.illustration where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.illustration
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -64,7 +69,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
   
   }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
-    SQL"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid".as(rowParser.singleOpt)
+    SQL"""select illustrationid, diagram, modifieddate
+          from production.illustration
+          where illustrationid = $illustrationid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     implicit val arrayToSql: ToSql[Array[IllustrationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -72,7 +80,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
       (s: PreparedStatement, index: Int, v: Array[IllustrationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)".as(rowParser.*)
+    SQL"""select illustrationid, diagram, modifieddate
+          from production.illustration
+          where illustrationid = ANY($illustrationids)
+       """.as(rowParser.*)
   
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
@@ -80,7 +91,8 @@ object IllustrationRepoImpl extends IllustrationRepo {
     SQL"""update production.illustration
           set diagram = ${row.diagram},
               modifieddate = ${row.modifieddate}
-          where illustrationid = $illustrationid""".executeUpdate() > 0
+          where illustrationid = $illustrationid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -92,7 +104,8 @@ object IllustrationRepoImpl extends IllustrationRepo {
         }
         val q = s"""update production.illustration
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where illustrationid = $illustrationid"""
+                    where illustrationid = $illustrationid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

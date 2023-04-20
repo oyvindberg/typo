@@ -48,13 +48,15 @@ object AddressRepoImpl extends AddressRepo {
     SQL"""insert into person.address(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning addressid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
-    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address".as(rowParser.*)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          from person.address
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
     fieldValues match {
@@ -71,7 +73,10 @@ object AddressRepoImpl extends AddressRepo {
           case AddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.address where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.address
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -81,7 +86,10 @@ object AddressRepoImpl extends AddressRepo {
   
   }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
-    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid".as(rowParser.singleOpt)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          from person.address
+          where addressid = $addressid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     implicit val arrayToSql: ToSql[Array[AddressId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -89,7 +97,10 @@ object AddressRepoImpl extends AddressRepo {
       (s: PreparedStatement, index: Int, v: Array[AddressId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)".as(rowParser.*)
+    SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          from person.address
+          where addressid = ANY($addressids)
+       """.as(rowParser.*)
   
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
@@ -103,7 +114,8 @@ object AddressRepoImpl extends AddressRepo {
               spatiallocation = ${row.spatiallocation},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where addressid = $addressid""".executeUpdate() > 0
+          where addressid = $addressid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -121,7 +133,8 @@ object AddressRepoImpl extends AddressRepo {
         }
         val q = s"""update person.address
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where addressid = $addressid"""
+                    where addressid = $addressid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

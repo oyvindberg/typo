@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object CuRepoImpl extends CuRepo {
   override def selectAll(implicit c: Connection): List[CuRow] = {
-    SQL"select id, currencycode, name, modifieddate from sa.cu".as(rowParser.*)
+    SQL"""select id, currencycode, name, modifieddate
+          from sa.cu
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CuFieldOrIdValue[_]])(implicit c: Connection): List[CuRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object CuRepoImpl extends CuRepo {
           case CuFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CuFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.cu where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.cu
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -20,7 +20,9 @@ import java.util.UUID
 
 object SpRepoImpl extends SpRepo {
   override def selectAll(implicit c: Connection): List[SpRow] = {
-    SQL"select id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sa.sp".as(rowParser.*)
+    SQL"""select id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+          from sa.sp
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpFieldOrIdValue[_]])(implicit c: Connection): List[SpRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object SpRepoImpl extends SpRepo {
           case SpFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.sp where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.sp
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

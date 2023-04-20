@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object PccRepoImpl extends PccRepo {
   override def selectAll(implicit c: Connection): List[PccRow] = {
-    SQL"select id, businessentityid, creditcardid, modifieddate from sa.pcc".as(rowParser.*)
+    SQL"""select id, businessentityid, creditcardid, modifieddate
+          from sa.pcc
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PccFieldOrIdValue[_]])(implicit c: Connection): List[PccRow] = {
     fieldValues match {
@@ -31,7 +33,10 @@ object PccRepoImpl extends PccRepo {
           case PccFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
           case PccFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.pcc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.pcc
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

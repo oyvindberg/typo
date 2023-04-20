@@ -42,13 +42,15 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SQL"""insert into sales.currencyrate(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning currencyrateid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate".as(rowParser.*)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          from sales.currencyrate
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
     fieldValues match {
@@ -63,7 +65,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           case CurrencyrateFieldValue.endofdayrate(value) => NamedParameter("endofdayrate", ParameterValue.from(value))
           case CurrencyrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.currencyrate where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.currencyrate
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -73,7 +78,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   
   }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
-    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid".as(rowParser.singleOpt)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          from sales.currencyrate
+          where currencyrateid = $currencyrateid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
     implicit val arrayToSql: ToSql[Array[CurrencyrateId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -81,7 +89,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       (s: PreparedStatement, index: Int, v: Array[CurrencyrateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)".as(rowParser.*)
+    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          from sales.currencyrate
+          where currencyrateid = ANY($currencyrateids)
+       """.as(rowParser.*)
   
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
@@ -93,7 +104,8 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
               averagerate = ${row.averagerate},
               endofdayrate = ${row.endofdayrate},
               modifieddate = ${row.modifieddate}
-          where currencyrateid = $currencyrateid""".executeUpdate() > 0
+          where currencyrateid = $currencyrateid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(currencyrateid: CurrencyrateId, fieldValues: List[CurrencyrateFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -109,7 +121,8 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         }
         val q = s"""update sales.currencyrate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where currencyrateid = $currencyrateid"""
+                    where currencyrateid = $currencyrateid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

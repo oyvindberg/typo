@@ -21,7 +21,9 @@ import java.util.UUID
 
 object SodRepoImpl extends SodRepo {
   override def selectAll(implicit c: Connection): List[SodRow] = {
-    SQL"select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sa.sod".as(rowParser.*)
+    SQL"""select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+          from sa.sod
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SodFieldOrIdValue[_]])(implicit c: Connection): List[SodRow] = {
     fieldValues match {
@@ -40,7 +42,10 @@ object SodRepoImpl extends SodRepo {
           case SodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.sod where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.sod
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

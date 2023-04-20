@@ -21,7 +21,9 @@ import typo.generated.information_schema.SqlIdentifier
 
 object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
   override def selectAll(implicit c: Connection): List[ReferentialConstraintsRow] = {
-    SQL"select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints".as(rowParser.*)
+    SQL"""select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule
+          from information_schema.referential_constraints
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ReferentialConstraintsFieldOrIdValue[_]])(implicit c: Connection): List[ReferentialConstraintsRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
           case ReferentialConstraintsFieldValue.updateRule(value) => NamedParameter("update_rule", ParameterValue.from(value))
           case ReferentialConstraintsFieldValue.deleteRule(value) => NamedParameter("delete_rule", ParameterValue.from(value))
         }
-        val q = s"""select * from information_schema.referential_constraints where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from information_schema.referential_constraints
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

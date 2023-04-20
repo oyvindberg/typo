@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 object JcRepoImpl extends JcRepo {
   override def selectAll(implicit c: Connection): List[JcRow] = {
-    SQL"select id, jobcandidateid, businessentityid, resume, modifieddate from hr.jc".as(rowParser.*)
+    SQL"""select id, jobcandidateid, businessentityid, resume, modifieddate
+          from hr.jc
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JcFieldOrIdValue[_]])(implicit c: Connection): List[JcRow] = {
     fieldValues match {
@@ -32,7 +34,10 @@ object JcRepoImpl extends JcRepo {
           case JcFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
           case JcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from hr.jc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from hr.jc
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

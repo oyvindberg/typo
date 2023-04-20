@@ -58,13 +58,15 @@ object DocumentRepoImpl extends DocumentRepo {
     SQL"""insert into production.document(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning documentnode
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
-    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document".as(rowParser.*)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
+          from production.document
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
     fieldValues match {
@@ -85,7 +87,10 @@ object DocumentRepoImpl extends DocumentRepo {
           case DocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case DocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select * from production.document where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.document
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -95,7 +100,10 @@ object DocumentRepoImpl extends DocumentRepo {
   
   }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode".as(rowParser.singleOpt)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
+          from production.document
+          where documentnode = $documentnode
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     implicit val arrayToSql: ToSql[Array[DocumentId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -103,7 +111,10 @@ object DocumentRepoImpl extends DocumentRepo {
       (s: PreparedStatement, index: Int, v: Array[DocumentId]) =>
         s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
     
-    SQL"select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode from production.document where documentnode = ANY($documentnodes)".as(rowParser.*)
+    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
+          from production.document
+          where documentnode = ANY($documentnodes)
+       """.as(rowParser.*)
   
   }
   override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
@@ -124,7 +135,8 @@ object DocumentRepoImpl extends DocumentRepo {
               document = ${row.document},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where documentnode = $documentnode""".executeUpdate() > 0
+          where documentnode = $documentnode
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -146,7 +158,8 @@ object DocumentRepoImpl extends DocumentRepo {
         }
         val q = s"""update production.document
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where documentnode = $documentnode"""
+                    where documentnode = $documentnode
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

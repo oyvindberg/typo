@@ -36,13 +36,15 @@ object CountryregionRepoImpl extends CountryregionRepo {
     
     SQL"""insert into person.countryregion(countryregioncode, ${namedParameters.map(_.name).mkString(", ")})
           values (${countryregioncode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
-    SQL"select countryregioncode, name, modifieddate from person.countryregion".as(rowParser.*)
+    SQL"""select countryregioncode, name, modifieddate
+          from person.countryregion
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow] = {
     fieldValues match {
@@ -53,7 +55,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
           case CountryregionFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CountryregionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.countryregion where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.countryregion
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -63,7 +68,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
   
   }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
-    SQL"select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = $countryregioncode".as(rowParser.singleOpt)
+    SQL"""select countryregioncode, name, modifieddate
+          from person.countryregion
+          where countryregioncode = $countryregioncode
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     implicit val arrayToSql: ToSql[Array[CountryregionId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -71,7 +79,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
       (s: PreparedStatement, index: Int, v: Array[CountryregionId]) =>
         s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
     
-    SQL"select countryregioncode, name, modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)".as(rowParser.*)
+    SQL"""select countryregioncode, name, modifieddate
+          from person.countryregion
+          where countryregioncode = ANY($countryregioncodes)
+       """.as(rowParser.*)
   
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
@@ -79,7 +90,8 @@ object CountryregionRepoImpl extends CountryregionRepo {
     SQL"""update person.countryregion
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where countryregioncode = $countryregioncode""".executeUpdate() > 0
+          where countryregioncode = $countryregioncode
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -91,7 +103,8 @@ object CountryregionRepoImpl extends CountryregionRepo {
         }
         val q = s"""update person.countryregion
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where countryregioncode = $countryregioncode"""
+                    where countryregioncode = $countryregioncode
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

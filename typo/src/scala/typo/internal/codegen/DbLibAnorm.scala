@@ -105,26 +105,39 @@ object DbLibAnorm extends DbLib {
     code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
   def cast(c: ColumnComputed) = c.dbCol.tpe match {
-    case db.Type.EnumRef(name) => code"::${name.value}"
+    case db.Type.EnumRef(name)   => code"::${name.value}"
     case db.Type.DomainRef(name) => code"::${name.value}"
-    case _ => sc.Code.Empty
+    case _                       => sc.Code.Empty
   }
 
   override def repoImpl(table: RelationComputed, repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectAll(_) =>
-        val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.relationName}""")
+        val sql = interpolate {
+          code"""|select ${table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")}
+                 |from ${table.relationName}
+                 |""".stripMargin
+        }
         code"""$sql.as($rowParserIdent.*)"""
 
       case RepoMethod.SelectById(id, _) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchId(id)}""")
+        val sql = interpolate {
+          code"""|select $joinedColNames
+                 |from ${table.relationName}
+                 |where ${matchId(id)}
+                 |""".stripMargin
+        }
         code"""$sql.as($rowParserIdent.singleOpt)"""
 
       case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
         val joinedColNames = table.cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
-        val sql = interpolate(code"""select $joinedColNames from ${table.relationName} where ${matchAnyId(unaryId, idsParam)}""")
+        val sql = interpolate {
+          code"""|select $joinedColNames
+                 |from ${table.relationName}
+                 |where ${matchAnyId(unaryId, idsParam)}
+                 |""".stripMargin
+        }
         val maybeToStatement = unaryId match {
           case IdComputed.UnaryUserSpecified(_, _) =>
             sc.Code.Empty
@@ -145,18 +158,23 @@ object DbLibAnorm extends DbLib {
                |""".stripMargin
 
       case RepoMethod.SelectByUnique(params, _) =>
-        val args = params.map { param => code"${table.FieldValueName}.${param.name}(${param.name})" }.mkCode(", ")
-        code"""selectByFieldValues(${sc.Type.List}($args)).headOption"""
+        val args = params.map { param =>
+          code"${table.FieldValueName}.${param.name}(${param.name})"
+        }
+        code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
 
       case RepoMethod.SelectByFieldValues(param, _) =>
         val cases: NonEmptyList[sc.Code] =
-          table.cols.map(col =>
+          table.cols.map { col =>
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
-          )
+          }
 
-        val sql = sc.s(
-          code"""select * from ${table.relationName} where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}"""
-        )
+        val sql = sc.s {
+          code"""|select *
+                 |from ${table.relationName}
+                 |where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}
+                 |""".stripMargin
+        }
         code"""${param.name} match {
               |  case Nil => selectAll
               |  case nonEmpty =>
@@ -178,11 +196,12 @@ object DbLibAnorm extends DbLib {
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
-        val sql = sc.s(
+        val sql = sc.s {
           code"""update ${table.relationName}
-                |    set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
-                |    where ${matchId(id)}""".stripMargin
-        )
+                |set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
+                |where ${matchId(id)}
+                |""".stripMargin
+        }
         code"""${param.name} match {
               |  case Nil => false
               |  case nonEmpty =>
@@ -199,11 +218,12 @@ object DbLibAnorm extends DbLib {
               |""".stripMargin
 
       case RepoMethod.Update(id, param, colsUnsaved) =>
-        val sql = interpolate(
-          code"""update ${table.relationName}
-                |      set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
-                |      where ${matchId(id)}""".stripMargin
-        )
+        val sql = interpolate {
+          code"""|update ${table.relationName}
+                 |set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
+                 |where ${matchId(id)}
+                 |""".stripMargin
+        }
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
                |$sql.executeUpdate() > 0"""
 
@@ -211,12 +231,12 @@ object DbLibAnorm extends DbLib {
         val values = colsUnsaved.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
-        val sql = interpolate(
+        val sql = interpolate {
           code"""|insert into ${table.relationName}(${colsUnsaved.map(c => maybeQuoted(c.dbName)).mkCode(", ")})
-                 |      values (${values.mkCode(", ")})
-                 |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
+                 |values (${values.mkCode(", ")})
+                 |returning ${id.cols.map(_.name.value.code).mkCode(", ")}
                  |""".stripMargin
-        )
+        }
 
         code"""|$sql
                |  .executeInsert($idRowParserIdent.single)
@@ -236,8 +256,8 @@ object DbLibAnorm extends DbLib {
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}($${namedParameters.map(_.name).mkString(", ")})
-                 |      values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
-                 |      returning ${id.cols.map(_.name.value.code).mkCode(", ")}
+                 |values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+                 |returning ${id.cols.map(_.name.value.code).mkCode(", ")}
                  |""".stripMargin
         )
 
@@ -263,7 +283,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}(${joinedIdColNames.mkCode(", ")}, ${joinedUnsavedColNames.mkCode(", ")})
-                 |      values (${idValues.mkCode(", ")}, ${unsavedValues.mkCode(", ")})
+                 |values (${idValues.mkCode(", ")}, ${unsavedValues.mkCode(", ")})
                  |""".stripMargin
         )
 
@@ -293,7 +313,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}($joinedIdColNames, $${namedParameters.map(_.name).mkString(", ")})
-                 |      values (${idValues.mkCode(", ")}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+                 |values (${idValues.mkCode(", ")}, $${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |""".stripMargin
         )
 
@@ -316,7 +336,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = interpolate(
           code"""|insert into ${table.relationName}($joinedIdColNames)
-                 |      values (${idValues.mkCode(", ")})
+                 |values (${idValues.mkCode(", ")})
                  |""".stripMargin
         )
 

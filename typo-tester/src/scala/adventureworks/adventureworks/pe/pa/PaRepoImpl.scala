@@ -19,7 +19,9 @@ import java.util.UUID
 
 object PaRepoImpl extends PaRepo {
   override def selectAll(implicit c: Connection): List[PaRow] = {
-    SQL"select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa".as(rowParser.*)
+    SQL"""select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          from pe.pa
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PaFieldOrIdValue[_]])(implicit c: Connection): List[PaRow] = {
     fieldValues match {
@@ -33,7 +35,10 @@ object PaRepoImpl extends PaRepo {
           case PaFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PaFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pe.pa where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pe.pa
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

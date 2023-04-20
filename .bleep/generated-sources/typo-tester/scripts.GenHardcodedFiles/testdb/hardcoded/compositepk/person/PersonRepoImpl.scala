@@ -23,12 +23,14 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""insert into compositepk.person(name)
           values (${unsaved.name})
           returning one, two
-    """
+       """
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"select one, two, name from compositepk.person".as(rowParser.*)
+    SQL"""select one, two, name
+          from compositepk.person
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -39,7 +41,10 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        val q = s"""select * from compositepk.person where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from compositepk.person
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -49,13 +54,17 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"select one, two, name from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}".as(rowParser.singleOpt)
+    SQL"""select one, two, name
+          from compositepk.person
+          where one = ${compositeId.one}, two = ${compositeId.two}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
           set name = ${row.name}
-          where one = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
+          where one = ${compositeId.one}, two = ${compositeId.two}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -66,7 +75,8 @@ object PersonRepoImpl extends PersonRepo {
         }
         val q = s"""update compositepk.person
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where one = ${compositeId.one}, two = ${compositeId.two}"""
+                    where one = ${compositeId.one}, two = ${compositeId.two}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

@@ -37,13 +37,15 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     
     SQL"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.businessentityid}, ${compositeId.personid}, ${compositeId.contacttypeid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentitycontactRow] = {
-    SQL"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact".as(rowParser.*)
+    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate
+          from person.businessentitycontact
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentitycontactRow] = {
     fieldValues match {
@@ -56,7 +58,10 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
           case BusinessentitycontactFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case BusinessentitycontactFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.businessentitycontact where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.businessentitycontact
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -66,14 +71,18 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   
   }
   override def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow] = {
-    SQL"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}".as(rowParser.singleOpt)
+    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate
+          from person.businessentitycontact
+          where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentitycontact
           set rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}""".executeUpdate() > 0
+          where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: BusinessentitycontactId, fieldValues: List[BusinessentitycontactFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -85,7 +94,8 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
         }
         val q = s"""update person.businessentitycontact
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}"""
+                    where businessentityid = ${compositeId.businessentityid}, personid = ${compositeId.personid}, contacttypeid = ${compositeId.contacttypeid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

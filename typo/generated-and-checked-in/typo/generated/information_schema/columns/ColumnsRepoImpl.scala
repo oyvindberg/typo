@@ -23,7 +23,9 @@ import typo.generated.information_schema.YesOrNo
 
 object ColumnsRepoImpl extends ColumnsRepo {
   override def selectAll(implicit c: Connection): List[ColumnsRow] = {
-    SQL"select table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, character_octet_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, domain_catalog, domain_schema, domain_name, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_self_referencing, is_identity, identity_generation, identity_start, identity_increment, identity_maximum, identity_minimum, identity_cycle, is_generated, generation_expression, is_updatable from information_schema.columns".as(rowParser.*)
+    SQL"""select table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, character_octet_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, domain_catalog, domain_schema, domain_name, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_self_referencing, is_identity, identity_generation, identity_start, identity_increment, identity_maximum, identity_minimum, identity_cycle, is_generated, generation_expression, is_updatable
+          from information_schema.columns
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ColumnsFieldOrIdValue[_]])(implicit c: Connection): List[ColumnsRow] = {
     fieldValues match {
@@ -75,7 +77,10 @@ object ColumnsRepoImpl extends ColumnsRepo {
           case ColumnsFieldValue.generationExpression(value) => NamedParameter("generation_expression", ParameterValue.from(value))
           case ColumnsFieldValue.isUpdatable(value) => NamedParameter("is_updatable", ParameterValue.from(value))
         }
-        val q = s"""select * from information_schema.columns where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from information_schema.columns
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

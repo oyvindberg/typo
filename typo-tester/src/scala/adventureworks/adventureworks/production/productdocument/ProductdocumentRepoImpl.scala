@@ -32,13 +32,15 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     
     SQL"""insert into production.productdocument(productid, documentnode, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.productid}, ${compositeId.documentnode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
-    SQL"select productid, modifieddate, documentnode from production.productdocument".as(rowParser.*)
+    SQL"""select productid, modifieddate, documentnode
+          from production.productdocument
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow] = {
     fieldValues match {
@@ -49,7 +51,10 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           case ProductdocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case ProductdocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productdocument where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productdocument
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -59,13 +64,17 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
-    SQL"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".as(rowParser.singleOpt)
+    SQL"""select productid, modifieddate, documentnode
+          from production.productdocument
+          where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productdocument
           set modifieddate = ${row.modifieddate}
-          where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}""".executeUpdate() > 0
+          where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -76,7 +85,8 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         }
         val q = s"""update production.productdocument
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}"""
+                    where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

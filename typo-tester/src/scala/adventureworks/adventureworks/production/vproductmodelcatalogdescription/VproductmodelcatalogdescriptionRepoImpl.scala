@@ -20,7 +20,9 @@ import java.util.UUID
 
 object VproductmodelcatalogdescriptionRepoImpl extends VproductmodelcatalogdescriptionRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
-    SQL"select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription".as(rowParser.*)
+    SQL"""select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate
+          from production.vproductmodelcatalogdescription
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
     fieldValues match {
@@ -53,7 +55,10 @@ object VproductmodelcatalogdescriptionRepoImpl extends Vproductmodelcatalogdescr
           case VproductmodelcatalogdescriptionFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VproductmodelcatalogdescriptionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.vproductmodelcatalogdescription where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.vproductmodelcatalogdescription
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

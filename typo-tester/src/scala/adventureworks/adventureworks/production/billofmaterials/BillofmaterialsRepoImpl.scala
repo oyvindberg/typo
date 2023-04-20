@@ -51,13 +51,15 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     SQL"""insert into production.billofmaterials(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning billofmaterialsid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
-    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials".as(rowParser.*)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          from production.billofmaterials
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow] = {
     fieldValues match {
@@ -74,7 +76,10 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           case BillofmaterialsFieldValue.perassemblyqty(value) => NamedParameter("perassemblyqty", ParameterValue.from(value))
           case BillofmaterialsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.billofmaterials where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.billofmaterials
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -84,7 +89,10 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   
   }
   override def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow] = {
-    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid".as(rowParser.singleOpt)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          from production.billofmaterials
+          where billofmaterialsid = $billofmaterialsid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
     implicit val arrayToSql: ToSql[Array[BillofmaterialsId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -92,7 +100,10 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       (s: PreparedStatement, index: Int, v: Array[BillofmaterialsId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)".as(rowParser.*)
+    SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          from production.billofmaterials
+          where billofmaterialsid = ANY($billofmaterialsids)
+       """.as(rowParser.*)
   
   }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
@@ -106,7 +117,8 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               bomlevel = ${row.bomlevel},
               perassemblyqty = ${row.perassemblyqty},
               modifieddate = ${row.modifieddate}
-          where billofmaterialsid = $billofmaterialsid""".executeUpdate() > 0
+          where billofmaterialsid = $billofmaterialsid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -124,7 +136,8 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         }
         val q = s"""update production.billofmaterials
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where billofmaterialsid = $billofmaterialsid"""
+                    where billofmaterialsid = $billofmaterialsid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

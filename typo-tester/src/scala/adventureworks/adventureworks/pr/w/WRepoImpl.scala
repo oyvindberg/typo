@@ -20,7 +20,9 @@ import java.time.LocalDateTime
 
 object WRepoImpl extends WRepo {
   override def selectAll(implicit c: Connection): List[WRow] = {
-    SQL"select id, workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from pr.w".as(rowParser.*)
+    SQL"""select id, workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          from pr.w
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WFieldOrIdValue[_]])(implicit c: Connection): List[WRow] = {
     fieldValues match {
@@ -38,7 +40,10 @@ object WRepoImpl extends WRepo {
           case WFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
           case WFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.w where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.w
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

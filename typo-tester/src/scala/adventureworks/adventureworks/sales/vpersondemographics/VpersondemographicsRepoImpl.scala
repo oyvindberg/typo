@@ -19,7 +19,9 @@ import org.postgresql.util.PGmoney
 
 object VpersondemographicsRepoImpl extends VpersondemographicsRepo {
   override def selectAll(implicit c: Connection): List[VpersondemographicsRow] = {
-    SQL"select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned from sales.vpersondemographics".as(rowParser.*)
+    SQL"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
+          from sales.vpersondemographics
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VpersondemographicsFieldOrIdValue[_]])(implicit c: Connection): List[VpersondemographicsRow] = {
     fieldValues match {
@@ -40,7 +42,10 @@ object VpersondemographicsRepoImpl extends VpersondemographicsRepo {
           case VpersondemographicsFieldValue.homeownerflag(value) => NamedParameter("homeownerflag", ParameterValue.from(value))
           case VpersondemographicsFieldValue.numbercarsowned(value) => NamedParameter("numbercarsowned", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.vpersondemographics where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.vpersondemographics
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

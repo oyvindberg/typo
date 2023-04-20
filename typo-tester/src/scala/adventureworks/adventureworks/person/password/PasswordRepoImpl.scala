@@ -43,13 +43,15 @@ object PasswordRepoImpl extends PasswordRepo {
     
     SQL"""insert into person.password(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
           values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
-    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password".as(rowParser.*)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          from person.password
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
     fieldValues match {
@@ -62,7 +64,10 @@ object PasswordRepoImpl extends PasswordRepo {
           case PasswordFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PasswordFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from person.password where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from person.password
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -72,7 +77,10 @@ object PasswordRepoImpl extends PasswordRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
-    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = $businessentityid".as(rowParser.singleOpt)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          from person.password
+          where businessentityid = $businessentityid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     implicit val arrayToSql: ToSql[Array[BusinessentityId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -80,7 +88,10 @@ object PasswordRepoImpl extends PasswordRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person.password where businessentityid = ANY($businessentityids)".as(rowParser.*)
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          from person.password
+          where businessentityid = ANY($businessentityids)
+       """.as(rowParser.*)
   
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
@@ -90,7 +101,8 @@ object PasswordRepoImpl extends PasswordRepo {
               passwordsalt = ${row.passwordsalt},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = $businessentityid""".executeUpdate() > 0
+          where businessentityid = $businessentityid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -104,7 +116,8 @@ object PasswordRepoImpl extends PasswordRepo {
         }
         val q = s"""update person.password
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid"""
+                    where businessentityid = $businessentityid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

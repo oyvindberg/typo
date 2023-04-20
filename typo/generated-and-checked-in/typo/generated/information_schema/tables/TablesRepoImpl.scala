@@ -22,7 +22,9 @@ import typo.generated.information_schema.YesOrNo
 
 object TablesRepoImpl extends TablesRepo {
   override def selectAll(implicit c: Connection): List[TablesRow] = {
-    SQL"select table_catalog, table_schema, table_name, table_type, self_referencing_column_name, reference_generation, user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, is_insertable_into, is_typed, commit_action from information_schema.tables".as(rowParser.*)
+    SQL"""select table_catalog, table_schema, table_name, table_type, self_referencing_column_name, reference_generation, user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, is_insertable_into, is_typed, commit_action
+          from information_schema.tables
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TablesFieldOrIdValue[_]])(implicit c: Connection): List[TablesRow] = {
     fieldValues match {
@@ -42,7 +44,10 @@ object TablesRepoImpl extends TablesRepo {
           case TablesFieldValue.isTyped(value) => NamedParameter("is_typed", ParameterValue.from(value))
           case TablesFieldValue.commitAction(value) => NamedParameter("commit_action", ParameterValue.from(value))
         }
-        val q = s"""select * from information_schema.tables where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from information_schema.tables
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

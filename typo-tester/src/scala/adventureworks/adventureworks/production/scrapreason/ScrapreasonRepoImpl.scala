@@ -38,13 +38,15 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     SQL"""insert into production.scrapreason(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning scrapreasonid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"select scrapreasonid, name, modifieddate from production.scrapreason".as(rowParser.*)
+    SQL"""select scrapreasonid, name, modifieddate
+          from production.scrapreason
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow] = {
     fieldValues match {
@@ -55,7 +57,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           case ScrapreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case ScrapreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.scrapreason where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.scrapreason
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -65,7 +70,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid".as(rowParser.singleOpt)
+    SQL"""select scrapreasonid, name, modifieddate
+          from production.scrapreason
+          where scrapreasonid = $scrapreasonid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
     implicit val arrayToSql: ToSql[Array[ScrapreasonId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -73,7 +81,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[ScrapreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select scrapreasonid, name, modifieddate from production.scrapreason where scrapreasonid = ANY($scrapreasonids)".as(rowParser.*)
+    SQL"""select scrapreasonid, name, modifieddate
+          from production.scrapreason
+          where scrapreasonid = ANY($scrapreasonids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
@@ -81,7 +92,8 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     SQL"""update production.scrapreason
           set name = ${row.name},
               modifieddate = ${row.modifieddate}
-          where scrapreasonid = $scrapreasonid""".executeUpdate() > 0
+          where scrapreasonid = $scrapreasonid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -93,7 +105,8 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         }
         val q = s"""update production.scrapreason
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where scrapreasonid = $scrapreasonid"""
+                    where scrapreasonid = $scrapreasonid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

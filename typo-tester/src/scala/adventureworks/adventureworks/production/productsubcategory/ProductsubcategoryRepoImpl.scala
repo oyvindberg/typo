@@ -45,13 +45,15 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     SQL"""insert into production.productsubcategory(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning productsubcategoryid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
-    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory".as(rowParser.*)
+    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate
+          from production.productsubcategory
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductsubcategoryRow] = {
     fieldValues match {
@@ -64,7 +66,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           case ProductsubcategoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductsubcategoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productsubcategory where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productsubcategory
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -74,7 +79,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow] = {
-    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = $productsubcategoryid".as(rowParser.singleOpt)
+    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate
+          from production.productsubcategory
+          where productsubcategoryid = $productsubcategoryid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
     implicit val arrayToSql: ToSql[Array[ProductsubcategoryId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -82,7 +90,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductsubcategoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select productsubcategoryid, productcategoryid, name, rowguid, modifieddate from production.productsubcategory where productsubcategoryid = ANY($productsubcategoryids)".as(rowParser.*)
+    SQL"""select productsubcategoryid, productcategoryid, name, rowguid, modifieddate
+          from production.productsubcategory
+          where productsubcategoryid = ANY($productsubcategoryids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
@@ -92,7 +103,8 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               name = ${row.name},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where productsubcategoryid = $productsubcategoryid""".executeUpdate() > 0
+          where productsubcategoryid = $productsubcategoryid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(productsubcategoryid: ProductsubcategoryId, fieldValues: List[ProductsubcategoryFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -106,7 +118,8 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
         }
         val q = s"""update production.productsubcategory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productsubcategoryid = $productsubcategoryid"""
+                    where productsubcategoryid = $productsubcategoryid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

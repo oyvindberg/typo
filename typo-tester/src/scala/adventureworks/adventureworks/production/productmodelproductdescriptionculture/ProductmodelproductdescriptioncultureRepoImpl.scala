@@ -33,13 +33,15 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     
     SQL"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, ${namedParameters.map(_.name).mkString(", ")})
           values (${compositeId.productmodelid}, ${compositeId.productdescriptionid}, ${compositeId.cultureid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-    """
+       """
       .on(namedParameters :_*)
       .execute()
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
-    SQL"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture".as(rowParser.*)
+    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
+          from production.productmodelproductdescriptionculture
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelproductdescriptioncultureFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     fieldValues match {
@@ -51,7 +53,10 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           case ProductmodelproductdescriptioncultureFieldValue.cultureid(value) => NamedParameter("cultureid", ParameterValue.from(value))
           case ProductmodelproductdescriptioncultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.productmodelproductdescriptionculture where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.productmodelproductdescriptionculture
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -61,13 +66,17 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
-    SQL"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".as(rowParser.singleOpt)
+    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
+          from production.productmodelproductdescriptionculture
+          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+       """.as(rowParser.singleOpt)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelproductdescriptionculture
           set modifieddate = ${row.modifieddate}
-          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}""".executeUpdate() > 0
+          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductmodelproductdescriptioncultureId, fieldValues: List[ProductmodelproductdescriptioncultureFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -78,7 +87,8 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
         }
         val q = s"""update production.productmodelproductdescriptionculture
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}"""
+                    where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

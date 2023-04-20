@@ -20,7 +20,9 @@ import java.util.UUID
 
 object PiRepoImpl extends PiRepo {
   override def selectAll(implicit c: Connection): List[PiRow] = {
-    SQL"select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi".as(rowParser.*)
+    SQL"""select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+          from pr.pi
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PiFieldOrIdValue[_]])(implicit c: Connection): List[PiRow] = {
     fieldValues match {
@@ -36,7 +38,10 @@ object PiRepoImpl extends PiRepo {
           case PiFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PiFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from pr.pi where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from pr.pi
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

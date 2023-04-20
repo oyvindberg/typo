@@ -18,7 +18,9 @@ import java.time.LocalDateTime
 
 object CcRepoImpl extends CcRepo {
   override def selectAll(implicit c: Connection): List[CcRow] = {
-    SQL"select id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sa.cc".as(rowParser.*)
+    SQL"""select id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          from sa.cc
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CcFieldOrIdValue[_]])(implicit c: Connection): List[CcRow] = {
     fieldValues match {
@@ -33,7 +35,10 @@ object CcRepoImpl extends CcRepo {
           case CcFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
           case CcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sa.cc where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sa.cc
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

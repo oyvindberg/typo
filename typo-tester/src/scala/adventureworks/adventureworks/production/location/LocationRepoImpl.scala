@@ -46,13 +46,15 @@ object LocationRepoImpl extends LocationRepo {
     SQL"""insert into production.location(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning locationid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
-    SQL"select locationid, name, costrate, availability, modifieddate from production.location".as(rowParser.*)
+    SQL"""select locationid, name, costrate, availability, modifieddate
+          from production.location
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
     fieldValues match {
@@ -65,7 +67,10 @@ object LocationRepoImpl extends LocationRepo {
           case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
           case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from production.location where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from production.location
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -75,7 +80,10 @@ object LocationRepoImpl extends LocationRepo {
   
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
-    SQL"select locationid, name, costrate, availability, modifieddate from production.location where locationid = $locationid".as(rowParser.singleOpt)
+    SQL"""select locationid, name, costrate, availability, modifieddate
+          from production.location
+          where locationid = $locationid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     implicit val arrayToSql: ToSql[Array[LocationId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -83,7 +91,10 @@ object LocationRepoImpl extends LocationRepo {
       (s: PreparedStatement, index: Int, v: Array[LocationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select locationid, name, costrate, availability, modifieddate from production.location where locationid = ANY($locationids)".as(rowParser.*)
+    SQL"""select locationid, name, costrate, availability, modifieddate
+          from production.location
+          where locationid = ANY($locationids)
+       """.as(rowParser.*)
   
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
@@ -93,7 +104,8 @@ object LocationRepoImpl extends LocationRepo {
               costrate = ${row.costrate},
               availability = ${row.availability},
               modifieddate = ${row.modifieddate}
-          where locationid = $locationid""".executeUpdate() > 0
+          where locationid = $locationid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -107,7 +119,8 @@ object LocationRepoImpl extends LocationRepo {
         }
         val q = s"""update production.location
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where locationid = $locationid"""
+                    where locationid = $locationid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)

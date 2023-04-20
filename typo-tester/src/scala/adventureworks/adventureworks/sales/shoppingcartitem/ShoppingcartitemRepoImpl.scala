@@ -47,13 +47,15 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SQL"""insert into sales.shoppingcartitem(${namedParameters.map(_.name).mkString(", ")})
           values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
           returning shoppingcartitemid
-    """
+       """
       .on(namedParameters :_*)
       .executeInsert(idRowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem".as(rowParser.*)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          from sales.shoppingcartitem
+       """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow] = {
     fieldValues match {
@@ -67,7 +69,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           case ShoppingcartitemFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
           case ShoppingcartitemFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select * from sales.shoppingcartitem where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}"""
+        val q = s"""select *
+                    from sales.shoppingcartitem
+                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
@@ -77,7 +82,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
-    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".as(rowParser.singleOpt)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          from sales.shoppingcartitem
+          where shoppingcartitemid = $shoppingcartitemid
+       """.as(rowParser.singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     implicit val arrayToSql: ToSql[Array[ShoppingcartitemId]] = _ => ("?", 1) // fix wrong instance from anorm
@@ -85,7 +93,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       (s: PreparedStatement, index: Int, v: Array[ShoppingcartitemId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = ANY($shoppingcartitemids)".as(rowParser.*)
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          from sales.shoppingcartitem
+          where shoppingcartitemid = ANY($shoppingcartitemids)
+       """.as(rowParser.*)
   
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
@@ -96,7 +107,8 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               productid = ${row.productid},
               datecreated = ${row.datecreated},
               modifieddate = ${row.modifieddate}
-          where shoppingcartitemid = $shoppingcartitemid""".executeUpdate() > 0
+          where shoppingcartitemid = $shoppingcartitemid
+       """.executeUpdate() > 0
   }
   override def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]])(implicit c: Connection): Boolean = {
     fieldValues match {
@@ -111,7 +123,8 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         }
         val q = s"""update sales.shoppingcartitem
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shoppingcartitemid = $shoppingcartitemid"""
+                    where shoppingcartitemid = $shoppingcartitemid
+                 """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
