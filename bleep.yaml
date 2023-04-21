@@ -1,7 +1,7 @@
 $schema: https://raw.githubusercontent.com/oyvindberg/bleep/master/schema.json
 $version: 0.0.1-M26
 jvm:
-  name: graalvm-java17:22.2.0
+  name: zulu:17.0.1
 projects:
   tests:
     dependencies: org.scalatest::scalatest:3.2.13
