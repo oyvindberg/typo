@@ -78,7 +78,7 @@ object GeneratedAdventureWorks {
             typo.Options(
               pkg = "adventureworks",
               jsonLib = typo.JsonLibName.PlayJson,
-              dbLib = typo.DbLibName.Anorm,
+              dbLib = typo.DbLibName.Anorm
             ),
             buildDir.resolve("adventureworks_sql"),
             typo.Selector.ExcludePostgresInternal
