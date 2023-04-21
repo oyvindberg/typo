@@ -26,7 +26,7 @@ object Publish extends BleepScript("Publish") {
     val sonatype = new Sonatype(
       logger = started.logger,
       sonatypeBundleDirectory = started.buildPaths.dotBleepDir / "sonatype-bundle",
-      sonatypeProfileName = groupId,
+      sonatypeProfileName = "com.olvind",
       bundleName = "typo",
       version = dynVer.version,
       sonatypeCredentialHost = Sonatype.sonatype01
