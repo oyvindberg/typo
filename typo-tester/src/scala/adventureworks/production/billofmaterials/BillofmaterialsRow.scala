@@ -18,34 +18,25 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class BillofmaterialsRow(
-  /** Primary key for BillOfMaterials records.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"billofmaterialsid","ordinal_position":1,"column_default":"nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for BillOfMaterials records. */
   billofmaterialsid: BillofmaterialsId,
   /** Parent product identification number. Foreign key to Product.ProductID.
-      Points to [[product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"productassemblyid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[product.ProductRow.productid]] */
   productassemblyid: Option[ProductId],
   /** Component identification number. Foreign key to Product.ProductID.
-      Points to [[product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"componentid","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[product.ProductRow.productid]] */
   componentid: ProductId,
-  /** Date the component started being used in the assembly item.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"startdate","ordinal_position":4,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the component started being used in the assembly item. */
   startdate: LocalDateTime,
-  /** Date the component stopped being used in the assembly item.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"enddate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the component stopped being used in the assembly item. */
   enddate: Option[LocalDateTime],
   /** Standard code identifying the unit of measure for the quantity.
-      Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"unitmeasurecode","ordinal_position":6,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
-  /** Indicates the depth the component is from its parent (AssemblyID).
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"bomlevel","ordinal_position":7,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Indicates the depth the component is from its parent (AssemblyID). */
   bomlevel: Int,
-  /** Quantity of the component needed to create the assembly.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"perassemblyqty","ordinal_position":8,"column_default":"1.00","is_nullable":"NO","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity of the component needed to create the assembly. */
   perassemblyqty: BigDecimal,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"billofmaterials","column_name":"modifieddate","ordinal_position":9,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 )
 

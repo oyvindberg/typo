@@ -73,18 +73,17 @@ object GeneratedAdventureWorks {
 
         val typoSources = buildDir.resolve("typo-tester/src/scala/adventureworks")
 
-        val selector = typo.Selector.ExcludePostgresInternal
-
-        val options = typo.Options(
-          pkg = "adventureworks",
-          jsonLib = typo.JsonLibName.PlayJson,
-          dbLib = typo.DbLibName.Anorm,
-          debugTypes = true
-        )
-        val files: typo.Generated =
-          typo.fromDb(options, selector)
-
-        files.overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
+        typo
+          .fromDbAndScripts(
+            typo.Options(
+              pkg = "adventureworks",
+              jsonLib = typo.JsonLibName.PlayJson,
+              dbLib = typo.DbLibName.Anorm,
+            ),
+            buildDir.resolve("adventureworks_sql"),
+            typo.Selector.ExcludePostgresInternal
+          )
+          .overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
 
         cli(
           "add files to git",

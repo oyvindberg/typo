@@ -16,22 +16,16 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ProductphotoRow(
-  /** Primary key for ProductPhoto records.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"productphotoid","ordinal_position":1,"column_default":"nextval('production.productphoto_productphotoid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for ProductPhoto records. */
   productphotoid: ProductphotoId,
-  /** Small image of the product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"thumbnailphoto","ordinal_position":2,"is_nullable":"YES","data_type":"bytea","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Small image of the product. */
   thumbnailphoto: Option[Array[Byte]],
-  /** Small image file name.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"thumbnailphotofilename","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Small image file name. */
   thumbnailphotofilename: Option[String],
-  /** Large image of the product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"largephoto","ordinal_position":4,"is_nullable":"YES","data_type":"bytea","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bytea","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Large image of the product. */
   largephoto: Option[Array[Byte]],
-  /** Large image file name.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"largephotofilename","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Large image file name. */
   largephotofilename: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productphoto","column_name":"modifieddate","ordinal_position":6,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 )
 

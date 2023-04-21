@@ -19,25 +19,19 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.currencyrate` which has not been persisted yet */
 case class CurrencyrateRowUnsaved(
-  /** Date and time the exchange rate was obtained.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"currencyratedate","ordinal_position":2,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date and time the exchange rate was obtained. */
   currencyratedate: LocalDateTime,
   /** Exchange rate was converted from this currency code.
-      Points to [[currency.CurrencyRow.currencycode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"fromcurrencycode","ordinal_position":3,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[currency.CurrencyRow.currencycode]] */
   fromcurrencycode: CurrencyId,
   /** Exchange rate was converted to this currency code.
-      Points to [[currency.CurrencyRow.currencycode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"tocurrencycode","ordinal_position":4,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[currency.CurrencyRow.currencycode]] */
   tocurrencycode: CurrencyId,
-  /** Average exchange rate for the day.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"averagerate","ordinal_position":5,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Average exchange rate for the day. */
   averagerate: BigDecimal,
-  /** Final exchange rate for the day.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"endofdayrate","ordinal_position":6,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Final exchange rate for the day. */
   endofdayrate: BigDecimal,
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"currencyrate","column_name":"modifieddate","ordinal_position":7,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(currencyrateid: CurrencyrateId): CurrencyrateRow =

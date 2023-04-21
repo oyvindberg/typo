@@ -19,17 +19,13 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PppRow(
-  /** Points to [[production.productproductphoto.ProductproductphotoRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"productid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productproductphoto.ProductproductphotoRow.productid]] */
   productid: Option[ProductId],
-  /** Points to [[production.productproductphoto.ProductproductphotoRow.productphotoid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"productphotoid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productproductphoto.ProductproductphotoRow.productphotoid]] */
   productphotoid: Option[ProductphotoId],
-  /** Points to [[production.productproductphoto.ProductproductphotoRow.primary]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"primary","ordinal_position":3,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productproductphoto.ProductproductphotoRow.primary]] */
   primary: Flag,
-  /** Points to [[production.productproductphoto.ProductproductphotoRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"ppp","column_name":"modifieddate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productproductphoto.ProductproductphotoRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

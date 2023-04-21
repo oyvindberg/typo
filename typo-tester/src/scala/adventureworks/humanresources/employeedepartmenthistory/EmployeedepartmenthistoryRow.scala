@@ -21,24 +21,18 @@ import scala.util.Try
 
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
-      Points to [[employee.EmployeeRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"businessentityid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Department in which the employee worked including currently. Foreign key to Department.DepartmentID.
-      Points to [[department.DepartmentRow.departmentid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"departmentid","ordinal_position":2,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[department.DepartmentRow.departmentid]] */
   departmentid: DepartmentId,
   /** Identifies which 8-hour shift the employee works. Foreign key to Shift.Shift.ID.
-      Points to [[shift.ShiftRow.shiftid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"shiftid","ordinal_position":3,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
-  /** Date the employee started work in the department.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"startdate","ordinal_position":4,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the employee started work in the department. */
   startdate: LocalDate,
-  /** Date the employee left the department. NULL = Current department.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"enddate","ordinal_position":5,"is_nullable":"YES","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the employee left the department. NULL = Current department. */
   enddate: Option[LocalDate],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employeedepartmenthistory","column_name":"modifieddate","ordinal_position":6,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)

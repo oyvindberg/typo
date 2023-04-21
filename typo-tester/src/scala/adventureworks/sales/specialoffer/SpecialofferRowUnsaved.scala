@@ -19,37 +19,27 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.specialoffer` which has not been persisted yet */
 case class SpecialofferRowUnsaved(
-  /** Discount description.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"description","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":255,"character_octet_length":1020,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Discount description. */
   description: String,
   /** Default: 0.00
-      Discount precentage.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"discountpct","ordinal_position":3,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Discount precentage. */
   discountpct: Defaulted[BigDecimal],
-  /** Discount type category.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"type","ordinal_position":4,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Discount type category. */
   `type`: String,
-  /** Group the discount applies to such as Reseller or Customer.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"category","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Group the discount applies to such as Reseller or Customer. */
   category: String,
-  /** Discount start date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"startdate","ordinal_position":6,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Discount start date. */
   startdate: LocalDateTime,
-  /** Discount end date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"enddate","ordinal_position":7,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Discount end date. */
   enddate: LocalDateTime,
   /** Default: 0
-      Minimum discount percent allowed.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"minqty","ordinal_position":8,"column_default":"0","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Minimum discount percent allowed. */
   minqty: Defaulted[Int],
-  /** Maximum discount percent allowed.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"maxqty","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Maximum discount percent allowed. */
   maxqty: Option[Int],
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"rowguid","ordinal_position":10,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"specialoffer","column_name":"modifieddate","ordinal_position":11,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(specialofferid: SpecialofferId): SpecialofferRow =

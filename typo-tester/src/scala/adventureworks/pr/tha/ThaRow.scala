@@ -17,34 +17,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class ThaRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactionid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
   transactionid: Option[TransactionhistoryarchiveId],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"productid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]] */
   productid: Option[Int],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"referenceorderid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderid]] */
   referenceorderid: Option[Int],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderlineid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"referenceorderlineid","ordinal_position":5,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderlineid]] */
   referenceorderlineid: Option[Int],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactiondate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
   transactiondate: Option[LocalDateTime],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"transactiontype","ordinal_position":7,"is_nullable":"YES","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
   transactiontype: Option[/* bpchar */ String],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"quantity","ordinal_position":8,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
   quantity: Option[Int],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"actualcost","ordinal_position":9,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */
   actualcost: Option[BigDecimal],
-  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"tha","column_name":"modifieddate","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

@@ -19,18 +19,13 @@ import scala.util.Try
 
 case class SalespersonquotahistoryRow(
   /** Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
-      Points to [[salesperson.SalespersonRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salespersonquotahistory","column_name":"businessentityid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Sales quota date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salespersonquotahistory","column_name":"quotadate","ordinal_position":2,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Sales quota date. */
   quotadate: LocalDateTime,
-  /** Sales quota amount.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salespersonquotahistory","column_name":"salesquota","ordinal_position":3,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Sales quota amount. */
   salesquota: BigDecimal,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salespersonquotahistory","column_name":"rowguid","ordinal_position":4,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rowguid: UUID,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salespersonquotahistory","column_name":"modifieddate","ordinal_position":5,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: SalespersonquotahistoryId = SalespersonquotahistoryId(businessentityid, quotadate)

@@ -15,19 +15,12 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class VsalespersonsalesbyfiscalyearsRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"SalesPersonID","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   SalesPersonID: Option[Int],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"FullName","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   FullName: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"JobTitle","ordinal_position":3,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   JobTitle: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"SalesTerritory","ordinal_position":4,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   SalesTerritory: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"2012","ordinal_position":5,"is_nullable":"YES","data_type":"numeric","numeric_precision":12,"numeric_precision_radix":10,"numeric_scale":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `2012`: Option[BigDecimal],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"2013","ordinal_position":6,"is_nullable":"YES","data_type":"numeric","numeric_precision":12,"numeric_precision_radix":10,"numeric_scale":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `2013`: Option[BigDecimal],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"vsalespersonsalesbyfiscalyears","column_name":"2014","ordinal_position":7,"is_nullable":"YES","data_type":"numeric","numeric_precision":12,"numeric_precision_radix":10,"numeric_scale":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `2014`: Option[BigDecimal]
 )
 

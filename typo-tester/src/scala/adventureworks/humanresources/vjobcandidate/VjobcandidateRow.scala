@@ -18,40 +18,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class VjobcandidateRow(
-  /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"jobcandidateid","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId],
-  /** Points to [[jobcandidate.JobcandidateRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Name.Prefix","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Name.Prefix`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Name.First","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Name.First`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Name.Middle","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Name.Middle`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Name.Last","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Name.Last`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Name.Suffix","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Name.Suffix`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Skills","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   Skills: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Addr.Type","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":30,"character_octet_length":120,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Addr.Type`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Addr.Loc.CountryRegion","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":100,"character_octet_length":400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Addr.Loc.CountryRegion`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Addr.Loc.State","ordinal_position":11,"is_nullable":"YES","data_type":"character varying","character_maximum_length":100,"character_octet_length":400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Addr.Loc.State`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Addr.Loc.City","ordinal_position":12,"is_nullable":"YES","data_type":"character varying","character_maximum_length":100,"character_octet_length":400,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Addr.Loc.City`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"Addr.PostalCode","ordinal_position":13,"is_nullable":"YES","data_type":"character varying","character_maximum_length":20,"character_octet_length":80,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   `Addr.PostalCode`: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"EMail","ordinal_position":14,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   EMail: Option[String],
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"WebSite","ordinal_position":15,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   WebSite: Option[String],
-  /** Points to [[jobcandidate.JobcandidateRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"vjobcandidate","column_name":"modifieddate","ordinal_position":16,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[jobcandidate.JobcandidateRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

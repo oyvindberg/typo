@@ -18,19 +18,14 @@ import scala.util.Try
 
 case class ProductcosthistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
-      Points to [[product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productcosthistory","column_name":"productid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  /** Product cost start date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productcosthistory","column_name":"startdate","ordinal_position":2,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Product cost start date. */
   startdate: LocalDateTime,
-  /** Product cost end date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productcosthistory","column_name":"enddate","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Product cost end date. */
   enddate: Option[LocalDateTime],
-  /** Standard cost of the product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productcosthistory","column_name":"standardcost","ordinal_position":4,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Standard cost of the product. */
   standardcost: BigDecimal,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productcosthistory","column_name":"modifieddate","ordinal_position":5,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: ProductcosthistoryId = ProductcosthistoryId(productid, startdate)

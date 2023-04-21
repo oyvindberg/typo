@@ -28,82 +28,56 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SohRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.salesorderid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"salesorderid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.salesorderid]] */
   salesorderid: Option[SalesorderheaderId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.revisionnumber]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"revisionnumber","ordinal_position":3,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.revisionnumber]] */
   revisionnumber: Option[Int],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.orderdate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"orderdate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.orderdate]] */
   orderdate: Option[LocalDateTime],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.duedate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"duedate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.duedate]] */
   duedate: Option[LocalDateTime],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipdate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"shipdate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipdate]] */
   shipdate: Option[LocalDateTime],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.status]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"status","ordinal_position":7,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.status]] */
   status: Option[Int],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.onlineorderflag]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"onlineorderflag","ordinal_position":8,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.onlineorderflag]] */
   onlineorderflag: Flag,
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.purchaseordernumber]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"purchaseordernumber","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"OrderNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.purchaseordernumber]] */
   purchaseordernumber: Option[OrderNumber],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.accountnumber]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"accountnumber","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"AccountNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.accountnumber]] */
   accountnumber: Option[AccountNumber],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.customerid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"customerid","ordinal_position":11,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.customerid]] */
   customerid: Option[CustomerId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.salespersonid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"salespersonid","ordinal_position":12,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"territoryid","ordinal_position":13,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.billtoaddressid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"billtoaddressid","ordinal_position":14,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.billtoaddressid]] */
   billtoaddressid: Option[AddressId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shiptoaddressid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"shiptoaddressid","ordinal_position":15,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shiptoaddressid]] */
   shiptoaddressid: Option[AddressId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipmethodid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"shipmethodid","ordinal_position":16,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipmethodid]] */
   shipmethodid: Option[ShipmethodId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"creditcardid","ordinal_position":17,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardapprovalcode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"creditcardapprovalcode","ordinal_position":18,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardapprovalcode]] */
   creditcardapprovalcode: Option[String],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.currencyrateid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"currencyrateid","ordinal_position":19,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.subtotal]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"subtotal","ordinal_position":20,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.subtotal]] */
   subtotal: Option[BigDecimal],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.taxamt]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"taxamt","ordinal_position":21,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.taxamt]] */
   taxamt: Option[BigDecimal],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.freight]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"freight","ordinal_position":22,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.freight]] */
   freight: Option[BigDecimal],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.totaldue]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"totaldue","ordinal_position":23,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.totaldue]] */
   totaldue: Option[BigDecimal],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"comment","ordinal_position":24,"is_nullable":"YES","data_type":"character varying","character_maximum_length":128,"character_octet_length":512,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]] */
   comment: Option[String],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"rowguid","ordinal_position":25,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"soh","column_name":"modifieddate","ordinal_position":26,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

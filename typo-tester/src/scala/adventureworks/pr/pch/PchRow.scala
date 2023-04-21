@@ -17,22 +17,16 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PchRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"productid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
   productid: Option[ProductId],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.startdate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"startdate","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcosthistory.ProductcosthistoryRow.startdate]] */
   startdate: Option[LocalDateTime],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.enddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"enddate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcosthistory.ProductcosthistoryRow.enddate]] */
   enddate: Option[LocalDateTime],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.standardcost]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"standardcost","ordinal_position":5,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcosthistory.ProductcosthistoryRow.standardcost]] */
   standardcost: Option[BigDecimal],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pch","column_name":"modifieddate","ordinal_position":6,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcosthistory.ProductcosthistoryRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

@@ -19,14 +19,11 @@ import scala.util.Try
 
 case class ProductmodelillustrationRow(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
-      Points to [[productmodel.ProductmodelRow.productmodelid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productmodelillustration","column_name":"productmodelid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: ProductmodelId,
   /** Primary key. Foreign key to Illustration.IllustrationID.
-      Points to [[illustration.IllustrationRow.illustrationid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productmodelillustration","column_name":"illustrationid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[illustration.IllustrationRow.illustrationid]] */
   illustrationid: IllustrationId,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productmodelillustration","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: ProductmodelillustrationId = ProductmodelillustrationId(productmodelid, illustrationid)

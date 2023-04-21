@@ -20,37 +20,26 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SodRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"salesorderid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderid]] */
   salesorderid: Option[SalesorderheaderId],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"salesorderdetailid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   salesorderdetailid: Option[Int],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"carriertrackingnumber","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]] */
   carriertrackingnumber: Option[String],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"orderqty","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]] */
   orderqty: Option[Int],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"productid","ordinal_position":6,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]] */
   productid: Option[ProductId],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.specialofferid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"specialofferid","ordinal_position":7,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.specialofferid]] */
   specialofferid: Option[SpecialofferId],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitprice]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"unitprice","ordinal_position":8,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitprice]] */
   unitprice: Option[BigDecimal],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitpricediscount]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"unitpricediscount","ordinal_position":9,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitpricediscount]] */
   unitpricediscount: Option[BigDecimal],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"rowguid","ordinal_position":10,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"sod","column_name":"modifieddate","ordinal_position":11,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

@@ -20,25 +20,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.customer.CustomerRow.customerid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"customerid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.customerid]] */
   customerid: Option[CustomerId],
-  /** Points to [[sales.customer.CustomerRow.personid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"personid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.personid]] */
   personid: Option[BusinessentityId],
-  /** Points to [[sales.customer.CustomerRow.storeid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"storeid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.storeid]] */
   storeid: Option[BusinessentityId],
-  /** Points to [[sales.customer.CustomerRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"territoryid","ordinal_position":5,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  /** Points to [[sales.customer.CustomerRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"rowguid","ordinal_position":6,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[sales.customer.CustomerRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"c","column_name":"modifieddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.customer.CustomerRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

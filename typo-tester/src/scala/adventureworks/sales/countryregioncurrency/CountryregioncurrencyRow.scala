@@ -19,14 +19,11 @@ import scala.util.Try
 
 case class CountryregioncurrencyRow(
   /** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
-      Points to [[person.countryregion.CountryregionRow.countryregioncode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"countryregioncurrency","column_name":"countryregioncode","ordinal_position":1,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
-      Points to [[currency.CurrencyRow.currencycode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"countryregioncurrency","column_name":"currencycode","ordinal_position":2,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"countryregioncurrency","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)

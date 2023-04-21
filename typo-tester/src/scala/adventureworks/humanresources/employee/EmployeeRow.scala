@@ -21,48 +21,33 @@ import scala.util.Try
 
 case class EmployeeRow(
   /** Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.
-      Points to [[person.person.PersonRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"businessentityid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Unique national identification number such as a social security number.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"nationalidnumber","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Unique national identification number such as a social security number. */
   nationalidnumber: String,
-  /** Network login.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"loginid","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":256,"character_octet_length":1024,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Network login. */
   loginid: String,
-  /** Work title such as Buyer or Sales Representative.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"jobtitle","ordinal_position":6,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Work title such as Buyer or Sales Representative. */
   jobtitle: String,
-  /** Date of birth.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"birthdate","ordinal_position":7,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date of birth. */
   birthdate: LocalDate,
-  /** M = Married, S = Single
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"maritalstatus","ordinal_position":8,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** M = Married, S = Single */
   maritalstatus: /* bpchar */ String,
-  /** M = Male, F = Female
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"gender","ordinal_position":9,"is_nullable":"NO","data_type":"character","character_maximum_length":1,"character_octet_length":4,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** M = Male, F = Female */
   gender: /* bpchar */ String,
-  /** Employee hired on this date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"hiredate","ordinal_position":10,"is_nullable":"NO","data_type":"date","datetime_precision":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"date","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Employee hired on this date. */
   hiredate: LocalDate,
-  /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"salariedflag","ordinal_position":11,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Flag,
-  /** Number of available vacation hours.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"vacationhours","ordinal_position":12,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Number of available vacation hours. */
   vacationhours: Int,
-  /** Number of available sick leave hours.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"sickleavehours","ordinal_position":13,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Number of available sick leave hours. */
   sickleavehours: Int,
-  /** 0 = Inactive, 1 = Active
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"currentflag","ordinal_position":14,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** 0 = Inactive, 1 = Active */
   currentflag: Flag,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"rowguid","ordinal_position":15,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rowguid: UUID,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"modifieddate","ordinal_position":16,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime,
-  /** Where the employee is located in corporate hierarchy.
-      debug: {"table_catalog":"Adventureworks","table_schema":"humanresources","table_name":"employee","column_name":"organizationnode","ordinal_position":17,"column_default":"'/'::character varying","is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Where the employee is located in corporate hierarchy. */
   organizationnode: Option[String]
 )
 

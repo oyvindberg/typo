@@ -30,91 +30,67 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
 case class SalesorderheaderRowUnsaved(
   /** Default: 0
-      Incremental number to track changes to the sales order over time.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"revisionnumber","ordinal_position":2,"column_default":"0","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Incremental number to track changes to the sales order over time. */
   revisionnumber: Defaulted[Int],
   /** Default: now()
-      Dates the sales order was created.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"orderdate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Dates the sales order was created. */
   orderdate: Defaulted[LocalDateTime],
-  /** Date the order is due to the customer.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"duedate","ordinal_position":4,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the order is due to the customer. */
   duedate: LocalDateTime,
-  /** Date the order was shipped to the customer.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"shipdate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the order was shipped to the customer. */
   shipdate: Option[LocalDateTime],
   /** Default: 1
-      Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"status","ordinal_position":6,"column_default":"1","is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
   status: Defaulted[Int],
   /** Default: true
-      0 = Order placed by sales person. 1 = Order placed online by customer.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"onlineorderflag","ordinal_position":7,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Defaulted[Flag],
-  /** Customer purchase order number reference.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"purchaseordernumber","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"OrderNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Customer purchase order number reference. */
   purchaseordernumber: Option[OrderNumber],
-  /** Financial accounting number reference.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"accountnumber","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"AccountNumber","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Financial accounting number reference. */
   accountnumber: Option[AccountNumber],
   /** Customer identification number. Foreign key to Customer.BusinessEntityID.
-      Points to [[customer.CustomerRow.customerid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"customerid","ordinal_position":11,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[customer.CustomerRow.customerid]] */
   customerid: CustomerId,
   /** Sales person who created the sales order. Foreign key to SalesPerson.BusinessEntityID.
-      Points to [[salesperson.SalespersonRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"salespersonid","ordinal_position":12,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[salesperson.SalespersonRow.businessentityid]] */
   salespersonid: Option[BusinessentityId],
   /** Territory in which the sale was made. Foreign key to SalesTerritory.SalesTerritoryID.
-      Points to [[salesterritory.SalesterritoryRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"territoryid","ordinal_position":13,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
   /** Customer billing address. Foreign key to Address.AddressID.
-      Points to [[person.address.AddressRow.addressid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"billtoaddressid","ordinal_position":14,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.address.AddressRow.addressid]] */
   billtoaddressid: AddressId,
   /** Customer shipping address. Foreign key to Address.AddressID.
-      Points to [[person.address.AddressRow.addressid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"shiptoaddressid","ordinal_position":15,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.address.AddressRow.addressid]] */
   shiptoaddressid: AddressId,
   /** Shipping method. Foreign key to ShipMethod.ShipMethodID.
-      Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"shipmethodid","ordinal_position":16,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
-      Points to [[creditcard.CreditcardRow.creditcardid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"creditcardid","ordinal_position":17,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
-  /** Approval code provided by the credit card company.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"creditcardapprovalcode","ordinal_position":18,"is_nullable":"YES","data_type":"character varying","character_maximum_length":15,"character_octet_length":60,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Approval code provided by the credit card company. */
   creditcardapprovalcode: Option[String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
-      Points to [[currencyrate.CurrencyrateRow.currencyrateid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"currencyrateid","ordinal_position":19,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Default: 0.00
-      Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"subtotal","ordinal_position":20,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID. */
   subtotal: Defaulted[BigDecimal],
   /** Default: 0.00
-      Tax amount.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"taxamt","ordinal_position":21,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Tax amount. */
   taxamt: Defaulted[BigDecimal],
   /** Default: 0.00
-      Shipping cost.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"freight","ordinal_position":22,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Shipping cost. */
   freight: Defaulted[BigDecimal],
-  /** Total due from customer. Computed as Subtotal + TaxAmt + Freight.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"totaldue","ordinal_position":23,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],
-  /** Sales representative comments.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"comment","ordinal_position":24,"is_nullable":"YES","data_type":"character varying","character_maximum_length":128,"character_octet_length":512,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Sales representative comments. */
   comment: Option[String],
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"rowguid","ordinal_position":25,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderheader","column_name":"modifieddate","ordinal_position":26,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(salesorderid: SalesorderheaderId): SalesorderheaderRow =

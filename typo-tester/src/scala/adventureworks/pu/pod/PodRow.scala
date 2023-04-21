@@ -18,34 +18,24 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PodRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"purchaseorderid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderid]] */
   purchaseorderid: Option[PurchaseorderheaderId],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"purchaseorderdetailid","ordinal_position":3,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   purchaseorderdetailid: Option[Int],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.duedate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"duedate","ordinal_position":4,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.duedate]] */
   duedate: Option[LocalDateTime],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.orderqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"orderqty","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.orderqty]] */
   orderqty: Option[Int],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"productid","ordinal_position":6,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.productid]] */
   productid: Option[ProductId],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.unitprice]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"unitprice","ordinal_position":7,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.unitprice]] */
   unitprice: Option[BigDecimal],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.receivedqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"receivedqty","ordinal_position":8,"is_nullable":"YES","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.receivedqty]] */
   receivedqty: Option[BigDecimal],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.rejectedqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"rejectedqty","ordinal_position":9,"is_nullable":"YES","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.rejectedqty]] */
   rejectedqty: Option[BigDecimal],
-  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pu","table_name":"pod","column_name":"modifieddate","ordinal_position":10,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

@@ -21,30 +21,22 @@ import scala.util.Try
 /** This class corresponds to a row in table `production.workorder` which has not been persisted yet */
 case class WorkorderRowUnsaved(
   /** Product identification number. Foreign key to Product.ProductID.
-      Points to [[product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"productid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  /** Product quantity to build.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"orderqty","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Product quantity to build. */
   orderqty: Int,
-  /** Quantity that failed inspection.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"scrappedqty","ordinal_position":5,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity that failed inspection. */
   scrappedqty: Int,
-  /** Work order start date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"startdate","ordinal_position":6,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Work order start date. */
   startdate: LocalDateTime,
-  /** Work order end date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"enddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Work order end date. */
   enddate: Option[LocalDateTime],
-  /** Work order due date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"duedate","ordinal_position":8,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Work order due date. */
   duedate: LocalDateTime,
   /** Reason for inspection failure.
-      Points to [[scrapreason.ScrapreasonRow.scrapreasonid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"scrapreasonid","ordinal_position":9,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"workorder","column_name":"modifieddate","ordinal_position":10,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(workorderid: WorkorderId): WorkorderRow =

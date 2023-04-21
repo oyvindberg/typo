@@ -21,37 +21,28 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesterritory` which has not been persisted yet */
 case class SalesterritoryRowUnsaved(
-  /** Sales territory description
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Sales territory description */
   name: Name,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
-      Points to [[person.countryregion.CountryregionRow.countryregioncode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"countryregioncode","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
-  /** Geographic area to which the sales territory belong.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"group","ordinal_position":4,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Geographic area to which the sales territory belong. */
   group: String,
   /** Default: 0.00
-      Sales in the territory year to date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"salesytd","ordinal_position":5,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Sales in the territory year to date. */
   salesytd: Defaulted[BigDecimal],
   /** Default: 0.00
-      Sales in the territory the previous year.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"saleslastyear","ordinal_position":6,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Sales in the territory the previous year. */
   saleslastyear: Defaulted[BigDecimal],
   /** Default: 0.00
-      Business costs in the territory year to date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"costytd","ordinal_position":7,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Business costs in the territory year to date. */
   costytd: Defaulted[BigDecimal],
   /** Default: 0.00
-      Business costs in the territory the previous year.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"costlastyear","ordinal_position":8,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Business costs in the territory the previous year. */
   costlastyear: Defaulted[BigDecimal],
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"rowguid","ordinal_position":9,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesterritory","column_name":"modifieddate","ordinal_position":10,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(territoryid: SalesterritoryId): SalesterritoryRow =

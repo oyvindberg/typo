@@ -22,31 +22,22 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SpRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"stateprovinceid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: Option[StateprovinceId],
-  /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"stateprovincecode","ordinal_position":3,"is_nullable":"YES","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
   stateprovincecode: Option[/* bpchar */ String],
-  /** Points to [[person.stateprovince.StateprovinceRow.countryregioncode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"countryregioncode","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.countryregioncode]] */
   countryregioncode: Option[CountryregionId],
-  /** Points to [[person.stateprovince.StateprovinceRow.isonlystateprovinceflag]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"isonlystateprovinceflag","ordinal_position":5,"is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.isonlystateprovinceflag]] */
   isonlystateprovinceflag: Flag,
-  /** Points to [[person.stateprovince.StateprovinceRow.name]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"name","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.name]] */
   name: Option[Name],
-  /** Points to [[person.stateprovince.StateprovinceRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"territoryid","ordinal_position":7,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  /** Points to [[person.stateprovince.StateprovinceRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"rowguid","ordinal_position":8,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[person.stateprovince.StateprovinceRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pe","table_name":"sp","column_name":"modifieddate","ordinal_position":9,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[person.stateprovince.StateprovinceRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

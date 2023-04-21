@@ -19,32 +19,23 @@ import scala.util.Try
 
 case class PurchaseorderdetailRow(
   /** Primary key. Foreign key to PurchaseOrderHeader.PurchaseOrderID.
-      Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"purchaseorderid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
-  /** Primary key. One line number per purchased product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"purchaseorderdetailid","ordinal_position":2,"column_default":"nextval('purchasing.purchaseorderdetail_purchaseorderdetailid_seq'::regclass)","is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key. One line number per purchased product. */
   purchaseorderdetailid: Int,
-  /** Date the product is expected to be received.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"duedate","ordinal_position":3,"is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Date the product is expected to be received. */
   duedate: LocalDateTime,
-  /** Quantity ordered.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"orderqty","ordinal_position":4,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity ordered. */
   orderqty: Int,
   /** Product identification number. Foreign key to Product.ProductID.
-      Points to [[production.product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"productid","ordinal_position":5,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
-  /** Vendor's selling price of a single product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"unitprice","ordinal_position":6,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Vendor's selling price of a single product. */
   unitprice: BigDecimal,
-  /** Quantity actually received from the vendor.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"receivedqty","ordinal_position":8,"is_nullable":"NO","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity actually received from the vendor. */
   receivedqty: BigDecimal,
-  /** Quantity rejected during inspection.
-      debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"rejectedqty","ordinal_position":9,"is_nullable":"NO","data_type":"numeric","numeric_precision":8,"numeric_precision_radix":10,"numeric_scale":2,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity rejected during inspection. */
   rejectedqty: BigDecimal,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"purchasing","table_name":"purchaseorderdetail","column_name":"modifieddate","ordinal_position":11,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)

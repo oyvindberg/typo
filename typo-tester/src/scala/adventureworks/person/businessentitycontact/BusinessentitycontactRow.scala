@@ -20,20 +20,15 @@ import scala.util.Try
 
 case class BusinessentitycontactRow(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
-      Points to [[businessentity.BusinessentityRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentitycontact","column_name":"businessentityid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Primary key. Foreign key to Person.BusinessEntityID.
-      Points to [[person.PersonRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentitycontact","column_name":"personid","ordinal_position":2,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[person.PersonRow.businessentityid]] */
   personid: BusinessentityId,
   /** Primary key.  Foreign key to ContactType.ContactTypeID.
-      Points to [[contacttype.ContacttypeRow.contacttypeid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentitycontact","column_name":"contacttypeid","ordinal_position":3,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentitycontact","column_name":"rowguid","ordinal_position":4,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   rowguid: UUID,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"businessentitycontact","column_name":"modifieddate","ordinal_position":5,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 ){
    val compositeId: BusinessentitycontactId = BusinessentitycontactId(businessentityid, personid, contacttypeid)

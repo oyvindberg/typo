@@ -22,33 +22,25 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.salesperson` which has not been persisted yet */
 case class SalespersonRowUnsaved(
   /** Territory currently assigned to. Foreign key to SalesTerritory.SalesTerritoryID.
-      Points to [[salesterritory.SalesterritoryRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"territoryid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  /** Projected yearly sales.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"salesquota","ordinal_position":3,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Projected yearly sales. */
   salesquota: Option[BigDecimal],
   /** Default: 0.00
-      Bonus due if quota is met.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"bonus","ordinal_position":4,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Bonus due if quota is met. */
   bonus: Defaulted[BigDecimal],
   /** Default: 0.00
-      Commision percent received per sale.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"commissionpct","ordinal_position":5,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Commision percent received per sale. */
   commissionpct: Defaulted[BigDecimal],
   /** Default: 0.00
-      Sales total year to date.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"salesytd","ordinal_position":6,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Sales total year to date. */
   salesytd: Defaulted[BigDecimal],
   /** Default: 0.00
-      Sales total of previous year.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"saleslastyear","ordinal_position":7,"column_default":"0.00","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Sales total of previous year. */
   saleslastyear: Defaulted[BigDecimal],
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"rowguid","ordinal_position":8,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesperson","column_name":"modifieddate","ordinal_position":9,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(businessentityid: BusinessentityId): SalespersonRow =

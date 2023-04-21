@@ -23,29 +23,22 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.stateprovince` which has not been persisted yet */
 case class StateprovinceRowUnsaved(
-  /** ISO standard state or province code.
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"stateprovincecode","ordinal_position":2,"is_nullable":"NO","data_type":"character","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** ISO standard state or province code. */
   stateprovincecode: /* bpchar */ String,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
-      Points to [[countryregion.CountryregionRow.countryregioncode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"countryregioncode","ordinal_position":3,"is_nullable":"NO","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** Default: true
-      0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode.
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"isonlystateprovinceflag","ordinal_position":4,"column_default":"true","is_nullable":"NO","data_type":"boolean","domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Flag","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode. */
   isonlystateprovinceflag: Defaulted[Flag],
-  /** State or province description.
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"name","ordinal_position":5,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** State or province description. */
   name: Name,
   /** ID of the territory in which the state or province is located. Foreign key to SalesTerritory.SalesTerritoryID.
-      Points to [[sales.salesterritory.SalesterritoryRow.territoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"territoryid","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"rowguid","ordinal_position":7,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"person","table_name":"stateprovince","column_name":"modifieddate","ordinal_position":8,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(stateprovinceid: StateprovinceId): StateprovinceRow =

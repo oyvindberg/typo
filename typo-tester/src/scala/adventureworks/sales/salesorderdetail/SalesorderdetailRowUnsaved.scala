@@ -21,32 +21,24 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderdetail` which has not been persisted yet */
 case class SalesorderdetailRowUnsaved(
-  /** Shipment tracking number supplied by the shipper.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"carriertrackingnumber","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[String],
-  /** Quantity ordered per product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"orderqty","ordinal_position":4,"is_nullable":"NO","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Quantity ordered per product. */
   orderqty: Int,
   /** Product sold to customer. Foreign key to Product.ProductID.
-      Points to [[specialofferproduct.SpecialofferproductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"productid","ordinal_position":5,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
   productid: ProductId,
   /** Promotional code. Foreign key to SpecialOffer.SpecialOfferID.
-      Points to [[specialofferproduct.SpecialofferproductRow.specialofferid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"specialofferid","ordinal_position":6,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[specialofferproduct.SpecialofferproductRow.specialofferid]] */
   specialofferid: SpecialofferId,
-  /** Selling price of a single product.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"unitprice","ordinal_position":7,"is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Selling price of a single product. */
   unitprice: BigDecimal,
   /** Default: 0.0
-      Discount amount.
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"unitpricediscount","ordinal_position":8,"column_default":"0.0","is_nullable":"NO","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Discount amount. */
   unitpricediscount: Defaulted[BigDecimal],
-  /** Default: uuid_generate_v1()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"rowguid","ordinal_position":10,"column_default":"uuid_generate_v1()","is_nullable":"NO","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
-  /** Default: now()
-      debug: {"table_catalog":"Adventureworks","table_schema":"sales","table_name":"salesorderdetail","column_name":"modifieddate","ordinal_position":11,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
   def unsafeToRow(compositeId: SalesorderdetailId): SalesorderdetailRow =

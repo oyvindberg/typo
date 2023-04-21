@@ -17,25 +17,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CcRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.creditcard.CreditcardRow.creditcardid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"creditcardid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
-  /** Points to [[sales.creditcard.CreditcardRow.cardtype]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"cardtype","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
   cardtype: Option[String],
-  /** Points to [[sales.creditcard.CreditcardRow.cardnumber]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"cardnumber","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_maximum_length":25,"character_octet_length":100,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.cardnumber]] */
   cardnumber: Option[String],
-  /** Points to [[sales.creditcard.CreditcardRow.expmonth]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"expmonth","ordinal_position":5,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.expmonth]] */
   expmonth: Option[Int],
-  /** Points to [[sales.creditcard.CreditcardRow.expyear]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"expyear","ordinal_position":6,"is_nullable":"YES","data_type":"smallint","numeric_precision":16,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int2","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
   expyear: Option[Int],
-  /** Points to [[sales.creditcard.CreditcardRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"cc","column_name":"modifieddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.creditcard.CreditcardRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

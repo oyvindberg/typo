@@ -19,19 +19,14 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class PcRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pc","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[production.productcategory.ProductcategoryRow.productcategoryid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pc","column_name":"productcategoryid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcategory.ProductcategoryRow.productcategoryid]] */
   productcategoryid: Option[ProductcategoryId],
-  /** Points to [[production.productcategory.ProductcategoryRow.name]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pc","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcategory.ProductcategoryRow.name]] */
   name: Option[Name],
-  /** Points to [[production.productcategory.ProductcategoryRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pc","column_name":"rowguid","ordinal_position":4,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcategory.ProductcategoryRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[production.productcategory.ProductcategoryRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"pr","table_name":"pc","column_name":"modifieddate","ordinal_position":5,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[production.productcategory.ProductcategoryRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

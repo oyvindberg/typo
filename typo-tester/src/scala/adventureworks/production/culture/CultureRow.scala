@@ -17,13 +17,10 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class CultureRow(
-  /** Primary key for Culture records.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"culture","column_name":"cultureid","ordinal_position":1,"is_nullable":"NO","data_type":"character","character_maximum_length":6,"character_octet_length":24,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"bpchar","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Primary key for Culture records. */
   cultureid: CultureId,
-  /** Culture description.
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"culture","column_name":"name","ordinal_position":2,"is_nullable":"NO","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Culture description. */
   name: Name,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"culture","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime
 )
 

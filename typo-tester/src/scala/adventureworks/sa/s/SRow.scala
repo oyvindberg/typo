@@ -19,25 +19,18 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.store.StoreRow.businessentityid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"businessentityid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  /** Points to [[sales.store.StoreRow.name]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"name","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"domain_catalog":"Adventureworks","domain_schema":"public","domain_name":"Name","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.name]] */
   name: Option[Name],
-  /** Points to [[sales.store.StoreRow.salespersonid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"salespersonid","ordinal_position":4,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],
-  /** Points to [[sales.store.StoreRow.demographics]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"demographics","ordinal_position":5,"is_nullable":"YES","data_type":"xml","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"xml","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.demographics]] */
   demographics: Option[/* xml */ String],
-  /** Points to [[sales.store.StoreRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"rowguid","ordinal_position":6,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[sales.store.StoreRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"s","column_name":"modifieddate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.store.StoreRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 

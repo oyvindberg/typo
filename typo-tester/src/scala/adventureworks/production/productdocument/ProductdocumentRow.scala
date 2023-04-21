@@ -19,14 +19,11 @@ import scala.util.Try
 
 case class ProductdocumentRow(
   /** Product identification number. Foreign key to Product.ProductID.
-      Points to [[product.ProductRow.productid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productdocument","column_name":"productid","ordinal_position":1,"is_nullable":"NO","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productdocument","column_name":"modifieddate","ordinal_position":3,"column_default":"now()","is_nullable":"NO","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   modifieddate: LocalDateTime,
   /** Document identification number. Foreign key to Document.DocumentNode.
-      Points to [[document.DocumentRow.documentnode]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"production","table_name":"productdocument","column_name":"documentnode","ordinal_position":4,"column_default":"'/'::character varying","is_nullable":"NO","data_type":"character varying","character_octet_length":1073741824,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+      Points to [[document.DocumentRow.documentnode]] */
   documentnode: DocumentId
 ){
    val compositeId: ProductdocumentId = ProductdocumentId(productid, documentnode)

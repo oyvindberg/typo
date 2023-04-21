@@ -18,40 +18,28 @@ import play.api.libs.json.OFormat
 import scala.util.Try
 
 case class SoRow(
-  /** debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"id","ordinal_position":1,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   id: Option[Int],
-  /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"specialofferid","ordinal_position":2,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
   specialofferid: Option[SpecialofferId],
-  /** Points to [[sales.specialoffer.SpecialofferRow.description]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"description","ordinal_position":3,"is_nullable":"YES","data_type":"character varying","character_maximum_length":255,"character_octet_length":1020,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.description]] */
   description: Option[String],
-  /** Points to [[sales.specialoffer.SpecialofferRow.discountpct]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"discountpct","ordinal_position":4,"is_nullable":"YES","data_type":"numeric","numeric_precision_radix":10,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"numeric","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.discountpct]] */
   discountpct: Option[BigDecimal],
-  /** Points to [[sales.specialoffer.SpecialofferRow.type]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"type","ordinal_position":5,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.type]] */
   `type`: Option[String],
-  /** Points to [[sales.specialoffer.SpecialofferRow.category]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"category","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_maximum_length":50,"character_octet_length":200,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.category]] */
   category: Option[String],
-  /** Points to [[sales.specialoffer.SpecialofferRow.startdate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"startdate","ordinal_position":7,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.startdate]] */
   startdate: Option[LocalDateTime],
-  /** Points to [[sales.specialoffer.SpecialofferRow.enddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"enddate","ordinal_position":8,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.enddate]] */
   enddate: Option[LocalDateTime],
-  /** Points to [[sales.specialoffer.SpecialofferRow.minqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"minqty","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.minqty]] */
   minqty: Option[Int],
-  /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"maxqty","ordinal_position":10,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]] */
   maxqty: Option[Int],
-  /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"rowguid","ordinal_position":11,"is_nullable":"YES","data_type":"uuid","udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"uuid","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]] */
   rowguid: Option[UUID],
-  /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]]
-      debug: {"table_catalog":"Adventureworks","table_schema":"sa","table_name":"so","column_name":"modifieddate","ordinal_position":12,"is_nullable":"YES","data_type":"timestamp without time zone","datetime_precision":6,"udt_catalog":"Adventureworks","udt_schema":"pg_catalog","udt_name":"timestamp","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
+  /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
 
