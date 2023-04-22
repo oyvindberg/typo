@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PcRepoImpl extends PcRepo {
   override def selectAll(implicit c: Connection): List[PcRow] = {
-    SQL"""select id, productcategoryid, name, rowguid, modifieddate
+    SQL"""select "id", productcategoryid, "name", rowguid, modifieddate
           from pr.pc
        """.as(rowParser.*)
   }
@@ -35,7 +35,7 @@ object PcRepoImpl extends PcRepo {
           case PcFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productcategoryid, "name", rowguid, modifieddate
                     from pr.pc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

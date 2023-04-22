@@ -13,7 +13,6 @@ package pg_namespace
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,10 +25,12 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_namespace where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
-          values (${oid}, ${unsaved.nspname}, ${unsaved.nspowner}, ${unsaved.nspacl})
-       """.execute()
+          values (${oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
+          returning oid, nspname, nspowner, nspacl
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
@@ -47,7 +48,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           case PgNamespaceFieldValue.nspowner(value) => NamedParameter("nspowner", ParameterValue.from(value))
           case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select oid, nspname, nspowner, nspacl
                     from pg_catalog.pg_namespace
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -100,12 +101,13 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         }
         val q = s"""update pg_catalog.pg_namespace
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid
+                    where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("oid", ParameterValue.from(oid)))
           .executeUpdate() > 0
     }
   
@@ -121,6 +123,4 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         )
       )
     }
-  val idRowParser: RowParser[PgNamespaceId] =
-    SqlParser.get[PgNamespaceId]("oid")
 }

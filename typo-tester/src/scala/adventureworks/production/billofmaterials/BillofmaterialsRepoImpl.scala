@@ -13,7 +13,6 @@ import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean = {
     SQL"delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid".executeUpdate() > 0
   }
-  override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsId = {
+  override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
       Some(NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid))),
       Some(NamedParameter("componentid", ParameterValue.from(unsaved.componentid))),
@@ -48,12 +47,22 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       }
     ).flatten
     
-    SQL"""insert into production.billofmaterials(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning billofmaterialsid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.billofmaterials default values
+            returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.billofmaterials(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
@@ -76,7 +85,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           case BillofmaterialsFieldValue.perassemblyqty(value) => NamedParameter("perassemblyqty", ParameterValue.from(value))
           case BillofmaterialsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
                     from production.billofmaterials
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -136,12 +145,13 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         }
         val q = s"""update production.billofmaterials
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where billofmaterialsid = $billofmaterialsid
+                    where billofmaterialsid = {billofmaterialsid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("billofmaterialsid", ParameterValue.from(billofmaterialsid)))
           .executeUpdate() > 0
     }
   
@@ -162,6 +172,4 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         )
       )
     }
-  val idRowParser: RowParser[BillofmaterialsId] =
-    SqlParser.get[BillofmaterialsId]("billofmaterialsid")
 }

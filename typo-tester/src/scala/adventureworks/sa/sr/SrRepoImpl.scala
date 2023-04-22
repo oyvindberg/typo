@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object SrRepoImpl extends SrRepo {
   override def selectAll(implicit c: Connection): List[SrRow] = {
-    SQL"""select id, salesreasonid, name, reasontype, modifieddate
+    SQL"""select "id", salesreasonid, "name", reasontype, modifieddate
           from sa.sr
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object SrRepoImpl extends SrRepo {
           case SrFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
           case SrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", salesreasonid, "name", reasontype, modifieddate
                     from sa.sr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

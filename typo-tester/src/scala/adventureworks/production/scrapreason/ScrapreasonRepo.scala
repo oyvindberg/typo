@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait ScrapreasonRepo {
   def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean
-  def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonId
+  def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow
   def selectAll(implicit c: Connection): List[ScrapreasonRow]
   def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow]

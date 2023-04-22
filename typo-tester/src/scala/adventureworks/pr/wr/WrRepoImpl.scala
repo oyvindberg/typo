@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object WrRepoImpl extends WrRepo {
   override def selectAll(implicit c: Connection): List[WrRow] = {
-    SQL"""select id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+    SQL"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from pr.wr
        """.as(rowParser.*)
   }
@@ -42,7 +42,7 @@ object WrRepoImpl extends WrRepo {
           case WrFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case WrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
                     from pr.wr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

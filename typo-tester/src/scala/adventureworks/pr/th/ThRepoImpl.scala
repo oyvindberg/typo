@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object ThRepoImpl extends ThRepo {
   override def selectAll(implicit c: Connection): List[ThRow] = {
-    SQL"""select id, transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+    SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from pr.th
        """.as(rowParser.*)
   }
@@ -39,7 +39,7 @@ object ThRepoImpl extends ThRepo {
           case ThFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case ThFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
                     from pr.th
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -42,7 +42,7 @@ object VpersondemographicsRepoImpl extends VpersondemographicsRepo {
           case VpersondemographicsFieldValue.homeownerflag(value) => NamedParameter("homeownerflag", ParameterValue.from(value))
           case VpersondemographicsFieldValue.numbercarsowned(value) => NamedParameter("numbercarsowned", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
                     from sales.vpersondemographics
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

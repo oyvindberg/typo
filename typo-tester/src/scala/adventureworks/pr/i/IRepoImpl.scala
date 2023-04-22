@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object IRepoImpl extends IRepo {
   override def selectAll(implicit c: Connection): List[IRow] = {
-    SQL"""select id, illustrationid, diagram, modifieddate
+    SQL"""select "id", illustrationid, diagram, modifieddate
           from pr.i
        """.as(rowParser.*)
   }
@@ -32,7 +32,7 @@ object IRepoImpl extends IRepo {
           case IFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
           case IFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", illustrationid, diagram, modifieddate
                     from pr.i
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

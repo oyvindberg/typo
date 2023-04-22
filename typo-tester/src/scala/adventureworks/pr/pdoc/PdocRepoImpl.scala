@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PdocRepoImpl extends PdocRepo {
   override def selectAll(implicit c: Connection): List[PdocRow] = {
-    SQL"""select id, productid, modifieddate, documentnode
+    SQL"""select "id", productid, modifieddate, documentnode
           from pr.pdoc
        """.as(rowParser.*)
   }
@@ -33,7 +33,7 @@ object PdocRepoImpl extends PdocRepo {
           case PdocFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case PdocFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productid, modifieddate, documentnode
                     from pr.pdoc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

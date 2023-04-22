@@ -13,7 +13,6 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".executeUpdate() > 0
   }
-  override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderId = {
+  override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     val namedParameters = List(
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
@@ -63,12 +62,22 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       }
     ).flatten
     
-    SQL"""insert into purchasing.purchaseorderheader(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning purchaseorderid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into purchasing.purchaseorderheader default values
+            returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into purchasing.purchaseorderheader(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
@@ -94,7 +103,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           case PurchaseorderheaderFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
           case PurchaseorderheaderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
                     from purchasing.purchaseorderheader
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -160,12 +169,13 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         }
         val q = s"""update purchasing.purchaseorderheader
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where purchaseorderid = $purchaseorderid
+                    where purchaseorderid = {purchaseorderid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("purchaseorderid", ParameterValue.from(purchaseorderid)))
           .executeUpdate() > 0
     }
   
@@ -189,6 +199,4 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         )
       )
     }
-  val idRowParser: RowParser[PurchaseorderheaderId] =
-    SqlParser.get[PurchaseorderheaderId]("purchaseorderid")
 }

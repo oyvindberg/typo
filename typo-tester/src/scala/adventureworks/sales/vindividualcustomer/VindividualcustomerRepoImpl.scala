@@ -47,7 +47,7 @@ object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
           case VindividualcustomerFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
           case VindividualcustomerFieldValue.demographics(value) => NamedParameter("demographics", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics
                     from sales.vindividualcustomer
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

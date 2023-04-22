@@ -13,7 +13,6 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -28,41 +27,45 @@ object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesperson where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
     val namedParameters = List(
-      Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),
-      Some(NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota))),
+      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
+      Some((NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota)), "::numeric")),
       unsaved.bonus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("bonus", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("bonus", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.commissionpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("commissionpct", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("commissionpct", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.saleslastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("saleslastyear", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.salesperson(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.salesperson(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
@@ -85,7 +88,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           case SalespersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalespersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
                     from sales.salesperson
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -145,12 +148,13 @@ object SalespersonRepoImpl extends SalespersonRepo {
         }
         val q = s"""update sales.salesperson
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -171,6 +175,4 @@ object SalespersonRepoImpl extends SalespersonRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

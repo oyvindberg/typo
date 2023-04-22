@@ -14,7 +14,7 @@ import java.sql.Connection
 
 trait PgConstraintRepo {
   def delete(oid: PgConstraintId)(implicit c: Connection): Boolean
-  def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean
+  def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): PgConstraintRow
   def selectAll(implicit c: Connection): List[PgConstraintRow]
   def selectByFieldValues(fieldValues: List[PgConstraintFieldOrIdValue[_]])(implicit c: Connection): List[PgConstraintRow]
   def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow]

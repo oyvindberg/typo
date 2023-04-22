@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -28,7 +27,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salestaxrate where salestaxrateid = $salestaxrateid".executeUpdate() > 0
   }
-  override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateId = {
+  override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
       Some(NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid))),
       Some(NamedParameter("taxtype", ParameterValue.from(unsaved.taxtype))),
@@ -47,16 +46,26 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.salestaxrate(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning salestaxrateid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.salestaxrate default values
+            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.salestaxrate(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
        """.as(rowParser.*)
   }
@@ -73,7 +82,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           case SalestaxrateFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalestaxrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
                     from sales.salestaxrate
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -86,7 +95,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = $salestaxrateid
        """.as(rowParser.singleOpt)
@@ -97,7 +106,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       (s: PreparedStatement, index: Int, v: Array[SalestaxrateId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
        """.as(rowParser.*)
@@ -109,7 +118,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           set stateprovinceid = ${row.stateprovinceid},
               taxtype = ${row.taxtype},
               taxrate = ${row.taxrate},
-              name = ${row.name},
+              "name" = ${row.name},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
           where salestaxrateid = $salestaxrateid
@@ -129,12 +138,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         }
         val q = s"""update sales.salestaxrate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salestaxrateid = $salestaxrateid
+                    where salestaxrateid = {salestaxrateid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("salestaxrateid", ParameterValue.from(salestaxrateid)))
           .executeUpdate() > 0
     }
   
@@ -153,6 +163,4 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         )
       )
     }
-  val idRowParser: RowParser[SalestaxrateId] =
-    SqlParser.get[SalestaxrateId]("salestaxrateid")
 }

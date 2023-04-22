@@ -21,7 +21,7 @@ import java.util.UUID
 
 object DRepoImpl extends DRepo {
   override def selectAll(implicit c: Connection): List[DRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
+    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from pr.d
        """.as(rowParser.*)
   }
@@ -44,7 +44,7 @@ object DRepoImpl extends DRepo {
           case DFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case DFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
                     from pr.d
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

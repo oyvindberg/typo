@@ -13,7 +13,6 @@ import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -29,50 +28,54 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.employee where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: EmployeeRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
-      Some(NamedParameter("nationalidnumber", ParameterValue.from(unsaved.nationalidnumber))),
-      Some(NamedParameter("loginid", ParameterValue.from(unsaved.loginid))),
-      Some(NamedParameter("jobtitle", ParameterValue.from(unsaved.jobtitle))),
-      Some(NamedParameter("birthdate", ParameterValue.from(unsaved.birthdate))),
-      Some(NamedParameter("maritalstatus", ParameterValue.from(unsaved.maritalstatus))),
-      Some(NamedParameter("gender", ParameterValue.from(unsaved.gender))),
-      Some(NamedParameter("hiredate", ParameterValue.from(unsaved.hiredate))),
+      Some((NamedParameter("nationalidnumber", ParameterValue.from(unsaved.nationalidnumber)), "")),
+      Some((NamedParameter("loginid", ParameterValue.from(unsaved.loginid)), "")),
+      Some((NamedParameter("jobtitle", ParameterValue.from(unsaved.jobtitle)), "")),
+      Some((NamedParameter("birthdate", ParameterValue.from(unsaved.birthdate)), "::date")),
+      Some((NamedParameter("maritalstatus", ParameterValue.from(unsaved.maritalstatus)), "::bpchar")),
+      Some((NamedParameter("gender", ParameterValue.from(unsaved.gender)), "::bpchar")),
+      Some((NamedParameter("hiredate", ParameterValue.from(unsaved.hiredate)), "::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("salariedflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("salariedflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("vacationhours", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("vacationhours", ParameterValue.from[Int](value)), "::int2"))
       },
       unsaved.sickleavehours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("sickleavehours", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("sickleavehours", ParameterValue.from[Int](value)), "::int2"))
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("currentflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("currentflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)), ""))
       }
     ).flatten
-    
-    SQL"""insert into humanresources.employee(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into humanresources.employee(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
@@ -101,7 +104,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
           case EmployeeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case EmployeeFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
                     from humanresources.employee
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -173,12 +176,13 @@ object EmployeeRepoImpl extends EmployeeRepo {
         }
         val q = s"""update humanresources.employee
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -205,6 +209,4 @@ object EmployeeRepoImpl extends EmployeeRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

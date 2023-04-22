@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -28,7 +27,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesterritory where territoryid = $territoryid".executeUpdate() > 0
   }
-  override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryId = {
+  override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode))),
@@ -59,16 +58,26 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.salesterritory(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning territoryid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.salesterritory default values
+            returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.salesterritory(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
        """.as(rowParser.*)
   }
@@ -88,7 +97,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           case SalesterritoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalesterritoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
                     from sales.salesterritory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -101,7 +110,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   
   }
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = $territoryid
        """.as(rowParser.singleOpt)
@@ -112,7 +121,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesterritoryId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = ANY($territoryids)
        """.as(rowParser.*)
@@ -121,9 +130,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid
     SQL"""update sales.salesterritory
-          set name = ${row.name},
+          set "name" = ${row.name},
               countryregioncode = ${row.countryregioncode},
-              group = ${row.group},
+              "group" = ${row.group},
               salesytd = ${row.salesytd},
               saleslastyear = ${row.saleslastyear},
               costytd = ${row.costytd},
@@ -150,12 +159,13 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         }
         val q = s"""update sales.salesterritory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where territoryid = $territoryid
+                    where territoryid = {territoryid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("territoryid", ParameterValue.from(territoryid)))
           .executeUpdate() > 0
     }
   
@@ -177,6 +187,4 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         )
       )
     }
-  val idRowParser: RowParser[SalesterritoryId] =
-    SqlParser.get[SalesterritoryId]("territoryid")
 }

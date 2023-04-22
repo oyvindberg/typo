@@ -22,19 +22,23 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}".executeUpdate() > 0
   }
-  override def insert(compositeId: CountryregioncurrencyId, unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: CountryregioncurrencyId, unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.countryregioncode}, ${compositeId.currencycode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({countryregioncode}, {currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning countryregioncode, currencycode, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("countryregioncode", ParameterValue.from(compositeId.countryregioncode)), NamedParameter("currencycode", ParameterValue.from(compositeId.currencycode)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
@@ -51,7 +55,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           case CountryregioncurrencyFieldValue.currencycode(value) => NamedParameter("currencycode", ParameterValue.from(value))
           case CountryregioncurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select countryregioncode, currencycode, modifieddate
                     from sales.countryregioncurrency
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -85,12 +89,13 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         }
         val q = s"""update sales.countryregioncurrency
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}
+                    where countryregioncode = {countryregioncode}, currencycode = {currencycode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("countryregioncode", ParameterValue.from(compositeId.countryregioncode)), NamedParameter("currencycode", ParameterValue.from(compositeId.currencycode)))
           .executeUpdate() > 0
     }
   
@@ -102,15 +107,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           countryregioncode = row[CountryregionId]("countryregioncode"),
           currencycode = row[CurrencyId]("currencycode"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[CountryregioncurrencyId] =
-    RowParser[CountryregioncurrencyId] { row =>
-      Success(
-        CountryregioncurrencyId(
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          currencycode = row[CurrencyId]("currencycode")
         )
       )
     }

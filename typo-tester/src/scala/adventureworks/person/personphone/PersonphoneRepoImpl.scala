@@ -23,19 +23,23 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"delete from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}".executeUpdate() > 0
   }
-  override def insert(compositeId: PersonphoneId, unsaved: PersonphoneRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: PersonphoneId, unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.businessentityid}, ${compositeId.phonenumber}, ${compositeId.phonenumbertypeid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, {phonenumber}::"public".Phone, {phonenumbertypeid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("phonenumber", ParameterValue.from(compositeId.phonenumber)), NamedParameter("phonenumbertypeid", ParameterValue.from(compositeId.phonenumbertypeid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
@@ -53,7 +57,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           case PersonphoneFieldValue.phonenumbertypeid(value) => NamedParameter("phonenumbertypeid", ParameterValue.from(value))
           case PersonphoneFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
                     from person.personphone
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -87,12 +91,13 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         }
         val q = s"""update person.personphone
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}
+                    where businessentityid = {businessentityid}, phonenumber = {phonenumber}, phonenumbertypeid = {phonenumbertypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("phonenumber", ParameterValue.from(compositeId.phonenumber)), NamedParameter("phonenumbertypeid", ParameterValue.from(compositeId.phonenumbertypeid)))
           .executeUpdate() > 0
     }
   
@@ -105,16 +110,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           phonenumber = row[Phone]("phonenumber"),
           phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[PersonphoneId] =
-    RowParser[PersonphoneId] { row =>
-      Success(
-        PersonphoneId(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          phonenumber = row[Phone]("phonenumber"),
-          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid")
         )
       )
     }

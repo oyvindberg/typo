@@ -23,29 +23,33 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductinventoryId, unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: ProductinventoryId, unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
-      Some(NamedParameter("shelf", ParameterValue.from(unsaved.shelf))),
-      Some(NamedParameter("bin", ParameterValue.from(unsaved.bin))),
+      Some((NamedParameter("shelf", ParameterValue.from(unsaved.shelf)), "")),
+      Some((NamedParameter("bin", ParameterValue.from(unsaved.bin)), "::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue.from[Int](value)), "::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.productinventory(productid, locationid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.productid}, ${compositeId.locationid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.productinventory(productid, locationid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({productid}::int4, {locationid}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("locationid", ParameterValue.from(compositeId.locationid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
@@ -66,7 +70,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           case ProductinventoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductinventoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
                     from production.productinventory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -108,12 +112,13 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         }
         val q = s"""update production.productinventory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}
+                    where productid = {productid}, locationid = {locationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("locationid", ParameterValue.from(compositeId.locationid)))
           .executeUpdate() > 0
     }
   
@@ -129,15 +134,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           quantity = row[Int]("quantity"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[ProductinventoryId] =
-    RowParser[ProductinventoryId] { row =>
-      Success(
-        ProductinventoryId(
-          productid = row[ProductId]("productid"),
-          locationid = row[LocationId]("locationid")
         )
       )
     }

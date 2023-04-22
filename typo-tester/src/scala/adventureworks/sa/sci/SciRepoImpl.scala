@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object SciRepoImpl extends SciRepo {
   override def selectAll(implicit c: Connection): List[SciRow] = {
-    SQL"""select id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+    SQL"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sa.sci
        """.as(rowParser.*)
   }
@@ -36,7 +36,7 @@ object SciRepoImpl extends SciRepo {
           case SciFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
           case SciFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
                     from sa.sci
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

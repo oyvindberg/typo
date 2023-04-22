@@ -20,8 +20,8 @@ import java.util.UUID
 
 object AtRepoImpl extends AtRepo {
   override def selectAll(implicit c: Connection): List[AtRow] = {
-    SQL"""select id, addresstypeid, name, rowguid, modifieddate
-          from pe.at
+    SQL"""select "id", addresstypeid, "name", rowguid, modifieddate
+          from pe."at"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AtFieldOrIdValue[_]])(implicit c: Connection): List[AtRow] = {
@@ -35,8 +35,8 @@ object AtRepoImpl extends AtRepo {
           case AtFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AtFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from pe.at
+        val q = s"""select "id", addresstypeid, "name", rowguid, modifieddate
+                    from pe."at"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

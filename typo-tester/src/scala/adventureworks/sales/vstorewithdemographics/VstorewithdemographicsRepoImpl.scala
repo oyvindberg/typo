@@ -19,7 +19,7 @@ import org.postgresql.util.PGmoney
 
 object VstorewithdemographicsRepoImpl extends VstorewithdemographicsRepo {
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsRow] = {
-    SQL"""select businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
+    SQL"""select businessentityid, "name", AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
           from sales.vstorewithdemographics
        """.as(rowParser.*)
   }
@@ -41,7 +41,7 @@ object VstorewithdemographicsRepoImpl extends VstorewithdemographicsRepo {
           case VstorewithdemographicsFieldValue.Internet(value) => NamedParameter("Internet", ParameterValue.from(value))
           case VstorewithdemographicsFieldValue.NumberEmployees(value) => NamedParameter("NumberEmployees", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, "name", AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
                     from sales.vstorewithdemographics
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

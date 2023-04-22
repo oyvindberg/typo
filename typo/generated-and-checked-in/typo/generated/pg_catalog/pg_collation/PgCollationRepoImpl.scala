@@ -13,7 +13,6 @@ package pg_collation
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,10 +24,12 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_collation where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): PgCollationRow = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
-          values (${oid}, ${unsaved.collname}, ${unsaved.collnamespace}, ${unsaved.collowner}, ${unsaved.collprovider}, ${unsaved.collisdeterministic}, ${unsaved.collencoding}, ${unsaved.collcollate}, ${unsaved.collctype}, ${unsaved.collversion})
-       """.execute()
+          values (${oid}::oid, ${unsaved.collname}::name, ${unsaved.collnamespace}::oid, ${unsaved.collowner}::oid, ${unsaved.collprovider}::char, ${unsaved.collisdeterministic}, ${unsaved.collencoding}::int4, ${unsaved.collcollate}::name, ${unsaved.collctype}::name, ${unsaved.collversion})
+          returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
@@ -52,7 +53,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
           case PgCollationFieldValue.collctype(value) => NamedParameter("collctype", ParameterValue.from(value))
           case PgCollationFieldValue.collversion(value) => NamedParameter("collversion", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
                     from pg_catalog.pg_collation
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -117,12 +118,13 @@ object PgCollationRepoImpl extends PgCollationRepo {
         }
         val q = s"""update pg_catalog.pg_collation
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid
+                    where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("oid", ParameterValue.from(oid)))
           .executeUpdate() > 0
     }
   
@@ -144,6 +146,4 @@ object PgCollationRepoImpl extends PgCollationRepo {
         )
       )
     }
-  val idRowParser: RowParser[PgCollationId] =
-    SqlParser.get[PgCollationId]("oid")
 }

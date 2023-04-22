@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait SalesterritoryRepo {
   def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean
-  def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryId
+  def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow
   def selectAll(implicit c: Connection): List[SalesterritoryRow]
   def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow]

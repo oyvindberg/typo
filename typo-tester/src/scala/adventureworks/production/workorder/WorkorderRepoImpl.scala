@@ -13,7 +13,6 @@ import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     SQL"delete from production.workorder where workorderid = $workorderid".executeUpdate() > 0
   }
-  override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderId = {
+  override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
       Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
       Some(NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty))),
@@ -42,12 +41,22 @@ object WorkorderRepoImpl extends WorkorderRepo {
       }
     ).flatten
     
-    SQL"""insert into production.workorder(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning workorderid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.workorder default values
+            returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.workorder(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
@@ -70,7 +79,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           case WorkorderFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
           case WorkorderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
                     from production.workorder
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -130,12 +139,13 @@ object WorkorderRepoImpl extends WorkorderRepo {
         }
         val q = s"""update production.workorder
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where workorderid = $workorderid
+                    where workorderid = {workorderid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("workorderid", ParameterValue.from(workorderid)))
           .executeUpdate() > 0
     }
   
@@ -156,6 +166,4 @@ object WorkorderRepoImpl extends WorkorderRepo {
         )
       )
     }
-  val idRowParser: RowParser[WorkorderId] =
-    SqlParser.get[WorkorderId]("workorderid")
 }

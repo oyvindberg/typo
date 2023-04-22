@@ -11,7 +11,6 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.businessentity where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityId = {
+  override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -38,12 +37,22 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
       }
     ).flatten
     
-    SQL"""insert into person.businessentity(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning businessentityid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.businessentity default values
+            returning businessentityid, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.businessentity(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning businessentityid, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
@@ -60,7 +69,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           case BusinessentityFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case BusinessentityFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, rowguid, modifieddate
                     from person.businessentity
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -108,12 +117,13 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
         }
         val q = s"""update person.businessentity
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -128,6 +138,4 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

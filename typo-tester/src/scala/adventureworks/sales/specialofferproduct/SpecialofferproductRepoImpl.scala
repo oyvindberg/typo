@@ -23,23 +23,27 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".executeUpdate() > 0
   }
-  override def insert(compositeId: SpecialofferproductId, unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: SpecialofferproductId, unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
     val namedParameters = List(
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.specialofferproduct(specialofferid, productid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.specialofferid}, ${compositeId.productid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.specialofferproduct(specialofferid, productid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({specialofferid}::int4, {productid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning specialofferid, productid, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("specialofferid", ParameterValue.from(compositeId.specialofferid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
@@ -57,7 +61,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           case SpecialofferproductFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpecialofferproductFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select specialofferid, productid, rowguid, modifieddate
                     from sales.specialofferproduct
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -93,12 +97,13 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         }
         val q = s"""update sales.specialofferproduct
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+                    where specialofferid = {specialofferid}, productid = {productid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("specialofferid", ParameterValue.from(compositeId.specialofferid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)))
           .executeUpdate() > 0
     }
   
@@ -111,15 +116,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           productid = row[ProductId]("productid"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[SpecialofferproductId] =
-    RowParser[SpecialofferproductId] { row =>
-      Success(
-        SpecialofferproductId(
-          specialofferid = row[SpecialofferId]("specialofferid"),
-          productid = row[ProductId]("productid")
         )
       )
     }

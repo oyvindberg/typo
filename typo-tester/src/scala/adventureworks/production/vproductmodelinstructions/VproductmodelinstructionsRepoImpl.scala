@@ -20,7 +20,7 @@ import java.util.UUID
 
 object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsRow] = {
-    SQL"""select productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
+    SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
           from production.vproductmodelinstructions
        """.as(rowParser.*)
   }
@@ -41,7 +41,7 @@ object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
           case VproductmodelinstructionsFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VproductmodelinstructionsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
                     from production.vproductmodelinstructions
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

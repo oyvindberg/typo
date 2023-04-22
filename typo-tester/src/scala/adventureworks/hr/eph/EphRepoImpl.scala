@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object EphRepoImpl extends EphRepo {
   override def selectAll(implicit c: Connection): List[EphRow] = {
-    SQL"""select id, businessentityid, ratechangedate, rate, payfrequency, modifieddate
+    SQL"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate
           from hr.eph
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object EphRepoImpl extends EphRepo {
           case EphFieldValue.payfrequency(value) => NamedParameter("payfrequency", ParameterValue.from(value))
           case EphFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate
                     from hr.eph
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

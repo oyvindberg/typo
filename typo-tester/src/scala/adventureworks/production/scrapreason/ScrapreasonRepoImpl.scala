@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from production.scrapreason where scrapreasonid = $scrapreasonid".executeUpdate() > 0
   }
-  override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonId = {
+  override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.modifieddate match {
@@ -35,16 +34,26 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       }
     ).flatten
     
-    SQL"""insert into production.scrapreason(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning scrapreasonid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.scrapreason default values
+            returning scrapreasonid, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.scrapreason(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning scrapreasonid, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate
           from production.scrapreason
        """.as(rowParser.*)
   }
@@ -57,7 +66,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           case ScrapreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case ScrapreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select scrapreasonid, "name", modifieddate
                     from production.scrapreason
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -70,7 +79,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, name, modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate
           from production.scrapreason
           where scrapreasonid = $scrapreasonid
        """.as(rowParser.singleOpt)
@@ -81,7 +90,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[ScrapreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select scrapreasonid, name, modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate
           from production.scrapreason
           where scrapreasonid = ANY($scrapreasonids)
        """.as(rowParser.*)
@@ -90,7 +99,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
-          set name = ${row.name},
+          set "name" = ${row.name},
               modifieddate = ${row.modifieddate}
           where scrapreasonid = $scrapreasonid
        """.executeUpdate() > 0
@@ -105,12 +114,13 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         }
         val q = s"""update production.scrapreason
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where scrapreasonid = $scrapreasonid
+                    where scrapreasonid = {scrapreasonid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("scrapreasonid", ParameterValue.from(scrapreasonid)))
           .executeUpdate() > 0
     }
   
@@ -125,6 +135,4 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         )
       )
     }
-  val idRowParser: RowParser[ScrapreasonId] =
-    SqlParser.get[ScrapreasonId]("scrapreasonid")
 }

@@ -21,7 +21,7 @@ import java.util.UUID
 
 object TrRepoImpl extends TrRepo {
   override def selectAll(implicit c: Connection): List[TrRow] = {
-    SQL"""select id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate
+    SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sa.tr
        """.as(rowParser.*)
   }
@@ -39,7 +39,7 @@ object TrRepoImpl extends TrRepo {
           case TrFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case TrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
                     from sa.tr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

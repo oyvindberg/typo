@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PrRepoImpl extends PrRepo {
   override def selectAll(implicit c: Connection): List[PrRow] = {
-    SQL"""select id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate
+    SQL"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from pr.pr
        """.as(rowParser.*)
   }
@@ -39,7 +39,7 @@ object PrRepoImpl extends PrRepo {
           case PrFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
           case PrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
                     from pr.pr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

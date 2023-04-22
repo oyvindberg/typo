@@ -11,7 +11,6 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,32 +24,36 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
     SQL"delete from production.transactionhistoryarchive where transactionid = $transactionid".executeUpdate() > 0
   }
-  override def insert(transactionid: TransactionhistoryarchiveId, unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(transactionid: TransactionhistoryarchiveId, unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
     val namedParameters = List(
-      Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
-      Some(NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid))),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid)), "::int4")),
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)), "::int4"))
       },
       unsaved.transactiondate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some(NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype))),
-      Some(NamedParameter("quantity", ParameterValue.from(unsaved.quantity))),
-      Some(NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost))),
+      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
+      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
+      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.transactionhistoryarchive(transactionid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${transactionid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.transactionhistoryarchive(transactionid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({transactionid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("transactionid", ParameterValue.from(transactionid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
@@ -73,7 +76,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
           case TransactionhistoryarchiveFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case TransactionhistoryarchiveFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
                     from production.transactionhistoryarchive
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -133,12 +136,13 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
         }
         val q = s"""update production.transactionhistoryarchive
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where transactionid = $transactionid
+                    where transactionid = {transactionid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("transactionid", ParameterValue.from(transactionid)))
           .executeUpdate() > 0
     }
   
@@ -159,6 +163,4 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
         )
       )
     }
-  val idRowParser: RowParser[TransactionhistoryarchiveId] =
-    SqlParser.get[TransactionhistoryarchiveId]("transactionid")
 }

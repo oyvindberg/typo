@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.shipmethod where shipmethodid = $shipmethodid".executeUpdate() > 0
   }
-  override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodId = {
+  override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.shipbase match {
@@ -48,16 +47,26 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       }
     ).flatten
     
-    SQL"""insert into purchasing.shipmethod(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning shipmethodid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into purchasing.shipmethod default values
+            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into purchasing.shipmethod(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
        """.as(rowParser.*)
   }
@@ -73,7 +82,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           case ShipmethodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ShipmethodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
                     from purchasing.shipmethod
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -86,7 +95,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = $shipmethodid
        """.as(rowParser.singleOpt)
@@ -97,7 +106,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       (s: PreparedStatement, index: Int, v: Array[ShipmethodId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)
        """.as(rowParser.*)
@@ -106,7 +115,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
-          set name = ${row.name},
+          set "name" = ${row.name},
               shipbase = ${row.shipbase},
               shiprate = ${row.shiprate},
               rowguid = ${row.rowguid},
@@ -127,12 +136,13 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         }
         val q = s"""update purchasing.shipmethod
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shipmethodid = $shipmethodid
+                    where shipmethodid = {shipmethodid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("shipmethodid", ParameterValue.from(shipmethodid)))
           .executeUpdate() > 0
     }
   
@@ -150,6 +160,4 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         )
       )
     }
-  val idRowParser: RowParser[ShipmethodId] =
-    SqlParser.get[ShipmethodId]("shipmethodid")
 }

@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait UnitmeasureRepo {
   def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean
-  def insert(unitmeasurecode: UnitmeasureId, unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): Boolean
+  def insert(unitmeasurecode: UnitmeasureId, unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow
   def selectAll(implicit c: Connection): List[UnitmeasureRow]
   def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow]

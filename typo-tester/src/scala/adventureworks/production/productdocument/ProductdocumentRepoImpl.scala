@@ -22,19 +22,23 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.productdocument(productid, documentnode, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.productid}, ${compositeId.documentnode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.productdocument(productid, documentnode, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({productid}::int4, {documentnode}, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning productid, modifieddate, documentnode
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("documentnode", ParameterValue.from(compositeId.documentnode)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
@@ -51,7 +55,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           case ProductdocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case ProductdocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productid, modifieddate, documentnode
                     from production.productdocument
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -85,12 +89,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         }
         val q = s"""update production.productdocument
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+                    where productid = {productid}, documentnode = {documentnode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("documentnode", ParameterValue.from(compositeId.documentnode)))
           .executeUpdate() > 0
     }
   
@@ -101,15 +106,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         ProductdocumentRow(
           productid = row[ProductId]("productid"),
           modifieddate = row[LocalDateTime]("modifieddate"),
-          documentnode = row[DocumentId]("documentnode")
-        )
-      )
-    }
-  val idRowParser: RowParser[ProductdocumentId] =
-    RowParser[ProductdocumentId] { row =>
-      Success(
-        ProductdocumentId(
-          productid = row[ProductId]("productid"),
           documentnode = row[DocumentId]("documentnode")
         )
       )

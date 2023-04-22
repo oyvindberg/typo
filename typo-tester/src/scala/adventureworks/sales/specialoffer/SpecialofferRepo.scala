@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait SpecialofferRepo {
   def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean
-  def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferId
+  def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow
   def selectAll(implicit c: Connection): List[SpecialofferRow]
   def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow]
   def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow]

@@ -11,7 +11,6 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,7 +24,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.creditcard where creditcardid = $creditcardid".executeUpdate() > 0
   }
-  override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardId = {
+  override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
     val namedParameters = List(
       Some(NamedParameter("cardtype", ParameterValue.from(unsaved.cardtype))),
       Some(NamedParameter("cardnumber", ParameterValue.from(unsaved.cardnumber))),
@@ -37,12 +36,22 @@ object CreditcardRepoImpl extends CreditcardRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.creditcard(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning creditcardid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.creditcard default values
+            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.creditcard(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
@@ -62,7 +71,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
           case CreditcardFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
           case CreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
                     from sales.creditcard
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -116,12 +125,13 @@ object CreditcardRepoImpl extends CreditcardRepo {
         }
         val q = s"""update sales.creditcard
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where creditcardid = $creditcardid
+                    where creditcardid = {creditcardid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("creditcardid", ParameterValue.from(creditcardid)))
           .executeUpdate() > 0
     }
   
@@ -139,6 +149,4 @@ object CreditcardRepoImpl extends CreditcardRepo {
         )
       )
     }
-  val idRowParser: RowParser[CreditcardId] =
-    SqlParser.get[CreditcardId]("creditcardid")
 }

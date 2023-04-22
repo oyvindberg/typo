@@ -45,7 +45,7 @@ object VjobcandidateRepoImpl extends VjobcandidateRepo {
           case VjobcandidateFieldValue.WebSite(value) => NamedParameter("WebSite", ParameterValue.from(value))
           case VjobcandidateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate
                     from humanresources.vjobcandidate
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

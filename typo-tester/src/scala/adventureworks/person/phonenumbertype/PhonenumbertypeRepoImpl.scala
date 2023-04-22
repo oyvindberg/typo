@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid".executeUpdate() > 0
   }
-  override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeId = {
+  override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.modifieddate match {
@@ -35,16 +34,26 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       }
     ).flatten
     
-    SQL"""insert into person.phonenumbertype(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning phonenumbertypeid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.phonenumbertype default values
+            returning phonenumbertypeid, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.phonenumbertype(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning phonenumbertypeid, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate
           from person.phonenumbertype
        """.as(rowParser.*)
   }
@@ -57,7 +66,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           case PhonenumbertypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case PhonenumbertypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select phonenumbertypeid, "name", modifieddate
                     from person.phonenumbertype
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -70,7 +79,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, name, modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate
           from person.phonenumbertype
           where phonenumbertypeid = $phonenumbertypeid
        """.as(rowParser.singleOpt)
@@ -81,7 +90,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       (s: PreparedStatement, index: Int, v: Array[PhonenumbertypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select phonenumbertypeid, name, modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate
           from person.phonenumbertype
           where phonenumbertypeid = ANY($phonenumbertypeids)
        """.as(rowParser.*)
@@ -90,7 +99,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     val phonenumbertypeid = row.phonenumbertypeid
     SQL"""update person.phonenumbertype
-          set name = ${row.name},
+          set "name" = ${row.name},
               modifieddate = ${row.modifieddate}
           where phonenumbertypeid = $phonenumbertypeid
        """.executeUpdate() > 0
@@ -105,12 +114,13 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
         }
         val q = s"""update person.phonenumbertype
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where phonenumbertypeid = $phonenumbertypeid
+                    where phonenumbertypeid = {phonenumbertypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("phonenumbertypeid", ParameterValue.from(phonenumbertypeid)))
           .executeUpdate() > 0
     }
   
@@ -125,6 +135,4 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
         )
       )
     }
-  val idRowParser: RowParser[PhonenumbertypeId] =
-    SqlParser.get[PhonenumbertypeId]("phonenumbertypeid")
 }

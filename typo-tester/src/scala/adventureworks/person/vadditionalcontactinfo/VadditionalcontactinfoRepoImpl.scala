@@ -47,7 +47,7 @@ object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
           case VadditionalcontactinfoFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VadditionalcontactinfoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
                     from person.vadditionalcontactinfo
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

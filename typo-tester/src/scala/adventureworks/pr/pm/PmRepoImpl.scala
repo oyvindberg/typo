@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PmRepoImpl extends PmRepo {
   override def selectAll(implicit c: Connection): List[PmRow] = {
-    SQL"""select id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from pr.pm
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object PmRepoImpl extends PmRepo {
           case PmFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PmFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
                     from pr.pm
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

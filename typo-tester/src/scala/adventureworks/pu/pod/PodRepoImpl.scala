@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PodRepoImpl extends PodRepo {
   override def selectAll(implicit c: Connection): List[PodRow] = {
-    SQL"""select id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
+    SQL"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from pu.pod
        """.as(rowParser.*)
   }
@@ -39,7 +39,7 @@ object PodRepoImpl extends PodRepo {
           case PodFieldValue.rejectedqty(value) => NamedParameter("rejectedqty", ParameterValue.from(value))
           case PodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
                     from pu.pod
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

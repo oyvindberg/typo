@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CtRepoImpl extends CtRepo {
   override def selectAll(implicit c: Connection): List[CtRow] = {
-    SQL"""select id, contacttypeid, name, modifieddate
+    SQL"""select "id", contacttypeid, "name", modifieddate
           from pe.ct
        """.as(rowParser.*)
   }
@@ -33,7 +33,7 @@ object CtRepoImpl extends CtRepo {
           case CtFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CtFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", contacttypeid, "name", modifieddate
                     from pe.ct
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

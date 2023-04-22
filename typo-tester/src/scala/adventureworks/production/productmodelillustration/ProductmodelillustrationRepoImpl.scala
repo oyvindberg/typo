@@ -22,19 +22,23 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductmodelillustrationId, unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: ProductmodelillustrationId, unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.productmodelid}, ${compositeId.illustrationid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.productmodelillustration(productmodelid, illustrationid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({productmodelid}::int4, {illustrationid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning productmodelid, illustrationid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("productmodelid", ParameterValue.from(compositeId.productmodelid)), NamedParameter("illustrationid", ParameterValue.from(compositeId.illustrationid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
@@ -51,7 +55,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           case ProductmodelillustrationFieldValue.illustrationid(value) => NamedParameter("illustrationid", ParameterValue.from(value))
           case ProductmodelillustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, illustrationid, modifieddate
                     from production.productmodelillustration
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -85,12 +89,13 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
         }
         val q = s"""update production.productmodelillustration
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+                    where productmodelid = {productmodelid}, illustrationid = {illustrationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productmodelid", ParameterValue.from(compositeId.productmodelid)), NamedParameter("illustrationid", ParameterValue.from(compositeId.illustrationid)))
           .executeUpdate() > 0
     }
   
@@ -102,15 +107,6 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           productmodelid = row[ProductmodelId]("productmodelid"),
           illustrationid = row[IllustrationId]("illustrationid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[ProductmodelillustrationId] =
-    RowParser[ProductmodelillustrationId] { row =>
-      Success(
-        ProductmodelillustrationId(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          illustrationid = row[IllustrationId]("illustrationid")
         )
       )
     }

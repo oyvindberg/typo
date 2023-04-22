@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object CcRepoImpl extends CcRepo {
   override def selectAll(implicit c: Connection): List[CcRow] = {
-    SQL"""select id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+    SQL"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
           from sa.cc
        """.as(rowParser.*)
   }
@@ -35,7 +35,7 @@ object CcRepoImpl extends CcRepo {
           case CcFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
           case CcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
                     from sa.cc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

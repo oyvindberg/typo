@@ -18,7 +18,7 @@ import java.sql.Connection
 
 object VvendorwithaddressesRepoImpl extends VvendorwithaddressesRepo {
   override def selectAll(implicit c: Connection): List[VvendorwithaddressesRow] = {
-    SQL"""select businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
+    SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
           from purchasing.vvendorwithaddresses
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object VvendorwithaddressesRepoImpl extends VvendorwithaddressesRepo {
           case VvendorwithaddressesFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
           case VvendorwithaddressesFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
                     from purchasing.vvendorwithaddresses
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

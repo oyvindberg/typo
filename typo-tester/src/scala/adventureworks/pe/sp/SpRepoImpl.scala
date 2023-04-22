@@ -23,7 +23,7 @@ import java.util.UUID
 
 object SpRepoImpl extends SpRepo {
   override def selectAll(implicit c: Connection): List[SpRow] = {
-    SQL"""select id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate
+    SQL"""select "id", stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from pe.sp
        """.as(rowParser.*)
   }
@@ -42,7 +42,7 @@ object SpRepoImpl extends SpRepo {
           case SpFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
                     from pe.sp
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

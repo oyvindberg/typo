@@ -164,8 +164,6 @@ case class TableComputed(
     } else None
 
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
-    val RowType = relation.RowName
-
     val fieldValueOrIdsParam = sc.Param(
       sc.Ident("fieldValues"),
       sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard))
@@ -180,24 +178,24 @@ case class TableComputed(
               val unsavedParam = sc.Param(sc.Ident("unsaved"), unsaved)
 
               if (id.cols.forall(_.dbCol.columnDefault.isDefined))
-                RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default)
+                RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default, relation.RowName)
               else
-                RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default)
+                RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default, relation.RowName)
             }
             .headOption
             .orElse(maybeId.map(RepoMethod.InsertOnlyKey.apply))
 
           List[Iterable[RepoMethod]](
-            Some(RepoMethod.SelectAll(RowType)),
-            Some(RepoMethod.SelectById(id, RowType)),
+            Some(RepoMethod.SelectAll(relation.RowName)),
+            Some(RepoMethod.SelectById(id, relation.RowName)),
             id match {
               case unary: IdComputed.Unary =>
-                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe)), RowType))
+                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe)), relation.RowName))
               case IdComputed.Composite(_, _, _) =>
                 // todo: support composite ids
                 None
             },
-            Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)),
+            Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, relation.RowName)),
             colsNotId.map(colsNotId =>
               RepoMethod.UpdateFieldValues(
                 id,
@@ -205,23 +203,24 @@ case class TableComputed(
                   sc.Ident("fieldValues"),
                   sc.Type.List.of(relation.FieldValueName.of(sc.Type.Wildcard))
                 ),
-                colsNotId
+                colsNotId,
+                relation.RowName
               )
             ),
-            colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), RowType), colsNotId)),
+            colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), relation.RowName), colsNotId)),
             insertMethod,
             Some(RepoMethod.Delete(id))
           ).flatten
         case None =>
           List(
-            RepoMethod.SelectAll(RowType),
-            RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, RowType)
+            RepoMethod.SelectAll(relation.RowName),
+            RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, relation.RowName)
           )
       },
       dbTable.uniqueKeys
         .map { uk =>
           val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
-          RepoMethod.SelectByUnique(params, RowType)
+          RepoMethod.SelectByUnique(params, relation.RowName)
         }
         .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
     )

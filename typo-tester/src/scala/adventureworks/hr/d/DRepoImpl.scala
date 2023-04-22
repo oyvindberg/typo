@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object DRepoImpl extends DRepo {
   override def selectAll(implicit c: Connection): List[DRow] = {
-    SQL"""select id, departmentid, name, groupname, modifieddate
+    SQL"""select "id", departmentid, "name", groupname, modifieddate
           from hr.d
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object DRepoImpl extends DRepo {
           case DFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
           case DFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", departmentid, "name", groupname, modifieddate
                     from hr.d
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

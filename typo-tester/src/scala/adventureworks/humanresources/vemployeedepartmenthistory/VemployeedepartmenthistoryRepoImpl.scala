@@ -40,7 +40,7 @@ object VemployeedepartmenthistoryRepoImpl extends VemployeedepartmenthistoryRepo
           case VemployeedepartmenthistoryFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
           case VemployeedepartmenthistoryFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate
                     from humanresources.vemployeedepartmenthistory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

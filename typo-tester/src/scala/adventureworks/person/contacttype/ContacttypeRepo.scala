@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait ContacttypeRepo {
   def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean
-  def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeId
+  def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow
   def selectAll(implicit c: Connection): List[ContacttypeRow]
   def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow]

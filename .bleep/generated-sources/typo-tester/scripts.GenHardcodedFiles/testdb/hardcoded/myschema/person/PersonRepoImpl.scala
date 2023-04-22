@@ -11,7 +11,6 @@ package person
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,9 +24,9 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
-    SQL"delete from myschema.person where id = $id".executeUpdate() > 0
+    SQL"""delete from myschema.person where "id" = $id""".executeUpdate() > 0
   }
-  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
+  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
       Some(NamedParameter("favourite_football_club_id", ParameterValue.from(unsaved.favouriteFootballClubId))),
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
@@ -47,16 +46,26 @@ object PersonRepoImpl extends PersonRepo {
       }
     ).flatten
     
-    SQL"""insert into myschema.person(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning id
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into myschema.person default values
+            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into myschema.person(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
        """.as(rowParser.*)
   }
@@ -77,7 +86,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
                     from myschema.person
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -90,9 +99,9 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
-          where id = $id
+          where "id" = $id
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
@@ -101,9 +110,9 @@ object PersonRepoImpl extends PersonRepo {
       (s: PreparedStatement, index: Int, v: Array[PersonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
     
-    SQL"""select id, favourite_football_club_id, name, nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
-          where id = ANY($ids)
+          where "id" = ANY($ids)
        """.as(rowParser.*)
   
   }
@@ -111,7 +120,7 @@ object PersonRepoImpl extends PersonRepo {
     val id = row.id
     SQL"""update myschema.person
           set favourite_football_club_id = ${row.favouriteFootballClubId},
-              name = ${row.name},
+              "name" = ${row.name},
               nick_name = ${row.nickName},
               blog_url = ${row.blogUrl},
               email = ${row.email},
@@ -120,7 +129,7 @@ object PersonRepoImpl extends PersonRepo {
               marital_status_id = ${row.maritalStatusId},
               work_email = ${row.workEmail},
               sector = ${row.sector}
-          where id = $id
+          where "id" = $id
        """.executeUpdate() > 0
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -141,12 +150,13 @@ object PersonRepoImpl extends PersonRepo {
         }
         val q = s"""update myschema.person
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where id = $id
+                    where "id" = {id}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("id", ParameterValue.from(id)))
           .executeUpdate() > 0
     }
   
@@ -169,6 +179,4 @@ object PersonRepoImpl extends PersonRepo {
         )
       )
     }
-  val idRowParser: RowParser[PersonId] =
-    SqlParser.get[PersonId]("id")
 }

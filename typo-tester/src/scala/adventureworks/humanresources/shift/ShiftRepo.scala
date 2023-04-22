@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait ShiftRepo {
   def delete(shiftid: ShiftId)(implicit c: Connection): Boolean
-  def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftId
+  def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow
   def selectAll(implicit c: Connection): List[ShiftRow]
   def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow]
   def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow]

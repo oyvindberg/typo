@@ -21,7 +21,7 @@ import java.util.UUID
 
 object BeaRepoImpl extends BeaRepo {
   override def selectAll(implicit c: Connection): List[BeaRow] = {
-    SQL"""select id, businessentityid, addressid, addresstypeid, rowguid, modifieddate
+    SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from pe.bea
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object BeaRepoImpl extends BeaRepo {
           case BeaFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case BeaFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate
                     from pe.bea
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -12,7 +12,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".executeUpdate() > 0
   }
-  override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateId = {
+  override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     val namedParameters = List(
       Some(NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid))),
       Some(NamedParameter("resume", ParameterValue.from(unsaved.resume))),
@@ -36,12 +35,22 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       }
     ).flatten
     
-    SQL"""insert into humanresources.jobcandidate(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning jobcandidateid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into humanresources.jobcandidate default values
+            returning jobcandidateid, businessentityid, resume, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into humanresources.jobcandidate(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning jobcandidateid, businessentityid, resume, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
@@ -59,7 +68,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           case JobcandidateFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
           case JobcandidateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select jobcandidateid, businessentityid, resume, modifieddate
                     from humanresources.jobcandidate
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -109,12 +118,13 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         }
         val q = s"""update humanresources.jobcandidate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where jobcandidateid = $jobcandidateid
+                    where jobcandidateid = {jobcandidateid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("jobcandidateid", ParameterValue.from(jobcandidateid)))
           .executeUpdate() > 0
     }
   
@@ -130,6 +140,4 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         )
       )
     }
-  val idRowParser: RowParser[JobcandidateId] =
-    SqlParser.get[JobcandidateId]("jobcandidateid")
 }

@@ -13,7 +13,6 @@ package pg_constraint
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,10 +25,12 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_constraint where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(oid: PgConstraintId, unsaved: PgConstraintRowUnsaved)(implicit c: Connection): PgConstraintRow = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
-          values (${oid}, ${unsaved.conname}, ${unsaved.connamespace}, ${unsaved.contype}, ${unsaved.condeferrable}, ${unsaved.condeferred}, ${unsaved.convalidated}, ${unsaved.conrelid}, ${unsaved.contypid}, ${unsaved.conindid}, ${unsaved.conparentid}, ${unsaved.confrelid}, ${unsaved.confupdtype}, ${unsaved.confdeltype}, ${unsaved.confmatchtype}, ${unsaved.conislocal}, ${unsaved.coninhcount}, ${unsaved.connoinherit}, ${unsaved.conkey}, ${unsaved.confkey}, ${unsaved.conpfeqop}, ${unsaved.conppeqop}, ${unsaved.conffeqop}, ${unsaved.conexclop}, ${unsaved.conbin})
-       """.execute()
+          values (${oid}::oid, ${unsaved.conname}::name, ${unsaved.connamespace}::oid, ${unsaved.contype}::char, ${unsaved.condeferrable}, ${unsaved.condeferred}, ${unsaved.convalidated}, ${unsaved.conrelid}::oid, ${unsaved.contypid}::oid, ${unsaved.conindid}::oid, ${unsaved.conparentid}::oid, ${unsaved.confrelid}::oid, ${unsaved.confupdtype}::char, ${unsaved.confdeltype}::char, ${unsaved.confmatchtype}::char, ${unsaved.conislocal}, ${unsaved.coninhcount}::int4, ${unsaved.connoinherit}, ${unsaved.conkey}::_int2, ${unsaved.confkey}::_int2, ${unsaved.conpfeqop}::_oid, ${unsaved.conppeqop}::_oid, ${unsaved.conffeqop}::_oid, ${unsaved.conexclop}::_oid, ${unsaved.conbin}::pg_node_tree)
+          returning oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
@@ -68,7 +69,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           case PgConstraintFieldValue.conexclop(value) => NamedParameter("conexclop", ParameterValue.from(value))
           case PgConstraintFieldValue.conbin(value) => NamedParameter("conbin", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
                     from pg_catalog.pg_constraint
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -163,12 +164,13 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
         }
         val q = s"""update pg_catalog.pg_constraint
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid
+                    where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("oid", ParameterValue.from(oid)))
           .executeUpdate() > 0
     }
   
@@ -205,6 +207,4 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
         )
       )
     }
-  val idRowParser: RowParser[PgConstraintId] =
-    SqlParser.get[PgConstraintId]("oid")
 }

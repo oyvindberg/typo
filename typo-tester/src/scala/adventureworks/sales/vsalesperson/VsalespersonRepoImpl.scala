@@ -51,7 +51,7 @@ object VsalespersonRepoImpl extends VsalespersonRepo {
           case VsalespersonFieldValue.salesytd(value) => NamedParameter("salesytd", ParameterValue.from(value))
           case VsalespersonFieldValue.saleslastyear(value) => NamedParameter("saleslastyear", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear
                     from sales.vsalesperson
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

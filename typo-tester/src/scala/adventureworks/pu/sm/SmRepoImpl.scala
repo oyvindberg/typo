@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SmRepoImpl extends SmRepo {
   override def selectAll(implicit c: Connection): List[SmRow] = {
-    SQL"""select id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate
+    SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from pu.sm
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object SmRepoImpl extends SmRepo {
           case SmFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SmFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
                     from pu.sm
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

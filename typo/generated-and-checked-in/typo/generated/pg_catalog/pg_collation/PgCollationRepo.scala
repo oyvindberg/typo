@@ -14,7 +14,7 @@ import java.sql.Connection
 
 trait PgCollationRepo {
   def delete(oid: PgCollationId)(implicit c: Connection): Boolean
-  def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): Boolean
+  def insert(oid: PgCollationId, unsaved: PgCollationRowUnsaved)(implicit c: Connection): PgCollationRow
   def selectAll(implicit c: Connection): List[PgCollationRow]
   def selectByFieldValues(fieldValues: List[PgCollationFieldOrIdValue[_]])(implicit c: Connection): List[PgCollationRow]
   def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow]

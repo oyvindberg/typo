@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object CuRepoImpl extends CuRepo {
   override def selectAll(implicit c: Connection): List[CuRow] = {
-    SQL"""select id, currencycode, name, modifieddate
+    SQL"""select "id", currencycode, "name", modifieddate
           from sa.cu
        """.as(rowParser.*)
   }
@@ -33,7 +33,7 @@ object CuRepoImpl extends CuRepo {
           case CuFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CuFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", currencycode, "name", modifieddate
                     from sa.cu
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -11,7 +11,6 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,7 +24,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.illustration where illustrationid = $illustrationid".executeUpdate() > 0
   }
-  override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationId = {
+  override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
       Some(NamedParameter("diagram", ParameterValue.from(unsaved.diagram))),
       unsaved.modifieddate match {
@@ -34,12 +33,22 @@ object IllustrationRepoImpl extends IllustrationRepo {
       }
     ).flatten
     
-    SQL"""insert into production.illustration(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning illustrationid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.illustration default values
+            returning illustrationid, diagram, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.illustration(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning illustrationid, diagram, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
@@ -56,7 +65,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           case IllustrationFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
           case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select illustrationid, diagram, modifieddate
                     from production.illustration
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -104,12 +113,13 @@ object IllustrationRepoImpl extends IllustrationRepo {
         }
         val q = s"""update production.illustration
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where illustrationid = $illustrationid
+                    where illustrationid = {illustrationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("illustrationid", ParameterValue.from(illustrationid)))
           .executeUpdate() > 0
     }
   
@@ -124,6 +134,4 @@ object IllustrationRepoImpl extends IllustrationRepo {
         )
       )
     }
-  val idRowParser: RowParser[IllustrationId] =
-    SqlParser.get[IllustrationId]("illustrationid")
 }

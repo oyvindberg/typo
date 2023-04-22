@@ -19,7 +19,7 @@ import java.util.UUID
 
 object PaRepoImpl extends PaRepo {
   override def selectAll(implicit c: Connection): List[PaRow] = {
-    SQL"""select id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+    SQL"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from pe.pa
        """.as(rowParser.*)
   }
@@ -35,7 +35,7 @@ object PaRepoImpl extends PaRepo {
           case PaFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PaFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
                     from pe.pa
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

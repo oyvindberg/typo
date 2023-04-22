@@ -34,7 +34,7 @@ object PmpdcRepoImpl extends PmpdcRepo {
           case PmpdcFieldValue.cultureid(value) => NamedParameter("cultureid", ParameterValue.from(value))
           case PmpdcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, productdescriptionid, cultureid, modifieddate
                     from pr.pmpdc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

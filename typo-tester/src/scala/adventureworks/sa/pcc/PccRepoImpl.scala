@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object PccRepoImpl extends PccRepo {
   override def selectAll(implicit c: Connection): List[PccRow] = {
-    SQL"""select id, businessentityid, creditcardid, modifieddate
+    SQL"""select "id", businessentityid, creditcardid, modifieddate
           from sa.pcc
        """.as(rowParser.*)
   }
@@ -33,7 +33,7 @@ object PccRepoImpl extends PccRepo {
           case PccFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
           case PccFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, creditcardid, modifieddate
                     from sa.pcc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

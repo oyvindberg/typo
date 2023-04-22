@@ -32,7 +32,7 @@ object PmiRepoImpl extends PmiRepo {
           case PmiFieldValue.illustrationid(value) => NamedParameter("illustrationid", ParameterValue.from(value))
           case PmiFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, illustrationid, modifieddate
                     from pr.pmi
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

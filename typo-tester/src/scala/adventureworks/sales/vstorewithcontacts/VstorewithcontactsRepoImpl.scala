@@ -19,7 +19,7 @@ import java.sql.Connection
 
 object VstorewithcontactsRepoImpl extends VstorewithcontactsRepo {
   override def selectAll(implicit c: Connection): List[VstorewithcontactsRow] = {
-    SQL"""select businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
+    SQL"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
           from sales.vstorewithcontacts
        """.as(rowParser.*)
   }
@@ -41,7 +41,7 @@ object VstorewithcontactsRepoImpl extends VstorewithcontactsRepo {
           case VstorewithcontactsFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
           case VstorewithcontactsFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
                     from sales.vstorewithcontacts
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

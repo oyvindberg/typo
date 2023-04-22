@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object LRepoImpl extends LRepo {
   override def selectAll(implicit c: Connection): List[LRow] = {
-    SQL"""select id, locationid, name, costrate, availability, modifieddate
+    SQL"""select "id", locationid, "name", costrate, availability, modifieddate
           from pr.l
        """.as(rowParser.*)
   }
@@ -35,7 +35,7 @@ object LRepoImpl extends LRepo {
           case LFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
           case LFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", locationid, "name", costrate, availability, modifieddate
                     from pr.l
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

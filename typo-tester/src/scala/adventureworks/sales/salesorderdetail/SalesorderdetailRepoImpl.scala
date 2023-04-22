@@ -24,32 +24,36 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
   }
-  override def insert(compositeId: SalesorderdetailId, unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: SalesorderdetailId, unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     val namedParameters = List(
-      Some(NamedParameter("carriertrackingnumber", ParameterValue.from(unsaved.carriertrackingnumber))),
-      Some(NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty))),
-      Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
-      Some(NamedParameter("specialofferid", ParameterValue.from(unsaved.specialofferid))),
-      Some(NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice))),
+      Some((NamedParameter("carriertrackingnumber", ParameterValue.from(unsaved.carriertrackingnumber)), "")),
+      Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int2")),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("specialofferid", ParameterValue.from(unsaved.specialofferid)), "::int4")),
+      Some((NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice)), "::numeric")),
       unsaved.unitpricediscount match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("unitpricediscount", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("unitpricediscount", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.salesorderid}, ${compositeId.salesorderdetailid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({salesorderid}::int4, {salesorderdetailid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesorderdetailid", ParameterValue.from(compositeId.salesorderdetailid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
@@ -73,7 +77,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           case SalesorderdetailFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalesorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
                     from sales.salesorderdetail
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -121,12 +125,13 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         }
         val q = s"""update sales.salesorderdetail
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}
+                    where salesorderid = {salesorderid}, salesorderdetailid = {salesorderdetailid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesorderdetailid", ParameterValue.from(compositeId.salesorderdetailid)))
           .executeUpdate() > 0
     }
   
@@ -145,15 +150,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           unitpricediscount = row[BigDecimal]("unitpricediscount"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[SalesorderdetailId] =
-    RowParser[SalesorderdetailId] { row =>
-      Success(
-        SalesorderdetailId(
-          salesorderid = row[SalesorderheaderId]("salesorderid"),
-          salesorderdetailid = row[Int]("salesorderdetailid")
         )
       )
     }

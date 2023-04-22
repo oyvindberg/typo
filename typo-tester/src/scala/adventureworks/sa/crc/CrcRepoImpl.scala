@@ -32,7 +32,7 @@ object CrcRepoImpl extends CrcRepo {
           case CrcFieldValue.currencycode(value) => NamedParameter("currencycode", ParameterValue.from(value))
           case CrcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select countryregioncode, currencycode, modifieddate
                     from sa.crc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

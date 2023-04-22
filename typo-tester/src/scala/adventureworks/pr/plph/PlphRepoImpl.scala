@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object PlphRepoImpl extends PlphRepo {
   override def selectAll(implicit c: Connection): List[PlphRow] = {
-    SQL"""select id, productid, startdate, enddate, listprice, modifieddate
+    SQL"""select "id", productid, startdate, enddate, listprice, modifieddate
           from pr.plph
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object PlphRepoImpl extends PlphRepo {
           case PlphFieldValue.listprice(value) => NamedParameter("listprice", ParameterValue.from(value))
           case PlphFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productid, startdate, enddate, listprice, modifieddate
                     from pr.plph
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

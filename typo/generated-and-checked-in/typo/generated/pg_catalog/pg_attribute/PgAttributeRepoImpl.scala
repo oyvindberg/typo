@@ -22,10 +22,12 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}".executeUpdate() > 0
   }
-  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): PgAttributeRow = {
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, attname, atttypid, attstattarget, attlen, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
-          values (${compositeId.attrelid}, ${compositeId.attnum}, ${unsaved.attname}, ${unsaved.atttypid}, ${unsaved.attstattarget}, ${unsaved.attlen}, ${unsaved.attndims}, ${unsaved.attcacheoff}, ${unsaved.atttypmod}, ${unsaved.attbyval}, ${unsaved.attalign}, ${unsaved.attstorage}, ${unsaved.attcompression}, ${unsaved.attnotnull}, ${unsaved.atthasdef}, ${unsaved.atthasmissing}, ${unsaved.attidentity}, ${unsaved.attgenerated}, ${unsaved.attisdropped}, ${unsaved.attislocal}, ${unsaved.attinhcount}, ${unsaved.attcollation}, ${unsaved.attacl}, ${unsaved.attoptions}, ${unsaved.attfdwoptions}, ${unsaved.attmissingval})
-       """.execute()
+          values (${compositeId.attrelid}::oid, ${compositeId.attnum}::int2, ${unsaved.attname}::name, ${unsaved.atttypid}::oid, ${unsaved.attstattarget}::int4, ${unsaved.attlen}::int2, ${unsaved.attndims}::int4, ${unsaved.attcacheoff}::int4, ${unsaved.atttypmod}::int4, ${unsaved.attbyval}, ${unsaved.attalign}::char, ${unsaved.attstorage}::char, ${unsaved.attcompression}::char, ${unsaved.attnotnull}, ${unsaved.atthasdef}, ${unsaved.atthasmissing}, ${unsaved.attidentity}::char, ${unsaved.attgenerated}::char, ${unsaved.attisdropped}, ${unsaved.attislocal}, ${unsaved.attinhcount}::int4, ${unsaved.attcollation}::oid, ${unsaved.attacl}::_aclitem, ${unsaved.attoptions}::_text, ${unsaved.attfdwoptions}::_text, ${unsaved.attmissingval}::anyarray)
+          returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
@@ -65,7 +67,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attfdwoptions(value) => NamedParameter("attfdwoptions", ParameterValue.from(value))
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
                     from pg_catalog.pg_attribute
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -148,12 +150,13 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
         }
         val q = s"""update pg_catalog.pg_attribute
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+                    where attrelid = {attrelid}, attnum = {attnum}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("attrelid", ParameterValue.from(compositeId.attrelid)), NamedParameter("attnum", ParameterValue.from(compositeId.attnum)))
           .executeUpdate() > 0
     }
   
@@ -188,15 +191,6 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           attoptions = row[Option[Array[String]]]("attoptions"),
           attfdwoptions = row[Option[Array[String]]]("attfdwoptions"),
           attmissingval = row[Option[/* anyarray */ PGobject]]("attmissingval")
-        )
-      )
-    }
-  val idRowParser: RowParser[PgAttributeId] =
-    RowParser[PgAttributeId] { row =>
-      Success(
-        PgAttributeId(
-          attrelid = row[/* oid */ Long]("attrelid"),
-          attnum = row[Int]("attnum")
         )
       )
     }

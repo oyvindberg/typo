@@ -13,7 +13,6 @@ import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,9 +24,9 @@ import java.util.UUID
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.document where documentnode = $documentnode".executeUpdate() > 0
+    SQL"""delete from production."document" where documentnode = $documentnode""".executeUpdate() > 0
   }
-  override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentId = {
+  override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     val namedParameters = List(
       Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
       Some(NamedParameter("owner", ParameterValue.from(unsaved.owner))),
@@ -55,17 +54,27 @@ object DocumentRepoImpl extends DocumentRepo {
       }
     ).flatten
     
-    SQL"""insert into production.document(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning documentnode
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production."document" default values
+            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production."document"(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
-          from production.document
+    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+          from production."document"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
@@ -87,8 +96,8 @@ object DocumentRepoImpl extends DocumentRepo {
           case DocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case DocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from production.document
+        val q = s"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+                    from production."document"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
@@ -100,8 +109,8 @@ object DocumentRepoImpl extends DocumentRepo {
   
   }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
-          from production.document
+    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+          from production."document"
           where documentnode = $documentnode
        """.as(rowParser.singleOpt)
   }
@@ -111,8 +120,8 @@ object DocumentRepoImpl extends DocumentRepo {
       (s: PreparedStatement, index: Int, v: Array[DocumentId]) =>
         s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
     
-    SQL"""select title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode
-          from production.document
+    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+          from production."document"
           where documentnode = ANY($documentnodes)
        """.as(rowParser.*)
   
@@ -122,9 +131,9 @@ object DocumentRepoImpl extends DocumentRepo {
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
     val documentnode = row.documentnode
-    SQL"""update production.document
+    SQL"""update production."document"
           set title = ${row.title},
-              owner = ${row.owner},
+              "owner" = ${row.owner},
               folderflag = ${row.folderflag},
               filename = ${row.filename},
               fileextension = ${row.fileextension},
@@ -132,7 +141,7 @@ object DocumentRepoImpl extends DocumentRepo {
               changenumber = ${row.changenumber},
               status = ${row.status},
               documentsummary = ${row.documentsummary},
-              document = ${row.document},
+              "document" = ${row.document},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
           where documentnode = $documentnode
@@ -156,14 +165,15 @@ object DocumentRepoImpl extends DocumentRepo {
           case DocumentFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case DocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""update production.document
+        val q = s"""update production."document"
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where documentnode = $documentnode
+                    where documentnode = {documentnode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("documentnode", ParameterValue.from(documentnode)))
           .executeUpdate() > 0
     }
   
@@ -188,6 +198,4 @@ object DocumentRepoImpl extends DocumentRepo {
         )
       )
     }
-  val idRowParser: RowParser[DocumentId] =
-    SqlParser.get[DocumentId]("documentnode")
 }

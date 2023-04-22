@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -28,30 +27,34 @@ object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.store where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: StoreRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
     val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
-      Some(NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid))),
-      Some(NamedParameter("demographics", ParameterValue.from(unsaved.demographics))),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid)), "::int4")),
+      Some((NamedParameter("demographics", ParameterValue.from(unsaved.demographics)), "::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.store(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.store(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
        """.as(rowParser.*)
   }
@@ -67,7 +70,7 @@ object StoreRepoImpl extends StoreRepo {
           case StoreFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case StoreFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
                     from sales.store
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -80,7 +83,7 @@ object StoreRepoImpl extends StoreRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = $businessentityid
        """.as(rowParser.singleOpt)
@@ -91,7 +94,7 @@ object StoreRepoImpl extends StoreRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = ANY($businessentityids)
        """.as(rowParser.*)
@@ -100,7 +103,7 @@ object StoreRepoImpl extends StoreRepo {
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.store
-          set name = ${row.name},
+          set "name" = ${row.name},
               salespersonid = ${row.salespersonid},
               demographics = ${row.demographics},
               rowguid = ${row.rowguid},
@@ -121,12 +124,13 @@ object StoreRepoImpl extends StoreRepo {
         }
         val q = s"""update sales.store
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -144,6 +148,4 @@ object StoreRepoImpl extends StoreRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

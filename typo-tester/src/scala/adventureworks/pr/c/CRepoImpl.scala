@@ -19,8 +19,8 @@ import java.time.LocalDateTime
 
 object CRepoImpl extends CRepo {
   override def selectAll(implicit c: Connection): List[CRow] = {
-    SQL"""select id, cultureid, name, modifieddate
-          from pr.c
+    SQL"""select "id", cultureid, "name", modifieddate
+          from pr."c"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CFieldOrIdValue[_]])(implicit c: Connection): List[CRow] = {
@@ -33,8 +33,8 @@ object CRepoImpl extends CRepo {
           case CFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from pr.c
+        val q = s"""select "id", cultureid, "name", modifieddate
+                    from pr."c"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

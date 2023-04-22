@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 object PchRepoImpl extends PchRepo {
   override def selectAll(implicit c: Connection): List[PchRow] = {
-    SQL"""select id, productid, startdate, enddate, standardcost, modifieddate
+    SQL"""select "id", productid, startdate, enddate, standardcost, modifieddate
           from pr.pch
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object PchRepoImpl extends PchRepo {
           case PchFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
           case PchFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productid, startdate, enddate, standardcost, modifieddate
                     from pr.pch
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

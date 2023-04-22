@@ -20,8 +20,8 @@ import java.util.UUID
 
 object ARepoImpl extends ARepo {
   override def selectAll(implicit c: Connection): List[ARow] = {
-    SQL"""select id, addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
-          from pe.a
+    SQL"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          from pe."a"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AFieldOrIdValue[_]])(implicit c: Connection): List[ARow] = {
@@ -40,8 +40,8 @@ object ARepoImpl extends ARepo {
           case AFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from pe.a
+        val q = s"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+                    from pe."a"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

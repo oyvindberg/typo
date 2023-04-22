@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -24,9 +23,9 @@ import java.time.LocalDateTime
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.location where locationid = $locationid".executeUpdate() > 0
+    SQL"""delete from production."location" where locationid = $locationid""".executeUpdate() > 0
   }
-  override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationId = {
+  override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.costrate match {
@@ -43,17 +42,27 @@ object LocationRepoImpl extends LocationRepo {
       }
     ).flatten
     
-    SQL"""insert into production.location(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning locationid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production."location" default values
+            returning locationid, "name", costrate, availability, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production."location"(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning locationid, "name", costrate, availability, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate
-          from production.location
+    SQL"""select locationid, "name", costrate, availability, modifieddate
+          from production."location"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
@@ -67,8 +76,8 @@ object LocationRepoImpl extends LocationRepo {
           case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
           case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from production.location
+        val q = s"""select locationid, "name", costrate, availability, modifieddate
+                    from production."location"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
@@ -80,8 +89,8 @@ object LocationRepoImpl extends LocationRepo {
   
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
-    SQL"""select locationid, name, costrate, availability, modifieddate
-          from production.location
+    SQL"""select locationid, "name", costrate, availability, modifieddate
+          from production."location"
           where locationid = $locationid
        """.as(rowParser.singleOpt)
   }
@@ -91,16 +100,16 @@ object LocationRepoImpl extends LocationRepo {
       (s: PreparedStatement, index: Int, v: Array[LocationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select locationid, name, costrate, availability, modifieddate
-          from production.location
+    SQL"""select locationid, "name", costrate, availability, modifieddate
+          from production."location"
           where locationid = ANY($locationids)
        """.as(rowParser.*)
   
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
-    SQL"""update production.location
-          set name = ${row.name},
+    SQL"""update production."location"
+          set "name" = ${row.name},
               costrate = ${row.costrate},
               availability = ${row.availability},
               modifieddate = ${row.modifieddate}
@@ -117,14 +126,15 @@ object LocationRepoImpl extends LocationRepo {
           case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
           case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""update production.location
+        val q = s"""update production."location"
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where locationid = $locationid
+                    where locationid = {locationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("locationid", ParameterValue.from(locationid)))
           .executeUpdate() > 0
     }
   
@@ -141,6 +151,4 @@ object LocationRepoImpl extends LocationRepo {
         )
       )
     }
-  val idRowParser: RowParser[LocationId] =
-    SqlParser.get[LocationId]("locationid")
 }

@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait AddressRepo {
   def delete(addressid: AddressId)(implicit c: Connection): Boolean
-  def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressId
+  def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow
   def selectAll(implicit c: Connection): List[AddressRow]
   def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow]
   def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow]

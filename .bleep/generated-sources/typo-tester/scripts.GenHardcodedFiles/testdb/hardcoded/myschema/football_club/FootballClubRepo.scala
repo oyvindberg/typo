@@ -12,7 +12,7 @@ import java.sql.Connection
 
 trait FootballClubRepo {
   def delete(id: FootballClubId)(implicit c: Connection): Boolean
-  def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): Boolean
+  def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): FootballClubRow
   def selectAll(implicit c: Connection): List[FootballClubRow]
   def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow]
   def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow]

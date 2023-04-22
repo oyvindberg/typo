@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PvRepoImpl extends PvRepo {
   override def selectAll(implicit c: Connection): List[PvRow] = {
-    SQL"""select id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+    SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from pu.pv
        """.as(rowParser.*)
   }
@@ -42,7 +42,7 @@ object PvRepoImpl extends PvRepo {
           case PvFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
           case PvFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
                     from pu.pv
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -12,7 +12,7 @@ import java.util.UUID
 
 trait DocumentRepo {
   def delete(documentnode: DocumentId)(implicit c: Connection): Boolean
-  def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentId
+  def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow
   def selectAll(implicit c: Connection): List[DocumentRow]
   def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow]
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]

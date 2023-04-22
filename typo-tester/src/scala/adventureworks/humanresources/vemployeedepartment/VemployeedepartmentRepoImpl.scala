@@ -39,7 +39,7 @@ object VemployeedepartmentRepoImpl extends VemployeedepartmentRepo {
           case VemployeedepartmentFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
           case VemployeedepartmentFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate
                     from humanresources.vemployeedepartment
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

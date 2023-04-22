@@ -14,7 +14,6 @@ import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -29,39 +28,43 @@ object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.person where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: PersonRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
-      Some(NamedParameter("persontype", ParameterValue.from(unsaved.persontype))),
+      Some((NamedParameter("persontype", ParameterValue.from(unsaved.persontype)), "::bpchar")),
       unsaved.namestyle match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("namestyle", ParameterValue.from[NameStyle](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("namestyle", ParameterValue.from[NameStyle](value)), """::"public".NameStyle"""))
       },
-      Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
-      Some(NamedParameter("firstname", ParameterValue.from(unsaved.firstname))),
-      Some(NamedParameter("middlename", ParameterValue.from(unsaved.middlename))),
-      Some(NamedParameter("lastname", ParameterValue.from(unsaved.lastname))),
-      Some(NamedParameter("suffix", ParameterValue.from(unsaved.suffix))),
+      Some((NamedParameter("title", ParameterValue.from(unsaved.title)), "")),
+      Some((NamedParameter("firstname", ParameterValue.from(unsaved.firstname)), """::"public"."Name"""")),
+      Some((NamedParameter("middlename", ParameterValue.from(unsaved.middlename)), """::"public"."Name"""")),
+      Some((NamedParameter("lastname", ParameterValue.from(unsaved.lastname)), """::"public"."Name"""")),
+      Some((NamedParameter("suffix", ParameterValue.from(unsaved.suffix)), "")),
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("emailpromotion", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("emailpromotion", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some(NamedParameter("additionalcontactinfo", ParameterValue.from(unsaved.additionalcontactinfo))),
-      Some(NamedParameter("demographics", ParameterValue.from(unsaved.demographics))),
+      Some((NamedParameter("additionalcontactinfo", ParameterValue.from(unsaved.additionalcontactinfo)), "::xml")),
+      Some((NamedParameter("demographics", ParameterValue.from(unsaved.demographics)), "::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into person.person(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into person.person(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
@@ -88,7 +91,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
                     from person.person
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -156,12 +159,13 @@ object PersonRepoImpl extends PersonRepo {
         }
         val q = s"""update person.person
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -186,6 +190,4 @@ object PersonRepoImpl extends PersonRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

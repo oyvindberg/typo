@@ -12,7 +12,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,32 +24,36 @@ import java.util.UUID
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.password where businessentityid = $businessentityid".executeUpdate() > 0
+    SQL"""delete from person."password" where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: PasswordRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
-      Some(NamedParameter("passwordhash", ParameterValue.from(unsaved.passwordhash))),
-      Some(NamedParameter("passwordsalt", ParameterValue.from(unsaved.passwordsalt))),
+      Some((NamedParameter("passwordhash", ParameterValue.from(unsaved.passwordhash)), "")),
+      Some((NamedParameter("passwordsalt", ParameterValue.from(unsaved.passwordsalt)), "")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into person.password(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into person."password"(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-          from person.password
+          from person."password"
        """.as(rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
@@ -64,8 +67,8 @@ object PasswordRepoImpl extends PasswordRepo {
           case PasswordFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PasswordFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
-                    from person.password
+        val q = s"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+                    from person."password"
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
@@ -78,7 +81,7 @@ object PasswordRepoImpl extends PasswordRepo {
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-          from person.password
+          from person."password"
           where businessentityid = $businessentityid
        """.as(rowParser.singleOpt)
   }
@@ -89,14 +92,14 @@ object PasswordRepoImpl extends PasswordRepo {
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-          from person.password
+          from person."password"
           where businessentityid = ANY($businessentityids)
        """.as(rowParser.*)
   
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update person.password
+    SQL"""update person."password"
           set passwordhash = ${row.passwordhash},
               passwordsalt = ${row.passwordsalt},
               rowguid = ${row.rowguid},
@@ -114,14 +117,15 @@ object PasswordRepoImpl extends PasswordRepo {
           case PasswordFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PasswordFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""update person.password
+        val q = s"""update person."password"
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -138,6 +142,4 @@ object PasswordRepoImpl extends PasswordRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

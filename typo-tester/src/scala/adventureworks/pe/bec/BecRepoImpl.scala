@@ -20,7 +20,7 @@ import java.util.UUID
 
 object BecRepoImpl extends BecRepo {
   override def selectAll(implicit c: Connection): List[BecRow] = {
-    SQL"""select id, businessentityid, personid, contacttypeid, rowguid, modifieddate
+    SQL"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate
           from pe.bec
        """.as(rowParser.*)
   }
@@ -36,7 +36,7 @@ object BecRepoImpl extends BecRepo {
           case BecFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case BecFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate
                     from pe.bec
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

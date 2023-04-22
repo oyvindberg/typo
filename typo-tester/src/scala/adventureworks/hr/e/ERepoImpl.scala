@@ -21,7 +21,7 @@ import java.util.UUID
 
 object ERepoImpl extends ERepo {
   override def selectAll(implicit c: Connection): List[ERow] = {
-    SQL"""select id, businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+    SQL"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from hr.e
        """.as(rowParser.*)
   }
@@ -47,7 +47,7 @@ object ERepoImpl extends ERepo {
           case EFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case EFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
                     from hr.e
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

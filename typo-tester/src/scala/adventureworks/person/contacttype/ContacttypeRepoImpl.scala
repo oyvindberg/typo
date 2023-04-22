@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.contacttype where contacttypeid = $contacttypeid".executeUpdate() > 0
   }
-  override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeId = {
+  override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.modifieddate match {
@@ -35,16 +34,26 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       }
     ).flatten
     
-    SQL"""insert into person.contacttype(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning contacttypeid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.contacttype default values
+            returning contacttypeid, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.contacttype(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning contacttypeid, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate
+    SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
        """.as(rowParser.*)
   }
@@ -57,7 +66,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           case ContacttypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case ContacttypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select contacttypeid, "name", modifieddate
                     from person.contacttype
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -70,7 +79,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
-    SQL"""select contacttypeid, name, modifieddate
+    SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = $contacttypeid
        """.as(rowParser.singleOpt)
@@ -81,7 +90,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       (s: PreparedStatement, index: Int, v: Array[ContacttypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select contacttypeid, name, modifieddate
+    SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = ANY($contacttypeids)
        """.as(rowParser.*)
@@ -90,7 +99,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
     SQL"""update person.contacttype
-          set name = ${row.name},
+          set "name" = ${row.name},
               modifieddate = ${row.modifieddate}
           where contacttypeid = $contacttypeid
        """.executeUpdate() > 0
@@ -105,12 +114,13 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         }
         val q = s"""update person.contacttype
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where contacttypeid = $contacttypeid
+                    where contacttypeid = {contacttypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("contacttypeid", ParameterValue.from(contacttypeid)))
           .executeUpdate() > 0
     }
   
@@ -125,6 +135,4 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         )
       )
     }
-  val idRowParser: RowParser[ContacttypeId] =
-    SqlParser.get[ContacttypeId]("contacttypeid")
 }

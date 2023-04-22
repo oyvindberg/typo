@@ -47,7 +47,7 @@ object VemployeeRepoImpl extends VemployeeRepo {
           case VemployeeFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
           case VemployeeFieldValue.additionalcontactinfo(value) => NamedParameter("additionalcontactinfo", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, additionalcontactinfo
                     from humanresources.vemployee
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

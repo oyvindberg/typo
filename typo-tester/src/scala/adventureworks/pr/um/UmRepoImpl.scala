@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object UmRepoImpl extends UmRepo {
   override def selectAll(implicit c: Connection): List[UmRow] = {
-    SQL"""select id, unitmeasurecode, name, modifieddate
+    SQL"""select "id", unitmeasurecode, "name", modifieddate
           from pr.um
        """.as(rowParser.*)
   }
@@ -33,7 +33,7 @@ object UmRepoImpl extends UmRepo {
           case UmFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case UmFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", unitmeasurecode, "name", modifieddate
                     from pr.um
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -19,7 +19,7 @@ import java.util.UUID
 
 object PdRepoImpl extends PdRepo {
   override def selectAll(implicit c: Connection): List[PdRow] = {
-    SQL"""select id, productdescriptionid, description, rowguid, modifieddate
+    SQL"""select "id", productdescriptionid, description, rowguid, modifieddate
           from pr.pd
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object PdRepoImpl extends PdRepo {
           case PdFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PdFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productdescriptionid, description, rowguid, modifieddate
                     from pr.pd
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

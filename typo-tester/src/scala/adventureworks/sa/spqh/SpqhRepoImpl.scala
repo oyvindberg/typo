@@ -19,7 +19,7 @@ import java.util.UUID
 
 object SpqhRepoImpl extends SpqhRepo {
   override def selectAll(implicit c: Connection): List[SpqhRow] = {
-    SQL"""select id, businessentityid, quotadate, salesquota, rowguid, modifieddate
+    SQL"""select "id", businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sa.spqh
        """.as(rowParser.*)
   }
@@ -35,7 +35,7 @@ object SpqhRepoImpl extends SpqhRepo {
           case SpqhFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpqhFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, quotadate, salesquota, rowguid, modifieddate
                     from sa.spqh
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

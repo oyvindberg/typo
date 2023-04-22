@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodel where productmodelid = $productmodelid".executeUpdate() > 0
   }
-  override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelId = {
+  override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("catalogdescription", ParameterValue.from(unsaved.catalogdescription))),
@@ -42,16 +41,26 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       }
     ).flatten
     
-    SQL"""insert into production.productmodel(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning productmodelid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productmodel default values
+            returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productmodel(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
-    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
        """.as(rowParser.*)
   }
@@ -67,7 +76,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           case ProductmodelFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductmodelFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
                     from production.productmodel
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -80,7 +89,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   
   }
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
-    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
           where productmodelid = $productmodelid
        """.as(rowParser.singleOpt)
@@ -91,7 +100,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       (s: PreparedStatement, index: Int, v: Array[ProductmodelId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select productmodelid, name, catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
           where productmodelid = ANY($productmodelids)
        """.as(rowParser.*)
@@ -100,7 +109,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
     SQL"""update production.productmodel
-          set name = ${row.name},
+          set "name" = ${row.name},
               catalogdescription = ${row.catalogdescription},
               instructions = ${row.instructions},
               rowguid = ${row.rowguid},
@@ -121,12 +130,13 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         }
         val q = s"""update production.productmodel
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = $productmodelid
+                    where productmodelid = {productmodelid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productmodelid", ParameterValue.from(productmodelid)))
           .executeUpdate() > 0
     }
   
@@ -144,6 +154,4 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         )
       )
     }
-  val idRowParser: RowParser[ProductmodelId] =
-    SqlParser.get[ProductmodelId]("productmodelid")
 }

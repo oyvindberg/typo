@@ -22,24 +22,28 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".executeUpdate() > 0
   }
-  override def insert(compositeId: SalespersonquotahistoryId, unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: SalespersonquotahistoryId, unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     val namedParameters = List(
-      Some(NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota))),
+      Some((NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota)), "::numeric")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.salespersonquotahistory(businessentityid, quotadate, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.businessentityid}, ${compositeId.quotadate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.salespersonquotahistory(businessentityid, quotadate, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, {quotadate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("quotadate", ParameterValue.from(compositeId.quotadate)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
@@ -58,7 +62,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           case SalespersonquotahistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalespersonquotahistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
                     from sales.salespersonquotahistory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -96,12 +100,13 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         }
         val q = s"""update sales.salespersonquotahistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+                    where businessentityid = {businessentityid}, quotadate = {quotadate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("quotadate", ParameterValue.from(compositeId.quotadate)))
           .executeUpdate() > 0
     }
   
@@ -115,15 +120,6 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           salesquota = row[BigDecimal]("salesquota"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[SalespersonquotahistoryId] =
-    RowParser[SalespersonquotahistoryId] { row =>
-      Success(
-        SalespersonquotahistoryId(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          quotadate = row[LocalDateTime]("quotadate")
         )
       )
     }

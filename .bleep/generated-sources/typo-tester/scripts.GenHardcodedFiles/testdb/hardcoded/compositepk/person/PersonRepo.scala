@@ -12,7 +12,7 @@ import java.sql.Connection
 
 trait PersonRepo {
   def delete(compositeId: PersonId)(implicit c: Connection): Boolean
-  def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId
+  def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow
   def selectAll(implicit c: Connection): List[PersonRow]
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow]
   def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow]

@@ -19,7 +19,7 @@ import java.util.UUID
 
 object SoRepoImpl extends SoRepo {
   override def selectAll(implicit c: Connection): List[SoRow] = {
-    SQL"""select id, specialofferid, description, discountpct, type, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+    SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sa.so
        """.as(rowParser.*)
   }
@@ -41,7 +41,7 @@ object SoRepoImpl extends SoRepo {
           case SoFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
                     from sa.so
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

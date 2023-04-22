@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait CurrencyRepo {
   def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean
-  def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): Boolean
+  def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]

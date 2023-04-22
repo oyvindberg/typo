@@ -22,19 +22,23 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}".executeUpdate() > 0
   }
-  override def insert(compositeId: SalesorderheadersalesreasonId, unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: SalesorderheadersalesreasonId, unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.salesorderid}, ${compositeId.salesreasonid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({salesorderid}::int4, {salesreasonid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning salesorderid, salesreasonid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesreasonid", ParameterValue.from(compositeId.salesreasonid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
@@ -51,7 +55,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           case SalesorderheadersalesreasonFieldValue.salesreasonid(value) => NamedParameter("salesreasonid", ParameterValue.from(value))
           case SalesorderheadersalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salesorderid, salesreasonid, modifieddate
                     from sales.salesorderheadersalesreason
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -85,12 +89,13 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
         }
         val q = s"""update sales.salesorderheadersalesreason
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}
+                    where salesorderid = {salesorderid}, salesreasonid = {salesreasonid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesreasonid", ParameterValue.from(compositeId.salesreasonid)))
           .executeUpdate() > 0
     }
   
@@ -102,15 +107,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           salesorderid = row[SalesorderheaderId]("salesorderid"),
           salesreasonid = row[SalesreasonId]("salesreasonid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[SalesorderheadersalesreasonId] =
-    RowParser[SalesorderheadersalesreasonId] { row =>
-      Success(
-        SalesorderheadersalesreasonId(
-          salesorderid = row[SalesorderheaderId]("salesorderid"),
-          salesreasonid = row[SalesreasonId]("salesreasonid")
         )
       )
     }

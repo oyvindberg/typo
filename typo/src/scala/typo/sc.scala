@@ -235,15 +235,19 @@ object sc {
       "@"
     )
 
-  def renderTree(tree: Tree): String = {
+  val Quote = '"'.toString
+  val TripleQuote = Quote * 3
+
+  def renderTree(tree: Tree): String =
     tree match {
       case Ident(value) =>
         def isValidId(str: String) = str.head.isUnicodeIdentifierStart && str.drop(1).forall(_.isUnicodeIdentifierPart)
         def escape(str: String) = s"`$str`"
         if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
-      case QIdent(value)    => value.map(renderTree).mkString(".")
-      case Param(name, tpe) => renderTree(name) + ": " + renderTree(tpe)
-      case StrLit(str)      => '"'.toString + str + '"'.toString
+      case QIdent(value)                      => value.map(renderTree).mkString(".")
+      case Param(name, tpe)                   => renderTree(name) + ": " + renderTree(tpe)
+      case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
+      case StrLit(str)                        => Quote + str + Quote
       case tpe: Type =>
         tpe match {
           case Type.Abstract(value)                => renderTree(value)
@@ -254,9 +258,6 @@ object sc {
           case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
-        val Quote = '"'.toString
-        val TripleQuote = Quote * 3
-
         content.render.linesIterator.toList match {
           case List(one) if content.render.contains(Quote) =>
             s"${renderTree(prefix)}$TripleQuote$one$TripleQuote"
@@ -272,7 +273,6 @@ object sc {
             )
         }
     }
-  }
 
   case class File(tpe: Type.Qualified, contents: Code, secondaryTypes: List[Type.Qualified]) {
     val name: Ident = tpe.value.name

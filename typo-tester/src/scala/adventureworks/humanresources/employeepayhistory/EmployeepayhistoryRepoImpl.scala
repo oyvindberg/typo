@@ -21,21 +21,25 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".executeUpdate() > 0
   }
-  override def insert(compositeId: EmployeepayhistoryId, unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: EmployeepayhistoryId, unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     val namedParameters = List(
-      Some(NamedParameter("rate", ParameterValue.from(unsaved.rate))),
-      Some(NamedParameter("payfrequency", ParameterValue.from(unsaved.payfrequency))),
+      Some((NamedParameter("rate", ParameterValue.from(unsaved.rate)), "::numeric")),
+      Some((NamedParameter("payfrequency", ParameterValue.from(unsaved.payfrequency)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.businessentityid}, ${compositeId.ratechangedate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, {ratechangedate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("ratechangedate", ParameterValue.from(compositeId.ratechangedate)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
@@ -54,7 +58,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           case EmployeepayhistoryFieldValue.payfrequency(value) => NamedParameter("payfrequency", ParameterValue.from(value))
           case EmployeepayhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
                     from humanresources.employeepayhistory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -92,12 +96,13 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         }
         val q = s"""update humanresources.employeepayhistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+                    where businessentityid = {businessentityid}, ratechangedate = {ratechangedate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("ratechangedate", ParameterValue.from(compositeId.ratechangedate)))
           .executeUpdate() > 0
     }
   
@@ -111,15 +116,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           rate = row[BigDecimal]("rate"),
           payfrequency = row[Int]("payfrequency"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[EmployeepayhistoryId] =
-    RowParser[EmployeepayhistoryId] { row =>
-      Success(
-        EmployeepayhistoryId(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          ratechangedate = row[LocalDateTime]("ratechangedate")
         )
       )
     }

@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object VRepoImpl extends VRepo {
   override def selectAll(implicit c: Connection): List[VRow] = {
-    SQL"""select id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+    SQL"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from pu.v
        """.as(rowParser.*)
   }
@@ -40,7 +40,7 @@ object VRepoImpl extends VRepo {
           case VFieldValue.purchasingwebserviceurl(value) => NamedParameter("purchasingwebserviceurl", ParameterValue.from(value))
           case VFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
                     from pu.v
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

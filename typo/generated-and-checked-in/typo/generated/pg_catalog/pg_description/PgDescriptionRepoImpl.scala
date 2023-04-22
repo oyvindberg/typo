@@ -21,10 +21,12 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_description where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}".executeUpdate() > 0
   }
-  override def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): PgDescriptionRow = {
     SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
-          values (${compositeId.objoid}, ${compositeId.classoid}, ${compositeId.objsubid}, ${unsaved.description})
-       """.execute()
+          values (${compositeId.objoid}::oid, ${compositeId.classoid}::oid, ${compositeId.objsubid}::int4, ${unsaved.description})
+          returning objoid, classoid, objsubid, description
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {
@@ -42,7 +44,7 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
           case PgDescriptionFieldValue.objsubid(value) => NamedParameter("objsubid", ParameterValue.from(value))
           case PgDescriptionFieldValue.description(value) => NamedParameter("description", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select objoid, classoid, objsubid, description
                     from pg_catalog.pg_description
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -76,12 +78,13 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
         }
         val q = s"""update pg_catalog.pg_description
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where objoid = ${compositeId.objoid}, classoid = ${compositeId.classoid}, objsubid = ${compositeId.objsubid}
+                    where objoid = {objoid}, classoid = {classoid}, objsubid = {objsubid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("objoid", ParameterValue.from(compositeId.objoid)), NamedParameter("classoid", ParameterValue.from(compositeId.classoid)), NamedParameter("objsubid", ParameterValue.from(compositeId.objsubid)))
           .executeUpdate() > 0
     }
   
@@ -94,16 +97,6 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
           classoid = row[/* oid */ Long]("classoid"),
           objsubid = row[Int]("objsubid"),
           description = row[String]("description")
-        )
-      )
-    }
-  val idRowParser: RowParser[PgDescriptionId] =
-    RowParser[PgDescriptionId] { row =>
-      Success(
-        PgDescriptionId(
-          objoid = row[/* oid */ Long]("objoid"),
-          classoid = row[/* oid */ Long]("classoid"),
-          objsubid = row[Int]("objsubid")
         )
       )
     }

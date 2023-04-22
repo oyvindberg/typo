@@ -14,7 +14,7 @@ import java.sql.Connection
 
 trait PgDescriptionRepo {
   def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean
-  def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): Boolean
+  def insert(compositeId: PgDescriptionId, unsaved: PgDescriptionRowUnsaved)(implicit c: Connection): PgDescriptionRow
   def selectAll(implicit c: Connection): List[PgDescriptionRow]
   def selectByFieldValues(fieldValues: List[PgDescriptionFieldOrIdValue[_]])(implicit c: Connection): List[PgDescriptionRow]
   def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow]

@@ -11,7 +11,6 @@ package marital_status
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -21,15 +20,16 @@ import java.sql.PreparedStatement
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"delete from myschema.marital_status where id = $id".executeUpdate() > 0
+    SQL"""delete from myschema.marital_status where "id" = $id""".executeUpdate() > 0
   }
-  override def insert(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"""insert into myschema.marital_status(id)
+  override def insert(id: MaritalStatusId)(implicit c: Connection): Unit = {
+    SQL"""insert into myschema.marital_status("id")
           values (${id})
        """.execute()
+    ()
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
-    SQL"""select id
+    SQL"""select "id"
           from myschema.marital_status
        """.as(rowParser.*)
   }
@@ -40,7 +40,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         val namedParams = nonEmpty.map{
           case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id"
                     from myschema.marital_status
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -53,9 +53,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
-    SQL"""select id
+    SQL"""select "id"
           from myschema.marital_status
-          where id = $id
+          where "id" = $id
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
@@ -64,9 +64,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
       (s: PreparedStatement, index: Int, v: Array[MaritalStatusId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
     
-    SQL"""select id
+    SQL"""select "id"
           from myschema.marital_status
-          where id = ANY($ids)
+          where "id" = ANY($ids)
        """.as(rowParser.*)
   
   }
@@ -78,6 +78,4 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         )
       )
     }
-  val idRowParser: RowParser[MaritalStatusId] =
-    SqlParser.get[MaritalStatusId]("id")
 }

@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PohRepoImpl extends PohRepo {
   override def selectAll(implicit c: Connection): List[PohRow] = {
-    SQL"""select id, purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+    SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from pu.poh
        """.as(rowParser.*)
   }
@@ -43,7 +43,7 @@ object PohRepoImpl extends PohRepo {
           case PohFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
           case PohFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
                     from pu.poh
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

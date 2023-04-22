@@ -13,7 +13,6 @@ package pg_type
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,10 +25,12 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_type where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(oid: PgTypeId, unsaved: PgTypeRowUnsaved)(implicit c: Connection): PgTypeRow = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
-          values (${oid}, ${unsaved.typname}, ${unsaved.typnamespace}, ${unsaved.typowner}, ${unsaved.typlen}, ${unsaved.typbyval}, ${unsaved.typtype}, ${unsaved.typcategory}, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}, ${unsaved.typrelid}, ${unsaved.typsubscript}, ${unsaved.typelem}, ${unsaved.typarray}, ${unsaved.typinput}, ${unsaved.typoutput}, ${unsaved.typreceive}, ${unsaved.typsend}, ${unsaved.typmodin}, ${unsaved.typmodout}, ${unsaved.typanalyze}, ${unsaved.typalign}, ${unsaved.typstorage}, ${unsaved.typnotnull}, ${unsaved.typbasetype}, ${unsaved.typtypmod}, ${unsaved.typndims}, ${unsaved.typcollation}, ${unsaved.typdefaultbin}, ${unsaved.typdefault}, ${unsaved.typacl})
-       """.execute()
+          values (${oid}::oid, ${unsaved.typname}::name, ${unsaved.typnamespace}::oid, ${unsaved.typowner}::oid, ${unsaved.typlen}::int2, ${unsaved.typbyval}, ${unsaved.typtype}::char, ${unsaved.typcategory}::char, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}::char, ${unsaved.typrelid}::oid, ${unsaved.typsubscript}::regproc, ${unsaved.typelem}::oid, ${unsaved.typarray}::oid, ${unsaved.typinput}::regproc, ${unsaved.typoutput}::regproc, ${unsaved.typreceive}::regproc, ${unsaved.typsend}::regproc, ${unsaved.typmodin}::regproc, ${unsaved.typmodout}::regproc, ${unsaved.typanalyze}::regproc, ${unsaved.typalign}::char, ${unsaved.typstorage}::char, ${unsaved.typnotnull}, ${unsaved.typbasetype}::oid, ${unsaved.typtypmod}::int4, ${unsaved.typndims}::int4, ${unsaved.typcollation}::oid, ${unsaved.typdefaultbin}::pg_node_tree, ${unsaved.typdefault}, ${unsaved.typacl}::_aclitem)
+          returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {
@@ -75,7 +76,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
           case PgTypeFieldValue.typdefault(value) => NamedParameter("typdefault", ParameterValue.from(value))
           case PgTypeFieldValue.typacl(value) => NamedParameter("typacl", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
                     from pg_catalog.pg_type
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -184,12 +185,13 @@ object PgTypeRepoImpl extends PgTypeRepo {
         }
         val q = s"""update pg_catalog.pg_type
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid
+                    where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("oid", ParameterValue.from(oid)))
           .executeUpdate() > 0
     }
   
@@ -233,6 +235,4 @@ object PgTypeRepoImpl extends PgTypeRepo {
         )
       )
     }
-  val idRowParser: RowParser[PgTypeId] =
-    SqlParser.get[PgTypeId]("oid")
 }

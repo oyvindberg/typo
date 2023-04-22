@@ -11,7 +11,6 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,7 +24,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productphoto where productphotoid = $productphotoid".executeUpdate() > 0
   }
-  override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoId = {
+  override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
       Some(NamedParameter("thumbnailphoto", ParameterValue.from(unsaved.thumbnailphoto))),
       Some(NamedParameter("thumbnailphotofilename", ParameterValue.from(unsaved.thumbnailphotofilename))),
@@ -37,12 +36,22 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       }
     ).flatten
     
-    SQL"""insert into production.productphoto(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning productphotoid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productphoto default values
+            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productphoto(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
@@ -62,7 +71,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           case ProductphotoFieldValue.largephotofilename(value) => NamedParameter("largephotofilename", ParameterValue.from(value))
           case ProductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
                     from production.productphoto
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -116,12 +125,13 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         }
         val q = s"""update production.productphoto
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productphotoid = $productphotoid
+                    where productphotoid = {productphotoid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productphotoid", ParameterValue.from(productphotoid)))
           .executeUpdate() > 0
     }
   
@@ -139,6 +149,4 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         )
       )
     }
-  val idRowParser: RowParser[ProductphotoId] =
-    SqlParser.get[ProductphotoId]("productphotoid")
 }

@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesreason where salesreasonid = $salesreasonid".executeUpdate() > 0
   }
-  override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonId = {
+  override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("reasontype", ParameterValue.from(unsaved.reasontype))),
@@ -36,16 +35,26 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.salesreason(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning salesreasonid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.salesreason default values
+            returning salesreasonid, "name", reasontype, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.salesreason(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning salesreasonid, "name", reasontype, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
        """.as(rowParser.*)
   }
@@ -59,7 +68,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           case SalesreasonFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
           case SalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salesreasonid, "name", reasontype, modifieddate
                     from sales.salesreason
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -72,7 +81,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"""select salesreasonid, name, reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = $salesreasonid
        """.as(rowParser.singleOpt)
@@ -83,7 +92,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       (s: PreparedStatement, index: Int, v: Array[SalesreasonId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select salesreasonid, name, reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = ANY($salesreasonids)
        """.as(rowParser.*)
@@ -92,7 +101,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
-          set name = ${row.name},
+          set "name" = ${row.name},
               reasontype = ${row.reasontype},
               modifieddate = ${row.modifieddate}
           where salesreasonid = $salesreasonid
@@ -109,12 +118,13 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         }
         val q = s"""update sales.salesreason
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salesreasonid = $salesreasonid
+                    where salesreasonid = {salesreasonid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("salesreasonid", ParameterValue.from(salesreasonid)))
           .executeUpdate() > 0
     }
   
@@ -130,6 +140,4 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         )
       )
     }
-  val idRowParser: RowParser[SalesreasonId] =
-    SqlParser.get[SalesreasonId]("salesreasonid")
 }

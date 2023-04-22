@@ -20,7 +20,7 @@ import java.time.LocalTime
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, shiftid, name, starttime, endtime, modifieddate
+    SQL"""select "id", shiftid, "name", starttime, endtime, modifieddate
           from hr.s
        """.as(rowParser.*)
   }
@@ -36,7 +36,7 @@ object SRepoImpl extends SRepo {
           case SFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
           case SFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", shiftid, "name", starttime, endtime, modifieddate
                     from hr.s
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

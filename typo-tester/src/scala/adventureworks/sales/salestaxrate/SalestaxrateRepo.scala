@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait SalestaxrateRepo {
   def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean
-  def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateId
+  def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow
   def selectAll(implicit c: Connection): List[SalestaxrateRow]
   def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow]

@@ -22,27 +22,31 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
     SQL"delete from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}".executeUpdate() > 0
   }
-  override def insert(compositeId: WorkorderroutingId, unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: WorkorderroutingId, unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
-      Some(NamedParameter("locationid", ParameterValue.from(unsaved.locationid))),
-      Some(NamedParameter("scheduledstartdate", ParameterValue.from(unsaved.scheduledstartdate))),
-      Some(NamedParameter("scheduledenddate", ParameterValue.from(unsaved.scheduledenddate))),
-      Some(NamedParameter("actualstartdate", ParameterValue.from(unsaved.actualstartdate))),
-      Some(NamedParameter("actualenddate", ParameterValue.from(unsaved.actualenddate))),
-      Some(NamedParameter("actualresourcehrs", ParameterValue.from(unsaved.actualresourcehrs))),
-      Some(NamedParameter("plannedcost", ParameterValue.from(unsaved.plannedcost))),
-      Some(NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost))),
+      Some((NamedParameter("locationid", ParameterValue.from(unsaved.locationid)), "::int2")),
+      Some((NamedParameter("scheduledstartdate", ParameterValue.from(unsaved.scheduledstartdate)), "::timestamp")),
+      Some((NamedParameter("scheduledenddate", ParameterValue.from(unsaved.scheduledenddate)), "::timestamp")),
+      Some((NamedParameter("actualstartdate", ParameterValue.from(unsaved.actualstartdate)), "::timestamp")),
+      Some((NamedParameter("actualenddate", ParameterValue.from(unsaved.actualenddate)), "::timestamp")),
+      Some((NamedParameter("actualresourcehrs", ParameterValue.from(unsaved.actualresourcehrs)), "::numeric")),
+      Some((NamedParameter("plannedcost", ParameterValue.from(unsaved.plannedcost)), "::numeric")),
+      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.workorderid}, ${compositeId.productid}, ${compositeId.operationsequence}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({workorderid}::int4, {productid}::int4, {operationsequence}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("workorderid", ParameterValue.from(compositeId.workorderid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("operationsequence", ParameterValue.from(compositeId.operationsequence)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
@@ -68,7 +72,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           case WorkorderroutingFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
                     from production.workorderrouting
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -118,12 +122,13 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         }
         val q = s"""update production.workorderrouting
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+                    where workorderid = {workorderid}, productid = {productid}, operationsequence = {operationsequence}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("workorderid", ParameterValue.from(compositeId.workorderid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("operationsequence", ParameterValue.from(compositeId.operationsequence)))
           .executeUpdate() > 0
     }
   
@@ -144,16 +149,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           plannedcost = row[BigDecimal]("plannedcost"),
           actualcost = row[Option[BigDecimal]]("actualcost"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[WorkorderroutingId] =
-    RowParser[WorkorderroutingId] { row =>
-      Success(
-        WorkorderroutingId(
-          workorderid = row[WorkorderId]("workorderid"),
-          productid = row[Int]("productid"),
-          operationsequence = row[Int]("operationsequence")
         )
       )
     }

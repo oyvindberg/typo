@@ -12,7 +12,6 @@ import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.transactionhistory where transactionid = $transactionid".executeUpdate() > 0
   }
-  override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryId = {
+  override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
     val namedParameters = List(
       Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
       Some(NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid))),
@@ -47,12 +46,22 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       }
     ).flatten
     
-    SQL"""insert into production.transactionhistory(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning transactionid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.transactionhistory default values
+            returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.transactionhistory(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
@@ -75,7 +84,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           case TransactionhistoryFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case TransactionhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
                     from production.transactionhistory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -135,12 +144,13 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         }
         val q = s"""update production.transactionhistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where transactionid = $transactionid
+                    where transactionid = {transactionid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("transactionid", ParameterValue.from(transactionid)))
           .executeUpdate() > 0
     }
   
@@ -161,6 +171,4 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         )
       )
     }
-  val idRowParser: RowParser[TransactionhistoryId] =
-    SqlParser.get[TransactionhistoryId]("transactionid")
 }

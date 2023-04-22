@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait IllustrationRepo {
   def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean
-  def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationId
+  def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]

@@ -21,7 +21,7 @@ import java.util.UUID
 
 object PscRepoImpl extends PscRepo {
   override def selectAll(implicit c: Connection): List[PscRow] = {
-    SQL"""select id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate
+    SQL"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from pr.psc
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object PscRepoImpl extends PscRepo {
           case PscFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PscFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
                     from pr.psc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

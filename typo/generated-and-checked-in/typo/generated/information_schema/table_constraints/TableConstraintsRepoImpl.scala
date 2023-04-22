@@ -22,7 +22,7 @@ import typo.generated.information_schema.YesOrNo
 
 object TableConstraintsRepoImpl extends TableConstraintsRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced
+    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
           from information_schema.table_constraints
        """.as(rowParser.*)
   }
@@ -42,7 +42,7 @@ object TableConstraintsRepoImpl extends TableConstraintsRepo {
           case TableConstraintsFieldValue.initiallyDeferred(value) => NamedParameter("initially_deferred", ParameterValue.from(value))
           case TableConstraintsFieldValue.enforced(value) => NamedParameter("enforced", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
                     from information_schema.table_constraints
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait ProductdocumentRepo {
   def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean
-  def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): Boolean
+  def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow
   def selectAll(implicit c: Connection): List[ProductdocumentRow]
   def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow]

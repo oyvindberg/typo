@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SodRepoImpl extends SodRepo {
   override def selectAll(implicit c: Connection): List[SodRow] = {
-    SQL"""select id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+    SQL"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sa.sod
        """.as(rowParser.*)
   }
@@ -42,7 +42,7 @@ object SodRepoImpl extends SodRepo {
           case SodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
                     from sa.sod
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

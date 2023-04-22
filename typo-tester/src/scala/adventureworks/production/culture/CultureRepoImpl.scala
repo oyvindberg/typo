@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,24 +24,28 @@ object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.culture where cultureid = $cultureid".executeUpdate() > 0
   }
-  override def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.culture(cultureid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${cultureid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.culture(cultureid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({cultureid}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning cultureid, "name", modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("cultureid", ParameterValue.from(cultureid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate
+    SQL"""select cultureid, "name", modifieddate
           from production.culture
        """.as(rowParser.*)
   }
@@ -55,7 +58,7 @@ object CultureRepoImpl extends CultureRepo {
           case CultureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select cultureid, "name", modifieddate
                     from production.culture
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -68,7 +71,7 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"""select cultureid, name, modifieddate
+    SQL"""select cultureid, "name", modifieddate
           from production.culture
           where cultureid = $cultureid
        """.as(rowParser.singleOpt)
@@ -79,7 +82,7 @@ object CultureRepoImpl extends CultureRepo {
       (s: PreparedStatement, index: Int, v: Array[CultureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"""select cultureid, name, modifieddate
+    SQL"""select cultureid, "name", modifieddate
           from production.culture
           where cultureid = ANY($cultureids)
        """.as(rowParser.*)
@@ -88,7 +91,7 @@ object CultureRepoImpl extends CultureRepo {
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
     SQL"""update production.culture
-          set name = ${row.name},
+          set "name" = ${row.name},
               modifieddate = ${row.modifieddate}
           where cultureid = $cultureid
        """.executeUpdate() > 0
@@ -103,12 +106,13 @@ object CultureRepoImpl extends CultureRepo {
         }
         val q = s"""update production.culture
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where cultureid = $cultureid
+                    where cultureid = {cultureid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("cultureid", ParameterValue.from(cultureid)))
           .executeUpdate() > 0
     }
   
@@ -123,6 +127,4 @@ object CultureRepoImpl extends CultureRepo {
         )
       )
     }
-  val idRowParser: RowParser[CultureId] =
-    SqlParser.get[CultureId]("cultureid")
 }

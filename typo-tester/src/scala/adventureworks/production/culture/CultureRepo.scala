@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait CultureRepo {
   def delete(cultureid: CultureId)(implicit c: Connection): Boolean
-  def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): Boolean
+  def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow
   def selectAll(implicit c: Connection): List[CultureRow]
   def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow]
   def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow]

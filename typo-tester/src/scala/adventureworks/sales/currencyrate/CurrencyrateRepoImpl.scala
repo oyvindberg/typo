@@ -12,7 +12,6 @@ import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currencyrate where currencyrateid = $currencyrateid".executeUpdate() > 0
   }
-  override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateId = {
+  override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     val namedParameters = List(
       Some(NamedParameter("currencyratedate", ParameterValue.from(unsaved.currencyratedate))),
       Some(NamedParameter("fromcurrencycode", ParameterValue.from(unsaved.fromcurrencycode))),
@@ -39,12 +38,22 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.currencyrate(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning currencyrateid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.currencyrate default values
+            returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.currencyrate(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
@@ -65,7 +74,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           case CurrencyrateFieldValue.endofdayrate(value) => NamedParameter("endofdayrate", ParameterValue.from(value))
           case CurrencyrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
                     from sales.currencyrate
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -121,12 +130,13 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         }
         val q = s"""update sales.currencyrate
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where currencyrateid = $currencyrateid
+                    where currencyrateid = {currencyrateid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("currencyrateid", ParameterValue.from(currencyrateid)))
           .executeUpdate() > 0
     }
   
@@ -145,6 +155,4 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         )
       )
     }
-  val idRowParser: RowParser[CurrencyrateId] =
-    SqlParser.get[CurrencyrateId]("currencyrateid")
 }

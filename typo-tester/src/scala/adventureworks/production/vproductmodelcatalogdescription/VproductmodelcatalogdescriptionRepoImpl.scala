@@ -20,7 +20,7 @@ import java.util.UUID
 
 object VproductmodelcatalogdescriptionRepoImpl extends VproductmodelcatalogdescriptionRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionRow] = {
-    SQL"""select productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate
+    SQL"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate
           from production.vproductmodelcatalogdescription
        """.as(rowParser.*)
   }
@@ -55,7 +55,7 @@ object VproductmodelcatalogdescriptionRepoImpl extends Vproductmodelcatalogdescr
           case VproductmodelcatalogdescriptionFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case VproductmodelcatalogdescriptionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate
                     from production.vproductmodelcatalogdescription
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

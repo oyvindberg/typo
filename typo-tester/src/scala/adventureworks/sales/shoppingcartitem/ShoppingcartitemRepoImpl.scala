@@ -12,7 +12,6 @@ import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,7 +25,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".executeUpdate() > 0
   }
-  override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemId = {
+  override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
     val namedParameters = List(
       Some(NamedParameter("shoppingcartid", ParameterValue.from(unsaved.shoppingcartid))),
       unsaved.quantity match {
@@ -44,12 +43,22 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       }
     ).flatten
     
-    SQL"""insert into sales.shoppingcartitem(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning shoppingcartitemid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.shoppingcartitem default values
+            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.shoppingcartitem(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
@@ -69,7 +78,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           case ShoppingcartitemFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
           case ShoppingcartitemFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
                     from sales.shoppingcartitem
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -123,12 +132,13 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         }
         val q = s"""update sales.shoppingcartitem
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shoppingcartitemid = $shoppingcartitemid
+                    where shoppingcartitemid = {shoppingcartitemid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("shoppingcartitemid", ParameterValue.from(shoppingcartitemid)))
           .executeUpdate() > 0
     }
   
@@ -146,6 +156,4 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         )
       )
     }
-  val idRowParser: RowParser[ShoppingcartitemId] =
-    SqlParser.get[ShoppingcartitemId]("shoppingcartitemid")
 }

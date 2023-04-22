@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
-    SQL"""select id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate
+    SQL"""select "id", businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sa.s
        """.as(rowParser.*)
   }
@@ -37,7 +37,7 @@ object SRepoImpl extends SRepo {
           case SFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
                     from sa.s
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

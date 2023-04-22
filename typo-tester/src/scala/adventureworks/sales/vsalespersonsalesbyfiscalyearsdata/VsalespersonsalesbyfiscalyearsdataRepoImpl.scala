@@ -34,7 +34,7 @@ object VsalespersonsalesbyfiscalyearsdataRepoImpl extends Vsalespersonsalesbyfis
           case VsalespersonsalesbyfiscalyearsdataFieldValue.salestotal(value) => NamedParameter("salestotal", ParameterValue.from(value))
           case VsalespersonsalesbyfiscalyearsdataFieldValue.fiscalyear(value) => NamedParameter("fiscalyear", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear
                     from sales.vsalespersonsalesbyfiscalyearsdata
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

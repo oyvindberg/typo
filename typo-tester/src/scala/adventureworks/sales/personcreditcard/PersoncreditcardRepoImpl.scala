@@ -22,19 +22,23 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".executeUpdate() > 0
   }
-  override def insert(compositeId: PersoncreditcardId, unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: PersoncreditcardId, unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     val namedParameters = List(
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.businessentityid}, ${compositeId.creditcardid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.personcreditcard(businessentityid, creditcardid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, {creditcardid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, creditcardid, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("creditcardid", ParameterValue.from(compositeId.creditcardid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
@@ -51,7 +55,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           case PersoncreditcardFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
           case PersoncreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, creditcardid, modifieddate
                     from sales.personcreditcard
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -85,12 +89,13 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         }
         val q = s"""update sales.personcreditcard
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+                    where businessentityid = {businessentityid}, creditcardid = {creditcardid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("creditcardid", ParameterValue.from(compositeId.creditcardid)))
           .executeUpdate() > 0
     }
   
@@ -102,15 +107,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           businessentityid = row[BusinessentityId]("businessentityid"),
           creditcardid = row[CreditcardId]("creditcardid"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[PersoncreditcardId] =
-    RowParser[PersoncreditcardId] { row =>
-      Success(
-        PersoncreditcardId(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          creditcardid = row[CreditcardId]("creditcardid")
         )
       )
     }

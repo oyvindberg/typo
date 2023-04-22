@@ -21,7 +21,7 @@ import typo.generated.information_schema.SqlIdentifier
 
 object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
   override def selectAll(implicit c: Connection): List[ReferentialConstraintsRow] = {
-    SQL"""select constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule
+    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule
           from information_schema.referential_constraints
        """.as(rowParser.*)
   }
@@ -40,7 +40,7 @@ object ReferentialConstraintsRepoImpl extends ReferentialConstraintsRepo {
           case ReferentialConstraintsFieldValue.updateRule(value) => NamedParameter("update_rule", ParameterValue.from(value))
           case ReferentialConstraintsFieldValue.deleteRule(value) => NamedParameter("delete_rule", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule
                     from information_schema.referential_constraints
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -15,7 +15,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -29,35 +28,39 @@ object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.vendor where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
-      Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
-      Some(NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating))),
+      Some((NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber)), """::"public".AccountNumber""")),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating)), "::int2")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("activeflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some(NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl))),
+      Some((NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl)), "")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into purchasing.vendor(businessentityid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${businessentityid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into purchasing.vendor(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+    SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
        """.as(rowParser.*)
   }
@@ -75,7 +78,7 @@ object VendorRepoImpl extends VendorRepo {
           case VendorFieldValue.purchasingwebserviceurl(value) => NamedParameter("purchasingwebserviceurl", ParameterValue.from(value))
           case VendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
                     from purchasing.vendor
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -88,7 +91,7 @@ object VendorRepoImpl extends VendorRepo {
   
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+    SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = $businessentityid
        """.as(rowParser.singleOpt)
@@ -99,7 +102,7 @@ object VendorRepoImpl extends VendorRepo {
       (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+    SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = ANY($businessentityids)
        """.as(rowParser.*)
@@ -109,7 +112,7 @@ object VendorRepoImpl extends VendorRepo {
     val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
           set accountnumber = ${row.accountnumber},
-              name = ${row.name},
+              "name" = ${row.name},
               creditrating = ${row.creditrating},
               preferredvendorstatus = ${row.preferredvendorstatus},
               activeflag = ${row.activeflag},
@@ -133,12 +136,13 @@ object VendorRepoImpl extends VendorRepo {
         }
         val q = s"""update purchasing.vendor
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = $businessentityid
+                    where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
           .executeUpdate() > 0
     }
   
@@ -158,6 +162,4 @@ object VendorRepoImpl extends VendorRepo {
         )
       )
     }
-  val idRowParser: RowParser[BusinessentityId] =
-    SqlParser.get[BusinessentityId]("businessentityid")
 }

@@ -13,7 +13,6 @@ package pg_class
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -26,10 +25,12 @@ object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_class where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(oid: PgClassId, unsaved: PgClassRowUnsaved)(implicit c: Connection): PgClassRow = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
-          values (${oid}, ${unsaved.relname}, ${unsaved.relnamespace}, ${unsaved.reltype}, ${unsaved.reloftype}, ${unsaved.relowner}, ${unsaved.relam}, ${unsaved.relfilenode}, ${unsaved.reltablespace}, ${unsaved.relpages}, ${unsaved.reltuples}, ${unsaved.relallvisible}, ${unsaved.reltoastrelid}, ${unsaved.relhasindex}, ${unsaved.relisshared}, ${unsaved.relpersistence}, ${unsaved.relkind}, ${unsaved.relnatts}, ${unsaved.relchecks}, ${unsaved.relhasrules}, ${unsaved.relhastriggers}, ${unsaved.relhassubclass}, ${unsaved.relrowsecurity}, ${unsaved.relforcerowsecurity}, ${unsaved.relispopulated}, ${unsaved.relreplident}, ${unsaved.relispartition}, ${unsaved.relrewrite}, ${unsaved.relfrozenxid}, ${unsaved.relminmxid}, ${unsaved.relacl}, ${unsaved.reloptions}, ${unsaved.relpartbound})
-       """.execute()
+          values (${oid}::oid, ${unsaved.relname}::name, ${unsaved.relnamespace}::oid, ${unsaved.reltype}::oid, ${unsaved.reloftype}::oid, ${unsaved.relowner}::oid, ${unsaved.relam}::oid, ${unsaved.relfilenode}::oid, ${unsaved.reltablespace}::oid, ${unsaved.relpages}::int4, ${unsaved.reltuples}::float4, ${unsaved.relallvisible}::int4, ${unsaved.reltoastrelid}::oid, ${unsaved.relhasindex}, ${unsaved.relisshared}, ${unsaved.relpersistence}::char, ${unsaved.relkind}::char, ${unsaved.relnatts}::int2, ${unsaved.relchecks}::int2, ${unsaved.relhasrules}, ${unsaved.relhastriggers}, ${unsaved.relhassubclass}, ${unsaved.relrowsecurity}, ${unsaved.relforcerowsecurity}, ${unsaved.relispopulated}, ${unsaved.relreplident}::char, ${unsaved.relispartition}, ${unsaved.relrewrite}::oid, ${unsaved.relfrozenxid}::xid, ${unsaved.relminmxid}::xid, ${unsaved.relacl}::_aclitem, ${unsaved.reloptions}::_text, ${unsaved.relpartbound}::pg_node_tree)
+          returning oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
+       """
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
@@ -76,7 +77,7 @@ object PgClassRepoImpl extends PgClassRepo {
           case PgClassFieldValue.reloptions(value) => NamedParameter("reloptions", ParameterValue.from(value))
           case PgClassFieldValue.relpartbound(value) => NamedParameter("relpartbound", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
                     from pg_catalog.pg_class
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -187,12 +188,13 @@ object PgClassRepoImpl extends PgClassRepo {
         }
         val q = s"""update pg_catalog.pg_class
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where oid = $oid
+                    where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("oid", ParameterValue.from(oid)))
           .executeUpdate() > 0
     }
   
@@ -237,6 +239,4 @@ object PgClassRepoImpl extends PgClassRepo {
         )
       )
     }
-  val idRowParser: RowParser[PgClassId] =
-    SqlParser.get[PgClassId]("oid")
 }

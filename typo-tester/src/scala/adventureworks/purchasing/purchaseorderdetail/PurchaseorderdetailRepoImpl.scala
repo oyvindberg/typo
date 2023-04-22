@@ -22,25 +22,29 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".executeUpdate() > 0
   }
-  override def insert(compositeId: PurchaseorderdetailId, unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: PurchaseorderdetailId, unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
     val namedParameters = List(
-      Some(NamedParameter("duedate", ParameterValue.from(unsaved.duedate))),
-      Some(NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty))),
-      Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
-      Some(NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice))),
-      Some(NamedParameter("receivedqty", ParameterValue.from(unsaved.receivedqty))),
-      Some(NamedParameter("rejectedqty", ParameterValue.from(unsaved.rejectedqty))),
+      Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
+      Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int2")),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice)), "::numeric")),
+      Some((NamedParameter("receivedqty", ParameterValue.from(unsaved.receivedqty)), "::numeric")),
+      Some((NamedParameter("rejectedqty", ParameterValue.from(unsaved.rejectedqty)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.purchaseorderid}, ${compositeId.purchaseorderdetailid}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({purchaseorderid}::int4, {purchaseorderdetailid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("purchaseorderid", ParameterValue.from(compositeId.purchaseorderid)), NamedParameter("purchaseorderdetailid", ParameterValue.from(compositeId.purchaseorderdetailid)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
@@ -63,7 +67,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           case PurchaseorderdetailFieldValue.rejectedqty(value) => NamedParameter("rejectedqty", ParameterValue.from(value))
           case PurchaseorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
                     from purchasing.purchaseorderdetail
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -109,12 +113,13 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         }
         val q = s"""update purchasing.purchaseorderdetail
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+                    where purchaseorderid = {purchaseorderid}, purchaseorderdetailid = {purchaseorderdetailid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("purchaseorderid", ParameterValue.from(compositeId.purchaseorderid)), NamedParameter("purchaseorderdetailid", ParameterValue.from(compositeId.purchaseorderdetailid)))
           .executeUpdate() > 0
     }
   
@@ -132,15 +137,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           receivedqty = row[BigDecimal]("receivedqty"),
           rejectedqty = row[BigDecimal]("rejectedqty"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[PurchaseorderdetailId] =
-    RowParser[PurchaseorderdetailId] { row =>
-      Success(
-        PurchaseorderdetailId(
-          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
-          purchaseorderdetailid = row[Int]("purchaseorderdetailid")
         )
       )
     }

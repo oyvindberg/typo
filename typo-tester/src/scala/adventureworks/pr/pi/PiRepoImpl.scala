@@ -20,7 +20,7 @@ import java.util.UUID
 
 object PiRepoImpl extends PiRepo {
   override def selectAll(implicit c: Connection): List[PiRow] = {
-    SQL"""select id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+    SQL"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from pr.pi
        """.as(rowParser.*)
   }
@@ -38,7 +38,7 @@ object PiRepoImpl extends PiRepo {
           case PiFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case PiFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate
                     from pr.pi
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

@@ -12,7 +12,6 @@ import adventureworks.person.stateprovince.StateprovinceId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
     SQL"delete from person.address where addressid = $addressid".executeUpdate() > 0
   }
-  override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressId = {
+  override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     val namedParameters = List(
       Some(NamedParameter("addressline1", ParameterValue.from(unsaved.addressline1))),
       Some(NamedParameter("addressline2", ParameterValue.from(unsaved.addressline2))),
@@ -45,12 +44,22 @@ object AddressRepoImpl extends AddressRepo {
       }
     ).flatten
     
-    SQL"""insert into person.address(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning addressid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.address default values
+            returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.address(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
@@ -73,7 +82,7 @@ object AddressRepoImpl extends AddressRepo {
           case AddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
                     from person.address
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -133,12 +142,13 @@ object AddressRepoImpl extends AddressRepo {
         }
         val q = s"""update person.address
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where addressid = $addressid
+                    where addressid = {addressid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("addressid", ParameterValue.from(addressid)))
           .executeUpdate() > 0
     }
   
@@ -159,6 +169,4 @@ object AddressRepoImpl extends AddressRepo {
         )
       )
     }
-  val idRowParser: RowParser[AddressId] =
-    SqlParser.get[AddressId]("addressid")
 }

@@ -21,21 +21,25 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productcosthistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductcosthistoryId, unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(compositeId: ProductcosthistoryId, unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow = {
     val namedParameters = List(
-      Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
-      Some(NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost))),
+      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
+      Some((NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into production.productcosthistory(productid, startdate, ${namedParameters.map(_.name).mkString(", ")})
-          values (${compositeId.productid}, ${compositeId.startdate}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into production.productcosthistory(productid, startdate, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({productid}::int4, {startdate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning productid, startdate, enddate, standardcost, modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("startdate", ParameterValue.from(compositeId.startdate)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
@@ -54,7 +58,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           case ProductcosthistoryFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
           case ProductcosthistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select productid, startdate, enddate, standardcost, modifieddate
                     from production.productcosthistory
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -92,12 +96,13 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         }
         val q = s"""update production.productcosthistory
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+                    where productid = {productid}, startdate = {startdate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("startdate", ParameterValue.from(compositeId.startdate)))
           .executeUpdate() > 0
     }
   
@@ -111,15 +116,6 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           enddate = row[Option[LocalDateTime]]("enddate"),
           standardcost = row[BigDecimal]("standardcost"),
           modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
-  val idRowParser: RowParser[ProductcosthistoryId] =
-    RowParser[ProductcosthistoryId] { row =>
-      Success(
-        ProductcosthistoryId(
-          productid = row[ProductId]("productid"),
-          startdate = row[LocalDateTime]("startdate")
         )
       )
     }

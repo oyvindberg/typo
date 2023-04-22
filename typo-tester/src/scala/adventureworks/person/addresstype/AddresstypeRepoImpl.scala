@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.addresstype where addresstypeid = $addresstypeid".executeUpdate() > 0
   }
-  override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeId = {
+  override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       unsaved.rowguid match {
@@ -40,16 +39,26 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       }
     ).flatten
     
-    SQL"""insert into person.addresstype(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning addresstypeid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.addresstype default values
+            returning addresstypeid, "name", rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.addresstype(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning addresstypeid, "name", rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate
+    SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
        """.as(rowParser.*)
   }
@@ -63,7 +72,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           case AddresstypeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case AddresstypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select addresstypeid, "name", rowguid, modifieddate
                     from person.addresstype
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -76,7 +85,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   
   }
   override def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow] = {
-    SQL"""select addresstypeid, name, rowguid, modifieddate
+    SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = $addresstypeid
        """.as(rowParser.singleOpt)
@@ -87,7 +96,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       (s: PreparedStatement, index: Int, v: Array[AddresstypeId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select addresstypeid, name, rowguid, modifieddate
+    SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = ANY($addresstypeids)
        """.as(rowParser.*)
@@ -96,7 +105,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
     val addresstypeid = row.addresstypeid
     SQL"""update person.addresstype
-          set name = ${row.name},
+          set "name" = ${row.name},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
           where addresstypeid = $addresstypeid
@@ -113,12 +122,13 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         }
         val q = s"""update person.addresstype
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where addresstypeid = $addresstypeid
+                    where addresstypeid = {addresstypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("addresstypeid", ParameterValue.from(addresstypeid)))
           .executeUpdate() > 0
     }
   
@@ -134,6 +144,4 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         )
       )
     }
-  val idRowParser: RowParser[AddresstypeId] =
-    SqlParser.get[AddresstypeId]("addresstypeid")
 }

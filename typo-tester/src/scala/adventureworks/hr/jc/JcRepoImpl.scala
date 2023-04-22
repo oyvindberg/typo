@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object JcRepoImpl extends JcRepo {
   override def selectAll(implicit c: Connection): List[JcRow] = {
-    SQL"""select id, jobcandidateid, businessentityid, resume, modifieddate
+    SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate
           from hr.jc
        """.as(rowParser.*)
   }
@@ -34,7 +34,7 @@ object JcRepoImpl extends JcRepo {
           case JcFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
           case JcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", jobcandidateid, businessentityid, resume, modifieddate
                     from hr.jc
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

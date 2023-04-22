@@ -32,7 +32,7 @@ object SohsrRepoImpl extends SohsrRepo {
           case SohsrFieldValue.salesreasonid(value) => NamedParameter("salesreasonid", ParameterValue.from(value))
           case SohsrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select salesorderid, salesreasonid, modifieddate
                     from sa.sohsr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

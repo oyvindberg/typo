@@ -17,18 +17,18 @@ import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"delete from compositepk.person where one = ${compositeId.one}, two = ${compositeId.two}".executeUpdate() > 0
+    SQL"""delete from compositepk.person where "one" = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
   }
-  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonId = {
-    SQL"""insert into compositepk.person(name)
+  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
+    SQL"""insert into compositepk.person("name")
           values (${unsaved.name})
-          returning one, two
+          returning one, two, name
        """
-      .executeInsert(idRowParser.single)
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select one, two, name
+    SQL"""select "one", two, "name"
           from compositepk.person
        """.as(rowParser.*)
   }
@@ -41,7 +41,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "one", two, "name"
                     from compositepk.person
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -54,16 +54,16 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select one, two, name
+    SQL"""select "one", two, "name"
           from compositepk.person
-          where one = ${compositeId.one}, two = ${compositeId.two}
+          where "one" = ${compositeId.one}, two = ${compositeId.two}
        """.as(rowParser.singleOpt)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
-          set name = ${row.name}
-          where one = ${compositeId.one}, two = ${compositeId.two}
+          set "name" = ${row.name}
+          where "one" = ${compositeId.one}, two = ${compositeId.two}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -75,12 +75,13 @@ object PersonRepoImpl extends PersonRepo {
         }
         val q = s"""update compositepk.person
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where one = ${compositeId.one}, two = ${compositeId.two}
+                    where "one" = {one}, two = {two}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("one", ParameterValue.from(compositeId.one)), NamedParameter("two", ParameterValue.from(compositeId.two)))
           .executeUpdate() > 0
     }
   
@@ -92,15 +93,6 @@ object PersonRepoImpl extends PersonRepo {
           one = row[Long]("one"),
           two = row[Option[String]]("two"),
           name = row[Option[String]]("name")
-        )
-      )
-    }
-  val idRowParser: RowParser[PersonId] =
-    RowParser[PersonId] { row =>
-      Success(
-        PersonId(
-          one = row[Long]("one"),
-          two = row[Option[String]]("two")
         )
       )
     }

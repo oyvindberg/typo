@@ -35,8 +35,18 @@ package object codegen {
     }
   }
 
+  implicit val tableName: ToCode[db.RelationName] = {
+    case db.RelationName(Some(schema), name) => code"${maybeQuotedDb(schema)}.${maybeQuotedDb(name)}"
+    case db.RelationName(None, name)         => maybeQuotedDb(name)
+  }
+
   def maybeQuoted(colName: db.ColName): sc.Code =
-    if (colName.value.exists(x => !x.isUnicodeIdentifierPart)) sc.StrLit(colName.value) else sc.Code.Str(colName.value)
+    maybeQuotedDb(colName.value)
+
+  private def maybeQuotedDb(str: String): sc.Code =
+    if (pgKeyword(str) || str.exists(x => !x.isUnicodeIdentifierPart))
+      sc.StrLit(str)
+    else sc.Code.Str(str)
 
   def scaladoc(title: String)(lines: List[String]): sc.Code = {
     lines match {

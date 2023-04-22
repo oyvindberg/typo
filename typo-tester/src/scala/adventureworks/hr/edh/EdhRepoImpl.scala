@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object EdhRepoImpl extends EdhRepo {
   override def selectAll(implicit c: Connection): List[EdhRow] = {
-    SQL"""select id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
+    SQL"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from hr.edh
        """.as(rowParser.*)
   }
@@ -38,7 +38,7 @@ object EdhRepoImpl extends EdhRepo {
           case EdhFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
           case EdhFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
                     from hr.edh
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

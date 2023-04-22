@@ -36,7 +36,7 @@ object CrRepoImpl extends CrRepo {
           case CrFieldValue.endofdayrate(value) => NamedParameter("endofdayrate", ParameterValue.from(value))
           case CrFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
                     from sa.cr
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """

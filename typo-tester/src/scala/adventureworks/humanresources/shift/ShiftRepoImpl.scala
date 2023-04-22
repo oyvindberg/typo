@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -27,7 +26,7 @@ object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.shift where shiftid = $shiftid".executeUpdate() > 0
   }
-  override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftId = {
+  override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
       Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
       Some(NamedParameter("starttime", ParameterValue.from(unsaved.starttime))),
@@ -38,16 +37,26 @@ object ShiftRepoImpl extends ShiftRepo {
       }
     ).flatten
     
-    SQL"""insert into humanresources.shift(${namedParameters.map(_.name).mkString(", ")})
-          values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-          returning shiftid
-       """
-      .on(namedParameters :_*)
-      .executeInsert(idRowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into humanresources.shift default values
+            returning shiftid, "name", starttime, endtime, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into humanresources.shift(${namedParameters.map(_.name).mkString(", ")})
+                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+                  returning shiftid, "name", starttime, endtime, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
        """.as(rowParser.*)
   }
@@ -62,7 +71,7 @@ object ShiftRepoImpl extends ShiftRepo {
           case ShiftFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
           case ShiftFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select shiftid, "name", starttime, endtime, modifieddate
                     from humanresources.shift
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -75,7 +84,7 @@ object ShiftRepoImpl extends ShiftRepo {
   
   }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
-    SQL"""select shiftid, name, starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
           where shiftid = $shiftid
        """.as(rowParser.singleOpt)
@@ -86,7 +95,7 @@ object ShiftRepoImpl extends ShiftRepo {
       (s: PreparedStatement, index: Int, v: Array[ShiftId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
     
-    SQL"""select shiftid, name, starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
           where shiftid = ANY($shiftids)
        """.as(rowParser.*)
@@ -95,7 +104,7 @@ object ShiftRepoImpl extends ShiftRepo {
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     val shiftid = row.shiftid
     SQL"""update humanresources.shift
-          set name = ${row.name},
+          set "name" = ${row.name},
               starttime = ${row.starttime},
               endtime = ${row.endtime},
               modifieddate = ${row.modifieddate}
@@ -114,12 +123,13 @@ object ShiftRepoImpl extends ShiftRepo {
         }
         val q = s"""update humanresources.shift
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where shiftid = $shiftid
+                    where shiftid = {shiftid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("shiftid", ParameterValue.from(shiftid)))
           .executeUpdate() > 0
     }
   
@@ -136,6 +146,4 @@ object ShiftRepoImpl extends ShiftRepo {
         )
       )
     }
-  val idRowParser: RowParser[ShiftId] =
-    SqlParser.get[ShiftId]("shiftid")
 }

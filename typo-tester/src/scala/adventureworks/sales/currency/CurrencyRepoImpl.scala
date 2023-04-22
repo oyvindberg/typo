@@ -12,7 +12,6 @@ import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
-import anorm.SqlParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import anorm.ToSql
@@ -25,24 +24,28 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
   }
-  override def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): Boolean = {
+  override def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
-    SQL"""insert into sales.currency(currencycode, ${namedParameters.map(_.name).mkString(", ")})
-          values (${currencycode}, ${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
-       """
-      .on(namedParameters :_*)
-      .execute()
+    val q = s"""insert into sales.currency(currencycode, ${namedParameters.map(_._1.name).mkString(", ")})
+                values ({currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                returning currencycode, "name", modifieddate
+             """
+    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+    import anorm._
+    SQL(q)
+      .on(namedParameters.map(_._1) :_*)
+      .on(NamedParameter("currencycode", ParameterValue.from(currencycode)))
+      .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
-    SQL"""select currencycode, name, modifieddate
+    SQL"""select currencycode, "name", modifieddate
           from sales.currency
        """.as(rowParser.*)
   }
@@ -55,7 +58,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
           case CurrencyFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case CurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
-        val q = s"""select *
+        val q = s"""select currencycode, "name", modifieddate
                     from sales.currency
                     where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
                  """
@@ -68,7 +71,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   
   }
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
-    SQL"""select currencycode, name, modifieddate
+    SQL"""select currencycode, "name", modifieddate
           from sales.currency
           where currencycode = $currencycode
        """.as(rowParser.singleOpt)
@@ -79,7 +82,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
       (s: PreparedStatement, index: Int, v: Array[CurrencyId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
     
-    SQL"""select currencycode, name, modifieddate
+    SQL"""select currencycode, "name", modifieddate
           from sales.currency
           where currencycode = ANY($currencycodes)
        """.as(rowParser.*)
@@ -88,7 +91,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     val currencycode = row.currencycode
     SQL"""update sales.currency
-          set name = ${row.name},
+          set "name" = ${row.name},
               modifieddate = ${row.modifieddate}
           where currencycode = $currencycode
        """.executeUpdate() > 0
@@ -103,12 +106,13 @@ object CurrencyRepoImpl extends CurrencyRepo {
         }
         val q = s"""update sales.currency
                     set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where currencycode = $currencycode
+                    where currencycode = {currencycode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
         SQL(q)
           .on(namedParams: _*)
+          .on(NamedParameter("currencycode", ParameterValue.from(currencycode)))
           .executeUpdate() > 0
     }
   
@@ -123,6 +127,4 @@ object CurrencyRepoImpl extends CurrencyRepo {
         )
       )
     }
-  val idRowParser: RowParser[CurrencyId] =
-    SqlParser.get[CurrencyId]("currencycode")
 }
