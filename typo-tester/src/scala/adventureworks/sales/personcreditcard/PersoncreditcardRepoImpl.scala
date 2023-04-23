@@ -76,7 +76,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """.executeUpdate() > 0
   }

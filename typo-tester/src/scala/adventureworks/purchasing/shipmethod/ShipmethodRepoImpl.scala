@@ -113,11 +113,11 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
-          set "name" = ${row.name},
-              shipbase = ${row.shipbase},
-              shiprate = ${row.shiprate},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              shipbase = ${row.shipbase}::numeric,
+              shiprate = ${row.shiprate}::numeric,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where shipmethodid = $shipmethodid
        """.executeUpdate() > 0
   }

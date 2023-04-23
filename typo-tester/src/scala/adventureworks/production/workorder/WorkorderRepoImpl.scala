@@ -110,14 +110,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid
     SQL"""update production.workorder
-          set productid = ${row.productid},
-              orderqty = ${row.orderqty},
-              scrappedqty = ${row.scrappedqty},
-              startdate = ${row.startdate},
-              enddate = ${row.enddate},
-              duedate = ${row.duedate},
-              scrapreasonid = ${row.scrapreasonid},
-              modifieddate = ${row.modifieddate}
+          set productid = ${row.productid}::int4,
+              orderqty = ${row.orderqty}::int4,
+              scrappedqty = ${row.scrappedqty}::int2,
+              startdate = ${row.startdate}::timestamp,
+              enddate = ${row.enddate}::timestamp,
+              duedate = ${row.duedate}::timestamp,
+              scrapreasonid = ${row.scrapreasonid}::int2,
+              modifieddate = ${row.modifieddate}::timestamp
           where workorderid = $workorderid
        """.executeUpdate() > 0
   }

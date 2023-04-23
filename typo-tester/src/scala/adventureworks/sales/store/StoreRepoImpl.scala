@@ -102,11 +102,11 @@ object StoreRepoImpl extends StoreRepo {
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.store
-          set "name" = ${row.name},
-              salespersonid = ${row.salespersonid},
-              demographics = ${row.demographics},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              salespersonid = ${row.salespersonid}::int4,
+              demographics = ${row.demographics}::xml,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

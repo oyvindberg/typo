@@ -123,15 +123,15 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     val specialofferid = row.specialofferid
     SQL"""update sales.specialoffer
           set description = ${row.description},
-              discountpct = ${row.discountpct},
+              discountpct = ${row.discountpct}::numeric,
               "type" = ${row.`type`},
               category = ${row.category},
-              startdate = ${row.startdate},
-              enddate = ${row.enddate},
-              minqty = ${row.minqty},
-              maxqty = ${row.maxqty},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              startdate = ${row.startdate}::timestamp,
+              enddate = ${row.enddate}::timestamp,
+              minqty = ${row.minqty}::int4,
+              maxqty = ${row.maxqty}::int4,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where specialofferid = $specialofferid
        """.executeUpdate() > 0
   }

@@ -82,8 +82,8 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct
-          set rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """.executeUpdate() > 0
   }

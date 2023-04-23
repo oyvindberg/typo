@@ -109,13 +109,13 @@ object VendorRepoImpl extends VendorRepo {
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
-          set accountnumber = ${row.accountnumber},
-              "name" = ${row.name},
-              creditrating = ${row.creditrating},
-              preferredvendorstatus = ${row.preferredvendorstatus},
-              activeflag = ${row.activeflag},
+          set accountnumber = ${row.accountnumber}::"public".AccountNumber,
+              "name" = ${row.name}::"public"."Name",
+              creditrating = ${row.creditrating}::int2,
+              preferredvendorstatus = ${row.preferredvendorstatus}::"public"."Flag",
+              activeflag = ${row.activeflag}::"public"."Flag",
               purchasingwebserviceurl = ${row.purchasingwebserviceurl},
-              modifieddate = ${row.modifieddate}
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

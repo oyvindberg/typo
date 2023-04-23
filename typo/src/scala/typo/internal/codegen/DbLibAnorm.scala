@@ -236,7 +236,7 @@ object DbLibAnorm extends DbLib {
       case RepoMethod.Update(id, param, colsUnsaved) =>
         val sql = SQL {
           code"""|update ${table.relationName}
-                 |set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}" }.mkCode(",\n")}
+                 |set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}${cast(col)}" }.mkCode(",\n")}
                  |where ${matchId(id)}
                  |""".stripMargin
         }

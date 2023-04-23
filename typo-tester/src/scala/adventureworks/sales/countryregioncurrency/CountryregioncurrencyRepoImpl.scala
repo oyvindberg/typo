@@ -76,7 +76,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.executeUpdate() > 0
   }

@@ -93,15 +93,15 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.productvendor
-          set averageleadtime = ${row.averageleadtime},
-              standardprice = ${row.standardprice},
-              lastreceiptcost = ${row.lastreceiptcost},
-              lastreceiptdate = ${row.lastreceiptdate},
-              minorderqty = ${row.minorderqty},
-              maxorderqty = ${row.maxorderqty},
-              onorderqty = ${row.onorderqty},
-              unitmeasurecode = ${row.unitmeasurecode},
-              modifieddate = ${row.modifieddate}
+          set averageleadtime = ${row.averageleadtime}::int4,
+              standardprice = ${row.standardprice}::numeric,
+              lastreceiptcost = ${row.lastreceiptcost}::numeric,
+              lastreceiptdate = ${row.lastreceiptdate}::timestamp,
+              minorderqty = ${row.minorderqty}::int4,
+              maxorderqty = ${row.maxorderqty}::int4,
+              onorderqty = ${row.onorderqty}::int4,
+              unitmeasurecode = ${row.unitmeasurecode}::bpchar,
+              modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
        """.executeUpdate() > 0
   }

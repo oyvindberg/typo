@@ -128,15 +128,15 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid
     SQL"""update sales.salesterritory
-          set "name" = ${row.name},
+          set "name" = ${row.name}::"public"."Name",
               countryregioncode = ${row.countryregioncode},
               "group" = ${row.group},
-              salesytd = ${row.salesytd},
-              saleslastyear = ${row.saleslastyear},
-              costytd = ${row.costytd},
-              costlastyear = ${row.costlastyear},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              salesytd = ${row.salesytd}::numeric,
+              saleslastyear = ${row.saleslastyear}::numeric,
+              costytd = ${row.costytd}::numeric,
+              costlastyear = ${row.costlastyear}::numeric,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where territoryid = $territoryid
        """.executeUpdate() > 0
   }

@@ -85,9 +85,9 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesterritoryhistory
-          set enddate = ${row.enddate},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set enddate = ${row.enddate}::timestamp,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.executeUpdate() > 0
   }

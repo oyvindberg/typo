@@ -89,8 +89,8 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode
     SQL"""update production.unitmeasure
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where unitmeasurecode = $unitmeasurecode
        """.executeUpdate() > 0
   }

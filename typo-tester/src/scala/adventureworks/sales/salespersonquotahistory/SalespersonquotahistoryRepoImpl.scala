@@ -83,9 +83,9 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory
-          set salesquota = ${row.salesquota},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set salesquota = ${row.salesquota}::numeric,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
        """.executeUpdate() > 0
   }

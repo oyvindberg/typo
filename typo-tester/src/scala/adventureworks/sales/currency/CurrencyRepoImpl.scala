@@ -89,8 +89,8 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     val currencycode = row.currencycode
     SQL"""update sales.currency
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where currencycode = $currencycode
        """.executeUpdate() > 0
   }

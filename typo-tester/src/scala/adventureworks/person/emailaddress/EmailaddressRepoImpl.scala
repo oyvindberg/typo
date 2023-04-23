@@ -84,8 +84,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     val compositeId = row.compositeId
     SQL"""update person.emailaddress
           set emailaddress = ${row.emailaddress},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """.executeUpdate() > 0
   }

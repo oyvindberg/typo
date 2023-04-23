@@ -87,14 +87,14 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_collation
-          set collname = ${row.collname},
-              collnamespace = ${row.collnamespace},
-              collowner = ${row.collowner},
-              collprovider = ${row.collprovider},
+          set collname = ${row.collname}::name,
+              collnamespace = ${row.collnamespace}::oid,
+              collowner = ${row.collowner}::oid,
+              collprovider = ${row.collprovider}::char,
               collisdeterministic = ${row.collisdeterministic},
-              collencoding = ${row.collencoding},
-              collcollate = ${row.collcollate},
-              collctype = ${row.collctype},
+              collencoding = ${row.collencoding}::int4,
+              collcollate = ${row.collcollate}::name,
+              collctype = ${row.collctype}::name,
               collversion = ${row.collversion}
           where oid = $oid
        """.executeUpdate() > 0

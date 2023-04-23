@@ -93,15 +93,15 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.workorderrouting
-          set locationid = ${row.locationid},
-              scheduledstartdate = ${row.scheduledstartdate},
-              scheduledenddate = ${row.scheduledenddate},
-              actualstartdate = ${row.actualstartdate},
-              actualenddate = ${row.actualenddate},
-              actualresourcehrs = ${row.actualresourcehrs},
-              plannedcost = ${row.plannedcost},
-              actualcost = ${row.actualcost},
-              modifieddate = ${row.modifieddate}
+          set locationid = ${row.locationid}::int2,
+              scheduledstartdate = ${row.scheduledstartdate}::timestamp,
+              scheduledenddate = ${row.scheduledenddate}::timestamp,
+              actualstartdate = ${row.actualstartdate}::timestamp,
+              actualenddate = ${row.actualenddate}::timestamp,
+              actualresourcehrs = ${row.actualresourcehrs}::numeric,
+              plannedcost = ${row.plannedcost}::numeric,
+              actualcost = ${row.actualcost}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
        """.executeUpdate() > 0
   }

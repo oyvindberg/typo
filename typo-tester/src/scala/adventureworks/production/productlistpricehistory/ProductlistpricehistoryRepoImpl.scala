@@ -79,9 +79,9 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productlistpricehistory
-          set enddate = ${row.enddate},
-              listprice = ${row.listprice},
-              modifieddate = ${row.modifieddate}
+          set enddate = ${row.enddate}::timestamp,
+              listprice = ${row.listprice}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
        """.executeUpdate() > 0
   }

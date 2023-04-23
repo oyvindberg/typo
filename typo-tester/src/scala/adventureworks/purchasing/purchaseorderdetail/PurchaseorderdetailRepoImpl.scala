@@ -88,13 +88,13 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.purchaseorderdetail
-          set duedate = ${row.duedate},
-              orderqty = ${row.orderqty},
-              productid = ${row.productid},
-              unitprice = ${row.unitprice},
-              receivedqty = ${row.receivedqty},
-              rejectedqty = ${row.rejectedqty},
-              modifieddate = ${row.modifieddate}
+          set duedate = ${row.duedate}::timestamp,
+              orderqty = ${row.orderqty}::int2,
+              productid = ${row.productid}::int4,
+              unitprice = ${row.unitprice}::numeric,
+              receivedqty = ${row.receivedqty}::numeric,
+              rejectedqty = ${row.rejectedqty}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
        """.executeUpdate() > 0
   }

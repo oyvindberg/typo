@@ -126,7 +126,7 @@ object PersonRepoImpl extends PersonRepo {
               likes_pizza = ${row.likesPizza},
               marital_status_id = ${row.maritalStatusId},
               work_email = ${row.workEmail},
-              sector = ${row.sector}
+              sector = ${row.sector}::myschema.sector
           where "id" = $id
        """.executeUpdate() > 0
   }

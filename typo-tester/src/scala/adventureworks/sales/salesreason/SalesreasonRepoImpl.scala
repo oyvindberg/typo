@@ -99,9 +99,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
-          set "name" = ${row.name},
-              reasontype = ${row.reasontype},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              reasontype = ${row.reasontype}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where salesreasonid = $salesreasonid
        """.executeUpdate() > 0
   }

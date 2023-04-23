@@ -113,12 +113,12 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
-          set stateprovinceid = ${row.stateprovinceid},
-              taxtype = ${row.taxtype},
-              taxrate = ${row.taxrate},
-              "name" = ${row.name},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set stateprovinceid = ${row.stateprovinceid}::int4,
+              taxtype = ${row.taxtype}::int2,
+              taxrate = ${row.taxrate}::numeric,
+              "name" = ${row.name}::"public"."Name",
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where salestaxrateid = $salestaxrateid
        """.executeUpdate() > 0
   }

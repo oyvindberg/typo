@@ -108,11 +108,11 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
     SQL"""update production.productmodel
-          set "name" = ${row.name},
-              catalogdescription = ${row.catalogdescription},
-              instructions = ${row.instructions},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              catalogdescription = ${row.catalogdescription}::xml,
+              instructions = ${row.instructions}::xml,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where productmodelid = $productmodelid
        """.executeUpdate() > 0
   }

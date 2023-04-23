@@ -115,14 +115,14 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid
     SQL"""update production.transactionhistory
-          set productid = ${row.productid},
-              referenceorderid = ${row.referenceorderid},
-              referenceorderlineid = ${row.referenceorderlineid},
-              transactiondate = ${row.transactiondate},
-              transactiontype = ${row.transactiontype},
-              quantity = ${row.quantity},
-              actualcost = ${row.actualcost},
-              modifieddate = ${row.modifieddate}
+          set productid = ${row.productid}::int4,
+              referenceorderid = ${row.referenceorderid}::int4,
+              referenceorderlineid = ${row.referenceorderlineid}::int4,
+              transactiondate = ${row.transactiondate}::timestamp,
+              transactiontype = ${row.transactiontype}::bpchar,
+              quantity = ${row.quantity}::int4,
+              actualcost = ${row.actualcost}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where transactionid = $transactionid
        """.executeUpdate() > 0
   }

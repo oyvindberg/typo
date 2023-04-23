@@ -84,8 +84,8 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentityaddress
-          set rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
        """.executeUpdate() > 0
   }

@@ -79,9 +79,9 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeepayhistory
-          set rate = ${row.rate},
-              payfrequency = ${row.payfrequency},
-              modifieddate = ${row.modifieddate}
+          set rate = ${row.rate}::numeric,
+              payfrequency = ${row.payfrequency}::int2,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
        """.executeUpdate() > 0
   }

@@ -131,17 +131,17 @@ object DocumentRepoImpl extends DocumentRepo {
     val documentnode = row.documentnode
     SQL"""update production."document"
           set title = ${row.title},
-              "owner" = ${row.owner},
-              folderflag = ${row.folderflag},
+              "owner" = ${row.owner}::int4,
+              folderflag = ${row.folderflag}::"public"."Flag",
               filename = ${row.filename},
               fileextension = ${row.fileextension},
-              revision = ${row.revision},
-              changenumber = ${row.changenumber},
-              status = ${row.status},
+              revision = ${row.revision}::bpchar,
+              changenumber = ${row.changenumber}::int4,
+              status = ${row.status}::int2,
               documentsummary = ${row.documentsummary},
-              "document" = ${row.document},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              "document" = ${row.document}::bytea,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where documentnode = $documentnode
        """.executeUpdate() > 0
   }

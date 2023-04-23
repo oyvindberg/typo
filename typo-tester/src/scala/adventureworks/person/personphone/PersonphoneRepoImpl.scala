@@ -78,7 +78,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.personphone
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
        """.executeUpdate() > 0
   }

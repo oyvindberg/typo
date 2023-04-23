@@ -107,10 +107,10 @@ object LocationRepoImpl extends LocationRepo {
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
     SQL"""update production."location"
-          set "name" = ${row.name},
-              costrate = ${row.costrate},
-              availability = ${row.availability},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              costrate = ${row.costrate}::numeric,
+              availability = ${row.availability}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where locationid = $locationid
        """.executeUpdate() > 0
   }

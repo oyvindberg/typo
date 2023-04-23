@@ -97,8 +97,8 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where scrapreasonid = $scrapreasonid
        """.executeUpdate() > 0
   }

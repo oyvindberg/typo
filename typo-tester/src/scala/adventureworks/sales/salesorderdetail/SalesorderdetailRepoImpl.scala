@@ -99,13 +99,13 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderdetail
           set carriertrackingnumber = ${row.carriertrackingnumber},
-              orderqty = ${row.orderqty},
-              productid = ${row.productid},
-              specialofferid = ${row.specialofferid},
-              unitprice = ${row.unitprice},
-              unitpricediscount = ${row.unitpricediscount},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              orderqty = ${row.orderqty}::int2,
+              productid = ${row.productid}::int4,
+              specialofferid = ${row.specialofferid}::int4,
+              unitprice = ${row.unitprice}::numeric,
+              unitpricediscount = ${row.unitpricediscount}::numeric,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """.executeUpdate() > 0
   }

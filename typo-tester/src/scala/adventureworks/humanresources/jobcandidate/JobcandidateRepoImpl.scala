@@ -100,9 +100,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
     val jobcandidateid = row.jobcandidateid
     SQL"""update humanresources.jobcandidate
-          set businessentityid = ${row.businessentityid},
-              resume = ${row.resume},
-              modifieddate = ${row.modifieddate}
+          set businessentityid = ${row.businessentityid}::int4,
+              resume = ${row.resume}::xml,
+              modifieddate = ${row.modifieddate}::timestamp
           where jobcandidateid = $jobcandidateid
        """.executeUpdate() > 0
   }

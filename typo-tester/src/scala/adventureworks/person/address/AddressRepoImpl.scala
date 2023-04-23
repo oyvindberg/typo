@@ -116,11 +116,11 @@ object AddressRepoImpl extends AddressRepo {
           set addressline1 = ${row.addressline1},
               addressline2 = ${row.addressline2},
               city = ${row.city},
-              stateprovinceid = ${row.stateprovinceid},
+              stateprovinceid = ${row.stateprovinceid}::int4,
               postalcode = ${row.postalcode},
-              spatiallocation = ${row.spatiallocation},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              spatiallocation = ${row.spatiallocation}::bytea,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where addressid = $addressid
        """.executeUpdate() > 0
   }

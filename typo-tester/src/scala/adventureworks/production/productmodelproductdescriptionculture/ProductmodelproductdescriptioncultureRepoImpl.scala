@@ -78,7 +78,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelproductdescriptionculture
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
        """.executeUpdate() > 0
   }

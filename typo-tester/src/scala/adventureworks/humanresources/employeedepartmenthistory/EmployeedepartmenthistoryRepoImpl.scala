@@ -82,8 +82,8 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeedepartmenthistory
-          set enddate = ${row.enddate},
-              modifieddate = ${row.modifieddate}
+          set enddate = ${row.enddate}::date,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
        """.executeUpdate() > 0
   }

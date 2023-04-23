@@ -103,9 +103,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
     val addresstypeid = row.addresstypeid
     SQL"""update person.addresstype
-          set "name" = ${row.name},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where addresstypeid = $addresstypeid
        """.executeUpdate() > 0
   }

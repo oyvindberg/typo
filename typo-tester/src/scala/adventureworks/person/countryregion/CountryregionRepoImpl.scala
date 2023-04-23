@@ -89,8 +89,8 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode
     SQL"""update person.countryregion
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = $countryregioncode
        """.executeUpdate() > 0
   }

@@ -82,9 +82,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_namespace
-          set nspname = ${row.nspname},
-              nspowner = ${row.nspowner},
-              nspacl = ${row.nspacl}
+          set nspname = ${row.nspname}::name,
+              nspowner = ${row.nspowner}::oid,
+              nspacl = ${row.nspacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
   }

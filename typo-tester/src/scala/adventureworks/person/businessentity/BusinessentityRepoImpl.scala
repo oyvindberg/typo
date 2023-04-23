@@ -100,8 +100,8 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.businessentity
-          set rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

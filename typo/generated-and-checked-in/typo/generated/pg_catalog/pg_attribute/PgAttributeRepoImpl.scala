@@ -91,30 +91,30 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def update(row: PgAttributeRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_attribute
-          set attname = ${row.attname},
-              atttypid = ${row.atttypid},
-              attstattarget = ${row.attstattarget},
-              attlen = ${row.attlen},
-              attndims = ${row.attndims},
-              attcacheoff = ${row.attcacheoff},
-              atttypmod = ${row.atttypmod},
+          set attname = ${row.attname}::name,
+              atttypid = ${row.atttypid}::oid,
+              attstattarget = ${row.attstattarget}::int4,
+              attlen = ${row.attlen}::int2,
+              attndims = ${row.attndims}::int4,
+              attcacheoff = ${row.attcacheoff}::int4,
+              atttypmod = ${row.atttypmod}::int4,
               attbyval = ${row.attbyval},
-              attalign = ${row.attalign},
-              attstorage = ${row.attstorage},
-              attcompression = ${row.attcompression},
+              attalign = ${row.attalign}::char,
+              attstorage = ${row.attstorage}::char,
+              attcompression = ${row.attcompression}::char,
               attnotnull = ${row.attnotnull},
               atthasdef = ${row.atthasdef},
               atthasmissing = ${row.atthasmissing},
-              attidentity = ${row.attidentity},
-              attgenerated = ${row.attgenerated},
+              attidentity = ${row.attidentity}::char,
+              attgenerated = ${row.attgenerated}::char,
               attisdropped = ${row.attisdropped},
               attislocal = ${row.attislocal},
-              attinhcount = ${row.attinhcount},
-              attcollation = ${row.attcollation},
-              attacl = ${row.attacl},
-              attoptions = ${row.attoptions},
-              attfdwoptions = ${row.attfdwoptions},
-              attmissingval = ${row.attmissingval}
+              attinhcount = ${row.attinhcount}::int4,
+              attcollation = ${row.attcollation}::oid,
+              attacl = ${row.attacl}::_aclitem,
+              attoptions = ${row.attoptions}::_text,
+              attfdwoptions = ${row.attfdwoptions}::_text,
+              attmissingval = ${row.attmissingval}::anyarray
           where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}
        """.executeUpdate() > 0
   }

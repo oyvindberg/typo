@@ -119,14 +119,14 @@ object SalespersonRepoImpl extends SalespersonRepo {
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.salesperson
-          set territoryid = ${row.territoryid},
-              salesquota = ${row.salesquota},
-              bonus = ${row.bonus},
-              commissionpct = ${row.commissionpct},
-              salesytd = ${row.salesytd},
-              saleslastyear = ${row.saleslastyear},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set territoryid = ${row.territoryid}::int4,
+              salesquota = ${row.salesquota}::numeric,
+              bonus = ${row.bonus}::numeric,
+              commissionpct = ${row.commissionpct}::numeric,
+              salesytd = ${row.salesytd}::numeric,
+              saleslastyear = ${row.saleslastyear}::numeric,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

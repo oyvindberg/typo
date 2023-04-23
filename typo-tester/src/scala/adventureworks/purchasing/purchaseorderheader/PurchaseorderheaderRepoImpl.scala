@@ -134,17 +134,17 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     val purchaseorderid = row.purchaseorderid
     SQL"""update purchasing.purchaseorderheader
-          set revisionnumber = ${row.revisionnumber},
-              status = ${row.status},
-              employeeid = ${row.employeeid},
-              vendorid = ${row.vendorid},
-              shipmethodid = ${row.shipmethodid},
-              orderdate = ${row.orderdate},
-              shipdate = ${row.shipdate},
-              subtotal = ${row.subtotal},
-              taxamt = ${row.taxamt},
-              freight = ${row.freight},
-              modifieddate = ${row.modifieddate}
+          set revisionnumber = ${row.revisionnumber}::int2,
+              status = ${row.status}::int2,
+              employeeid = ${row.employeeid}::int4,
+              vendorid = ${row.vendorid}::int4,
+              shipmethodid = ${row.shipmethodid}::int4,
+              orderdate = ${row.orderdate}::timestamp,
+              shipdate = ${row.shipdate}::timestamp,
+              subtotal = ${row.subtotal}::numeric,
+              taxamt = ${row.taxamt}::numeric,
+              freight = ${row.freight}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where purchaseorderid = $purchaseorderid
        """.executeUpdate() > 0
   }

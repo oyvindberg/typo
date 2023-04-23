@@ -108,11 +108,11 @@ object CustomerRepoImpl extends CustomerRepo {
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
     SQL"""update sales.customer
-          set personid = ${row.personid},
-              storeid = ${row.storeid},
-              territoryid = ${row.territoryid},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set personid = ${row.personid}::int4,
+              storeid = ${row.storeid}::int4,
+              territoryid = ${row.territoryid}::int4,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where customerid = $customerid
        """.executeUpdate() > 0
   }

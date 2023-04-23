@@ -103,9 +103,9 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
     val productcategoryid = row.productcategoryid
     SQL"""update production.productcategory
-          set "name" = ${row.name},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where productcategoryid = $productcategoryid
        """.executeUpdate() > 0
   }

@@ -110,10 +110,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     val shoppingcartitemid = row.shoppingcartitemid
     SQL"""update sales.shoppingcartitem
           set shoppingcartid = ${row.shoppingcartid},
-              quantity = ${row.quantity},
-              productid = ${row.productid},
-              datecreated = ${row.datecreated},
-              modifieddate = ${row.modifieddate}
+              quantity = ${row.quantity}::int4,
+              productid = ${row.productid}::int4,
+              datecreated = ${row.datecreated}::timestamp,
+              modifieddate = ${row.modifieddate}::timestamp
           where shoppingcartitemid = $shoppingcartitemid
        """.executeUpdate() > 0
   }

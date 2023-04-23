@@ -92,10 +92,10 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     val compositeId = row.compositeId
     SQL"""update production.productinventory
           set shelf = ${row.shelf},
-              bin = ${row.bin},
-              quantity = ${row.quantity},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              bin = ${row.bin}::int2,
+              quantity = ${row.quantity}::int2,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
        """.executeUpdate() > 0
   }

@@ -117,13 +117,13 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
     val stateprovinceid = row.stateprovinceid
     SQL"""update person.stateprovince
-          set stateprovincecode = ${row.stateprovincecode},
+          set stateprovincecode = ${row.stateprovincecode}::bpchar,
               countryregioncode = ${row.countryregioncode},
-              isonlystateprovinceflag = ${row.isonlystateprovinceflag},
-              "name" = ${row.name},
-              territoryid = ${row.territoryid},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              isonlystateprovinceflag = ${row.isonlystateprovinceflag}::"public"."Flag",
+              "name" = ${row.name}::"public"."Name",
+              territoryid = ${row.territoryid}::int4,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where stateprovinceid = $stateprovinceid
        """.executeUpdate() > 0
   }

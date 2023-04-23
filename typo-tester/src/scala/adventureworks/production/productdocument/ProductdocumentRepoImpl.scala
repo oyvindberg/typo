@@ -76,7 +76,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productdocument
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
        """.executeUpdate() > 0
   }

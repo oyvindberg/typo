@@ -123,18 +123,18 @@ object PersonRepoImpl extends PersonRepo {
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.person
-          set persontype = ${row.persontype},
-              namestyle = ${row.namestyle},
+          set persontype = ${row.persontype}::bpchar,
+              namestyle = ${row.namestyle}::"public".NameStyle,
               title = ${row.title},
-              firstname = ${row.firstname},
-              middlename = ${row.middlename},
-              lastname = ${row.lastname},
+              firstname = ${row.firstname}::"public"."Name",
+              middlename = ${row.middlename}::"public"."Name",
+              lastname = ${row.lastname}::"public"."Name",
               suffix = ${row.suffix},
-              emailpromotion = ${row.emailpromotion},
-              additionalcontactinfo = ${row.additionalcontactinfo},
-              demographics = ${row.demographics},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              emailpromotion = ${row.emailpromotion}::int4,
+              additionalcontactinfo = ${row.additionalcontactinfo}::xml,
+              demographics = ${row.demographics}::xml,
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

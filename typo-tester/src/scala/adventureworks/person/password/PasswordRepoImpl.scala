@@ -100,8 +100,8 @@ object PasswordRepoImpl extends PasswordRepo {
     SQL"""update person."password"
           set passwordhash = ${row.passwordhash},
               passwordsalt = ${row.passwordsalt},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
   }

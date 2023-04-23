@@ -82,8 +82,8 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productproductphoto
-          set "primary" = ${row.primary},
-              modifieddate = ${row.modifieddate}
+          set "primary" = ${row.primary}::"public"."Flag",
+              modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
        """.executeUpdate() > 0
   }

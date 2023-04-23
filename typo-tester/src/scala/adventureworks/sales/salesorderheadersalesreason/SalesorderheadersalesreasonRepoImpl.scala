@@ -76,7 +76,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderheadersalesreason
-          set modifieddate = ${row.modifieddate}
+          set modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
        """.executeUpdate() > 0
   }

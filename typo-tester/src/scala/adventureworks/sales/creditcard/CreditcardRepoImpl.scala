@@ -104,9 +104,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
     SQL"""update sales.creditcard
           set cardtype = ${row.cardtype},
               cardnumber = ${row.cardnumber},
-              expmonth = ${row.expmonth},
-              expyear = ${row.expyear},
-              modifieddate = ${row.modifieddate}
+              expmonth = ${row.expmonth}::int2,
+              expyear = ${row.expyear}::int2,
+              modifieddate = ${row.modifieddate}::timestamp
           where creditcardid = $creditcardid
        """.executeUpdate() > 0
   }

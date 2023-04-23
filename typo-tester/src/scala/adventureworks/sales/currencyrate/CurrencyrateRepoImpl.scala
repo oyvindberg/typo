@@ -105,12 +105,12 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     val currencyrateid = row.currencyrateid
     SQL"""update sales.currencyrate
-          set currencyratedate = ${row.currencyratedate},
-              fromcurrencycode = ${row.fromcurrencycode},
-              tocurrencycode = ${row.tocurrencycode},
-              averagerate = ${row.averagerate},
-              endofdayrate = ${row.endofdayrate},
-              modifieddate = ${row.modifieddate}
+          set currencyratedate = ${row.currencyratedate}::timestamp,
+              fromcurrencycode = ${row.fromcurrencycode}::bpchar,
+              tocurrencycode = ${row.tocurrencycode}::bpchar,
+              averagerate = ${row.averagerate}::numeric,
+              endofdayrate = ${row.endofdayrate}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where currencyrateid = $currencyrateid
        """.executeUpdate() > 0
   }

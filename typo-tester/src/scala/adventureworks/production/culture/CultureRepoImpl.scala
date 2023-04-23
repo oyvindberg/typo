@@ -89,8 +89,8 @@ object CultureRepoImpl extends CultureRepo {
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
     SQL"""update production.culture
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where cultureid = $cultureid
        """.executeUpdate() > 0
   }

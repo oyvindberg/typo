@@ -102,11 +102,11 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
     val productphotoid = row.productphotoid
     SQL"""update production.productphoto
-          set thumbnailphoto = ${row.thumbnailphoto},
+          set thumbnailphoto = ${row.thumbnailphoto}::bytea,
               thumbnailphotofilename = ${row.thumbnailphotofilename},
-              largephoto = ${row.largephoto},
+              largephoto = ${row.largephoto}::bytea,
               largephotofilename = ${row.largephotofilename},
-              modifieddate = ${row.modifieddate}
+              modifieddate = ${row.modifieddate}::timestamp
           where productphotoid = $productphotoid
        """.executeUpdate() > 0
   }

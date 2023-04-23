@@ -102,10 +102,10 @@ object ShiftRepoImpl extends ShiftRepo {
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     val shiftid = row.shiftid
     SQL"""update humanresources.shift
-          set "name" = ${row.name},
-              starttime = ${row.starttime},
-              endtime = ${row.endtime},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              starttime = ${row.starttime}::time,
+              endtime = ${row.endtime}::time,
+              modifieddate = ${row.modifieddate}::timestamp
           where shiftid = $shiftid
        """.executeUpdate() > 0
   }

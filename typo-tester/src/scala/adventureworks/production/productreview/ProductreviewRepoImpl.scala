@@ -111,13 +111,13 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
     val productreviewid = row.productreviewid
     SQL"""update production.productreview
-          set productid = ${row.productid},
-              reviewername = ${row.reviewername},
-              reviewdate = ${row.reviewdate},
+          set productid = ${row.productid}::int4,
+              reviewername = ${row.reviewername}::"public"."Name",
+              reviewdate = ${row.reviewdate}::timestamp,
               emailaddress = ${row.emailaddress},
-              rating = ${row.rating},
+              rating = ${row.rating}::int4,
               "comments" = ${row.comments},
-              modifieddate = ${row.modifieddate}
+              modifieddate = ${row.modifieddate}::timestamp
           where productreviewid = $productreviewid
        """.executeUpdate() > 0
   }

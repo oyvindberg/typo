@@ -103,8 +103,8 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     val productdescriptionid = row.productdescriptionid
     SQL"""update production.productdescription
           set description = ${row.description},
-              rowguid = ${row.rowguid},
-              modifieddate = ${row.modifieddate}
+              rowguid = ${row.rowguid}::uuid,
+              modifieddate = ${row.modifieddate}::timestamp
           where productdescriptionid = $productdescriptionid
        """.executeUpdate() > 0
   }

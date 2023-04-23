@@ -97,8 +97,8 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
     SQL"""update person.contacttype
-          set "name" = ${row.name},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where contacttypeid = $contacttypeid
        """.executeUpdate() > 0
   }

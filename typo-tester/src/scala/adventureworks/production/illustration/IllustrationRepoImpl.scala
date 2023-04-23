@@ -97,8 +97,8 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid
     SQL"""update production.illustration
-          set diagram = ${row.diagram},
-              modifieddate = ${row.modifieddate}
+          set diagram = ${row.diagram}::xml,
+              modifieddate = ${row.modifieddate}::timestamp
           where illustrationid = $illustrationid
        """.executeUpdate() > 0
   }

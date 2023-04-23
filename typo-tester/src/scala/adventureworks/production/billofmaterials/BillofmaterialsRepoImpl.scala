@@ -116,14 +116,14 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     val billofmaterialsid = row.billofmaterialsid
     SQL"""update production.billofmaterials
-          set productassemblyid = ${row.productassemblyid},
-              componentid = ${row.componentid},
-              startdate = ${row.startdate},
-              enddate = ${row.enddate},
-              unitmeasurecode = ${row.unitmeasurecode},
-              bomlevel = ${row.bomlevel},
-              perassemblyqty = ${row.perassemblyqty},
-              modifieddate = ${row.modifieddate}
+          set productassemblyid = ${row.productassemblyid}::int4,
+              componentid = ${row.componentid}::int4,
+              startdate = ${row.startdate}::timestamp,
+              enddate = ${row.enddate}::timestamp,
+              unitmeasurecode = ${row.unitmeasurecode}::bpchar,
+              bomlevel = ${row.bomlevel}::int2,
+              perassemblyqty = ${row.perassemblyqty}::numeric,
+              modifieddate = ${row.modifieddate}::timestamp
           where billofmaterialsid = $billofmaterialsid
        """.executeUpdate() > 0
   }

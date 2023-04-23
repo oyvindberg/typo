@@ -99,9 +99,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
     SQL"""update humanresources.department
-          set "name" = ${row.name},
-              groupname = ${row.groupname},
-              modifieddate = ${row.modifieddate}
+          set "name" = ${row.name}::"public"."Name",
+              groupname = ${row.groupname}::"public"."Name",
+              modifieddate = ${row.modifieddate}::timestamp
           where departmentid = $departmentid
        """.executeUpdate() > 0
   }
