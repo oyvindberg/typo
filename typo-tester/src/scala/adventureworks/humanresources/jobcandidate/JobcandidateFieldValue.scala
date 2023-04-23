@@ -9,6 +9,7 @@ package jobcandidate
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class JobcandidateFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class JobcandidateFieldValue[T](name: String, value: T) extends JobcandidateFieldOrIdValue(name, value)
@@ -16,6 +17,6 @@ sealed abstract class JobcandidateFieldValue[T](name: String, value: T) extends 
 object JobcandidateFieldValue {
   case class jobcandidateid(override val value: JobcandidateId) extends JobcandidateFieldOrIdValue("jobcandidateid", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends JobcandidateFieldValue("businessentityid", value)
-  case class resume(override val value: Option[/* xml */ String]) extends JobcandidateFieldValue("resume", value)
+  case class resume(override val value: Option[PgSQLXML]) extends JobcandidateFieldValue("resume", value)
   case class modifieddate(override val value: LocalDateTime) extends JobcandidateFieldValue("modifieddate", value)
 }

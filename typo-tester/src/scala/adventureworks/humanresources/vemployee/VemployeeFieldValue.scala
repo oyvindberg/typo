@@ -10,6 +10,7 @@ package vemployee
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class VemployeeFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VemployeeFieldValue[T](name: String, value: T) extends VemployeeFieldOrIdValue(name, value)
@@ -32,5 +33,5 @@ object VemployeeFieldValue {
   case class stateprovincename(override val value: Option[Name]) extends VemployeeFieldValue("stateprovincename", value)
   case class postalcode(override val value: Option[String]) extends VemployeeFieldValue("postalcode", value)
   case class countryregionname(override val value: Option[Name]) extends VemployeeFieldValue("countryregionname", value)
-  case class additionalcontactinfo(override val value: Option[/* xml */ String]) extends VemployeeFieldValue("additionalcontactinfo", value)
+  case class additionalcontactinfo(override val value: Option[PgSQLXML]) extends VemployeeFieldValue("additionalcontactinfo", value)
 }

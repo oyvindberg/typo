@@ -11,6 +11,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -27,7 +28,7 @@ case class SRow(
   /** Points to [[sales.store.StoreRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],
   /** Points to [[sales.store.StoreRow.demographics]] */
-  demographics: Option[/* xml */ String],
+  demographics: Option[PgSQLXML],
   /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.store.StoreRow.modifieddate]] */
@@ -55,7 +56,7 @@ object SRow {
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             name = json.\("name").toOption.map(_.as[Name]),
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
+            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

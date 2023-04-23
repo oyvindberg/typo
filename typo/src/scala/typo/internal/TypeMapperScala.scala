@@ -96,7 +96,7 @@ case class TypeMapperScala(
       case db.Type.Timestamp       => sc.Type.LocalDateTime
       case db.Type.TimestampTz     => sc.Type.ZonedDateTime
       case db.Type.UUID            => sc.Type.UUID
-      case db.Type.Xml             => sc.Type.String.withComment("xml")
+      case db.Type.Xml             => sc.Type.PgSQLXML
       case db.Type.VarChar(_)      => sc.Type.String
     }
   }

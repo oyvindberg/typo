@@ -18,6 +18,7 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object PRepoImpl extends PRepo {
   override def selectAll(implicit c: Connection): List[PRow] = {
@@ -71,8 +72,8 @@ object PRepoImpl extends PRepo {
           lastname = row[Option[Name]]("lastname"),
           suffix = row[Option[String]]("suffix"),
           emailpromotion = row[Option[Int]]("emailpromotion"),
-          additionalcontactinfo = row[Option[/* xml */ String]]("additionalcontactinfo"),
-          demographics = row[Option[/* xml */ String]]("demographics"),
+          additionalcontactinfo = row[Option[PgSQLXML]]("additionalcontactinfo"),
+          demographics = row[Option[PgSQLXML]]("demographics"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

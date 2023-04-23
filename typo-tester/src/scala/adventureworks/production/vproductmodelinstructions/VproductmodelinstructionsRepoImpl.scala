@@ -17,6 +17,7 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsRow] = {
@@ -59,7 +60,7 @@ object VproductmodelinstructionsRepoImpl extends VproductmodelinstructionsRepo {
         VproductmodelinstructionsRow(
           productmodelid = row[Option[ProductmodelId]]("productmodelid"),
           name = row[Option[Name]]("name"),
-          instructions = row[Option[/* xml */ String]]("instructions"),
+          instructions = row[Option[PgSQLXML]]("instructions"),
           LocationID = row[Option[Int]]("LocationID"),
           SetupHours = row[Option[BigDecimal]]("SetupHours"),
           MachineHours = row[Option[BigDecimal]]("MachineHours"),

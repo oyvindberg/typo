@@ -11,6 +11,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class VadditionalcontactinfoFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VadditionalcontactinfoFieldValue[T](name: String, value: T) extends VadditionalcontactinfoFieldOrIdValue(name, value)
@@ -20,17 +21,17 @@ object VadditionalcontactinfoFieldValue {
   case class firstname(override val value: Option[Name]) extends VadditionalcontactinfoFieldValue("firstname", value)
   case class middlename(override val value: Option[Name]) extends VadditionalcontactinfoFieldValue("middlename", value)
   case class lastname(override val value: Option[Name]) extends VadditionalcontactinfoFieldValue("lastname", value)
-  case class telephonenumber(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("telephonenumber", value)
+  case class telephonenumber(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("telephonenumber", value)
   case class telephonespecialinstructions(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("telephonespecialinstructions", value)
-  case class street(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("street", value)
-  case class city(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("city", value)
-  case class stateprovince(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("stateprovince", value)
-  case class postalcode(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("postalcode", value)
-  case class countryregion(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("countryregion", value)
-  case class homeaddressspecialinstructions(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("homeaddressspecialinstructions", value)
-  case class emailaddress(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("emailaddress", value)
+  case class street(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("street", value)
+  case class city(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("city", value)
+  case class stateprovince(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("stateprovince", value)
+  case class postalcode(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("postalcode", value)
+  case class countryregion(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("countryregion", value)
+  case class homeaddressspecialinstructions(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("homeaddressspecialinstructions", value)
+  case class emailaddress(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("emailaddress", value)
   case class emailspecialinstructions(override val value: Option[String]) extends VadditionalcontactinfoFieldValue("emailspecialinstructions", value)
-  case class emailtelephonenumber(override val value: Option[/* xml */ String]) extends VadditionalcontactinfoFieldValue("emailtelephonenumber", value)
+  case class emailtelephonenumber(override val value: Option[PgSQLXML]) extends VadditionalcontactinfoFieldValue("emailtelephonenumber", value)
   case class rowguid(override val value: Option[UUID]) extends VadditionalcontactinfoFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends VadditionalcontactinfoFieldValue("modifieddate", value)
 }

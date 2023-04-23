@@ -19,6 +19,7 @@ import java.lang.Integer
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
@@ -129,7 +130,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
       Success(
         IllustrationRow(
           illustrationid = row[IllustrationId]("illustrationid"),
-          diagram = row[Option[/* xml */ String]]("diagram"),
+          diagram = row[Option[PgSQLXML]]("diagram"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
       )

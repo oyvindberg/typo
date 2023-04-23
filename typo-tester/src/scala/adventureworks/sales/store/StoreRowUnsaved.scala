@@ -12,6 +12,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -27,7 +28,7 @@ case class StoreRowUnsaved(
       Points to [[salesperson.SalespersonRow.businessentityid]] */
   salespersonid: Option[BusinessentityId],
   /** Demographic informationg about the store such as the number of employees, annual sales and store type. */
-  demographics: Option[/* xml */ String],
+  demographics: Option[PgSQLXML],
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID],
   /** Default: now() */
@@ -66,7 +67,7 @@ object StoreRowUnsaved {
           StoreRowUnsaved(
             name = json.\("name").as[Name],
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
+            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

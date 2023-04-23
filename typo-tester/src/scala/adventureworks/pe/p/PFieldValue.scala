@@ -12,6 +12,7 @@ import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class PFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class PFieldValue[T](name: String, value: T) extends PFieldOrIdValue(name, value)
@@ -27,8 +28,8 @@ object PFieldValue {
   case class lastname(override val value: Option[Name]) extends PFieldValue("lastname", value)
   case class suffix(override val value: Option[String]) extends PFieldValue("suffix", value)
   case class emailpromotion(override val value: Option[Int]) extends PFieldValue("emailpromotion", value)
-  case class additionalcontactinfo(override val value: Option[/* xml */ String]) extends PFieldValue("additionalcontactinfo", value)
-  case class demographics(override val value: Option[/* xml */ String]) extends PFieldValue("demographics", value)
+  case class additionalcontactinfo(override val value: Option[PgSQLXML]) extends PFieldValue("additionalcontactinfo", value)
+  case class demographics(override val value: Option[PgSQLXML]) extends PFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends PFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PFieldValue("modifieddate", value)
 }

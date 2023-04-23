@@ -17,6 +17,7 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoRow] = {
@@ -67,17 +68,17 @@ object VadditionalcontactinfoRepoImpl extends VadditionalcontactinfoRepo {
           firstname = row[Option[Name]]("firstname"),
           middlename = row[Option[Name]]("middlename"),
           lastname = row[Option[Name]]("lastname"),
-          telephonenumber = row[Option[/* xml */ String]]("telephonenumber"),
+          telephonenumber = row[Option[PgSQLXML]]("telephonenumber"),
           telephonespecialinstructions = row[Option[String]]("telephonespecialinstructions"),
-          street = row[Option[/* xml */ String]]("street"),
-          city = row[Option[/* xml */ String]]("city"),
-          stateprovince = row[Option[/* xml */ String]]("stateprovince"),
-          postalcode = row[Option[/* xml */ String]]("postalcode"),
-          countryregion = row[Option[/* xml */ String]]("countryregion"),
-          homeaddressspecialinstructions = row[Option[/* xml */ String]]("homeaddressspecialinstructions"),
-          emailaddress = row[Option[/* xml */ String]]("emailaddress"),
+          street = row[Option[PgSQLXML]]("street"),
+          city = row[Option[PgSQLXML]]("city"),
+          stateprovince = row[Option[PgSQLXML]]("stateprovince"),
+          postalcode = row[Option[PgSQLXML]]("postalcode"),
+          countryregion = row[Option[PgSQLXML]]("countryregion"),
+          homeaddressspecialinstructions = row[Option[PgSQLXML]]("homeaddressspecialinstructions"),
+          emailaddress = row[Option[PgSQLXML]]("emailaddress"),
           emailspecialinstructions = row[Option[String]]("emailspecialinstructions"),
-          emailtelephonenumber = row[Option[/* xml */ String]]("emailtelephonenumber"),
+          emailtelephonenumber = row[Option[PgSQLXML]]("emailtelephonenumber"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

@@ -12,6 +12,7 @@ import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,9 +41,9 @@ case class PersonRow(
   /** 0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners. */
   emailpromotion: Int,
   /** Additional contact information about the person stored in xml format. */
-  additionalcontactinfo: Option[/* xml */ String],
+  additionalcontactinfo: Option[PgSQLXML],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
-  demographics: Option[/* xml */ String],
+  demographics: Option[PgSQLXML],
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -79,8 +80,8 @@ object PersonRow {
             lastname = json.\("lastname").as[Name],
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").as[Int],
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[/* xml */ String]),
-            demographics = json.\("demographics").toOption.map(_.as[/* xml */ String]),
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[PgSQLXML]),
+            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML]),
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

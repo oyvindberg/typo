@@ -10,6 +10,7 @@ package vindividualcustomer
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class VindividualcustomerFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VindividualcustomerFieldValue[T](name: String, value: T) extends VindividualcustomerFieldOrIdValue(name, value)
@@ -32,5 +33,5 @@ object VindividualcustomerFieldValue {
   case class stateprovincename(override val value: Option[Name]) extends VindividualcustomerFieldValue("stateprovincename", value)
   case class postalcode(override val value: Option[String]) extends VindividualcustomerFieldValue("postalcode", value)
   case class countryregionname(override val value: Option[Name]) extends VindividualcustomerFieldValue("countryregionname", value)
-  case class demographics(override val value: Option[/* xml */ String]) extends VindividualcustomerFieldValue("demographics", value)
+  case class demographics(override val value: Option[PgSQLXML]) extends VindividualcustomerFieldValue("demographics", value)
 }

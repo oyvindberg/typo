@@ -17,6 +17,7 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object PmRepoImpl extends PmRepo {
   override def selectAll(implicit c: Connection): List[PmRow] = {
@@ -56,8 +57,8 @@ object PmRepoImpl extends PmRepo {
           id = row[Option[Int]]("id"),
           productmodelid = row[Option[ProductmodelId]]("productmodelid"),
           name = row[Option[Name]]("name"),
-          catalogdescription = row[Option[/* xml */ String]]("catalogdescription"),
-          instructions = row[Option[/* xml */ String]]("instructions"),
+          catalogdescription = row[Option[PgSQLXML]]("catalogdescription"),
+          instructions = row[Option[PgSQLXML]]("instructions"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

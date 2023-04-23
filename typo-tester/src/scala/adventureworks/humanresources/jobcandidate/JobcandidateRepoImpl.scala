@@ -20,6 +20,7 @@ import java.lang.Integer
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
@@ -135,7 +136,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         JobcandidateRow(
           jobcandidateid = row[JobcandidateId]("jobcandidateid"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[/* xml */ String]]("resume"),
+          resume = row[Option[PgSQLXML]]("resume"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
       )

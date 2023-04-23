@@ -10,6 +10,7 @@ package jobcandidate
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -23,7 +24,7 @@ case class JobcandidateRowUnsaved(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
-  resume: Option[/* xml */ String],
+  resume: Option[PgSQLXML],
   /** Default: now() */
   modifieddate: Defaulted[LocalDateTime]
 ) {
@@ -52,7 +53,7 @@ object JobcandidateRowUnsaved {
         Try(
           JobcandidateRowUnsaved(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            resume = json.\("resume").toOption.map(_.as[/* xml */ String]),
+            resume = json.\("resume").toOption.map(_.as[PgSQLXML]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

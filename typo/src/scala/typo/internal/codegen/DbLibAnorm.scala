@@ -436,6 +436,18 @@ object DbLibAnorm extends DbLib {
              |}
              |""".stripMargin
     }
+    val PgSQLXML = {
+      val tpe = sc.Type.PgSQLXML
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
+             |  override def sqlType: ${sc.Type.String} = "xml"
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.SQLXML
+             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
+             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |}
+             |""".stripMargin
+
+    }
     val hstore = {
       val tpe = sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
       val either = sc.Type.Either.of(SqlRequestError, tpe)
@@ -477,7 +489,7 @@ object DbLibAnorm extends DbLib {
            |""".stripMargin
     }
 
-    arrayInstances ++ postgresTypes ++ List(hstore, pgObject, localTime)
+    arrayInstances ++ postgresTypes ++ List(PgSQLXML, hstore, pgObject, localTime)
   }
 
   def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {

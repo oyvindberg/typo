@@ -16,6 +16,7 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 object JcRepoImpl extends JcRepo {
   override def selectAll(implicit c: Connection): List[JcRow] = {
@@ -53,7 +54,7 @@ object JcRepoImpl extends JcRepo {
           id = row[Option[Int]]("id"),
           jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[/* xml */ String]]("resume"),
+          resume = row[Option[PgSQLXML]]("resume"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

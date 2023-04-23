@@ -11,6 +11,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -27,17 +28,17 @@ case class VadditionalcontactinfoRow(
   middlename: Option[Name],
   /** Points to [[person.PersonRow.lastname]] */
   lastname: Option[Name],
-  telephonenumber: Option[/* xml */ String],
+  telephonenumber: Option[PgSQLXML],
   telephonespecialinstructions: Option[String],
-  street: Option[/* xml */ String],
-  city: Option[/* xml */ String],
-  stateprovince: Option[/* xml */ String],
-  postalcode: Option[/* xml */ String],
-  countryregion: Option[/* xml */ String],
-  homeaddressspecialinstructions: Option[/* xml */ String],
-  emailaddress: Option[/* xml */ String],
+  street: Option[PgSQLXML],
+  city: Option[PgSQLXML],
+  stateprovince: Option[PgSQLXML],
+  postalcode: Option[PgSQLXML],
+  countryregion: Option[PgSQLXML],
+  homeaddressspecialinstructions: Option[PgSQLXML],
+  emailaddress: Option[PgSQLXML],
   emailspecialinstructions: Option[String],
-  emailtelephonenumber: Option[/* xml */ String],
+  emailtelephonenumber: Option[PgSQLXML],
   /** Points to [[person.PersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.PersonRow.modifieddate]] */
@@ -75,17 +76,17 @@ object VadditionalcontactinfoRow {
             firstname = json.\("firstname").toOption.map(_.as[Name]),
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").toOption.map(_.as[Name]),
-            telephonenumber = json.\("telephonenumber").toOption.map(_.as[/* xml */ String]),
+            telephonenumber = json.\("telephonenumber").toOption.map(_.as[PgSQLXML]),
             telephonespecialinstructions = json.\("telephonespecialinstructions").toOption.map(_.as[String]),
-            street = json.\("street").toOption.map(_.as[/* xml */ String]),
-            city = json.\("city").toOption.map(_.as[/* xml */ String]),
-            stateprovince = json.\("stateprovince").toOption.map(_.as[/* xml */ String]),
-            postalcode = json.\("postalcode").toOption.map(_.as[/* xml */ String]),
-            countryregion = json.\("countryregion").toOption.map(_.as[/* xml */ String]),
-            homeaddressspecialinstructions = json.\("homeaddressspecialinstructions").toOption.map(_.as[/* xml */ String]),
-            emailaddress = json.\("emailaddress").toOption.map(_.as[/* xml */ String]),
+            street = json.\("street").toOption.map(_.as[PgSQLXML]),
+            city = json.\("city").toOption.map(_.as[PgSQLXML]),
+            stateprovince = json.\("stateprovince").toOption.map(_.as[PgSQLXML]),
+            postalcode = json.\("postalcode").toOption.map(_.as[PgSQLXML]),
+            countryregion = json.\("countryregion").toOption.map(_.as[PgSQLXML]),
+            homeaddressspecialinstructions = json.\("homeaddressspecialinstructions").toOption.map(_.as[PgSQLXML]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[PgSQLXML]),
             emailspecialinstructions = json.\("emailspecialinstructions").toOption.map(_.as[String]),
-            emailtelephonenumber = json.\("emailtelephonenumber").toOption.map(_.as[/* xml */ String]),
+            emailtelephonenumber = json.\("emailtelephonenumber").toOption.map(_.as[PgSQLXML]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

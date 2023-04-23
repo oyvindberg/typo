@@ -23,6 +23,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
@@ -183,8 +184,8 @@ object PersonRepoImpl extends PersonRepo {
           lastname = row[Name]("lastname"),
           suffix = row[Option[String]]("suffix"),
           emailpromotion = row[Int]("emailpromotion"),
-          additionalcontactinfo = row[Option[/* xml */ String]]("additionalcontactinfo"),
-          demographics = row[Option[/* xml */ String]]("demographics"),
+          additionalcontactinfo = row[Option[PgSQLXML]]("additionalcontactinfo"),
+          demographics = row[Option[PgSQLXML]]("demographics"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

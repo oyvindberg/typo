@@ -76,6 +76,7 @@ object sc {
     val PGpath = Qualified("org.postgresql.geometric.PGpath")
     val PGpoint = Qualified("org.postgresql.geometric.PGpoint")
     val PGpolygon = Qualified("org.postgresql.geometric.PGpolygon")
+    val PgSQLXML = Qualified("org.postgresql.jdbc.PgSQLXML")
     val PGInterval = Qualified("org.postgresql.util.PGInterval")
     val PGmoney = Qualified("org.postgresql.util.PGmoney")
     val PGobject = Qualified("org.postgresql.util.PGobject")

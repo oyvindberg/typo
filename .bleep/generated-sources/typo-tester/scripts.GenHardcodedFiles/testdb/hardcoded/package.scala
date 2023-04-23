@@ -139,6 +139,13 @@ package object hardcoded {
     override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.util.PGmoney] = scala.Right(v1.asInstanceOf[org.postgresql.util.PGmoney])
   }
   
+  implicit val PgSQLXMLDb: anorm.ToStatement[org.postgresql.jdbc.PgSQLXML] with anorm.ParameterMetaData[org.postgresql.jdbc.PgSQLXML] with anorm.Column[org.postgresql.jdbc.PgSQLXML] = new anorm.ToStatement[org.postgresql.jdbc.PgSQLXML] with anorm.ParameterMetaData[org.postgresql.jdbc.PgSQLXML] with anorm.Column[org.postgresql.jdbc.PgSQLXML] {
+    override def sqlType: java.lang.String = "xml"
+    override def jdbcType: scala.Int = java.sql.Types.SQLXML
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: org.postgresql.jdbc.PgSQLXML): scala.Unit = s.setObject(index, v)
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, org.postgresql.jdbc.PgSQLXML] = scala.Right(v1.asInstanceOf[org.postgresql.jdbc.PgSQLXML])
+  }
+  
   implicit val hstoreDb: anorm.ToStatement[java.util.Map[java.lang.String, java.lang.String]] with anorm.ParameterMetaData[java.util.Map[java.lang.String, java.lang.String]] with anorm.Column[java.util.Map[java.lang.String, java.lang.String]] = new anorm.ToStatement[java.util.Map[java.lang.String, java.lang.String]] with anorm.ParameterMetaData[java.util.Map[java.lang.String, java.lang.String]] with anorm.Column[java.util.Map[java.lang.String, java.lang.String]] {
     override def sqlType: java.lang.String = "hstore"
     override def jdbcType: scala.Int = java.sql.Types.OTHER
@@ -174,6 +181,7 @@ package object hardcoded {
   implicit val PGpolygonFormat: play.api.libs.json.Format[org.postgresql.geometric.PGpolygon] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.geometric.PGpolygon](new org.postgresql.geometric.PGpolygon(_), _.getValue)
   implicit val PGIntervalFormat: play.api.libs.json.Format[org.postgresql.util.PGInterval] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGInterval](new org.postgresql.util.PGInterval(_), _.getValue)
   implicit val PGmoneyFormat: play.api.libs.json.Format[org.postgresql.util.PGmoney] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.util.PGmoney](new org.postgresql.util.PGmoney(_), _.getValue)
+  implicit val PgSQLXMLFormat: play.api.libs.json.Format[org.postgresql.jdbc.PgSQLXML] = implicitly[play.api.libs.json.Format[java.lang.String]].bimap[org.postgresql.jdbc.PgSQLXML](new org.postgresql.jdbc.PgSQLXML(null, _), _.getString)
   implicit val hstoreFormat: play.api.libs.json.Format[java.util.Map[java.lang.String, java.lang.String]] = {
     // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
     import scala.jdk.CollectionConverters._

@@ -15,6 +15,7 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 object IRepoImpl extends IRepo {
   override def selectAll(implicit c: Connection): List[IRow] = {
@@ -50,7 +51,7 @@ object IRepoImpl extends IRepo {
         IRow(
           id = row[Option[Int]]("id"),
           illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          diagram = row[Option[/* xml */ String]]("diagram"),
+          diagram = row[Option[PgSQLXML]]("diagram"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

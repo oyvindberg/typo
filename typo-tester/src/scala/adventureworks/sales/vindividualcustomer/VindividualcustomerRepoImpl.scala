@@ -16,6 +16,7 @@ import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
+import org.postgresql.jdbc.PgSQLXML
 
 object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
   override def selectAll(implicit c: Connection): List[VindividualcustomerRow] = {
@@ -80,7 +81,7 @@ object VindividualcustomerRepoImpl extends VindividualcustomerRepo {
           stateprovincename = row[Option[Name]]("stateprovincename"),
           postalcode = row[Option[String]]("postalcode"),
           countryregionname = row[Option[Name]]("countryregionname"),
-          demographics = row[Option[/* xml */ String]]("demographics")
+          demographics = row[Option[PgSQLXML]]("demographics")
         )
       )
     }

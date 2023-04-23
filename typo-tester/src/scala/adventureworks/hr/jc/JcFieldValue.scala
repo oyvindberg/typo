@@ -10,6 +10,7 @@ package jc
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class JcFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class JcFieldValue[T](name: String, value: T) extends JcFieldOrIdValue(name, value)
@@ -18,6 +19,6 @@ object JcFieldValue {
   case class id(override val value: Option[Int]) extends JcFieldValue("id", value)
   case class jobcandidateid(override val value: Option[JobcandidateId]) extends JcFieldValue("jobcandidateid", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends JcFieldValue("businessentityid", value)
-  case class resume(override val value: Option[/* xml */ String]) extends JcFieldValue("resume", value)
+  case class resume(override val value: Option[PgSQLXML]) extends JcFieldValue("resume", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends JcFieldValue("modifieddate", value)
 }

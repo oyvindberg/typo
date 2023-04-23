@@ -17,6 +17,7 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object SRepoImpl extends SRepo {
   override def selectAll(implicit c: Connection): List[SRow] = {
@@ -57,7 +58,7 @@ object SRepoImpl extends SRepo {
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
           name = row[Option[Name]]("name"),
           salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[/* xml */ String]]("demographics"),
+          demographics = row[Option[PgSQLXML]]("demographics"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

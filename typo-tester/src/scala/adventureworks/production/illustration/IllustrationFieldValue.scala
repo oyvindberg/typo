@@ -8,12 +8,13 @@ package production
 package illustration
 
 import java.time.LocalDateTime
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class IllustrationFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class IllustrationFieldValue[T](name: String, value: T) extends IllustrationFieldOrIdValue(name, value)
 
 object IllustrationFieldValue {
   case class illustrationid(override val value: IllustrationId) extends IllustrationFieldOrIdValue("illustrationid", value)
-  case class diagram(override val value: Option[/* xml */ String]) extends IllustrationFieldValue("diagram", value)
+  case class diagram(override val value: Option[PgSQLXML]) extends IllustrationFieldValue("diagram", value)
   case class modifieddate(override val value: LocalDateTime) extends IllustrationFieldValue("modifieddate", value)
 }

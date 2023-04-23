@@ -105,6 +105,10 @@ object JsonLibPlay extends JsonLib {
     val postgresTypes = PostgresTypes.all.map { case (_, tpe) =>
       code"""implicit val ${tpe.value.name.value}Format: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(_), _.getValue)"""
     }
+    val PgSQLXML = {
+      val tpe = sc.Type.PgSQLXML
+      code"""implicit val PgSQLXMLFormat: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(null, _), _.getString)"""
+    }
 
     val hstore = {
       val javaMap = Format(sc.Type.JavaMap.of(sc.Type.String, sc.Type.String))
@@ -142,6 +146,6 @@ object JsonLibPlay extends JsonLib {
             |""".stripMargin
     }
 
-    postgresTypes ++ List(hstore, pgObjectFormat)
+    postgresTypes ++ List(PgSQLXML, hstore, pgObjectFormat)
   }
 }

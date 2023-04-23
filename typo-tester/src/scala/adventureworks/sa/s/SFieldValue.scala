@@ -11,6 +11,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class SFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class SFieldValue[T](name: String, value: T) extends SFieldOrIdValue(name, value)
@@ -20,7 +21,7 @@ object SFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends SFieldValue("businessentityid", value)
   case class name(override val value: Option[Name]) extends SFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SFieldValue("salespersonid", value)
-  case class demographics(override val value: Option[/* xml */ String]) extends SFieldValue("demographics", value)
+  case class demographics(override val value: Option[PgSQLXML]) extends SFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends SFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SFieldValue("modifieddate", value)
 }

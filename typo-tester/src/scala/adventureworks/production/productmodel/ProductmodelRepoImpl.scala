@@ -21,6 +21,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
+import org.postgresql.jdbc.PgSQLXML
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
@@ -147,8 +148,8 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         ProductmodelRow(
           productmodelid = row[ProductmodelId]("productmodelid"),
           name = row[Name]("name"),
-          catalogdescription = row[Option[/* xml */ String]]("catalogdescription"),
-          instructions = row[Option[/* xml */ String]]("instructions"),
+          catalogdescription = row[Option[PgSQLXML]]("catalogdescription"),
+          instructions = row[Option[PgSQLXML]]("instructions"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
