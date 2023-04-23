@@ -15,7 +15,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -96,7 +95,6 @@ object PgClassRepoImpl extends PgClassRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgClassId])(implicit c: Connection): List[PgClassRow] = {
-    implicit val arrayToSql: ToSql[Array[PgClassId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[PgClassId]] =
       (s: PreparedStatement, index: Int, v: Array[PgClassId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))

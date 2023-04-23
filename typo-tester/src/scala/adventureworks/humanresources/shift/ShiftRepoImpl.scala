@@ -14,7 +14,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.lang.Integer
 import java.sql.Connection
@@ -90,7 +89,6 @@ object ShiftRepoImpl extends ShiftRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
-    implicit val arrayToSql: ToSql[Array[ShiftId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[ShiftId]] =
       (s: PreparedStatement, index: Int, v: Array[ShiftId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))

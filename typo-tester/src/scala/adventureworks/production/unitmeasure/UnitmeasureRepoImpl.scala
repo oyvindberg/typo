@@ -14,7 +14,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -77,7 +76,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
-    implicit val arrayToSql: ToSql[Array[UnitmeasureId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[UnitmeasureId]] =
       (s: PreparedStatement, index: Int, v: Array[UnitmeasureId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))

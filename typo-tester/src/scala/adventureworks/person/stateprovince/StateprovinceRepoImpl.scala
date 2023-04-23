@@ -17,7 +17,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.lang.Integer
 import java.sql.Connection
@@ -105,7 +104,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
-    implicit val arrayToSql: ToSql[Array[StateprovinceId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[StateprovinceId]] =
       (s: PreparedStatement, index: Int, v: Array[StateprovinceId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))

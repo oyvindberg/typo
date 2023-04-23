@@ -107,9 +107,6 @@ object MetaDb {
         def mappedCols: List[db.Col] =
           columns.map { c =>
             val jsonDescription = minimalJson(c)
-            if (relationName.name == "foo2") {
-              print(1)
-            }
 
             val colName = db.ColName(c.columnName.get.value)
             db.Col(
@@ -141,9 +138,6 @@ object MetaDb {
                   val colName = db.ColName(x.columnName)
                   (colName, (db.RelationName(x.tableSchema.map(_.getValue), x.tableName), colName))
               }.toMap
-            if (relationName.name == "foo" || relationName.name == "foo3") {
-              print(1)
-            }
 
             for {
               mappedCols <- NonEmptyList.fromList(mappedCols)

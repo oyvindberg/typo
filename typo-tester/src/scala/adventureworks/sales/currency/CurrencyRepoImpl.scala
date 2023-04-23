@@ -14,7 +14,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -77,7 +76,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
-    implicit val arrayToSql: ToSql[Array[CurrencyId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[CurrencyId]] =
       (s: PreparedStatement, index: Int, v: Array[CurrencyId]) =>
         s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))

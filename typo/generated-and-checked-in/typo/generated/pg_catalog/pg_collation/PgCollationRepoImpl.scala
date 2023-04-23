@@ -15,7 +15,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -72,7 +71,6 @@ object PgCollationRepoImpl extends PgCollationRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
-    implicit val arrayToSql: ToSql[Array[PgCollationId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[PgCollationId]] =
       (s: PreparedStatement, index: Int, v: Array[PgCollationId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))

@@ -15,7 +15,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -88,7 +87,6 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
-    implicit val arrayToSql: ToSql[Array[PgConstraintId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[PgConstraintId]] =
       (s: PreparedStatement, index: Int, v: Array[PgConstraintId]) =>
         s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))

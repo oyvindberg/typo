@@ -156,8 +156,7 @@ object DbLibAnorm extends DbLib {
                    |""".stripMargin
         }
 
-        code"""|implicit val arrayToSql: ${ToSql.of(sc.Type.Array.of(unaryId.tpe))} = _ => ("?", 1) // fix wrong instance from anorm
-               |$maybeToStatement
+        code"""|$maybeToStatement
                |$sql.as($rowParserIdent.*)
                |""".stripMargin
 

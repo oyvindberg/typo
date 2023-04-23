@@ -13,7 +13,6 @@ import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
-import anorm.ToSql
 import anorm.ToStatement
 import java.lang.Integer
 import java.sql.Connection
@@ -90,7 +89,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
        """.as(rowParser.singleOpt)
   }
   override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
-    implicit val arrayToSql: ToSql[Array[CreditcardId]] = _ => ("?", 1) // fix wrong instance from anorm
     implicit val toStatement: ToStatement[Array[CreditcardId]] =
       (s: PreparedStatement, index: Int, v: Array[CreditcardId]) =>
         s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
