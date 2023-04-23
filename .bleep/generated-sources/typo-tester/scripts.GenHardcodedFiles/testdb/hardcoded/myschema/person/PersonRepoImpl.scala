@@ -52,7 +52,7 @@ object PersonRepoImpl extends PersonRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into myschema.person(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into myschema.person(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
                """
@@ -149,7 +149,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
         }
         val q = s"""update myschema.person
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where "id" = {id}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

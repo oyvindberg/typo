@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".executeUpdate() > 0
+    SQL"delete from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductvendorId, unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
@@ -38,7 +38,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into purchasing.productvendor(productid, businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into purchasing.productvendor(productid, businessentityid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({productid}::int4, {businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
              """
@@ -87,7 +87,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from purchasing.productvendor
-          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+          where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
@@ -102,7 +102,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
               onorderqty = ${row.onorderqty},
               unitmeasurecode = ${row.unitmeasurecode},
               modifieddate = ${row.modifieddate}
-          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+          where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductvendorId, fieldValues: List[ProductvendorFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -121,8 +121,8 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           case ProductvendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update purchasing.productvendor
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = {productid}, businessentityid = {businessentityid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where productid = {productid} AND businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

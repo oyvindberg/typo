@@ -56,7 +56,7 @@ object PersonRepoImpl extends PersonRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into person.person(businessentityid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into person.person(businessentityid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
              """
@@ -159,7 +159,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update person.person
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

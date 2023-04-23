@@ -53,7 +53,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into purchasing.shipmethod(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into purchasing.shipmethod(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
                """
@@ -135,7 +135,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           case ShipmethodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update purchasing.shipmethod
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where shipmethodid = {shipmethodid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

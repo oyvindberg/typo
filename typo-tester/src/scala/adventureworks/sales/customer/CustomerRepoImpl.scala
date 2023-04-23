@@ -48,7 +48,7 @@ object CustomerRepoImpl extends CustomerRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.customer(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into sales.customer(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning customerid, personid, storeid, territoryid, rowguid, modifieddate
                """
@@ -130,7 +130,7 @@ object CustomerRepoImpl extends CustomerRepo {
           case CustomerFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.customer
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where customerid = {customerid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

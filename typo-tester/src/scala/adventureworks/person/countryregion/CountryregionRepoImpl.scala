@@ -32,7 +32,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into person.countryregion(countryregioncode, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into person.countryregion(countryregioncode, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({countryregioncode}, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning countryregioncode, "name", modifieddate
              """
@@ -105,7 +105,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           case CountryregionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update person.countryregion
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where countryregioncode = {countryregioncode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

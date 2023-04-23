@@ -98,7 +98,7 @@ object DbLibAnorm extends DbLib {
       case id: IdComputed.Unary =>
         code"${maybeQuoted(id.col.dbName)} = $$${id.paramName}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(", ")}"
+        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(" AND ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
@@ -200,7 +200,7 @@ object DbLibAnorm extends DbLib {
             code"case ${table.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
         val where: sc.Code =
-          id.cols.map { col => code"${maybeQuoted(col.dbName)} = {${col.name}}" }.mkCode(", ")
+          id.cols.map { col => code"${maybeQuoted(col.dbName)} = {${col.name}}" }.mkCode(" AND ")
 
         val idCases: NonEmptyList[sc.Code] =
           id match {
@@ -214,7 +214,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = sc.s {
           code"""update ${table.relationName}
-                |set $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(", ")}
+                |set $${namedParams.map(x => s"\\\"$${x.name}\\\" = {$${x.name}}").mkString(", ")}
                 |where $where
                 |""".stripMargin
         }
@@ -272,7 +272,7 @@ object DbLibAnorm extends DbLib {
         }
 
         val sql = sc.s {
-          code"""|insert into ${table.relationName}($${namedParameters.map(_.name).mkString(", ")})
+          code"""|insert into ${table.relationName}($${namedParameters.map(x => "\\\"" + x.name + "\\\"").mkString(", ")})
                  |values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
                  |returning ${dbNames(table.cols)}
                  |""".stripMargin
@@ -347,7 +347,7 @@ object DbLibAnorm extends DbLib {
           }
 
         val sql = sc.s {
-          code"""|insert into ${table.relationName}(${dbNames(id.cols)}, $${namedParameters.map(_._1.name).mkString(", ")})
+          code"""|insert into ${table.relationName}(${dbNames(id.cols)}, $${namedParameters.map(x => "\\\"" + x._1.name + "\\\"").mkString(", ")})
                  |values ($idColRefs, $${namedParameters.map{case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
                  |returning ${dbNames(table.cols)}
                  |""".stripMargin

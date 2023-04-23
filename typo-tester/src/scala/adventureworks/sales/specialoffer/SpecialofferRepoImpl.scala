@@ -57,7 +57,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.specialoffer(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into sales.specialoffer(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
                """
@@ -154,7 +154,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           case SpecialofferFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.specialoffer
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where specialofferid = {specialofferid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

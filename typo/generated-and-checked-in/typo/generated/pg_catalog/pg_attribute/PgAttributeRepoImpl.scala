@@ -20,7 +20,7 @@ import org.postgresql.util.PGobject
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".executeUpdate() > 0
   }
   override def insert(compositeId: PgAttributeId, unsaved: PgAttributeRowUnsaved)(implicit c: Connection): PgAttributeRow = {
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attnum, attname, atttypid, attstattarget, attlen, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
@@ -82,7 +82,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
     SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
           from pg_catalog.pg_attribute
-          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+          where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}
        """.as(rowParser.singleOpt)
   }
   override def selectByUnique(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
@@ -115,7 +115,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
               attoptions = ${row.attoptions},
               attfdwoptions = ${row.attfdwoptions},
               attmissingval = ${row.attmissingval}
-          where attrelid = ${compositeId.attrelid}, attnum = ${compositeId.attnum}
+          where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PgAttributeId, fieldValues: List[PgAttributeFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -149,8 +149,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           case PgAttributeFieldValue.attmissingval(value) => NamedParameter("attmissingval", ParameterValue.from(value))
         }
         val q = s"""update pg_catalog.pg_attribute
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where attrelid = {attrelid}, attnum = {attnum}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where attrelid = {attrelid} AND attnum = {attnum}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

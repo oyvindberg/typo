@@ -32,7 +32,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.currency(currencycode, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.currency(currencycode, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning currencycode, "name", modifieddate
              """
@@ -105,7 +105,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
           case CurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.currency
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where currencycode = {currencycode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

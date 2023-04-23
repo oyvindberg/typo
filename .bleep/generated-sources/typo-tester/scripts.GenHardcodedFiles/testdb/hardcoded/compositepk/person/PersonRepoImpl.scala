@@ -17,7 +17,7 @@ import java.sql.Connection
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where "one" = ${compositeId.one}, two = ${compositeId.two}""".executeUpdate() > 0
+    SQL"""delete from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("name")
@@ -56,14 +56,14 @@ object PersonRepoImpl extends PersonRepo {
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select "one", two, "name"
           from compositepk.person
-          where "one" = ${compositeId.one}, two = ${compositeId.two}
+          where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """.as(rowParser.singleOpt)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
           set "name" = ${row.name}
-          where "one" = ${compositeId.one}, two = ${compositeId.two}
+          where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -74,8 +74,8 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
         val q = s"""update compositepk.person
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where "one" = {one}, two = {two}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where "one" = {one} AND two = {two}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

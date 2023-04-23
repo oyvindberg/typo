@@ -45,7 +45,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.productcategory(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into production.productcategory(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning productcategoryid, "name", rowguid, modifieddate
                """
@@ -121,7 +121,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
           case ProductcategoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.productcategory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where productcategoryid = {productcategoryid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

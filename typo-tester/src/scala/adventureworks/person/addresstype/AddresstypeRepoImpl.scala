@@ -45,7 +45,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into person.addresstype(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into person.addresstype(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning addresstypeid, "name", rowguid, modifieddate
                """
@@ -121,7 +121,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           case AddresstypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update person.addresstype
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where addresstypeid = {addresstypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

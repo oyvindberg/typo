@@ -40,7 +40,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into person.contacttype(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into person.contacttype(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning contacttypeid, "name", modifieddate
                """
@@ -113,7 +113,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           case ContacttypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update person.contacttype
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where contacttypeid = {contacttypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

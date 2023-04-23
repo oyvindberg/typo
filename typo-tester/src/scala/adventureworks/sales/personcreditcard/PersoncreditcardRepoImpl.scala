@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".executeUpdate() > 0
+    SQL"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".executeUpdate() > 0
   }
   override def insert(compositeId: PersoncreditcardId, unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     val namedParameters = List(
@@ -29,7 +29,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.personcreditcard(businessentityid, creditcardid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.personcreditcard(businessentityid, creditcardid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, {creditcardid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, creditcardid, modifieddate
              """
@@ -70,14 +70,14 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate
           from sales.personcreditcard
-          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+          where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
           set modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+          where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: PersoncreditcardId, fieldValues: List[PersoncreditcardFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -88,8 +88,8 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           case PersoncreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.personcreditcard
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}, creditcardid = {creditcardid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where businessentityid = {businessentityid} AND creditcardid = {creditcardid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

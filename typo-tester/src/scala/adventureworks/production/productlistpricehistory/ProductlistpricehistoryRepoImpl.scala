@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productlistpricehistory where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}".executeUpdate() > 0
+    SQL"delete from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductlistpricehistoryId, unsaved: ProductlistpricehistoryRowUnsaved)(implicit c: Connection): ProductlistpricehistoryRow = {
     val namedParameters = List(
@@ -30,7 +30,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.productlistpricehistory(productid, startdate, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into production.productlistpricehistory(productid, startdate, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({productid}::int4, {startdate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning productid, startdate, enddate, listprice, modifieddate
              """
@@ -73,7 +73,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
     SQL"""select productid, startdate, enddate, listprice, modifieddate
           from production.productlistpricehistory
-          where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
        """.as(rowParser.singleOpt)
   }
   override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
@@ -82,7 +82,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
           set enddate = ${row.enddate},
               listprice = ${row.listprice},
               modifieddate = ${row.modifieddate}
-          where productid = ${compositeId.productid}, startdate = ${compositeId.startdate}
+          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductlistpricehistoryId, fieldValues: List[ProductlistpricehistoryFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -95,8 +95,8 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
           case ProductlistpricehistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.productlistpricehistory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productid = {productid}, startdate = {startdate}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where productid = {productid} AND startdate = {startdate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

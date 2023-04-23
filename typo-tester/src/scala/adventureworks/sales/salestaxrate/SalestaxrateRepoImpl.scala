@@ -52,7 +52,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.salestaxrate(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into sales.salestaxrate(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
                """
@@ -137,7 +137,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           case SalestaxrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.salestaxrate
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where salestaxrateid = {salestaxrateid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

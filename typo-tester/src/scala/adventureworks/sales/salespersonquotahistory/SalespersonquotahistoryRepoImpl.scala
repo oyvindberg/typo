@@ -20,7 +20,7 @@ import java.util.UUID
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".executeUpdate() > 0
+    SQL"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".executeUpdate() > 0
   }
   override def insert(compositeId: SalespersonquotahistoryId, unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     val namedParameters = List(
@@ -34,7 +34,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.salespersonquotahistory(businessentityid, quotadate, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.salespersonquotahistory(businessentityid, quotadate, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, {quotadate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, quotadate, salesquota, rowguid, modifieddate
              """
@@ -77,7 +77,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sales.salespersonquotahistory
-          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+          where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
        """.as(rowParser.singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
@@ -86,7 +86,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           set salesquota = ${row.salesquota},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+          where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SalespersonquotahistoryId, fieldValues: List[SalespersonquotahistoryFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -99,8 +99,8 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           case SalespersonquotahistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.salespersonquotahistory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}, quotadate = {quotadate}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where businessentityid = {businessentityid} AND quotadate = {quotadate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

@@ -163,7 +163,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           case PgConstraintFieldValue.conbin(value) => NamedParameter("conbin", ParameterValue.from(value))
         }
         val q = s"""update pg_catalog.pg_constraint
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

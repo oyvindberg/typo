@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".executeUpdate() > 0
+    SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".executeUpdate() > 0
   }
   override def insert(compositeId: ProductmodelproductdescriptioncultureId, unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     val namedParameters = List(
@@ -30,7 +30,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({productmodelid}::int4, {productdescriptionid}::int4, {cultureid}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning productmodelid, productdescriptionid, cultureid, modifieddate
              """
@@ -72,14 +72,14 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
           from production.productmodelproductdescriptionculture
-          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+          where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelproductdescriptionculture
           set modifieddate = ${row.modifieddate}
-          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+          where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: ProductmodelproductdescriptioncultureId, fieldValues: List[ProductmodelproductdescriptioncultureFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -90,8 +90,8 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           case ProductmodelproductdescriptioncultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.productmodelproductdescriptionculture
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where productmodelid = {productmodelid}, productdescriptionid = {productdescriptionid}, cultureid = {cultureid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where productmodelid = {productmodelid} AND productdescriptionid = {productdescriptionid} AND cultureid = {cultureid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

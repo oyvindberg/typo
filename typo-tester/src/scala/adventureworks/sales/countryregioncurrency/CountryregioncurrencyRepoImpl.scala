@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}".executeUpdate() > 0
+    SQL"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".executeUpdate() > 0
   }
   override def insert(compositeId: CountryregioncurrencyId, unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
     val namedParameters = List(
@@ -29,7 +29,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({countryregioncode}, {currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning countryregioncode, currencycode, modifieddate
              """
@@ -70,14 +70,14 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate
           from sales.countryregioncurrency
-          where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}
+          where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.as(rowParser.singleOpt)
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency
           set modifieddate = ${row.modifieddate}
-          where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}
+          where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: CountryregioncurrencyId, fieldValues: List[CountryregioncurrencyFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -88,8 +88,8 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           case CountryregioncurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.countryregioncurrency
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where countryregioncode = {countryregioncode}, currencycode = {currencycode}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where countryregioncode = {countryregioncode} AND currencycode = {currencycode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

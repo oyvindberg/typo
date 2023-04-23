@@ -40,7 +40,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.illustration(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into production.illustration(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning illustrationid, diagram, modifieddate
                """
@@ -113,7 +113,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.illustration
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where illustrationid = {illustrationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

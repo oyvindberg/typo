@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".executeUpdate() > 0
+    SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".executeUpdate() > 0
   }
   override def insert(compositeId: SpecialofferproductId, unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
     val namedParameters = List(
@@ -34,7 +34,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.specialofferproduct(specialofferid, productid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.specialofferproduct(specialofferid, productid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({specialofferid}::int4, {productid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning specialofferid, productid, rowguid, modifieddate
              """
@@ -76,7 +76,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
     SQL"""select specialofferid, productid, rowguid, modifieddate
           from sales.specialofferproduct
-          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+          where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
@@ -84,7 +84,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     SQL"""update sales.specialofferproduct
           set rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+          where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SpecialofferproductId, fieldValues: List[SpecialofferproductFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -96,8 +96,8 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           case SpecialofferproductFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.specialofferproduct
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where specialofferid = {specialofferid}, productid = {productid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where specialofferid = {specialofferid} AND productid = {productid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

@@ -22,7 +22,7 @@ import java.util.UUID
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
+    SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
   }
   override def insert(compositeId: SalesorderdetailId, unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     val namedParameters = List(
@@ -44,7 +44,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({salesorderid}::int4, {salesorderdetailid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
              """
@@ -92,7 +92,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def selectById(compositeId: SalesorderdetailId)(implicit c: Connection): Option[SalesorderdetailRow] = {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sales.salesorderdetail
-          where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}
+          where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
@@ -106,7 +106,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               unitpricediscount = ${row.unitpricediscount},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}
+          where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SalesorderdetailId, fieldValues: List[SalesorderdetailFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -124,8 +124,8 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           case SalesorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.salesorderdetail
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where salesorderid = {salesorderid}, salesorderdetailid = {salesorderdetailid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where salesorderid = {salesorderid} AND salesorderdetailid = {salesorderdetailid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

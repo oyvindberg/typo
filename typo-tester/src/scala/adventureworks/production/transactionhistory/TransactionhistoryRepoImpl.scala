@@ -52,7 +52,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.transactionhistory(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into production.transactionhistory(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
                """
@@ -143,7 +143,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           case TransactionhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.transactionhistory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where transactionid = {transactionid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

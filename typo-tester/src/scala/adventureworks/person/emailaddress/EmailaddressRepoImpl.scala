@@ -20,7 +20,7 @@ import java.util.UUID
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".executeUpdate() > 0
+    SQL"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".executeUpdate() > 0
   }
   override def insert(compositeId: EmailaddressId, unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
     val namedParameters = List(
@@ -34,7 +34,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into person.emailaddress(businessentityid, emailaddressid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into person.emailaddress(businessentityid, emailaddressid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, {emailaddressid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
              """
@@ -77,7 +77,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from person.emailaddress
-          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+          where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
@@ -86,7 +86,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           set emailaddress = ${row.emailaddress},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+          where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: EmailaddressId, fieldValues: List[EmailaddressFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -99,8 +99,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           case EmailaddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update person.emailaddress
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}, emailaddressid = {emailaddressid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where businessentityid = {businessentityid} AND emailaddressid = {emailaddressid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

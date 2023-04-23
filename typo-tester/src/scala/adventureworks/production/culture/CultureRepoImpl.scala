@@ -32,7 +32,7 @@ object CultureRepoImpl extends CultureRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.culture(cultureid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into production.culture(cultureid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({cultureid}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning cultureid, "name", modifieddate
              """
@@ -105,7 +105,7 @@ object CultureRepoImpl extends CultureRepo {
           case CultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.culture
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where cultureid = {cultureid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

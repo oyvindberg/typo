@@ -44,7 +44,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.currencyrate(${namedParameters.map(_.name).mkString(", ")})
+      val q = s"""insert into sales.currencyrate(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
                   values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
                   returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
                """
@@ -129,7 +129,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           case CurrencyrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.currencyrate
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
                     where currencyrateid = {currencyrateid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

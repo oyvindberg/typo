@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}".executeUpdate() > 0
+    SQL"delete from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}".executeUpdate() > 0
   }
   override def insert(compositeId: EmployeedepartmenthistoryId, unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     val namedParameters = List(
@@ -32,7 +32,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into humanresources.employeedepartmenthistory(businessentityid, startdate, departmentid, shiftid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into humanresources.employeedepartmenthistory(businessentityid, startdate, departmentid, shiftid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, {startdate}::date, {departmentid}::int2, {shiftid}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
              """
@@ -76,7 +76,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow] = {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from humanresources.employeedepartmenthistory
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}
+          where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
@@ -84,7 +84,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     SQL"""update humanresources.employeedepartmenthistory
           set enddate = ${row.enddate},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, departmentid = ${compositeId.departmentid}, shiftid = ${compositeId.shiftid}
+          where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: EmployeedepartmenthistoryId, fieldValues: List[EmployeedepartmenthistoryFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -96,8 +96,8 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           case EmployeedepartmenthistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update humanresources.employeedepartmenthistory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}, startdate = {startdate}, departmentid = {departmentid}, shiftid = {shiftid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where businessentityid = {businessentityid} AND startdate = {startdate} AND departmentid = {departmentid} AND shiftid = {shiftid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

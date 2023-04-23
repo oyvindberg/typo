@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}".executeUpdate() > 0
+    SQL"delete from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".executeUpdate() > 0
   }
   override def insert(compositeId: WorkorderroutingId, unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
@@ -37,7 +37,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({workorderid}::int4, {productid}::int4, {operationsequence}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
              """
@@ -87,7 +87,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
-          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+          where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
        """.as(rowParser.singleOpt)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
@@ -102,7 +102,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               plannedcost = ${row.plannedcost},
               actualcost = ${row.actualcost},
               modifieddate = ${row.modifieddate}
-          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+          where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -121,8 +121,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update production.workorderrouting
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where workorderid = {workorderid}, productid = {productid}, operationsequence = {operationsequence}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where workorderid = {workorderid} AND productid = {productid} AND operationsequence = {operationsequence}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

@@ -21,7 +21,7 @@ import java.util.UUID
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".executeUpdate() > 0
+    SQL"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".executeUpdate() > 0
   }
   override def insert(compositeId: SalesterritoryhistoryId, unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): SalesterritoryhistoryRow = {
     val namedParameters = List(
@@ -35,7 +35,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.salesterritoryhistory(businessentityid, startdate, territoryid, ${namedParameters.map(_._1.name).mkString(", ")})
+    val q = s"""insert into sales.salesterritoryhistory(businessentityid, startdate, territoryid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
                 values ({businessentityid}::int4, {startdate}::timestamp, {territoryid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
              """
@@ -79,7 +79,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
           from sales.salesterritoryhistory
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+          where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.as(rowParser.singleOpt)
   }
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
@@ -88,7 +88,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           set enddate = ${row.enddate},
               rowguid = ${row.rowguid},
               modifieddate = ${row.modifieddate}
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+          where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.executeUpdate() > 0
   }
   override def updateFieldValues(compositeId: SalesterritoryhistoryId, fieldValues: List[SalesterritoryhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
@@ -101,8 +101,8 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           case SalesterritoryhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
         val q = s"""update sales.salesterritoryhistory
-                    set ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}, startdate = {startdate}, territoryid = {territoryid}
+                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    where businessentityid = {businessentityid} AND startdate = {startdate} AND territoryid = {territoryid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
