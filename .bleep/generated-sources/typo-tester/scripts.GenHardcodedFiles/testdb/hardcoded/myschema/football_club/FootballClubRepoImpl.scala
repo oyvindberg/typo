@@ -106,10 +106,10 @@ object FootballClubRepoImpl extends FootballClubRepo {
             ${unsaved.id}::int8,
             ${unsaved.name}
           )
-          returning "id", "name"
           on conflict ("id")
           do update set
             "name" = EXCLUDED."name"
+          returning "id", "name"
        """
       .executeInsert(rowParser.single)
   

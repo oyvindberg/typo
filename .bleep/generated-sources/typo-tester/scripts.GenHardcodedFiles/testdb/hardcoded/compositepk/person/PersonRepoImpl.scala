@@ -127,10 +127,10 @@ object PersonRepoImpl extends PersonRepo {
             ${unsaved.two},
             ${unsaved.name}
           )
-          returning "one", two, "name"
           on conflict ("one", two)
           do update set
             "name" = EXCLUDED."name"
+          returning "one", two, "name"
        """
       .executeInsert(rowParser.single)
   

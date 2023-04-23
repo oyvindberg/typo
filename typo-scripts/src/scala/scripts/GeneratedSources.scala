@@ -9,10 +9,10 @@ import java.util
 object GeneratedSources {
   def main(args: Array[String]): Unit = {
     implicit val c: Connection = {
-      val url = "jdbc:postgresql://localhost:5432/postgres"
+      val url = "jdbc:postgresql://localhost:6432/postgres"
       val props = new util.Properties
       props.setProperty("user", "postgres")
-      props.setProperty("password", "postgres")
+      props.setProperty("password", "password")
       props.setProperty("port", "6432")
       DriverManager.getConnection(url, props)
     }

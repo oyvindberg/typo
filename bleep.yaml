@@ -3,33 +3,40 @@ $version: 0.0.1-M27
 jvm:
   name: graalvm-java17:22.2.0
 projects:
+  # these tests do not depend on running codegen, just unit tests and so on
   tests:
     dependencies: org.scalatest::scalatest:3.2.13
     dependsOn: typo
     extends: template-nocross
     isTestProject: true
+  # main project
   typo:
     dependencies:
     - com.typesafe.play::play-json:2.10.0-RC7
     - org.playframework.anorm::anorm:2.7.0
-    - org.postgresql:postgresql:42.5.4
+    - org.postgresql:postgresql:42.6.0
     extends: template-cross
     platform:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in
+  # scripts for publishing, codegen and so on
   typo-scripts:
     dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
     dependsOn: typo
     extends: template-nocross
+  # scripts generate code into this project, and there are hand-written tests as well
   typo-tester:
     dependencies:
     - com.typesafe.play::play-json:2.10.0-RC7
     - org.playframework.anorm::anorm:2.7.0
-    - org.postgresql:postgresql:42.5.4
+    - org.postgresql:postgresql:42.6.0
+    - org.scalatest::scalatest:3.2.13
     extends: template-nocross
+    isTestProject: true
     sourcegen:
       main: scripts.GenHardcodedFiles
       project: typo-scripts
+    sources: ./generated-and-checked-in
 scripts:
   generate-sources:
     main: scripts.GeneratedSources
@@ -45,22 +52,21 @@ templates:
     platform:
       name: jvm
     scala:
-      options: -encoding utf8 -feature -unchecked -Xfatal-warnings
+      options: -Xfatal-warnings -encoding utf8 -feature -unchecked
       strict: true
   template-cross:
     cross:
       jvm212:
         dependencies: org.scala-lang.modules::scala-collection-compat:2.9.0
         scala:
-          version: 2.12.15
           options: -Xsource:3
+          version: 2.12.15
       jvm213:
         scala:
-          version: 2.13.10
           options: -Xsource:3
+          version: 2.13.10
       jvm3:
-        scala:
-          version: 3.2.0
+        extends: template-nocross
     extends: template-common
   template-nocross:
     extends: template-common
