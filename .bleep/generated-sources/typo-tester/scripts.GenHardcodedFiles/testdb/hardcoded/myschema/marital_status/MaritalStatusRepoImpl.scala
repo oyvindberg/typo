@@ -76,10 +76,10 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           values (
             ${unsaved.id}::int8
           )
-          returning "id"
           on conflict ("id")
           do update set
             
+          returning "id"
        """
       .executeInsert(rowParser.single)
   

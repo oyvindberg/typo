@@ -188,7 +188,6 @@ object PersonRepoImpl extends PersonRepo {
             ${unsaved.workEmail},
             ${unsaved.sector}::myschema.sector
           )
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           on conflict ("id")
           do update set
             favourite_football_club_id = EXCLUDED.favourite_football_club_id,
@@ -201,6 +200,7 @@ object PersonRepoImpl extends PersonRepo {
             marital_status_id = EXCLUDED.marital_status_id,
             work_email = EXCLUDED.work_email,
             sector = EXCLUDED.sector
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
       .executeInsert(rowParser.single)
   

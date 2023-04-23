@@ -21,6 +21,9 @@ jobs:
       - name: Scalafmt Check
         run: bleep fmt --check
 
+      - name: Start up Postgres
+        run: docker-compose up -d
+
       - name: Run tests
         env:
           CI: true
