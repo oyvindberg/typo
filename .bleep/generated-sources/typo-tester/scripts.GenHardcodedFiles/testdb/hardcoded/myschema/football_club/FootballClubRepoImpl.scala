@@ -85,8 +85,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
         val namedParams = nonEmpty.map{
           case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update myschema.football_club
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where "id" = {id}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

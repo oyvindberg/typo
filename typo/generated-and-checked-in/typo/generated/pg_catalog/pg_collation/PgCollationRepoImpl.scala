@@ -114,8 +114,9 @@ object PgCollationRepoImpl extends PgCollationRepo {
           case PgCollationFieldValue.collctype(value) => NamedParameter("collctype", ParameterValue.from(value))
           case PgCollationFieldValue.collversion(value) => NamedParameter("collversion", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update pg_catalog.pg_collation
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

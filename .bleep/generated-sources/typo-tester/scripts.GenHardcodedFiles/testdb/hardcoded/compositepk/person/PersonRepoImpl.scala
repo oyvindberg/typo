@@ -73,8 +73,9 @@ object PersonRepoImpl extends PersonRepo {
         val namedParams = nonEmpty.map{
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update compositepk.person
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where "one" = {one} AND two = {two}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

@@ -213,7 +213,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = sc.s {
           code"""update ${table.relationName}
-                |set $${namedParams.map(x => s"\\\"$${x.name}\\\" = {$${x.name}}").mkString(", ")}
+                |set $${namedParams.map(x => s"$${quote}$${x.name}$${quote} = {$${x.name}}").mkString(", ")}
                 |where $where
                 |""".stripMargin
         }
@@ -223,6 +223,7 @@ object DbLibAnorm extends DbLib {
               |    val namedParams = nonEmpty.map{
               |      ${cases.mkCode("\n")}
               |    }
+              |    val quote = '"'.toString
               |    val q = $sql
               |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
               |    import anorm._
@@ -274,7 +275,7 @@ object DbLibAnorm extends DbLib {
         }
 
         val sql = sc.s {
-          code"""|insert into ${table.relationName}($${namedParameters.map{case (x, _) => "\\\"" + x.name + "\\\""}.mkString(", ")})
+          code"""|insert into ${table.relationName}($${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                  |values ($${namedParameters.map{ case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
                  |returning ${dbNames(table.cols)}
                  |""".stripMargin
@@ -288,7 +289,7 @@ object DbLibAnorm extends DbLib {
         code"""|val namedParameters = List(
                |  ${maybeNamedParameters.mkCode(",\n")}
                |).flatten
-               |
+               |val quote = '"'.toString
                |if (namedParameters.isEmpty) {
                |  $sqlEmpty
                |    .executeInsert($rowParserIdent.single)
@@ -349,7 +350,7 @@ object DbLibAnorm extends DbLib {
           }
 
         val sql = sc.s {
-          code"""|insert into ${table.relationName}(${dbNames(id.cols)}, $${namedParameters.map(x => "\\\"" + x._1.name + "\\\"").mkString(", ")})
+          code"""|insert into ${table.relationName}(${dbNames(id.cols)}, $${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                  |values ($idColRefs, $${namedParameters.map{case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
                  |returning ${dbNames(table.cols)}
                  |""".stripMargin
@@ -358,6 +359,7 @@ object DbLibAnorm extends DbLib {
         code"""|val namedParameters = List(
                |  ${maybeNamedParameters.mkCode(",\n")}
                |).flatten
+               |val quote = '"'.toString
                |val q = $sql
                |// this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
                |import anorm._
