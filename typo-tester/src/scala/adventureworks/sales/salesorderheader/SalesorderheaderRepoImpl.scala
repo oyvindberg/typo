@@ -39,54 +39,54 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     val namedParameters = List(
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("revisionnumber", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue.from[Int](value)), "::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some(NamedParameter("duedate", ParameterValue.from(unsaved.duedate))),
-      Some(NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate))),
+      Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
+      Some((NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate)), "::timestamp")),
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("status", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue.from[Int](value)), "::int2"))
       },
       unsaved.onlineorderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some(NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber))),
-      Some(NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber))),
-      Some(NamedParameter("customerid", ParameterValue.from(unsaved.customerid))),
-      Some(NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid))),
-      Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),
-      Some(NamedParameter("billtoaddressid", ParameterValue.from(unsaved.billtoaddressid))),
-      Some(NamedParameter("shiptoaddressid", ParameterValue.from(unsaved.shiptoaddressid))),
-      Some(NamedParameter("shipmethodid", ParameterValue.from(unsaved.shipmethodid))),
-      Some(NamedParameter("creditcardid", ParameterValue.from(unsaved.creditcardid))),
-      Some(NamedParameter("creditcardapprovalcode", ParameterValue.from(unsaved.creditcardapprovalcode))),
-      Some(NamedParameter("currencyrateid", ParameterValue.from(unsaved.currencyrateid))),
+      Some((NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber)), """::"public".OrderNumber""")),
+      Some((NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber)), """::"public".AccountNumber""")),
+      Some((NamedParameter("customerid", ParameterValue.from(unsaved.customerid)), "::int4")),
+      Some((NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid)), "::int4")),
+      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
+      Some((NamedParameter("billtoaddressid", ParameterValue.from(unsaved.billtoaddressid)), "::int4")),
+      Some((NamedParameter("shiptoaddressid", ParameterValue.from(unsaved.shiptoaddressid)), "::int4")),
+      Some((NamedParameter("shipmethodid", ParameterValue.from(unsaved.shipmethodid)), "::int4")),
+      Some((NamedParameter("creditcardid", ParameterValue.from(unsaved.creditcardid)), "::int4")),
+      Some((NamedParameter("creditcardapprovalcode", ParameterValue.from(unsaved.creditcardapprovalcode)), "")),
+      Some((NamedParameter("currencyrateid", ParameterValue.from(unsaved.currencyrateid)), "::int4")),
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.taxamt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("taxamt", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("taxamt", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.freight match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("freight", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("freight", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
-      Some(NamedParameter("totaldue", ParameterValue.from(unsaved.totaldue))),
-      Some(NamedParameter("comment", ParameterValue.from(unsaved.comment))),
+      Some((NamedParameter("totaldue", ParameterValue.from(unsaved.totaldue)), "::numeric")),
+      Some((NamedParameter("comment", ParameterValue.from(unsaved.comment)), "")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -96,14 +96,14 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.salesorderheader(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into sales.salesorderheader(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

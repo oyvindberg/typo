@@ -32,41 +32,41 @@ object ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
     val namedParameters = List(
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
-      Some(NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber))),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber)), "")),
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("makeflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("makeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some(NamedParameter("color", ParameterValue.from(unsaved.color))),
-      Some(NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel))),
-      Some(NamedParameter("reorderpoint", ParameterValue.from(unsaved.reorderpoint))),
-      Some(NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost))),
-      Some(NamedParameter("listprice", ParameterValue.from(unsaved.listprice))),
-      Some(NamedParameter("size", ParameterValue.from(unsaved.size))),
-      Some(NamedParameter("sizeunitmeasurecode", ParameterValue.from(unsaved.sizeunitmeasurecode))),
-      Some(NamedParameter("weightunitmeasurecode", ParameterValue.from(unsaved.weightunitmeasurecode))),
-      Some(NamedParameter("weight", ParameterValue.from(unsaved.weight))),
-      Some(NamedParameter("daystomanufacture", ParameterValue.from(unsaved.daystomanufacture))),
-      Some(NamedParameter("productline", ParameterValue.from(unsaved.productline))),
-      Some(NamedParameter("class", ParameterValue.from(unsaved.`class`))),
-      Some(NamedParameter("style", ParameterValue.from(unsaved.style))),
-      Some(NamedParameter("productsubcategoryid", ParameterValue.from(unsaved.productsubcategoryid))),
-      Some(NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid))),
-      Some(NamedParameter("sellstartdate", ParameterValue.from(unsaved.sellstartdate))),
-      Some(NamedParameter("sellenddate", ParameterValue.from(unsaved.sellenddate))),
-      Some(NamedParameter("discontinueddate", ParameterValue.from(unsaved.discontinueddate))),
+      Some((NamedParameter("color", ParameterValue.from(unsaved.color)), "")),
+      Some((NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel)), "::int2")),
+      Some((NamedParameter("reorderpoint", ParameterValue.from(unsaved.reorderpoint)), "::int2")),
+      Some((NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost)), "::numeric")),
+      Some((NamedParameter("listprice", ParameterValue.from(unsaved.listprice)), "::numeric")),
+      Some((NamedParameter("size", ParameterValue.from(unsaved.size)), "")),
+      Some((NamedParameter("sizeunitmeasurecode", ParameterValue.from(unsaved.sizeunitmeasurecode)), "::bpchar")),
+      Some((NamedParameter("weightunitmeasurecode", ParameterValue.from(unsaved.weightunitmeasurecode)), "::bpchar")),
+      Some((NamedParameter("weight", ParameterValue.from(unsaved.weight)), "::numeric")),
+      Some((NamedParameter("daystomanufacture", ParameterValue.from(unsaved.daystomanufacture)), "::int4")),
+      Some((NamedParameter("productline", ParameterValue.from(unsaved.productline)), "::bpchar")),
+      Some((NamedParameter("class", ParameterValue.from(unsaved.`class`)), "::bpchar")),
+      Some((NamedParameter("style", ParameterValue.from(unsaved.style)), "::bpchar")),
+      Some((NamedParameter("productsubcategoryid", ParameterValue.from(unsaved.productsubcategoryid)), "::int4")),
+      Some((NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid)), "::int4")),
+      Some((NamedParameter("sellstartdate", ParameterValue.from(unsaved.sellstartdate)), "::timestamp")),
+      Some((NamedParameter("sellenddate", ParameterValue.from(unsaved.sellenddate)), "::timestamp")),
+      Some((NamedParameter("discontinueddate", ParameterValue.from(unsaved.discontinueddate)), "::timestamp")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -76,14 +76,14 @@ object ProductRepoImpl extends ProductRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.product(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into production.product(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

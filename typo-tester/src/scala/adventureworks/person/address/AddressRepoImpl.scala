@@ -28,19 +28,19 @@ object AddressRepoImpl extends AddressRepo {
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     val namedParameters = List(
-      Some(NamedParameter("addressline1", ParameterValue.from(unsaved.addressline1))),
-      Some(NamedParameter("addressline2", ParameterValue.from(unsaved.addressline2))),
-      Some(NamedParameter("city", ParameterValue.from(unsaved.city))),
-      Some(NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid))),
-      Some(NamedParameter("postalcode", ParameterValue.from(unsaved.postalcode))),
-      Some(NamedParameter("spatiallocation", ParameterValue.from(unsaved.spatiallocation))),
+      Some((NamedParameter("addressline1", ParameterValue.from(unsaved.addressline1)), "")),
+      Some((NamedParameter("addressline2", ParameterValue.from(unsaved.addressline2)), "")),
+      Some((NamedParameter("city", ParameterValue.from(unsaved.city)), "")),
+      Some((NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid)), "::int4")),
+      Some((NamedParameter("postalcode", ParameterValue.from(unsaved.postalcode)), "")),
+      Some((NamedParameter("spatiallocation", ParameterValue.from(unsaved.spatiallocation)), "::bytea")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -50,14 +50,14 @@ object AddressRepoImpl extends AddressRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into person.address(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into person.address(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

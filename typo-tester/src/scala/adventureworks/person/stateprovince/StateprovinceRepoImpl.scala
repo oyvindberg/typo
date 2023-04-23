@@ -31,21 +31,21 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     val namedParameters = List(
-      Some(NamedParameter("stateprovincecode", ParameterValue.from(unsaved.stateprovincecode))),
-      Some(NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode))),
+      Some((NamedParameter("stateprovincecode", ParameterValue.from(unsaved.stateprovincecode)), "::bpchar")),
+      Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
       unsaved.isonlystateprovinceflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("isonlystateprovinceflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("isonlystateprovinceflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
-      Some(NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid))),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -55,14 +55,14 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into person.stateprovince(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into person.stateprovince(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

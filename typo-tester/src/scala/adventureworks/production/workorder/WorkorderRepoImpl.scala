@@ -28,16 +28,16 @@ object WorkorderRepoImpl extends WorkorderRepo {
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
-      Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
-      Some(NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty))),
-      Some(NamedParameter("scrappedqty", ParameterValue.from(unsaved.scrappedqty))),
-      Some(NamedParameter("startdate", ParameterValue.from(unsaved.startdate))),
-      Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
-      Some(NamedParameter("duedate", ParameterValue.from(unsaved.duedate))),
-      Some(NamedParameter("scrapreasonid", ParameterValue.from(unsaved.scrapreasonid))),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int4")),
+      Some((NamedParameter("scrappedqty", ParameterValue.from(unsaved.scrappedqty)), "::int2")),
+      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
+      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
+      Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
+      Some((NamedParameter("scrapreasonid", ParameterValue.from(unsaved.scrapreasonid)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -47,14 +47,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.workorder(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into production.workorder(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

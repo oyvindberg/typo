@@ -27,14 +27,14 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     val namedParameters = List(
-      Some(NamedParameter("currencyratedate", ParameterValue.from(unsaved.currencyratedate))),
-      Some(NamedParameter("fromcurrencycode", ParameterValue.from(unsaved.fromcurrencycode))),
-      Some(NamedParameter("tocurrencycode", ParameterValue.from(unsaved.tocurrencycode))),
-      Some(NamedParameter("averagerate", ParameterValue.from(unsaved.averagerate))),
-      Some(NamedParameter("endofdayrate", ParameterValue.from(unsaved.endofdayrate))),
+      Some((NamedParameter("currencyratedate", ParameterValue.from(unsaved.currencyratedate)), "::timestamp")),
+      Some((NamedParameter("fromcurrencycode", ParameterValue.from(unsaved.fromcurrencycode)), "::bpchar")),
+      Some((NamedParameter("tocurrencycode", ParameterValue.from(unsaved.tocurrencycode)), "::bpchar")),
+      Some((NamedParameter("averagerate", ParameterValue.from(unsaved.averagerate)), "::numeric")),
+      Some((NamedParameter("endofdayrate", ParameterValue.from(unsaved.endofdayrate)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -44,14 +44,14 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.currencyrate(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into sales.currencyrate(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

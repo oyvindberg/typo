@@ -27,19 +27,19 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
     val namedParameters = List(
-      Some(NamedParameter("shoppingcartid", ParameterValue.from(unsaved.shoppingcartid))),
+      Some((NamedParameter("shoppingcartid", ParameterValue.from(unsaved.shoppingcartid)), "")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("quantity", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some(NamedParameter("productid", ParameterValue.from(unsaved.productid))),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -49,14 +49,14 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.shoppingcartitem(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into sales.shoppingcartitem(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

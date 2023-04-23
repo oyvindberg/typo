@@ -261,19 +261,22 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.InsertDbGeneratedKey(_, colsUnsaved, unsavedParam, default, _) =>
         val maybeNamedParameters = colsUnsaved.map {
-          case ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbCol) =>
+          case col @ ColumnComputed(_, ident, sc.Type.TApply(default.Defaulted, List(tpe)), dbCol) =>
             val dbName = sc.StrLit(dbCol.name.value)
+            val colCast = sc.StrLit(cast(col).render)
+
             code"""|${unsavedParam.name}.$ident match {
                    |  case ${default.Defaulted}.${default.UseDefault} => None
-                   |  case ${default.Defaulted}.${default.Provided}(value) => Some($NamedParameter($dbName, $ParameterValue.from[$tpe](value)))
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some(($NamedParameter($dbName, $ParameterValue.from[$tpe](value)), $colCast))
                    |}"""
           case col =>
-            code"""Some($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})))"""
+            val colCast = sc.StrLit(cast(col).render)
+            code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})), $colCast))"""
         }
 
         val sql = sc.s {
-          code"""|insert into ${table.relationName}($${namedParameters.map(x => "\\\"" + x.name + "\\\"").mkString(", ")})
-                 |values ($${namedParameters.map(np => s"{$${np.name}}").mkString(", ")})
+          code"""|insert into ${table.relationName}($${namedParameters.map{case (x, _) => "\\\"" + x.name + "\\\""}.mkString(", ")})
+                 |values ($${namedParameters.map{ case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
                  |returning ${dbNames(table.cols)}
                  |""".stripMargin
         }
@@ -295,7 +298,7 @@ object DbLibAnorm extends DbLib {
                |  // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
                |  import anorm._
                |  SQL(q)
-               |    .on(namedParameters :_*)
+               |    .on(namedParameters.map(_._1) :_*)
                |    .executeInsert($rowParserIdent.single)
                |}
                |"""

@@ -28,22 +28,22 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
-      Some(NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid))),
-      Some(NamedParameter("componentid", ParameterValue.from(unsaved.componentid))),
+      Some((NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid)), "::int4")),
+      Some((NamedParameter("componentid", ParameterValue.from(unsaved.componentid)), "::int4")),
       unsaved.startdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("startdate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("startdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some(NamedParameter("enddate", ParameterValue.from(unsaved.enddate))),
-      Some(NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode))),
-      Some(NamedParameter("bomlevel", ParameterValue.from(unsaved.bomlevel))),
+      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
+      Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),
+      Some((NamedParameter("bomlevel", ParameterValue.from(unsaved.bomlevel)), "::int2")),
       unsaved.perassemblyqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("perassemblyqty", ParameterValue.from[BigDecimal](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("perassemblyqty", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -53,14 +53,14 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.billofmaterials(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into production.billofmaterials(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

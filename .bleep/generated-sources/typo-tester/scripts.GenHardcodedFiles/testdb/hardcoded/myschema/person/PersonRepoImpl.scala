@@ -28,21 +28,21 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
-      Some(NamedParameter("favourite_football_club_id", ParameterValue.from(unsaved.favouriteFootballClubId))),
-      Some(NamedParameter("name", ParameterValue.from(unsaved.name))),
-      Some(NamedParameter("nick_name", ParameterValue.from(unsaved.nickName))),
-      Some(NamedParameter("blog_url", ParameterValue.from(unsaved.blogUrl))),
-      Some(NamedParameter("email", ParameterValue.from(unsaved.email))),
-      Some(NamedParameter("phone", ParameterValue.from(unsaved.phone))),
-      Some(NamedParameter("likes_pizza", ParameterValue.from(unsaved.likesPizza))),
+      Some((NamedParameter("favourite_football_club_id", ParameterValue.from(unsaved.favouriteFootballClubId)), "")),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), "")),
+      Some((NamedParameter("nick_name", ParameterValue.from(unsaved.nickName)), "")),
+      Some((NamedParameter("blog_url", ParameterValue.from(unsaved.blogUrl)), "")),
+      Some((NamedParameter("email", ParameterValue.from(unsaved.email)), "")),
+      Some((NamedParameter("phone", ParameterValue.from(unsaved.phone)), "")),
+      Some((NamedParameter("likes_pizza", ParameterValue.from(unsaved.likesPizza)), "")),
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)), ""))
       },
-      Some(NamedParameter("work_email", ParameterValue.from(unsaved.workEmail))),
+      Some((NamedParameter("work_email", ParameterValue.from(unsaved.workEmail)), "")),
       unsaved.sector match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("sector", ParameterValue.from[Sector](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("sector", ParameterValue.from[Sector](value)), "::myschema.sector"))
       }
     ).flatten
     
@@ -52,14 +52,14 @@ object PersonRepoImpl extends PersonRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into myschema.person(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into myschema.person(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

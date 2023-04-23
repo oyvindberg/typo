@@ -26,13 +26,13 @@ object CreditcardRepoImpl extends CreditcardRepo {
   }
   override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
     val namedParameters = List(
-      Some(NamedParameter("cardtype", ParameterValue.from(unsaved.cardtype))),
-      Some(NamedParameter("cardnumber", ParameterValue.from(unsaved.cardnumber))),
-      Some(NamedParameter("expmonth", ParameterValue.from(unsaved.expmonth))),
-      Some(NamedParameter("expyear", ParameterValue.from(unsaved.expyear))),
+      Some((NamedParameter("cardtype", ParameterValue.from(unsaved.cardtype)), "")),
+      Some((NamedParameter("cardnumber", ParameterValue.from(unsaved.cardnumber)), "")),
+      Some((NamedParameter("expmonth", ParameterValue.from(unsaved.expmonth)), "::int2")),
+      Some((NamedParameter("expyear", ParameterValue.from(unsaved.expyear)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -42,14 +42,14 @@ object CreditcardRepoImpl extends CreditcardRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.creditcard(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into sales.creditcard(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   

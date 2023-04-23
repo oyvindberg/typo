@@ -28,29 +28,29 @@ object DocumentRepoImpl extends DocumentRepo {
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     val namedParameters = List(
-      Some(NamedParameter("title", ParameterValue.from(unsaved.title))),
-      Some(NamedParameter("owner", ParameterValue.from(unsaved.owner))),
+      Some((NamedParameter("title", ParameterValue.from(unsaved.title)), "")),
+      Some((NamedParameter("owner", ParameterValue.from(unsaved.owner)), "::int4")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("folderflag", ParameterValue.from[Flag](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("folderflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some(NamedParameter("filename", ParameterValue.from(unsaved.filename))),
-      Some(NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension))),
-      Some(NamedParameter("revision", ParameterValue.from(unsaved.revision))),
+      Some((NamedParameter("filename", ParameterValue.from(unsaved.filename)), "")),
+      Some((NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension)), "")),
+      Some((NamedParameter("revision", ParameterValue.from(unsaved.revision)), "::bpchar")),
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("changenumber", ParameterValue.from[Int](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("changenumber", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some(NamedParameter("status", ParameterValue.from(unsaved.status))),
-      Some(NamedParameter("documentsummary", ParameterValue.from(unsaved.documentsummary))),
-      Some(NamedParameter("document", ParameterValue.from(unsaved.document))),
+      Some((NamedParameter("status", ParameterValue.from(unsaved.status)), "::int2")),
+      Some((NamedParameter("documentsummary", ParameterValue.from(unsaved.documentsummary)), "")),
+      Some((NamedParameter("document", ParameterValue.from(unsaved.document)), "::bytea")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("rowguid", ParameterValue.from[UUID](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some(NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     
@@ -60,14 +60,14 @@ object DocumentRepoImpl extends DocumentRepo {
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production."document"(${namedParameters.map(x => "\"" + x.name + "\"").mkString(", ")})
-                  values (${namedParameters.map(np => s"{${np.name}}").mkString(", ")})
+      val q = s"""insert into production."document"(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
       SQL(q)
-        .on(namedParameters :_*)
+        .on(namedParameters.map(_._1) :_*)
         .executeInsert(rowParser.single)
     }
   
