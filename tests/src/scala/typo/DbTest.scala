@@ -3,10 +3,10 @@ package typo
 import org.postgresql.util.PSQLException
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import typo.generated.custom.view_find_all.ViewFindAllRepoImpl
-import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesRepoImpl
 import typo.generated.custom.domains.DomainsRepoImpl
-import typo.generated.{information_schema, pg_catalog}
+import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesRepoImpl
+import typo.generated.custom.view_find_all.ViewFindAllRepoImpl
+import typo.generated.information_schema
 
 import java.sql.{Connection, DriverManager}
 
@@ -22,8 +22,6 @@ class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
       println(information_schema.referential_constraints.ReferentialConstraintsRepoImpl.selectAll.take(1))
       println(information_schema.table_constraints.TableConstraintsRepoImpl.selectAll.take(1))
       println(information_schema.tables.TablesRepoImpl.selectAll.take(1))
-      println(pg_catalog.pg_attribute.PgAttributeRepoImpl.selectAll.take(1))
-      println(pg_catalog.pg_class.PgClassRepoImpl.selectAll.take(1))
       println(ViewFindAllRepoImpl().take(1))
       println(ViewColumnDependenciesRepoImpl(None).take(1))
       println(DomainsRepoImpl().take(1))

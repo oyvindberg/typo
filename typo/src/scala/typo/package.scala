@@ -63,20 +63,27 @@ package object typo {
     // here we keep only the values which have been evaluated. as such, the selector pattern should be safe
     val computedRelations = computeds.flatMap { case (_, lazyValue) => lazyValue.getIfEvaluated }
 
+    val scriptFiles = computedScripts.flatMap(x => SqlFileFiles(x, naming, options).all)
+    val relationFilesByName = computedRelations.flatMap {
+      case Left(viewComputed)   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
+      case Right(tableComputed) => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
+    }
     val mostFiles: List[sc.File] =
       List(
         List(DefaultFile(default, options.jsonLib).file),
         enums.map(StringEnumFile(naming, options)),
         domains.map(DomainFile(naming, options, scalaTypeMapper)),
-        computedRelations.flatMap {
-          case Left(viewComputed)   => ViewFiles(viewComputed, options).all
-          case Right(tableComputed) => TableFiles(tableComputed, options).all
-        },
-        computedScripts.flatMap(x => SqlFileFiles(x, naming, options).all)
+        relationFilesByName.map { case (_, f) => f },
+        scriptFiles
       ).flatten
 
+    val entryPoints: Iterable[sc.File] =
+      scriptFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
+
+    val keptMostFiles: List[sc.File] = minimize(mostFiles, entryPoints)
+
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
-      mostFiles.groupBy(_.pkg).map { case (pkg, files) =>
+      keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>
         (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
       }
 
@@ -84,8 +91,58 @@ package object typo {
     // this should be a stop-gap solution anyway
     val pkgObject = List(PackageObjectFile.packageObject(options))
 
-    val allFiles = mostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
+    val allFiles = keptMostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
     Generated(allFiles.map(file => file.copy(contents = options.header.code ++ file.contents)))
   }
 
+  /** Keep those files among `allFiles` which are part of or reachable (through type references) from `entryPoints`.
+    * @return
+    */
+  def minimize(allFiles: List[sc.File], entryPoints: Iterable[sc.File]): List[sc.File] = {
+    val toKeep: Set[sc.QIdent] = {
+      val b = Set.newBuilder[sc.QIdent]
+      b ++= entryPoints.map(_.tpe.value)
+      entryPoints.foreach { f =>
+        def goTree(tree: sc.Tree): Unit = {
+          tree match {
+            case sc.Ident(_)      => ()
+            case x: sc.QIdent     => b += x
+            case sc.Param(_, tpe) => go(tpe)
+            case sc.StrLit(_)     => ()
+            case sc.StringInterpolate(i, prefix, content) =>
+              goTree(i)
+              goTree(prefix)
+              go(content)
+            case sc.Type.Wildcard =>
+              ()
+            case sc.Type.TApply(underlying, targs) =>
+              go(underlying)
+              targs.foreach(goTree)
+            case sc.Type.Qualified(value)         => go(value)
+            case sc.Type.Abstract(_)              => ()
+            case sc.Type.Commented(underlying, _) => go(underlying)
+            case sc.Type.UserDefined(underlying)  => go(underlying)
+          }
+        }
+
+        def go(code: sc.Code): Unit = {
+          code match {
+            case sc.Code.Interpolated(_, args) =>
+              args.foreach(go)
+            case sc.Code.Combined(codes) =>
+              codes.foreach(go)
+            case sc.Code.Str(_) =>
+              ()
+            case sc.Code.Tree(tree) =>
+              goTree(tree)
+          }
+        }
+
+        go(f.contents)
+      }
+      b.result()
+    }
+
+    allFiles.filter(f => toKeep(f.tpe.value))
+  }
 }
