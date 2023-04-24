@@ -40,7 +40,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.productinventory(productid, locationid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into production.productinventory(productid, locationid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({productid}::int4, {locationid}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
              """
@@ -110,8 +111,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           case ProductinventoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductinventoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update production.productinventory
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where productid = {productid} AND locationid = {locationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

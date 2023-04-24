@@ -32,14 +32,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
+    val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.illustration default values
             returning illustrationid, diagram, modifieddate
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.illustration(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+      val q = s"""insert into production.illustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning illustrationid, diagram, modifieddate
                """
@@ -110,8 +110,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
           case IllustrationFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
           case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update production.illustration
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where illustrationid = {illustrationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

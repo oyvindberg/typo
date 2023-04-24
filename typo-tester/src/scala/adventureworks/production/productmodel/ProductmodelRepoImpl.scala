@@ -40,14 +40,14 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
+    val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productmodel default values
             returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into production.productmodel(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+      val q = s"""insert into production.productmodel(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
                """
@@ -127,8 +127,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           case ProductmodelFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case ProductmodelFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update production.productmodel
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where productmodelid = {productmodelid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

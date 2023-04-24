@@ -33,14 +33,14 @@ object DepartmentRepoImpl extends DepartmentRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
+    val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into humanresources.department default values
             returning departmentid, "name", groupname, modifieddate
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+      val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning departmentid, "name", groupname, modifieddate
                """
@@ -114,8 +114,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
           case DepartmentFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
           case DepartmentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update humanresources.department
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where departmentid = {departmentid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

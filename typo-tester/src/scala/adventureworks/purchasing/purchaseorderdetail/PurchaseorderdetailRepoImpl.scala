@@ -35,7 +35,8 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({purchaseorderid}::int4, {purchaseorderdetailid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
              """
@@ -111,8 +112,9 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           case PurchaseorderdetailFieldValue.rejectedqty(value) => NamedParameter("rejectedqty", ParameterValue.from(value))
           case PurchaseorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update purchasing.purchaseorderdetail
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where purchaseorderid = {purchaseorderid} AND purchaseorderdetailid = {purchaseorderdetailid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

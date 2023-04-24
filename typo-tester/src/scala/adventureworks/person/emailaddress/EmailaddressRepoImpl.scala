@@ -34,7 +34,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into person.emailaddress(businessentityid, emailaddressid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into person.emailaddress(businessentityid, emailaddressid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({businessentityid}::int4, {emailaddressid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
              """
@@ -98,8 +99,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           case EmailaddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case EmailaddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update person.emailaddress
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid} AND emailaddressid = {emailaddressid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

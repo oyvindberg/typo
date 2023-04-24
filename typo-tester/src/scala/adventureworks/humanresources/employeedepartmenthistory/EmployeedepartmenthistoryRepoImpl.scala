@@ -32,7 +32,8 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into humanresources.employeedepartmenthistory(businessentityid, startdate, departmentid, shiftid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into humanresources.employeedepartmenthistory(businessentityid, startdate, departmentid, shiftid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({businessentityid}::int4, {startdate}::date, {departmentid}::int2, {shiftid}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
              """
@@ -95,8 +96,9 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           case EmployeedepartmenthistoryFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
           case EmployeedepartmenthistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update humanresources.employeedepartmenthistory
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid} AND startdate = {startdate} AND departmentid = {departmentid} AND shiftid = {shiftid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

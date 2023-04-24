@@ -30,7 +30,8 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into production.productcosthistory(productid, startdate, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into production.productcosthistory(productid, startdate, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({productid}::int4, {startdate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning productid, startdate, enddate, standardcost, modifieddate
              """
@@ -94,8 +95,9 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           case ProductcosthistoryFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
           case ProductcosthistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update production.productcosthistory
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where productid = {productid} AND startdate = {startdate}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

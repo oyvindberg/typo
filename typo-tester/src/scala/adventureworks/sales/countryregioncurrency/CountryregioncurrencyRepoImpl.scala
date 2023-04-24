@@ -29,7 +29,8 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into sales.countryregioncurrency(countryregioncode, currencycode, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({countryregioncode}, {currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning countryregioncode, currencycode, modifieddate
              """
@@ -87,8 +88,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         val namedParams = nonEmpty.map{
           case CountryregioncurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update sales.countryregioncurrency
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where countryregioncode = {countryregioncode} AND currencycode = {currencycode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

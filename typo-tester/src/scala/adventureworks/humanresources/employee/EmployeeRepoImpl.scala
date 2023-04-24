@@ -65,7 +65,8 @@ object EmployeeRepoImpl extends EmployeeRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)), ""))
       }
     ).flatten
-    val q = s"""insert into humanresources.employee(businessentityid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into humanresources.employee(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
              """
@@ -172,8 +173,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
           case EmployeeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case EmployeeFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update humanresources.employee
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

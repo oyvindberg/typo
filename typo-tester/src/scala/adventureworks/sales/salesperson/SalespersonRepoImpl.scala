@@ -55,7 +55,8 @@ object SalespersonRepoImpl extends SalespersonRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    val q = s"""insert into sales.salesperson(businessentityid, ${namedParameters.map(x => "\"" + x._1.name + "\"").mkString(", ")})
+    val quote = '"'.toString
+    val q = s"""insert into sales.salesperson(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
                 values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                 returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
              """
@@ -144,8 +145,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
           case SalespersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalespersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update sales.salesperson
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

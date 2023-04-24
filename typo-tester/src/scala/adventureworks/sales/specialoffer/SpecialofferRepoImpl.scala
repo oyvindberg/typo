@@ -49,14 +49,14 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
-    
+    val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.specialoffer default values
             returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
          """
         .executeInsert(rowParser.single)
     } else {
-      val q = s"""insert into sales.specialoffer(${namedParameters.map{case (x, _) => "\"" + x.name + "\""}.mkString(", ")})
+      val q = s"""insert into sales.specialoffer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
                """
@@ -151,8 +151,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           case SpecialofferFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SpecialofferFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""update sales.specialoffer
-                    set ${namedParams.map(x => s"\"${x.name}\" = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
                     where specialofferid = {specialofferid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
