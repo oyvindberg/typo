@@ -9,6 +9,7 @@ package purchaseorderdetail
 
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,6 +20,9 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.purchaseorderdetail` which has not been persisted yet */
 case class PurchaseorderdetailRowUnsaved(
+  /** Primary key. Foreign key to PurchaseOrderHeader.PurchaseOrderID.
+      Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
+  purchaseorderid: PurchaseorderheaderId,
   /** Date the product is expected to be received. */
   duedate: LocalDateTime,
   /** Quantity ordered. */
@@ -32,21 +36,27 @@ case class PurchaseorderdetailRowUnsaved(
   receivedqty: BigDecimal,
   /** Quantity rejected during inspection. */
   rejectedqty: BigDecimal,
+  /** Default: nextval('purchasing.purchaseorderdetail_purchaseorderdetailid_seq'::regclass)
+      Primary key. One line number per purchased product. */
+  purchaseorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: PurchaseorderdetailId): PurchaseorderdetailRow =
+  def toRow(purchaseorderdetailidDefault: => Int, modifieddateDefault: => LocalDateTime): PurchaseorderdetailRow =
     PurchaseorderdetailRow(
-      purchaseorderid = compositeId.purchaseorderid,
-      purchaseorderdetailid = compositeId.purchaseorderdetailid,
+      purchaseorderid = purchaseorderid,
       duedate = duedate,
       orderqty = orderqty,
       productid = productid,
       unitprice = unitprice,
       receivedqty = receivedqty,
       rejectedqty = rejectedqty,
+      purchaseorderdetailid = purchaseorderdetailid match {
+                                case Defaulted.UseDefault => purchaseorderdetailidDefault
+                                case Defaulted.Provided(value) => value
+                              },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -55,12 +65,14 @@ object PurchaseorderdetailRowUnsaved {
   implicit val oFormat: OFormat[PurchaseorderdetailRowUnsaved] = new OFormat[PurchaseorderdetailRowUnsaved]{
     override def writes(o: PurchaseorderdetailRowUnsaved): JsObject =
       Json.obj(
+        "purchaseorderid" -> o.purchaseorderid,
         "duedate" -> o.duedate,
         "orderqty" -> o.orderqty,
         "productid" -> o.productid,
         "unitprice" -> o.unitprice,
         "receivedqty" -> o.receivedqty,
         "rejectedqty" -> o.rejectedqty,
+        "purchaseorderdetailid" -> o.purchaseorderdetailid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -68,12 +80,14 @@ object PurchaseorderdetailRowUnsaved {
       JsResult.fromTry(
         Try(
           PurchaseorderdetailRowUnsaved(
+            purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
             duedate = json.\("duedate").as[LocalDateTime],
             orderqty = json.\("orderqty").as[Int],
             productid = json.\("productid").as[ProductId],
             unitprice = json.\("unitprice").as[BigDecimal],
             receivedqty = json.\("receivedqty").as[BigDecimal],
             rejectedqty = json.\("rejectedqty").as[BigDecimal],
+            purchaseorderdetailid = json.\("purchaseorderdetailid").as[Defaulted[Int]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

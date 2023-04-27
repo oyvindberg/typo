@@ -22,40 +22,43 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.vendor` which has not been persisted yet */
 case class VendorRowUnsaved(
+  /** Primary key for Vendor records.  Foreign key to BusinessEntity.BusinessEntityID
+      Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** Vendor account (identification) number. */
   accountnumber: AccountNumber,
   /** Company name. */
   name: Name,
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
   creditrating: Int,
-  /** Default: true
-      0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
-  preferredvendorstatus: Defaulted[Flag],
-  /** Default: true
-      0 = Vendor no longer used. 1 = Vendor is actively used. */
-  activeflag: Defaulted[Flag],
   /** Vendor URL. */
   purchasingwebserviceurl: Option[String],
+  /** Default: true
+      0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
+  preferredvendorstatus: Defaulted[Flag] = Defaulted.UseDefault,
+  /** Default: true
+      0 = Vendor no longer used. 1 = Vendor is actively used. */
+  activeflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(businessentityid: BusinessentityId): VendorRow =
+  def toRow(preferredvendorstatusDefault: => Flag, activeflagDefault: => Flag, modifieddateDefault: => LocalDateTime): VendorRow =
     VendorRow(
       businessentityid = businessentityid,
       accountnumber = accountnumber,
       name = name,
       creditrating = creditrating,
+      purchasingwebserviceurl = purchasingwebserviceurl,
       preferredvendorstatus = preferredvendorstatus match {
-                                case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                                case Defaulted.UseDefault => preferredvendorstatusDefault
                                 case Defaulted.Provided(value) => value
                               },
       activeflag = activeflag match {
-                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                     case Defaulted.UseDefault => activeflagDefault
                      case Defaulted.Provided(value) => value
                    },
-      purchasingwebserviceurl = purchasingwebserviceurl,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -64,12 +67,13 @@ object VendorRowUnsaved {
   implicit val oFormat: OFormat[VendorRowUnsaved] = new OFormat[VendorRowUnsaved]{
     override def writes(o: VendorRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "accountnumber" -> o.accountnumber,
         "name" -> o.name,
         "creditrating" -> o.creditrating,
+        "purchasingwebserviceurl" -> o.purchasingwebserviceurl,
         "preferredvendorstatus" -> o.preferredvendorstatus,
         "activeflag" -> o.activeflag,
-        "purchasingwebserviceurl" -> o.purchasingwebserviceurl,
         "modifieddate" -> o.modifieddate
       )
   
@@ -77,12 +81,13 @@ object VendorRowUnsaved {
       JsResult.fromTry(
         Try(
           VendorRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             accountnumber = json.\("accountnumber").as[AccountNumber],
             name = json.\("name").as[Name],
             creditrating = json.\("creditrating").as[Int],
+            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
             preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
             activeflag = json.\("activeflag").as[Defaulted[Flag]],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

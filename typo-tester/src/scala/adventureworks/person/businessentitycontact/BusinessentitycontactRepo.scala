@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait BusinessentitycontactRepo {
   def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean
-  def insert(compositeId: BusinessentitycontactId, unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow
+  def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow
   def selectAll(implicit c: Connection): List[BusinessentitycontactRow]
   def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow]

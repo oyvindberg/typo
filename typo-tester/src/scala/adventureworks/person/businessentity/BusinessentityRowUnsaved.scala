@@ -19,20 +19,26 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.businessentity` which has not been persisted yet */
 case class BusinessentityRowUnsaved(
+  /** Default: nextval('person.businessentity_businessentityid_seq'::regclass)
+      Primary key for all customers, vendors, and employees. */
+  businessentityid: Defaulted[BusinessentityId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(businessentityid: BusinessentityId): BusinessentityRow =
+  def toRow(businessentityidDefault: => BusinessentityId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): BusinessentityRow =
     BusinessentityRow(
-      businessentityid = businessentityid,
+      businessentityid = businessentityid match {
+                           case Defaulted.UseDefault => businessentityidDefault
+                           case Defaulted.Provided(value) => value
+                         },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -41,6 +47,7 @@ object BusinessentityRowUnsaved {
   implicit val oFormat: OFormat[BusinessentityRowUnsaved] = new OFormat[BusinessentityRowUnsaved]{
     override def writes(o: BusinessentityRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -49,6 +56,7 @@ object BusinessentityRowUnsaved {
       JsResult.fromTry(
         Try(
           BusinessentityRowUnsaved(
+            businessentityid = json.\("businessentityid").as[Defaulted[BusinessentityId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

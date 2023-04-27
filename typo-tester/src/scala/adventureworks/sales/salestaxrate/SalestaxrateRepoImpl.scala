@@ -30,11 +30,15 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     val namedParameters = List(
       Some((NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid)), "::int4")),
       Some((NamedParameter("taxtype", ParameterValue.from(unsaved.taxtype)), "::int2")),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.salestaxrateid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("salestaxrateid", ParameterValue.from[SalestaxrateId](value)), "::int4"))
+      },
       unsaved.taxrate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("taxrate", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

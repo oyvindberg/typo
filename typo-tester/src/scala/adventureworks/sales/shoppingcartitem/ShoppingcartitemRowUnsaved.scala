@@ -21,33 +21,39 @@ import scala.util.Try
 case class ShoppingcartitemRowUnsaved(
   /** Shopping cart identification number. */
   shoppingcartid: String,
-  /** Default: 1
-      Product quantity ordered. */
-  quantity: Defaulted[Int],
   /** Product ordered. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
+  /** Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass)
+      Primary key for ShoppingCartItem records. */
+  shoppingcartitemid: Defaulted[ShoppingcartitemId] = Defaulted.UseDefault,
+  /** Default: 1
+      Product quantity ordered. */
+  quantity: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the time the record was created. */
-  datecreated: Defaulted[LocalDateTime],
+  datecreated: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(shoppingcartitemid: ShoppingcartitemId): ShoppingcartitemRow =
+  def toRow(shoppingcartitemidDefault: => ShoppingcartitemId, quantityDefault: => Int, datecreatedDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ShoppingcartitemRow =
     ShoppingcartitemRow(
-      shoppingcartitemid = shoppingcartitemid,
       shoppingcartid = shoppingcartid,
+      productid = productid,
+      shoppingcartitemid = shoppingcartitemid match {
+                             case Defaulted.UseDefault => shoppingcartitemidDefault
+                             case Defaulted.Provided(value) => value
+                           },
       quantity = quantity match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => quantityDefault
                    case Defaulted.Provided(value) => value
                  },
-      productid = productid,
       datecreated = datecreated match {
-                      case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                      case Defaulted.UseDefault => datecreatedDefault
                       case Defaulted.Provided(value) => value
                     },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -57,8 +63,9 @@ object ShoppingcartitemRowUnsaved {
     override def writes(o: ShoppingcartitemRowUnsaved): JsObject =
       Json.obj(
         "shoppingcartid" -> o.shoppingcartid,
-        "quantity" -> o.quantity,
         "productid" -> o.productid,
+        "shoppingcartitemid" -> o.shoppingcartitemid,
+        "quantity" -> o.quantity,
         "datecreated" -> o.datecreated,
         "modifieddate" -> o.modifieddate
       )
@@ -68,8 +75,9 @@ object ShoppingcartitemRowUnsaved {
         Try(
           ShoppingcartitemRowUnsaved(
             shoppingcartid = json.\("shoppingcartid").as[String],
-            quantity = json.\("quantity").as[Defaulted[Int]],
             productid = json.\("productid").as[ProductId],
+            shoppingcartitemid = json.\("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]],
+            quantity = json.\("quantity").as[Defaulted[Int]],
             datecreated = json.\("datecreated").as[Defaulted[LocalDateTime]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

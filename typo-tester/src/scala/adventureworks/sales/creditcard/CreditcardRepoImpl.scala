@@ -29,6 +29,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
       Some((NamedParameter("cardnumber", ParameterValue.from(unsaved.cardnumber)), "")),
       Some((NamedParameter("expmonth", ParameterValue.from(unsaved.expmonth)), "::int2")),
       Some((NamedParameter("expyear", ParameterValue.from(unsaved.expyear)), "::int2")),
+      unsaved.creditcardid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("creditcardid", ParameterValue.from[CreditcardId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

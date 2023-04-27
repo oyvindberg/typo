@@ -25,8 +25,9 @@ object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person."password" where businessentityid = $businessentityid""".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
+  override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("passwordhash", ParameterValue.from(unsaved.passwordhash)), "")),
       Some((NamedParameter("passwordsalt", ParameterValue.from(unsaved.passwordsalt)), "")),
       unsaved.rowguid match {
@@ -39,16 +40,22 @@ object PasswordRepoImpl extends PasswordRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into person."password"(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person."password" default values
+            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person."password"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {

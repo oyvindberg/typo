@@ -27,6 +27,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
       Some((NamedParameter("diagram", ParameterValue.from(unsaved.diagram)), "::xml")),
+      unsaved.illustrationid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("illustrationid", ParameterValue.from[IllustrationId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

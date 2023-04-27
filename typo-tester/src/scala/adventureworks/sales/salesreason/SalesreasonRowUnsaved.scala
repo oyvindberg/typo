@@ -23,16 +23,22 @@ case class SalesreasonRowUnsaved(
   name: Name,
   /** Category the sales reason belongs to. */
   reasontype: Name,
+  /** Default: nextval('sales.salesreason_salesreasonid_seq'::regclass)
+      Primary key for SalesReason records. */
+  salesreasonid: Defaulted[SalesreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(salesreasonid: SalesreasonId): SalesreasonRow =
+  def toRow(salesreasonidDefault: => SalesreasonId, modifieddateDefault: => LocalDateTime): SalesreasonRow =
     SalesreasonRow(
-      salesreasonid = salesreasonid,
       name = name,
       reasontype = reasontype,
+      salesreasonid = salesreasonid match {
+                        case Defaulted.UseDefault => salesreasonidDefault
+                        case Defaulted.Provided(value) => value
+                      },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -43,6 +49,7 @@ object SalesreasonRowUnsaved {
       Json.obj(
         "name" -> o.name,
         "reasontype" -> o.reasontype,
+        "salesreasonid" -> o.salesreasonid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -52,6 +59,7 @@ object SalesreasonRowUnsaved {
           SalesreasonRowUnsaved(
             name = json.\("name").as[Name],
             reasontype = json.\("reasontype").as[Name],
+            salesreasonid = json.\("salesreasonid").as[Defaulted[SalesreasonId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

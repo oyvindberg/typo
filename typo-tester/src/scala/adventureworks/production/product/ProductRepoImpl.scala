@@ -33,14 +33,6 @@ object ProductRepoImpl extends ProductRepo {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("productnumber", ParameterValue.from(unsaved.productnumber)), "")),
-      unsaved.makeflag match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("makeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
-      },
-      unsaved.finishedgoodsflag match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
-      },
       Some((NamedParameter("color", ParameterValue.from(unsaved.color)), "")),
       Some((NamedParameter("safetystocklevel", ParameterValue.from(unsaved.safetystocklevel)), "::int2")),
       Some((NamedParameter("reorderpoint", ParameterValue.from(unsaved.reorderpoint)), "::int2")),
@@ -59,6 +51,18 @@ object ProductRepoImpl extends ProductRepo {
       Some((NamedParameter("sellstartdate", ParameterValue.from(unsaved.sellstartdate)), "::timestamp")),
       Some((NamedParameter("sellenddate", ParameterValue.from(unsaved.sellenddate)), "::timestamp")),
       Some((NamedParameter("discontinueddate", ParameterValue.from(unsaved.discontinueddate)), "::timestamp")),
+      unsaved.productid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productid", ParameterValue.from[ProductId](value)), "::int4"))
+      },
+      unsaved.makeflag match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("makeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+      },
+      unsaved.finishedgoodsflag match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("finishedgoodsflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

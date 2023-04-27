@@ -8,6 +8,7 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,24 +20,33 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.emailaddress` which has not been persisted yet */
 case class EmailaddressRowUnsaved(
+  /** Primary key. Person associated with this email address.  Foreign key to Person.BusinessEntityID
+      Points to [[person.PersonRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** E-mail address for the person. */
   emailaddress: Option[String],
+  /** Default: nextval('person.emailaddress_emailaddressid_seq'::regclass)
+      Primary key. ID of this email address. */
+  emailaddressid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: EmailaddressId): EmailaddressRow =
+  def toRow(emailaddressidDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): EmailaddressRow =
     EmailaddressRow(
-      businessentityid = compositeId.businessentityid,
-      emailaddressid = compositeId.emailaddressid,
+      businessentityid = businessentityid,
       emailaddress = emailaddress,
+      emailaddressid = emailaddressid match {
+                         case Defaulted.UseDefault => emailaddressidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -45,7 +55,9 @@ object EmailaddressRowUnsaved {
   implicit val oFormat: OFormat[EmailaddressRowUnsaved] = new OFormat[EmailaddressRowUnsaved]{
     override def writes(o: EmailaddressRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "emailaddress" -> o.emailaddress,
+        "emailaddressid" -> o.emailaddressid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -54,7 +66,9 @@ object EmailaddressRowUnsaved {
       JsResult.fromTry(
         Try(
           EmailaddressRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddressid = json.\("emailaddressid").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

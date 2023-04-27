@@ -21,6 +21,9 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesperson` which has not been persisted yet */
 case class SalespersonRowUnsaved(
+  /** Primary key for SalesPerson records. Foreign key to Employee.BusinessEntityID
+      Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** Territory currently assigned to. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
@@ -28,48 +31,48 @@ case class SalespersonRowUnsaved(
   salesquota: Option[BigDecimal],
   /** Default: 0.00
       Bonus due if quota is met. */
-  bonus: Defaulted[BigDecimal],
+  bonus: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Commision percent received per sale. */
-  commissionpct: Defaulted[BigDecimal],
+  commissionpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales total year to date. */
-  salesytd: Defaulted[BigDecimal],
+  salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales total of previous year. */
-  saleslastyear: Defaulted[BigDecimal],
+  saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(businessentityid: BusinessentityId): SalespersonRow =
+  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalespersonRow =
     SalespersonRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
       salesquota = salesquota,
       bonus = bonus match {
-                case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                case Defaulted.UseDefault => bonusDefault
                 case Defaulted.Provided(value) => value
               },
       commissionpct = commissionpct match {
-                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.UseDefault => commissionpctDefault
                         case Defaulted.Provided(value) => value
                       },
       salesytd = salesytd match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => salesytdDefault
                    case Defaulted.Provided(value) => value
                  },
       saleslastyear = saleslastyear match {
-                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.UseDefault => saleslastyearDefault
                         case Defaulted.Provided(value) => value
                       },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -78,6 +81,7 @@ object SalespersonRowUnsaved {
   implicit val oFormat: OFormat[SalespersonRowUnsaved] = new OFormat[SalespersonRowUnsaved]{
     override def writes(o: SalespersonRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "territoryid" -> o.territoryid,
         "salesquota" -> o.salesquota,
         "bonus" -> o.bonus,
@@ -92,6 +96,7 @@ object SalespersonRowUnsaved {
       JsResult.fromTry(
         Try(
           SalespersonRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
             salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
             bonus = json.\("bonus").as[Defaulted[BigDecimal]],

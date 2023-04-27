@@ -22,21 +22,27 @@ import scala.util.Try
 case class AddresstypeRowUnsaved(
   /** Address type description. For example, Billing, Home, or Shipping. */
   name: Name,
+  /** Default: nextval('person.addresstype_addresstypeid_seq'::regclass)
+      Primary key for AddressType records. */
+  addresstypeid: Defaulted[AddresstypeId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(addresstypeid: AddresstypeId): AddresstypeRow =
+  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddresstypeRow =
     AddresstypeRow(
-      addresstypeid = addresstypeid,
       name = name,
+      addresstypeid = addresstypeid match {
+                        case Defaulted.UseDefault => addresstypeidDefault
+                        case Defaulted.Provided(value) => value
+                      },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -46,6 +52,7 @@ object AddresstypeRowUnsaved {
     override def writes(o: AddresstypeRowUnsaved): JsObject =
       Json.obj(
         "name" -> o.name,
+        "addresstypeid" -> o.addresstypeid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -55,6 +62,7 @@ object AddresstypeRowUnsaved {
         Try(
           AddresstypeRowUnsaved(
             name = json.\("name").as[Name],
+            addresstypeid = json.\("addresstypeid").as[Defaulted[AddresstypeId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

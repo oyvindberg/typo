@@ -21,15 +21,21 @@ import scala.util.Try
 case class ScrapreasonRowUnsaved(
   /** Failure description. */
   name: Name,
+  /** Default: nextval('production.scrapreason_scrapreasonid_seq'::regclass)
+      Primary key for ScrapReason records. */
+  scrapreasonid: Defaulted[ScrapreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(scrapreasonid: ScrapreasonId): ScrapreasonRow =
+  def toRow(scrapreasonidDefault: => ScrapreasonId, modifieddateDefault: => LocalDateTime): ScrapreasonRow =
     ScrapreasonRow(
-      scrapreasonid = scrapreasonid,
       name = name,
+      scrapreasonid = scrapreasonid match {
+                        case Defaulted.UseDefault => scrapreasonidDefault
+                        case Defaulted.Provided(value) => value
+                      },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -39,6 +45,7 @@ object ScrapreasonRowUnsaved {
     override def writes(o: ScrapreasonRowUnsaved): JsObject =
       Json.obj(
         "name" -> o.name,
+        "scrapreasonid" -> o.scrapreasonid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -47,6 +54,7 @@ object ScrapreasonRowUnsaved {
         Try(
           ScrapreasonRowUnsaved(
             name = json.\("name").as[Name],
+            scrapreasonid = json.\("scrapreasonid").as[Defaulted[ScrapreasonId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

@@ -27,11 +27,15 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
     val namedParameters = List(
       Some((NamedParameter("shoppingcartid", ParameterValue.from(unsaved.shoppingcartid)), "")),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      unsaved.shoppingcartitemid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("shoppingcartitemid", ParameterValue.from[ShoppingcartitemId](value)), "::int4"))
+      },
       unsaved.quantity match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

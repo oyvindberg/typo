@@ -4,18 +4,15 @@ package internal
 import typo.internal.rewriteDependentData.Eval
 
 case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, Either[ViewComputed, TableComputed]]) {
-  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
+  val cols: NonEmptyList[ColumnComputed] =
     view.cols.map { dbCol =>
-      val columnComputed = ColumnComputed(
+      ColumnComputed(
         pointsTo = view.dependencies.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbCol = dbCol
       )
-
-      dbCol -> columnComputed
     }
-  }
 
   def deriveType(dbCol: db.Col) = {
     // we let types flow through constraints down to this column, the point is to reuse id types downstream
@@ -41,7 +38,6 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     tpe
   }
 
-  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, view.name, cols, maybeId = None)
 
   val repoMethods: NonEmptyList[RepoMethod] = {

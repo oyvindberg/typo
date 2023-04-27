@@ -116,6 +116,8 @@ case class TypeMapperScala(
         sc.Type.TApply(stripOptionAndArray(other), targs.map(stripOptionAndArray))
       case sc.Type.Commented(underlying, comment) =>
         sc.Type.Commented(stripOptionAndArray(underlying), comment)
+      case sc.Type.ByName(underlying) =>
+        sc.Type.ByName(stripOptionAndArray(underlying))
       case sc.Type.UserDefined(underlying) =>
         sc.Type.UserDefined(stripOptionAndArray(underlying))
       case tpe @ (sc.Type.Abstract(_) | sc.Type.Wildcard | sc.Type.Qualified(_)) =>

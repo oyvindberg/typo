@@ -8,6 +8,7 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
+import adventureworks.production.product.ProductId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,21 +19,26 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productlistpricehistory` which has not been persisted yet */
 case class ProductlistpricehistoryRowUnsaved(
+  /** Product identification number. Foreign key to Product.ProductID
+      Points to [[product.ProductRow.productid]] */
+  productid: ProductId,
+  /** List price start date. */
+  startdate: LocalDateTime,
   /** List price end date */
   enddate: Option[LocalDateTime],
   /** Product list price. */
   listprice: BigDecimal,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: ProductlistpricehistoryId): ProductlistpricehistoryRow =
+  def toRow(modifieddateDefault: => LocalDateTime): ProductlistpricehistoryRow =
     ProductlistpricehistoryRow(
-      productid = compositeId.productid,
-      startdate = compositeId.startdate,
+      productid = productid,
+      startdate = startdate,
       enddate = enddate,
       listprice = listprice,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -41,6 +47,8 @@ object ProductlistpricehistoryRowUnsaved {
   implicit val oFormat: OFormat[ProductlistpricehistoryRowUnsaved] = new OFormat[ProductlistpricehistoryRowUnsaved]{
     override def writes(o: ProductlistpricehistoryRowUnsaved): JsObject =
       Json.obj(
+        "productid" -> o.productid,
+        "startdate" -> o.startdate,
         "enddate" -> o.enddate,
         "listprice" -> o.listprice,
         "modifieddate" -> o.modifieddate
@@ -50,6 +58,8 @@ object ProductlistpricehistoryRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductlistpricehistoryRowUnsaved(
+            productid = json.\("productid").as[ProductId],
+            startdate = json.\("startdate").as[LocalDateTime],
             enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
             listprice = json.\("listprice").as[BigDecimal],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

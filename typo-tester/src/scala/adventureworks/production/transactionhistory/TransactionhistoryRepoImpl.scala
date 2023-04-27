@@ -28,6 +28,13 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       Some((NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid)), "::int4")),
+      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
+      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
+      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
+      unsaved.transactionid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("transactionid", ParameterValue.from[TransactionhistoryId](value)), "::int4"))
+      },
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)), "::int4"))
@@ -36,9 +43,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
-      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
-      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

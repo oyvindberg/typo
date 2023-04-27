@@ -21,11 +21,13 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.marital_status where "id" = $id""".executeUpdate() > 0
   }
-  override def insert(id: MaritalStatusId)(implicit c: Connection): Unit = {
+  override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")
-          values (${id})
-       """.execute()
-    ()
+          values (${unsaved.id}::int8)
+          returning "id"
+       """
+      .executeInsert(rowParser.single)
+  
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"

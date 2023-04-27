@@ -27,6 +27,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.scrapreasonid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("scrapreasonid", ParameterValue.from[ScrapreasonId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

@@ -22,6 +22,9 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.employee` which has not been persisted yet */
 case class EmployeeRowUnsaved(
+  /** Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.
+      Points to [[person.person.PersonRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** Unique national identification number such as a social security number. */
   nationalidnumber: String,
   /** Network login. */
@@ -38,25 +41,25 @@ case class EmployeeRowUnsaved(
   hiredate: LocalDate,
   /** Default: true
       Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
-  salariedflag: Defaulted[Flag],
+  salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: 0
       Number of available vacation hours. */
-  vacationhours: Defaulted[Int],
+  vacationhours: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: 0
       Number of available sick leave hours. */
-  sickleavehours: Defaulted[Int],
+  sickleavehours: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: true
       0 = Inactive, 1 = Active */
-  currentflag: Defaulted[Flag],
+  currentflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime],
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Where the employee is located in corporate hierarchy. */
-  organizationnode: Defaulted[Option[String]]
+  organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(businessentityid: BusinessentityId): EmployeeRow =
+  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
     EmployeeRow(
       businessentityid = businessentityid,
       nationalidnumber = nationalidnumber,
@@ -67,31 +70,31 @@ case class EmployeeRowUnsaved(
       gender = gender,
       hiredate = hiredate,
       salariedflag = salariedflag match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => salariedflagDefault
                        case Defaulted.Provided(value) => value
                      },
       vacationhours = vacationhours match {
-                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.UseDefault => vacationhoursDefault
                         case Defaulted.Provided(value) => value
                       },
       sickleavehours = sickleavehours match {
-                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.UseDefault => sickleavehoursDefault
                          case Defaulted.Provided(value) => value
                        },
       currentflag = currentflag match {
-                      case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                      case Defaulted.UseDefault => currentflagDefault
                       case Defaulted.Provided(value) => value
                     },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      },
       organizationnode = organizationnode match {
-                           case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                           case Defaulted.UseDefault => organizationnodeDefault
                            case Defaulted.Provided(value) => value
                          }
     )
@@ -100,6 +103,7 @@ object EmployeeRowUnsaved {
   implicit val oFormat: OFormat[EmployeeRowUnsaved] = new OFormat[EmployeeRowUnsaved]{
     override def writes(o: EmployeeRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "nationalidnumber" -> o.nationalidnumber,
         "loginid" -> o.loginid,
         "jobtitle" -> o.jobtitle,
@@ -120,6 +124,7 @@ object EmployeeRowUnsaved {
       JsResult.fromTry(
         Try(
           EmployeeRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             nationalidnumber = json.\("nationalidnumber").as[String],
             loginid = json.\("loginid").as[String],
             jobtitle = json.\("jobtitle").as[String],

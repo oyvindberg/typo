@@ -21,8 +21,10 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductlistpricehistoryId, unsaved: ProductlistpricehistoryRowUnsaved)(implicit c: Connection): ProductlistpricehistoryRow = {
+  override def insert(unsaved: ProductlistpricehistoryRowUnsaved)(implicit c: Connection): ProductlistpricehistoryRow = {
     val namedParameters = List(
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
       Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
       Some((NamedParameter("listprice", ParameterValue.from(unsaved.listprice)), "::numeric")),
       unsaved.modifieddate match {
@@ -31,16 +33,22 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.productlistpricehistory(productid, startdate, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({productid}::int4, {startdate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning productid, startdate, enddate, listprice, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("startdate", ParameterValue.from(compositeId.startdate)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productlistpricehistory default values
+            returning productid, startdate, enddate, listprice, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productlistpricehistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning productid, startdate, enddate, listprice, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductlistpricehistoryRow] = {

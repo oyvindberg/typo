@@ -24,13 +24,18 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
   }
-  override def insert(compositeId: SalesorderdetailId, unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
+  override def insert(unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     val namedParameters = List(
+      Some((NamedParameter("salesorderid", ParameterValue.from(unsaved.salesorderid)), "::int4")),
       Some((NamedParameter("carriertrackingnumber", ParameterValue.from(unsaved.carriertrackingnumber)), "")),
       Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int2")),
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       Some((NamedParameter("specialofferid", ParameterValue.from(unsaved.specialofferid)), "::int4")),
       Some((NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice)), "::numeric")),
+      unsaved.salesorderdetailid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("salesorderdetailid", ParameterValue.from[Int](value)), "::int4"))
+      },
       unsaved.unitpricediscount match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("unitpricediscount", ParameterValue.from[BigDecimal](value)), "::numeric"))
@@ -45,16 +50,22 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({salesorderid}::int4, {salesorderdetailid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesorderdetailid", ParameterValue.from(compositeId.salesorderdetailid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.salesorderdetail default values
+            returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.salesorderdetail(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {

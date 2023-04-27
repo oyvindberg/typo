@@ -21,29 +21,35 @@ import scala.util.Try
 case class LocationRowUnsaved(
   /** Location description. */
   name: Name,
+  /** Default: nextval('production.location_locationid_seq'::regclass)
+      Primary key for Location records. */
+  locationid: Defaulted[LocationId] = Defaulted.UseDefault,
   /** Default: 0.00
       Standard hourly cost of the manufacturing location. */
-  costrate: Defaulted[BigDecimal],
+  costrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Work capacity (in hours) of the manufacturing location. */
-  availability: Defaulted[BigDecimal],
+  availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(locationid: LocationId): LocationRow =
+  def toRow(locationidDefault: => LocationId, costrateDefault: => BigDecimal, availabilityDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): LocationRow =
     LocationRow(
-      locationid = locationid,
       name = name,
+      locationid = locationid match {
+                     case Defaulted.UseDefault => locationidDefault
+                     case Defaulted.Provided(value) => value
+                   },
       costrate = costrate match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => costrateDefault
                    case Defaulted.Provided(value) => value
                  },
       availability = availability match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => availabilityDefault
                        case Defaulted.Provided(value) => value
                      },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -53,6 +59,7 @@ object LocationRowUnsaved {
     override def writes(o: LocationRowUnsaved): JsObject =
       Json.obj(
         "name" -> o.name,
+        "locationid" -> o.locationid,
         "costrate" -> o.costrate,
         "availability" -> o.availability,
         "modifieddate" -> o.modifieddate
@@ -63,6 +70,7 @@ object LocationRowUnsaved {
         Try(
           LocationRowUnsaved(
             name = json.\("name").as[Name],
+            locationid = json.\("locationid").as[Defaulted[LocationId]],
             costrate = json.\("costrate").as[Defaulted[BigDecimal]],
             availability = json.\("availability").as[Defaulted[BigDecimal]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

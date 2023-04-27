@@ -36,24 +36,8 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     val namedParameters = List(
-      unsaved.revisionnumber match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue.from[Int](value)), "::int2"))
-      },
-      unsaved.orderdate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
-      },
       Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
       Some((NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate)), "::timestamp")),
-      unsaved.status match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue.from[Int](value)), "::int2"))
-      },
-      unsaved.onlineorderflag match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
-      },
       Some((NamedParameter("purchaseordernumber", ParameterValue.from(unsaved.purchaseordernumber)), """::"public".OrderNumber""")),
       Some((NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber)), """::"public".AccountNumber""")),
       Some((NamedParameter("customerid", ParameterValue.from(unsaved.customerid)), "::int4")),
@@ -65,6 +49,28 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       Some((NamedParameter("creditcardid", ParameterValue.from(unsaved.creditcardid)), "::int4")),
       Some((NamedParameter("creditcardapprovalcode", ParameterValue.from(unsaved.creditcardapprovalcode)), "")),
       Some((NamedParameter("currencyrateid", ParameterValue.from(unsaved.currencyrateid)), "::int4")),
+      Some((NamedParameter("totaldue", ParameterValue.from(unsaved.totaldue)), "::numeric")),
+      Some((NamedParameter("comment", ParameterValue.from(unsaved.comment)), "")),
+      unsaved.salesorderid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("salesorderid", ParameterValue.from[SalesorderheaderId](value)), "::int4"))
+      },
+      unsaved.revisionnumber match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue.from[Int](value)), "::int2"))
+      },
+      unsaved.orderdate match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+      },
+      unsaved.status match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue.from[Int](value)), "::int2"))
+      },
+      unsaved.onlineorderflag match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("onlineorderflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+      },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)), "::numeric"))
@@ -77,8 +83,6 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("freight", ParameterValue.from[BigDecimal](value)), "::numeric"))
       },
-      Some((NamedParameter("totaldue", ParameterValue.from(unsaved.totaldue)), "::numeric")),
-      Some((NamedParameter("comment", ParameterValue.from(unsaved.comment)), "")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

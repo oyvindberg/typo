@@ -27,6 +27,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.contacttypeid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("contacttypeid", ParameterValue.from[ContacttypeId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

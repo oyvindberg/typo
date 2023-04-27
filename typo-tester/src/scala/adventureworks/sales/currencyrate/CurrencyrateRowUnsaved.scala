@@ -31,19 +31,25 @@ case class CurrencyrateRowUnsaved(
   averagerate: BigDecimal,
   /** Final exchange rate for the day. */
   endofdayrate: BigDecimal,
+  /** Default: nextval('sales.currencyrate_currencyrateid_seq'::regclass)
+      Primary key for CurrencyRate records. */
+  currencyrateid: Defaulted[CurrencyrateId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(currencyrateid: CurrencyrateId): CurrencyrateRow =
+  def toRow(currencyrateidDefault: => CurrencyrateId, modifieddateDefault: => LocalDateTime): CurrencyrateRow =
     CurrencyrateRow(
-      currencyrateid = currencyrateid,
       currencyratedate = currencyratedate,
       fromcurrencycode = fromcurrencycode,
       tocurrencycode = tocurrencycode,
       averagerate = averagerate,
       endofdayrate = endofdayrate,
+      currencyrateid = currencyrateid match {
+                         case Defaulted.UseDefault => currencyrateidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -57,6 +63,7 @@ object CurrencyrateRowUnsaved {
         "tocurrencycode" -> o.tocurrencycode,
         "averagerate" -> o.averagerate,
         "endofdayrate" -> o.endofdayrate,
+        "currencyrateid" -> o.currencyrateid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -69,6 +76,7 @@ object CurrencyrateRowUnsaved {
             tocurrencycode = json.\("tocurrencycode").as[CurrencyId],
             averagerate = json.\("averagerate").as[BigDecimal],
             endofdayrate = json.\("endofdayrate").as[BigDecimal],
+            currencyrateid = json.\("currencyrateid").as[Defaulted[CurrencyrateId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

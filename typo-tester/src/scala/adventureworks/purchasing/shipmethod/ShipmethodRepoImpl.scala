@@ -28,6 +28,10 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.shipmethodid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("shipmethodid", ParameterValue.from[ShipmethodId](value)), "::int4"))
+      },
       unsaved.shipbase match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("shipbase", ParameterValue.from[BigDecimal](value)), "::numeric"))

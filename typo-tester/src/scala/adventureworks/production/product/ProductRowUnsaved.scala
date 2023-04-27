@@ -28,12 +28,6 @@ case class ProductRowUnsaved(
   name: Name,
   /** Unique product identification number. */
   productnumber: String,
-  /** Default: true
-      0 = Product is purchased, 1 = Product is manufactured in-house. */
-  makeflag: Defaulted[Flag],
-  /** Default: true
-      0 = Product is not a salable item. 1 = Product is salable. */
-  finishedgoodsflag: Defaulted[Flag],
   /** Product color. */
   color: Option[String],
   /** Minimum inventory quantity. */
@@ -74,24 +68,24 @@ case class ProductRowUnsaved(
   sellenddate: Option[LocalDateTime],
   /** Date the product was discontinued. */
   discontinueddate: Option[LocalDateTime],
+  /** Default: nextval('production.product_productid_seq'::regclass)
+      Primary key for Product records. */
+  productid: Defaulted[ProductId] = Defaulted.UseDefault,
+  /** Default: true
+      0 = Product is purchased, 1 = Product is manufactured in-house. */
+  makeflag: Defaulted[Flag] = Defaulted.UseDefault,
+  /** Default: true
+      0 = Product is not a salable item. 1 = Product is salable. */
+  finishedgoodsflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productid: ProductId): ProductRow =
+  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductRow =
     ProductRow(
-      productid = productid,
       name = name,
       productnumber = productnumber,
-      makeflag = makeflag match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                   case Defaulted.Provided(value) => value
-                 },
-      finishedgoodsflag = finishedgoodsflag match {
-                            case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                            case Defaulted.Provided(value) => value
-                          },
       color = color,
       safetystocklevel = safetystocklevel,
       reorderpoint = reorderpoint,
@@ -110,12 +104,24 @@ case class ProductRowUnsaved(
       sellstartdate = sellstartdate,
       sellenddate = sellenddate,
       discontinueddate = discontinueddate,
+      productid = productid match {
+                    case Defaulted.UseDefault => productidDefault
+                    case Defaulted.Provided(value) => value
+                  },
+      makeflag = makeflag match {
+                   case Defaulted.UseDefault => makeflagDefault
+                   case Defaulted.Provided(value) => value
+                 },
+      finishedgoodsflag = finishedgoodsflag match {
+                            case Defaulted.UseDefault => finishedgoodsflagDefault
+                            case Defaulted.Provided(value) => value
+                          },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -126,8 +132,6 @@ object ProductRowUnsaved {
       Json.obj(
         "name" -> o.name,
         "productnumber" -> o.productnumber,
-        "makeflag" -> o.makeflag,
-        "finishedgoodsflag" -> o.finishedgoodsflag,
         "color" -> o.color,
         "safetystocklevel" -> o.safetystocklevel,
         "reorderpoint" -> o.reorderpoint,
@@ -146,6 +150,9 @@ object ProductRowUnsaved {
         "sellstartdate" -> o.sellstartdate,
         "sellenddate" -> o.sellenddate,
         "discontinueddate" -> o.discontinueddate,
+        "productid" -> o.productid,
+        "makeflag" -> o.makeflag,
+        "finishedgoodsflag" -> o.finishedgoodsflag,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -156,8 +163,6 @@ object ProductRowUnsaved {
           ProductRowUnsaved(
             name = json.\("name").as[Name],
             productnumber = json.\("productnumber").as[String],
-            makeflag = json.\("makeflag").as[Defaulted[Flag]],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Flag]],
             color = json.\("color").toOption.map(_.as[String]),
             safetystocklevel = json.\("safetystocklevel").as[Int],
             reorderpoint = json.\("reorderpoint").as[Int],
@@ -176,6 +181,9 @@ object ProductRowUnsaved {
             sellstartdate = json.\("sellstartdate").as[LocalDateTime],
             sellenddate = json.\("sellenddate").toOption.map(_.as[LocalDateTime]),
             discontinueddate = json.\("discontinueddate").toOption.map(_.as[LocalDateTime]),
+            productid = json.\("productid").as[Defaulted[ProductId]],
+            makeflag = json.\("makeflag").as[Defaulted[Flag]],
+            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Flag]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

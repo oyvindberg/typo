@@ -21,15 +21,21 @@ import scala.util.Try
 case class ContacttypeRowUnsaved(
   /** Contact type description. */
   name: Name,
+  /** Default: nextval('person.contacttype_contacttypeid_seq'::regclass)
+      Primary key for ContactType records. */
+  contacttypeid: Defaulted[ContacttypeId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(contacttypeid: ContacttypeId): ContacttypeRow =
+  def toRow(contacttypeidDefault: => ContacttypeId, modifieddateDefault: => LocalDateTime): ContacttypeRow =
     ContacttypeRow(
-      contacttypeid = contacttypeid,
       name = name,
+      contacttypeid = contacttypeid match {
+                        case Defaulted.UseDefault => contacttypeidDefault
+                        case Defaulted.Provided(value) => value
+                      },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -39,6 +45,7 @@ object ContacttypeRowUnsaved {
     override def writes(o: ContacttypeRowUnsaved): JsObject =
       Json.obj(
         "name" -> o.name,
+        "contacttypeid" -> o.contacttypeid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -47,6 +54,7 @@ object ContacttypeRowUnsaved {
         Try(
           ContacttypeRowUnsaved(
             name = json.\("name").as[Name],
+            contacttypeid = json.\("contacttypeid").as[Defaulted[ContacttypeId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

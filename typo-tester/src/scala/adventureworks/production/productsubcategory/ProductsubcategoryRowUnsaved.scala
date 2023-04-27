@@ -26,22 +26,28 @@ case class ProductsubcategoryRowUnsaved(
   productcategoryid: ProductcategoryId,
   /** Subcategory description. */
   name: Name,
+  /** Default: nextval('production.productsubcategory_productsubcategoryid_seq'::regclass)
+      Primary key for ProductSubcategory records. */
+  productsubcategoryid: Defaulted[ProductsubcategoryId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productsubcategoryid: ProductsubcategoryId): ProductsubcategoryRow =
+  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductsubcategoryRow =
     ProductsubcategoryRow(
-      productsubcategoryid = productsubcategoryid,
       productcategoryid = productcategoryid,
       name = name,
+      productsubcategoryid = productsubcategoryid match {
+                               case Defaulted.UseDefault => productsubcategoryidDefault
+                               case Defaulted.Provided(value) => value
+                             },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -52,6 +58,7 @@ object ProductsubcategoryRowUnsaved {
       Json.obj(
         "productcategoryid" -> o.productcategoryid,
         "name" -> o.name,
+        "productsubcategoryid" -> o.productsubcategoryid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -62,6 +69,7 @@ object ProductsubcategoryRowUnsaved {
           ProductsubcategoryRowUnsaved(
             productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
             name = json.\("name").as[Name],
+            productsubcategoryid = json.\("productsubcategoryid").as[Defaulted[ProductsubcategoryId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

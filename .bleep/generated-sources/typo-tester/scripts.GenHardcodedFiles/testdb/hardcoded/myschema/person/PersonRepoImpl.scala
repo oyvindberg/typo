@@ -34,11 +34,15 @@ object PersonRepoImpl extends PersonRepo {
       Some((NamedParameter("email", ParameterValue.from(unsaved.email)), "")),
       Some((NamedParameter("phone", ParameterValue.from(unsaved.phone)), "")),
       Some((NamedParameter("likes_pizza", ParameterValue.from(unsaved.likesPizza)), "")),
+      Some((NamedParameter("work_email", ParameterValue.from(unsaved.workEmail)), "")),
+      unsaved.id match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("id", ParameterValue.from[PersonId](value)), "::int8"))
+      },
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("marital_status_id", ParameterValue.from[MaritalStatusId](value)), ""))
       },
-      Some((NamedParameter("work_email", ParameterValue.from(unsaved.workEmail)), "")),
       unsaved.sector match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("sector", ParameterValue.from[Sector](value)), "::myschema.sector"))

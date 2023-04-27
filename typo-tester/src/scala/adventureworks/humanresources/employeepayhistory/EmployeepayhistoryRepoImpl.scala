@@ -21,8 +21,10 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".executeUpdate() > 0
   }
-  override def insert(compositeId: EmployeepayhistoryId, unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
+  override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
+      Some((NamedParameter("ratechangedate", ParameterValue.from(unsaved.ratechangedate)), "::timestamp")),
       Some((NamedParameter("rate", ParameterValue.from(unsaved.rate)), "::numeric")),
       Some((NamedParameter("payfrequency", ParameterValue.from(unsaved.payfrequency)), "::int2")),
       unsaved.modifieddate match {
@@ -31,16 +33,22 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, {ratechangedate}::timestamp, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("ratechangedate", ParameterValue.from(compositeId.ratechangedate)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into humanresources.employeepayhistory default values
+            returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into humanresources.employeepayhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {

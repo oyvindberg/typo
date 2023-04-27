@@ -26,17 +26,23 @@ case class ShiftRowUnsaved(
   starttime: LocalTime,
   /** Shift end time. */
   endtime: LocalTime,
+  /** Default: nextval('humanresources.shift_shiftid_seq'::regclass)
+      Primary key for Shift records. */
+  shiftid: Defaulted[ShiftId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(shiftid: ShiftId): ShiftRow =
+  def toRow(shiftidDefault: => ShiftId, modifieddateDefault: => LocalDateTime): ShiftRow =
     ShiftRow(
-      shiftid = shiftid,
       name = name,
       starttime = starttime,
       endtime = endtime,
+      shiftid = shiftid match {
+                  case Defaulted.UseDefault => shiftidDefault
+                  case Defaulted.Provided(value) => value
+                },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -48,6 +54,7 @@ object ShiftRowUnsaved {
         "name" -> o.name,
         "starttime" -> o.starttime,
         "endtime" -> o.endtime,
+        "shiftid" -> o.shiftid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -58,6 +65,7 @@ object ShiftRowUnsaved {
             name = json.\("name").as[Name],
             starttime = json.\("starttime").as[LocalTime],
             endtime = json.\("endtime").as[LocalTime],
+            shiftid = json.\("shiftid").as[Defaulted[ShiftId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

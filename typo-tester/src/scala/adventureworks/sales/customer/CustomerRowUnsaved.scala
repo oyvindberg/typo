@@ -30,23 +30,29 @@ case class CustomerRowUnsaved(
   /** ID of the territory in which the customer is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
+  /** Default: nextval('sales.customer_customerid_seq'::regclass)
+      Primary key. */
+  customerid: Defaulted[CustomerId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(customerid: CustomerId): CustomerRow =
+  def toRow(customeridDefault: => CustomerId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): CustomerRow =
     CustomerRow(
-      customerid = customerid,
       personid = personid,
       storeid = storeid,
       territoryid = territoryid,
+      customerid = customerid match {
+                     case Defaulted.UseDefault => customeridDefault
+                     case Defaulted.Provided(value) => value
+                   },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -58,6 +64,7 @@ object CustomerRowUnsaved {
         "personid" -> o.personid,
         "storeid" -> o.storeid,
         "territoryid" -> o.territoryid,
+        "customerid" -> o.customerid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -69,6 +76,7 @@ object CustomerRowUnsaved {
             personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
             storeid = json.\("storeid").toOption.map(_.as[BusinessentityId]),
             territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+            customerid = json.\("customerid").as[Defaulted[CustomerId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

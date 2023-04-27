@@ -61,18 +61,16 @@ case class TableComputed(
       }
     }
 
-  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
+  val cols: NonEmptyList[ColumnComputed] = {
     dbTable.cols.map { dbCol =>
       val tpe = deriveType(dbCol)
 
-      val computed = ColumnComputed(
+      ColumnComputed(
         pointsTo = pointsTo.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = tpe,
         dbCol = dbCol
       )
-
-      dbCol -> computed
     }
   }
 
@@ -107,23 +105,18 @@ case class TableComputed(
     tpe
   }
 
-  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
-
   val relation = RelationComputed(naming, dbTable.name, cols, maybeId)
 
   val colsNotId: Option[NonEmptyList[ColumnComputed]] =
-    maybeId.flatMap { _ =>
-      val all = dbColsAndCols.toList
-        .filterNot { case (_, col) => dbTable.primaryKey.exists(_.colNames.contains(col.dbName)) }
-        .map { case (dbCol, col) =>
-          val newType = if (dbCol.columnDefault.isDefined) sc.Type.TApply(default.Defaulted, List(col.tpe)) else col.tpe
-          col.copy(tpe = newType)
-        }
-      NonEmptyList.fromList(all)
+    maybeId.flatMap { id =>
+      val idNames = id.cols.map(_.dbName)
+      NonEmptyList.fromList(
+        cols.toList.filterNot(col => idNames.contains(col.dbName))
+      )
     }
 
-  val RowUnsavedName: Option[sc.Type.Qualified] =
-    colsNotId.map(_ => sc.Type.Qualified(naming.rowUnsaved(dbTable.name)))
+  val maybeUnsavedRow: Option[RowUnsavedComputed] =
+    RowUnsavedComputed(dbTable.name, cols, default, naming)
 
   val RowJoined: Option[RowJoinedComputed] =
     if (dbTable.foreignKeys.nonEmpty) {
@@ -169,22 +162,22 @@ case class TableComputed(
       sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard))
     )
 
+    val insertMethod: RepoMethod =
+      maybeUnsavedRow match {
+        case Some(unsavedRow) =>
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe)
+
+          RepoMethod.Insert(unsavedRow.allCols, unsavedParam, default, relation.RowName)
+
+        case None =>
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), relation.RowName)
+
+          RepoMethod.Insert(cols, unsavedParam, default, relation.RowName)
+      }
+
     val maybeMethods = List(
       maybeId match {
         case Some(id) =>
-          val insertMethod = RowUnsavedName
-            .zip(colsNotId)
-            .map { case (unsaved, colsUnsaved) =>
-              val unsavedParam = sc.Param(sc.Ident("unsaved"), unsaved)
-
-              if (id.cols.forall(_.dbCol.columnDefault.isDefined))
-                RepoMethod.InsertDbGeneratedKey(id, colsUnsaved, unsavedParam, default, relation.RowName)
-              else
-                RepoMethod.InsertProvidedKey(id, colsUnsaved, unsavedParam, default, relation.RowName)
-            }
-            .headOption
-            .orElse(maybeId.map(RepoMethod.InsertOnlyKey.apply))
-
           List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(relation.RowName)),
             Some(RepoMethod.SelectById(id, relation.RowName)),
@@ -208,11 +201,12 @@ case class TableComputed(
               )
             ),
             colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), relation.RowName), colsNotId)),
-            insertMethod,
+            Some(insertMethod),
             Some(RepoMethod.Delete(id))
           ).flatten
         case None =>
           List(
+            insertMethod,
             RepoMethod.SelectAll(relation.RowName),
             RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, relation.RowName)
           )

@@ -8,6 +8,8 @@ package purchasing
 package productvendor
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
@@ -19,6 +21,12 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.productvendor` which has not been persisted yet */
 case class ProductvendorRowUnsaved(
+  /** Primary key. Foreign key to Product.ProductID.
+      Points to [[production.product.ProductRow.productid]] */
+  productid: ProductId,
+  /** Primary key. Foreign key to Vendor.BusinessEntityID.
+      Points to [[vendor.VendorRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** The average span of time (in days) between placing an order with the vendor and receiving the purchased product. */
   averageleadtime: Int,
   /** The vendor's usual selling price. */
@@ -37,12 +45,12 @@ case class ProductvendorRowUnsaved(
       Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: ProductvendorId): ProductvendorRow =
+  def toRow(modifieddateDefault: => LocalDateTime): ProductvendorRow =
     ProductvendorRow(
-      productid = compositeId.productid,
-      businessentityid = compositeId.businessentityid,
+      productid = productid,
+      businessentityid = businessentityid,
       averageleadtime = averageleadtime,
       standardprice = standardprice,
       lastreceiptcost = lastreceiptcost,
@@ -52,7 +60,7 @@ case class ProductvendorRowUnsaved(
       onorderqty = onorderqty,
       unitmeasurecode = unitmeasurecode,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -61,6 +69,8 @@ object ProductvendorRowUnsaved {
   implicit val oFormat: OFormat[ProductvendorRowUnsaved] = new OFormat[ProductvendorRowUnsaved]{
     override def writes(o: ProductvendorRowUnsaved): JsObject =
       Json.obj(
+        "productid" -> o.productid,
+        "businessentityid" -> o.businessentityid,
         "averageleadtime" -> o.averageleadtime,
         "standardprice" -> o.standardprice,
         "lastreceiptcost" -> o.lastreceiptcost,
@@ -76,6 +86,8 @@ object ProductvendorRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductvendorRowUnsaved(
+            productid = json.\("productid").as[ProductId],
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             averageleadtime = json.\("averageleadtime").as[Int],
             standardprice = json.\("standardprice").as[BigDecimal],
             lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as[BigDecimal]),

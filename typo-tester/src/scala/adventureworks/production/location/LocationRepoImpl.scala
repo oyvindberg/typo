@@ -27,6 +27,10 @@ object LocationRepoImpl extends LocationRepo {
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.locationid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("locationid", ParameterValue.from[LocationId](value)), "::int4"))
+      },
       unsaved.costrate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("costrate", ParameterValue.from[BigDecimal](value)), "::numeric"))

@@ -22,8 +22,11 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
     SQL"delete from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".executeUpdate() > 0
   }
-  override def insert(compositeId: WorkorderroutingId, unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
+  override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
+      Some((NamedParameter("workorderid", ParameterValue.from(unsaved.workorderid)), "::int4")),
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("operationsequence", ParameterValue.from(unsaved.operationsequence)), "::int2")),
       Some((NamedParameter("locationid", ParameterValue.from(unsaved.locationid)), "::int2")),
       Some((NamedParameter("scheduledstartdate", ParameterValue.from(unsaved.scheduledstartdate)), "::timestamp")),
       Some((NamedParameter("scheduledenddate", ParameterValue.from(unsaved.scheduledenddate)), "::timestamp")),
@@ -38,16 +41,22 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.workorderrouting(workorderid, productid, operationsequence, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({workorderid}::int4, {productid}::int4, {operationsequence}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("workorderid", ParameterValue.from(compositeId.workorderid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("operationsequence", ParameterValue.from(compositeId.operationsequence)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.workorderrouting default values
+            returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.workorderrouting(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {

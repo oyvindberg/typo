@@ -27,6 +27,10 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
     val namedParameters = List(
       Some((NamedParameter("description", ParameterValue.from(unsaved.description)), "")),
+      unsaved.productdescriptionid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productdescriptionid", ParameterValue.from[ProductdescriptionId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

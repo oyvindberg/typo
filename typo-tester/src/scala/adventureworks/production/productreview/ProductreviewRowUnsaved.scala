@@ -25,32 +25,38 @@ case class ProductreviewRowUnsaved(
   productid: ProductId,
   /** Name of the reviewer. */
   reviewername: Name,
-  /** Default: now()
-      Date review was submitted. */
-  reviewdate: Defaulted[LocalDateTime],
   /** Reviewer's e-mail address. */
   emailaddress: String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
   comments: Option[String],
+  /** Default: nextval('production.productreview_productreviewid_seq'::regclass)
+      Primary key for ProductReview records. */
+  productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
+  /** Default: now()
+      Date review was submitted. */
+  reviewdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productreviewid: ProductreviewId): ProductreviewRow =
+  def toRow(productreviewidDefault: => ProductreviewId, reviewdateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ProductreviewRow =
     ProductreviewRow(
-      productreviewid = productreviewid,
       productid = productid,
       reviewername = reviewername,
-      reviewdate = reviewdate match {
-                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                     case Defaulted.Provided(value) => value
-                   },
       emailaddress = emailaddress,
       rating = rating,
       comments = comments,
+      productreviewid = productreviewid match {
+                          case Defaulted.UseDefault => productreviewidDefault
+                          case Defaulted.Provided(value) => value
+                        },
+      reviewdate = reviewdate match {
+                     case Defaulted.UseDefault => reviewdateDefault
+                     case Defaulted.Provided(value) => value
+                   },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -61,10 +67,11 @@ object ProductreviewRowUnsaved {
       Json.obj(
         "productid" -> o.productid,
         "reviewername" -> o.reviewername,
-        "reviewdate" -> o.reviewdate,
         "emailaddress" -> o.emailaddress,
         "rating" -> o.rating,
         "comments" -> o.comments,
+        "productreviewid" -> o.productreviewid,
+        "reviewdate" -> o.reviewdate,
         "modifieddate" -> o.modifieddate
       )
   
@@ -74,10 +81,11 @@ object ProductreviewRowUnsaved {
           ProductreviewRowUnsaved(
             productid = json.\("productid").as[ProductId],
             reviewername = json.\("reviewername").as[Name],
-            reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
             emailaddress = json.\("emailaddress").as[String],
             rating = json.\("rating").as[Int],
             comments = json.\("comments").toOption.map(_.as[String]),
+            productreviewid = json.\("productreviewid").as[Defaulted[ProductreviewId]],
+            reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

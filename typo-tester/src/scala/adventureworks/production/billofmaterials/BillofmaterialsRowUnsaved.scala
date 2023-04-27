@@ -26,9 +26,6 @@ case class BillofmaterialsRowUnsaved(
   /** Component identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
   componentid: ProductId,
-  /** Default: now()
-      Date the component started being used in the assembly item. */
-  startdate: Defaulted[LocalDateTime],
   /** Date the component stopped being used in the assembly item. */
   enddate: Option[LocalDateTime],
   /** Standard code identifying the unit of measure for the quantity.
@@ -36,30 +33,39 @@ case class BillofmaterialsRowUnsaved(
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID). */
   bomlevel: Int,
+  /** Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
+      Primary key for BillOfMaterials records. */
+  billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
+  /** Default: now()
+      Date the component started being used in the assembly item. */
+  startdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: 1.00
       Quantity of the component needed to create the assembly. */
-  perassemblyqty: Defaulted[BigDecimal],
+  perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(billofmaterialsid: BillofmaterialsId): BillofmaterialsRow =
+  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => LocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): BillofmaterialsRow =
     BillofmaterialsRow(
-      billofmaterialsid = billofmaterialsid,
       productassemblyid = productassemblyid,
       componentid = componentid,
-      startdate = startdate match {
-                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                    case Defaulted.Provided(value) => value
-                  },
       enddate = enddate,
       unitmeasurecode = unitmeasurecode,
       bomlevel = bomlevel,
+      billofmaterialsid = billofmaterialsid match {
+                            case Defaulted.UseDefault => billofmaterialsidDefault
+                            case Defaulted.Provided(value) => value
+                          },
+      startdate = startdate match {
+                    case Defaulted.UseDefault => startdateDefault
+                    case Defaulted.Provided(value) => value
+                  },
       perassemblyqty = perassemblyqty match {
-                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                         case Defaulted.UseDefault => perassemblyqtyDefault
                          case Defaulted.Provided(value) => value
                        },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -70,10 +76,11 @@ object BillofmaterialsRowUnsaved {
       Json.obj(
         "productassemblyid" -> o.productassemblyid,
         "componentid" -> o.componentid,
-        "startdate" -> o.startdate,
         "enddate" -> o.enddate,
         "unitmeasurecode" -> o.unitmeasurecode,
         "bomlevel" -> o.bomlevel,
+        "billofmaterialsid" -> o.billofmaterialsid,
+        "startdate" -> o.startdate,
         "perassemblyqty" -> o.perassemblyqty,
         "modifieddate" -> o.modifieddate
       )
@@ -84,10 +91,11 @@ object BillofmaterialsRowUnsaved {
           BillofmaterialsRowUnsaved(
             productassemblyid = json.\("productassemblyid").toOption.map(_.as[ProductId]),
             componentid = json.\("componentid").as[ProductId],
-            startdate = json.\("startdate").as[Defaulted[LocalDateTime]],
             enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
             unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
             bomlevel = json.\("bomlevel").as[Int],
+            billofmaterialsid = json.\("billofmaterialsid").as[Defaulted[BillofmaterialsId]],
+            startdate = json.\("startdate").as[Defaulted[LocalDateTime]],
             perassemblyqty = json.\("perassemblyqty").as[Defaulted[BigDecimal]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

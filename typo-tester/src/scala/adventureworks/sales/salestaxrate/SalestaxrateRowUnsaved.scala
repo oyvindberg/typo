@@ -26,32 +26,38 @@ case class SalestaxrateRowUnsaved(
   stateprovinceid: StateprovinceId,
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions. */
   taxtype: Int,
-  /** Default: 0.00
-      Tax rate amount. */
-  taxrate: Defaulted[BigDecimal],
   /** Tax rate description. */
   name: Name,
+  /** Default: nextval('sales.salestaxrate_salestaxrateid_seq'::regclass)
+      Primary key for SalesTaxRate records. */
+  salestaxrateid: Defaulted[SalestaxrateId] = Defaulted.UseDefault,
+  /** Default: 0.00
+      Tax rate amount. */
+  taxrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(salestaxrateid: SalestaxrateId): SalestaxrateRow =
+  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalestaxrateRow =
     SalestaxrateRow(
-      salestaxrateid = salestaxrateid,
       stateprovinceid = stateprovinceid,
       taxtype = taxtype,
+      name = name,
+      salestaxrateid = salestaxrateid match {
+                         case Defaulted.UseDefault => salestaxrateidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       taxrate = taxrate match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => taxrateDefault
                   case Defaulted.Provided(value) => value
                 },
-      name = name,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -62,8 +68,9 @@ object SalestaxrateRowUnsaved {
       Json.obj(
         "stateprovinceid" -> o.stateprovinceid,
         "taxtype" -> o.taxtype,
-        "taxrate" -> o.taxrate,
         "name" -> o.name,
+        "salestaxrateid" -> o.salestaxrateid,
+        "taxrate" -> o.taxrate,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -74,8 +81,9 @@ object SalestaxrateRowUnsaved {
           SalestaxrateRowUnsaved(
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
             taxtype = json.\("taxtype").as[Int],
-            taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
             name = json.\("name").as[Name],
+            salestaxrateid = json.\("salestaxrateid").as[Defaulted[SalestaxrateId]],
+            taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

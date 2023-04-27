@@ -21,15 +21,21 @@ import scala.util.Try
 case class IllustrationRowUnsaved(
   /** Illustrations used in manufacturing instructions. Stored as XML. */
   diagram: Option[PgSQLXML],
+  /** Default: nextval('production.illustration_illustrationid_seq'::regclass)
+      Primary key for Illustration records. */
+  illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(illustrationid: IllustrationId): IllustrationRow =
+  def toRow(illustrationidDefault: => IllustrationId, modifieddateDefault: => LocalDateTime): IllustrationRow =
     IllustrationRow(
-      illustrationid = illustrationid,
       diagram = diagram,
+      illustrationid = illustrationid match {
+                         case Defaulted.UseDefault => illustrationidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -39,6 +45,7 @@ object IllustrationRowUnsaved {
     override def writes(o: IllustrationRowUnsaved): JsObject =
       Json.obj(
         "diagram" -> o.diagram,
+        "illustrationid" -> o.illustrationid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -47,6 +54,7 @@ object IllustrationRowUnsaved {
         Try(
           IllustrationRowUnsaved(
             diagram = json.\("diagram").toOption.map(_.as[PgSQLXML]),
+            illustrationid = json.\("illustrationid").as[Defaulted[IllustrationId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

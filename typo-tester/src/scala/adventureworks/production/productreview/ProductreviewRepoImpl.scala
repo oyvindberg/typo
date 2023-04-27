@@ -29,13 +29,17 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       Some((NamedParameter("reviewername", ParameterValue.from(unsaved.reviewername)), """::"public"."Name"""")),
+      Some((NamedParameter("emailaddress", ParameterValue.from(unsaved.emailaddress)), "")),
+      Some((NamedParameter("rating", ParameterValue.from(unsaved.rating)), "::int4")),
+      Some((NamedParameter("comments", ParameterValue.from(unsaved.comments)), "")),
+      unsaved.productreviewid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productreviewid", ParameterValue.from[ProductreviewId](value)), "::int4"))
+      },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("reviewdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some((NamedParameter("emailaddress", ParameterValue.from(unsaved.emailaddress)), "")),
-      Some((NamedParameter("rating", ParameterValue.from(unsaved.rating)), "::int4")),
-      Some((NamedParameter("comments", ParameterValue.from(unsaved.comments)), "")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

@@ -27,23 +27,29 @@ case class ProductmodelRowUnsaved(
   catalogdescription: Option[PgSQLXML],
   /** Manufacturing instructions in xml format. */
   instructions: Option[PgSQLXML],
+  /** Default: nextval('production.productmodel_productmodelid_seq'::regclass)
+      Primary key for ProductModel records. */
+  productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productmodelid: ProductmodelId): ProductmodelRow =
+  def toRow(productmodelidDefault: => ProductmodelId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductmodelRow =
     ProductmodelRow(
-      productmodelid = productmodelid,
       name = name,
       catalogdescription = catalogdescription,
       instructions = instructions,
+      productmodelid = productmodelid match {
+                         case Defaulted.UseDefault => productmodelidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -55,6 +61,7 @@ object ProductmodelRowUnsaved {
         "name" -> o.name,
         "catalogdescription" -> o.catalogdescription,
         "instructions" -> o.instructions,
+        "productmodelid" -> o.productmodelid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -66,6 +73,7 @@ object ProductmodelRowUnsaved {
             name = json.\("name").as[Name],
             catalogdescription = json.\("catalogdescription").toOption.map(_.as[PgSQLXML]),
             instructions = json.\("instructions").toOption.map(_.as[PgSQLXML]),
+            productmodelid = json.\("productmodelid").as[Defaulted[ProductmodelId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

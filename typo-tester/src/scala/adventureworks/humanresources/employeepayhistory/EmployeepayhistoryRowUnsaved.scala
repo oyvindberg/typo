@@ -8,6 +8,7 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,21 +19,26 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.employeepayhistory` which has not been persisted yet */
 case class EmployeepayhistoryRowUnsaved(
+  /** Employee identification number. Foreign key to Employee.BusinessEntityID.
+      Points to [[employee.EmployeeRow.businessentityid]] */
+  businessentityid: BusinessentityId,
+  /** Date the change in pay is effective */
+  ratechangedate: LocalDateTime,
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
   payfrequency: Int,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: EmployeepayhistoryId): EmployeepayhistoryRow =
+  def toRow(modifieddateDefault: => LocalDateTime): EmployeepayhistoryRow =
     EmployeepayhistoryRow(
-      businessentityid = compositeId.businessentityid,
-      ratechangedate = compositeId.ratechangedate,
+      businessentityid = businessentityid,
+      ratechangedate = ratechangedate,
       rate = rate,
       payfrequency = payfrequency,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -41,6 +47,8 @@ object EmployeepayhistoryRowUnsaved {
   implicit val oFormat: OFormat[EmployeepayhistoryRowUnsaved] = new OFormat[EmployeepayhistoryRowUnsaved]{
     override def writes(o: EmployeepayhistoryRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
+        "ratechangedate" -> o.ratechangedate,
         "rate" -> o.rate,
         "payfrequency" -> o.payfrequency,
         "modifieddate" -> o.modifieddate
@@ -50,6 +58,8 @@ object EmployeepayhistoryRowUnsaved {
       JsResult.fromTry(
         Try(
           EmployeepayhistoryRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
+            ratechangedate = json.\("ratechangedate").as[LocalDateTime],
             rate = json.\("rate").as[BigDecimal],
             payfrequency = json.\("payfrequency").as[Int],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

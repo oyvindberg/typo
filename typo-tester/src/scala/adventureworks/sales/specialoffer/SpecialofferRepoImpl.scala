@@ -27,19 +27,23 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     val namedParameters = List(
       Some((NamedParameter("description", ParameterValue.from(unsaved.description)), "")),
-      unsaved.discountpct match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("discountpct", ParameterValue.from[BigDecimal](value)), "::numeric"))
-      },
       Some((NamedParameter("type", ParameterValue.from(unsaved.`type`)), "")),
       Some((NamedParameter("category", ParameterValue.from(unsaved.category)), "")),
       Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
       Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
+      Some((NamedParameter("maxqty", ParameterValue.from(unsaved.maxqty)), "::int4")),
+      unsaved.specialofferid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("specialofferid", ParameterValue.from[SpecialofferId](value)), "::int4"))
+      },
+      unsaved.discountpct match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("discountpct", ParameterValue.from[BigDecimal](value)), "::numeric"))
+      },
       unsaved.minqty match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("minqty", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some((NamedParameter("maxqty", ParameterValue.from(unsaved.maxqty)), "::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

@@ -34,6 +34,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
       Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
       Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
       Some((NamedParameter("scrapreasonid", ParameterValue.from(unsaved.scrapreasonid)), "::int2")),
+      unsaved.workorderid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("workorderid", ParameterValue.from[WorkorderId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

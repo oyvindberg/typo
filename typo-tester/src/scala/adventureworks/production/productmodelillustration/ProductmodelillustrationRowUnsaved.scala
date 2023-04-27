@@ -8,6 +8,8 @@ package production
 package productmodelillustration
 
 import adventureworks.Defaulted
+import adventureworks.production.illustration.IllustrationId
+import adventureworks.production.productmodel.ProductmodelId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,15 +20,21 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productmodelillustration` which has not been persisted yet */
 case class ProductmodelillustrationRowUnsaved(
+  /** Primary key. Foreign key to ProductModel.ProductModelID.
+      Points to [[productmodel.ProductmodelRow.productmodelid]] */
+  productmodelid: ProductmodelId,
+  /** Primary key. Foreign key to Illustration.IllustrationID.
+      Points to [[illustration.IllustrationRow.illustrationid]] */
+  illustrationid: IllustrationId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: ProductmodelillustrationId): ProductmodelillustrationRow =
+  def toRow(modifieddateDefault: => LocalDateTime): ProductmodelillustrationRow =
     ProductmodelillustrationRow(
-      productmodelid = compositeId.productmodelid,
-      illustrationid = compositeId.illustrationid,
+      productmodelid = productmodelid,
+      illustrationid = illustrationid,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -35,6 +43,8 @@ object ProductmodelillustrationRowUnsaved {
   implicit val oFormat: OFormat[ProductmodelillustrationRowUnsaved] = new OFormat[ProductmodelillustrationRowUnsaved]{
     override def writes(o: ProductmodelillustrationRowUnsaved): JsObject =
       Json.obj(
+        "productmodelid" -> o.productmodelid,
+        "illustrationid" -> o.illustrationid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -42,6 +52,8 @@ object ProductmodelillustrationRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductmodelillustrationRowUnsaved(
+            productmodelid = json.\("productmodelid").as[ProductmodelId],
+            illustrationid = json.\("illustrationid").as[IllustrationId],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

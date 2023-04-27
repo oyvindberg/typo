@@ -23,16 +23,22 @@ case class DepartmentRowUnsaved(
   name: Name,
   /** Name of the group to which the department belongs. */
   groupname: Name,
+  /** Default: nextval('humanresources.department_departmentid_seq'::regclass)
+      Primary key for Department records. */
+  departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(departmentid: DepartmentId): DepartmentRow =
+  def toRow(departmentidDefault: => DepartmentId, modifieddateDefault: => LocalDateTime): DepartmentRow =
     DepartmentRow(
-      departmentid = departmentid,
       name = name,
       groupname = groupname,
+      departmentid = departmentid match {
+                       case Defaulted.UseDefault => departmentidDefault
+                       case Defaulted.Provided(value) => value
+                     },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -43,6 +49,7 @@ object DepartmentRowUnsaved {
       Json.obj(
         "name" -> o.name,
         "groupname" -> o.groupname,
+        "departmentid" -> o.departmentid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -52,6 +59,7 @@ object DepartmentRowUnsaved {
           DepartmentRowUnsaved(
             name = json.\("name").as[Name],
             groupname = json.\("groupname").as[Name],
+            departmentid = json.\("departmentid").as[Defaulted[DepartmentId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

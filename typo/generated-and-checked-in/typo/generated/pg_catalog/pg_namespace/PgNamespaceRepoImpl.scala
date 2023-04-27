@@ -24,9 +24,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_namespace where oid = $oid".executeUpdate() > 0
   }
-  override def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): PgNamespaceRow = {
+  override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
-          values (${oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
+          values (${unsaved.oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
           returning oid, nspname, nspowner, nspacl
        """
       .executeInsert(rowParser.single)

@@ -30,6 +30,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     val namedParameters = List(
       Some((NamedParameter("productcategoryid", ParameterValue.from(unsaved.productcategoryid)), "::int4")),
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      unsaved.productsubcategoryid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productsubcategoryid", ParameterValue.from[ProductsubcategoryId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

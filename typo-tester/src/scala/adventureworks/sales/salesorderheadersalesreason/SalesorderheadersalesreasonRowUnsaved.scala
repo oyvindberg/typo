@@ -8,6 +8,8 @@ package sales
 package salesorderheadersalesreason
 
 import adventureworks.Defaulted
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesreason.SalesreasonId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,15 +20,21 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderheadersalesreason` which has not been persisted yet */
 case class SalesorderheadersalesreasonRowUnsaved(
+  /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
+      Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */
+  salesorderid: SalesorderheaderId,
+  /** Primary key. Foreign key to SalesReason.SalesReasonID.
+      Points to [[salesreason.SalesreasonRow.salesreasonid]] */
+  salesreasonid: SalesreasonId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: SalesorderheadersalesreasonId): SalesorderheadersalesreasonRow =
+  def toRow(modifieddateDefault: => LocalDateTime): SalesorderheadersalesreasonRow =
     SalesorderheadersalesreasonRow(
-      salesorderid = compositeId.salesorderid,
-      salesreasonid = compositeId.salesreasonid,
+      salesorderid = salesorderid,
+      salesreasonid = salesreasonid,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -35,6 +43,8 @@ object SalesorderheadersalesreasonRowUnsaved {
   implicit val oFormat: OFormat[SalesorderheadersalesreasonRowUnsaved] = new OFormat[SalesorderheadersalesreasonRowUnsaved]{
     override def writes(o: SalesorderheadersalesreasonRowUnsaved): JsObject =
       Json.obj(
+        "salesorderid" -> o.salesorderid,
+        "salesreasonid" -> o.salesreasonid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -42,6 +52,8 @@ object SalesorderheadersalesreasonRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesorderheadersalesreasonRowUnsaved(
+            salesorderid = json.\("salesorderid").as[SalesorderheaderId],
+            salesreasonid = json.\("salesreasonid").as[SalesreasonId],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

@@ -23,8 +23,10 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductinventoryId, unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
+  override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("locationid", ParameterValue.from(unsaved.locationid)), "::int2")),
       Some((NamedParameter("shelf", ParameterValue.from(unsaved.shelf)), "")),
       Some((NamedParameter("bin", ParameterValue.from(unsaved.bin)), "::int2")),
       unsaved.quantity match {
@@ -41,16 +43,22 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.productinventory(productid, locationid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({productid}::int4, {locationid}::int2, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("locationid", ParameterValue.from(compositeId.locationid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productinventory default values
+            returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productinventory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {

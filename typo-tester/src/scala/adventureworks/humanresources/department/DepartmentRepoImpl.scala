@@ -28,6 +28,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("groupname", ParameterValue.from(unsaved.groupname)), """::"public"."Name"""")),
+      unsaved.departmentid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("departmentid", ParameterValue.from[DepartmentId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

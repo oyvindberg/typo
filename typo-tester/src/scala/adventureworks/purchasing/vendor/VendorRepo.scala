@@ -12,7 +12,7 @@ import java.sql.Connection
 
 trait VendorRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
-  def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
+  def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
   def selectAll(implicit c: Connection): List[VendorRow]
   def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow]

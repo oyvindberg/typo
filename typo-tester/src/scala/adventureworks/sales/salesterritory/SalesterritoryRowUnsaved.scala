@@ -28,51 +28,57 @@ case class SalesterritoryRowUnsaved(
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
   group: String,
+  /** Default: nextval('sales.salesterritory_territoryid_seq'::regclass)
+      Primary key for SalesTerritory records. */
+  territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales in the territory year to date. */
-  salesytd: Defaulted[BigDecimal],
+  salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales in the territory the previous year. */
-  saleslastyear: Defaulted[BigDecimal],
+  saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Business costs in the territory year to date. */
-  costytd: Defaulted[BigDecimal],
+  costytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Business costs in the territory the previous year. */
-  costlastyear: Defaulted[BigDecimal],
+  costlastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(territoryid: SalesterritoryId): SalesterritoryRow =
+  def toRow(territoryidDefault: => SalesterritoryId, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, costytdDefault: => BigDecimal, costlastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesterritoryRow =
     SalesterritoryRow(
-      territoryid = territoryid,
       name = name,
       countryregioncode = countryregioncode,
       group = group,
+      territoryid = territoryid match {
+                      case Defaulted.UseDefault => territoryidDefault
+                      case Defaulted.Provided(value) => value
+                    },
       salesytd = salesytd match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => salesytdDefault
                    case Defaulted.Provided(value) => value
                  },
       saleslastyear = saleslastyear match {
-                        case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                        case Defaulted.UseDefault => saleslastyearDefault
                         case Defaulted.Provided(value) => value
                       },
       costytd = costytd match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => costytdDefault
                   case Defaulted.Provided(value) => value
                 },
       costlastyear = costlastyear match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => costlastyearDefault
                        case Defaulted.Provided(value) => value
                      },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -84,6 +90,7 @@ object SalesterritoryRowUnsaved {
         "name" -> o.name,
         "countryregioncode" -> o.countryregioncode,
         "group" -> o.group,
+        "territoryid" -> o.territoryid,
         "salesytd" -> o.salesytd,
         "saleslastyear" -> o.saleslastyear,
         "costytd" -> o.costytd,
@@ -99,6 +106,7 @@ object SalesterritoryRowUnsaved {
             name = json.\("name").as[Name],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
             group = json.\("group").as[String],
+            territoryid = json.\("territoryid").as[Defaulted[SalesterritoryId]],
             salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
             saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],
             costytd = json.\("costytd").as[Defaulted[BigDecimal]],

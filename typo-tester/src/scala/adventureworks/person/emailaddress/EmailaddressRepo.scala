@@ -11,7 +11,7 @@ import java.sql.Connection
 
 trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean
-  def insert(compositeId: EmailaddressId, unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow
+  def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow
   def selectAll(implicit c: Connection): List[EmailaddressRow]
   def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow]
   def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow]

@@ -22,24 +22,32 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".executeUpdate() > 0
   }
-  override def insert(compositeId: SalesorderheadersalesreasonId, unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
+  override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
+      Some((NamedParameter("salesorderid", ParameterValue.from(unsaved.salesorderid)), "::int4")),
+      Some((NamedParameter("salesreasonid", ParameterValue.from(unsaved.salesreasonid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({salesorderid}::int4, {salesreasonid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning salesorderid, salesreasonid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesreasonid", ParameterValue.from(compositeId.salesreasonid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.salesorderheadersalesreason default values
+            returning salesorderid, salesreasonid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.salesorderheadersalesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning salesorderid, salesreasonid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {

@@ -8,6 +8,8 @@ package production
 package productdocument
 
 import adventureworks.Defaulted
+import adventureworks.production.document.DocumentId
+import adventureworks.production.product.ProductId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,31 +20,45 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productdocument` which has not been persisted yet */
 case class ProductdocumentRowUnsaved(
+  /** Product identification number. Foreign key to Product.ProductID.
+      Points to [[product.ProductRow.productid]] */
+  productid: ProductId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  /** Default: '/'::character varying
+      Document identification number. Foreign key to Document.DocumentNode.
+      Points to [[document.DocumentRow.documentnode]] */
+  documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: ProductdocumentId): ProductdocumentRow =
+  def toRow(modifieddateDefault: => LocalDateTime, documentnodeDefault: => DocumentId): ProductdocumentRow =
     ProductdocumentRow(
-      productid = compositeId.productid,
+      productid = productid,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      },
-      documentnode = compositeId.documentnode
+      documentnode = documentnode match {
+                       case Defaulted.UseDefault => documentnodeDefault
+                       case Defaulted.Provided(value) => value
+                     }
     )
 }
 object ProductdocumentRowUnsaved {
   implicit val oFormat: OFormat[ProductdocumentRowUnsaved] = new OFormat[ProductdocumentRowUnsaved]{
     override def writes(o: ProductdocumentRowUnsaved): JsObject =
       Json.obj(
-        "modifieddate" -> o.modifieddate
+        "productid" -> o.productid,
+        "modifieddate" -> o.modifieddate,
+        "documentnode" -> o.documentnode
       )
   
     override def reads(json: JsValue): JsResult[ProductdocumentRowUnsaved] = {
       JsResult.fromTry(
         Try(
           ProductdocumentRowUnsaved(
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
+            productid = json.\("productid").as[ProductId],
+            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]],
+            documentnode = json.\("documentnode").as[Defaulted[DocumentId]]
           )
         )
       )

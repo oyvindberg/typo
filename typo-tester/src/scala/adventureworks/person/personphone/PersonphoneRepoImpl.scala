@@ -23,24 +23,33 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"delete from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".executeUpdate() > 0
   }
-  override def insert(compositeId: PersonphoneId, unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
+  override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
+      Some((NamedParameter("phonenumber", ParameterValue.from(unsaved.phonenumber)), """::"public".Phone""")),
+      Some((NamedParameter("phonenumbertypeid", ParameterValue.from(unsaved.phonenumbertypeid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, {phonenumber}::"public".Phone, {phonenumbertypeid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("phonenumber", ParameterValue.from(compositeId.phonenumber)), NamedParameter("phonenumbertypeid", ParameterValue.from(compositeId.phonenumbertypeid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.personphone default values
+            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.personphone(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {

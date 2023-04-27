@@ -8,6 +8,7 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,24 +20,29 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salespersonquotahistory` which has not been persisted yet */
 case class SalespersonquotahistoryRowUnsaved(
+  /** Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
+      Points to [[salesperson.SalespersonRow.businessentityid]] */
+  businessentityid: BusinessentityId,
+  /** Sales quota date. */
+  quotadate: LocalDateTime,
   /** Sales quota amount. */
   salesquota: BigDecimal,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: SalespersonquotahistoryId): SalespersonquotahistoryRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalespersonquotahistoryRow =
     SalespersonquotahistoryRow(
-      businessentityid = compositeId.businessentityid,
-      quotadate = compositeId.quotadate,
+      businessentityid = businessentityid,
+      quotadate = quotadate,
       salesquota = salesquota,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -45,6 +51,8 @@ object SalespersonquotahistoryRowUnsaved {
   implicit val oFormat: OFormat[SalespersonquotahistoryRowUnsaved] = new OFormat[SalespersonquotahistoryRowUnsaved]{
     override def writes(o: SalespersonquotahistoryRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
+        "quotadate" -> o.quotadate,
         "salesquota" -> o.salesquota,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
@@ -54,6 +62,8 @@ object SalespersonquotahistoryRowUnsaved {
       JsResult.fromTry(
         Try(
           SalespersonquotahistoryRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
+            quotadate = json.\("quotadate").as[LocalDateTime],
             salesquota = json.\("salesquota").as[BigDecimal],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

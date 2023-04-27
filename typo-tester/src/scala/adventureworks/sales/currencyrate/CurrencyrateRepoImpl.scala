@@ -31,6 +31,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       Some((NamedParameter("tocurrencycode", ParameterValue.from(unsaved.tocurrencycode)), "::bpchar")),
       Some((NamedParameter("averagerate", ParameterValue.from(unsaved.averagerate)), "::numeric")),
       Some((NamedParameter("endofdayrate", ParameterValue.from(unsaved.endofdayrate)), "::numeric")),
+      unsaved.currencyrateid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("currencyrateid", ParameterValue.from[CurrencyrateId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

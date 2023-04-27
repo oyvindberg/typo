@@ -23,8 +23,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
   }
-  override def insert(currencycode: CurrencyId, unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
+  override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
+      Some((NamedParameter("currencycode", ParameterValue.from(unsaved.currencycode)), "::bpchar")),
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -32,16 +33,22 @@ object CurrencyRepoImpl extends CurrencyRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into sales.currency(currencycode, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({currencycode}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning currencycode, "name", modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("currencycode", ParameterValue.from(currencycode)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into sales.currency default values
+            returning currencycode, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into sales.currency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning currencycode, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {

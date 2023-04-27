@@ -29,13 +29,17 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     val namedParameters = List(
       Some((NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid)), "::int4")),
       Some((NamedParameter("componentid", ParameterValue.from(unsaved.componentid)), "::int4")),
+      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
+      Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),
+      Some((NamedParameter("bomlevel", ParameterValue.from(unsaved.bomlevel)), "::int2")),
+      unsaved.billofmaterialsid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("billofmaterialsid", ParameterValue.from[BillofmaterialsId](value)), "::int4"))
+      },
       unsaved.startdate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("startdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
-      Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),
-      Some((NamedParameter("bomlevel", ParameterValue.from(unsaved.bomlevel)), "::int2")),
       unsaved.perassemblyqty match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("perassemblyqty", ParameterValue.from[BigDecimal](value)), "::numeric"))

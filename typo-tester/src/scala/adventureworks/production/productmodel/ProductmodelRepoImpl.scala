@@ -31,6 +31,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("catalogdescription", ParameterValue.from(unsaved.catalogdescription)), "::xml")),
       Some((NamedParameter("instructions", ParameterValue.from(unsaved.instructions)), "::xml")),
+      unsaved.productmodelid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productmodelid", ParameterValue.from[ProductmodelId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

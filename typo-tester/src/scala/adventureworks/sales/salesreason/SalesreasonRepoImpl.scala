@@ -28,6 +28,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("reasontype", ParameterValue.from(unsaved.reasontype)), """::"public"."Name"""")),
+      unsaved.salesreasonid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("salesreasonid", ParameterValue.from[SalesreasonId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

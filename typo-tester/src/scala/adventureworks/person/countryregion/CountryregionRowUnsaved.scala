@@ -19,17 +19,19 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.countryregion` which has not been persisted yet */
 case class CountryregionRowUnsaved(
+  /** ISO standard code for countries and regions. */
+  countryregioncode: CountryregionId,
   /** Country or region name. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(countryregioncode: CountryregionId): CountryregionRow =
+  def toRow(modifieddateDefault: => LocalDateTime): CountryregionRow =
     CountryregionRow(
       countryregioncode = countryregioncode,
       name = name,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -38,6 +40,7 @@ object CountryregionRowUnsaved {
   implicit val oFormat: OFormat[CountryregionRowUnsaved] = new OFormat[CountryregionRowUnsaved]{
     override def writes(o: CountryregionRowUnsaved): JsObject =
       Json.obj(
+        "countryregioncode" -> o.countryregioncode,
         "name" -> o.name,
         "modifieddate" -> o.modifieddate
       )
@@ -46,6 +49,7 @@ object CountryregionRowUnsaved {
       JsResult.fromTry(
         Try(
           CountryregionRowUnsaved(
+            countryregioncode = json.\("countryregioncode").as[CountryregionId],
             name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

@@ -29,6 +29,10 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       Some((NamedParameter("thumbnailphotofilename", ParameterValue.from(unsaved.thumbnailphotofilename)), "")),
       Some((NamedParameter("largephoto", ParameterValue.from(unsaved.largephoto)), "::bytea")),
       Some((NamedParameter("largephotofilename", ParameterValue.from(unsaved.largephotofilename)), "")),
+      unsaved.productphotoid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("productphotoid", ParameterValue.from[ProductphotoId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

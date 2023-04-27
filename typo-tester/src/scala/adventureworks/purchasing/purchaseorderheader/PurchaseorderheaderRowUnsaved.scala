@@ -20,12 +20,6 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.purchaseorderheader` which has not been persisted yet */
 case class PurchaseorderheaderRowUnsaved(
-  /** Default: 0
-      Incremental number to track changes to the purchase order over time. */
-  revisionnumber: Defaulted[Int],
-  /** Default: 1
-      Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
-  status: Defaulted[Int],
   /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   employeeid: BusinessentityId,
@@ -35,56 +29,68 @@ case class PurchaseorderheaderRowUnsaved(
   /** Shipping method. Foreign key to ShipMethod.ShipMethodID.
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
-  /** Default: now()
-      Purchase order creation date. */
-  orderdate: Defaulted[LocalDateTime],
   /** Estimated shipment date from the vendor. */
   shipdate: Option[LocalDateTime],
+  /** Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass)
+      Primary key. */
+  purchaseorderid: Defaulted[PurchaseorderheaderId] = Defaulted.UseDefault,
+  /** Default: 0
+      Incremental number to track changes to the purchase order over time. */
+  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: 1
+      Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
+  status: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: now()
+      Purchase order creation date. */
+  orderdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: 0.00
       Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID. */
-  subtotal: Defaulted[BigDecimal],
+  subtotal: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Tax amount. */
-  taxamt: Defaulted[BigDecimal],
+  taxamt: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Shipping cost. */
-  freight: Defaulted[BigDecimal],
+  freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(purchaseorderid: PurchaseorderheaderId): PurchaseorderheaderRow =
+  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => Int, statusDefault: => Int, orderdateDefault: => LocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): PurchaseorderheaderRow =
     PurchaseorderheaderRow(
-      purchaseorderid = purchaseorderid,
-      revisionnumber = revisionnumber match {
-                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                         case Defaulted.Provided(value) => value
-                       },
-      status = status match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                 case Defaulted.Provided(value) => value
-               },
       employeeid = employeeid,
       vendorid = vendorid,
       shipmethodid = shipmethodid,
+      shipdate = shipdate,
+      purchaseorderid = purchaseorderid match {
+                          case Defaulted.UseDefault => purchaseorderidDefault
+                          case Defaulted.Provided(value) => value
+                        },
+      revisionnumber = revisionnumber match {
+                         case Defaulted.UseDefault => revisionnumberDefault
+                         case Defaulted.Provided(value) => value
+                       },
+      status = status match {
+                 case Defaulted.UseDefault => statusDefault
+                 case Defaulted.Provided(value) => value
+               },
       orderdate = orderdate match {
-                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                    case Defaulted.UseDefault => orderdateDefault
                     case Defaulted.Provided(value) => value
                   },
-      shipdate = shipdate,
       subtotal = subtotal match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => subtotalDefault
                    case Defaulted.Provided(value) => value
                  },
       taxamt = taxamt match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.UseDefault => taxamtDefault
                  case Defaulted.Provided(value) => value
                },
       freight = freight match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => freightDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -93,13 +99,14 @@ object PurchaseorderheaderRowUnsaved {
   implicit val oFormat: OFormat[PurchaseorderheaderRowUnsaved] = new OFormat[PurchaseorderheaderRowUnsaved]{
     override def writes(o: PurchaseorderheaderRowUnsaved): JsObject =
       Json.obj(
-        "revisionnumber" -> o.revisionnumber,
-        "status" -> o.status,
         "employeeid" -> o.employeeid,
         "vendorid" -> o.vendorid,
         "shipmethodid" -> o.shipmethodid,
-        "orderdate" -> o.orderdate,
         "shipdate" -> o.shipdate,
+        "purchaseorderid" -> o.purchaseorderid,
+        "revisionnumber" -> o.revisionnumber,
+        "status" -> o.status,
+        "orderdate" -> o.orderdate,
         "subtotal" -> o.subtotal,
         "taxamt" -> o.taxamt,
         "freight" -> o.freight,
@@ -110,13 +117,14 @@ object PurchaseorderheaderRowUnsaved {
       JsResult.fromTry(
         Try(
           PurchaseorderheaderRowUnsaved(
-            revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
-            status = json.\("status").as[Defaulted[Int]],
             employeeid = json.\("employeeid").as[BusinessentityId],
             vendorid = json.\("vendorid").as[BusinessentityId],
             shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-            orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],
             shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
+            purchaseorderid = json.\("purchaseorderid").as[Defaulted[PurchaseorderheaderId]],
+            revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
+            status = json.\("status").as[Defaulted[Int]],
+            orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],
             subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
             taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
             freight = json.\("freight").as[Defaulted[BigDecimal]],

@@ -23,10 +23,14 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
     SQL"delete from production.transactionhistoryarchive where transactionid = $transactionid".executeUpdate() > 0
   }
-  override def insert(transactionid: TransactionhistoryarchiveId, unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
+  override def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
     val namedParameters = List(
+      Some((NamedParameter("transactionid", ParameterValue.from(unsaved.transactionid)), "::int4")),
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       Some((NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid)), "::int4")),
+      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
+      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
+      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)), "::int4"))
@@ -35,25 +39,28 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("transactiondate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
-      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
-      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.transactionhistoryarchive(transactionid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({transactionid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("transactionid", ParameterValue.from(transactionid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.transactionhistoryarchive default values
+            returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.transactionhistoryarchive(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {

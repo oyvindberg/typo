@@ -14,30 +14,45 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
+import testdb.hardcoded.Defaulted
 
 /** This class corresponds to a row in table `compositepk.person` which has not been persisted yet */
 case class PersonRowUnsaved(
-  name: Option[String]
+  name: Option[String],
+  /** Default: auto-increment */
+  one: Defaulted[Long] = Defaulted.UseDefault,
+  /** Default: auto-increment */
+  two: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: PersonId): PersonRow =
+  def toRow(oneDefault: => Long, twoDefault: => Option[String]): PersonRow =
     PersonRow(
-      one = compositeId.one,
-      two = compositeId.two,
-      name = name
+      name = name,
+      one = one match {
+              case Defaulted.UseDefault => oneDefault
+              case Defaulted.Provided(value) => value
+            },
+      two = two match {
+              case Defaulted.UseDefault => twoDefault
+              case Defaulted.Provided(value) => value
+            }
     )
 }
 object PersonRowUnsaved {
   implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
     override def writes(o: PersonRowUnsaved): JsObject =
       Json.obj(
-        "name" -> o.name
+        "name" -> o.name,
+        "one" -> o.one,
+        "two" -> o.two
       )
   
     override def reads(json: JsValue): JsResult[PersonRowUnsaved] = {
       JsResult.fromTry(
         Try(
           PersonRowUnsaved(
-            name = json.\("name").toOption.map(_.as[String])
+            name = json.\("name").toOption.map(_.as[String]),
+            one = json.\("one").as[Defaulted[Long]],
+            two = json.\("two").as[Defaulted[Option[String]]]
           )
         )
       )

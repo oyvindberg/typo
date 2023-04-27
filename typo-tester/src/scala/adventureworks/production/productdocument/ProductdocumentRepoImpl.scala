@@ -22,24 +22,35 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductdocumentId, unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
+  override def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
     val namedParameters = List(
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+      },
+      unsaved.documentnode match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("documentnode", ParameterValue.from[DocumentId](value)), ""))
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.productdocument(productid, documentnode, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({productid}::int4, {documentnode}, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning productid, modifieddate, documentnode
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("documentnode", ParameterValue.from(compositeId.documentnode)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productdocument default values
+            returning productid, modifieddate, documentnode
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productdocument(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning productid, modifieddate, documentnode
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {

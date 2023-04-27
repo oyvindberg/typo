@@ -27,6 +27,14 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     val namedParameters = List(
+      Some((NamedParameter("employeeid", ParameterValue.from(unsaved.employeeid)), "::int4")),
+      Some((NamedParameter("vendorid", ParameterValue.from(unsaved.vendorid)), "::int4")),
+      Some((NamedParameter("shipmethodid", ParameterValue.from(unsaved.shipmethodid)), "::int4")),
+      Some((NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate)), "::timestamp")),
+      unsaved.purchaseorderid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("purchaseorderid", ParameterValue.from[PurchaseorderheaderId](value)), "::int4"))
+      },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue.from[Int](value)), "::int2"))
@@ -35,14 +43,10 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue.from[Int](value)), "::int2"))
       },
-      Some((NamedParameter("employeeid", ParameterValue.from(unsaved.employeeid)), "::int4")),
-      Some((NamedParameter("vendorid", ParameterValue.from(unsaved.vendorid)), "::int4")),
-      Some((NamedParameter("shipmethodid", ParameterValue.from(unsaved.shipmethodid)), "::int4")),
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       },
-      Some((NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate)), "::timestamp")),
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)), "::numeric"))

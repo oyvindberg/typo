@@ -8,6 +8,10 @@ import scala.reflect.ClassTag
   */
 case class NonEmptyList[T](head: T, tail: List[T]) {
   def ::(t: T): NonEmptyList[T] = NonEmptyList(t, head :: tail)
+  def :::(ts: List[T]): NonEmptyList[T] = {
+    val all = ts ::: toList
+    NonEmptyList(all.head, all.tail)
+  }
   def ++(other: List[T]): NonEmptyList[T] = NonEmptyList(head, tail ++ other)
   def length: Int = tail.length + 1
   def toList: List[T] = head :: tail

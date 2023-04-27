@@ -19,17 +19,19 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.culture` which has not been persisted yet */
 case class CultureRowUnsaved(
+  /** Primary key for Culture records. */
+  cultureid: CultureId,
   /** Culture description. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(cultureid: CultureId): CultureRow =
+  def toRow(modifieddateDefault: => LocalDateTime): CultureRow =
     CultureRow(
       cultureid = cultureid,
       name = name,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -38,6 +40,7 @@ object CultureRowUnsaved {
   implicit val oFormat: OFormat[CultureRowUnsaved] = new OFormat[CultureRowUnsaved]{
     override def writes(o: CultureRowUnsaved): JsObject =
       Json.obj(
+        "cultureid" -> o.cultureid,
         "name" -> o.name,
         "modifieddate" -> o.modifieddate
       )
@@ -46,6 +49,7 @@ object CultureRowUnsaved {
       JsResult.fromTry(
         Try(
           CultureRowUnsaved(
+            cultureid = json.\("cultureid").as[CultureId],
             name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

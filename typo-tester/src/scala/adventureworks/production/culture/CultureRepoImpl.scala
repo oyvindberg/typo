@@ -23,8 +23,9 @@ object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.culture where cultureid = $cultureid".executeUpdate() > 0
   }
-  override def insert(cultureid: CultureId, unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
+  override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
+      Some((NamedParameter("cultureid", ParameterValue.from(unsaved.cultureid)), "::bpchar")),
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -32,16 +33,22 @@ object CultureRepoImpl extends CultureRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.culture(cultureid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({cultureid}::bpchar, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning cultureid, "name", modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("cultureid", ParameterValue.from(cultureid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.culture default values
+            returning cultureid, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.culture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning cultureid, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {

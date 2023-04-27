@@ -8,6 +8,8 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
+import adventureworks.production.product.ProductId
+import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
@@ -19,22 +21,28 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
 case class ProductproductphotoRowUnsaved(
+  /** Product identification number. Foreign key to Product.ProductID.
+      Points to [[product.ProductRow.productid]] */
+  productid: ProductId,
+  /** Product photo identification number. Foreign key to ProductPhoto.ProductPhotoID.
+      Points to [[productphoto.ProductphotoRow.productphotoid]] */
+  productphotoid: ProductphotoId,
   /** Default: false
       0 = Photo is not the principal image. 1 = Photo is the principal image. */
-  primary: Defaulted[Flag],
+  primary: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: ProductproductphotoId): ProductproductphotoRow =
+  def toRow(primaryDefault: => Flag, modifieddateDefault: => LocalDateTime): ProductproductphotoRow =
     ProductproductphotoRow(
-      productid = compositeId.productid,
-      productphotoid = compositeId.productphotoid,
+      productid = productid,
+      productphotoid = productphotoid,
       primary = primary match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => primaryDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -43,6 +51,8 @@ object ProductproductphotoRowUnsaved {
   implicit val oFormat: OFormat[ProductproductphotoRowUnsaved] = new OFormat[ProductproductphotoRowUnsaved]{
     override def writes(o: ProductproductphotoRowUnsaved): JsObject =
       Json.obj(
+        "productid" -> o.productid,
+        "productphotoid" -> o.productphotoid,
         "primary" -> o.primary,
         "modifieddate" -> o.modifieddate
       )
@@ -51,6 +61,8 @@ object ProductproductphotoRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductproductphotoRowUnsaved(
+            productid = json.\("productid").as[ProductId],
+            productphotoid = json.\("productphotoid").as[ProductphotoId],
             primary = json.\("primary").as[Defaulted[Flag]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

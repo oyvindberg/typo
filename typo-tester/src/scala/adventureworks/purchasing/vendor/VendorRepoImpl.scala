@@ -27,11 +27,13 @@ object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.vendor where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
+  override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber)), """::"public".AccountNumber""")),
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating)), "::int2")),
+      Some((NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl)), "")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
@@ -40,23 +42,28 @@ object VendorRepoImpl extends VendorRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some((NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl)), "")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into purchasing.vendor(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into purchasing.vendor default values
+            returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into purchasing.vendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {

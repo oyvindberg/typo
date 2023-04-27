@@ -26,18 +26,24 @@ case class CreditcardRowUnsaved(
   expmonth: Int,
   /** Credit card expiration year. */
   expyear: Int,
+  /** Default: nextval('sales.creditcard_creditcardid_seq'::regclass)
+      Primary key for CreditCard records. */
+  creditcardid: Defaulted[CreditcardId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(creditcardid: CreditcardId): CreditcardRow =
+  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => LocalDateTime): CreditcardRow =
     CreditcardRow(
-      creditcardid = creditcardid,
       cardtype = cardtype,
       cardnumber = cardnumber,
       expmonth = expmonth,
       expyear = expyear,
+      creditcardid = creditcardid match {
+                       case Defaulted.UseDefault => creditcardidDefault
+                       case Defaulted.Provided(value) => value
+                     },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -50,6 +56,7 @@ object CreditcardRowUnsaved {
         "cardnumber" -> o.cardnumber,
         "expmonth" -> o.expmonth,
         "expyear" -> o.expyear,
+        "creditcardid" -> o.creditcardid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -61,6 +68,7 @@ object CreditcardRowUnsaved {
             cardnumber = json.\("cardnumber").as[String],
             expmonth = json.\("expmonth").as[Int],
             expyear = json.\("expyear").as[Int],
+            creditcardid = json.\("creditcardid").as[Defaulted[CreditcardId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

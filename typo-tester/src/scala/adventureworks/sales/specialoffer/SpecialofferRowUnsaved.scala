@@ -21,9 +21,6 @@ import scala.util.Try
 case class SpecialofferRowUnsaved(
   /** Discount description. */
   description: String,
-  /** Default: 0.00
-      Discount precentage. */
-  discountpct: Defaulted[BigDecimal],
   /** Discount type category. */
   `type`: String,
   /** Group the discount applies to such as Reseller or Customer. */
@@ -32,39 +29,48 @@ case class SpecialofferRowUnsaved(
   startdate: LocalDateTime,
   /** Discount end date. */
   enddate: LocalDateTime,
-  /** Default: 0
-      Minimum discount percent allowed. */
-  minqty: Defaulted[Int],
   /** Maximum discount percent allowed. */
   maxqty: Option[Int],
+  /** Default: nextval('sales.specialoffer_specialofferid_seq'::regclass)
+      Primary key for SpecialOffer records. */
+  specialofferid: Defaulted[SpecialofferId] = Defaulted.UseDefault,
+  /** Default: 0.00
+      Discount precentage. */
+  discountpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
+  /** Default: 0
+      Minimum discount percent allowed. */
+  minqty: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(specialofferid: SpecialofferId): SpecialofferRow =
+  def toRow(specialofferidDefault: => SpecialofferId, discountpctDefault: => BigDecimal, minqtyDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SpecialofferRow =
     SpecialofferRow(
-      specialofferid = specialofferid,
       description = description,
-      discountpct = discountpct match {
-                      case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                      case Defaulted.Provided(value) => value
-                    },
       `type` = `type`,
       category = category,
       startdate = startdate,
       enddate = enddate,
+      maxqty = maxqty,
+      specialofferid = specialofferid match {
+                         case Defaulted.UseDefault => specialofferidDefault
+                         case Defaulted.Provided(value) => value
+                       },
+      discountpct = discountpct match {
+                      case Defaulted.UseDefault => discountpctDefault
+                      case Defaulted.Provided(value) => value
+                    },
       minqty = minqty match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.UseDefault => minqtyDefault
                  case Defaulted.Provided(value) => value
                },
-      maxqty = maxqty,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -74,13 +80,14 @@ object SpecialofferRowUnsaved {
     override def writes(o: SpecialofferRowUnsaved): JsObject =
       Json.obj(
         "description" -> o.description,
-        "discountpct" -> o.discountpct,
         "type" -> o.`type`,
         "category" -> o.category,
         "startdate" -> o.startdate,
         "enddate" -> o.enddate,
-        "minqty" -> o.minqty,
         "maxqty" -> o.maxqty,
+        "specialofferid" -> o.specialofferid,
+        "discountpct" -> o.discountpct,
+        "minqty" -> o.minqty,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -90,13 +97,14 @@ object SpecialofferRowUnsaved {
         Try(
           SpecialofferRowUnsaved(
             description = json.\("description").as[String],
-            discountpct = json.\("discountpct").as[Defaulted[BigDecimal]],
             `type` = json.\("type").as[String],
             category = json.\("category").as[String],
             startdate = json.\("startdate").as[LocalDateTime],
             enddate = json.\("enddate").as[LocalDateTime],
-            minqty = json.\("minqty").as[Defaulted[Int]],
             maxqty = json.\("maxqty").toOption.map(_.as[Int]),
+            specialofferid = json.\("specialofferid").as[Defaulted[SpecialofferId]],
+            discountpct = json.\("discountpct").as[Defaulted[BigDecimal]],
+            minqty = json.\("minqty").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

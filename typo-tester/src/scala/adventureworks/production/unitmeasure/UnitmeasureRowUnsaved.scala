@@ -19,17 +19,19 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.unitmeasure` which has not been persisted yet */
 case class UnitmeasureRowUnsaved(
+  /** Primary key. */
+  unitmeasurecode: UnitmeasureId,
   /** Unit of measure description. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(unitmeasurecode: UnitmeasureId): UnitmeasureRow =
+  def toRow(modifieddateDefault: => LocalDateTime): UnitmeasureRow =
     UnitmeasureRow(
       unitmeasurecode = unitmeasurecode,
       name = name,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -38,6 +40,7 @@ object UnitmeasureRowUnsaved {
   implicit val oFormat: OFormat[UnitmeasureRowUnsaved] = new OFormat[UnitmeasureRowUnsaved]{
     override def writes(o: UnitmeasureRowUnsaved): JsObject =
       Json.obj(
+        "unitmeasurecode" -> o.unitmeasurecode,
         "name" -> o.name,
         "modifieddate" -> o.modifieddate
       )
@@ -46,6 +49,7 @@ object UnitmeasureRowUnsaved {
       JsResult.fromTry(
         Try(
           UnitmeasureRowUnsaved(
+            unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
             name = json.\("name").as[Name],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

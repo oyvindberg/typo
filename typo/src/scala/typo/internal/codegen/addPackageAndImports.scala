@@ -55,6 +55,7 @@ object addPackageAndImports {
       case sc.Type.TApply(underlying, targs)      => sc.Type.TApply(shortenNames(underlying, f), targs.map(targ => shortenNames(targ, f)))
       case sc.Type.Qualified(value)               => f(sc.Type.Qualified(value))
       case sc.Type.Commented(underlying, comment) => sc.Type.Commented(shortenNames(underlying, f), comment)
+      case sc.Type.ByName(underlying)             => sc.Type.ByName(shortenNames(underlying, f))
       case sc.Type.UserDefined(underlying)        => sc.Type.UserDefined(shortenNames(underlying, f))
     }
 }

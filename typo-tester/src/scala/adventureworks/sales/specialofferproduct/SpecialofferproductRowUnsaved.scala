@@ -8,6 +8,8 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
+import adventureworks.production.product.ProductId
+import adventureworks.sales.specialoffer.SpecialofferId
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -19,21 +21,27 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.specialofferproduct` which has not been persisted yet */
 case class SpecialofferproductRowUnsaved(
+  /** Primary key for SpecialOfferProduct records.
+      Points to [[specialoffer.SpecialofferRow.specialofferid]] */
+  specialofferid: SpecialofferId,
+  /** Product identification number. Foreign key to Product.ProductID.
+      Points to [[production.product.ProductRow.productid]] */
+  productid: ProductId,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: SpecialofferproductId): SpecialofferproductRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SpecialofferproductRow =
     SpecialofferproductRow(
-      specialofferid = compositeId.specialofferid,
-      productid = compositeId.productid,
+      specialofferid = specialofferid,
+      productid = productid,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -42,6 +50,8 @@ object SpecialofferproductRowUnsaved {
   implicit val oFormat: OFormat[SpecialofferproductRowUnsaved] = new OFormat[SpecialofferproductRowUnsaved]{
     override def writes(o: SpecialofferproductRowUnsaved): JsObject =
       Json.obj(
+        "specialofferid" -> o.specialofferid,
+        "productid" -> o.productid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -50,6 +60,8 @@ object SpecialofferproductRowUnsaved {
       JsResult.fromTry(
         Try(
           SpecialofferproductRowUnsaved(
+            specialofferid = json.\("specialofferid").as[SpecialofferId],
+            productid = json.\("productid").as[ProductId],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

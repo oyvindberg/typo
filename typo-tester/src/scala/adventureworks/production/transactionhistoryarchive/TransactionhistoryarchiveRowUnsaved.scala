@@ -18,43 +18,45 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.transactionhistoryarchive` which has not been persisted yet */
 case class TransactionhistoryarchiveRowUnsaved(
+  /** Primary key for TransactionHistoryArchive records. */
+  transactionid: TransactionhistoryarchiveId,
   /** Product identification number. Foreign key to Product.ProductID. */
   productid: Int,
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
-  /** Default: 0
-      Line number associated with the purchase order, sales order, or work order. */
-  referenceorderlineid: Defaulted[Int],
-  /** Default: now()
-      Date and time of the transaction. */
-  transactiondate: Defaulted[LocalDateTime],
   /** W = Work Order, S = Sales Order, P = Purchase Order */
   transactiontype: /* bpchar */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
+  /** Default: 0
+      Line number associated with the purchase order, sales order, or work order. */
+  referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: now()
+      Date and time of the transaction. */
+  transactiondate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(transactionid: TransactionhistoryarchiveId): TransactionhistoryarchiveRow =
+  def toRow(referenceorderlineidDefault: => Int, transactiondateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): TransactionhistoryarchiveRow =
     TransactionhistoryarchiveRow(
       transactionid = transactionid,
       productid = productid,
       referenceorderid = referenceorderid,
-      referenceorderlineid = referenceorderlineid match {
-                               case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                               case Defaulted.Provided(value) => value
-                             },
-      transactiondate = transactiondate match {
-                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                          case Defaulted.Provided(value) => value
-                        },
       transactiontype = transactiontype,
       quantity = quantity,
       actualcost = actualcost,
+      referenceorderlineid = referenceorderlineid match {
+                               case Defaulted.UseDefault => referenceorderlineidDefault
+                               case Defaulted.Provided(value) => value
+                             },
+      transactiondate = transactiondate match {
+                          case Defaulted.UseDefault => transactiondateDefault
+                          case Defaulted.Provided(value) => value
+                        },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -63,13 +65,14 @@ object TransactionhistoryarchiveRowUnsaved {
   implicit val oFormat: OFormat[TransactionhistoryarchiveRowUnsaved] = new OFormat[TransactionhistoryarchiveRowUnsaved]{
     override def writes(o: TransactionhistoryarchiveRowUnsaved): JsObject =
       Json.obj(
+        "transactionid" -> o.transactionid,
         "productid" -> o.productid,
         "referenceorderid" -> o.referenceorderid,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
         "transactiontype" -> o.transactiontype,
         "quantity" -> o.quantity,
         "actualcost" -> o.actualcost,
+        "referenceorderlineid" -> o.referenceorderlineid,
+        "transactiondate" -> o.transactiondate,
         "modifieddate" -> o.modifieddate
       )
   
@@ -77,13 +80,14 @@ object TransactionhistoryarchiveRowUnsaved {
       JsResult.fromTry(
         Try(
           TransactionhistoryarchiveRowUnsaved(
+            transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
             productid = json.\("productid").as[Int],
             referenceorderid = json.\("referenceorderid").as[Int],
-            referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
-            transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
             transactiontype = json.\("transactiontype").as[/* bpchar */ String],
             quantity = json.\("quantity").as[Int],
             actualcost = json.\("actualcost").as[BigDecimal],
+            referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
+            transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

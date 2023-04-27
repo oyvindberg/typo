@@ -23,8 +23,10 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductvendorId, unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
+  override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("averageleadtime", ParameterValue.from(unsaved.averageleadtime)), "::int4")),
       Some((NamedParameter("standardprice", ParameterValue.from(unsaved.standardprice)), "::numeric")),
       Some((NamedParameter("lastreceiptcost", ParameterValue.from(unsaved.lastreceiptcost)), "::numeric")),
@@ -39,16 +41,22 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into purchasing.productvendor(productid, businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({productid}::int4, {businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into purchasing.productvendor default values
+            returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into purchasing.productvendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {

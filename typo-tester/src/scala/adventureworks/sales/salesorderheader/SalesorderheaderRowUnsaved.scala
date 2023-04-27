@@ -29,22 +29,10 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
 case class SalesorderheaderRowUnsaved(
-  /** Default: 0
-      Incremental number to track changes to the sales order over time. */
-  revisionnumber: Defaulted[Int],
-  /** Default: now()
-      Dates the sales order was created. */
-  orderdate: Defaulted[LocalDateTime],
   /** Date the order is due to the customer. */
   duedate: LocalDateTime,
   /** Date the order was shipped to the customer. */
   shipdate: Option[LocalDateTime],
-  /** Default: 1
-      Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
-  status: Defaulted[Int],
-  /** Default: true
-      0 = Order placed by sales person. 1 = Order placed online by customer. */
-  onlineorderflag: Defaulted[Flag],
   /** Customer purchase order number reference. */
   purchaseordernumber: Option[OrderNumber],
   /** Financial accounting number reference. */
@@ -75,45 +63,43 @@ case class SalesorderheaderRowUnsaved(
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
       Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
-  /** Default: 0.00
-      Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID. */
-  subtotal: Defaulted[BigDecimal],
-  /** Default: 0.00
-      Tax amount. */
-  taxamt: Defaulted[BigDecimal],
-  /** Default: 0.00
-      Shipping cost. */
-  freight: Defaulted[BigDecimal],
   /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
   comment: Option[String],
+  /** Default: nextval('sales.salesorderheader_salesorderid_seq'::regclass)
+      Primary key. */
+  salesorderid: Defaulted[SalesorderheaderId] = Defaulted.UseDefault,
+  /** Default: 0
+      Incremental number to track changes to the sales order over time. */
+  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: now()
+      Dates the sales order was created. */
+  orderdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  /** Default: 1
+      Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
+  status: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: true
+      0 = Order placed by sales person. 1 = Order placed online by customer. */
+  onlineorderflag: Defaulted[Flag] = Defaulted.UseDefault,
+  /** Default: 0.00
+      Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID. */
+  subtotal: Defaulted[BigDecimal] = Defaulted.UseDefault,
+  /** Default: 0.00
+      Tax amount. */
+  taxamt: Defaulted[BigDecimal] = Defaulted.UseDefault,
+  /** Default: 0.00
+      Shipping cost. */
+  freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(salesorderid: SalesorderheaderId): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => LocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
-      salesorderid = salesorderid,
-      revisionnumber = revisionnumber match {
-                         case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                         case Defaulted.Provided(value) => value
-                       },
-      orderdate = orderdate match {
-                    case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                    case Defaulted.Provided(value) => value
-                  },
       duedate = duedate,
       shipdate = shipdate,
-      status = status match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                 case Defaulted.Provided(value) => value
-               },
-      onlineorderflag = onlineorderflag match {
-                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                          case Defaulted.Provided(value) => value
-                        },
       purchaseordernumber = purchaseordernumber,
       accountnumber = accountnumber,
       customerid = customerid,
@@ -125,26 +111,46 @@ case class SalesorderheaderRowUnsaved(
       creditcardid = creditcardid,
       creditcardapprovalcode = creditcardapprovalcode,
       currencyrateid = currencyrateid,
+      totaldue = totaldue,
+      comment = comment,
+      salesorderid = salesorderid match {
+                       case Defaulted.UseDefault => salesorderidDefault
+                       case Defaulted.Provided(value) => value
+                     },
+      revisionnumber = revisionnumber match {
+                         case Defaulted.UseDefault => revisionnumberDefault
+                         case Defaulted.Provided(value) => value
+                       },
+      orderdate = orderdate match {
+                    case Defaulted.UseDefault => orderdateDefault
+                    case Defaulted.Provided(value) => value
+                  },
+      status = status match {
+                 case Defaulted.UseDefault => statusDefault
+                 case Defaulted.Provided(value) => value
+               },
+      onlineorderflag = onlineorderflag match {
+                          case Defaulted.UseDefault => onlineorderflagDefault
+                          case Defaulted.Provided(value) => value
+                        },
       subtotal = subtotal match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => subtotalDefault
                    case Defaulted.Provided(value) => value
                  },
       taxamt = taxamt match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.UseDefault => taxamtDefault
                  case Defaulted.Provided(value) => value
                },
       freight = freight match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => freightDefault
                   case Defaulted.Provided(value) => value
                 },
-      totaldue = totaldue,
-      comment = comment,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -153,12 +159,8 @@ object SalesorderheaderRowUnsaved {
   implicit val oFormat: OFormat[SalesorderheaderRowUnsaved] = new OFormat[SalesorderheaderRowUnsaved]{
     override def writes(o: SalesorderheaderRowUnsaved): JsObject =
       Json.obj(
-        "revisionnumber" -> o.revisionnumber,
-        "orderdate" -> o.orderdate,
         "duedate" -> o.duedate,
         "shipdate" -> o.shipdate,
-        "status" -> o.status,
-        "onlineorderflag" -> o.onlineorderflag,
         "purchaseordernumber" -> o.purchaseordernumber,
         "accountnumber" -> o.accountnumber,
         "customerid" -> o.customerid,
@@ -170,11 +172,16 @@ object SalesorderheaderRowUnsaved {
         "creditcardid" -> o.creditcardid,
         "creditcardapprovalcode" -> o.creditcardapprovalcode,
         "currencyrateid" -> o.currencyrateid,
+        "totaldue" -> o.totaldue,
+        "comment" -> o.comment,
+        "salesorderid" -> o.salesorderid,
+        "revisionnumber" -> o.revisionnumber,
+        "orderdate" -> o.orderdate,
+        "status" -> o.status,
+        "onlineorderflag" -> o.onlineorderflag,
         "subtotal" -> o.subtotal,
         "taxamt" -> o.taxamt,
         "freight" -> o.freight,
-        "totaldue" -> o.totaldue,
-        "comment" -> o.comment,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -183,12 +190,8 @@ object SalesorderheaderRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesorderheaderRowUnsaved(
-            revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
-            orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],
             duedate = json.\("duedate").as[LocalDateTime],
             shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
-            status = json.\("status").as[Defaulted[Int]],
-            onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
             purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
             accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
             customerid = json.\("customerid").as[CustomerId],
@@ -200,11 +203,16 @@ object SalesorderheaderRowUnsaved {
             creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
             creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[String]),
             currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
+            totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
+            comment = json.\("comment").toOption.map(_.as[String]),
+            salesorderid = json.\("salesorderid").as[Defaulted[SalesorderheaderId]],
+            revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
+            orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],
+            status = json.\("status").as[Defaulted[Int]],
+            onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
             subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
             taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
             freight = json.\("freight").as[Defaulted[BigDecimal]],
-            totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-            comment = json.\("comment").toOption.map(_.as[String]),
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

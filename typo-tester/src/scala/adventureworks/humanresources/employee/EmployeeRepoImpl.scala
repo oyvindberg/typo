@@ -27,8 +27,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.employee where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
+  override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("nationalidnumber", ParameterValue.from(unsaved.nationalidnumber)), "")),
       Some((NamedParameter("loginid", ParameterValue.from(unsaved.loginid)), "")),
       Some((NamedParameter("jobtitle", ParameterValue.from(unsaved.jobtitle)), "")),
@@ -66,16 +67,22 @@ object EmployeeRepoImpl extends EmployeeRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into humanresources.employee(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into humanresources.employee default values
+            returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into humanresources.employee(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {

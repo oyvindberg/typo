@@ -25,16 +25,22 @@ case class JobcandidateRowUnsaved(
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
   resume: Option[PgSQLXML],
+  /** Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass)
+      Primary key for JobCandidate records. */
+  jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(jobcandidateid: JobcandidateId): JobcandidateRow =
+  def toRow(jobcandidateidDefault: => JobcandidateId, modifieddateDefault: => LocalDateTime): JobcandidateRow =
     JobcandidateRow(
-      jobcandidateid = jobcandidateid,
       businessentityid = businessentityid,
       resume = resume,
+      jobcandidateid = jobcandidateid match {
+                         case Defaulted.UseDefault => jobcandidateidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -45,6 +51,7 @@ object JobcandidateRowUnsaved {
       Json.obj(
         "businessentityid" -> o.businessentityid,
         "resume" -> o.resume,
+        "jobcandidateid" -> o.jobcandidateid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -54,6 +61,7 @@ object JobcandidateRowUnsaved {
           JobcandidateRowUnsaved(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             resume = json.\("resume").toOption.map(_.as[PgSQLXML]),
+            jobcandidateid = json.\("jobcandidateid").as[Defaulted[JobcandidateId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

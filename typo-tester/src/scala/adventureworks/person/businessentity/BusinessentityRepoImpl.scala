@@ -26,6 +26,10 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
+      unsaved.businessentityid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("businessentityid", ParameterValue.from[BusinessentityId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

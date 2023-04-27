@@ -33,6 +33,10 @@ object AddressRepoImpl extends AddressRepo {
       Some((NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid)), "::int4")),
       Some((NamedParameter("postalcode", ParameterValue.from(unsaved.postalcode)), "")),
       Some((NamedParameter("spatiallocation", ParameterValue.from(unsaved.spatiallocation)), "::bytea")),
+      unsaved.addressid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("addressid", ParameterValue.from[AddressId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

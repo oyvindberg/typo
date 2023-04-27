@@ -23,8 +23,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"delete from person.countryregion where countryregioncode = $countryregioncode".executeUpdate() > 0
   }
-  override def insert(countryregioncode: CountryregionId, unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
+  override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
+      Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -32,16 +33,22 @@ object CountryregionRepoImpl extends CountryregionRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into person.countryregion(countryregioncode, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({countryregioncode}, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning countryregioncode, "name", modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("countryregioncode", ParameterValue.from(countryregioncode)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.countryregion default values
+            returning countryregioncode, "name", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.countryregion(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning countryregioncode, "name", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {

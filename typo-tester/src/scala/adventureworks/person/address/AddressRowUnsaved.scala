@@ -33,26 +33,32 @@ case class AddressRowUnsaved(
   postalcode: String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
+  /** Default: nextval('person.address_addressid_seq'::regclass)
+      Primary key for Address records. */
+  addressid: Defaulted[AddressId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(addressid: AddressId): AddressRow =
+  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddressRow =
     AddressRow(
-      addressid = addressid,
       addressline1 = addressline1,
       addressline2 = addressline2,
       city = city,
       stateprovinceid = stateprovinceid,
       postalcode = postalcode,
       spatiallocation = spatiallocation,
+      addressid = addressid match {
+                    case Defaulted.UseDefault => addressidDefault
+                    case Defaulted.Provided(value) => value
+                  },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -67,6 +73,7 @@ object AddressRowUnsaved {
         "stateprovinceid" -> o.stateprovinceid,
         "postalcode" -> o.postalcode,
         "spatiallocation" -> o.spatiallocation,
+        "addressid" -> o.addressid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -81,6 +88,7 @@ object AddressRowUnsaved {
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
             postalcode = json.\("postalcode").as[String],
             spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
+            addressid = json.\("addressid").as[Defaulted[AddressId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

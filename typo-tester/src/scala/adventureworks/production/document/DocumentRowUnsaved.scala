@@ -26,57 +26,63 @@ case class DocumentRowUnsaved(
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId,
-  /** Default: false
-      0 = This is a folder, 1 = This is a document. */
-  folderflag: Defaulted[Flag],
   /** File name of the document */
   filename: String,
   /** File extension indicating the document type. For example, .doc or .txt. */
   fileextension: Option[String],
   /** Revision number of the document. */
   revision: /* bpchar */ String,
-  /** Default: 0
-      Engineering change approval number. */
-  changenumber: Defaulted[Int],
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
   status: Int,
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
   document: Option[Array[Byte]],
+  /** Default: false
+      0 = This is a folder, 1 = This is a document. */
+  folderflag: Defaulted[Flag] = Defaulted.UseDefault,
+  /** Default: 0
+      Engineering change approval number. */
+  changenumber: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1()
       ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  /** Default: '/'::character varying
+      Primary key for Document records. */
+  documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(documentnode: DocumentId): DocumentRow =
+  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
     DocumentRow(
       title = title,
       owner = owner,
-      folderflag = folderflag match {
-                     case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                     case Defaulted.Provided(value) => value
-                   },
       filename = filename,
       fileextension = fileextension,
       revision = revision,
-      changenumber = changenumber match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                       case Defaulted.Provided(value) => value
-                     },
       status = status,
       documentsummary = documentsummary,
       document = document,
+      folderflag = folderflag match {
+                     case Defaulted.UseDefault => folderflagDefault
+                     case Defaulted.Provided(value) => value
+                   },
+      changenumber = changenumber match {
+                       case Defaulted.UseDefault => changenumberDefault
+                       case Defaulted.Provided(value) => value
+                     },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      },
-      documentnode = documentnode
+      documentnode = documentnode match {
+                       case Defaulted.UseDefault => documentnodeDefault
+                       case Defaulted.Provided(value) => value
+                     }
     )
 }
 object DocumentRowUnsaved {
@@ -85,16 +91,17 @@ object DocumentRowUnsaved {
       Json.obj(
         "title" -> o.title,
         "owner" -> o.owner,
-        "folderflag" -> o.folderflag,
         "filename" -> o.filename,
         "fileextension" -> o.fileextension,
         "revision" -> o.revision,
-        "changenumber" -> o.changenumber,
         "status" -> o.status,
         "documentsummary" -> o.documentsummary,
         "document" -> o.document,
+        "folderflag" -> o.folderflag,
+        "changenumber" -> o.changenumber,
         "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+        "modifieddate" -> o.modifieddate,
+        "documentnode" -> o.documentnode
       )
   
     override def reads(json: JsValue): JsResult[DocumentRowUnsaved] = {
@@ -103,16 +110,17 @@ object DocumentRowUnsaved {
           DocumentRowUnsaved(
             title = json.\("title").as[String],
             owner = json.\("owner").as[BusinessentityId],
-            folderflag = json.\("folderflag").as[Defaulted[Flag]],
             filename = json.\("filename").as[String],
             fileextension = json.\("fileextension").toOption.map(_.as[String]),
             revision = json.\("revision").as[/* bpchar */ String],
-            changenumber = json.\("changenumber").as[Defaulted[Int]],
             status = json.\("status").as[Int],
             documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
             document = json.\("document").toOption.map(_.as[Array[Byte]]),
+            folderflag = json.\("folderflag").as[Defaulted[Flag]],
+            changenumber = json.\("changenumber").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
+            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]],
+            documentnode = json.\("documentnode").as[Defaulted[DocumentId]]
           )
         )
       )

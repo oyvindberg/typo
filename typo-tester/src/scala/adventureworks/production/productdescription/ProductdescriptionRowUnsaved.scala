@@ -21,21 +21,27 @@ import scala.util.Try
 case class ProductdescriptionRowUnsaved(
   /** Description of the product. */
   description: String,
+  /** Default: nextval('production.productdescription_productdescriptionid_seq'::regclass)
+      Primary key for ProductDescription records. */
+  productdescriptionid: Defaulted[ProductdescriptionId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productdescriptionid: ProductdescriptionId): ProductdescriptionRow =
+  def toRow(productdescriptionidDefault: => ProductdescriptionId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductdescriptionRow =
     ProductdescriptionRow(
-      productdescriptionid = productdescriptionid,
       description = description,
+      productdescriptionid = productdescriptionid match {
+                               case Defaulted.UseDefault => productdescriptionidDefault
+                               case Defaulted.Provided(value) => value
+                             },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -45,6 +51,7 @@ object ProductdescriptionRowUnsaved {
     override def writes(o: ProductdescriptionRowUnsaved): JsObject =
       Json.obj(
         "description" -> o.description,
+        "productdescriptionid" -> o.productdescriptionid,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -54,6 +61,7 @@ object ProductdescriptionRowUnsaved {
         Try(
           ProductdescriptionRowUnsaved(
             description = json.\("description").as[String],
+            productdescriptionid = json.\("productdescriptionid").as[Defaulted[ProductdescriptionId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

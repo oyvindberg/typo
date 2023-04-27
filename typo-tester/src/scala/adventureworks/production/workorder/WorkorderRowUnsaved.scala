@@ -36,12 +36,14 @@ case class WorkorderRowUnsaved(
   /** Reason for inspection failure.
       Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
+  /** Default: nextval('production.workorder_workorderid_seq'::regclass)
+      Primary key for WorkOrder records. */
+  workorderid: Defaulted[WorkorderId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(workorderid: WorkorderId): WorkorderRow =
+  def toRow(workorderidDefault: => WorkorderId, modifieddateDefault: => LocalDateTime): WorkorderRow =
     WorkorderRow(
-      workorderid = workorderid,
       productid = productid,
       orderqty = orderqty,
       scrappedqty = scrappedqty,
@@ -49,8 +51,12 @@ case class WorkorderRowUnsaved(
       enddate = enddate,
       duedate = duedate,
       scrapreasonid = scrapreasonid,
+      workorderid = workorderid match {
+                      case Defaulted.UseDefault => workorderidDefault
+                      case Defaulted.Provided(value) => value
+                    },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -66,6 +72,7 @@ object WorkorderRowUnsaved {
         "enddate" -> o.enddate,
         "duedate" -> o.duedate,
         "scrapreasonid" -> o.scrapreasonid,
+        "workorderid" -> o.workorderid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -80,6 +87,7 @@ object WorkorderRowUnsaved {
             enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
             duedate = json.\("duedate").as[LocalDateTime],
             scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
+            workorderid = json.\("workorderid").as[Defaulted[WorkorderId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

@@ -9,6 +9,7 @@ package workorderrouting
 
 import adventureworks.Defaulted
 import adventureworks.production.location.LocationId
+import adventureworks.production.workorder.WorkorderId
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -19,6 +20,13 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `production.workorderrouting` which has not been persisted yet */
 case class WorkorderroutingRowUnsaved(
+  /** Primary key. Foreign key to WorkOrder.WorkOrderID.
+      Points to [[workorder.WorkorderRow.workorderid]] */
+  workorderid: WorkorderId,
+  /** Primary key. Foreign key to Product.ProductID. */
+  productid: Int,
+  /** Primary key. Indicates the manufacturing process sequence. */
+  operationsequence: Int,
   /** Manufacturing location where the part is processed. Foreign key to Location.LocationID.
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
@@ -37,13 +45,13 @@ case class WorkorderroutingRowUnsaved(
   /** Actual manufacturing cost. */
   actualcost: Option[BigDecimal],
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: WorkorderroutingId): WorkorderroutingRow =
+  def toRow(modifieddateDefault: => LocalDateTime): WorkorderroutingRow =
     WorkorderroutingRow(
-      workorderid = compositeId.workorderid,
-      productid = compositeId.productid,
-      operationsequence = compositeId.operationsequence,
+      workorderid = workorderid,
+      productid = productid,
+      operationsequence = operationsequence,
       locationid = locationid,
       scheduledstartdate = scheduledstartdate,
       scheduledenddate = scheduledenddate,
@@ -53,7 +61,7 @@ case class WorkorderroutingRowUnsaved(
       plannedcost = plannedcost,
       actualcost = actualcost,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -62,6 +70,9 @@ object WorkorderroutingRowUnsaved {
   implicit val oFormat: OFormat[WorkorderroutingRowUnsaved] = new OFormat[WorkorderroutingRowUnsaved]{
     override def writes(o: WorkorderroutingRowUnsaved): JsObject =
       Json.obj(
+        "workorderid" -> o.workorderid,
+        "productid" -> o.productid,
+        "operationsequence" -> o.operationsequence,
         "locationid" -> o.locationid,
         "scheduledstartdate" -> o.scheduledstartdate,
         "scheduledenddate" -> o.scheduledenddate,
@@ -77,6 +88,9 @@ object WorkorderroutingRowUnsaved {
       JsResult.fromTry(
         Try(
           WorkorderroutingRowUnsaved(
+            workorderid = json.\("workorderid").as[WorkorderId],
+            productid = json.\("productid").as[Int],
+            operationsequence = json.\("operationsequence").as[Int],
             locationid = json.\("locationid").as[LocationId],
             scheduledstartdate = json.\("scheduledstartdate").as[LocalDateTime],
             scheduledenddate = json.\("scheduledenddate").as[LocalDateTime],

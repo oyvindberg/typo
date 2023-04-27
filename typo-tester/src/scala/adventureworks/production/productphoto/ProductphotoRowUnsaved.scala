@@ -26,18 +26,24 @@ case class ProductphotoRowUnsaved(
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
   largephotofilename: Option[String],
+  /** Default: nextval('production.productphoto_productphotoid_seq'::regclass)
+      Primary key for ProductPhoto records. */
+  productphotoid: Defaulted[ProductphotoId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(productphotoid: ProductphotoId): ProductphotoRow =
+  def toRow(productphotoidDefault: => ProductphotoId, modifieddateDefault: => LocalDateTime): ProductphotoRow =
     ProductphotoRow(
-      productphotoid = productphotoid,
       thumbnailphoto = thumbnailphoto,
       thumbnailphotofilename = thumbnailphotofilename,
       largephoto = largephoto,
       largephotofilename = largephotofilename,
+      productphotoid = productphotoid match {
+                         case Defaulted.UseDefault => productphotoidDefault
+                         case Defaulted.Provided(value) => value
+                       },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -50,6 +56,7 @@ object ProductphotoRowUnsaved {
         "thumbnailphotofilename" -> o.thumbnailphotofilename,
         "largephoto" -> o.largephoto,
         "largephotofilename" -> o.largephotofilename,
+        "productphotoid" -> o.productphotoid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -61,6 +68,7 @@ object ProductphotoRowUnsaved {
             thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[String]),
             largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
             largephotofilename = json.\("largephotofilename").toOption.map(_.as[String]),
+            productphotoid = json.\("productphotoid").as[Defaulted[ProductphotoId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

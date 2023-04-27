@@ -7,36 +7,43 @@ import play.api.libs.json.{JsNull, Json}
 case class TableFiles(table: TableComputed, options: InternalOptions) {
   val relation = RelationFiles(table.naming, table.relation, options)
 
-  val UnsavedRowFile: Option[sc.File] = table.RowUnsavedName.zip(table.colsNotId).zip(table.maybeId).headOption.map { case ((rowType, colsUnsaved), id) =>
+  val UnsavedRowFile: Option[sc.File] = table.maybeUnsavedRow.map { unsaved =>
     val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
 
-    val maybeToRow: sc.Code = {
-      val keyValues = table.cols.map { col =>
-        val ref: sc.Code = id match {
-          case unary: IdComputed.Unary if unary.col.name == col.name =>
-            sc.QIdent.of(unary.paramName)
-          case composite: IdComputed.Composite if composite.colByName.contains(col.name) =>
-            sc.QIdent.of(composite.paramName, composite.colByName(col.name).name)
-          case _ =>
-            if (col.dbCol.columnDefault.isDefined) {
-              code"""|${col.name} match {
-                     |  case ${table.default.Defaulted}.${table.default.UseDefault} => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                     |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
-                     |}""".stripMargin
-            } else sc.QIdent.of(col.name)
+    val toRow: sc.Code = {
+      def mkDefaultParamName(col: ColumnComputed): sc.Ident =
+        sc.Ident(col.name.value).appended("Default")
+
+      val params: NonEmptyList[sc.Param] =
+        unsaved.defaultCols.map { case (col, originalType) =>
+          sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType))
         }
 
-        col.name -> ref
-      }
-      val name = if (table.cols.exists(_.dbCol.columnDefault.isDefined)) sc.Ident("unsafeToRow") else sc.Ident("toRow")
+      val keyValues1 =
+        unsaved.defaultCols.map { case (col, _) =>
+          val defaultParamName = mkDefaultParamName(col)
+          val impl = code"""|${col.name} match {
+                   |  case ${table.default.Defaulted}.${table.default.UseDefault} => $defaultParamName
+                   |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
+                   |}""".stripMargin
+          (col.name, impl)
+        }
 
-      code"""|def $name(${id.param}): ${table.relation.RowName} =
+      val keyValues2 =
+        unsaved.restCols.map { col =>
+          (col.name, sc.QIdent.of(col.name).code)
+        }
+
+      val keyValues: List[(sc.Ident, sc.Code)] =
+        keyValues2 ::: keyValues1.toList
+
+      code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.relation.RowName} =
              |  ${table.relation.RowName}(
              |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
              |  )""".stripMargin
     }
 
-    val formattedCols = colsUnsaved.map { col =>
+    val formattedCols = unsaved.allCols.map { col =>
       val commentPieces = List(
         col.dbCol.columnDefault.map(x => s"Default: $x"),
         col.dbCol.comment,
@@ -58,20 +65,24 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
                  |""".stripMargin
       }
 
-      code"$comment${col.param.code}"
+      val default = col.dbCol.columnDefault match {
+        case Some(_) => code" = ${table.default.Defaulted}.${table.default.UseDefault}"
+        case None    => sc.Code.Empty
+      }
+      code"$comment${col.param.code}$default"
     }
 
     val str =
       code"""|$comments
-             |case class ${rowType.name}(
+             |case class ${unsaved.tpe.name}(
              |  ${formattedCols.mkCode(",\n")}
              |) {
-             |  $maybeToRow
+             |  $toRow
              |}
-             |${obj(rowType.name, options.jsonLib.instances(rowType, colsUnsaved))}
+             |${obj(unsaved.tpe.name, options.jsonLib.instances(unsaved.tpe, unsaved.allCols))}
              |""".stripMargin
 
-    sc.File(rowType, str, secondaryTypes = Nil)
+    sc.File(unsaved.tpe, str, secondaryTypes = Nil)
   }
 
   val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>

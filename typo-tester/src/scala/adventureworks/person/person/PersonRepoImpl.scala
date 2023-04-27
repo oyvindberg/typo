@@ -28,24 +28,25 @@ object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.person where businessentityid = $businessentityid".executeUpdate() > 0
   }
-  override def insert(businessentityid: BusinessentityId, unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
+  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
+      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("persontype", ParameterValue.from(unsaved.persontype)), "::bpchar")),
-      unsaved.namestyle match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("namestyle", ParameterValue.from[NameStyle](value)), """::"public".NameStyle"""))
-      },
       Some((NamedParameter("title", ParameterValue.from(unsaved.title)), "")),
       Some((NamedParameter("firstname", ParameterValue.from(unsaved.firstname)), """::"public"."Name"""")),
       Some((NamedParameter("middlename", ParameterValue.from(unsaved.middlename)), """::"public"."Name"""")),
       Some((NamedParameter("lastname", ParameterValue.from(unsaved.lastname)), """::"public"."Name"""")),
       Some((NamedParameter("suffix", ParameterValue.from(unsaved.suffix)), "")),
+      Some((NamedParameter("additionalcontactinfo", ParameterValue.from(unsaved.additionalcontactinfo)), "::xml")),
+      Some((NamedParameter("demographics", ParameterValue.from(unsaved.demographics)), "::xml")),
+      unsaved.namestyle match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("namestyle", ParameterValue.from[NameStyle](value)), """::"public".NameStyle"""))
+      },
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("emailpromotion", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some((NamedParameter("additionalcontactinfo", ParameterValue.from(unsaved.additionalcontactinfo)), "::xml")),
-      Some((NamedParameter("demographics", ParameterValue.from(unsaved.demographics)), "::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
@@ -56,16 +57,22 @@ object PersonRepoImpl extends PersonRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into person.person(businessentityid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({businessentityid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into person.person default values
+            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into person.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {

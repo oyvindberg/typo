@@ -30,6 +30,10 @@ object ShiftRepoImpl extends ShiftRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("starttime", ParameterValue.from(unsaved.starttime)), "::time")),
       Some((NamedParameter("endtime", ParameterValue.from(unsaved.endtime)), "::time")),
+      unsaved.shiftid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("shiftid", ParameterValue.from[ShiftId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

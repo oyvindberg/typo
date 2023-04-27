@@ -8,6 +8,9 @@ package person
 package personphone
 
 import adventureworks.Defaulted
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.public.Phone
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -18,16 +21,24 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.personphone` which has not been persisted yet */
 case class PersonphoneRowUnsaved(
+  /** Business entity identification number. Foreign key to Person.BusinessEntityID.
+      Points to [[person.PersonRow.businessentityid]] */
+  businessentityid: BusinessentityId,
+  /** Telephone number identification number. */
+  phonenumber: Phone,
+  /** Kind of phone number. Foreign key to PhoneNumberType.PhoneNumberTypeID.
+      Points to [[phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
+  phonenumbertypeid: PhonenumbertypeId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: PersonphoneId): PersonphoneRow =
+  def toRow(modifieddateDefault: => LocalDateTime): PersonphoneRow =
     PersonphoneRow(
-      businessentityid = compositeId.businessentityid,
-      phonenumber = compositeId.phonenumber,
-      phonenumbertypeid = compositeId.phonenumbertypeid,
+      businessentityid = businessentityid,
+      phonenumber = phonenumber,
+      phonenumbertypeid = phonenumbertypeid,
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -36,6 +47,9 @@ object PersonphoneRowUnsaved {
   implicit val oFormat: OFormat[PersonphoneRowUnsaved] = new OFormat[PersonphoneRowUnsaved]{
     override def writes(o: PersonphoneRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
+        "phonenumber" -> o.phonenumber,
+        "phonenumbertypeid" -> o.phonenumbertypeid,
         "modifieddate" -> o.modifieddate
       )
   
@@ -43,6 +57,9 @@ object PersonphoneRowUnsaved {
       JsResult.fromTry(
         Try(
           PersonphoneRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
+            phonenumber = json.\("phonenumber").as[Phone],
+            phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

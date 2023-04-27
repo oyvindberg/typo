@@ -29,16 +29,17 @@ case class PersonRowUnsaved(
   email: String,
   phone: String,
   likesPizza: Boolean,
+  workEmail: Option[String],
+  /** Default: auto-increment */
+  id: Defaulted[PersonId] = Defaulted.UseDefault,
   /** Default: some-value
       Points to [[marital_status.MaritalStatusRow.id]] */
-  maritalStatusId: Defaulted[MaritalStatusId],
-  workEmail: Option[String],
+  maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
   /** Default: PUBLIC */
-  sector: Defaulted[Sector]
+  sector: Defaulted[Sector] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(id: PersonId): PersonRow =
+  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector): PersonRow =
     PersonRow(
-      id = id,
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
       nickName = nickName,
@@ -46,13 +47,17 @@ case class PersonRowUnsaved(
       email = email,
       phone = phone,
       likesPizza = likesPizza,
+      workEmail = workEmail,
+      id = id match {
+             case Defaulted.UseDefault => idDefault
+             case Defaulted.Provided(value) => value
+           },
       maritalStatusId = maritalStatusId match {
-                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                          case Defaulted.UseDefault => maritalStatusIdDefault
                           case Defaulted.Provided(value) => value
                         },
-      workEmail = workEmail,
       sector = sector match {
-                 case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                 case Defaulted.UseDefault => sectorDefault
                  case Defaulted.Provided(value) => value
                }
     )
@@ -68,8 +73,9 @@ object PersonRowUnsaved {
         "email" -> o.email,
         "phone" -> o.phone,
         "likes_pizza" -> o.likesPizza,
-        "marital_status_id" -> o.maritalStatusId,
         "work_email" -> o.workEmail,
+        "id" -> o.id,
+        "marital_status_id" -> o.maritalStatusId,
         "sector" -> o.sector
       )
   
@@ -84,8 +90,9 @@ object PersonRowUnsaved {
             email = json.\("email").as[String],
             phone = json.\("phone").as[String],
             likesPizza = json.\("likes_pizza").as[Boolean],
-            maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
             workEmail = json.\("work_email").toOption.map(_.as[String]),
+            id = json.\("id").as[Defaulted[PersonId]],
+            maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
             sector = json.\("sector").as[Defaulted[Sector]]
           )
         )

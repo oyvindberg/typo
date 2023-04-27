@@ -48,6 +48,7 @@ object sc {
     case class Abstract(value: Ident) extends Type
     case class Commented(underlying: Type, comment: String) extends Type
     case class UserDefined(underlying: Type) extends Type
+    case class ByName(underlying: Type) extends Type
 
     object Qualified {
       implicit val ordering: Ordering[Qualified] = scala.Ordering.by(renderTree)
@@ -145,6 +146,7 @@ object sc {
         case Qualified(_)                    => scala.None
         case Abstract(_)                     => scala.None
         case Commented(underlying, _)        => unapply(underlying)
+        case ByName(underlying)              => unapply(underlying)
         case UserDefined(underlying)         => unapply(underlying)
       }
     }
@@ -160,6 +162,7 @@ object sc {
         case Byte                     => scala.Some(Qualified("java.lang.Byte"))
         case Char                     => scala.Some(Qualified("java.lang.Character"))
         case Commented(underlying, _) => boxedType(underlying)
+        case ByName(underlying)       => boxedType(underlying)
         case UserDefined(underlying)  => boxedType(underlying)
         case _                        => scala.None
       }
@@ -170,6 +173,7 @@ object sc {
       case Qualified(_)              => false
       case Abstract(_)               => false
       case Commented(underlying, _)  => containsUserDefined(underlying)
+      case ByName(underlying)        => containsUserDefined(underlying)
       case UserDefined(_)            => true
     }
   }
@@ -256,6 +260,7 @@ object sc {
           case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
           case Type.Qualified(value)               => renderTree(value)
           case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
+          case Type.ByName(underlying)             => s"=> ${renderTree(underlying)}"
           case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>

@@ -122,6 +122,7 @@ package object typo {
             case sc.Type.Abstract(_)              => ()
             case sc.Type.Commented(underlying, _) => go(underlying)
             case sc.Type.UserDefined(underlying)  => go(underlying)
+            case sc.Type.ByName(underlying)       => go(underlying)
           }
         }
 

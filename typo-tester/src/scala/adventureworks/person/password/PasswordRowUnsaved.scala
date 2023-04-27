@@ -20,26 +20,28 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `person.password` which has not been persisted yet */
 case class PasswordRowUnsaved(
+  /** Points to [[person.PersonRow.businessentityid]] */
+  businessentityid: BusinessentityId,
   /** Password for the e-mail account. */
   passwordhash: String,
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: String,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(businessentityid: BusinessentityId): PasswordRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): PasswordRow =
     PasswordRow(
       businessentityid = businessentityid,
       passwordhash = passwordhash,
       passwordsalt = passwordsalt,
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -48,6 +50,7 @@ object PasswordRowUnsaved {
   implicit val oFormat: OFormat[PasswordRowUnsaved] = new OFormat[PasswordRowUnsaved]{
     override def writes(o: PasswordRowUnsaved): JsObject =
       Json.obj(
+        "businessentityid" -> o.businessentityid,
         "passwordhash" -> o.passwordhash,
         "passwordsalt" -> o.passwordsalt,
         "rowguid" -> o.rowguid,
@@ -58,6 +61,7 @@ object PasswordRowUnsaved {
       JsResult.fromTry(
         Try(
           PasswordRowUnsaved(
+            businessentityid = json.\("businessentityid").as[BusinessentityId],
             passwordhash = json.\("passwordhash").as[String],
             passwordsalt = json.\("passwordsalt").as[String],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

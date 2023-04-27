@@ -15,17 +15,15 @@ case class SqlFileComputed(
   val relationName = db.RelationName(None, pathSegments.last.value.replace(".sql", ""))
   val naming = mkNaming(pkg0 / pathSegments.dropRight(1))
 
-  val dbColsAndCols: NonEmptyList[(db.Col, ColumnComputed)] = {
+  val cols: NonEmptyList[ColumnComputed] =
     sqlFile.cols.map { dbCol =>
-      val columnComputed = ColumnComputed(
+      ColumnComputed(
         pointsTo = sqlFile.dependencies.get(dbCol.name),
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbCol = dbCol
       )
-      dbCol -> columnComputed
     }
-  }
 
   def deriveType(dbCol: db.Col): sc.Type = {
     // we let types flow through constraints down to this column, the point is to reuse id types downstream
@@ -65,7 +63,6 @@ case class SqlFileComputed(
     }
   }
 
-  val cols: NonEmptyList[ColumnComputed] = dbColsAndCols.map { case (_, col) => col }
   val relation = RelationComputed(naming, relationName, cols, maybeId = None)
 
   val repoMethods: NonEmptyList[RepoMethod] = {

@@ -22,35 +22,41 @@ import scala.util.Try
 case class ShipmethodRowUnsaved(
   /** Shipping company name. */
   name: Name,
+  /** Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass)
+      Primary key for ShipMethod records. */
+  shipmethodid: Defaulted[ShipmethodId] = Defaulted.UseDefault,
   /** Default: 0.00
       Minimum shipping charge. */
-  shipbase: Defaulted[BigDecimal],
+  shipbase: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Shipping charge per pound. */
-  shiprate: Defaulted[BigDecimal],
+  shiprate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(shipmethodid: ShipmethodId): ShipmethodRow =
+  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ShipmethodRow =
     ShipmethodRow(
-      shipmethodid = shipmethodid,
       name = name,
+      shipmethodid = shipmethodid match {
+                       case Defaulted.UseDefault => shipmethodidDefault
+                       case Defaulted.Provided(value) => value
+                     },
       shipbase = shipbase match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => shipbaseDefault
                    case Defaulted.Provided(value) => value
                  },
       shiprate = shiprate match {
-                   case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                   case Defaulted.UseDefault => shiprateDefault
                    case Defaulted.Provided(value) => value
                  },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -60,6 +66,7 @@ object ShipmethodRowUnsaved {
     override def writes(o: ShipmethodRowUnsaved): JsObject =
       Json.obj(
         "name" -> o.name,
+        "shipmethodid" -> o.shipmethodid,
         "shipbase" -> o.shipbase,
         "shiprate" -> o.shiprate,
         "rowguid" -> o.rowguid,
@@ -71,6 +78,7 @@ object ShipmethodRowUnsaved {
         Try(
           ShipmethodRowUnsaved(
             name = json.\("name").as[Name],
+            shipmethodid = json.\("shipmethodid").as[Defaulted[ShipmethodId]],
             shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
             shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

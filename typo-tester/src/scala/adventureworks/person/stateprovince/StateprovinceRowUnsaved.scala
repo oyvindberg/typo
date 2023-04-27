@@ -28,36 +28,42 @@ case class StateprovinceRowUnsaved(
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
-  /** Default: true
-      0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode. */
-  isonlystateprovinceflag: Defaulted[Flag],
   /** State or province description. */
   name: Name,
   /** ID of the territory in which the state or province is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
+  /** Default: nextval('person.stateprovince_stateprovinceid_seq'::regclass)
+      Primary key for StateProvince records. */
+  stateprovinceid: Defaulted[StateprovinceId] = Defaulted.UseDefault,
+  /** Default: true
+      0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode. */
+  isonlystateprovinceflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(stateprovinceid: StateprovinceId): StateprovinceRow =
+  def toRow(stateprovinceidDefault: => StateprovinceId, isonlystateprovinceflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): StateprovinceRow =
     StateprovinceRow(
-      stateprovinceid = stateprovinceid,
       stateprovincecode = stateprovincecode,
       countryregioncode = countryregioncode,
-      isonlystateprovinceflag = isonlystateprovinceflag match {
-                                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                                  case Defaulted.Provided(value) => value
-                                },
       name = name,
       territoryid = territoryid,
+      stateprovinceid = stateprovinceid match {
+                          case Defaulted.UseDefault => stateprovinceidDefault
+                          case Defaulted.Provided(value) => value
+                        },
+      isonlystateprovinceflag = isonlystateprovinceflag match {
+                                  case Defaulted.UseDefault => isonlystateprovinceflagDefault
+                                  case Defaulted.Provided(value) => value
+                                },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -68,9 +74,10 @@ object StateprovinceRowUnsaved {
       Json.obj(
         "stateprovincecode" -> o.stateprovincecode,
         "countryregioncode" -> o.countryregioncode,
-        "isonlystateprovinceflag" -> o.isonlystateprovinceflag,
         "name" -> o.name,
         "territoryid" -> o.territoryid,
+        "stateprovinceid" -> o.stateprovinceid,
+        "isonlystateprovinceflag" -> o.isonlystateprovinceflag,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
       )
@@ -81,9 +88,10 @@ object StateprovinceRowUnsaved {
           StateprovinceRowUnsaved(
             stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[Flag]],
             name = json.\("name").as[Name],
             territoryid = json.\("territoryid").as[SalesterritoryId],
+            stateprovinceid = json.\("stateprovinceid").as[Defaulted[StateprovinceId]],
+            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[Flag]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

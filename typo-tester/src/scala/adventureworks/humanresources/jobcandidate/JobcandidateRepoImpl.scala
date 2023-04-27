@@ -29,6 +29,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
       Some((NamedParameter("resume", ParameterValue.from(unsaved.resume)), "::xml")),
+      unsaved.jobcandidateid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("jobcandidateid", ParameterValue.from[JobcandidateId](value)), "::int4"))
+      },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))

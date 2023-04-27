@@ -24,39 +24,45 @@ case class TransactionhistoryRowUnsaved(
   productid: ProductId,
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
-  /** Default: 0
-      Line number associated with the purchase order, sales order, or work order. */
-  referenceorderlineid: Defaulted[Int],
-  /** Default: now()
-      Date and time of the transaction. */
-  transactiondate: Defaulted[LocalDateTime],
   /** W = WorkOrder, S = SalesOrder, P = PurchaseOrder */
   transactiontype: /* bpchar */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
+  /** Default: nextval('production.transactionhistory_transactionid_seq'::regclass)
+      Primary key for TransactionHistory records. */
+  transactionid: Defaulted[TransactionhistoryId] = Defaulted.UseDefault,
+  /** Default: 0
+      Line number associated with the purchase order, sales order, or work order. */
+  referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
+  /** Default: now()
+      Date and time of the transaction. */
+  transactiondate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(transactionid: TransactionhistoryId): TransactionhistoryRow =
+  def toRow(transactionidDefault: => TransactionhistoryId, referenceorderlineidDefault: => Int, transactiondateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): TransactionhistoryRow =
     TransactionhistoryRow(
-      transactionid = transactionid,
       productid = productid,
       referenceorderid = referenceorderid,
-      referenceorderlineid = referenceorderlineid match {
-                               case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                               case Defaulted.Provided(value) => value
-                             },
-      transactiondate = transactiondate match {
-                          case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
-                          case Defaulted.Provided(value) => value
-                        },
       transactiontype = transactiontype,
       quantity = quantity,
       actualcost = actualcost,
+      transactionid = transactionid match {
+                        case Defaulted.UseDefault => transactionidDefault
+                        case Defaulted.Provided(value) => value
+                      },
+      referenceorderlineid = referenceorderlineid match {
+                               case Defaulted.UseDefault => referenceorderlineidDefault
+                               case Defaulted.Provided(value) => value
+                             },
+      transactiondate = transactiondate match {
+                          case Defaulted.UseDefault => transactiondateDefault
+                          case Defaulted.Provided(value) => value
+                        },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -67,11 +73,12 @@ object TransactionhistoryRowUnsaved {
       Json.obj(
         "productid" -> o.productid,
         "referenceorderid" -> o.referenceorderid,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
         "transactiontype" -> o.transactiontype,
         "quantity" -> o.quantity,
         "actualcost" -> o.actualcost,
+        "transactionid" -> o.transactionid,
+        "referenceorderlineid" -> o.referenceorderlineid,
+        "transactiondate" -> o.transactiondate,
         "modifieddate" -> o.modifieddate
       )
   
@@ -81,11 +88,12 @@ object TransactionhistoryRowUnsaved {
           TransactionhistoryRowUnsaved(
             productid = json.\("productid").as[ProductId],
             referenceorderid = json.\("referenceorderid").as[Int],
-            referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
-            transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
             transactiontype = json.\("transactiontype").as[/* bpchar */ String],
             quantity = json.\("quantity").as[Int],
             actualcost = json.\("actualcost").as[BigDecimal],
+            transactionid = json.\("transactionid").as[Defaulted[TransactionhistoryId]],
+            referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
+            transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )
         )

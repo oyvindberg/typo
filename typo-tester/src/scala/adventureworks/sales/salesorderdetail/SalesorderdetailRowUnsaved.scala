@@ -9,6 +9,7 @@ package salesorderdetail
 
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
+import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,6 +22,9 @@ import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderdetail` which has not been persisted yet */
 case class SalesorderdetailRowUnsaved(
+  /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
+      Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */
+  salesorderid: SalesorderheaderId,
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[String],
   /** Quantity ordered per product. */
@@ -33,33 +37,39 @@ case class SalesorderdetailRowUnsaved(
   specialofferid: SpecialofferId,
   /** Selling price of a single product. */
   unitprice: BigDecimal,
+  /** Default: nextval('sales.salesorderdetail_salesorderdetailid_seq'::regclass)
+      Primary key. One incremental unique number per product sold. */
+  salesorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: 0.0
       Discount amount. */
-  unitpricediscount: Defaulted[BigDecimal],
+  unitpricediscount: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID],
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime]
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
 ) {
-  def unsafeToRow(compositeId: SalesorderdetailId): SalesorderdetailRow =
+  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderdetailRow =
     SalesorderdetailRow(
-      salesorderid = compositeId.salesorderid,
-      salesorderdetailid = compositeId.salesorderdetailid,
+      salesorderid = salesorderid,
       carriertrackingnumber = carriertrackingnumber,
       orderqty = orderqty,
       productid = productid,
       specialofferid = specialofferid,
       unitprice = unitprice,
+      salesorderdetailid = salesorderdetailid match {
+                             case Defaulted.UseDefault => salesorderdetailidDefault
+                             case Defaulted.Provided(value) => value
+                           },
       unitpricediscount = unitpricediscount match {
-                            case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                            case Defaulted.UseDefault => unitpricediscountDefault
                             case Defaulted.Provided(value) => value
                           },
       rowguid = rowguid match {
-                  case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                  case Defaulted.UseDefault => rowguidDefault
                   case Defaulted.Provided(value) => value
                 },
       modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => sys.error("cannot produce row when you depend on a value which is defaulted in database")
+                       case Defaulted.UseDefault => modifieddateDefault
                        case Defaulted.Provided(value) => value
                      }
     )
@@ -68,11 +78,13 @@ object SalesorderdetailRowUnsaved {
   implicit val oFormat: OFormat[SalesorderdetailRowUnsaved] = new OFormat[SalesorderdetailRowUnsaved]{
     override def writes(o: SalesorderdetailRowUnsaved): JsObject =
       Json.obj(
+        "salesorderid" -> o.salesorderid,
         "carriertrackingnumber" -> o.carriertrackingnumber,
         "orderqty" -> o.orderqty,
         "productid" -> o.productid,
         "specialofferid" -> o.specialofferid,
         "unitprice" -> o.unitprice,
+        "salesorderdetailid" -> o.salesorderdetailid,
         "unitpricediscount" -> o.unitpricediscount,
         "rowguid" -> o.rowguid,
         "modifieddate" -> o.modifieddate
@@ -82,11 +94,13 @@ object SalesorderdetailRowUnsaved {
       JsResult.fromTry(
         Try(
           SalesorderdetailRowUnsaved(
+            salesorderid = json.\("salesorderid").as[SalesorderheaderId],
             carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[String]),
             orderqty = json.\("orderqty").as[Int],
             productid = json.\("productid").as[ProductId],
             specialofferid = json.\("specialofferid").as[SpecialofferId],
             unitprice = json.\("unitprice").as[BigDecimal],
+            salesorderdetailid = json.\("salesorderdetailid").as[Defaulted[Int]],
             unitpricediscount = json.\("unitpricediscount").as[Defaulted[BigDecimal]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

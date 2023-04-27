@@ -14,7 +14,7 @@ import java.sql.Connection
 
 trait PgNamespaceRepo {
   def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean
-  def insert(oid: PgNamespaceId, unsaved: PgNamespaceRowUnsaved)(implicit c: Connection): PgNamespaceRow
+  def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow
   def selectAll(implicit c: Connection): List[PgNamespaceRow]
   def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow]
   def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow]

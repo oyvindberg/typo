@@ -23,8 +23,10 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}".executeUpdate() > 0
   }
-  override def insert(compositeId: ProductproductphotoId, unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow = {
+  override def insert(unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow = {
     val namedParameters = List(
+      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
+      Some((NamedParameter("productphotoid", ParameterValue.from(unsaved.productphotoid)), "::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("primary", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
@@ -35,16 +37,22 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       }
     ).flatten
     val quote = '"'.toString
-    val q = s"""insert into production.productproductphoto(productid, productphotoid, ${namedParameters.map(x => quote + x._1.name + quote).mkString(", ")})
-                values ({productid}::int4, {productphotoid}::int4, ${namedParameters.map{case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                returning productid, productphotoid, "primary", modifieddate
-             """
-    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-    import anorm._
-    SQL(q)
-      .on(namedParameters.map(_._1) :_*)
-      .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("productphotoid", ParameterValue.from(compositeId.productphotoid)))
-      .executeInsert(rowParser.single)
+    if (namedParameters.isEmpty) {
+      SQL"""insert into production.productproductphoto default values
+            returning productid, productphotoid, "primary", modifieddate
+         """
+        .executeInsert(rowParser.single)
+    } else {
+      val q = s"""insert into production.productproductphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning productid, productphotoid, "primary", modifieddate
+               """
+      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
+      import anorm._
+      SQL(q)
+        .on(namedParameters.map(_._1) :_*)
+        .executeInsert(rowParser.single)
+    }
   
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {

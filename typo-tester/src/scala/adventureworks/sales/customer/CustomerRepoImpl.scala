@@ -31,6 +31,10 @@ object CustomerRepoImpl extends CustomerRepo {
       Some((NamedParameter("personid", ParameterValue.from(unsaved.personid)), "::int4")),
       Some((NamedParameter("storeid", ParameterValue.from(unsaved.storeid)), "::int4")),
       Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
+      unsaved.customerid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("customerid", ParameterValue.from[CustomerId](value)), "::int4"))
+      },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))

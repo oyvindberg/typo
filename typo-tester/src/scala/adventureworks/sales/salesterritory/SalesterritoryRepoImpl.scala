@@ -31,6 +31,10 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
       Some((NamedParameter("group", ParameterValue.from(unsaved.group)), "")),
+      unsaved.territoryid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("territoryid", ParameterValue.from[SalesterritoryId](value)), "::int4"))
+      },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("salesytd", ParameterValue.from[BigDecimal](value)), "::numeric"))

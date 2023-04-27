@@ -29,20 +29,20 @@ object DocumentRepoImpl extends DocumentRepo {
     val namedParameters = List(
       Some((NamedParameter("title", ParameterValue.from(unsaved.title)), "")),
       Some((NamedParameter("owner", ParameterValue.from(unsaved.owner)), "::int4")),
+      Some((NamedParameter("filename", ParameterValue.from(unsaved.filename)), "")),
+      Some((NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension)), "")),
+      Some((NamedParameter("revision", ParameterValue.from(unsaved.revision)), "::bpchar")),
+      Some((NamedParameter("status", ParameterValue.from(unsaved.status)), "::int2")),
+      Some((NamedParameter("documentsummary", ParameterValue.from(unsaved.documentsummary)), "")),
+      Some((NamedParameter("document", ParameterValue.from(unsaved.document)), "::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("folderflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some((NamedParameter("filename", ParameterValue.from(unsaved.filename)), "")),
-      Some((NamedParameter("fileextension", ParameterValue.from(unsaved.fileextension)), "")),
-      Some((NamedParameter("revision", ParameterValue.from(unsaved.revision)), "::bpchar")),
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("changenumber", ParameterValue.from[Int](value)), "::int4"))
       },
-      Some((NamedParameter("status", ParameterValue.from(unsaved.status)), "::int2")),
-      Some((NamedParameter("documentsummary", ParameterValue.from(unsaved.documentsummary)), "")),
-      Some((NamedParameter("document", ParameterValue.from(unsaved.document)), "::bytea")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
@@ -50,6 +50,10 @@ object DocumentRepoImpl extends DocumentRepo {
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+      },
+      unsaved.documentnode match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("documentnode", ParameterValue.from[DocumentId](value)), ""))
       }
     ).flatten
     val quote = '"'.toString

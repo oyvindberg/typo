@@ -21,9 +21,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.football_club where "id" = $id""".executeUpdate() > 0
   }
-  override def insert(id: FootballClubId, unsaved: FootballClubRowUnsaved)(implicit c: Connection): FootballClubRow = {
+  override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
-          values (${id}::int8, ${unsaved.name})
+          values (${unsaved.id}::int8, ${unsaved.name})
           returning "id", "name"
        """
       .executeInsert(rowParser.single)

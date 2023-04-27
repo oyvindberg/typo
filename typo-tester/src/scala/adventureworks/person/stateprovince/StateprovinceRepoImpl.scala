@@ -32,12 +32,16 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     val namedParameters = List(
       Some((NamedParameter("stateprovincecode", ParameterValue.from(unsaved.stateprovincecode)), "::bpchar")),
       Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
+      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
+      unsaved.stateprovinceid match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("stateprovinceid", ParameterValue.from[StateprovinceId](value)), "::int4"))
+      },
       unsaved.isonlystateprovinceflag match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("isonlystateprovinceflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
       },
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
