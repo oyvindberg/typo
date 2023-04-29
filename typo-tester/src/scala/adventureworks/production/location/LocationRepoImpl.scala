@@ -79,9 +79,10 @@ object LocationRepoImpl extends LocationRepo {
           case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
           case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select locationid, "name", costrate, availability, modifieddate
                     from production."location"
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -130,7 +131,7 @@ object LocationRepoImpl extends LocationRepo {
         }
         val quote = '"'.toString
         val q = s"""update production."location"
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where locationid = {locationid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

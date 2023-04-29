@@ -70,9 +70,10 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           case ProductproductphotoFieldValue.primary(value) => NamedParameter("primary", ParameterValue.from(value))
           case ProductproductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select productid, productphotoid, "primary", modifieddate
                     from production.productproductphoto
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -106,7 +107,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
         }
         val quote = '"'.toString
         val q = s"""update production.productproductphoto
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where productid = {productid} AND productphotoid = {productphotoid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

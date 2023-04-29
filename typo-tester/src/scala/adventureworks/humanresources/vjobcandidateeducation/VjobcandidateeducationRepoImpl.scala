@@ -41,9 +41,10 @@ object VjobcandidateeducationRepoImpl extends VjobcandidateeducationRepo {
           case VjobcandidateeducationFieldValue.`Edu.Loc.State`(value) => NamedParameter("Edu.Loc.State", ParameterValue.from(value))
           case VjobcandidateeducationFieldValue.`Edu.Loc.City`(value) => NamedParameter("Edu.Loc.City", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City"
                     from humanresources.vjobcandidateeducation
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

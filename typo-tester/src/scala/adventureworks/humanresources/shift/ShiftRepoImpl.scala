@@ -74,9 +74,10 @@ object ShiftRepoImpl extends ShiftRepo {
           case ShiftFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
           case ShiftFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select shiftid, "name", starttime, endtime, modifieddate
                     from humanresources.shift
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -125,7 +126,7 @@ object ShiftRepoImpl extends ShiftRepo {
         }
         val quote = '"'.toString
         val q = s"""update humanresources.shift
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where shiftid = {shiftid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

@@ -65,9 +65,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           case UnitmeasureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case UnitmeasureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select unitmeasurecode, "name", modifieddate
                     from production.unitmeasure
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -112,7 +113,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         }
         val quote = '"'.toString
         val q = s"""update production.unitmeasure
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where unitmeasurecode = {unitmeasurecode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

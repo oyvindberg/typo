@@ -69,9 +69,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           case ScrapreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
           case ScrapreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select scrapreasonid, "name", modifieddate
                     from production.scrapreason
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -116,7 +117,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         }
         val quote = '"'.toString
         val q = s"""update production.scrapreason
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where scrapreasonid = {scrapreasonid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

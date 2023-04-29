@@ -71,9 +71,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           case SalesreasonFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
           case SalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select salesreasonid, "name", reasontype, modifieddate
                     from sales.salesreason
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -120,7 +121,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         }
         val quote = '"'.toString
         val q = s"""update sales.salesreason
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where salesreasonid = {salesreasonid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

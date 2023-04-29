@@ -35,9 +35,10 @@ object CcRepoImpl extends CcRepo {
           case CcFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
           case CcFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
                     from sa.cc
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

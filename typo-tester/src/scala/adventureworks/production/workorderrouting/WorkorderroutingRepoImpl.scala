@@ -82,9 +82,10 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           case WorkorderroutingFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
           case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
                     from production.workorderrouting
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -132,7 +133,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         }
         val quote = '"'.toString
         val q = s"""update production.workorderrouting
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where workorderid = {workorderid} AND productid = {productid} AND operationsequence = {operationsequence}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

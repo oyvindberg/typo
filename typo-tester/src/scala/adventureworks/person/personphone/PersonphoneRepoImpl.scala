@@ -67,9 +67,10 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           case PersonphoneFieldValue.phonenumbertypeid(value) => NamedParameter("phonenumbertypeid", ParameterValue.from(value))
           case PersonphoneFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
                     from person.personphone
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -101,7 +102,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         }
         val quote = '"'.toString
         val q = s"""update person.personphone
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid} AND phonenumber = {phonenumber} AND phonenumbertypeid = {phonenumbertypeid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

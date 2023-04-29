@@ -81,9 +81,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           case ShoppingcartitemFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
           case ShoppingcartitemFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
                     from sales.shoppingcartitem
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -134,7 +135,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         }
         val quote = '"'.toString
         val q = s"""update sales.shoppingcartitem
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where shoppingcartitemid = {shoppingcartitemid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

@@ -37,9 +37,10 @@ object SthRepoImpl extends SthRepo {
           case SthFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SthFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select "id", businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
                     from sa.sth
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

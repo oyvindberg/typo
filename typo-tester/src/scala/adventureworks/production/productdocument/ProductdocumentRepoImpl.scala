@@ -67,9 +67,10 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           case ProductdocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
           case ProductdocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select productid, modifieddate, documentnode
                     from production.productdocument
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -101,7 +102,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         }
         val quote = '"'.toString
         val q = s"""update production.productdocument
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where productid = {productid} AND documentnode = {documentnode}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

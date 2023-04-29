@@ -47,9 +47,10 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           case PgNamespaceFieldValue.nspowner(value) => NamedParameter("nspowner", ParameterValue.from(value))
           case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select oid, nspname, nspowner, nspacl
                     from pg_catalog.pg_namespace
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -99,7 +100,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         }
         val quote = '"'.toString
         val q = s"""update pg_catalog.pg_namespace
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where oid = {oid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

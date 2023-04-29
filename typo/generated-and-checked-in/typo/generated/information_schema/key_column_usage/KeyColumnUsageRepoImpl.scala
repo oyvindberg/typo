@@ -40,9 +40,10 @@ object KeyColumnUsageRepoImpl extends KeyColumnUsageRepo {
           case KeyColumnUsageFieldValue.ordinalPosition(value) => NamedParameter("ordinal_position", ParameterValue.from(value))
           case KeyColumnUsageFieldValue.positionInUniqueConstraint(value) => NamedParameter("position_in_unique_constraint", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", "column_name", ordinal_position, position_in_unique_constraint
                     from information_schema.key_column_usage
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

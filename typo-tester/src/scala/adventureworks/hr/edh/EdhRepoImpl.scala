@@ -38,9 +38,10 @@ object EdhRepoImpl extends EdhRepo {
           case EdhFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
           case EdhFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
                     from hr.edh
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._

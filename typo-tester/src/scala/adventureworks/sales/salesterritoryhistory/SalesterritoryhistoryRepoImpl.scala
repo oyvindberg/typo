@@ -74,9 +74,10 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           case SalesterritoryhistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
           case SalesterritoryhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
         }
+        val quote = '"'.toString
         val q = s"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
                     from sales.salesterritoryhistory
-                    where ${namedParams.map(x => s"${x.name} = {${x.name}}").mkString(" AND ")}
+                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
         import anorm._
@@ -112,7 +113,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         }
         val quote = '"'.toString
         val q = s"""update sales.salesterritoryhistory
-                    set ${namedParams.map(x => s"${quote}${x.name}${quote} = {${x.name}}").mkString(", ")}
+                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where businessentityid = {businessentityid} AND startdate = {startdate} AND territoryid = {territoryid}
                  """
         // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2

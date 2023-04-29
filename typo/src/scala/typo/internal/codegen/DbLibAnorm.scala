@@ -171,7 +171,7 @@ object DbLibAnorm extends DbLib {
         val sql = sc.s {
           code"""|select ${dbNames(table.cols)}
                  |from ${table.relationName}
-                 |where $${namedParams.map(x => s"$${x.name} = {$${x.name}}").mkString(" AND ")}
+                 |where $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
                  |""".stripMargin
         }
         code"""${param.name} match {
@@ -180,6 +180,7 @@ object DbLibAnorm extends DbLib {
               |    val namedParams = nonEmpty.map{
               |      ${cases.mkCode("\n")}
               |    }
+              |    val quote = '"'.toString
               |    val q = $sql
               |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
               |    import anorm._
@@ -209,7 +210,7 @@ object DbLibAnorm extends DbLib {
 
         val sql = sc.s {
           code"""update ${table.relationName}
-                |set $${namedParams.map(x => s"$${quote}$${x.name}$${quote} = {$${x.name}}").mkString(", ")}
+                |set $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(", ")}
                 |where $where
                 |""".stripMargin
         }
