@@ -57,3 +57,5 @@ jobs:
           name: "${{ steps.get_version.outputs.version-without-v }}"
           prerelease: true
           generate_release_notes: true
+    permissions:
+      contents: write
