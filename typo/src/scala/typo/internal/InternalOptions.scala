@@ -9,6 +9,7 @@ case class InternalOptions(
     dbLib: DbLib,
     naming: sc.QIdent => Naming,
     typeOverride: TypeOverride,
+    generateMockRepos: Selector,
     header: String,
     debugTypes: Boolean
 )

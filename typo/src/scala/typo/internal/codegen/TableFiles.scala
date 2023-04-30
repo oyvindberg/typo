@@ -144,6 +144,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
     table.maybeId
       .zip(table.repoMethods)
       .headOption
+      .filter { _ => options.generateMockRepos.include(table.dbTable.name) }
       .map { case (id, repoMethods) => relation.RepoMockFile(id, repoMethods) }
 
   val all: List[sc.File] = List(

@@ -38,6 +38,7 @@ package object typo {
       },
       naming = publicOptions.naming,
       typeOverride = publicOptions.typeOverride,
+      generateMockRepos = publicOptions.generateMockRepos,
       header = publicOptions.header,
       debugTypes = publicOptions.debugTypes
     )
