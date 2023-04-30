@@ -25,6 +25,14 @@ object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person."password" where businessentityid = $businessentityid""".executeUpdate() > 0
   }
+  override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
+    SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),

@@ -16,7 +16,7 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
 
       val params: NonEmptyList[sc.Param] =
         unsaved.defaultCols.map { case (col, originalType) =>
-          sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType))
+          sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None)
         }
 
       val keyValues1 =
@@ -140,12 +140,20 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
     }
   }
 
+  private val maybeMockRepo: Option[sc.File] =
+    table.maybeId
+      .zip(table.repoMethods)
+      .headOption
+      .filter { _ => options.generateMockRepos.include(table.dbTable.name) }
+      .map { case (id, repoMethods) => relation.RepoMockFile(id, repoMethods) }
+
   val all: List[sc.File] = List(
     Some(relation.RowFile),
     UnsavedRowFile,
     table.repoMethods.map(relation.RepoTraitFile),
     table.repoMethods.map(relation.RepoImplFile),
     Some(relation.FieldValueFile),
+    maybeMockRepo,
     IdFile
     // JoinedRowFile
   ).flatten

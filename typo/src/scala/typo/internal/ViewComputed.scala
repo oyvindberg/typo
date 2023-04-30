@@ -44,7 +44,8 @@ case class ViewComputed(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     val RowType = relation.RowName
     val fieldValuesParam = sc.Param(
       sc.Ident("fieldValues"),
-      sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard))
+      sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard)),
+      None
     )
 
     NonEmptyList(

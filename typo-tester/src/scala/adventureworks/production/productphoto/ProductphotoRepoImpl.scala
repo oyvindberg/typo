@@ -23,6 +23,14 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productphoto where productphotoid = $productphotoid".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
+    SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
+          values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
+          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
       Some((NamedParameter("thumbnailphoto", ParameterValue.from(unsaved.thumbnailphoto)), "::bytea")),

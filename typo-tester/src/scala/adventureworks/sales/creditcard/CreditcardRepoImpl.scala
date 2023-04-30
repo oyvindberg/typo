@@ -23,6 +23,14 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.creditcard where creditcardid = $creditcardid".executeUpdate() > 0
   }
+  override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
+    SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
+          values (${unsaved.creditcardid}::int4, ${unsaved.cardtype}, ${unsaved.cardnumber}, ${unsaved.expmonth}::int2, ${unsaved.expyear}::int2, ${unsaved.modifieddate}::timestamp)
+          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
     val namedParameters = List(
       Some((NamedParameter("cardtype", ParameterValue.from(unsaved.cardtype)), "")),

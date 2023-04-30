@@ -24,6 +24,14 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.businessentity where businessentityid = $businessentityid".executeUpdate() > 0
   }
+  override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
+    SQL"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
       unsaved.businessentityid match {

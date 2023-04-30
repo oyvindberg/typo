@@ -7,6 +7,7 @@ case class Options(
     naming: sc.QIdent => Naming = new Naming(_),
     typeOverride: TypeOverride = TypeOverride.Empty,
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,
+    generateMockRepos: Selector = Selector.All,
     header: String = Options.header,
     debugTypes: Boolean = false
 )

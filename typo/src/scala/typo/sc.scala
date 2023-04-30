@@ -29,7 +29,7 @@ object sc {
   object QIdent {
     def of(idents: Ident*): QIdent = QIdent(idents.toList)
   }
-  case class Param(name: Ident, tpe: Type) extends Tree
+  case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
 
   case class StrLit(str: String) extends Tree
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
@@ -91,6 +91,7 @@ object sc {
     val Double = Qualified("scala.Double")
     val Either = Qualified("scala.Either")
     val Float = Qualified("scala.Float")
+    val Function1 = Qualified("scala.Function1")
     val Int = Qualified("scala.Int")
     val Left = Qualified("scala.Left")
     val List = Qualified("scala.List")
@@ -103,6 +104,7 @@ object sc {
     val StringContext = Qualified("scala.StringContext")
     val Unit = Qualified("scala.Unit")
     val Map = Qualified("scala.collection.immutable.Map")
+    val mutableMap = Qualified("scala.collection.mutable.Map")
     val BigDecimal = Qualified("scala.math.BigDecimal")
     val Ordering = Qualified("scala.math.Ordering")
     val Try = Qualified("scala.util.Try")
@@ -250,7 +252,8 @@ object sc {
         def escape(str: String) = s"`$str`"
         if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
       case QIdent(value)                      => value.map(renderTree).mkString(".")
-      case Param(name, tpe)                   => renderTree(name) + ": " + renderTree(tpe)
+      case Param(name, tpe, Some(default))    => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
+      case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
       case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
       case StrLit(str)                        => Quote + str + Quote
       case tpe: Type =>

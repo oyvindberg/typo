@@ -159,20 +159,19 @@ case class TableComputed(
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
     val fieldValueOrIdsParam = sc.Param(
       sc.Ident("fieldValues"),
-      sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard))
+      sc.Type.List.of(relation.FieldOrIdValueName.of(sc.Type.Wildcard)),
+      None
     )
 
-    val insertMethod: RepoMethod =
-      maybeUnsavedRow match {
-        case Some(unsavedRow) =>
-          val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe)
+    val insertMethod: RepoMethod = {
+      val unsavedParam = sc.Param(sc.Ident("unsaved"), relation.RowName, None)
+      RepoMethod.Insert(cols, unsavedParam, relation.RowName)
+    }
 
-          RepoMethod.Insert(unsavedRow.allCols, unsavedParam, default, relation.RowName)
-
-        case None =>
-          val unsavedParam = sc.Param(sc.Ident("unsaved"), relation.RowName)
-
-          RepoMethod.Insert(cols, unsavedParam, default, relation.RowName)
+    val maybeInsertUnsavedMethod: Option[RepoMethod] =
+      maybeUnsavedRow.map { unsavedRow =>
+        val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
+        RepoMethod.InsertUnsaved(unsavedRow, unsavedParam, default, relation.RowName)
       }
 
     val maybeMethods = List(
@@ -183,7 +182,7 @@ case class TableComputed(
             Some(RepoMethod.SelectById(id, relation.RowName)),
             id match {
               case unary: IdComputed.Unary =>
-                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe)), relation.RowName))
+                Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe), None), relation.RowName))
               case IdComputed.Composite(_, _, _) =>
                 // todo: support composite ids
                 None
@@ -194,22 +193,25 @@ case class TableComputed(
                 id,
                 sc.Param(
                   sc.Ident("fieldValues"),
-                  sc.Type.List.of(relation.FieldValueName.of(sc.Type.Wildcard))
+                  sc.Type.List.of(relation.FieldValueName.of(sc.Type.Wildcard)),
+                  None
                 ),
                 colsNotId,
                 relation.RowName
               )
             ),
-            colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), relation.RowName), colsNotId)),
+            colsNotId.map(colsNotId => RepoMethod.Update(id, sc.Param(sc.Ident("row"), relation.RowName, None), colsNotId)),
             Some(insertMethod),
+            maybeInsertUnsavedMethod,
             Some(RepoMethod.Delete(id))
           ).flatten
         case None =>
           List(
-            insertMethod,
-            RepoMethod.SelectAll(relation.RowName),
-            RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, relation.RowName)
-          )
+            Some(insertMethod),
+            maybeInsertUnsavedMethod,
+            Some(RepoMethod.SelectAll(relation.RowName)),
+            Some(RepoMethod.SelectByFieldValues(fieldValueOrIdsParam, relation.RowName))
+          ).flatten
       },
       dbTable.uniqueKeys
         .map { uk =>

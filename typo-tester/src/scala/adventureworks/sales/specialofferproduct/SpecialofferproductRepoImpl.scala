@@ -23,6 +23,14 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".executeUpdate() > 0
   }
+  override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
+    SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
+          values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning specialofferid, productid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
     val namedParameters = List(
       Some((NamedParameter("specialofferid", ParameterValue.from(unsaved.specialofferid)), "::int4")),

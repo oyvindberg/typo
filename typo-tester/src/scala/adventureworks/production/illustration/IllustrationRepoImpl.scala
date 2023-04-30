@@ -24,6 +24,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.illustration where illustrationid = $illustrationid".executeUpdate() > 0
   }
+  override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
+    SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
+          values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
+          returning illustrationid, diagram, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
       Some((NamedParameter("diagram", ParameterValue.from(unsaved.diagram)), "::xml")),

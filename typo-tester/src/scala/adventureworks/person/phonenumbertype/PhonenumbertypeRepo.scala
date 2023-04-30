@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait PhonenumbertypeRepo {
   def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean
+  def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
   def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
   def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow]

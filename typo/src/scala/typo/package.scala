@@ -38,6 +38,7 @@ package object typo {
       },
       naming = publicOptions.naming,
       typeOverride = publicOptions.typeOverride,
+      generateMockRepos = publicOptions.generateMockRepos,
       header = publicOptions.header,
       debugTypes = publicOptions.debugTypes
     )
@@ -105,10 +106,12 @@ package object typo {
       entryPoints.foreach { f =>
         def goTree(tree: sc.Tree): Unit = {
           tree match {
-            case sc.Ident(_)      => ()
-            case x: sc.QIdent     => b += x
-            case sc.Param(_, tpe) => go(tpe)
-            case sc.StrLit(_)     => ()
+            case sc.Ident(_)  => ()
+            case x: sc.QIdent => b += x
+            case sc.Param(_, tpe, maybeCode) =>
+              go(tpe)
+              maybeCode.foreach(go)
+            case sc.StrLit(_) => ()
             case sc.StringInterpolate(i, prefix, content) =>
               goTree(i)
               goTree(prefix)

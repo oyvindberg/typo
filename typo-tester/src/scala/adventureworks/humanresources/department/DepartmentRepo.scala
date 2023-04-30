@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait DepartmentRepo {
   def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean
+  def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
   def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow
   def selectAll(implicit c: Connection): List[DepartmentRow]
   def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow]

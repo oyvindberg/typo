@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait ShipmethodRepo {
   def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean
+  def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow
   def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow
   def selectAll(implicit c: Connection): List[ShipmethodRow]
   def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow]

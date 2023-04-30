@@ -93,6 +93,39 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
     sc.File(relation.RepoImplName, str, secondaryTypes = Nil)
   }
 
+  def RepoMockFile(idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val maybeToRowParam: Option[sc.Param] =
+      repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(unsaved, _, _, _) =>
+        sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, relation.RowName), None)
+      }
+
+    val methods: NonEmptyList[sc.Code] =
+      repoMethods.sortedBy { options.dbLib.repoSig }.map { repoMethod =>
+        code"""|override ${options.dbLib.repoSig(repoMethod)} = {
+               |  ${options.dbLib.mockRepoImpl(relation, idComputed, repoMethod, maybeToRowParam)}
+               |}""".stripMargin
+      }
+
+    val classParams = List(
+      maybeToRowParam,
+      Some(
+        sc.Param(
+          sc.Ident("map"),
+          sc.Type.mutableMap.of(idComputed.tpe, relation.RowName),
+          Some(code"${sc.Type.mutableMap}.empty")
+        )
+      )
+    ).flatten
+
+    val str =
+      code"""|class ${relation.RepoMockName.name}(${classParams.map(_.code).mkCode(",\n")}) extends ${relation.RepoName} {
+             |  ${methods.mkCode("\n")}
+             |}
+             |""".stripMargin
+
+    sc.File(relation.RepoMockName, str, secondaryTypes = Nil)
+  }
+
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =
     (a, b) match {
       case (x :: xs, y :: ys) if x == y && xs.nonEmpty => dropCommonPrefix(xs, ys)

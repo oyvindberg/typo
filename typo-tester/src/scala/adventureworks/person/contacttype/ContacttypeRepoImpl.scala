@@ -24,6 +24,14 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.contacttype where contacttypeid = $contacttypeid".executeUpdate() > 0
   }
+  override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
+    SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
+          values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning contacttypeid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

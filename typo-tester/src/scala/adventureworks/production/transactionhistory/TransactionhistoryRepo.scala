@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait TransactionhistoryRepo {
   def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean
+  def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow
   def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow
   def selectAll(implicit c: Connection): List[TransactionhistoryRow]
   def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow]

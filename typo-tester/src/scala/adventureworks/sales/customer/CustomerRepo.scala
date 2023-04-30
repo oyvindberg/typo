@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait CustomerRepo {
   def delete(customerid: CustomerId)(implicit c: Connection): Boolean
+  def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow
   def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow
   def selectAll(implicit c: Connection): List[CustomerRow]
   def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow]

@@ -10,6 +10,7 @@ class Naming(pkg: sc.QIdent) {
   def idName(name: db.RelationName): sc.QIdent = relation(name, "Id")
   def repoName(name: db.RelationName): sc.QIdent = relation(name, "Repo")
   def repoImplName(name: db.RelationName): sc.QIdent = relation(name, "RepoImpl")
+  def repoMockName(name: db.RelationName): sc.QIdent = relation(name, "RepoMock")
   def rowName(name: db.RelationName): sc.QIdent = relation(name, "Row")
   def fieldValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldValue")
   def fieldOrIdValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldOrIdValue")

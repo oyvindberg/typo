@@ -25,6 +25,14 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productcategory where productcategoryid = $productcategoryid".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
+    SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
+          values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning productcategoryid, "name", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

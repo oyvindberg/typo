@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait ProductcosthistoryRepo {
   def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean
+  def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
   def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
   def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow]

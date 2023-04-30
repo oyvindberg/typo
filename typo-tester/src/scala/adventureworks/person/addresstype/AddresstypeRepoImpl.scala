@@ -25,6 +25,14 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.addresstype where addresstypeid = $addresstypeid".executeUpdate() > 0
   }
+  override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
+    SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
+          values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning addresstypeid, "name", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
