@@ -20,6 +20,14 @@ object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".executeUpdate() > 0
   }
+  override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
+    SQL"""insert into compositepk.person("one", two, "name")
+          values (${unsaved.one}::int8, ${unsaved.two}, ${unsaved.name})
+          returning "one", two, "name"
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), "")),

@@ -24,6 +24,14 @@ object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production."location" where locationid = $locationid""".executeUpdate() > 0
   }
+  override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
+    SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
+          values (${unsaved.locationid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.costrate}::numeric, ${unsaved.availability}::numeric, ${unsaved.modifieddate}::timestamp)
+          returning locationid, "name", costrate, availability, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

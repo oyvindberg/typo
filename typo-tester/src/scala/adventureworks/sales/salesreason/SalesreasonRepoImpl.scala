@@ -24,6 +24,14 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesreason where salesreasonid = $salesreasonid".executeUpdate() > 0
   }
+  override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
+    SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
+          values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning salesreasonid, "name", reasontype, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

@@ -25,6 +25,14 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".executeUpdate() > 0
   }
+  override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
+    SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
+          values (${unsaved.purchaseorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.status}::int2, ${unsaved.employeeid}::int4, ${unsaved.vendorid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.orderdate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.modifieddate}::timestamp)
+          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     val namedParameters = List(
       Some((NamedParameter("employeeid", ParameterValue.from(unsaved.employeeid)), "::int4")),

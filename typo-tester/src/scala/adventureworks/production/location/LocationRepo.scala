@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait LocationRepo {
   def delete(locationid: LocationId)(implicit c: Connection): Boolean
+  def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow]

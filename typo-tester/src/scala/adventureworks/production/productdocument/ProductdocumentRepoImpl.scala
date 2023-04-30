@@ -22,6 +22,14 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
+    SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
+          values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
+          returning productid, modifieddate, documentnode
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),

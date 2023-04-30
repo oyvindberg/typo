@@ -5,7 +5,7 @@ sealed trait IdComputed {
   def paramName: sc.Ident
   def cols: NonEmptyList[ColumnComputed]
   def tpe: sc.Type
-  final def param: sc.Param = sc.Param(paramName, tpe)
+  final def param: sc.Param = sc.Param(paramName, tpe, None)
 }
 
 object IdComputed {

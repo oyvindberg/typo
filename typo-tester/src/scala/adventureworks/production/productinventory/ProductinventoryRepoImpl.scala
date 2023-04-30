@@ -23,6 +23,14 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
+    SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
+          values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),

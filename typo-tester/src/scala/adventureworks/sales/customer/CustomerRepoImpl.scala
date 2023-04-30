@@ -26,6 +26,14 @@ object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.customer where customerid = $customerid".executeUpdate() > 0
   }
+  override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
+    SQL"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
+          values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     val namedParameters = List(
       Some((NamedParameter("personid", ParameterValue.from(unsaved.personid)), "::int4")),

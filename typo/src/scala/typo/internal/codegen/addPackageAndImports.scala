@@ -10,7 +10,8 @@ object addPackageAndImports {
   def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
 
-    val withShortenedNames = file.contents.mapTrees { tree =>
+    val contents = file.contents
+    val withShortenedNames = contents.mapTrees { tree =>
       shortenNames(tree) {
         case currentQName if currentQName.value.idents.length <= 1 => currentQName
         case currentQName =>
@@ -41,7 +42,7 @@ object addPackageAndImports {
     tree match {
       case x: sc.Ident                              => x
       case x: sc.QIdent                             => x
-      case sc.Param(name, tpe)                      => sc.Param(name, shortenNames(tpe, f))
+      case sc.Param(name, tpe, maybeDefault)        => sc.Param(name, shortenNames(tpe, f), maybeDefault.map(code => code.mapTrees(shortenNames(_)(f))))
       case x: sc.StrLit                             => x
       case tpe: sc.Type                             => shortenNames(tpe, f)
       case sc.StringInterpolate(i, prefix, content) => sc.StringInterpolate(shortenNames(i, f), prefix, content)

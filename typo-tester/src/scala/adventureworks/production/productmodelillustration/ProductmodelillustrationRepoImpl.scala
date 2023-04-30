@@ -22,6 +22,14 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
+    SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
+          values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
+          returning productmodelid, illustrationid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
     val namedParameters = List(
       Some((NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid)), "::int4")),

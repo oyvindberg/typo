@@ -23,6 +23,14 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"delete from person.countryregion where countryregioncode = $countryregioncode".executeUpdate() > 0
   }
+  override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
+    SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
+          values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning countryregioncode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
       Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),

@@ -22,6 +22,14 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".executeUpdate() > 0
   }
+  override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
+    SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
+          values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
+          returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
     val namedParameters = List(
       Some((NamedParameter("purchaseorderid", ParameterValue.from(unsaved.purchaseorderid)), "::int4")),

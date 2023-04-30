@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait EmployeepayhistoryRepo {
   def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean
+  def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
   def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow
   def selectAll(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow]

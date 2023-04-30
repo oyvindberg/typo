@@ -24,6 +24,14 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.department where departmentid = $departmentid".executeUpdate() > 0
   }
+  override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
+    SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
+          values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning departmentid, "name", groupname, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

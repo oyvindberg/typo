@@ -5,6 +5,6 @@ case class RowJoinedComputed(name: sc.QIdent, params: NonEmptyList[RowJoinedComp
 
 object RowJoinedComputed {
   case class Param(name: sc.Ident, tpe: sc.Type, isOptional: Boolean, table: TableComputed) {
-    def param: sc.Param = sc.Param(name, tpe)
+    def param: sc.Param = sc.Param(name, tpe, None)
   }
 }

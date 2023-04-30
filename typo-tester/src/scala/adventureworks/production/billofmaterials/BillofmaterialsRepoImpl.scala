@@ -25,6 +25,14 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean = {
     SQL"delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid".executeUpdate() > 0
   }
+  override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
+    SQL"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
+          values (${unsaved.billofmaterialsid}::int4, ${unsaved.productassemblyid}::int4, ${unsaved.componentid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.bomlevel}::int2, ${unsaved.perassemblyqty}::numeric, ${unsaved.modifieddate}::timestamp)
+          returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
       Some((NamedParameter("productassemblyid", ParameterValue.from(unsaved.productassemblyid)), "::int4")),

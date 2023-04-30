@@ -23,6 +23,14 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
     SQL"delete from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".executeUpdate() > 0
   }
+  override def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
+    SQL"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.personid}::int4, ${unsaved.contacttypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, personid, contacttypeid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),

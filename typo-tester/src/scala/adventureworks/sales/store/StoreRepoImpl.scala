@@ -27,6 +27,14 @@ object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.store where businessentityid = $businessentityid".executeUpdate() > 0
   }
+  override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
+    SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),

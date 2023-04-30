@@ -22,6 +22,14 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".executeUpdate() > 0
   }
+  override def insert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
+    SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
+          values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
+          returning salesorderid, salesreasonid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
       Some((NamedParameter("salesorderid", ParameterValue.from(unsaved.salesorderid)), "::int4")),

@@ -22,6 +22,14 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
     SQL"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".executeUpdate() > 0
   }
+  override def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
+    SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),

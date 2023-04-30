@@ -25,6 +25,14 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productreview where productreviewid = $productreviewid".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
+    SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
+          values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
+          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),

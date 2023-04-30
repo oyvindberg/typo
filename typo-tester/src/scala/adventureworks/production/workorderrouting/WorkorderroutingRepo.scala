@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean
+  def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
   def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow]

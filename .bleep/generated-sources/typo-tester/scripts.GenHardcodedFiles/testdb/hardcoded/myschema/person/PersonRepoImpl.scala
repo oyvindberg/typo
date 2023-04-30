@@ -25,6 +25,14 @@ object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.person where "id" = $id""".executeUpdate() > 0
   }
+  override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
+    SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
+          values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
       Some((NamedParameter("favourite_football_club_id", ParameterValue.from(unsaved.favouriteFootballClubId)), "")),

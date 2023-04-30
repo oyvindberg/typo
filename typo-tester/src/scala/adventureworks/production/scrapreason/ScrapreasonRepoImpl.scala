@@ -24,6 +24,14 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from production.scrapreason where scrapreasonid = $scrapreasonid".executeUpdate() > 0
   }
+  override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
+    SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+          values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning scrapreasonid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

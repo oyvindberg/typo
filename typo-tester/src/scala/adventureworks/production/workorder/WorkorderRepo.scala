@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait WorkorderRepo {
   def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean
+  def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
   def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow
   def selectAll(implicit c: Connection): List[WorkorderRow]
   def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow]

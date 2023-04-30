@@ -25,6 +25,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     SQL"delete from production.workorder where workorderid = $workorderid".executeUpdate() > 0
   }
+  override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
+    SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
+          values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
+          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),

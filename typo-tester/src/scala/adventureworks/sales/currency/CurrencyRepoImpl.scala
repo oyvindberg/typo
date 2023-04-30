@@ -23,6 +23,14 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
   }
+  override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
+    SQL"""insert into sales.currency(currencycode, "name", modifieddate)
+          values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning currencycode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
       Some((NamedParameter("currencycode", ParameterValue.from(unsaved.currencycode)), "::bpchar")),

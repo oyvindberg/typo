@@ -11,6 +11,7 @@ import java.sql.Connection
 
 trait CountryregioncurrencyRepo {
   def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean
+  def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
   def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow
   def selectAll(implicit c: Connection): List[CountryregioncurrencyRow]
   def selectByFieldValues(fieldValues: List[CountryregioncurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CountryregioncurrencyRow]

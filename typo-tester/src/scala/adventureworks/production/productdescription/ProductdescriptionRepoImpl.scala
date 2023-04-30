@@ -24,6 +24,14 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdescription where productdescriptionid = $productdescriptionid".executeUpdate() > 0
   }
+  override def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
+    SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
+          values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning productdescriptionid, description, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
     val namedParameters = List(
       Some((NamedParameter("description", ParameterValue.from(unsaved.description)), "")),

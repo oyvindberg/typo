@@ -8,5 +8,5 @@ case class ColumnComputed(
     dbCol: db.Col
 ) {
   def dbName = dbCol.name
-  def param: sc.Param = sc.Param(name, tpe)
+  def param: sc.Param = sc.Param(name, tpe, None)
 }

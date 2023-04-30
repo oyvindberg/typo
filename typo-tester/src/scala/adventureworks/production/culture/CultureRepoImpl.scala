@@ -23,6 +23,14 @@ object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.culture where cultureid = $cultureid".executeUpdate() > 0
   }
+  override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
+    SQL"""insert into production.culture(cultureid, "name", modifieddate)
+          values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning cultureid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
       Some((NamedParameter("cultureid", ParameterValue.from(unsaved.cultureid)), "::bpchar")),

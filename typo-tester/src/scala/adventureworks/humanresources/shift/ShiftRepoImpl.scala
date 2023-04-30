@@ -25,6 +25,14 @@ object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.shift where shiftid = $shiftid".executeUpdate() > 0
   }
+  override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
+    SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
+          values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
+          returning shiftid, "name", starttime, endtime, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),

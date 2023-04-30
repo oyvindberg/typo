@@ -23,6 +23,14 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"delete from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".executeUpdate() > 0
   }
+  override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
+    SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),

@@ -23,6 +23,14 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.unitmeasure where unitmeasurecode = $unitmeasurecode".executeUpdate() > 0
   }
+  override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
+    SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
+          values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          returning unitmeasurecode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     val namedParameters = List(
       Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),

@@ -34,6 +34,14 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheader where salesorderid = $salesorderid".executeUpdate() > 0
   }
+  override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
+    SQL"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
+          values (${unsaved.salesorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.orderdate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.status}::int2, ${unsaved.onlineorderflag}::"public"."Flag", ${unsaved.purchaseordernumber}::"public".OrderNumber, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.customerid}::int4, ${unsaved.salespersonid}::int4, ${unsaved.territoryid}::int4, ${unsaved.billtoaddressid}::int4, ${unsaved.shiptoaddressid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.creditcardapprovalcode}, ${unsaved.currencyrateid}::int4, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.totaldue}::numeric, ${unsaved.comment}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     val namedParameters = List(
       Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),

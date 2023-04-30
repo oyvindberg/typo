@@ -26,6 +26,14 @@ object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesperson where businessentityid = $businessentityid".executeUpdate() > 0
   }
+  override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
+    SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
+          values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.salesquota}::numeric, ${unsaved.bonus}::numeric, ${unsaved.commissionpct}::numeric, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
