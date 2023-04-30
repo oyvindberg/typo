@@ -16,13 +16,14 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     map.remove(workorderid).isDefined
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
-    map.put(unsaved.workorderid, unsaved)
+    if (map.contains(unsaved.workorderid))
+      sys.error(s"id ${unsaved.workorderid} already exists")
+    else
+      map.put(unsaved.workorderid, unsaved)
     unsaved
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
-    val row = toRow(unsaved)
-    map.put(row.workorderid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     map.values.toList

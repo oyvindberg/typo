@@ -16,13 +16,14 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     map.remove(currencycode).isDefined
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
-    map.put(unsaved.currencycode, unsaved)
+    if (map.contains(unsaved.currencycode))
+      sys.error(s"id ${unsaved.currencycode} already exists")
+    else
+      map.put(unsaved.currencycode, unsaved)
     unsaved
   }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
-    val row = toRow(unsaved)
-    map.put(row.currencycode, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
     map.values.toList

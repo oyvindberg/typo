@@ -16,13 +16,14 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     map.remove(unitmeasurecode).isDefined
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
-    map.put(unsaved.unitmeasurecode, unsaved)
+    if (map.contains(unsaved.unitmeasurecode))
+      sys.error(s"id ${unsaved.unitmeasurecode} already exists")
+    else
+      map.put(unsaved.unitmeasurecode, unsaved)
     unsaved
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
-    val row = toRow(unsaved)
-    map.put(row.unitmeasurecode, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     map.values.toList

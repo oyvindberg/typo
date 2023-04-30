@@ -16,13 +16,14 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     map.remove(territoryid).isDefined
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    map.put(unsaved.territoryid, unsaved)
+    if (map.contains(unsaved.territoryid))
+      sys.error(s"id ${unsaved.territoryid} already exists")
+    else
+      map.put(unsaved.territoryid, unsaved)
     unsaved
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
-    val row = toRow(unsaved)
-    map.put(row.territoryid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     map.values.toList

@@ -17,7 +17,10 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     map.remove(oid).isDefined
   }
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    map.put(unsaved.oid, unsaved)
+    if (map.contains(unsaved.oid))
+      sys.error(s"id ${unsaved.oid} already exists")
+    else
+      map.put(unsaved.oid, unsaved)
     unsaved
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {

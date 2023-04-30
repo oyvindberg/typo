@@ -17,13 +17,14 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     map.remove(compositeId).isDefined
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    map.put(unsaved.compositeId, unsaved)
+    if (map.contains(unsaved.compositeId))
+      sys.error(s"id ${unsaved.compositeId} already exists")
+    else
+      map.put(unsaved.compositeId, unsaved)
     unsaved
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
-    val row = toRow(unsaved)
-    map.put(row.compositeId, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     map.values.toList

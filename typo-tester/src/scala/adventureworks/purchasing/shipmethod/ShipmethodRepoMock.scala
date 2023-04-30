@@ -16,13 +16,14 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     map.remove(shipmethodid).isDefined
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
-    map.put(unsaved.shipmethodid, unsaved)
+    if (map.contains(unsaved.shipmethodid))
+      sys.error(s"id ${unsaved.shipmethodid} already exists")
+    else
+      map.put(unsaved.shipmethodid, unsaved)
     unsaved
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
-    val row = toRow(unsaved)
-    map.put(row.shipmethodid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     map.values.toList

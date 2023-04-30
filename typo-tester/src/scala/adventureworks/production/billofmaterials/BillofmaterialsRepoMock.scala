@@ -16,13 +16,14 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     map.remove(billofmaterialsid).isDefined
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
-    map.put(unsaved.billofmaterialsid, unsaved)
+    if (map.contains(unsaved.billofmaterialsid))
+      sys.error(s"id ${unsaved.billofmaterialsid} already exists")
+    else
+      map.put(unsaved.billofmaterialsid, unsaved)
     unsaved
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
-    val row = toRow(unsaved)
-    map.put(row.billofmaterialsid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     map.values.toList

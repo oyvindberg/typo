@@ -17,13 +17,14 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     map.remove(businessentityid).isDefined
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    map.put(unsaved.businessentityid, unsaved)
+    if (map.contains(unsaved.businessentityid))
+      sys.error(s"id ${unsaved.businessentityid} already exists")
+    else
+      map.put(unsaved.businessentityid, unsaved)
     unsaved
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
-    val row = toRow(unsaved)
-    map.put(row.businessentityid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     map.values.toList

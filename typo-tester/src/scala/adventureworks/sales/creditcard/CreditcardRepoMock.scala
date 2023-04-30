@@ -16,13 +16,14 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     map.remove(creditcardid).isDefined
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
-    map.put(unsaved.creditcardid, unsaved)
+    if (map.contains(unsaved.creditcardid))
+      sys.error(s"id ${unsaved.creditcardid} already exists")
+    else
+      map.put(unsaved.creditcardid, unsaved)
     unsaved
   }
   override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
-    val row = toRow(unsaved)
-    map.put(row.creditcardid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
     map.values.toList

@@ -16,13 +16,14 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     map.remove(cultureid).isDefined
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    map.put(unsaved.cultureid, unsaved)
+    if (map.contains(unsaved.cultureid))
+      sys.error(s"id ${unsaved.cultureid} already exists")
+    else
+      map.put(unsaved.cultureid, unsaved)
     unsaved
   }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
-    val row = toRow(unsaved)
-    map.put(row.cultureid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     map.values.toList

@@ -16,13 +16,14 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     map.remove(scrapreasonid).isDefined
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
-    map.put(unsaved.scrapreasonid, unsaved)
+    if (map.contains(unsaved.scrapreasonid))
+      sys.error(s"id ${unsaved.scrapreasonid} already exists")
+    else
+      map.put(unsaved.scrapreasonid, unsaved)
     unsaved
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
-    val row = toRow(unsaved)
-    map.put(row.scrapreasonid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
     map.values.toList

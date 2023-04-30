@@ -16,13 +16,14 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     map.remove(phonenumbertypeid).isDefined
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
-    map.put(unsaved.phonenumbertypeid, unsaved)
+    if (map.contains(unsaved.phonenumbertypeid))
+      sys.error(s"id ${unsaved.phonenumbertypeid} already exists")
+    else
+      map.put(unsaved.phonenumbertypeid, unsaved)
     unsaved
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow = {
-    val row = toRow(unsaved)
-    map.put(row.phonenumbertypeid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     map.values.toList

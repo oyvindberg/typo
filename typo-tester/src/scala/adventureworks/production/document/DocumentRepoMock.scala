@@ -17,13 +17,14 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     map.remove(documentnode).isDefined
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
-    map.put(unsaved.documentnode, unsaved)
+    if (map.contains(unsaved.documentnode))
+      sys.error(s"id ${unsaved.documentnode} already exists")
+    else
+      map.put(unsaved.documentnode, unsaved)
     unsaved
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
-    val row = toRow(unsaved)
-    map.put(row.documentnode, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     map.values.toList

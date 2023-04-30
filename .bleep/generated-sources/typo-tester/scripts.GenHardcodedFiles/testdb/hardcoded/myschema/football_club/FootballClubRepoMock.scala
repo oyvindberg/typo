@@ -15,7 +15,10 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     map.remove(id).isDefined
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
-    map.put(unsaved.id, unsaved)
+    if (map.contains(unsaved.id))
+      sys.error(s"id ${unsaved.id} already exists")
+    else
+      map.put(unsaved.id, unsaved)
     unsaved
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {

@@ -16,13 +16,14 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     map.remove(locationid).isDefined
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
-    map.put(unsaved.locationid, unsaved)
+    if (map.contains(unsaved.locationid))
+      sys.error(s"id ${unsaved.locationid} already exists")
+    else
+      map.put(unsaved.locationid, unsaved)
     unsaved
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
-    val row = toRow(unsaved)
-    map.put(row.locationid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     map.values.toList

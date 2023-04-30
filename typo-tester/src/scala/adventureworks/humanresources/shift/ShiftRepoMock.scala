@@ -16,13 +16,14 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     map.remove(shiftid).isDefined
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
-    map.put(unsaved.shiftid, unsaved)
+    if (map.contains(unsaved.shiftid))
+      sys.error(s"id ${unsaved.shiftid} already exists")
+    else
+      map.put(unsaved.shiftid, unsaved)
     unsaved
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
-    val row = toRow(unsaved)
-    map.put(row.shiftid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     map.values.toList

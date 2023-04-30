@@ -16,13 +16,14 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     map.remove(salesorderid).isDefined
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
-    map.put(unsaved.salesorderid, unsaved)
+    if (map.contains(unsaved.salesorderid))
+      sys.error(s"id ${unsaved.salesorderid} already exists")
+    else
+      map.put(unsaved.salesorderid, unsaved)
     unsaved
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
-    val row = toRow(unsaved)
-    map.put(row.salesorderid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     map.values.toList

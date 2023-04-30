@@ -16,13 +16,14 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     map.remove(countryregioncode).isDefined
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
-    map.put(unsaved.countryregioncode, unsaved)
+    if (map.contains(unsaved.countryregioncode))
+      sys.error(s"id ${unsaved.countryregioncode} already exists")
+    else
+      map.put(unsaved.countryregioncode, unsaved)
     unsaved
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
-    val row = toRow(unsaved)
-    map.put(row.countryregioncode, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     map.values.toList

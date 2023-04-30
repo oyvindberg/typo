@@ -16,13 +16,14 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     map.remove(contacttypeid).isDefined
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
-    map.put(unsaved.contacttypeid, unsaved)
+    if (map.contains(unsaved.contacttypeid))
+      sys.error(s"id ${unsaved.contacttypeid} already exists")
+    else
+      map.put(unsaved.contacttypeid, unsaved)
     unsaved
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
-    val row = toRow(unsaved)
-    map.put(row.contacttypeid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     map.values.toList

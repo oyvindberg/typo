@@ -16,13 +16,14 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     map.remove(salestaxrateid).isDefined
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    map.put(unsaved.salestaxrateid, unsaved)
+    if (map.contains(unsaved.salestaxrateid))
+      sys.error(s"id ${unsaved.salestaxrateid} already exists")
+    else
+      map.put(unsaved.salestaxrateid, unsaved)
     unsaved
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
-    val row = toRow(unsaved)
-    map.put(row.salestaxrateid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     map.values.toList

@@ -476,12 +476,14 @@ object DbLibAnorm extends DbLib {
               |  case ${sc.Type.None} => false
               |}""".stripMargin
       case RepoMethod.Insert(_, unsavedParam, _) =>
-        code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
+        code"""|if (map.contains(${unsavedParam.name}.${id.paramName}))
+               |  sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")
+               |else
+               |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
                |${unsavedParam.name}"""
       case RepoMethod.InsertUnsaved(_, unsavedParam, _, _) =>
-        code"""|val row = ${maybeToRow.get.name}(${unsavedParam.name})
-               |map.put(row.${id.paramName}, row)
-               |row""".stripMargin
+        code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
+
       case RepoMethod.Delete(id) =>
         code"map.remove(${id.paramName}).isDefined"
       case RepoMethod.SqlFile(_) =>

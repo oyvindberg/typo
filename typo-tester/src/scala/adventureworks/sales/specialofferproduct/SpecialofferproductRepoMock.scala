@@ -16,13 +16,14 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     map.remove(compositeId).isDefined
   }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
-    map.put(unsaved.compositeId, unsaved)
+    if (map.contains(unsaved.compositeId))
+      sys.error(s"id ${unsaved.compositeId} already exists")
+    else
+      map.put(unsaved.compositeId, unsaved)
     unsaved
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
-    val row = toRow(unsaved)
-    map.put(row.compositeId, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     map.values.toList

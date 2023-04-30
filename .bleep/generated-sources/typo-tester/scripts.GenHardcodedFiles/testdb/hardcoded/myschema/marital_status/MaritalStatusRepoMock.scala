@@ -15,7 +15,10 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     map.remove(id).isDefined
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
-    map.put(unsaved.id, unsaved)
+    if (map.contains(unsaved.id))
+      sys.error(s"id ${unsaved.id} already exists")
+    else
+      map.put(unsaved.id, unsaved)
     unsaved
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {

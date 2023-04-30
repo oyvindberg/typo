@@ -16,13 +16,14 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     map.remove(transactionid).isDefined
   }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
-    map.put(unsaved.transactionid, unsaved)
+    if (map.contains(unsaved.transactionid))
+      sys.error(s"id ${unsaved.transactionid} already exists")
+    else
+      map.put(unsaved.transactionid, unsaved)
     unsaved
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
-    val row = toRow(unsaved)
-    map.put(row.transactionid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
     map.values.toList

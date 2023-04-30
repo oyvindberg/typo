@@ -16,13 +16,14 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
     map.remove(productmodelid).isDefined
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
-    map.put(unsaved.productmodelid, unsaved)
+    if (map.contains(unsaved.productmodelid))
+      sys.error(s"id ${unsaved.productmodelid} already exists")
+    else
+      map.put(unsaved.productmodelid, unsaved)
     unsaved
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
-    val row = toRow(unsaved)
-    map.put(row.productmodelid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     map.values.toList

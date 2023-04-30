@@ -16,13 +16,14 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     map.remove(shoppingcartitemid).isDefined
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    map.put(unsaved.shoppingcartitemid, unsaved)
+    if (map.contains(unsaved.shoppingcartitemid))
+      sys.error(s"id ${unsaved.shoppingcartitemid} already exists")
+    else
+      map.put(unsaved.shoppingcartitemid, unsaved)
     unsaved
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
-    val row = toRow(unsaved)
-    map.put(row.shoppingcartitemid, row)
-    row
+    insert(toRow(unsaved))
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     map.values.toList
