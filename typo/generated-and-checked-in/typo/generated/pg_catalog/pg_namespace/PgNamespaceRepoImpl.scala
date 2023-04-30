@@ -112,6 +112,24 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     }
   
   }
+  override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
+    SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
+          values (
+            ${unsaved.oid}::oid,
+            ${unsaved.nspname}::name,
+            ${unsaved.nspowner}::oid,
+            ${unsaved.nspacl}::_aclitem
+          )
+          on conflict (oid)
+          do update set
+            nspname = EXCLUDED.nspname,
+            nspowner = EXCLUDED.nspowner,
+            nspacl = EXCLUDED.nspacl
+          returning oid, nspname, nspowner, nspacl
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PgNamespaceRow] =
     RowParser[PgNamespaceRow] { row =>
       Success(

@@ -66,4 +66,8 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
       case None => false
     }
   }
+  override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

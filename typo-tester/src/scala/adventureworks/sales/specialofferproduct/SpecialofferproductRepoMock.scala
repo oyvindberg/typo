@@ -64,4 +64,8 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
       case None => false
     }
   }
+  override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

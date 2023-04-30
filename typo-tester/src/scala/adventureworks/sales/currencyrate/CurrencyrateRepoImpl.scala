@@ -153,6 +153,30 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     }
   
   }
+  override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
+    SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
+          values (
+            ${unsaved.currencyrateid}::int4,
+            ${unsaved.currencyratedate}::timestamp,
+            ${unsaved.fromcurrencycode}::bpchar,
+            ${unsaved.tocurrencycode}::bpchar,
+            ${unsaved.averagerate}::numeric,
+            ${unsaved.endofdayrate}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (currencyrateid)
+          do update set
+            currencyratedate = EXCLUDED.currencyratedate,
+            fromcurrencycode = EXCLUDED.fromcurrencycode,
+            tocurrencycode = EXCLUDED.tocurrencycode,
+            averagerate = EXCLUDED.averagerate,
+            endofdayrate = EXCLUDED.endofdayrate,
+            modifieddate = EXCLUDED.modifieddate
+          returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CurrencyrateRow] =
     RowParser[CurrencyrateRow] { row =>
       Success(

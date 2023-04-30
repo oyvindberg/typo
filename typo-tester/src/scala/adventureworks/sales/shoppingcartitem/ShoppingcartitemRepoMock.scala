@@ -72,4 +72,8 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
       case None => false
     }
   }
+  override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
+    map.put(unsaved.shoppingcartitemid, unsaved)
+    unsaved
+  }
 }

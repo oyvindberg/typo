@@ -110,4 +110,8 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
       case None => false
     }
   }
+  override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
+    map.put(unsaved.salesorderid, unsaved)
+    unsaved
+  }
 }

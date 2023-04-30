@@ -19,4 +19,5 @@ trait ContacttypeRepo {
   def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow]
   def update(row: ContacttypeRow)(implicit c: Connection): Boolean
   def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow
 }

@@ -80,4 +80,8 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       case None => false
     }
   }
+  override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
+    map.put(unsaved.territoryid, unsaved)
+    unsaved
+  }
 }

@@ -76,4 +76,8 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
       case None => false
     }
   }
+  override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
+    map.put(unsaved.stateprovinceid, unsaved)
+    unsaved
+  }
 }

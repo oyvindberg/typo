@@ -133,6 +133,22 @@ object CountryregionRepoImpl extends CountryregionRepo {
     }
   
   }
+  override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
+    SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
+          values (
+            ${unsaved.countryregioncode},
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (countryregioncode)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning countryregioncode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CountryregionRow] =
     RowParser[CountryregionRow] { row =>
       Success(

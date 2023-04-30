@@ -66,4 +66,8 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
       case None => false
     }
   }
+  override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

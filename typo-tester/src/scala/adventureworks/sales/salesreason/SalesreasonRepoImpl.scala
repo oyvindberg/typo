@@ -141,6 +141,24 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     }
   
   }
+  override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
+    SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
+          values (
+            ${unsaved.salesreasonid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.reasontype}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (salesreasonid)
+          do update set
+            "name" = EXCLUDED."name",
+            reasontype = EXCLUDED.reasontype,
+            modifieddate = EXCLUDED.modifieddate
+          returning salesreasonid, "name", reasontype, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesreasonRow] =
     RowParser[SalesreasonRow] { row =>
       Success(

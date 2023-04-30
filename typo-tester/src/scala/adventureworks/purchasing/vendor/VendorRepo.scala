@@ -20,4 +20,5 @@ trait VendorRepo {
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow]
   def update(row: VendorRow)(implicit c: Connection): Boolean
   def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow
 }

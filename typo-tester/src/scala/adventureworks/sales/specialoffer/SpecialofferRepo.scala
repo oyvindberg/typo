@@ -19,4 +19,5 @@ trait SpecialofferRepo {
   def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow]
   def update(row: SpecialofferRow)(implicit c: Connection): Boolean
   def updateFieldValues(specialofferid: SpecialofferId, fieldValues: List[SpecialofferFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow
 }

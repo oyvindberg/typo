@@ -122,6 +122,22 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     }
   
   }
+  override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
+    SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.phonenumber}::"public".Phone,
+            ${unsaved.phonenumbertypeid}::int4,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, phonenumber, phonenumbertypeid)
+          do update set
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PersonphoneRow] =
     RowParser[PersonphoneRow] { row =>
       Success(

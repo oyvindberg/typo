@@ -161,6 +161,32 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     }
   
   }
+  override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
+    SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
+          values (
+            ${unsaved.productreviewid}::int4,
+            ${unsaved.productid}::int4,
+            ${unsaved.reviewername}::"public"."Name",
+            ${unsaved.reviewdate}::timestamp,
+            ${unsaved.emailaddress},
+            ${unsaved.rating}::int4,
+            ${unsaved.comments},
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productreviewid)
+          do update set
+            productid = EXCLUDED.productid,
+            reviewername = EXCLUDED.reviewername,
+            reviewdate = EXCLUDED.reviewdate,
+            emailaddress = EXCLUDED.emailaddress,
+            rating = EXCLUDED.rating,
+            "comments" = EXCLUDED."comments",
+            modifieddate = EXCLUDED.modifieddate
+          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductreviewRow] =
     RowParser[ProductreviewRow] { row =>
       Success(

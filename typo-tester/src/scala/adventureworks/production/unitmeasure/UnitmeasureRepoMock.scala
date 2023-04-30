@@ -66,4 +66,8 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
       case None => false
     }
   }
+  override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
+    map.put(unsaved.unitmeasurecode, unsaved)
+    unsaved
+  }
 }

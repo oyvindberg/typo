@@ -78,4 +78,8 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
       case None => false
     }
   }
+  override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
+    map.put(unsaved.workorderid, unsaved)
+    unsaved
+  }
 }

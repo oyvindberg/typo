@@ -76,4 +76,8 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
       case None => false
     }
   }
+  override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
+    map.put(unsaved.productreviewid, unsaved)
+    unsaved
+  }
 }

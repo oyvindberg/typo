@@ -187,6 +187,42 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
+    SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.persontype}::bpchar,
+            ${unsaved.namestyle}::"public".NameStyle,
+            ${unsaved.title},
+            ${unsaved.firstname}::"public"."Name",
+            ${unsaved.middlename}::"public"."Name",
+            ${unsaved.lastname}::"public"."Name",
+            ${unsaved.suffix},
+            ${unsaved.emailpromotion}::int4,
+            ${unsaved.additionalcontactinfo}::xml,
+            ${unsaved.demographics}::xml,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid)
+          do update set
+            persontype = EXCLUDED.persontype,
+            namestyle = EXCLUDED.namestyle,
+            title = EXCLUDED.title,
+            firstname = EXCLUDED.firstname,
+            middlename = EXCLUDED.middlename,
+            lastname = EXCLUDED.lastname,
+            suffix = EXCLUDED.suffix,
+            emailpromotion = EXCLUDED.emailpromotion,
+            additionalcontactinfo = EXCLUDED.additionalcontactinfo,
+            demographics = EXCLUDED.demographics,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PersonRow] =
     RowParser[PersonRow] { row =>
       Success(

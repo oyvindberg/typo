@@ -71,4 +71,8 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
       case None => false
     }
   }
+  override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
+    map.put(unsaved.businessentityid, unsaved)
+    unsaved
+  }
 }

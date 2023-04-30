@@ -71,6 +71,19 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
        """.as(rowParser.*)
   
   }
+  override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
+    SQL"""insert into myschema.marital_status("id")
+          values (
+            ${unsaved.id}::int8
+          )
+          returning "id"
+          on conflict ("id")
+          do update set
+            
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[MaritalStatusRow] =
     RowParser[MaritalStatusRow] { row =>
       Success(

@@ -74,4 +74,8 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
       case None => false
     }
   }
+  override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
+    map.put(unsaved.currencyrateid, unsaved)
+    unsaved
+  }
 }

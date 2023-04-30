@@ -178,6 +178,38 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     }
   
   }
+  override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
+    SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
+          values (
+            ${unsaved.specialofferid}::int4,
+            ${unsaved.description},
+            ${unsaved.discountpct}::numeric,
+            ${unsaved.`type`},
+            ${unsaved.category},
+            ${unsaved.startdate}::timestamp,
+            ${unsaved.enddate}::timestamp,
+            ${unsaved.minqty}::int4,
+            ${unsaved.maxqty}::int4,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (specialofferid)
+          do update set
+            description = EXCLUDED.description,
+            discountpct = EXCLUDED.discountpct,
+            "type" = EXCLUDED."type",
+            category = EXCLUDED.category,
+            startdate = EXCLUDED.startdate,
+            enddate = EXCLUDED.enddate,
+            minqty = EXCLUDED.minqty,
+            maxqty = EXCLUDED.maxqty,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SpecialofferRow] =
     RowParser[SpecialofferRow] { row =>
       Success(

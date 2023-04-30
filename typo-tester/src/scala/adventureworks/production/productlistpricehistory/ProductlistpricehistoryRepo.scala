@@ -18,4 +18,5 @@ trait ProductlistpricehistoryRepo {
   def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow]
   def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: ProductlistpricehistoryId, fieldValues: List[ProductlistpricehistoryFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow
 }

@@ -78,4 +78,8 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
       case None => false
     }
   }
+  override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
+    map.put(unsaved.transactionid, unsaved)
+    unsaved
+  }
 }

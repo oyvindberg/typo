@@ -155,6 +155,28 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     }
   
   }
+  override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
+    SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
+          values (
+            ${unsaved.shoppingcartitemid}::int4,
+            ${unsaved.shoppingcartid},
+            ${unsaved.quantity}::int4,
+            ${unsaved.productid}::int4,
+            ${unsaved.datecreated}::timestamp,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (shoppingcartitemid)
+          do update set
+            shoppingcartid = EXCLUDED.shoppingcartid,
+            quantity = EXCLUDED.quantity,
+            productid = EXCLUDED.productid,
+            datecreated = EXCLUDED.datecreated,
+            modifieddate = EXCLUDED.modifieddate
+          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ShoppingcartitemRow] =
     RowParser[ShoppingcartitemRow] { row =>
       Success(

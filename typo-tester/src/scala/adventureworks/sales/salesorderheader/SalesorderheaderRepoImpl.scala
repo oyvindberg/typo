@@ -259,6 +259,66 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     }
   
   }
+  override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
+    SQL"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
+          values (
+            ${unsaved.salesorderid}::int4,
+            ${unsaved.revisionnumber}::int2,
+            ${unsaved.orderdate}::timestamp,
+            ${unsaved.duedate}::timestamp,
+            ${unsaved.shipdate}::timestamp,
+            ${unsaved.status}::int2,
+            ${unsaved.onlineorderflag}::"public"."Flag",
+            ${unsaved.purchaseordernumber}::"public".OrderNumber,
+            ${unsaved.accountnumber}::"public".AccountNumber,
+            ${unsaved.customerid}::int4,
+            ${unsaved.salespersonid}::int4,
+            ${unsaved.territoryid}::int4,
+            ${unsaved.billtoaddressid}::int4,
+            ${unsaved.shiptoaddressid}::int4,
+            ${unsaved.shipmethodid}::int4,
+            ${unsaved.creditcardid}::int4,
+            ${unsaved.creditcardapprovalcode},
+            ${unsaved.currencyrateid}::int4,
+            ${unsaved.subtotal}::numeric,
+            ${unsaved.taxamt}::numeric,
+            ${unsaved.freight}::numeric,
+            ${unsaved.totaldue}::numeric,
+            ${unsaved.comment},
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (salesorderid)
+          do update set
+            revisionnumber = EXCLUDED.revisionnumber,
+            orderdate = EXCLUDED.orderdate,
+            duedate = EXCLUDED.duedate,
+            shipdate = EXCLUDED.shipdate,
+            status = EXCLUDED.status,
+            onlineorderflag = EXCLUDED.onlineorderflag,
+            purchaseordernumber = EXCLUDED.purchaseordernumber,
+            accountnumber = EXCLUDED.accountnumber,
+            customerid = EXCLUDED.customerid,
+            salespersonid = EXCLUDED.salespersonid,
+            territoryid = EXCLUDED.territoryid,
+            billtoaddressid = EXCLUDED.billtoaddressid,
+            shiptoaddressid = EXCLUDED.shiptoaddressid,
+            shipmethodid = EXCLUDED.shipmethodid,
+            creditcardid = EXCLUDED.creditcardid,
+            creditcardapprovalcode = EXCLUDED.creditcardapprovalcode,
+            currencyrateid = EXCLUDED.currencyrateid,
+            subtotal = EXCLUDED.subtotal,
+            taxamt = EXCLUDED.taxamt,
+            freight = EXCLUDED.freight,
+            totaldue = EXCLUDED.totaldue,
+            "comment" = EXCLUDED."comment",
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesorderheaderRow] =
     RowParser[SalesorderheaderRow] { row =>
       Success(

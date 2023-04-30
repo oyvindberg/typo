@@ -145,6 +145,24 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     }
   
   }
+  override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
+    SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
+          values (
+            ${unsaved.addresstypeid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (addresstypeid)
+          do update set
+            "name" = EXCLUDED."name",
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning addresstypeid, "name", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[AddresstypeRow] =
     RowParser[AddresstypeRow] { row =>
       Success(

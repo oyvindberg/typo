@@ -19,4 +19,5 @@ trait TransactionhistoryRepo {
   def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow]
   def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean
   def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow
 }

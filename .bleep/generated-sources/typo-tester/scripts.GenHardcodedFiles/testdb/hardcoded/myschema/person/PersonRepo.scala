@@ -20,4 +20,5 @@ trait PersonRepo {
   def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
 }

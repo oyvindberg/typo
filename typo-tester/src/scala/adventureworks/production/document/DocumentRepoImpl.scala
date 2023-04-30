@@ -190,6 +190,42 @@ object DocumentRepoImpl extends DocumentRepo {
     }
   
   }
+  override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
+    SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
+          values (
+            ${unsaved.title},
+            ${unsaved.owner}::int4,
+            ${unsaved.folderflag}::"public"."Flag",
+            ${unsaved.filename},
+            ${unsaved.fileextension},
+            ${unsaved.revision}::bpchar,
+            ${unsaved.changenumber}::int4,
+            ${unsaved.status}::int2,
+            ${unsaved.documentsummary},
+            ${unsaved.document}::bytea,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp,
+            ${unsaved.documentnode}
+          )
+          on conflict (documentnode)
+          do update set
+            title = EXCLUDED.title,
+            "owner" = EXCLUDED."owner",
+            folderflag = EXCLUDED.folderflag,
+            filename = EXCLUDED.filename,
+            fileextension = EXCLUDED.fileextension,
+            revision = EXCLUDED.revision,
+            changenumber = EXCLUDED.changenumber,
+            status = EXCLUDED.status,
+            documentsummary = EXCLUDED.documentsummary,
+            "document" = EXCLUDED."document",
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[DocumentRow] =
     RowParser[DocumentRow] { row =>
       Success(

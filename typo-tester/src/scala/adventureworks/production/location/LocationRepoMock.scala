@@ -70,4 +70,8 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
       case None => false
     }
   }
+  override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
+    map.put(unsaved.locationid, unsaved)
+    unsaved
+  }
 }

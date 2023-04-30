@@ -19,4 +19,5 @@ trait CultureRepo {
   def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow]
   def update(row: CultureRow)(implicit c: Connection): Boolean
   def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow
 }

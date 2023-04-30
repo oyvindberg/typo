@@ -192,6 +192,40 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     }
   
   }
+  override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
+    SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
+          values (
+            ${unsaved.purchaseorderid}::int4,
+            ${unsaved.revisionnumber}::int2,
+            ${unsaved.status}::int2,
+            ${unsaved.employeeid}::int4,
+            ${unsaved.vendorid}::int4,
+            ${unsaved.shipmethodid}::int4,
+            ${unsaved.orderdate}::timestamp,
+            ${unsaved.shipdate}::timestamp,
+            ${unsaved.subtotal}::numeric,
+            ${unsaved.taxamt}::numeric,
+            ${unsaved.freight}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (purchaseorderid)
+          do update set
+            revisionnumber = EXCLUDED.revisionnumber,
+            status = EXCLUDED.status,
+            employeeid = EXCLUDED.employeeid,
+            vendorid = EXCLUDED.vendorid,
+            shipmethodid = EXCLUDED.shipmethodid,
+            orderdate = EXCLUDED.orderdate,
+            shipdate = EXCLUDED.shipdate,
+            subtotal = EXCLUDED.subtotal,
+            taxamt = EXCLUDED.taxamt,
+            freight = EXCLUDED.freight,
+            modifieddate = EXCLUDED.modifieddate
+          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PurchaseorderheaderRow] =
     RowParser[PurchaseorderheaderRow] { row =>
       Success(

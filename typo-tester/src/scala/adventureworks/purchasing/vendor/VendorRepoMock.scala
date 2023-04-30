@@ -77,4 +77,8 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
       case None => false
     }
   }
+  override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
+    map.put(unsaved.businessentityid, unsaved)
+    unsaved
+  }
 }

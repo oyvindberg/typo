@@ -19,4 +19,5 @@ trait LocationRepo {
   def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow]
   def update(row: LocationRow)(implicit c: Connection): Boolean
   def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow
 }

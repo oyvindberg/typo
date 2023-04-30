@@ -182,6 +182,36 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     }
   
   }
+  override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
+    SQL"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
+          values (
+            ${unsaved.territoryid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.countryregioncode},
+            ${unsaved.group},
+            ${unsaved.salesytd}::numeric,
+            ${unsaved.saleslastyear}::numeric,
+            ${unsaved.costytd}::numeric,
+            ${unsaved.costlastyear}::numeric,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (territoryid)
+          do update set
+            "name" = EXCLUDED."name",
+            countryregioncode = EXCLUDED.countryregioncode,
+            "group" = EXCLUDED."group",
+            salesytd = EXCLUDED.salesytd,
+            saleslastyear = EXCLUDED.saleslastyear,
+            costytd = EXCLUDED.costytd,
+            costlastyear = EXCLUDED.costlastyear,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesterritoryRow] =
     RowParser[SalesterritoryRow] { row =>
       Success(

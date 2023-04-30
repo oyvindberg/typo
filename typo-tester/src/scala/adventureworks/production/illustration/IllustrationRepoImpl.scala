@@ -137,6 +137,22 @@ object IllustrationRepoImpl extends IllustrationRepo {
     }
   
   }
+  override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
+    SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
+          values (
+            ${unsaved.illustrationid}::int4,
+            ${unsaved.diagram}::xml,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (illustrationid)
+          do update set
+            diagram = EXCLUDED.diagram,
+            modifieddate = EXCLUDED.modifieddate
+          returning illustrationid, diagram, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[IllustrationRow] =
     RowParser[IllustrationRow] { row =>
       Success(

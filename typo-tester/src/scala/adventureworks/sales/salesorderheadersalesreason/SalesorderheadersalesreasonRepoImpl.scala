@@ -119,6 +119,21 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     }
   
   }
+  override def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
+    SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
+          values (
+            ${unsaved.salesorderid}::int4,
+            ${unsaved.salesreasonid}::int4,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (salesorderid, salesreasonid)
+          do update set
+            modifieddate = EXCLUDED.modifieddate
+          returning salesorderid, salesreasonid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesorderheadersalesreasonRow] =
     RowParser[SalesorderheadersalesreasonRow] { row =>
       Success(

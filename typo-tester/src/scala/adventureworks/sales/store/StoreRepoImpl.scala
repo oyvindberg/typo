@@ -152,6 +152,28 @@ object StoreRepoImpl extends StoreRepo {
     }
   
   }
+  override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
+    SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.salespersonid}::int4,
+            ${unsaved.demographics}::xml,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid)
+          do update set
+            "name" = EXCLUDED."name",
+            salespersonid = EXCLUDED.salespersonid,
+            demographics = EXCLUDED.demographics,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[StoreRow] =
     RowParser[StoreRow] { row =>
       Success(

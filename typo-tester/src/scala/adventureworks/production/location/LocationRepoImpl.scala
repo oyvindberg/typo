@@ -151,6 +151,26 @@ object LocationRepoImpl extends LocationRepo {
     }
   
   }
+  override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
+    SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
+          values (
+            ${unsaved.locationid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.costrate}::numeric,
+            ${unsaved.availability}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (locationid)
+          do update set
+            "name" = EXCLUDED."name",
+            costrate = EXCLUDED.costrate,
+            availability = EXCLUDED.availability,
+            modifieddate = EXCLUDED.modifieddate
+          returning locationid, "name", costrate, availability, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[LocationRow] =
     RowParser[LocationRow] { row =>
       Success(

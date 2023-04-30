@@ -158,6 +158,35 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
   
   }
+  override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
+    SQL"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
+          values (
+            ${unsaved.salesorderid}::int4,
+            ${unsaved.salesorderdetailid}::int4,
+            ${unsaved.carriertrackingnumber},
+            ${unsaved.orderqty}::int2,
+            ${unsaved.productid}::int4,
+            ${unsaved.specialofferid}::int4,
+            ${unsaved.unitprice}::numeric,
+            ${unsaved.unitpricediscount}::numeric,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (salesorderid, salesorderdetailid)
+          do update set
+            carriertrackingnumber = EXCLUDED.carriertrackingnumber,
+            orderqty = EXCLUDED.orderqty,
+            productid = EXCLUDED.productid,
+            specialofferid = EXCLUDED.specialofferid,
+            unitprice = EXCLUDED.unitprice,
+            unitpricediscount = EXCLUDED.unitpricediscount,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesorderdetailRow] =
     RowParser[SalesorderdetailRow] { row =>
       Success(

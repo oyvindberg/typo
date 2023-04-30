@@ -141,6 +141,24 @@ object DepartmentRepoImpl extends DepartmentRepo {
     }
   
   }
+  override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
+    SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
+          values (
+            ${unsaved.departmentid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.groupname}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (departmentid)
+          do update set
+            "name" = EXCLUDED."name",
+            groupname = EXCLUDED.groupname,
+            modifieddate = EXCLUDED.modifieddate
+          returning departmentid, "name", groupname, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[DepartmentRow] =
     RowParser[DepartmentRow] { row =>
       Success(

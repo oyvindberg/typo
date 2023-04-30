@@ -66,4 +66,8 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
       case None => false
     }
   }
+  override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
+    map.put(unsaved.phonenumbertypeid, unsaved)
+    unsaved
+  }
 }

@@ -133,6 +133,26 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     }
   
   }
+  override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
+    SQL"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.territoryid}::int4,
+            ${unsaved.startdate}::timestamp,
+            ${unsaved.enddate}::timestamp,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, startdate, territoryid)
+          do update set
+            enddate = EXCLUDED.enddate,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalesterritoryhistoryRow] =
     RowParser[SalesterritoryhistoryRow] { row =>
       Success(

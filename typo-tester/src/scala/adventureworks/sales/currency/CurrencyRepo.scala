@@ -19,4 +19,5 @@ trait CurrencyRepo {
   def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
   def update(row: CurrencyRow)(implicit c: Connection): Boolean
   def updateFieldValues(currencycode: CurrencyId, fieldValues: List[CurrencyFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
 }

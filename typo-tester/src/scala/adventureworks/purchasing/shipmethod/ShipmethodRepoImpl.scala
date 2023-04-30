@@ -159,6 +159,28 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     }
   
   }
+  override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
+    SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
+          values (
+            ${unsaved.shipmethodid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.shipbase}::numeric,
+            ${unsaved.shiprate}::numeric,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (shipmethodid)
+          do update set
+            "name" = EXCLUDED."name",
+            shipbase = EXCLUDED.shipbase,
+            shiprate = EXCLUDED.shiprate,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ShipmethodRow] =
     RowParser[ShipmethodRow] { row =>
       Success(

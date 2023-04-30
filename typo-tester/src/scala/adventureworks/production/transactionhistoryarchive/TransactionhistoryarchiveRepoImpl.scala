@@ -163,6 +163,34 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     }
   
   }
+  override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
+    SQL"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
+          values (
+            ${unsaved.transactionid}::int4,
+            ${unsaved.productid}::int4,
+            ${unsaved.referenceorderid}::int4,
+            ${unsaved.referenceorderlineid}::int4,
+            ${unsaved.transactiondate}::timestamp,
+            ${unsaved.transactiontype}::bpchar,
+            ${unsaved.quantity}::int4,
+            ${unsaved.actualcost}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (transactionid)
+          do update set
+            productid = EXCLUDED.productid,
+            referenceorderid = EXCLUDED.referenceorderid,
+            referenceorderlineid = EXCLUDED.referenceorderlineid,
+            transactiondate = EXCLUDED.transactiondate,
+            transactiontype = EXCLUDED.transactiontype,
+            quantity = EXCLUDED.quantity,
+            actualcost = EXCLUDED.actualcost,
+            modifieddate = EXCLUDED.modifieddate
+          returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[TransactionhistoryarchiveRow] =
     RowParser[TransactionhistoryarchiveRow] { row =>
       Success(

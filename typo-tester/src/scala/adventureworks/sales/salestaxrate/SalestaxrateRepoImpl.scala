@@ -161,6 +161,30 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
   
   }
+  override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
+    SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
+          values (
+            ${unsaved.salestaxrateid}::int4,
+            ${unsaved.stateprovinceid}::int4,
+            ${unsaved.taxtype}::int2,
+            ${unsaved.taxrate}::numeric,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (salestaxrateid)
+          do update set
+            stateprovinceid = EXCLUDED.stateprovinceid,
+            taxtype = EXCLUDED.taxtype,
+            taxrate = EXCLUDED.taxrate,
+            "name" = EXCLUDED."name",
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalestaxrateRow] =
     RowParser[SalestaxrateRow] { row =>
       Success(

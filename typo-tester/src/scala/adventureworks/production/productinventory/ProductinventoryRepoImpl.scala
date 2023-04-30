@@ -142,6 +142,29 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     }
   
   }
+  override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
+    SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.locationid}::int2,
+            ${unsaved.shelf},
+            ${unsaved.bin}::int2,
+            ${unsaved.quantity}::int2,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productid, locationid)
+          do update set
+            shelf = EXCLUDED.shelf,
+            bin = EXCLUDED.bin,
+            quantity = EXCLUDED.quantity,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductinventoryRow] =
     RowParser[ProductinventoryRow] { row =>
       Success(

@@ -74,4 +74,8 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
       case None => false
     }
   }
+  override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
+    map.put(unsaved.salestaxrateid, unsaved)
+    unsaved
+  }
 }

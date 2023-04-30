@@ -133,6 +133,22 @@ object CultureRepoImpl extends CultureRepo {
     }
   
   }
+  override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
+    SQL"""insert into production.culture(cultureid, "name", modifieddate)
+          values (
+            ${unsaved.cultureid}::bpchar,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (cultureid)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning cultureid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CultureRow] =
     RowParser[CultureRow] { row =>
       Success(

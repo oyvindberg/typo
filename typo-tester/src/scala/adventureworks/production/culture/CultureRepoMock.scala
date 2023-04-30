@@ -66,4 +66,8 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
       case None => false
     }
   }
+  override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
+    map.put(unsaved.cultureid, unsaved)
+    unsaved
+  }
 }

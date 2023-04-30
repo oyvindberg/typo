@@ -144,6 +144,24 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     }
   
   }
+  override def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
+    SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
+          values (
+            ${unsaved.productdescriptionid}::int4,
+            ${unsaved.description},
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productdescriptionid)
+          do update set
+            description = EXCLUDED.description,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning productdescriptionid, description, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductdescriptionRow] =
     RowParser[ProductdescriptionRow] { row =>
       Success(

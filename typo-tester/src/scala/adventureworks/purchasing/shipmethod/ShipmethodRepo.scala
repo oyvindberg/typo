@@ -19,4 +19,5 @@ trait ShipmethodRepo {
   def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow]
   def update(row: ShipmethodRow)(implicit c: Connection): Boolean
   def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow
 }

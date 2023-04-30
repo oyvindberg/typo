@@ -62,4 +62,8 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
       case None => false
     }
   }
+  override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

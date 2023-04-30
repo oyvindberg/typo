@@ -73,4 +73,8 @@ class StoreRepoMock(toRow: Function1[StoreRowUnsaved, StoreRow],
       case None => false
     }
   }
+  override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
+    map.put(unsaved.businessentityid, unsaved)
+    unsaved
+  }
 }

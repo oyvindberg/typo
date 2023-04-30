@@ -63,4 +63,8 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
       case None => false
     }
   }
+  override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

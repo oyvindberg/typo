@@ -100,6 +100,20 @@ object FootballClubRepoImpl extends FootballClubRepo {
     }
   
   }
+  override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
+    SQL"""insert into myschema.football_club("id", "name")
+          values (
+            ${unsaved.id}::int8,
+            ${unsaved.name}
+          )
+          returning "id", "name"
+          on conflict ("id")
+          do update set
+            "name" = EXCLUDED."name"
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[FootballClubRow] =
     RowParser[FootballClubRow] { row =>
       Success(
