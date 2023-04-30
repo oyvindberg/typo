@@ -18,4 +18,5 @@ trait ProductvendorRepo {
   def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow]
   def update(row: ProductvendorRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: ProductvendorId, fieldValues: List[ProductvendorFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow
 }

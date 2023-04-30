@@ -133,6 +133,25 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     }
   
   }
+  override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
+    SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.emailaddressid}::int4,
+            ${unsaved.emailaddress},
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, emailaddressid)
+          do update set
+            emailaddress = EXCLUDED.emailaddress,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[EmailaddressRow] =
     RowParser[EmailaddressRow] { row =>
       Success(

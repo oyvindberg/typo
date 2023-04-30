@@ -142,6 +142,24 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     }
   
   }
+  override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
+    SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
+          values (
+            ${unsaved.jobcandidateid}::int4,
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.resume}::xml,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (jobcandidateid)
+          do update set
+            businessentityid = EXCLUDED.businessentityid,
+            resume = EXCLUDED.resume,
+            modifieddate = EXCLUDED.modifieddate
+          returning jobcandidateid, businessentityid, resume, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[JobcandidateRow] =
     RowParser[JobcandidateRow] { row =>
       Success(

@@ -119,6 +119,21 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     }
   
   }
+  override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
+    SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
+          values (
+            ${unsaved.countryregioncode},
+            ${unsaved.currencycode}::bpchar,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (countryregioncode, currencycode)
+          do update set
+            modifieddate = EXCLUDED.modifieddate
+          returning countryregioncode, currencycode, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CountryregioncurrencyRow] =
     RowParser[CountryregioncurrencyRow] { row =>
       Success(

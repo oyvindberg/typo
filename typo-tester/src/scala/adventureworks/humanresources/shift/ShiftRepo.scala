@@ -19,4 +19,5 @@ trait ShiftRepo {
   def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow]
   def update(row: ShiftRow)(implicit c: Connection): Boolean
   def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
 }

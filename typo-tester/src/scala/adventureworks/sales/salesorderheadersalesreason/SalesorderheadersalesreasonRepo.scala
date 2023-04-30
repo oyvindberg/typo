@@ -18,4 +18,5 @@ trait SalesorderheadersalesreasonRepo {
   def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow]
   def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: SalesorderheadersalesreasonId, fieldValues: List[SalesorderheadersalesreasonFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow
 }

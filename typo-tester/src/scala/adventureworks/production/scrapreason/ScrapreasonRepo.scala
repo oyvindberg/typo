@@ -19,4 +19,5 @@ trait ScrapreasonRepo {
   def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow]
   def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
 }

@@ -78,4 +78,8 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       case None => false
     }
   }
+  override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
+    map.put(unsaved.addressid, unsaved)
+    unsaved
+  }
 }

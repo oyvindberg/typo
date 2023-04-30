@@ -146,6 +146,26 @@ object PasswordRepoImpl extends PasswordRepo {
     }
   
   }
+  override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
+    SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.passwordhash},
+            ${unsaved.passwordsalt},
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid)
+          do update set
+            passwordhash = EXCLUDED.passwordhash,
+            passwordsalt = EXCLUDED.passwordsalt,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PasswordRow] =
     RowParser[PasswordRow] { row =>
       Success(

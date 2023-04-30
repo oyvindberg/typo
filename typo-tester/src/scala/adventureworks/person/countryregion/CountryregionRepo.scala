@@ -19,4 +19,5 @@ trait CountryregionRepo {
   def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow]
   def update(row: CountryregionRow)(implicit c: Connection): Boolean
   def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow
 }

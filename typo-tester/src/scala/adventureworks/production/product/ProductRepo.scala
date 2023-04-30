@@ -19,4 +19,5 @@ trait ProductRepo {
   def selectByIds(productids: Array[ProductId])(implicit c: Connection): List[ProductRow]
   def update(row: ProductRow)(implicit c: Connection): Boolean
   def updateFieldValues(productid: ProductId, fieldValues: List[ProductFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow
 }

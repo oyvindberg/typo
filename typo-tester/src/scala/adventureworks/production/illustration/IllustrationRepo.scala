@@ -19,4 +19,5 @@ trait IllustrationRepo {
   def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
   def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
 }

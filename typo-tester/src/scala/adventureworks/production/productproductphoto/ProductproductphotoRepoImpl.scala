@@ -127,6 +127,23 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     }
   
   }
+  override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
+    SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.productphotoid}::int4,
+            ${unsaved.primary}::"public"."Flag",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productid, productphotoid)
+          do update set
+            "primary" = EXCLUDED."primary",
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, productphotoid, "primary", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductproductphotoRow] =
     RowParser[ProductproductphotoRow] { row =>
       Success(

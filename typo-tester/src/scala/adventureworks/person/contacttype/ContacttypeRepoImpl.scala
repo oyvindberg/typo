@@ -137,6 +137,22 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     }
   
   }
+  override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
+    SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
+          values (
+            ${unsaved.contacttypeid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (contacttypeid)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning contacttypeid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ContacttypeRow] =
     RowParser[ContacttypeRow] { row =>
       Success(

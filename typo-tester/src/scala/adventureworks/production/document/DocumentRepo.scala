@@ -21,4 +21,5 @@ trait DocumentRepo {
   def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow]
   def update(row: DocumentRow)(implicit c: Connection): Boolean
   def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
 }

@@ -120,6 +120,21 @@ object PersonRepoImpl extends PersonRepo {
     }
   
   }
+  override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
+    SQL"""insert into compositepk.person("one", two, "name")
+          values (
+            ${unsaved.one}::int8,
+            ${unsaved.two},
+            ${unsaved.name}
+          )
+          returning "one", two, "name"
+          on conflict ("one", two)
+          do update set
+            "name" = EXCLUDED."name"
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PersonRow] =
     RowParser[PersonRow] { row =>
       Success(

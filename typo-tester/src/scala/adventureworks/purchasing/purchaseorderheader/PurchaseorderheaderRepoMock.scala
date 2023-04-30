@@ -84,4 +84,8 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
       case None => false
     }
   }
+  override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
+    map.put(unsaved.purchaseorderid, unsaved)
+    unsaved
+  }
 }

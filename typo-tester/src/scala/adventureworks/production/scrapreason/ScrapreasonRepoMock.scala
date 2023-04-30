@@ -66,4 +66,8 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       case None => false
     }
   }
+  override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
+    map.put(unsaved.scrapreasonid, unsaved)
+    unsaved
+  }
 }

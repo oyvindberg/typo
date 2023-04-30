@@ -154,6 +154,28 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     }
   
   }
+  override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
+    SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
+          values (
+            ${unsaved.productmodelid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.catalogdescription}::xml,
+            ${unsaved.instructions}::xml,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productmodelid)
+          do update set
+            "name" = EXCLUDED."name",
+            catalogdescription = EXCLUDED.catalogdescription,
+            instructions = EXCLUDED.instructions,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductmodelRow] =
     RowParser[ProductmodelRow] { row =>
       Success(

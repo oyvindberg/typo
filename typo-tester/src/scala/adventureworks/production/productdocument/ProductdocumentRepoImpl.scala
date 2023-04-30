@@ -122,6 +122,21 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     }
   
   }
+  override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
+    SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.modifieddate}::timestamp,
+            ${unsaved.documentnode}
+          )
+          on conflict (productid, documentnode)
+          do update set
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, modifieddate, documentnode
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductdocumentRow] =
     RowParser[ProductdocumentRow] { row =>
       Success(

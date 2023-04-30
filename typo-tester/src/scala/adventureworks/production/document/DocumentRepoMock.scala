@@ -90,4 +90,8 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       case None => false
     }
   }
+  override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
+    map.put(unsaved.documentnode, unsaved)
+    unsaved
+  }
 }

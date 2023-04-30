@@ -126,6 +126,25 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     }
   
   }
+  override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
+    SQL"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.startdate}::timestamp,
+            ${unsaved.enddate}::timestamp,
+            ${unsaved.standardcost}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productid, startdate)
+          do update set
+            enddate = EXCLUDED.enddate,
+            standardcost = EXCLUDED.standardcost,
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, startdate, enddate, standardcost, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductcosthistoryRow] =
     RowParser[ProductcosthistoryRow] { row =>
       Success(

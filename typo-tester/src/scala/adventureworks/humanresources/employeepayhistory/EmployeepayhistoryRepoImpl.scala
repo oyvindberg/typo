@@ -126,6 +126,25 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     }
   
   }
+  override def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
+    SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.ratechangedate}::timestamp,
+            ${unsaved.rate}::numeric,
+            ${unsaved.payfrequency}::int2,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, ratechangedate)
+          do update set
+            rate = EXCLUDED.rate,
+            payfrequency = EXCLUDED.payfrequency,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[EmployeepayhistoryRow] =
     RowParser[EmployeepayhistoryRow] { row =>
       Success(

@@ -146,6 +146,33 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     }
   
   }
+  override def upsert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
+    SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
+          values (
+            ${unsaved.purchaseorderid}::int4,
+            ${unsaved.purchaseorderdetailid}::int4,
+            ${unsaved.duedate}::timestamp,
+            ${unsaved.orderqty}::int2,
+            ${unsaved.productid}::int4,
+            ${unsaved.unitprice}::numeric,
+            ${unsaved.receivedqty}::numeric,
+            ${unsaved.rejectedqty}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (purchaseorderid, purchaseorderdetailid)
+          do update set
+            duedate = EXCLUDED.duedate,
+            orderqty = EXCLUDED.orderqty,
+            productid = EXCLUDED.productid,
+            unitprice = EXCLUDED.unitprice,
+            receivedqty = EXCLUDED.receivedqty,
+            rejectedqty = EXCLUDED.rejectedqty,
+            modifieddate = EXCLUDED.modifieddate
+          returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PurchaseorderdetailRow] =
     RowParser[PurchaseorderdetailRow] { row =>
       Success(

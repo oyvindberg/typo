@@ -130,6 +130,25 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     }
   
   }
+  override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
+    SQL"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.quotadate}::timestamp,
+            ${unsaved.salesquota}::numeric,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, quotadate)
+          do update set
+            salesquota = EXCLUDED.salesquota,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[SalespersonquotahistoryRow] =
     RowParser[SalespersonquotahistoryRow] { row =>
       Success(

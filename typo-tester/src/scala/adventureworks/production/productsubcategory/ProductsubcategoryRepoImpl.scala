@@ -150,6 +150,26 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     }
   
   }
+  override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
+    SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
+          values (
+            ${unsaved.productsubcategoryid}::int4,
+            ${unsaved.productcategoryid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productsubcategoryid)
+          do update set
+            productcategoryid = EXCLUDED.productcategoryid,
+            "name" = EXCLUDED."name",
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductsubcategoryRow] =
     RowParser[ProductsubcategoryRow] { row =>
       Success(

@@ -19,4 +19,5 @@ trait CurrencyrateRepo {
   def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow]
   def update(row: CurrencyrateRow)(implicit c: Connection): Boolean
   def updateFieldValues(currencyrateid: CurrencyrateId, fieldValues: List[CurrencyrateFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow
 }

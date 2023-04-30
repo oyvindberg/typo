@@ -20,4 +20,5 @@ trait PasswordRepo {
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow]
   def update(row: PasswordRow)(implicit c: Connection): Boolean
   def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
 }

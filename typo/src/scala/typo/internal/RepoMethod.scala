@@ -11,6 +11,7 @@ object RepoMethod {
   case class SelectByFieldValues(param: sc.Param, rowType: sc.Type) extends RepoMethod
   case class UpdateFieldValues(id: IdComputed, param: sc.Param, cases: NonEmptyList[ColumnComputed], rowType: sc.Type) extends RepoMethod
   case class Update(id: IdComputed, param: sc.Param, colsNotId: NonEmptyList[ColumnComputed]) extends RepoMethod
+  case class Upsert(id: IdComputed, unsavedParam: sc.Param, rowType: sc.Type) extends RepoMethod
   case class Insert(cols: NonEmptyList[ColumnComputed], unsavedParam: sc.Param, rowType: sc.Type) extends RepoMethod
   case class InsertUnsaved(unsaved: RowUnsavedComputed, unsavedParam: sc.Param, default: DefaultComputed, rowType: sc.Type) extends RepoMethod
   case class Delete(id: IdComputed) extends RepoMethod

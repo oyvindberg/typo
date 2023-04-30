@@ -168,6 +168,34 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     }
   
   }
+  override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
+    SQL"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
+          values (
+            ${unsaved.billofmaterialsid}::int4,
+            ${unsaved.productassemblyid}::int4,
+            ${unsaved.componentid}::int4,
+            ${unsaved.startdate}::timestamp,
+            ${unsaved.enddate}::timestamp,
+            ${unsaved.unitmeasurecode}::bpchar,
+            ${unsaved.bomlevel}::int2,
+            ${unsaved.perassemblyqty}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (billofmaterialsid)
+          do update set
+            productassemblyid = EXCLUDED.productassemblyid,
+            componentid = EXCLUDED.componentid,
+            startdate = EXCLUDED.startdate,
+            enddate = EXCLUDED.enddate,
+            unitmeasurecode = EXCLUDED.unitmeasurecode,
+            bomlevel = EXCLUDED.bomlevel,
+            perassemblyqty = EXCLUDED.perassemblyqty,
+            modifieddate = EXCLUDED.modifieddate
+          returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[BillofmaterialsRow] =
     RowParser[BillofmaterialsRow] { row =>
       Success(

@@ -129,6 +129,25 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     }
   
   }
+  override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
+    SQL"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.departmentid}::int2,
+            ${unsaved.shiftid}::int2,
+            ${unsaved.startdate}::date,
+            ${unsaved.enddate}::date,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, startdate, departmentid, shiftid)
+          do update set
+            enddate = EXCLUDED.enddate,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[EmployeedepartmenthistoryRow] =
     RowParser[EmployeedepartmenthistoryRow] { row =>
       Success(

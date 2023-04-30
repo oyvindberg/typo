@@ -19,4 +19,5 @@ trait AddressRepo {
   def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow]
   def update(row: AddressRow)(implicit c: Connection): Boolean
   def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow
 }

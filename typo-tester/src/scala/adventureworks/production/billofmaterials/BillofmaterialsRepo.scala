@@ -19,4 +19,5 @@ trait BillofmaterialsRepo {
   def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow]
   def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean
   def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
 }

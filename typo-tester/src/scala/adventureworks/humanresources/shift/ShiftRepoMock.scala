@@ -70,4 +70,8 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       case None => false
     }
   }
+  override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
+    map.put(unsaved.shiftid, unsaved)
+    unsaved
+  }
 }

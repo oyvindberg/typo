@@ -203,6 +203,46 @@ object EmployeeRepoImpl extends EmployeeRepo {
     }
   
   }
+  override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
+    SQL"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.nationalidnumber},
+            ${unsaved.loginid},
+            ${unsaved.jobtitle},
+            ${unsaved.birthdate}::date,
+            ${unsaved.maritalstatus}::bpchar,
+            ${unsaved.gender}::bpchar,
+            ${unsaved.hiredate}::date,
+            ${unsaved.salariedflag}::"public"."Flag",
+            ${unsaved.vacationhours}::int2,
+            ${unsaved.sickleavehours}::int2,
+            ${unsaved.currentflag}::"public"."Flag",
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp,
+            ${unsaved.organizationnode}
+          )
+          on conflict (businessentityid)
+          do update set
+            nationalidnumber = EXCLUDED.nationalidnumber,
+            loginid = EXCLUDED.loginid,
+            jobtitle = EXCLUDED.jobtitle,
+            birthdate = EXCLUDED.birthdate,
+            maritalstatus = EXCLUDED.maritalstatus,
+            gender = EXCLUDED.gender,
+            hiredate = EXCLUDED.hiredate,
+            salariedflag = EXCLUDED.salariedflag,
+            vacationhours = EXCLUDED.vacationhours,
+            sickleavehours = EXCLUDED.sickleavehours,
+            currentflag = EXCLUDED.currentflag,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate,
+            organizationnode = EXCLUDED.organizationnode
+          returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[EmployeeRow] =
     RowParser[EmployeeRow] { row =>
       Success(

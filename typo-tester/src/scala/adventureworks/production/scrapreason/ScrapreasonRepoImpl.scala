@@ -137,6 +137,22 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     }
   
   }
+  override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
+    SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+          values (
+            ${unsaved.scrapreasonid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (scrapreasonid)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning scrapreasonid, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ScrapreasonRow] =
     RowParser[ScrapreasonRow] { row =>
       Success(

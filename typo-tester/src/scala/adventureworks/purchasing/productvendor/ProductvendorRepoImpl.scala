@@ -152,6 +152,37 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     }
   
   }
+  override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
+    SQL"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.averageleadtime}::int4,
+            ${unsaved.standardprice}::numeric,
+            ${unsaved.lastreceiptcost}::numeric,
+            ${unsaved.lastreceiptdate}::timestamp,
+            ${unsaved.minorderqty}::int4,
+            ${unsaved.maxorderqty}::int4,
+            ${unsaved.onorderqty}::int4,
+            ${unsaved.unitmeasurecode}::bpchar,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productid, businessentityid)
+          do update set
+            averageleadtime = EXCLUDED.averageleadtime,
+            standardprice = EXCLUDED.standardprice,
+            lastreceiptcost = EXCLUDED.lastreceiptcost,
+            lastreceiptdate = EXCLUDED.lastreceiptdate,
+            minorderqty = EXCLUDED.minorderqty,
+            maxorderqty = EXCLUDED.maxorderqty,
+            onorderqty = EXCLUDED.onorderqty,
+            unitmeasurecode = EXCLUDED.unitmeasurecode,
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductvendorRow] =
     RowParser[ProductvendorRow] { row =>
       Success(

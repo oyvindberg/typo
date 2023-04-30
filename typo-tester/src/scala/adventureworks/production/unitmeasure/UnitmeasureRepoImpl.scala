@@ -133,6 +133,22 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     }
   
   }
+  override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
+    SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
+          values (
+            ${unsaved.unitmeasurecode}::bpchar,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (unitmeasurecode)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning unitmeasurecode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[UnitmeasureRow] =
     RowParser[UnitmeasureRow] { row =>
       Success(

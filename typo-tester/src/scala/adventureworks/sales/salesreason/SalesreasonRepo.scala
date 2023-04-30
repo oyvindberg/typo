@@ -19,4 +19,5 @@ trait SalesreasonRepo {
   def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow]
   def update(row: SalesreasonRow)(implicit c: Connection): Boolean
   def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow
 }

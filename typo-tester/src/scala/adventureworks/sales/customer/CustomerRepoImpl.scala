@@ -154,6 +154,28 @@ object CustomerRepoImpl extends CustomerRepo {
     }
   
   }
+  override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
+    SQL"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
+          values (
+            ${unsaved.customerid}::int4,
+            ${unsaved.personid}::int4,
+            ${unsaved.storeid}::int4,
+            ${unsaved.territoryid}::int4,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (customerid)
+          do update set
+            personid = EXCLUDED.personid,
+            storeid = EXCLUDED.storeid,
+            territoryid = EXCLUDED.territoryid,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CustomerRow] =
     RowParser[CustomerRow] { row =>
       Success(

@@ -167,6 +167,32 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     }
   
   }
+  override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
+    SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
+          values (
+            ${unsaved.stateprovinceid}::int4,
+            ${unsaved.stateprovincecode}::bpchar,
+            ${unsaved.countryregioncode},
+            ${unsaved.isonlystateprovinceflag}::"public"."Flag",
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.territoryid}::int4,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (stateprovinceid)
+          do update set
+            stateprovincecode = EXCLUDED.stateprovincecode,
+            countryregioncode = EXCLUDED.countryregioncode,
+            isonlystateprovinceflag = EXCLUDED.isonlystateprovinceflag,
+            "name" = EXCLUDED."name",
+            territoryid = EXCLUDED.territoryid,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[StateprovinceRow] =
     RowParser[StateprovinceRow] { row =>
       Success(

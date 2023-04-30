@@ -20,4 +20,5 @@ trait StoreRepo {
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow]
   def update(row: StoreRow)(implicit c: Connection): Boolean
   def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow
 }

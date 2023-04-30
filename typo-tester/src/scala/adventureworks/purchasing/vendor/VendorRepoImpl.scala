@@ -163,6 +163,32 @@ object VendorRepoImpl extends VendorRepo {
     }
   
   }
+  override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
+    SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.accountnumber}::"public".AccountNumber,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.creditrating}::int2,
+            ${unsaved.preferredvendorstatus}::"public"."Flag",
+            ${unsaved.activeflag}::"public"."Flag",
+            ${unsaved.purchasingwebserviceurl},
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid)
+          do update set
+            accountnumber = EXCLUDED.accountnumber,
+            "name" = EXCLUDED."name",
+            creditrating = EXCLUDED.creditrating,
+            preferredvendorstatus = EXCLUDED.preferredvendorstatus,
+            activeflag = EXCLUDED.activeflag,
+            purchasingwebserviceurl = EXCLUDED.purchasingwebserviceurl,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[VendorRow] =
     RowParser[VendorRow] { row =>
       Success(

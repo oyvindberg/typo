@@ -60,4 +60,8 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
       case None => false
     }
   }
+  override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
+    map.put(unsaved.id, unsaved)
+    unsaved
+  }
 }

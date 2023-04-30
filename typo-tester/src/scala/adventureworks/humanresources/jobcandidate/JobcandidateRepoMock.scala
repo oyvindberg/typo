@@ -68,4 +68,8 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
       case None => false
     }
   }
+  override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
+    map.put(unsaved.jobcandidateid, unsaved)
+    unsaved
+  }
 }

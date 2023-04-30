@@ -146,6 +146,26 @@ object ShiftRepoImpl extends ShiftRepo {
     }
   
   }
+  override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
+    SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
+          values (
+            ${unsaved.shiftid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.starttime}::time,
+            ${unsaved.endtime}::time,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (shiftid)
+          do update set
+            "name" = EXCLUDED."name",
+            starttime = EXCLUDED.starttime,
+            endtime = EXCLUDED.endtime,
+            modifieddate = EXCLUDED.modifieddate
+          returning shiftid, "name", starttime, endtime, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ShiftRow] =
     RowParser[ShiftRow] { row =>
       Success(

@@ -19,4 +19,5 @@ trait ShoppingcartitemRepo {
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean
   def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow
 }

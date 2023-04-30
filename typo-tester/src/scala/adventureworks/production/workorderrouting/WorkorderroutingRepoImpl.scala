@@ -153,6 +153,38 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     }
   
   }
+  override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
+    SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
+          values (
+            ${unsaved.workorderid}::int4,
+            ${unsaved.productid}::int4,
+            ${unsaved.operationsequence}::int2,
+            ${unsaved.locationid}::int2,
+            ${unsaved.scheduledstartdate}::timestamp,
+            ${unsaved.scheduledenddate}::timestamp,
+            ${unsaved.actualstartdate}::timestamp,
+            ${unsaved.actualenddate}::timestamp,
+            ${unsaved.actualresourcehrs}::numeric,
+            ${unsaved.plannedcost}::numeric,
+            ${unsaved.actualcost}::numeric,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (workorderid, productid, operationsequence)
+          do update set
+            locationid = EXCLUDED.locationid,
+            scheduledstartdate = EXCLUDED.scheduledstartdate,
+            scheduledenddate = EXCLUDED.scheduledenddate,
+            actualstartdate = EXCLUDED.actualstartdate,
+            actualenddate = EXCLUDED.actualenddate,
+            actualresourcehrs = EXCLUDED.actualresourcehrs,
+            plannedcost = EXCLUDED.plannedcost,
+            actualcost = EXCLUDED.actualcost,
+            modifieddate = EXCLUDED.modifieddate
+          returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[WorkorderroutingRow] =
     RowParser[WorkorderroutingRow] { row =>
       Success(

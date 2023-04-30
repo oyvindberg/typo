@@ -63,4 +63,8 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       case None => false
     }
   }
+  override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
+    map.put(unsaved.compositeId, unsaved)
+    unsaved
+  }
 }

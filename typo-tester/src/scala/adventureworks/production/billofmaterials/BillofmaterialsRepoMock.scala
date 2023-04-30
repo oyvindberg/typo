@@ -78,4 +78,8 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
       case None => false
     }
   }
+  override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
+    map.put(unsaved.billofmaterialsid, unsaved)
+    unsaved
+  }
 }

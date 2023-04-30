@@ -133,6 +133,22 @@ object CurrencyRepoImpl extends CurrencyRepo {
     }
   
   }
+  override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
+    SQL"""insert into sales.currency(currencycode, "name", modifieddate)
+          values (
+            ${unsaved.currencycode}::bpchar,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (currencycode)
+          do update set
+            "name" = EXCLUDED."name",
+            modifieddate = EXCLUDED.modifieddate
+          returning currencycode, "name", modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[CurrencyRow] =
     RowParser[CurrencyRow] { row =>
       Success(

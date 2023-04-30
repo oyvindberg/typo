@@ -69,4 +69,8 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
       case None => false
     }
   }
+  override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
+    map.put(unsaved.oid, unsaved)
+    unsaved
+  }
 }

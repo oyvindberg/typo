@@ -119,6 +119,21 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     }
   
   }
+  override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
+    SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.creditcardid}::int4,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, creditcardid)
+          do update set
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, creditcardid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[PersoncreditcardRow] =
     RowParser[PersoncreditcardRow] { row =>
       Success(

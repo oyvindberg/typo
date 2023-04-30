@@ -130,6 +130,24 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     }
   
   }
+  override def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
+    SQL"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
+          values (
+            ${unsaved.businessentityid}::int4,
+            ${unsaved.addressid}::int4,
+            ${unsaved.addresstypeid}::int4,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (businessentityid, addressid, addresstypeid)
+          do update set
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[BusinessentityaddressRow] =
     RowParser[BusinessentityaddressRow] { row =>
       Success(

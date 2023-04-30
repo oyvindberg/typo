@@ -35,4 +35,8 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     ids.flatMap(map.get).toList
   }
+  override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
+    map.put(unsaved.id, unsaved)
+    unsaved
+  }
 }

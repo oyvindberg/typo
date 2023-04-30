@@ -179,7 +179,10 @@ case class TableComputed(
         case Some(id) =>
           List[Iterable[RepoMethod]](
             Some(RepoMethod.SelectAll(relation.RowName)),
-            Some(RepoMethod.SelectById(id, relation.RowName)),
+            Some(RepoMethod.SelectById(id, relation.RowName)), {
+              val unsavedParam = sc.Param(sc.Ident("unsaved"), relation.RowName, None)
+              Some(RepoMethod.Upsert(id, unsavedParam, relation.RowName))
+            },
             id match {
               case unary: IdComputed.Unary =>
                 Some(RepoMethod.SelectAllByIds(unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe), None), relation.RowName))

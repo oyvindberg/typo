@@ -66,4 +66,8 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
       case None => false
     }
   }
+  override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
+    map.put(unsaved.illustrationid, unsaved)
+    unsaved
+  }
 }

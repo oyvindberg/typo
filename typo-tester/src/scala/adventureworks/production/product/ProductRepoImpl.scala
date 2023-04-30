@@ -239,6 +239,66 @@ object ProductRepoImpl extends ProductRepo {
     }
   
   }
+  override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
+    SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
+          values (
+            ${unsaved.productid}::int4,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.productnumber},
+            ${unsaved.makeflag}::"public"."Flag",
+            ${unsaved.finishedgoodsflag}::"public"."Flag",
+            ${unsaved.color},
+            ${unsaved.safetystocklevel}::int2,
+            ${unsaved.reorderpoint}::int2,
+            ${unsaved.standardcost}::numeric,
+            ${unsaved.listprice}::numeric,
+            ${unsaved.size},
+            ${unsaved.sizeunitmeasurecode}::bpchar,
+            ${unsaved.weightunitmeasurecode}::bpchar,
+            ${unsaved.weight}::numeric,
+            ${unsaved.daystomanufacture}::int4,
+            ${unsaved.productline}::bpchar,
+            ${unsaved.`class`}::bpchar,
+            ${unsaved.style}::bpchar,
+            ${unsaved.productsubcategoryid}::int4,
+            ${unsaved.productmodelid}::int4,
+            ${unsaved.sellstartdate}::timestamp,
+            ${unsaved.sellenddate}::timestamp,
+            ${unsaved.discontinueddate}::timestamp,
+            ${unsaved.rowguid}::uuid,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (productid)
+          do update set
+            "name" = EXCLUDED."name",
+            productnumber = EXCLUDED.productnumber,
+            makeflag = EXCLUDED.makeflag,
+            finishedgoodsflag = EXCLUDED.finishedgoodsflag,
+            color = EXCLUDED.color,
+            safetystocklevel = EXCLUDED.safetystocklevel,
+            reorderpoint = EXCLUDED.reorderpoint,
+            standardcost = EXCLUDED.standardcost,
+            listprice = EXCLUDED.listprice,
+            "size" = EXCLUDED."size",
+            sizeunitmeasurecode = EXCLUDED.sizeunitmeasurecode,
+            weightunitmeasurecode = EXCLUDED.weightunitmeasurecode,
+            weight = EXCLUDED.weight,
+            daystomanufacture = EXCLUDED.daystomanufacture,
+            productline = EXCLUDED.productline,
+            "class" = EXCLUDED."class",
+            "style" = EXCLUDED."style",
+            productsubcategoryid = EXCLUDED.productsubcategoryid,
+            productmodelid = EXCLUDED.productmodelid,
+            sellstartdate = EXCLUDED.sellstartdate,
+            sellenddate = EXCLUDED.sellenddate,
+            discontinueddate = EXCLUDED.discontinueddate,
+            rowguid = EXCLUDED.rowguid,
+            modifieddate = EXCLUDED.modifieddate
+          returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[ProductRow] =
     RowParser[ProductRow] { row =>
       Success(

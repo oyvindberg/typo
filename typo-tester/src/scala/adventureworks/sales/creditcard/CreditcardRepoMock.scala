@@ -72,4 +72,8 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
       case None => false
     }
   }
+  override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
+    map.put(unsaved.creditcardid, unsaved)
+    unsaved
+  }
 }

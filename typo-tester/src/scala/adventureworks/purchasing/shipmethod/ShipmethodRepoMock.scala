@@ -72,4 +72,8 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
       case None => false
     }
   }
+  override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
+    map.put(unsaved.shipmethodid, unsaved)
+    unsaved
+  }
 }

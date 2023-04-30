@@ -18,4 +18,5 @@ trait CountryregioncurrencyRepo {
   def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: CountryregioncurrencyId, fieldValues: List[CountryregioncurrencyFieldValue[_]])(implicit c: Connection): Boolean
+  def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
 }

@@ -162,6 +162,34 @@ object WorkorderRepoImpl extends WorkorderRepo {
     }
   
   }
+  override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
+    SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
+          values (
+            ${unsaved.workorderid}::int4,
+            ${unsaved.productid}::int4,
+            ${unsaved.orderqty}::int4,
+            ${unsaved.scrappedqty}::int2,
+            ${unsaved.startdate}::timestamp,
+            ${unsaved.enddate}::timestamp,
+            ${unsaved.duedate}::timestamp,
+            ${unsaved.scrapreasonid}::int2,
+            ${unsaved.modifieddate}::timestamp
+          )
+          on conflict (workorderid)
+          do update set
+            productid = EXCLUDED.productid,
+            orderqty = EXCLUDED.orderqty,
+            scrappedqty = EXCLUDED.scrappedqty,
+            startdate = EXCLUDED.startdate,
+            enddate = EXCLUDED.enddate,
+            duedate = EXCLUDED.duedate,
+            scrapreasonid = EXCLUDED.scrapreasonid,
+            modifieddate = EXCLUDED.modifieddate
+          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+       """
+      .executeInsert(rowParser.single)
+  
+  }
   val rowParser: RowParser[WorkorderRow] =
     RowParser[WorkorderRow] { row =>
       Success(
