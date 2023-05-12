@@ -27,8 +27,10 @@ package object typo {
       sqlScripts: List[SqlFile],
       selector: Selector
   ): Generated = {
+    val pkg = sc.Type.Qualified(publicOptions.pkg).value
+    val naming = publicOptions.naming(pkg)
     val options = InternalOptions(
-      pkg = sc.Type.Qualified(publicOptions.pkg).value,
+      pkg = pkg,
       jsonLib = publicOptions.jsonLib match {
         case JsonLibName.PlayJson => JsonLibPlay
         case JsonLibName.None     => JsonLib.None
@@ -36,28 +38,27 @@ package object typo {
       dbLib = publicOptions.dbLib match {
         case DbLibName.Anorm => DbLibAnorm
       },
-      naming = publicOptions.naming,
+      naming = naming,
       typeOverride = publicOptions.typeOverride,
       generateMockRepos = publicOptions.generateMockRepos,
       header = publicOptions.header,
       debugTypes = publicOptions.debugTypes
     )
-    val naming = options.naming(options.pkg)
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming)
 
-    val default: DefaultComputed =
-      DefaultComputed(naming)
+    val default: ComputedDefault =
+      ComputedDefault(naming)
 
-    val computeds: SortedMap[db.RelationName, Lazy[Either[ViewComputed, TableComputed]]] =
-      rewriteDependentData(relations.map(rel => rel.name -> rel).toMap).apply[Either[ViewComputed, TableComputed]] {
+    val computeds: SortedMap[db.RelationName, Lazy[HasSource]] =
+      rewriteDependentData(relations.map(rel => rel.name -> rel).toMap).apply[HasSource] {
         case (_, dbTable: db.Table, eval) =>
-          Right(TableComputed(options, default, dbTable, naming, scalaTypeMapper, eval))
+          ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
         case (_, dbView: db.View, eval) =>
-          Left(ViewComputed(dbView, naming, scalaTypeMapper, eval))
+          ComputedView(dbView, naming, scalaTypeMapper, eval)
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedScripts = sqlScripts.map(sqlScript => SqlFileComputed(sqlScript, options.pkg, options.naming, scalaTypeMapper, computeds.apply))
+    val computedScripts = sqlScripts.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.forceGet
     }
@@ -66,8 +67,9 @@ package object typo {
 
     val scriptFiles = computedScripts.flatMap(x => SqlFileFiles(x, naming, options).all)
     val relationFilesByName = computedRelations.flatMap {
-      case Left(viewComputed)   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
-      case Right(tableComputed) => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
+      case viewComputed: ComputedView   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
+      case tableComputed: ComputedTable => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
+      case _                            => Nil
     }
     val mostFiles: List[sc.File] =
       List(

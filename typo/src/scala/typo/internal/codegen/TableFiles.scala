@@ -4,14 +4,14 @@ package codegen
 
 import play.api.libs.json.{JsNull, Json}
 
-case class TableFiles(table: TableComputed, options: InternalOptions) {
-  val relation = RelationFiles(table.naming, table.relation, options)
+case class TableFiles(table: ComputedTable, options: InternalOptions) {
+  val relation = RelationFiles(table.naming, table.names, options)
 
   val UnsavedRowFile: Option[sc.File] = table.maybeUnsavedRow.map { unsaved =>
     val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
 
     val toRow: sc.Code = {
-      def mkDefaultParamName(col: ColumnComputed): sc.Ident =
+      def mkDefaultParamName(col: ComputedColumn): sc.Ident =
         sc.Ident(col.name.value).appended("Default")
 
       val params: NonEmptyList[sc.Param] =
@@ -37,8 +37,8 @@ case class TableFiles(table: TableComputed, options: InternalOptions) {
       val keyValues: List[(sc.Ident, sc.Code)] =
         keyValues2 ::: keyValues1.toList
 
-      code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.relation.RowName} =
-             |  ${table.relation.RowName}(
+      code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.names.RowName} =
+             |  ${table.names.RowName}(
              |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
              |  )""".stripMargin
     }

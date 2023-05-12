@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-case class DefaultFile(dc: DefaultComputed, jsonLib: JsonLib) {
+case class DefaultFile(dc: ComputedDefault, jsonLib: JsonLib) {
   val contents =
     code"""
 /**

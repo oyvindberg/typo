@@ -13,7 +13,7 @@ trait TypeOverride {
     *   name of column
     * @return
     */
-  def apply(from: OverrideFrom, colName: db.ColName): Option[String]
+  def apply(from: Source, colName: db.ColName): Option[String]
 
   final def orElse(other: TypeOverride): TypeOverride =
     (from, colName) => apply(from, colName).orElse(other(from, colName))
@@ -22,30 +22,30 @@ trait TypeOverride {
 object TypeOverride {
   val Empty: TypeOverride = (_, _) => None
 
-  def of(pf: PartialFunction[(OverrideFrom, db.ColName), String]): TypeOverride =
+  def of(pf: PartialFunction[(Source, db.ColName), String]): TypeOverride =
     (from, colName) => pf.lift((from, colName))
 
   def relation(pf: PartialFunction[(String, String), String]): TypeOverride =
     (from, colName) => {
       from match {
-        case rel: OverrideFrom.Relation => pf.lift((rel.name.value, colName.value))
-        case _                          => None
+        case rel: Source.Relation => pf.lift((rel.name.value, colName.value))
+        case _                    => None
       }
     }
 
   def sqlFile(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
     (from, colName) => {
       from match {
-        case sql: OverrideFrom.SqlFile => pf.lift((sql.relPath, colName.value))
-        case _                         => None
+        case sql: Source.SqlFile => pf.lift((sql.relPath, colName.value))
+        case _                   => None
       }
     }
 
   def sqlFileParam(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
     (from, colName) => {
       from match {
-        case OverrideFrom.SqlFileParam(relPath) => pf.lift((relPath, colName.value))
-        case _                                  => None
+        case Source.SqlFileParam(relPath) => pf.lift((relPath, colName.value))
+        case _                            => None
       }
     }
 

@@ -4,9 +4,9 @@ package codegen
 
 import play.api.libs.json.{JsNull, Json}
 
-case class RelationFiles(naming: Naming, relation: RelationComputed, options: InternalOptions) {
+case class RelationFiles(naming: Naming, names: ComputedNames, options: InternalOptions) {
   val RowFile: sc.File = {
-    val compositeId = relation.maybeId match {
+    val compositeId = names.maybeId match {
       case Some(x: IdComputed.Composite) =>
         code"""|{
                |  val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})
@@ -14,11 +14,11 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       case _ => code""
     }
 
-    val formattedCols = relation.cols.map { col =>
+    val formattedCols = names.cols.map { col =>
       val commentPieces = List(
         col.dbCol.comment,
         col.pointsTo map { case (relationName, columnName) =>
-          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, relation.RowName.value.idents))
+          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
         },
         col.dbCol.jsonDescription match {
@@ -38,71 +38,71 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       code"$comment${col.param.code}"
     }
     val str =
-      code"""case class ${relation.RowName.name}(
+      code"""case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |${obj(relation.RowName.name, options.jsonLib.instances(relation.RowName, relation.cols))}
+            |${obj(names.RowName.name, options.jsonLib.instances(names.RowName, names.cols))}
             |""".stripMargin
 
-    sc.File(relation.RowName, str, secondaryTypes = Nil)
+    sc.File(names.RowName, str, secondaryTypes = Nil)
   }
 
   val FieldValueFile: sc.File = {
     val members = {
-      relation.cols.map { col =>
-        val parent = if (relation.isIdColumn(col.dbName)) relation.FieldOrIdValueName else relation.FieldValueName
+      names.cols.map { col =>
+        val parent = if (names.isIdColumn(col.dbName)) names.FieldOrIdValueName else names.FieldValueName
         code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
       }
     }
     val str =
-      code"""sealed abstract class ${relation.FieldOrIdValueName.name}[T](val name: String, val value: T)
-            |sealed abstract class ${relation.FieldValueName.name}[T](name: String, value: T) extends ${relation.FieldOrIdValueName.name}(name, value)
+      code"""sealed abstract class ${names.FieldOrIdValueName.name}[T](val name: String, val value: T)
+            |sealed abstract class ${names.FieldValueName.name}[T](name: String, value: T) extends ${names.FieldOrIdValueName.name}(name, value)
             |
-            |${obj(relation.FieldValueName.name, members.toList)}
+            |${obj(names.FieldValueName.name, members.toList)}
             |""".stripMargin
 
-    sc.File(relation.FieldValueName, str, secondaryTypes = List(relation.FieldOrIdValueName))
+    sc.File(names.FieldValueName, str, secondaryTypes = List(names.FieldOrIdValueName))
   }
 
   def RepoTraitFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val str =
-      code"""trait ${relation.RepoName.name} {
+      code"""trait ${names.RepoName.name} {
             |  ${repoMethods.sortedBy(options.dbLib.repoSig).map(options.dbLib.repoSig).mkCode("\n")}
             |}
             |""".stripMargin
 
-    sc.File(relation.RepoName, str, secondaryTypes = Nil)
+    sc.File(names.RepoName, str, secondaryTypes = Nil)
   }
 
   def RepoImplFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val renderedMethods: NonEmptyList[sc.Code] = repoMethods.sortedBy { options.dbLib.repoSig }.map { repoMethod =>
       code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-             |  ${options.dbLib.repoImpl(relation, repoMethod)}
+             |  ${options.dbLib.repoImpl(repoMethod)}
              |}""".stripMargin
     }
     val allMethods = renderedMethods ++
-      options.dbLib.repoAdditionalMembers(relation.maybeId, relation.RowName, relation.cols)
+      options.dbLib.repoAdditionalMembers(names.maybeId, names.RowName, names.cols)
 
     val str =
-      code"""|object ${relation.RepoImplName.name} extends ${relation.RepoName} {
+      code"""|object ${names.RepoImplName.name} extends ${names.RepoName} {
              |  ${allMethods.mkCode("\n")}
              |}
              |""".stripMargin
 
-    sc.File(relation.RepoImplName, str, secondaryTypes = Nil)
+    sc.File(names.RepoImplName, str, secondaryTypes = Nil)
   }
 
   def RepoMockFile(idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val maybeToRowParam: Option[sc.Param] =
-      repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(unsaved, _, _, _) =>
-        sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, relation.RowName), None)
+      repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(_, _, unsaved, _, _, _) =>
+        sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, names.RowName), None)
       }
 
     val methods: NonEmptyList[sc.Code] =
       repoMethods.sortedBy { options.dbLib.repoSig }.map { repoMethod =>
         code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-               |  ${options.dbLib.mockRepoImpl(relation, idComputed, repoMethod, maybeToRowParam)}
+               |  ${options.dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
                |}""".stripMargin
       }
 
@@ -111,19 +111,19 @@ case class RelationFiles(naming: Naming, relation: RelationComputed, options: In
       Some(
         sc.Param(
           sc.Ident("map"),
-          sc.Type.mutableMap.of(idComputed.tpe, relation.RowName),
+          sc.Type.mutableMap.of(idComputed.tpe, names.RowName),
           Some(code"${sc.Type.mutableMap}.empty")
         )
       )
     ).flatten
 
     val str =
-      code"""|class ${relation.RepoMockName.name}(${classParams.map(_.code).mkCode(",\n")}) extends ${relation.RepoName} {
+      code"""|class ${names.RepoMockName.name}(${classParams.map(_.code).mkCode(",\n")}) extends ${names.RepoName} {
              |  ${methods.mkCode("\n")}
              |}
              |""".stripMargin
 
-    sc.File(relation.RepoMockName, str, secondaryTypes = Nil)
+    sc.File(names.RepoMockName, str, secondaryTypes = Nil)
   }
 
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =
