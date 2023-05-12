@@ -2,7 +2,7 @@ package typo.internal.sqlfiles
 
 import anorm.*
 import org.postgresql.util.PSQLException
-import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesRepoImpl
+import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesSqlRepoImpl
 import typo.internal.{TypeMapperDb, minimalJson}
 import typo.{NonEmptyList, RelPath, db}
 
@@ -54,7 +54,7 @@ object Load {
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
     try {
       SQL(sql).execute()
-      ViewColumnDependenciesRepoImpl(Some(viewName)).map { row =>
+      ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
         val table = db.RelationName(row.tableSchema.map(_.getValue), row.tableName)
         (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
       }.toMap

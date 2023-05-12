@@ -3,18 +3,18 @@ package internal
 package metadb
 
 import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.key_column_usage.KeyColumnUsageRow
-import typo.generated.information_schema.referential_constraints.ReferentialConstraintsRow
-import typo.generated.information_schema.table_constraints.TableConstraintsRow
+import typo.generated.information_schema.key_column_usage.KeyColumnUsageViewRow
+import typo.generated.information_schema.referential_constraints.ReferentialConstraintsViewRow
+import typo.generated.information_schema.table_constraints.TableConstraintsViewRow
 
 object ForeignKeys {
   def apply(
-      tableConstraints: List[TableConstraintsRow],
-      keyColumnUsage: List[KeyColumnUsageRow],
-      referentialConstraints: List[ReferentialConstraintsRow]
+      tableConstraints: List[TableConstraintsViewRow],
+      keyColumnUsage: List[KeyColumnUsageViewRow],
+      referentialConstraints: List[ReferentialConstraintsViewRow]
   ): Map[db.RelationName, List[db.ForeignKey]] = {
 
-    def getReferringColumns(fk: TableConstraintsRow): List[db.ColName] = {
+    def getReferringColumns(fk: TableConstraintsViewRow): List[db.ColName] = {
       val kcus =
         keyColumnUsage.filter { kcu =>
           fk.constraintCatalog == kcu.constraintCatalog &&
@@ -27,7 +27,7 @@ object ForeignKeys {
         .map(kcu => db.ColName(kcu.columnName.get.value))
     }
 
-    def getReferredTable(fk: TableConstraintsRow): Option[db.RelationName] = {
+    def getReferredTable(fk: TableConstraintsViewRow): Option[db.RelationName] = {
       referentialConstraints
         .find { rc =>
           fk.constraintCatalog == rc.constraintCatalog &&
@@ -46,7 +46,7 @@ object ForeignKeys {
         }
     }
 
-    def getReferredColumns(fk: TableConstraintsRow): List[db.ColName] = {
+    def getReferredColumns(fk: TableConstraintsViewRow): List[db.ColName] = {
       referentialConstraints
         .filter { rc =>
           fk.constraintCatalog == rc.constraintCatalog &&

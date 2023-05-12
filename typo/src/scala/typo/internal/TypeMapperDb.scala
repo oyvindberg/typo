@@ -1,10 +1,10 @@
 package typo
 package internal
 
-import typo.generated.information_schema.columns.ColumnsRow
+import typo.generated.information_schema.columns.ColumnsViewRow
 
 case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, db.Domain]) {
-  def col(c: ColumnsRow): Option[db.Type] = {
+  def col(c: ColumnsViewRow): Option[db.Type] = {
     val fromDomain: Option[db.Type.DomainRef] =
       c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema.map(_.value), domainName.value)))
 
