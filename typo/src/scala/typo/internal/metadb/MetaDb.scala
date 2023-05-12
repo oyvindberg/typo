@@ -2,16 +2,16 @@ package typo
 package internal
 package metadb
 
-import typo.generated.custom.comments.{CommentsRepoImpl, CommentsRow}
-import typo.generated.custom.domains.{DomainsRepoImpl, DomainsRow}
+import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
+import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
 import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
-import typo.generated.information_schema.columns.{ColumnsRepoImpl, ColumnsRow}
-import typo.generated.information_schema.key_column_usage.{KeyColumnUsageRepoImpl, KeyColumnUsageRow}
-import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsRepoImpl, ReferentialConstraintsRow}
-import typo.generated.information_schema.table_constraints.{TableConstraintsRepoImpl, TableConstraintsRow}
-import typo.generated.information_schema.tables.{TablesRepoImpl, TablesRow}
+import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
+import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRepoImpl, KeyColumnUsageViewRow}
+import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
+import typo.generated.information_schema.table_constraints.{TableConstraintsViewRepoImpl, TableConstraintsViewRow}
+import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
 
 import java.sql.Connection
 
@@ -24,38 +24,38 @@ case class MetaDb(
 
 object MetaDb {
   case class Input(
-      tableConstraints: List[TableConstraintsRow],
-      keyColumnUsage: List[KeyColumnUsageRow],
-      referentialConstraints: List[ReferentialConstraintsRow],
+      tableConstraints: List[TableConstraintsViewRow],
+      keyColumnUsage: List[KeyColumnUsageViewRow],
+      referentialConstraints: List[ReferentialConstraintsViewRow],
       pgEnums: List[PgEnum.Row],
-      tablesRows: List[TablesRow],
-      columnsRows: List[ColumnsRow],
-      viewRows: List[ViewFindAllRow],
-      viewColumnDeps: List[ViewColumnDependenciesRow],
-      domains: List[DomainsRow],
-      comments: List[CommentsRow]
+      TablesViewRows: List[TablesViewRow],
+      ColumnsViewRows: List[ColumnsViewRow],
+      viewRows: List[ViewFindAllSqlRow],
+      viewColumnDeps: List[ViewColumnDependenciesSqlRow],
+      domains: List[DomainsSqlRow],
+      comments: List[CommentsSqlRow]
   )
 
   object Input {
     def fromDb(implicit c: Connection): Input = {
       Input(
-        tableConstraints = TableConstraintsRepoImpl.selectAll,
-        keyColumnUsage = KeyColumnUsageRepoImpl.selectAll,
-        referentialConstraints = ReferentialConstraintsRepoImpl.selectAll,
+        tableConstraints = TableConstraintsViewRepoImpl.selectAll,
+        keyColumnUsage = KeyColumnUsageViewRepoImpl.selectAll,
+        referentialConstraints = ReferentialConstraintsViewRepoImpl.selectAll,
         pgEnums = PgEnum.all,
-        tablesRows = TablesRepoImpl.selectAll,
-        columnsRows = ColumnsRepoImpl.selectAll,
-        viewRows = ViewFindAllRepoImpl(),
-        viewColumnDeps = ViewColumnDependenciesRepoImpl(None),
-        domains = DomainsRepoImpl(),
-        comments = CommentsRepoImpl()
+        TablesViewRows = TablesViewRepoImpl.selectAll,
+        ColumnsViewRows = ColumnsViewRepoImpl.selectAll,
+        viewRows = ViewFindAllSqlRepoImpl(),
+        viewColumnDeps = ViewColumnDependenciesSqlRepoImpl(None),
+        domains = DomainsSqlRepoImpl(),
+        comments = CommentsSqlRepoImpl()
       )
     }
   }
 
   def apply(input: Input): MetaDb = {
 
-    val groupedViewRows: Map[db.RelationName, ViewFindAllRow] =
+    val groupedViewRows: Map[db.RelationName, ViewFindAllSqlRow] =
       input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
 
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
@@ -89,18 +89,18 @@ object MetaDb {
     )
 
     val comments: Map[(db.RelationName, db.ColName), String] =
-      input.comments.collect { case CommentsRow(maybeSchema, Some(SqlIdentifier(table)), Some(SqlIdentifier(column)), description) =>
+      input.comments.collect { case CommentsSqlRow(maybeSchema, Some(SqlIdentifier(table)), Some(SqlIdentifier(column)), description) =>
         (db.RelationName(maybeSchema.map(_.value), table), db.ColName(column)) -> description
       }.toMap
 
     val relations: List[db.Relation] = {
-      input.tablesRows.flatMap { table =>
+      input.TablesViewRows.flatMap { table =>
         val relationName = db.RelationName(
           schema = table.tableSchema.map(_.value),
           name = table.tableName.get.value
         )
 
-        val columns = input.columnsRows
+        val columns = input.ColumnsViewRows
           .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
           .sortBy(_.ordinalPosition)
 
