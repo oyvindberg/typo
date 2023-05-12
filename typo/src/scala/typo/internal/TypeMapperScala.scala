@@ -6,7 +6,7 @@ case class TypeMapperScala(
     nullabilityOverride: NullabilityOverride,
     naming: Naming
 ) {
-  def col(from: OverrideFrom, col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
+  def col(from: Source, col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
       val maybeOverridden = typeOverride(from, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
       val maybeFromFK = typeFromFK.map(stripOptionAndArray)
@@ -24,7 +24,7 @@ case class TypeMapperScala(
     withNullability(baseTpe, nullabilityOverride.apply(from, col.name).getOrElse(col.nullability))
   }
 
-  def param(from: OverrideFrom.SqlFileParam, maybeColName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
+  def param(from: Source.SqlFileParam, maybeColName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
       val maybeOverridden = {
         for {

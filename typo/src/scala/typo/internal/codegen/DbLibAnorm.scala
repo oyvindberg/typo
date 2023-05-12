@@ -22,7 +22,7 @@ object DbLibAnorm extends DbLib {
   def SQL(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
-  def dbNames(cols: NonEmptyList[ColumnComputed]): sc.Code =
+  def dbNames(cols: NonEmptyList[ComputedColumn]): sc.Code =
     cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
@@ -56,40 +56,40 @@ object DbLibAnorm extends DbLib {
   }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
-    case RepoMethod.SelectAll(rowType) =>
+    case RepoMethod.SelectAll(_, _, rowType) =>
       code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
-    case RepoMethod.SelectById(id, rowType) =>
+    case RepoMethod.SelectById(_, _, id, rowType) =>
       code"def selectById(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
-    case RepoMethod.SelectAllByIds(unaryId, idsParam, rowType) =>
+    case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
           code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}, toStatement: ${ToStatement.of(sc.Type.Array.of(tpe))}): ${sc.Type.List.of(rowType)}"
         case _ =>
           code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
       }
-    case RepoMethod.SelectByUnique(params, rowType) =>
+    case RepoMethod.SelectByUnique(params, _, rowType) =>
       val ident = Naming.camelCase(Array("selectByUnique"))
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
-    case RepoMethod.SelectByFieldValues(param, rowType) =>
-      code"def selectByFieldValues($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
-    case RepoMethod.UpdateFieldValues(id, param, _, _) =>
-      code"def updateFieldValues(${id.param}, $param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
-    case RepoMethod.Update(_, param, _) =>
+    case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
+      code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+    case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
+      code"def updateFieldValues(${id.param}, $varargs)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
+    case RepoMethod.Update(_, _, _, param, _) =>
       code"def update($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
-    case RepoMethod.Insert(_, unsavedParam, rowType) =>
+    case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
-    case RepoMethod.Upsert(_, unsavedParam, rowType) =>
+    case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
-    case RepoMethod.InsertUnsaved(_, unsavedParam, _, rowType) =>
+    case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
-    case RepoMethod.Delete(id) =>
+    case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sqlScript.params match {
         case Nil      => sc.Code.Empty
         case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
       }
-      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sqlScript.relation.RowName)}"
+      code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sqlScript.RowName)}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -103,7 +103,7 @@ object DbLibAnorm extends DbLib {
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
     code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
-  def cast(c: ColumnComputed): sc.Code =
+  def cast(c: ComputedColumn): sc.Code =
     c.dbCol.tpe match {
       case db.Type.EnumRef(name)                               => code"::$name"
       case db.Type.DomainRef(name)                             => code"::$name"
@@ -115,29 +115,29 @@ object DbLibAnorm extends DbLib {
         }
     }
 
-  override def repoImpl(rel: RelationComputed, repoMethod: RepoMethod): sc.Code =
+  override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
-      case RepoMethod.SelectAll(_) =>
+      case RepoMethod.SelectAll(relName, cols, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(rel.cols)}
-                 |from ${rel.relationName}
+          code"""|select ${dbNames(cols)}
+                 |from $relName
                  |""".stripMargin
         }
         code"""$sql.as($rowParserIdent.*)"""
 
-      case RepoMethod.SelectById(id, _) =>
+      case RepoMethod.SelectById(relName, cols, id, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(rel.cols)}
-                 |from ${rel.relationName}
+          code"""|select ${dbNames(cols)}
+                 |from $relName
                  |where ${matchId(id)}
                  |""".stripMargin
         }
         code"""$sql.as($rowParserIdent.singleOpt)"""
 
-      case RepoMethod.SelectAllByIds(unaryId, idsParam, _) =>
+      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(rel.cols)}
-                 |from ${rel.relationName}
+          code"""|select ${dbNames(cols)}
+                 |from $relName
                  |where ${matchAnyId(unaryId, idsParam)}
                  |""".stripMargin
         }
@@ -159,25 +159,25 @@ object DbLibAnorm extends DbLib {
                |$sql.as($rowParserIdent.*)
                |""".stripMargin
 
-      case RepoMethod.SelectByUnique(params, _) =>
+      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
         val args = params.map { param =>
-          code"${rel.FieldValueName}.${param.name}(${param.name})"
+          code"$fieldValue.${param.name}(${param.name})"
         }
         code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
 
-      case RepoMethod.SelectByFieldValues(param, _) =>
+      case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases: NonEmptyList[sc.Code] =
-          rel.cols.map { col =>
-            code"case ${rel.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
+          cols.map { col =>
+            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
 
         val sql = sc.s {
-          code"""|select ${dbNames(rel.cols)}
-                 |from ${rel.relationName}
+          code"""|select ${dbNames(cols)}
+                 |from $relName
                  |where $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
                  |""".stripMargin
         }
-        code"""${param.name} match {
+        code"""${fieldValueOrIdsParam.name} match {
               |  case Nil => selectAll
               |  case nonEmpty =>
               |    val namedParams = nonEmpty.map{
@@ -193,10 +193,10 @@ object DbLibAnorm extends DbLib {
               |}
               |""".stripMargin
 
-      case RepoMethod.UpdateFieldValues(id, param, cases0, _) =>
+      case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            code"case ${rel.FieldValueName}.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
+            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
           }
         val where: sc.Code =
           id.cols.map { col => code"${maybeQuoted(col.dbName)} = {${col.name}}" }.mkCode(" AND ")
@@ -212,12 +212,12 @@ object DbLibAnorm extends DbLib {
           }
 
         val sql = sc.s {
-          code"""update ${rel.relationName}
+          code"""update $relName
                 |set $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(", ")}
                 |where $where
                 |""".stripMargin
         }
-        code"""${param.name} match {
+        code"""${varargs.name} match {
               |  case Nil => false
               |  case nonEmpty =>
               |    val namedParams = nonEmpty.map{
@@ -234,9 +234,9 @@ object DbLibAnorm extends DbLib {
               |}
               |""".stripMargin
 
-      case RepoMethod.Update(id, param, colsUnsaved) =>
+      case RepoMethod.Update(relName, _, id, param, colsUnsaved) =>
         val sql = SQL {
-          code"""|update ${rel.relationName}
+          code"""|update $relName
                  |set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}${cast(col)}" }.mkCode(",\n")}
                  |where ${matchId(id)}
                  |""".stripMargin
@@ -244,38 +244,38 @@ object DbLibAnorm extends DbLib {
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
                |$sql.executeUpdate() > 0"""
 
-      case RepoMethod.Insert(cols, unsavedParam, _) =>
+      case RepoMethod.Insert(relName, cols, unsavedParam, _) =>
         val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
         val sql = SQL {
-          code"""|insert into ${rel.relationName}(${dbNames(cols)})
+          code"""|insert into $relName(${dbNames(cols)})
                  |values (${values.mkCode(", ")})
-                 |returning ${dbNames(rel.cols)}
+                 |returning ${dbNames(cols)}
                  |""".stripMargin
         }
 
         code"""|$sql
                |  .executeInsert($rowParserIdent.single)
                |"""
-      case RepoMethod.Upsert(id, unsavedParam, _) =>
-        val values = rel.cols.map { c =>
+      case RepoMethod.Upsert(relName, cols, id, unsavedParam, _) =>
+        val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
 
-        val pickExcludedCols = rel.cols.toList
+        val pickExcludedCols = cols.toList
           .filterNot(c => id.cols.exists(_.name == c.name))
           .map { c => code"${maybeQuoted(c.dbName)} = EXCLUDED.${maybeQuoted(c.dbName)}" }
 
         val sql = SQL {
-          code"""|insert into ${rel.relationName}(${dbNames(rel.cols)})
+          code"""|insert into $relName(${dbNames(cols)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
                  |on conflict (${dbNames(id.cols)})
                  |do update set
                  |  ${pickExcludedCols.mkCode(",\n")}
-                 |returning ${dbNames(rel.cols)}
+                 |returning ${dbNames(cols)}
                  |""".stripMargin
         }
 
@@ -283,12 +283,12 @@ object DbLibAnorm extends DbLib {
                |  .executeInsert($rowParserIdent.single)
                |"""
 
-      case RepoMethod.InsertUnsaved(unsaved, unsavedParam, default, _) =>
+      case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, _) =>
         val cases0 = unsaved.restCols.map { col =>
           val colCast = sc.StrLit(cast(col).render)
           code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})), $colCast))"""
         }
-        val cases1 = unsaved.defaultCols.map { case (col @ ColumnComputed(_, ident, _, dbCol), origType) =>
+        val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
           val dbName = sc.StrLit(dbCol.name.value)
           val colCast = sc.StrLit(cast(col).render)
 
@@ -299,14 +299,14 @@ object DbLibAnorm extends DbLib {
         }
 
         val sql = sc.s {
-          code"""|insert into ${rel.relationName}($${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+          code"""|insert into $relName($${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                  |values ($${namedParameters.map{ case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
-                 |returning ${dbNames(rel.cols)}
+                 |returning ${dbNames(cols)}
                  |""".stripMargin
         }
         val sqlEmpty = SQL {
-          code"""|insert into ${rel.relationName} default values
-                 |returning ${dbNames(rel.cols)}
+          code"""|insert into $relName default values
+                 |returning ${dbNames(cols)}
                  |""".stripMargin
         }
 
@@ -327,9 +327,9 @@ object DbLibAnorm extends DbLib {
                |}
                |"""
 
-      case RepoMethod.Delete(id) =>
+      case RepoMethod.Delete(relName, id) =>
         val sql = SQL {
-          code"""delete from ${rel.relationName} where ${matchId(id)}"""
+          code"""delete from $relName where ${matchId(id)}"""
         }
         code"$sql.executeUpdate() > 0"
       case RepoMethod.SqlFile(sqlScript) =>
@@ -438,7 +438,7 @@ object DbLibAnorm extends DbLib {
     arrayInstances ++ postgresTypes ++ List(PgSQLXML, hstore, pgObject, localTime)
   }
 
-  def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ColumnComputed]): List[sc.Code] = {
+  def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
     val rowParser = {
       val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbName.value)})" }
       code"""|val $rowParserIdent: ${RowParser.of(tpe)} =
@@ -454,35 +454,35 @@ object DbLibAnorm extends DbLib {
     List(rowParser)
   }
 
-  override def mockRepoImpl(rel: RelationComputed, id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
+  override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
     repoMethod match {
-      case RepoMethod.SelectAll(_) =>
+      case RepoMethod.SelectAll(_, _, _) =>
         code"map.values.toList"
-      case RepoMethod.SelectById(id, _) =>
+      case RepoMethod.SelectById(_, _, id, _) =>
         code"map.get(${id.paramName})"
-      case RepoMethod.SelectAllByIds(_, idsParam, _) =>
+      case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"${idsParam.name}.flatMap(map.get).toList"
-      case RepoMethod.SelectByUnique(params, _) =>
+      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
         val args = params.map { param =>
-          code"${rel.FieldValueName}.${param.name}(${param.name})"
+          code"$fieldValue.${param.name}(${param.name})"
         }
         code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
 
-      case RepoMethod.SelectByFieldValues(param, _) =>
-        val cases = rel.cols.map { col =>
-          code"case (acc, ${rel.FieldValueName}.${col.name}(value)) => acc.filter(_.${col.name} == value)"
+      case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
+        val cases = cols.map { col =>
+          code"case (acc, $fieldValue.${col.name}(value)) => acc.filter(_.${col.name} == value)"
         }
-        code"""${param.name}.foldLeft(map.values) {
+        code"""${fieldValueOrIdsParam.name}.foldLeft(map.values) {
               |  ${cases.mkCode("\n")}
               |}.toList""".stripMargin
-      case RepoMethod.UpdateFieldValues(_, param, cols, _) =>
-        val cases = cols.map { col =>
-          code"case (acc, ${rel.FieldValueName}.${col.name}(value)) => acc.copy(${col.name} = value)"
+      case RepoMethod.UpdateFieldValues(_, _, varargs, fieldValue, cases0, _) =>
+        val cases = cases0.map { col =>
+          code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
         }
 
         code"""|map.get(${id.paramName}) match {
                |  case ${sc.Type.Some}(oldRow) =>
-               |    val updatedRow = ${param.name}.foldLeft(oldRow) {
+               |    val updatedRow = ${varargs.name}.foldLeft(oldRow) {
                |      ${cases.mkCode("\n")}
                |    }
                |    if (updatedRow != oldRow) {
@@ -493,7 +493,7 @@ object DbLibAnorm extends DbLib {
                |    }
                |  case ${sc.Type.None} => false
                |}""".stripMargin
-      case RepoMethod.Update(_, param, _) =>
+      case RepoMethod.Update(_, _, _, param, _) =>
         code"""map.get(${param.name}.${id.paramName}) match {
               |  case ${sc.Type.Some}(`${param.name}`) => false
               |  case ${sc.Type.Some}(_) =>
@@ -501,19 +501,19 @@ object DbLibAnorm extends DbLib {
               |    true
               |  case ${sc.Type.None} => false
               |}""".stripMargin
-      case RepoMethod.Insert(_, unsavedParam, _) =>
+      case RepoMethod.Insert(_, _, unsavedParam, _) =>
         code"""|if (map.contains(${unsavedParam.name}.${id.paramName}))
                |  sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")
                |else
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
                |${unsavedParam.name}"""
-      case RepoMethod.Upsert(_, unsavedParam, _) =>
+      case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
         code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
                |${unsavedParam.name}"""
-      case RepoMethod.InsertUnsaved(_, unsavedParam, _, _) =>
+      case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 
-      case RepoMethod.Delete(id) =>
+      case RepoMethod.Delete(_, id) =>
         code"map.remove(${id.paramName}).isDefined"
       case RepoMethod.SqlFile(_) =>
         // should not happen (tm)

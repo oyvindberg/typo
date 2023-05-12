@@ -136,7 +136,8 @@ object MetaDb {
                   // TODO: I'm only able to get the column name from one of the two tables involved in the dependency.
                   // I suppose this means that we'll only find the dependency if the column name is the same in both tables.
                   val colName = db.ColName(x.columnName)
-                  (colName, (db.RelationName(x.tableSchema.map(_.getValue), x.tableName), colName))
+                  val relName = db.RelationName(x.tableSchema.map(_.getValue), x.tableName)
+                  (colName, (relName, colName))
               }.toMap
 
             for {

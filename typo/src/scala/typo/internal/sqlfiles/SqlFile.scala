@@ -1,6 +1,6 @@
-package typo.internal.sqlfiles
-
-import typo.{NonEmptyList, Nullability, RelPath, db}
+package typo
+package internal
+package sqlfiles
 
 case class SqlFile(
     relPath: RelPath,

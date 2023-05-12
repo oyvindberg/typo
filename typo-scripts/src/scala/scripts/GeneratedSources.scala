@@ -1,6 +1,6 @@
 package scripts
 
-import typo.{Nullability, NullabilityOverride, OverrideFrom, RelPath, db}
+import typo.{Nullability, NullabilityOverride, Source, RelPath, db}
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
@@ -43,7 +43,7 @@ object GeneratedSources {
 
     val nullabilityOverride: NullabilityOverride = {
       // postgres has problems with a left join in this query
-      case (OverrideFrom.SqlFile(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
+      case (Source.SqlFile(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
         Some(Nullability.Nullable)
       case (_, _) =>
         None

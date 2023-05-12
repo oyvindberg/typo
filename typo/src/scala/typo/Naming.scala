@@ -1,21 +1,49 @@
 package typo
 
-class Naming(pkg: sc.QIdent) {
-  protected def relation(name: db.RelationName, suffix: String): sc.QIdent =
-    pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(name.name) / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
+class Naming(val pkg: sc.QIdent) {
+  protected def fragments(source: Source): (sc.QIdent, String) = {
+    def forRelPath(relPath: RelPath): (sc.QIdent, String) =
+      (
+        pkg / relPath.segments.init.map(sc.Ident.apply),
+        relPath.segments.last.replace(".sql", "")
+      )
+
+    source match {
+      case relation: Source.Relation =>
+        (pkg / relation.name.schema.toList.map(sc.Ident.apply), relation.name.name)
+      case Source.SqlFile(relPath)      => forRelPath(relPath)
+      case Source.SqlFileParam(relPath) => forRelPath(relPath)
+    }
+  }
+
+  def suffixFor(source: Source): String =
+    source match {
+      case Source.Table(_)        => ""
+      case Source.View(_, false)  => "View"
+      case Source.View(_, true)   => "MV"
+      case Source.SqlFile(_)      => "Sql"
+      case Source.SqlFileParam(_) => ""
+    }
+
+  protected def relation(source: Source, suffix: String): sc.QIdent = {
+    val (init, name) = fragments(source)
+    val suffix0 = suffixFor(source)
+    init / sc.Ident(name) / sc.Ident(Naming.titleCase(name)).appended(suffix0 + suffix)
+  }
+
   protected def tpe(name: db.RelationName, suffix: String): sc.QIdent =
     pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
 
-  // class names
-  def idName(name: db.RelationName): sc.QIdent = relation(name, "Id")
-  def repoName(name: db.RelationName): sc.QIdent = relation(name, "Repo")
-  def repoImplName(name: db.RelationName): sc.QIdent = relation(name, "RepoImpl")
-  def repoMockName(name: db.RelationName): sc.QIdent = relation(name, "RepoMock")
-  def rowName(name: db.RelationName): sc.QIdent = relation(name, "Row")
-  def fieldValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldValue")
-  def fieldOrIdValueName(name: db.RelationName): sc.QIdent = relation(name, "FieldOrIdValue")
-  def rowUnsaved(name: db.RelationName): sc.QIdent = relation(name, "RowUnsaved")
-  def joinedRow(name: db.RelationName): sc.QIdent = relation(name, "JoinedRow")
+  def idName(source: Source): sc.QIdent = relation(source, "Id")
+  def repoName(source: Source): sc.QIdent = relation(source, "Repo")
+  def repoImplName(source: Source): sc.QIdent = relation(source, "RepoImpl")
+  def repoMockName(source: Source): sc.QIdent = relation(source, "RepoMock")
+  def rowName(source: Source): sc.QIdent = relation(source, "Row")
+  def fieldValueName(source: Source): sc.QIdent = relation(source, "FieldValue")
+  def fieldOrIdValueName(source: Source): sc.QIdent = relation(source, "FieldOrIdValue")
+  def rowUnsaved(source: Source): sc.QIdent = relation(source, "RowUnsaved")
+  def joinedRow(source: Source): sc.QIdent = relation(source, "JoinedRow")
+
   def className(names: List[sc.Ident]): sc.QIdent = pkg / names
 
   def enumName(name: db.RelationName): sc.QIdent =
