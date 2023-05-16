@@ -34,26 +34,26 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
-      Some((Fragment.const(s"productassemblyid"), fr"productassemblyid = ${unsaved.productassemblyid}::int4")),
-      Some((Fragment.const(s"componentid"), fr"componentid = ${unsaved.componentid}::int4")),
-      Some((Fragment.const(s"enddate"), fr"enddate = ${unsaved.enddate}::timestamp")),
-      Some((Fragment.const(s"unitmeasurecode"), fr"unitmeasurecode = ${unsaved.unitmeasurecode}::bpchar")),
-      Some((Fragment.const(s"bomlevel"), fr"bomlevel = ${unsaved.bomlevel}::int2")),
+      Some((Fragment.const(s"productassemblyid"), fr"${unsaved.productassemblyid}::int4")),
+      Some((Fragment.const(s"componentid"), fr"${unsaved.componentid}::int4")),
+      Some((Fragment.const(s"enddate"), fr"${unsaved.enddate}::timestamp")),
+      Some((Fragment.const(s"unitmeasurecode"), fr"${unsaved.unitmeasurecode}::bpchar")),
+      Some((Fragment.const(s"bomlevel"), fr"${unsaved.bomlevel}::int2")),
       unsaved.billofmaterialsid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"billofmaterialsid"), fr"billofmaterialsid = ${value: BillofmaterialsId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"billofmaterialsid"), fr"${value: BillofmaterialsId}::int4"))
       },
       unsaved.startdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"startdate"), fr"startdate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"startdate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.perassemblyqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"perassemblyqty"), fr"perassemblyqty = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"perassemblyqty"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -64,7 +64,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.billofmaterials(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
          """
     }
@@ -95,7 +95,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid".query[BillofmaterialsRow].option
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid in $billofmaterialsids".query[BillofmaterialsRow].stream
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)".query[BillofmaterialsRow].stream
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
@@ -131,7 +131,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           } :_*
         )
         sql"""update production.billofmaterials
-              set $updates
+              $updates
               where billofmaterialsid = $billofmaterialsid
            """.update.run.map(_ > 0)
     }

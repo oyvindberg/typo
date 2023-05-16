@@ -33,26 +33,26 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"referenceorderid"), fr"referenceorderid = ${unsaved.referenceorderid}::int4")),
-      Some((Fragment.const(s"transactiontype"), fr"transactiontype = ${unsaved.transactiontype}::bpchar")),
-      Some((Fragment.const(s"quantity"), fr"quantity = ${unsaved.quantity}::int4")),
-      Some((Fragment.const(s"actualcost"), fr"actualcost = ${unsaved.actualcost}::numeric")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"referenceorderid"), fr"${unsaved.referenceorderid}::int4")),
+      Some((Fragment.const(s"transactiontype"), fr"${unsaved.transactiontype}::bpchar")),
+      Some((Fragment.const(s"quantity"), fr"${unsaved.quantity}::int4")),
+      Some((Fragment.const(s"actualcost"), fr"${unsaved.actualcost}::numeric")),
       unsaved.transactionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"transactionid"), fr"transactionid = ${value: TransactionhistoryId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"transactionid"), fr"${value: TransactionhistoryId}::int4"))
       },
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"referenceorderlineid"), fr"referenceorderlineid = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"referenceorderlineid"), fr"${value: Int}::int4"))
       },
       unsaved.transactiondate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"transactiondate"), fr"transactiondate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"transactiondate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -63,7 +63,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.transactionhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
          """
     }
@@ -94,7 +94,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid".query[TransactionhistoryRow].option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid in $transactionids".query[TransactionhistoryRow].stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = ANY($transactionids)".query[TransactionhistoryRow].stream
   }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
@@ -130,7 +130,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           } :_*
         )
         sql"""update production.transactionhistory
-              set $updates
+              $updates
               where transactionid = $transactionid
            """.update.run.map(_ > 0)
     }

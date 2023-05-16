@@ -34,41 +34,41 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved): ConnectionIO[PurchaseorderheaderRow] = {
     val fs = List(
-      Some((Fragment.const(s"employeeid"), fr"employeeid = ${unsaved.employeeid}::int4")),
-      Some((Fragment.const(s"vendorid"), fr"vendorid = ${unsaved.vendorid}::int4")),
-      Some((Fragment.const(s"shipmethodid"), fr"shipmethodid = ${unsaved.shipmethodid}::int4")),
-      Some((Fragment.const(s"shipdate"), fr"shipdate = ${unsaved.shipdate}::timestamp")),
+      Some((Fragment.const(s"employeeid"), fr"${unsaved.employeeid}::int4")),
+      Some((Fragment.const(s"vendorid"), fr"${unsaved.vendorid}::int4")),
+      Some((Fragment.const(s"shipmethodid"), fr"${unsaved.shipmethodid}::int4")),
+      Some((Fragment.const(s"shipdate"), fr"${unsaved.shipdate}::timestamp")),
       unsaved.purchaseorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderid"), fr"purchaseorderid = ${value: PurchaseorderheaderId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderid"), fr"${value: PurchaseorderheaderId}::int4"))
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"revisionnumber"), fr"revisionnumber = ${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"revisionnumber"), fr"${value: Int}::int2"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"status"), fr"status = ${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"status"), fr"${value: Int}::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"orderdate"), fr"orderdate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"orderdate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"subtotal"), fr"subtotal = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"subtotal"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.taxamt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"taxamt"), fr"taxamt = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"taxamt"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.freight match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"freight"), fr"freight = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"freight"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -79,7 +79,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.purchaseorderheader(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
          """
     }
@@ -113,7 +113,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".query[PurchaseorderheaderRow].option
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid in $purchaseorderids".query[PurchaseorderheaderRow].stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)".query[PurchaseorderheaderRow].stream
   }
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid
@@ -155,7 +155,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           } :_*
         )
         sql"""update purchasing.purchaseorderheader
-              set $updates
+              $updates
               where purchaseorderid = $purchaseorderid
            """.update.run.map(_ > 0)
     }

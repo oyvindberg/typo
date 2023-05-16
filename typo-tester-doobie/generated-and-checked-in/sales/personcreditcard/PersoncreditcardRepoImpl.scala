@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
-    sql"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".update.run.map(_ > 0)
+    sql"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
@@ -34,11 +34,11 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"creditcardid"), fr"creditcardid = ${unsaved.creditcardid}::int4")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"creditcardid"), fr"${unsaved.creditcardid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -49,7 +49,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.personcreditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, creditcardid, modifieddate
          """
     }
@@ -71,13 +71,13 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   
   }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
-    sql"select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}".query[PersoncreditcardRow].option
+    sql"select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".query[PersoncreditcardRow].option
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard
           set modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+          where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """
       .update
       .run
@@ -93,8 +93,8 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           } :_*
         )
         sql"""update sales.personcreditcard
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, creditcardid = ${compositeId.creditcardid}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
            """.update.run.map(_ > 0)
     }
   }

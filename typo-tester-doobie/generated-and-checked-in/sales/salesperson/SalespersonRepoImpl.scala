@@ -35,32 +35,32 @@ object SalespersonRepoImpl extends SalespersonRepo {
   }
   override def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"territoryid"), fr"territoryid = ${unsaved.territoryid}::int4")),
-      Some((Fragment.const(s"salesquota"), fr"salesquota = ${unsaved.salesquota}::numeric")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"territoryid"), fr"${unsaved.territoryid}::int4")),
+      Some((Fragment.const(s"salesquota"), fr"${unsaved.salesquota}::numeric")),
       unsaved.bonus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"bonus"), fr"bonus = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"bonus"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.commissionpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"commissionpct"), fr"commissionpct = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"commissionpct"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"salesytd = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.saleslastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"saleslastyear = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -71,7 +71,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesperson(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
          """
     }
@@ -102,7 +102,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid".query[SalespersonRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, SalespersonRow] = {
-    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid in $businessentityids".query[SalespersonRow].stream
+    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = ANY($businessentityids)".query[SalespersonRow].stream
   }
   override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -138,7 +138,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           } :_*
         )
         sql"""update sales.salesperson
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }

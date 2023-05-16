@@ -27,17 +27,17 @@ object CultureRepoImpl extends CultureRepo {
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
-          values (${unsaved.cultureid}::bpchar, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning cultureid, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
-      Some((Fragment.const(s"cultureid"), fr"cultureid = ${unsaved.cultureid}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s"cultureid"), fr"${unsaved.cultureid}::bpchar")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -48,7 +48,7 @@ object CultureRepoImpl extends CultureRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.culture(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning cultureid, "name", modifieddate
          """
     }
@@ -73,12 +73,12 @@ object CultureRepoImpl extends CultureRepo {
     sql"""select cultureid, "name", modifieddate from production.culture where cultureid = $cultureid""".query[CultureRow].option
   }
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
-    sql"""select cultureid, "name", modifieddate from production.culture where cultureid in $cultureids""".query[CultureRow].stream
+    sql"""select cultureid, "name", modifieddate from production.culture where cultureid = ANY($cultureids)""".query[CultureRow].stream
   }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
     sql"""update production.culture
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where cultureid = $cultureid
        """
@@ -92,12 +92,12 @@ object CultureRepoImpl extends CultureRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case CultureFieldValue.name(value) => fr"name = $value"
+            case CultureFieldValue.name(value) => fr""""name" = $value"""
             case CultureFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.culture
-              set $updates
+              $updates
               where cultureid = $cultureid
            """.update.run.map(_ > 0)
     }
@@ -106,7 +106,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
           values (
             ${unsaved.cultureid}::bpchar,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (cultureid)

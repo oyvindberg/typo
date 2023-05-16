@@ -25,25 +25,25 @@ import java.time.LocalDateTime
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
-    sql"delete from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}".update.run.map(_ > 0)
+    sql"delete from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::public.Flag, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
           returning productid, productphotoid, "primary", modifieddate
        """.query.unique
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"productphotoid"), fr"productphotoid = ${unsaved.productphotoid}::int4")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"productphotoid"), fr"${unsaved.productphotoid}::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""primary""""), fr""""primary" = ${value: Flag}::public.Flag"""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""primary""""), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -54,7 +54,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productproductphoto(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productid, productphotoid, "primary", modifieddate
          """
     }
@@ -77,14 +77,14 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   
   }
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
-    sql"""select productid, productphotoid, "primary", modifieddate from production.productproductphoto where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}""".query[ProductproductphotoRow].option
+    sql"""select productid, productphotoid, "primary", modifieddate from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}""".query[ProductproductphotoRow].option
   }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productproductphoto
-          set "primary" = ${row.primary}::public.Flag,
+          set "primary" = ${row.primary}::"public"."Flag",
               modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}
+          where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
        """
       .update
       .run
@@ -96,13 +96,13 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ProductproductphotoFieldValue.primary(value) => fr"primary = $value"
+            case ProductproductphotoFieldValue.primary(value) => fr""""primary" = $value"""
             case ProductproductphotoFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.productproductphoto
-              set $updates
-              where productid = ${compositeId.productid}, productphotoid = ${compositeId.productphotoid}
+              $updates
+              where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
            """.update.run.map(_ > 0)
     }
   }
@@ -111,7 +111,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           values (
             ${unsaved.productid}::int4,
             ${unsaved.productphotoid}::int4,
-            ${unsaved.primary}::public.Flag,
+            ${unsaved.primary}::"public"."Flag",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (productid, productphotoid)

@@ -28,24 +28,24 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   }
   override def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
-          values (${unsaved.productcategoryid}::int4, ${unsaved.name}::public.Name, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productcategoryid, "name", rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.productcategoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productcategoryid"), fr"productcategoryid = ${value: ProductcategoryId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productcategoryid"), fr"${value: ProductcategoryId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -56,7 +56,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productcategory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productcategoryid, "name", rowguid, modifieddate
          """
     }
@@ -82,12 +82,12 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""select productcategoryid, "name", rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".query[ProductcategoryRow].option
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow] = {
-    sql"""select productcategoryid, "name", rowguid, modifieddate from production.productcategory where productcategoryid in $productcategoryids""".query[ProductcategoryRow].stream
+    sql"""select productcategoryid, "name", rowguid, modifieddate from production.productcategory where productcategoryid = ANY($productcategoryids)""".query[ProductcategoryRow].stream
   }
   override def update(row: ProductcategoryRow): ConnectionIO[Boolean] = {
     val productcategoryid = row.productcategoryid
     sql"""update production.productcategory
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
           where productcategoryid = $productcategoryid
@@ -102,13 +102,13 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ProductcategoryFieldValue.name(value) => fr"name = $value"
+            case ProductcategoryFieldValue.name(value) => fr""""name" = $value"""
             case ProductcategoryFieldValue.rowguid(value) => fr"rowguid = $value"
             case ProductcategoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.productcategory
-              set $updates
+              $updates
               where productcategoryid = $productcategoryid
            """.update.run.map(_ > 0)
     }
@@ -117,7 +117,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
           values (
             ${unsaved.productcategoryid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.rowguid}::uuid,
             ${unsaved.modifieddate}::timestamp
           )

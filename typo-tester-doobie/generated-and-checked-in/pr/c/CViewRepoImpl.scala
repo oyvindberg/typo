@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 object CViewRepoImpl extends CViewRepo {
   override def selectAll: Stream[ConnectionIO, CViewRow] = {
-    sql"""select "id", cultureid, "name", modifieddate from pr.c""".query[CViewRow].stream
+    sql"""select "id", cultureid, "name", modifieddate from pr."c"""".query[CViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[CViewFieldOrIdValue[_]]): Stream[ConnectionIO, CViewRow] = {
     val where = fragments.whereAnd(
@@ -32,7 +32,7 @@ object CViewRepoImpl extends CViewRepo {
         case CViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from pr.c $where".query[CViewRow].stream
+    sql"""select * from pr."c" $where""".query[CViewRow].stream
   
   }
   implicit val read: Read[CViewRow] =

@@ -25,7 +25,7 @@ import java.util.UUID
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".update.run.map(_ > 0)
+    sql"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
@@ -35,17 +35,17 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"territoryid"), fr"territoryid = ${unsaved.territoryid}::int4")),
-      Some((Fragment.const(s"startdate"), fr"startdate = ${unsaved.startdate}::timestamp")),
-      Some((Fragment.const(s"enddate"), fr"enddate = ${unsaved.enddate}::timestamp")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"territoryid"), fr"${unsaved.territoryid}::int4")),
+      Some((Fragment.const(s"startdate"), fr"${unsaved.startdate}::timestamp")),
+      Some((Fragment.const(s"enddate"), fr"${unsaved.enddate}::timestamp")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -56,7 +56,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesterritoryhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
          """
     }
@@ -81,7 +81,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
-    sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
+    sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
   }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -89,7 +89,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           set enddate = ${row.enddate}::timestamp,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+          where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """
       .update
       .run
@@ -107,8 +107,8 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           } :_*
         )
         sql"""update sales.salesterritoryhistory
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, startdate = ${compositeId.startdate}, territoryid = ${compositeId.territoryid}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
            """.update.run.map(_ > 0)
     }
   }

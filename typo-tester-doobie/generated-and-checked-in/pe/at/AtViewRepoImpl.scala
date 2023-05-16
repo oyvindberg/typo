@@ -22,7 +22,7 @@ import java.util.UUID
 
 object AtViewRepoImpl extends AtViewRepo {
   override def selectAll: Stream[ConnectionIO, AtViewRow] = {
-    sql"""select "id", addresstypeid, "name", rowguid, modifieddate from pe.at""".query[AtViewRow].stream
+    sql"""select "id", addresstypeid, "name", rowguid, modifieddate from pe."at"""".query[AtViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[AtViewFieldOrIdValue[_]]): Stream[ConnectionIO, AtViewRow] = {
     val where = fragments.whereAnd(
@@ -34,7 +34,7 @@ object AtViewRepoImpl extends AtViewRepo {
         case AtViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from pe.at $where".query[AtViewRow].stream
+    sql"""select * from pe."at" $where""".query[AtViewRow].stream
   
   }
   implicit val read: Read[AtViewRow] =

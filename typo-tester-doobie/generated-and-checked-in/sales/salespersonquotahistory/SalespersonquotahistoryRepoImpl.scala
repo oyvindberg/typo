@@ -24,7 +24,7 @@ import java.util.UUID
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".update.run.map(_ > 0)
+    sql"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
@@ -34,16 +34,16 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"quotadate"), fr"quotadate = ${unsaved.quotadate}::timestamp")),
-      Some((Fragment.const(s"salesquota"), fr"salesquota = ${unsaved.salesquota}::numeric")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"quotadate"), fr"${unsaved.quotadate}::timestamp")),
+      Some((Fragment.const(s"salesquota"), fr"${unsaved.salesquota}::numeric")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -54,7 +54,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salespersonquotahistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, quotadate, salesquota, rowguid, modifieddate
          """
     }
@@ -78,7 +78,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}".query[SalespersonquotahistoryRow].option
+    sql"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".query[SalespersonquotahistoryRow].option
   }
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -86,7 +86,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           set salesquota = ${row.salesquota}::numeric,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+          where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
        """
       .update
       .run
@@ -104,8 +104,8 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           } :_*
         )
         sql"""update sales.salespersonquotahistory
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, quotadate = ${compositeId.quotadate}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
            """.update.run.map(_ > 0)
     }
   }

@@ -24,7 +24,7 @@ import java.util.UUID
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
-    sql"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".update.run.map(_ > 0)
+    sql"delete from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
@@ -34,19 +34,19 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"emailaddress"), fr"emailaddress = ${unsaved.emailaddress}")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"emailaddress"), fr"${unsaved.emailaddress}")),
       unsaved.emailaddressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"emailaddressid"), fr"emailaddressid = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"emailaddressid"), fr"${value: Int}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -57,7 +57,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.emailaddress(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
          """
     }
@@ -81,7 +81,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
-    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
+    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
   }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -89,7 +89,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           set emailaddress = ${row.emailaddress},
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+          where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """
       .update
       .run
@@ -107,8 +107,8 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           } :_*
         )
         sql"""update person.emailaddress
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, emailaddressid = ${compositeId.emailaddressid}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
            """.update.run.map(_ > 0)
     }
   }

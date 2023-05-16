@@ -28,32 +28,32 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
-          values (${unsaved.shipmethodid}::int4, ${unsaved.name}::public.Name, ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shipmethodid"), fr"shipmethodid = ${value: ShipmethodId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shipmethodid"), fr"${value: ShipmethodId}::int4"))
       },
       unsaved.shipbase match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shipbase"), fr"shipbase = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shipbase"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.shiprate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shiprate"), fr"shiprate = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shiprate"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -64,7 +64,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.shipmethod(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
          """
     }
@@ -92,12 +92,12 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".query[ShipmethodRow].option
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid in $shipmethodids""".query[ShipmethodRow].stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)""".query[ShipmethodRow].stream
   }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
     sql"""update purchasing.shipmethod
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               shipbase = ${row.shipbase}::numeric,
               shiprate = ${row.shiprate}::numeric,
               rowguid = ${row.rowguid}::uuid,
@@ -114,7 +114,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ShipmethodFieldValue.name(value) => fr"name = $value"
+            case ShipmethodFieldValue.name(value) => fr""""name" = $value"""
             case ShipmethodFieldValue.shipbase(value) => fr"shipbase = $value"
             case ShipmethodFieldValue.shiprate(value) => fr"shiprate = $value"
             case ShipmethodFieldValue.rowguid(value) => fr"rowguid = $value"
@@ -122,7 +122,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           } :_*
         )
         sql"""update purchasing.shipmethod
-              set $updates
+              $updates
               where shipmethodid = $shipmethodid
            """.update.run.map(_ > 0)
     }
@@ -131,7 +131,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (
             ${unsaved.shipmethodid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.shipbase}::numeric,
             ${unsaved.shiprate}::numeric,
             ${unsaved.rowguid}::uuid,

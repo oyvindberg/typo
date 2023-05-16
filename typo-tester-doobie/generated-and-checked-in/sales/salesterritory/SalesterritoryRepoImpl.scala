@@ -29,42 +29,42 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
-          values (${unsaved.territoryid}::int4, ${unsaved.name}::public.Name, ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"countryregioncode"), fr"countryregioncode = ${unsaved.countryregioncode}")),
-      Some((Fragment.const(s""""group""""), fr""""group" = ${unsaved.group}""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
+      Some((Fragment.const(s""""group""""), fr"${unsaved.group}")),
       unsaved.territoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"territoryid"), fr"territoryid = ${value: SalesterritoryId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"territoryid"), fr"${value: SalesterritoryId}::int4"))
       },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"salesytd = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.saleslastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"saleslastyear = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.costytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"costytd"), fr"costytd = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"costytd"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.costlastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"costlastyear"), fr"costlastyear = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"costlastyear"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -75,7 +75,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesterritory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
          """
     }
@@ -107,12 +107,12 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid""".query[SalesterritoryRow].option
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid in $territoryids""".query[SalesterritoryRow].stream
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = ANY($territoryids)""".query[SalesterritoryRow].stream
   }
   override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     val territoryid = row.territoryid
     sql"""update sales.salesterritory
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               countryregioncode = ${row.countryregioncode},
               "group" = ${row.group},
               salesytd = ${row.salesytd}::numeric,
@@ -133,9 +133,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case SalesterritoryFieldValue.name(value) => fr"name = $value"
+            case SalesterritoryFieldValue.name(value) => fr""""name" = $value"""
             case SalesterritoryFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-            case SalesterritoryFieldValue.group(value) => fr"group = $value"
+            case SalesterritoryFieldValue.group(value) => fr""""group" = $value"""
             case SalesterritoryFieldValue.salesytd(value) => fr"salesytd = $value"
             case SalesterritoryFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
             case SalesterritoryFieldValue.costytd(value) => fr"costytd = $value"
@@ -145,7 +145,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           } :_*
         )
         sql"""update sales.salesterritory
-              set $updates
+              $updates
               where territoryid = $territoryid
            """.update.run.map(_ > 0)
     }
@@ -154,7 +154,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
           values (
             ${unsaved.territoryid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.countryregioncode},
             ${unsaved.group},
             ${unsaved.salesytd}::numeric,

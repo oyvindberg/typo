@@ -26,7 +26,7 @@ import java.util.UUID
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
-    sql"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from pr.p""".query[PViewRow].stream
+    sql"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from pr."p"""".query[PViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]]): Stream[ConnectionIO, PViewRow] = {
     val where = fragments.whereAnd(
@@ -59,7 +59,7 @@ object PViewRepoImpl extends PViewRepo {
         case PViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from pr.p $where".query[PViewRow].stream
+    sql"""select * from pr."p" $where""".query[PViewRow].stream
   
   }
   implicit val read: Read[PViewRow] =

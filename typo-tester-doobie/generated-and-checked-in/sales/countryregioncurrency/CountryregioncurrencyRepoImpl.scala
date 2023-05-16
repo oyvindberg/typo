@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
-    sql"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}".update.run.map(_ > 0)
+    sql"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
@@ -34,11 +34,11 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
-      Some((Fragment.const(s"countryregioncode"), fr"countryregioncode = ${unsaved.countryregioncode}")),
-      Some((Fragment.const(s"currencycode"), fr"currencycode = ${unsaved.currencycode}::bpchar")),
+      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
+      Some((Fragment.const(s"currencycode"), fr"${unsaved.currencycode}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -49,7 +49,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.countryregioncurrency(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning countryregioncode, currencycode, modifieddate
          """
     }
@@ -71,13 +71,13 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   
   }
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
-    sql"select countryregioncode, currencycode, modifieddate from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}".query[CountryregioncurrencyRow].option
+    sql"select countryregioncode, currencycode, modifieddate from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".query[CountryregioncurrencyRow].option
   }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.countryregioncurrency
           set modifieddate = ${row.modifieddate}::timestamp
-          where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}
+          where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """
       .update
       .run
@@ -93,8 +93,8 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           } :_*
         )
         sql"""update sales.countryregioncurrency
-              set $updates
-              where countryregioncode = ${compositeId.countryregioncode}, currencycode = ${compositeId.currencycode}
+              $updates
+              where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
            """.update.run.map(_ > 0)
     }
   }

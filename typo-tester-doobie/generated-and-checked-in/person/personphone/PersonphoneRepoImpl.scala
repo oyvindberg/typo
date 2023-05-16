@@ -25,22 +25,22 @@ import java.time.LocalDateTime
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
-    sql"delete from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}".update.run.map(_ > 0)
+    sql"delete from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::public.Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"phonenumber"), fr"phonenumber = ${unsaved.phonenumber}::public.Phone")),
-      Some((Fragment.const(s"phonenumbertypeid"), fr"phonenumbertypeid = ${unsaved.phonenumbertypeid}::int4")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"phonenumber"), fr"""${unsaved.phonenumber}::"public".Phone""")),
+      Some((Fragment.const(s"phonenumbertypeid"), fr"${unsaved.phonenumbertypeid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.personphone(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
          """
     }
@@ -74,13 +74,13 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.personphone
           set modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}
+          where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
        """
       .update
       .run
@@ -96,8 +96,8 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           } :_*
         )
         sql"""update person.personphone
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, phonenumber = ${compositeId.phonenumber}, phonenumbertypeid = ${compositeId.phonenumbertypeid}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
            """.update.run.map(_ > 0)
     }
   }
@@ -105,7 +105,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (
             ${unsaved.businessentityid}::int4,
-            ${unsaved.phonenumber}::public.Phone,
+            ${unsaved.phonenumber}::"public".Phone,
             ${unsaved.phonenumbertypeid}::int4,
             ${unsaved.modifieddate}::timestamp
           )

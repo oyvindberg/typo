@@ -30,28 +30,28 @@ object VendorRepoImpl extends VendorRepo {
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::public.AccountNumber, ${unsaved.name}::public.Name, ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::public.Flag, ${unsaved.activeflag}::public.Flag, ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
        """.query.unique
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"accountnumber"), fr"accountnumber = ${unsaved.accountnumber}::public.AccountNumber")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"creditrating"), fr"creditrating = ${unsaved.creditrating}::int2")),
-      Some((Fragment.const(s"purchasingwebserviceurl"), fr"purchasingwebserviceurl = ${unsaved.purchasingwebserviceurl}")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"accountnumber"), fr"""${unsaved.accountnumber}::"public".AccountNumber""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"creditrating"), fr"${unsaved.creditrating}::int2")),
+      Some((Fragment.const(s"purchasingwebserviceurl"), fr"${unsaved.purchasingwebserviceurl}")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"preferredvendorstatus"), fr"preferredvendorstatus = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"preferredvendorstatus"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"activeflag"), fr"activeflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"activeflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -62,7 +62,7 @@ object VendorRepoImpl extends VendorRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.vendor(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
          """
     }
@@ -92,16 +92,16 @@ object VendorRepoImpl extends VendorRepo {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".query[VendorRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow] = {
-    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid in $businessentityids""".query[VendorRow].stream
+    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = ANY($businessentityids)""".query[VendorRow].stream
   }
   override def update(row: VendorRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update purchasing.vendor
-          set accountnumber = ${row.accountnumber}::public.AccountNumber,
-              "name" = ${row.name}::public.Name,
+          set accountnumber = ${row.accountnumber}::"public".AccountNumber,
+              "name" = ${row.name}::"public"."Name",
               creditrating = ${row.creditrating}::int2,
-              preferredvendorstatus = ${row.preferredvendorstatus}::public.Flag,
-              activeflag = ${row.activeflag}::public.Flag,
+              preferredvendorstatus = ${row.preferredvendorstatus}::"public"."Flag",
+              activeflag = ${row.activeflag}::"public"."Flag",
               purchasingwebserviceurl = ${row.purchasingwebserviceurl},
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
@@ -117,7 +117,7 @@ object VendorRepoImpl extends VendorRepo {
         val updates = fragments.set(
           nonEmpty.map {
             case VendorFieldValue.accountnumber(value) => fr"accountnumber = $value"
-            case VendorFieldValue.name(value) => fr"name = $value"
+            case VendorFieldValue.name(value) => fr""""name" = $value"""
             case VendorFieldValue.creditrating(value) => fr"creditrating = $value"
             case VendorFieldValue.preferredvendorstatus(value) => fr"preferredvendorstatus = $value"
             case VendorFieldValue.activeflag(value) => fr"activeflag = $value"
@@ -126,7 +126,7 @@ object VendorRepoImpl extends VendorRepo {
           } :_*
         )
         sql"""update purchasing.vendor
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }
@@ -135,11 +135,11 @@ object VendorRepoImpl extends VendorRepo {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (
             ${unsaved.businessentityid}::int4,
-            ${unsaved.accountnumber}::public.AccountNumber,
-            ${unsaved.name}::public.Name,
+            ${unsaved.accountnumber}::"public".AccountNumber,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.creditrating}::int2,
-            ${unsaved.preferredvendorstatus}::public.Flag,
-            ${unsaved.activeflag}::public.Flag,
+            ${unsaved.preferredvendorstatus}::"public"."Flag",
+            ${unsaved.activeflag}::"public"."Flag",
             ${unsaved.purchasingwebserviceurl},
             ${unsaved.modifieddate}::timestamp
           )

@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean] = {
-    sql"delete from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}".update.run.map(_ > 0)
+    sql"delete from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".update.run.map(_ > 0)
   }
   override def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
@@ -34,20 +34,20 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     val fs = List(
-      Some((Fragment.const(s"workorderid"), fr"workorderid = ${unsaved.workorderid}::int4")),
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"operationsequence"), fr"operationsequence = ${unsaved.operationsequence}::int2")),
-      Some((Fragment.const(s"locationid"), fr"locationid = ${unsaved.locationid}::int2")),
-      Some((Fragment.const(s"scheduledstartdate"), fr"scheduledstartdate = ${unsaved.scheduledstartdate}::timestamp")),
-      Some((Fragment.const(s"scheduledenddate"), fr"scheduledenddate = ${unsaved.scheduledenddate}::timestamp")),
-      Some((Fragment.const(s"actualstartdate"), fr"actualstartdate = ${unsaved.actualstartdate}::timestamp")),
-      Some((Fragment.const(s"actualenddate"), fr"actualenddate = ${unsaved.actualenddate}::timestamp")),
-      Some((Fragment.const(s"actualresourcehrs"), fr"actualresourcehrs = ${unsaved.actualresourcehrs}::numeric")),
-      Some((Fragment.const(s"plannedcost"), fr"plannedcost = ${unsaved.plannedcost}::numeric")),
-      Some((Fragment.const(s"actualcost"), fr"actualcost = ${unsaved.actualcost}::numeric")),
+      Some((Fragment.const(s"workorderid"), fr"${unsaved.workorderid}::int4")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"operationsequence"), fr"${unsaved.operationsequence}::int2")),
+      Some((Fragment.const(s"locationid"), fr"${unsaved.locationid}::int2")),
+      Some((Fragment.const(s"scheduledstartdate"), fr"${unsaved.scheduledstartdate}::timestamp")),
+      Some((Fragment.const(s"scheduledenddate"), fr"${unsaved.scheduledenddate}::timestamp")),
+      Some((Fragment.const(s"actualstartdate"), fr"${unsaved.actualstartdate}::timestamp")),
+      Some((Fragment.const(s"actualenddate"), fr"${unsaved.actualenddate}::timestamp")),
+      Some((Fragment.const(s"actualresourcehrs"), fr"${unsaved.actualresourcehrs}::numeric")),
+      Some((Fragment.const(s"plannedcost"), fr"${unsaved.plannedcost}::numeric")),
+      Some((Fragment.const(s"actualcost"), fr"${unsaved.actualcost}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -58,7 +58,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.workorderrouting(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
          """
     }
@@ -89,7 +89,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   
   }
   override def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]] = {
-    sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}".query[WorkorderroutingRow].option
+    sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".query[WorkorderroutingRow].option
   }
   override def update(row: WorkorderroutingRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -103,7 +103,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               plannedcost = ${row.plannedcost}::numeric,
               actualcost = ${row.actualcost}::numeric,
               modifieddate = ${row.modifieddate}::timestamp
-          where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+          where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
        """
       .update
       .run
@@ -127,8 +127,8 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           } :_*
         )
         sql"""update production.workorderrouting
-              set $updates
-              where workorderid = ${compositeId.workorderid}, productid = ${compositeId.productid}, operationsequence = ${compositeId.operationsequence}
+              $updates
+              where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
            """.update.run.map(_ > 0)
     }
   }

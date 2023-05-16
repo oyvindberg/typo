@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".update.run.map(_ > 0)
+    sql"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".update.run.map(_ > 0)
   }
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
@@ -33,13 +33,13 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"ratechangedate"), fr"ratechangedate = ${unsaved.ratechangedate}::timestamp")),
-      Some((Fragment.const(s"rate"), fr"rate = ${unsaved.rate}::numeric")),
-      Some((Fragment.const(s"payfrequency"), fr"payfrequency = ${unsaved.payfrequency}::int2")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"ratechangedate"), fr"${unsaved.ratechangedate}::timestamp")),
+      Some((Fragment.const(s"rate"), fr"${unsaved.rate}::numeric")),
+      Some((Fragment.const(s"payfrequency"), fr"${unsaved.payfrequency}::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -50,7 +50,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.employeepayhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
          """
     }
@@ -74,7 +74,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
-    sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
+    sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -82,7 +82,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           set rate = ${row.rate}::numeric,
               payfrequency = ${row.payfrequency}::int2,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+          where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
        """
       .update
       .run
@@ -100,8 +100,8 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           } :_*
         )
         sql"""update humanresources.employeepayhistory
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, ratechangedate = ${compositeId.ratechangedate}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
            """.update.run.map(_ > 0)
     }
   }

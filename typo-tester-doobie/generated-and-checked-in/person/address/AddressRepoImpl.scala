@@ -34,23 +34,23 @@ object AddressRepoImpl extends AddressRepo {
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
-      Some((Fragment.const(s"addressline1"), fr"addressline1 = ${unsaved.addressline1}")),
-      Some((Fragment.const(s"addressline2"), fr"addressline2 = ${unsaved.addressline2}")),
-      Some((Fragment.const(s"city"), fr"city = ${unsaved.city}")),
-      Some((Fragment.const(s"stateprovinceid"), fr"stateprovinceid = ${unsaved.stateprovinceid}::int4")),
-      Some((Fragment.const(s"postalcode"), fr"postalcode = ${unsaved.postalcode}")),
-      Some((Fragment.const(s"spatiallocation"), fr"spatiallocation = ${unsaved.spatiallocation}::bytea")),
+      Some((Fragment.const(s"addressline1"), fr"${unsaved.addressline1}")),
+      Some((Fragment.const(s"addressline2"), fr"${unsaved.addressline2}")),
+      Some((Fragment.const(s"city"), fr"${unsaved.city}")),
+      Some((Fragment.const(s"stateprovinceid"), fr"${unsaved.stateprovinceid}::int4")),
+      Some((Fragment.const(s"postalcode"), fr"${unsaved.postalcode}")),
+      Some((Fragment.const(s"spatiallocation"), fr"${unsaved.spatiallocation}::bytea")),
       unsaved.addressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"addressid"), fr"addressid = ${value: AddressId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"addressid"), fr"${value: AddressId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -61,7 +61,7 @@ object AddressRepoImpl extends AddressRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.address(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
          """
     }
@@ -92,7 +92,7 @@ object AddressRepoImpl extends AddressRepo {
     sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid".query[AddressRow].option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid in $addressids".query[AddressRow].stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)".query[AddressRow].stream
   }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
@@ -128,7 +128,7 @@ object AddressRepoImpl extends AddressRepo {
           } :_*
         )
         sql"""update person.address
-              set $updates
+              $updates
               where addressid = $addressid
            """.update.run.map(_ > 0)
     }

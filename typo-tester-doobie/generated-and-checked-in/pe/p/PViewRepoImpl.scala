@@ -24,7 +24,7 @@ import org.postgresql.jdbc.PgSQLXML
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
-    sql"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe.p""".query[PViewRow].stream
+    sql"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe."p"""".query[PViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]]): Stream[ConnectionIO, PViewRow] = {
     val where = fragments.whereAnd(
@@ -45,7 +45,7 @@ object PViewRepoImpl extends PViewRepo {
         case PViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from pe.p $where".query[PViewRow].stream
+    sql"""select * from pe."p" $where""".query[PViewRow].stream
   
   }
   implicit val read: Read[PViewRow] =

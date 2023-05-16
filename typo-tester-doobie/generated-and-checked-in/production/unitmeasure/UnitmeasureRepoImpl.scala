@@ -27,17 +27,17 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
-          values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning unitmeasurecode, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
-      Some((Fragment.const(s"unitmeasurecode"), fr"unitmeasurecode = ${unsaved.unitmeasurecode}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s"unitmeasurecode"), fr"${unsaved.unitmeasurecode}::bpchar")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -48,7 +48,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.unitmeasure(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning unitmeasurecode, "name", modifieddate
          """
     }
@@ -73,12 +73,12 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""select unitmeasurecode, "name", modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".query[UnitmeasureRow].option
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select unitmeasurecode, "name", modifieddate from production.unitmeasure where unitmeasurecode in $unitmeasurecodes""".query[UnitmeasureRow].stream
+    sql"""select unitmeasurecode, "name", modifieddate from production.unitmeasure where unitmeasurecode = ANY($unitmeasurecodes)""".query[UnitmeasureRow].stream
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update production.unitmeasure
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where unitmeasurecode = $unitmeasurecode
        """
@@ -92,12 +92,12 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case UnitmeasureFieldValue.name(value) => fr"name = $value"
+            case UnitmeasureFieldValue.name(value) => fr""""name" = $value"""
             case UnitmeasureFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.unitmeasure
-              set $updates
+              $updates
               where unitmeasurecode = $unitmeasurecode
            """.update.run.map(_ > 0)
     }
@@ -106,7 +106,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (
             ${unsaved.unitmeasurecode}::bpchar,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (unitmeasurecode)

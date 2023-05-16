@@ -28,22 +28,22 @@ object ShiftRepoImpl extends ShiftRepo {
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
-          values (${unsaved.shiftid}::int4, ${unsaved.name}::public.Name, ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
           returning shiftid, "name", starttime, endtime, modifieddate
        """.query.unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"starttime"), fr"starttime = ${unsaved.starttime}::time")),
-      Some((Fragment.const(s"endtime"), fr"endtime = ${unsaved.endtime}::time")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"starttime"), fr"${unsaved.starttime}::time")),
+      Some((Fragment.const(s"endtime"), fr"${unsaved.endtime}::time")),
       unsaved.shiftid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shiftid"), fr"shiftid = ${value: ShiftId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shiftid"), fr"${value: ShiftId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -54,7 +54,7 @@ object ShiftRepoImpl extends ShiftRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.shift(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning shiftid, "name", starttime, endtime, modifieddate
          """
     }
@@ -81,12 +81,12 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".query[ShiftRow].option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid in $shiftids""".query[ShiftRow].stream
+    sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid = ANY($shiftids)""".query[ShiftRow].stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               starttime = ${row.starttime}::time,
               endtime = ${row.endtime}::time,
               modifieddate = ${row.modifieddate}::timestamp
@@ -102,14 +102,14 @@ object ShiftRepoImpl extends ShiftRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ShiftFieldValue.name(value) => fr"name = $value"
+            case ShiftFieldValue.name(value) => fr""""name" = $value"""
             case ShiftFieldValue.starttime(value) => fr"starttime = $value"
             case ShiftFieldValue.endtime(value) => fr"endtime = $value"
             case ShiftFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update humanresources.shift
-              set $updates
+              $updates
               where shiftid = $shiftid
            """.update.run.map(_ > 0)
     }
@@ -118,7 +118,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (
             ${unsaved.shiftid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.starttime}::time,
             ${unsaved.endtime}::time,
             ${unsaved.modifieddate}::timestamp

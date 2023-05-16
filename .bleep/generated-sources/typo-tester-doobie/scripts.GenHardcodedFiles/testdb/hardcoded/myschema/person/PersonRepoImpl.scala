@@ -35,25 +35,25 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s"favourite_football_club_id"), fr"favourite_football_club_id = ${unsaved.favouriteFootballClubId}")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}""")),
-      Some((Fragment.const(s"nick_name"), fr"nick_name = ${unsaved.nickName}")),
-      Some((Fragment.const(s"blog_url"), fr"blog_url = ${unsaved.blogUrl}")),
-      Some((Fragment.const(s"email"), fr"email = ${unsaved.email}")),
-      Some((Fragment.const(s"phone"), fr"phone = ${unsaved.phone}")),
-      Some((Fragment.const(s"likes_pizza"), fr"likes_pizza = ${unsaved.likesPizza}")),
-      Some((Fragment.const(s"work_email"), fr"work_email = ${unsaved.workEmail}")),
+      Some((Fragment.const(s"favourite_football_club_id"), fr"${unsaved.favouriteFootballClubId}")),
+      Some((Fragment.const(s""""name""""), fr"${unsaved.name}")),
+      Some((Fragment.const(s"nick_name"), fr"${unsaved.nickName}")),
+      Some((Fragment.const(s"blog_url"), fr"${unsaved.blogUrl}")),
+      Some((Fragment.const(s"email"), fr"${unsaved.email}")),
+      Some((Fragment.const(s"phone"), fr"${unsaved.phone}")),
+      Some((Fragment.const(s"likes_pizza"), fr"${unsaved.likesPizza}")),
+      Some((Fragment.const(s"work_email"), fr"${unsaved.workEmail}")),
       unsaved.id match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""id""""), fr""""id" = ${value: PersonId}::int8"""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""id""""), fr"${value: PersonId}::int8"))
       },
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"marital_status_id"), fr"marital_status_id = ${value: MaritalStatusId}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"marital_status_id"), fr"${value: MaritalStatusId}"))
       },
       unsaved.sector match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"sector"), fr"sector = ${value: Sector}::myschema.sector"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"sector"), fr"${value: Sector}::myschema.sector"))
       }
     ).flatten
     
@@ -64,7 +64,7 @@ object PersonRepoImpl extends PersonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into myschema.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
          """
     }
@@ -97,7 +97,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = $id""".query[PersonRow].option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" in $ids""".query[PersonRow].stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY($ids)""".query[PersonRow].stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -125,7 +125,7 @@ object PersonRepoImpl extends PersonRepo {
         val updates = fragments.set(
           nonEmpty.map {
             case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = $value"
-            case PersonFieldValue.name(value) => fr"name = $value"
+            case PersonFieldValue.name(value) => fr""""name" = $value"""
             case PersonFieldValue.nickName(value) => fr"nick_name = $value"
             case PersonFieldValue.blogUrl(value) => fr"blog_url = $value"
             case PersonFieldValue.email(value) => fr"email = $value"
@@ -137,7 +137,7 @@ object PersonRepoImpl extends PersonRepo {
           } :_*
         )
         sql"""update myschema.person
-              set $updates
+              $updates
               where "id" = $id
            """.update.run.map(_ > 0)
     }

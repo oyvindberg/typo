@@ -25,54 +25,54 @@ import java.util.UUID
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
-    sql"delete from production.document where documentnode = $documentnode".update.run.map(_ > 0)
+    sql"""delete from production."document" where documentnode = $documentnode""".update.run.map(_ > 0)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
-    sql"""insert into production.document(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
-          values (${unsaved.title}, ${unsaved.owner}::int4, ${unsaved.folderflag}::public.Flag, ${unsaved.filename}, ${unsaved.fileextension}, ${unsaved.revision}::bpchar, ${unsaved.changenumber}::int4, ${unsaved.status}::int2, ${unsaved.documentsummary}, ${unsaved.document}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
+    sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
+          values (${unsaved.title}, ${unsaved.owner}::int4, ${unsaved.folderflag}::"public"."Flag", ${unsaved.filename}, ${unsaved.fileextension}, ${unsaved.revision}::bpchar, ${unsaved.changenumber}::int4, ${unsaved.status}::int2, ${unsaved.documentsummary}, ${unsaved.document}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
        """.query.unique
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
-      Some((Fragment.const(s"title"), fr"title = ${unsaved.title}")),
-      Some((Fragment.const(s""""owner""""), fr""""owner" = ${unsaved.owner}::int4""")),
-      Some((Fragment.const(s"filename"), fr"filename = ${unsaved.filename}")),
-      Some((Fragment.const(s"fileextension"), fr"fileextension = ${unsaved.fileextension}")),
-      Some((Fragment.const(s"revision"), fr"revision = ${unsaved.revision}::bpchar")),
-      Some((Fragment.const(s"status"), fr"status = ${unsaved.status}::int2")),
-      Some((Fragment.const(s"documentsummary"), fr"documentsummary = ${unsaved.documentsummary}")),
-      Some((Fragment.const(s""""document""""), fr""""document" = ${unsaved.document}::bytea""")),
+      Some((Fragment.const(s"title"), fr"${unsaved.title}")),
+      Some((Fragment.const(s""""owner""""), fr"${unsaved.owner}::int4")),
+      Some((Fragment.const(s"filename"), fr"${unsaved.filename}")),
+      Some((Fragment.const(s"fileextension"), fr"${unsaved.fileextension}")),
+      Some((Fragment.const(s"revision"), fr"${unsaved.revision}::bpchar")),
+      Some((Fragment.const(s"status"), fr"${unsaved.status}::int2")),
+      Some((Fragment.const(s"documentsummary"), fr"${unsaved.documentsummary}")),
+      Some((Fragment.const(s""""document""""), fr"${unsaved.document}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"folderflag"), fr"folderflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"folderflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"changenumber"), fr"changenumber = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"changenumber"), fr"${value: Int}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"documentnode = ${value: DocumentId}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"${value: DocumentId}"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.document default values
+      sql"""insert into production."document" default values
             returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.document(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+      sql"""insert into production."document"(${fs.map { case (n, _) => n }.intercalate(fr", ")})
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
          """
     }
@@ -80,7 +80,7 @@ object DocumentRepoImpl extends DocumentRepo {
   
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production.document""".query[DocumentRow].stream
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document"""".query[DocumentRow].stream
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]]): Stream[ConnectionIO, DocumentRow] = {
     val where = fragments.whereAnd(
@@ -100,24 +100,24 @@ object DocumentRepoImpl extends DocumentRepo {
         case DocumentFieldValue.documentnode(value) => fr"documentnode = $value"
       } :_*
     )
-    sql"select * from production.document $where".query[DocumentRow].stream
+    sql"""select * from production."document" $where""".query[DocumentRow].stream
   
   }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production.document where documentnode = $documentnode""".query[DocumentRow].option
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = $documentnode""".query[DocumentRow].option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production.document where documentnode in $documentnodes""".query[DocumentRow].stream
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = ANY($documentnodes)""".query[DocumentRow].stream
   }
   override def selectByUnique(rowguid: UUID): ConnectionIO[Option[DocumentRow]] = {
     selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).compile.last
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
-    sql"""update production.document
+    sql"""update production."document"
           set title = ${row.title},
               "owner" = ${row.owner}::int4,
-              folderflag = ${row.folderflag}::public.Flag,
+              folderflag = ${row.folderflag}::"public"."Flag",
               filename = ${row.filename},
               fileextension = ${row.fileextension},
               revision = ${row.revision}::bpchar,
@@ -140,7 +140,7 @@ object DocumentRepoImpl extends DocumentRepo {
         val updates = fragments.set(
           nonEmpty.map {
             case DocumentFieldValue.title(value) => fr"title = $value"
-            case DocumentFieldValue.owner(value) => fr"owner = $value"
+            case DocumentFieldValue.owner(value) => fr""""owner" = $value"""
             case DocumentFieldValue.folderflag(value) => fr"folderflag = $value"
             case DocumentFieldValue.filename(value) => fr"filename = $value"
             case DocumentFieldValue.fileextension(value) => fr"fileextension = $value"
@@ -148,23 +148,23 @@ object DocumentRepoImpl extends DocumentRepo {
             case DocumentFieldValue.changenumber(value) => fr"changenumber = $value"
             case DocumentFieldValue.status(value) => fr"status = $value"
             case DocumentFieldValue.documentsummary(value) => fr"documentsummary = $value"
-            case DocumentFieldValue.document(value) => fr"document = $value"
+            case DocumentFieldValue.document(value) => fr""""document" = $value"""
             case DocumentFieldValue.rowguid(value) => fr"rowguid = $value"
             case DocumentFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
-        sql"""update production.document
-              set $updates
+        sql"""update production."document"
+              $updates
               where documentnode = $documentnode
            """.update.run.map(_ > 0)
     }
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
-    sql"""insert into production.document(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
+    sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
           values (
             ${unsaved.title},
             ${unsaved.owner}::int4,
-            ${unsaved.folderflag}::public.Flag,
+            ${unsaved.folderflag}::"public"."Flag",
             ${unsaved.filename},
             ${unsaved.fileextension},
             ${unsaved.revision}::bpchar,

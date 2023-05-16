@@ -29,30 +29,30 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
-          values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::public.Name, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
-      Some((Fragment.const(s"stateprovinceid"), fr"stateprovinceid = ${unsaved.stateprovinceid}::int4")),
-      Some((Fragment.const(s"taxtype"), fr"taxtype = ${unsaved.taxtype}::int2")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s"stateprovinceid"), fr"${unsaved.stateprovinceid}::int4")),
+      Some((Fragment.const(s"taxtype"), fr"${unsaved.taxtype}::int2")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salestaxrateid"), fr"salestaxrateid = ${value: SalestaxrateId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salestaxrateid"), fr"${value: SalestaxrateId}::int4"))
       },
       unsaved.taxrate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"taxrate"), fr"taxrate = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"taxrate"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -63,7 +63,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salestaxrate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
          """
     }
@@ -92,7 +92,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".query[SalestaxrateRow].option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid in $salestaxrateids""".query[SalestaxrateRow].stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid = ANY($salestaxrateids)""".query[SalestaxrateRow].stream
   }
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid
@@ -100,7 +100,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           set stateprovinceid = ${row.stateprovinceid}::int4,
               taxtype = ${row.taxtype}::int2,
               taxrate = ${row.taxrate}::numeric,
-              "name" = ${row.name}::public.Name,
+              "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
           where salestaxrateid = $salestaxrateid
@@ -118,13 +118,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             case SalestaxrateFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
             case SalestaxrateFieldValue.taxtype(value) => fr"taxtype = $value"
             case SalestaxrateFieldValue.taxrate(value) => fr"taxrate = $value"
-            case SalestaxrateFieldValue.name(value) => fr"name = $value"
+            case SalestaxrateFieldValue.name(value) => fr""""name" = $value"""
             case SalestaxrateFieldValue.rowguid(value) => fr"rowguid = $value"
             case SalestaxrateFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update sales.salestaxrate
-              set $updates
+              $updates
               where salestaxrateid = $salestaxrateid
            """.update.run.map(_ > 0)
     }
@@ -136,7 +136,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             ${unsaved.stateprovinceid}::int4,
             ${unsaved.taxtype}::int2,
             ${unsaved.taxrate}::numeric,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.rowguid}::uuid,
             ${unsaved.modifieddate}::timestamp
           )

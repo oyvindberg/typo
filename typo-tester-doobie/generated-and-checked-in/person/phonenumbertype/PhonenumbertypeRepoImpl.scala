@@ -27,20 +27,20 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
-          values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning phonenumbertypeid, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.phonenumbertypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"phonenumbertypeid"), fr"phonenumbertypeid = ${value: PhonenumbertypeId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"phonenumbertypeid"), fr"${value: PhonenumbertypeId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.phonenumbertype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning phonenumbertypeid, "name", modifieddate
          """
     }
@@ -76,12 +76,12 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""select phonenumbertypeid, "name", modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".query[PhonenumbertypeRow].option
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select phonenumbertypeid, "name", modifieddate from person.phonenumbertype where phonenumbertypeid in $phonenumbertypeids""".query[PhonenumbertypeRow].stream
+    sql"""select phonenumbertypeid, "name", modifieddate from person.phonenumbertype where phonenumbertypeid = ANY($phonenumbertypeids)""".query[PhonenumbertypeRow].stream
   }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update person.phonenumbertype
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where phonenumbertypeid = $phonenumbertypeid
        """
@@ -95,12 +95,12 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case PhonenumbertypeFieldValue.name(value) => fr"name = $value"
+            case PhonenumbertypeFieldValue.name(value) => fr""""name" = $value"""
             case PhonenumbertypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update person.phonenumbertype
-              set $updates
+              $updates
               where phonenumbertypeid = $phonenumbertypeid
            """.update.run.map(_ > 0)
     }
@@ -109,7 +109,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (
             ${unsaved.phonenumbertypeid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (phonenumbertypeid)

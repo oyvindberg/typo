@@ -25,7 +25,7 @@ import java.util.UUID
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
-    sql"delete from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}".update.run.map(_ > 0)
+    sql"delete from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
@@ -35,21 +35,21 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"locationid"), fr"locationid = ${unsaved.locationid}::int2")),
-      Some((Fragment.const(s"shelf"), fr"shelf = ${unsaved.shelf}")),
-      Some((Fragment.const(s"bin"), fr"bin = ${unsaved.bin}::int2")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"locationid"), fr"${unsaved.locationid}::int2")),
+      Some((Fragment.const(s"shelf"), fr"${unsaved.shelf}")),
+      Some((Fragment.const(s"bin"), fr"${unsaved.bin}::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"quantity"), fr"quantity = ${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"quantity"), fr"${value: Int}::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -60,7 +60,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productinventory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
          """
     }
@@ -86,7 +86,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   
   }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
-    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}".query[ProductinventoryRow].option
+    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".query[ProductinventoryRow].option
   }
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -96,7 +96,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
               quantity = ${row.quantity}::int2,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}
+          where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
        """
       .update
       .run
@@ -116,8 +116,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           } :_*
         )
         sql"""update production.productinventory
-              set $updates
-              where productid = ${compositeId.productid}, locationid = ${compositeId.locationid}
+              $updates
+              where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
            """.update.run.map(_ > 0)
     }
   }

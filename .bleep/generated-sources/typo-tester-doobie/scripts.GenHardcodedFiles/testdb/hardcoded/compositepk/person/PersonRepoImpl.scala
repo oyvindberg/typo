@@ -32,14 +32,14 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}""")),
+      Some((Fragment.const(s""""name""""), fr"${unsaved.name}")),
       unsaved.one match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""one""""), fr""""one" = ${value: Long}::int8"""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""one""""), fr"${value: Long}::int8"))
       },
       unsaved.two match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"two"), fr"two = ${value: Option[String]}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"two"), fr"${value: Option[String]}"))
       }
     ).flatten
     
@@ -50,7 +50,7 @@ object PersonRepoImpl extends PersonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into compositepk.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning "one", two, "name"
          """
     }
@@ -90,11 +90,11 @@ object PersonRepoImpl extends PersonRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case PersonFieldValue.name(value) => fr"name = $value"
+            case PersonFieldValue.name(value) => fr""""name" = $value"""
           } :_*
         )
         sql"""update compositepk.person
-              set $updates
+              $updates
               where "one" = ${compositeId.one}, two = ${compositeId.two}
            """.update.run.map(_ > 0)
     }

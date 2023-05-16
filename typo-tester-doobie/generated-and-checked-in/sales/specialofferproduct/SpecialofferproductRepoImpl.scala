@@ -25,7 +25,7 @@ import java.util.UUID
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId): ConnectionIO[Boolean] = {
-    sql"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".update.run.map(_ > 0)
+    sql"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
@@ -35,15 +35,15 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
-      Some((Fragment.const(s"specialofferid"), fr"specialofferid = ${unsaved.specialofferid}::int4")),
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
+      Some((Fragment.const(s"specialofferid"), fr"${unsaved.specialofferid}::int4")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -54,7 +54,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.specialofferproduct(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning specialofferid, productid, rowguid, modifieddate
          """
     }
@@ -77,14 +77,14 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
-    sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}".query[SpecialofferproductRow].option
+    sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query[SpecialofferproductRow].option
   }
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.specialofferproduct
           set rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+          where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """
       .update
       .run
@@ -101,8 +101,8 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           } :_*
         )
         sql"""update sales.specialofferproduct
-              set $updates
-              where specialofferid = ${compositeId.specialofferid}, productid = ${compositeId.productid}
+              $updates
+              where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
            """.update.run.map(_ > 0)
     }
   }

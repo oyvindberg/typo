@@ -32,17 +32,17 @@ object CreditcardRepoImpl extends CreditcardRepo {
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
-      Some((Fragment.const(s"cardtype"), fr"cardtype = ${unsaved.cardtype}")),
-      Some((Fragment.const(s"cardnumber"), fr"cardnumber = ${unsaved.cardnumber}")),
-      Some((Fragment.const(s"expmonth"), fr"expmonth = ${unsaved.expmonth}::int2")),
-      Some((Fragment.const(s"expyear"), fr"expyear = ${unsaved.expyear}::int2")),
+      Some((Fragment.const(s"cardtype"), fr"${unsaved.cardtype}")),
+      Some((Fragment.const(s"cardnumber"), fr"${unsaved.cardnumber}")),
+      Some((Fragment.const(s"expmonth"), fr"${unsaved.expmonth}::int2")),
+      Some((Fragment.const(s"expyear"), fr"${unsaved.expyear}::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"creditcardid"), fr"creditcardid = ${value: CreditcardId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"creditcardid"), fr"${value: CreditcardId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -53,7 +53,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.creditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
          """
     }
@@ -81,7 +81,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid".query[CreditcardRow].option
   }
   override def selectByIds(creditcardids: Array[CreditcardId]): Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid in $creditcardids".query[CreditcardRow].stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = ANY($creditcardids)".query[CreditcardRow].stream
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid
@@ -111,7 +111,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
           } :_*
         )
         sql"""update sales.creditcard
-              set $updates
+              $updates
               where creditcardid = $creditcardid
            """.update.run.map(_ > 0)
     }

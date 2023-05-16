@@ -27,17 +27,17 @@ object CountryregionRepoImpl extends CountryregionRepo {
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
-          values (${unsaved.countryregioncode}, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
-      Some((Fragment.const(s"countryregioncode"), fr"countryregioncode = ${unsaved.countryregioncode}")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -48,7 +48,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.countryregion(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning countryregioncode, "name", modifieddate
          """
     }
@@ -73,12 +73,12 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode = $countryregioncode""".query[CountryregionRow].option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode in $countryregioncodes""".query[CountryregionRow].stream
+    sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)""".query[CountryregionRow].stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = $countryregioncode
        """
@@ -92,12 +92,12 @@ object CountryregionRepoImpl extends CountryregionRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case CountryregionFieldValue.name(value) => fr"name = $value"
+            case CountryregionFieldValue.name(value) => fr""""name" = $value"""
             case CountryregionFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update person.countryregion
-              set $updates
+              $updates
               where countryregioncode = $countryregioncode
            """.update.run.map(_ > 0)
     }
@@ -106,7 +106,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (
             ${unsaved.countryregioncode},
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (countryregioncode)

@@ -32,17 +32,17 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
-      Some((Fragment.const(s"thumbnailphoto"), fr"thumbnailphoto = ${unsaved.thumbnailphoto}::bytea")),
-      Some((Fragment.const(s"thumbnailphotofilename"), fr"thumbnailphotofilename = ${unsaved.thumbnailphotofilename}")),
-      Some((Fragment.const(s"largephoto"), fr"largephoto = ${unsaved.largephoto}::bytea")),
-      Some((Fragment.const(s"largephotofilename"), fr"largephotofilename = ${unsaved.largephotofilename}")),
+      Some((Fragment.const(s"thumbnailphoto"), fr"${unsaved.thumbnailphoto}::bytea")),
+      Some((Fragment.const(s"thumbnailphotofilename"), fr"${unsaved.thumbnailphotofilename}")),
+      Some((Fragment.const(s"largephoto"), fr"${unsaved.largephoto}::bytea")),
+      Some((Fragment.const(s"largephotofilename"), fr"${unsaved.largephotofilename}")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productphotoid"), fr"productphotoid = ${value: ProductphotoId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productphotoid"), fr"${value: ProductphotoId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -53,7 +53,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productphoto(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
          """
     }
@@ -81,7 +81,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = $productphotoid".query[ProductphotoRow].option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid in $productphotoids".query[ProductphotoRow].stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = ANY($productphotoids)".query[ProductphotoRow].stream
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
@@ -111,7 +111,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           } :_*
         )
         sql"""update production.productphoto
-              set $updates
+              $updates
               where productphotoid = $productphotoid
            """.update.run.map(_ > 0)
     }

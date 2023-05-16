@@ -35,20 +35,20 @@ object CustomerRepoImpl extends CustomerRepo {
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
-      Some((Fragment.const(s"personid"), fr"personid = ${unsaved.personid}::int4")),
-      Some((Fragment.const(s"storeid"), fr"storeid = ${unsaved.storeid}::int4")),
-      Some((Fragment.const(s"territoryid"), fr"territoryid = ${unsaved.territoryid}::int4")),
+      Some((Fragment.const(s"personid"), fr"${unsaved.personid}::int4")),
+      Some((Fragment.const(s"storeid"), fr"${unsaved.storeid}::int4")),
+      Some((Fragment.const(s"territoryid"), fr"${unsaved.territoryid}::int4")),
       unsaved.customerid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"customerid"), fr"customerid = ${value: CustomerId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"customerid"), fr"${value: CustomerId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -59,7 +59,7 @@ object CustomerRepoImpl extends CustomerRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.customer(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning customerid, personid, storeid, territoryid, rowguid, modifieddate
          """
     }
@@ -87,7 +87,7 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid".query[CustomerRow].option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid in $customerids".query[CustomerRow].stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = ANY($customerids)".query[CustomerRow].stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
@@ -117,7 +117,7 @@ object CustomerRepoImpl extends CustomerRepo {
           } :_*
         )
         sql"""update sales.customer
-              set $updates
+              $updates
               where customerid = $customerid
            """.update.run.map(_ > 0)
     }

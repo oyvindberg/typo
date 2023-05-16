@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 
 object BomViewRepoImpl extends BomViewRepo {
   override def selectAll: Stream[ConnectionIO, BomViewRow] = {
-    sql"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr.bom""".query[BomViewRow].stream
+    sql"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr."bom"""".query[BomViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]]): Stream[ConnectionIO, BomViewRow] = {
     val where = fragments.whereAnd(
@@ -39,7 +39,7 @@ object BomViewRepoImpl extends BomViewRepo {
         case BomViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from pr.bom $where".query[BomViewRow].stream
+    sql"""select * from pr."bom" $where""".query[BomViewRow].stream
   
   }
   implicit val read: Read[BomViewRow] =

@@ -27,20 +27,20 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
-          values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning scrapreasonid, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.scrapreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"scrapreasonid"), fr"scrapreasonid = ${value: ScrapreasonId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"scrapreasonid"), fr"${value: ScrapreasonId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.scrapreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning scrapreasonid, "name", modifieddate
          """
     }
@@ -76,12 +76,12 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""select scrapreasonid, "name", modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".query[ScrapreasonRow].option
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate from production.scrapreason where scrapreasonid in $scrapreasonids""".query[ScrapreasonRow].stream
+    sql"""select scrapreasonid, "name", modifieddate from production.scrapreason where scrapreasonid = ANY($scrapreasonids)""".query[ScrapreasonRow].stream
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update production.scrapreason
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where scrapreasonid = $scrapreasonid
        """
@@ -95,12 +95,12 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ScrapreasonFieldValue.name(value) => fr"name = $value"
+            case ScrapreasonFieldValue.name(value) => fr""""name" = $value"""
             case ScrapreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.scrapreason
-              set $updates
+              $updates
               where scrapreasonid = $scrapreasonid
            """.update.run.map(_ > 0)
     }
@@ -109,7 +109,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (
             ${unsaved.scrapreasonid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (scrapreasonid)

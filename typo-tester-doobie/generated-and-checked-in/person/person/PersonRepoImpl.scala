@@ -31,36 +31,36 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.persontype}::bpchar, ${unsaved.namestyle}::public.NameStyle, ${unsaved.title}, ${unsaved.firstname}::public.Name, ${unsaved.middlename}::public.Name, ${unsaved.lastname}::public.Name, ${unsaved.suffix}, ${unsaved.emailpromotion}::int4, ${unsaved.additionalcontactinfo}::xml, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.businessentityid}::int4, ${unsaved.persontype}::bpchar, ${unsaved.namestyle}::"public".NameStyle, ${unsaved.title}, ${unsaved.firstname}::"public"."Name", ${unsaved.middlename}::"public"."Name", ${unsaved.lastname}::"public"."Name", ${unsaved.suffix}, ${unsaved.emailpromotion}::int4, ${unsaved.additionalcontactinfo}::xml, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"persontype"), fr"persontype = ${unsaved.persontype}::bpchar")),
-      Some((Fragment.const(s"title"), fr"title = ${unsaved.title}")),
-      Some((Fragment.const(s"firstname"), fr"firstname = ${unsaved.firstname}::public.Name")),
-      Some((Fragment.const(s"middlename"), fr"middlename = ${unsaved.middlename}::public.Name")),
-      Some((Fragment.const(s"lastname"), fr"lastname = ${unsaved.lastname}::public.Name")),
-      Some((Fragment.const(s"suffix"), fr"suffix = ${unsaved.suffix}")),
-      Some((Fragment.const(s"additionalcontactinfo"), fr"additionalcontactinfo = ${unsaved.additionalcontactinfo}::xml")),
-      Some((Fragment.const(s"demographics"), fr"demographics = ${unsaved.demographics}::xml")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"persontype"), fr"${unsaved.persontype}::bpchar")),
+      Some((Fragment.const(s"title"), fr"${unsaved.title}")),
+      Some((Fragment.const(s"firstname"), fr"""${unsaved.firstname}::"public"."Name"""")),
+      Some((Fragment.const(s"middlename"), fr"""${unsaved.middlename}::"public"."Name"""")),
+      Some((Fragment.const(s"lastname"), fr"""${unsaved.lastname}::"public"."Name"""")),
+      Some((Fragment.const(s"suffix"), fr"${unsaved.suffix}")),
+      Some((Fragment.const(s"additionalcontactinfo"), fr"${unsaved.additionalcontactinfo}::xml")),
+      Some((Fragment.const(s"demographics"), fr"${unsaved.demographics}::xml")),
       unsaved.namestyle match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"namestyle"), fr"namestyle = ${value: NameStyle}::public.NameStyle"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"namestyle"), fr"""${value: NameStyle}::"public".NameStyle"""))
       },
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"emailpromotion"), fr"emailpromotion = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"emailpromotion"), fr"${value: Int}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -71,7 +71,7 @@ object PersonRepoImpl extends PersonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
          """
     }
@@ -106,17 +106,17 @@ object PersonRepoImpl extends PersonRepo {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid".query[PersonRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
-    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid in $businessentityids".query[PersonRow].stream
+    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = ANY($businessentityids)".query[PersonRow].stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update person.person
           set persontype = ${row.persontype}::bpchar,
-              namestyle = ${row.namestyle}::public.NameStyle,
+              namestyle = ${row.namestyle}::"public".NameStyle,
               title = ${row.title},
-              firstname = ${row.firstname}::public.Name,
-              middlename = ${row.middlename}::public.Name,
-              lastname = ${row.lastname}::public.Name,
+              firstname = ${row.firstname}::"public"."Name",
+              middlename = ${row.middlename}::"public"."Name",
+              lastname = ${row.lastname}::"public"."Name",
               suffix = ${row.suffix},
               emailpromotion = ${row.emailpromotion}::int4,
               additionalcontactinfo = ${row.additionalcontactinfo}::xml,
@@ -150,7 +150,7 @@ object PersonRepoImpl extends PersonRepo {
           } :_*
         )
         sql"""update person.person
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }
@@ -160,11 +160,11 @@ object PersonRepoImpl extends PersonRepo {
           values (
             ${unsaved.businessentityid}::int4,
             ${unsaved.persontype}::bpchar,
-            ${unsaved.namestyle}::public.NameStyle,
+            ${unsaved.namestyle}::"public".NameStyle,
             ${unsaved.title},
-            ${unsaved.firstname}::public.Name,
-            ${unsaved.middlename}::public.Name,
-            ${unsaved.lastname}::public.Name,
+            ${unsaved.firstname}::"public"."Name",
+            ${unsaved.middlename}::"public"."Name",
+            ${unsaved.lastname}::"public"."Name",
             ${unsaved.suffix},
             ${unsaved.emailpromotion}::int4,
             ${unsaved.additionalcontactinfo}::xml,

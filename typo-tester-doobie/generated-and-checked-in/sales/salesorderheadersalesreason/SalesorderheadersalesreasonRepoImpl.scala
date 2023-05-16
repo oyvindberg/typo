@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}".update.run.map(_ > 0)
+    sql"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
@@ -34,11 +34,11 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s"salesorderid"), fr"salesorderid = ${unsaved.salesorderid}::int4")),
-      Some((Fragment.const(s"salesreasonid"), fr"salesreasonid = ${unsaved.salesreasonid}::int4")),
+      Some((Fragment.const(s"salesorderid"), fr"${unsaved.salesorderid}::int4")),
+      Some((Fragment.const(s"salesreasonid"), fr"${unsaved.salesreasonid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -49,7 +49,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesorderheadersalesreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning salesorderid, salesreasonid, modifieddate
          """
     }
@@ -71,13 +71,13 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
-    sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
+    sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason
           set modifieddate = ${row.modifieddate}::timestamp
-          where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}
+          where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
        """
       .update
       .run
@@ -93,8 +93,8 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           } :_*
         )
         sql"""update sales.salesorderheadersalesreason
-              set $updates
-              where salesorderid = ${compositeId.salesorderid}, salesreasonid = ${compositeId.salesreasonid}
+              $updates
+              where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
            """.update.run.map(_ > 0)
     }
   }

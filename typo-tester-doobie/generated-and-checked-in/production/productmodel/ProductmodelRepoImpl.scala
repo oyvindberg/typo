@@ -29,26 +29,26 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   }
   override def insert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
-          values (${unsaved.productmodelid}::int4, ${unsaved.name}::public.Name, ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"catalogdescription"), fr"catalogdescription = ${unsaved.catalogdescription}::xml")),
-      Some((Fragment.const(s"instructions"), fr"instructions = ${unsaved.instructions}::xml")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"catalogdescription"), fr"${unsaved.catalogdescription}::xml")),
+      Some((Fragment.const(s"instructions"), fr"${unsaved.instructions}::xml")),
       unsaved.productmodelid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productmodelid"), fr"productmodelid = ${value: ProductmodelId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productmodelid"), fr"${value: ProductmodelId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -59,7 +59,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productmodel(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
          """
     }
@@ -87,12 +87,12 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid = $productmodelid""".query[ProductmodelRow].option
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid in $productmodelids""".query[ProductmodelRow].stream
+    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid = ANY($productmodelids)""".query[ProductmodelRow].stream
   }
   override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
     val productmodelid = row.productmodelid
     sql"""update production.productmodel
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               catalogdescription = ${row.catalogdescription}::xml,
               instructions = ${row.instructions}::xml,
               rowguid = ${row.rowguid}::uuid,
@@ -109,7 +109,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ProductmodelFieldValue.name(value) => fr"name = $value"
+            case ProductmodelFieldValue.name(value) => fr""""name" = $value"""
             case ProductmodelFieldValue.catalogdescription(value) => fr"catalogdescription = $value"
             case ProductmodelFieldValue.instructions(value) => fr"instructions = $value"
             case ProductmodelFieldValue.rowguid(value) => fr"rowguid = $value"
@@ -117,7 +117,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           } :_*
         )
         sql"""update production.productmodel
-              set $updates
+              $updates
               where productmodelid = $productmodelid
            """.update.run.map(_ > 0)
     }
@@ -126,7 +126,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (
             ${unsaved.productmodelid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.catalogdescription}::xml,
             ${unsaved.instructions}::xml,
             ${unsaved.rowguid}::uuid,

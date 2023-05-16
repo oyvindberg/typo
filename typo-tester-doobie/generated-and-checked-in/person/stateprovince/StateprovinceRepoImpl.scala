@@ -31,31 +31,31 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
-          values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::public.Flag, ${unsaved.name}::public.Name, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::"public"."Flag", ${unsaved.name}::"public"."Name", ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     val fs = List(
-      Some((Fragment.const(s"stateprovincecode"), fr"stateprovincecode = ${unsaved.stateprovincecode}::bpchar")),
-      Some((Fragment.const(s"countryregioncode"), fr"countryregioncode = ${unsaved.countryregioncode}")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"territoryid"), fr"territoryid = ${unsaved.territoryid}::int4")),
+      Some((Fragment.const(s"stateprovincecode"), fr"${unsaved.stateprovincecode}::bpchar")),
+      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"territoryid"), fr"${unsaved.territoryid}::int4")),
       unsaved.stateprovinceid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"stateprovinceid"), fr"stateprovinceid = ${value: StateprovinceId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"stateprovinceid"), fr"${value: StateprovinceId}::int4"))
       },
       unsaved.isonlystateprovinceflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"isonlystateprovinceflag"), fr"isonlystateprovinceflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"isonlystateprovinceflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -66,7 +66,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.stateprovince(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
          """
     }
@@ -96,15 +96,15 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid""".query[StateprovinceRow].option
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid in $stateprovinceids""".query[StateprovinceRow].stream
+    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = ANY($stateprovinceids)""".query[StateprovinceRow].stream
   }
   override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
     val stateprovinceid = row.stateprovinceid
     sql"""update person.stateprovince
           set stateprovincecode = ${row.stateprovincecode}::bpchar,
               countryregioncode = ${row.countryregioncode},
-              isonlystateprovinceflag = ${row.isonlystateprovinceflag}::public.Flag,
-              "name" = ${row.name}::public.Name,
+              isonlystateprovinceflag = ${row.isonlystateprovinceflag}::"public"."Flag",
+              "name" = ${row.name}::"public"."Name",
               territoryid = ${row.territoryid}::int4,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
@@ -123,14 +123,14 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             case StateprovinceFieldValue.stateprovincecode(value) => fr"stateprovincecode = $value"
             case StateprovinceFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
             case StateprovinceFieldValue.isonlystateprovinceflag(value) => fr"isonlystateprovinceflag = $value"
-            case StateprovinceFieldValue.name(value) => fr"name = $value"
+            case StateprovinceFieldValue.name(value) => fr""""name" = $value"""
             case StateprovinceFieldValue.territoryid(value) => fr"territoryid = $value"
             case StateprovinceFieldValue.rowguid(value) => fr"rowguid = $value"
             case StateprovinceFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update person.stateprovince
-              set $updates
+              $updates
               where stateprovinceid = $stateprovinceid
            """.update.run.map(_ > 0)
     }
@@ -141,8 +141,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             ${unsaved.stateprovinceid}::int4,
             ${unsaved.stateprovincecode}::bpchar,
             ${unsaved.countryregioncode},
-            ${unsaved.isonlystateprovinceflag}::public.Flag,
-            ${unsaved.name}::public.Name,
+            ${unsaved.isonlystateprovinceflag}::"public"."Flag",
+            ${unsaved.name}::"public"."Name",
             ${unsaved.territoryid}::int4,
             ${unsaved.rowguid}::uuid,
             ${unsaved.modifieddate}::timestamp

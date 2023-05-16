@@ -26,7 +26,7 @@ import java.util.UUID
 
 object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean] = {
-    sql"delete from person.businessentityaddress where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}".update.run.map(_ > 0)
+    sql"delete from person.businessentityaddress where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     sql"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
@@ -36,16 +36,16 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"addressid"), fr"addressid = ${unsaved.addressid}::int4")),
-      Some((Fragment.const(s"addresstypeid"), fr"addresstypeid = ${unsaved.addresstypeid}::int4")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"addressid"), fr"${unsaved.addressid}::int4")),
+      Some((Fragment.const(s"addresstypeid"), fr"${unsaved.addresstypeid}::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -56,7 +56,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.businessentityaddress(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
          """
     }
@@ -80,14 +80,14 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   
   }
   override def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]] = {
-    sql"select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}".query[BusinessentityaddressRow].option
+    sql"select businessentityid, addressid, addresstypeid, rowguid, modifieddate from person.businessentityaddress where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}".query[BusinessentityaddressRow].option
   }
   override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.businessentityaddress
           set rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}
+          where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
        """
       .update
       .run
@@ -104,8 +104,8 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           } :_*
         )
         sql"""update person.businessentityaddress
-              set $updates
-              where businessentityid = ${compositeId.businessentityid}, addressid = ${compositeId.addressid}, addresstypeid = ${compositeId.addresstypeid}
+              $updates
+              where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
            """.update.run.map(_ > 0)
     }
   }

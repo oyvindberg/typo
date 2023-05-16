@@ -32,51 +32,51 @@ object ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.name}::public.Name, ${unsaved.productnumber}, ${unsaved.makeflag}::public.Flag, ${unsaved.finishedgoodsflag}::public.Flag, ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.productid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.productnumber}, ${unsaved.makeflag}::"public"."Flag", ${unsaved.finishedgoodsflag}::"public"."Flag", ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"productnumber"), fr"productnumber = ${unsaved.productnumber}")),
-      Some((Fragment.const(s"color"), fr"color = ${unsaved.color}")),
-      Some((Fragment.const(s"safetystocklevel"), fr"safetystocklevel = ${unsaved.safetystocklevel}::int2")),
-      Some((Fragment.const(s"reorderpoint"), fr"reorderpoint = ${unsaved.reorderpoint}::int2")),
-      Some((Fragment.const(s"standardcost"), fr"standardcost = ${unsaved.standardcost}::numeric")),
-      Some((Fragment.const(s"listprice"), fr"listprice = ${unsaved.listprice}::numeric")),
-      Some((Fragment.const(s""""size""""), fr""""size" = ${unsaved.size}""")),
-      Some((Fragment.const(s"sizeunitmeasurecode"), fr"sizeunitmeasurecode = ${unsaved.sizeunitmeasurecode}::bpchar")),
-      Some((Fragment.const(s"weightunitmeasurecode"), fr"weightunitmeasurecode = ${unsaved.weightunitmeasurecode}::bpchar")),
-      Some((Fragment.const(s"weight"), fr"weight = ${unsaved.weight}::numeric")),
-      Some((Fragment.const(s"daystomanufacture"), fr"daystomanufacture = ${unsaved.daystomanufacture}::int4")),
-      Some((Fragment.const(s"productline"), fr"productline = ${unsaved.productline}::bpchar")),
-      Some((Fragment.const(s""""class""""), fr""""class" = ${unsaved.`class`}::bpchar""")),
-      Some((Fragment.const(s""""style""""), fr""""style" = ${unsaved.style}::bpchar""")),
-      Some((Fragment.const(s"productsubcategoryid"), fr"productsubcategoryid = ${unsaved.productsubcategoryid}::int4")),
-      Some((Fragment.const(s"productmodelid"), fr"productmodelid = ${unsaved.productmodelid}::int4")),
-      Some((Fragment.const(s"sellstartdate"), fr"sellstartdate = ${unsaved.sellstartdate}::timestamp")),
-      Some((Fragment.const(s"sellenddate"), fr"sellenddate = ${unsaved.sellenddate}::timestamp")),
-      Some((Fragment.const(s"discontinueddate"), fr"discontinueddate = ${unsaved.discontinueddate}::timestamp")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"productnumber"), fr"${unsaved.productnumber}")),
+      Some((Fragment.const(s"color"), fr"${unsaved.color}")),
+      Some((Fragment.const(s"safetystocklevel"), fr"${unsaved.safetystocklevel}::int2")),
+      Some((Fragment.const(s"reorderpoint"), fr"${unsaved.reorderpoint}::int2")),
+      Some((Fragment.const(s"standardcost"), fr"${unsaved.standardcost}::numeric")),
+      Some((Fragment.const(s"listprice"), fr"${unsaved.listprice}::numeric")),
+      Some((Fragment.const(s""""size""""), fr"${unsaved.size}")),
+      Some((Fragment.const(s"sizeunitmeasurecode"), fr"${unsaved.sizeunitmeasurecode}::bpchar")),
+      Some((Fragment.const(s"weightunitmeasurecode"), fr"${unsaved.weightunitmeasurecode}::bpchar")),
+      Some((Fragment.const(s"weight"), fr"${unsaved.weight}::numeric")),
+      Some((Fragment.const(s"daystomanufacture"), fr"${unsaved.daystomanufacture}::int4")),
+      Some((Fragment.const(s"productline"), fr"${unsaved.productline}::bpchar")),
+      Some((Fragment.const(s""""class""""), fr"${unsaved.`class`}::bpchar")),
+      Some((Fragment.const(s""""style""""), fr"${unsaved.style}::bpchar")),
+      Some((Fragment.const(s"productsubcategoryid"), fr"${unsaved.productsubcategoryid}::int4")),
+      Some((Fragment.const(s"productmodelid"), fr"${unsaved.productmodelid}::int4")),
+      Some((Fragment.const(s"sellstartdate"), fr"${unsaved.sellstartdate}::timestamp")),
+      Some((Fragment.const(s"sellenddate"), fr"${unsaved.sellenddate}::timestamp")),
+      Some((Fragment.const(s"discontinueddate"), fr"${unsaved.discontinueddate}::timestamp")),
       unsaved.productid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productid"), fr"productid = ${value: ProductId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productid"), fr"${value: ProductId}::int4"))
       },
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"makeflag"), fr"makeflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"makeflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"finishedgoodsflag"), fr"finishedgoodsflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"finishedgoodsflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -87,7 +87,7 @@ object ProductRepoImpl extends ProductRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.product(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
          """
     }
@@ -134,15 +134,15 @@ object ProductRepoImpl extends ProductRepo {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid = $productid""".query[ProductRow].option
   }
   override def selectByIds(productids: Array[ProductId]): Stream[ConnectionIO, ProductRow] = {
-    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid in $productids""".query[ProductRow].stream
+    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid = ANY($productids)""".query[ProductRow].stream
   }
   override def update(row: ProductRow): ConnectionIO[Boolean] = {
     val productid = row.productid
     sql"""update production.product
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               productnumber = ${row.productnumber},
-              makeflag = ${row.makeflag}::public.Flag,
-              finishedgoodsflag = ${row.finishedgoodsflag}::public.Flag,
+              makeflag = ${row.makeflag}::"public"."Flag",
+              finishedgoodsflag = ${row.finishedgoodsflag}::"public"."Flag",
               color = ${row.color},
               safetystocklevel = ${row.safetystocklevel}::int2,
               reorderpoint = ${row.reorderpoint}::int2,
@@ -175,7 +175,7 @@ object ProductRepoImpl extends ProductRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ProductFieldValue.name(value) => fr"name = $value"
+            case ProductFieldValue.name(value) => fr""""name" = $value"""
             case ProductFieldValue.productnumber(value) => fr"productnumber = $value"
             case ProductFieldValue.makeflag(value) => fr"makeflag = $value"
             case ProductFieldValue.finishedgoodsflag(value) => fr"finishedgoodsflag = $value"
@@ -184,14 +184,14 @@ object ProductRepoImpl extends ProductRepo {
             case ProductFieldValue.reorderpoint(value) => fr"reorderpoint = $value"
             case ProductFieldValue.standardcost(value) => fr"standardcost = $value"
             case ProductFieldValue.listprice(value) => fr"listprice = $value"
-            case ProductFieldValue.size(value) => fr"size = $value"
+            case ProductFieldValue.size(value) => fr""""size" = $value"""
             case ProductFieldValue.sizeunitmeasurecode(value) => fr"sizeunitmeasurecode = $value"
             case ProductFieldValue.weightunitmeasurecode(value) => fr"weightunitmeasurecode = $value"
             case ProductFieldValue.weight(value) => fr"weight = $value"
             case ProductFieldValue.daystomanufacture(value) => fr"daystomanufacture = $value"
             case ProductFieldValue.productline(value) => fr"productline = $value"
-            case ProductFieldValue.`class`(value) => fr"class = $value"
-            case ProductFieldValue.style(value) => fr"style = $value"
+            case ProductFieldValue.`class`(value) => fr""""class" = $value"""
+            case ProductFieldValue.style(value) => fr""""style" = $value"""
             case ProductFieldValue.productsubcategoryid(value) => fr"productsubcategoryid = $value"
             case ProductFieldValue.productmodelid(value) => fr"productmodelid = $value"
             case ProductFieldValue.sellstartdate(value) => fr"sellstartdate = $value"
@@ -202,7 +202,7 @@ object ProductRepoImpl extends ProductRepo {
           } :_*
         )
         sql"""update production.product
-              set $updates
+              $updates
               where productid = $productid
            """.update.run.map(_ > 0)
     }
@@ -211,10 +211,10 @@ object ProductRepoImpl extends ProductRepo {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
           values (
             ${unsaved.productid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.productnumber},
-            ${unsaved.makeflag}::public.Flag,
-            ${unsaved.finishedgoodsflag}::public.Flag,
+            ${unsaved.makeflag}::"public"."Flag",
+            ${unsaved.finishedgoodsflag}::"public"."Flag",
             ${unsaved.color},
             ${unsaved.safetystocklevel}::int2,
             ${unsaved.reorderpoint}::int2,

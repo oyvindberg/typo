@@ -35,15 +35,15 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     val fs = List(
       unsaved.businessentityid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${value: BusinessentityId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"businessentityid"), fr"${value: BusinessentityId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -54,7 +54,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.businessentity(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, rowguid, modifieddate
          """
     }
@@ -79,7 +79,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid".query[BusinessentityRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid in $businessentityids".query[BusinessentityRow].stream
+    sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = ANY($businessentityids)".query[BusinessentityRow].stream
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -103,7 +103,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           } :_*
         )
         sql"""update person.businessentity
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }

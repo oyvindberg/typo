@@ -27,17 +27,17 @@ object CurrencyRepoImpl extends CurrencyRepo {
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
-          values (${unsaved.currencycode}::bpchar, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning currencycode, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
-      Some((Fragment.const(s"currencycode"), fr"currencycode = ${unsaved.currencycode}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s"currencycode"), fr"${unsaved.currencycode}::bpchar")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -48,7 +48,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.currency(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning currencycode, "name", modifieddate
          """
     }
@@ -73,12 +73,12 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""select currencycode, "name", modifieddate from sales.currency where currencycode = $currencycode""".query[CurrencyRow].option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate from sales.currency where currencycode in $currencycodes""".query[CurrencyRow].stream
+    sql"""select currencycode, "name", modifieddate from sales.currency where currencycode = ANY($currencycodes)""".query[CurrencyRow].stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where currencycode = $currencycode
        """
@@ -92,12 +92,12 @@ object CurrencyRepoImpl extends CurrencyRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case CurrencyFieldValue.name(value) => fr"name = $value"
+            case CurrencyFieldValue.name(value) => fr""""name" = $value"""
             case CurrencyFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update sales.currency
-              set $updates
+              $updates
               where currencycode = $currencycode
            """.update.run.map(_ > 0)
     }
@@ -106,7 +106,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (
             ${unsaved.currencycode}::bpchar,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (currencycode)

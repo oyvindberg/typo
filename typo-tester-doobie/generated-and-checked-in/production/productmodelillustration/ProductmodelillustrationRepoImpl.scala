@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
-    sql"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".update.run.map(_ > 0)
+    sql"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
@@ -34,11 +34,11 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
-      Some((Fragment.const(s"productmodelid"), fr"productmodelid = ${unsaved.productmodelid}::int4")),
-      Some((Fragment.const(s"illustrationid"), fr"illustrationid = ${unsaved.illustrationid}::int4")),
+      Some((Fragment.const(s"productmodelid"), fr"${unsaved.productmodelid}::int4")),
+      Some((Fragment.const(s"illustrationid"), fr"${unsaved.illustrationid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -49,7 +49,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productmodelillustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productmodelid, illustrationid, modifieddate
          """
     }
@@ -71,13 +71,13 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
-    sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
+    sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
   }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelillustration
           set modifieddate = ${row.modifieddate}::timestamp
-          where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+          where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
        """
       .update
       .run
@@ -93,8 +93,8 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           } :_*
         )
         sql"""update production.productmodelillustration
-              set $updates
-              where productmodelid = ${compositeId.productmodelid}, illustrationid = ${compositeId.illustrationid}
+              $updates
+              where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
            """.update.run.map(_ > 0)
     }
   }

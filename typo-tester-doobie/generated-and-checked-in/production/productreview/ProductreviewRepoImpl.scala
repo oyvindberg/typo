@@ -28,28 +28,28 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
-          values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::public.Name, ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
        """.query.unique
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"reviewername"), fr"reviewername = ${unsaved.reviewername}::public.Name")),
-      Some((Fragment.const(s"emailaddress"), fr"emailaddress = ${unsaved.emailaddress}")),
-      Some((Fragment.const(s"rating"), fr"rating = ${unsaved.rating}::int4")),
-      Some((Fragment.const(s""""comments""""), fr""""comments" = ${unsaved.comments}""")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"reviewername"), fr"""${unsaved.reviewername}::"public"."Name"""")),
+      Some((Fragment.const(s"emailaddress"), fr"${unsaved.emailaddress}")),
+      Some((Fragment.const(s"rating"), fr"${unsaved.rating}::int4")),
+      Some((Fragment.const(s""""comments""""), fr"${unsaved.comments}")),
       unsaved.productreviewid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productreviewid"), fr"productreviewid = ${value: ProductreviewId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productreviewid"), fr"${value: ProductreviewId}::int4"))
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"reviewdate"), fr"reviewdate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"reviewdate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -60,7 +60,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productreview(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
          """
     }
@@ -90,13 +90,13 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid = $productreviewid""".query[ProductreviewRow].option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid in $productreviewids""".query[ProductreviewRow].stream
+    sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid = ANY($productreviewids)""".query[ProductreviewRow].stream
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
     sql"""update production.productreview
           set productid = ${row.productid}::int4,
-              reviewername = ${row.reviewername}::public.Name,
+              reviewername = ${row.reviewername}::"public"."Name",
               reviewdate = ${row.reviewdate}::timestamp,
               emailaddress = ${row.emailaddress},
               rating = ${row.rating}::int4,
@@ -119,12 +119,12 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             case ProductreviewFieldValue.reviewdate(value) => fr"reviewdate = $value"
             case ProductreviewFieldValue.emailaddress(value) => fr"emailaddress = $value"
             case ProductreviewFieldValue.rating(value) => fr"rating = $value"
-            case ProductreviewFieldValue.comments(value) => fr"comments = $value"
+            case ProductreviewFieldValue.comments(value) => fr""""comments" = $value"""
             case ProductreviewFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update production.productreview
-              set $updates
+              $updates
               where productreviewid = $productreviewid
            """.update.run.map(_ > 0)
     }
@@ -134,7 +134,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           values (
             ${unsaved.productreviewid}::int4,
             ${unsaved.productid}::int4,
-            ${unsaved.reviewername}::public.Name,
+            ${unsaved.reviewername}::"public"."Name",
             ${unsaved.reviewdate}::timestamp,
             ${unsaved.emailaddress},
             ${unsaved.rating}::int4,

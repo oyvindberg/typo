@@ -33,23 +33,23 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
-      Some((Fragment.const(s"shoppingcartid"), fr"shoppingcartid = ${unsaved.shoppingcartid}")),
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
+      Some((Fragment.const(s"shoppingcartid"), fr"${unsaved.shoppingcartid}")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
       unsaved.shoppingcartitemid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shoppingcartitemid"), fr"shoppingcartitemid = ${value: ShoppingcartitemId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shoppingcartitemid"), fr"${value: ShoppingcartitemId}::int4"))
       },
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"quantity"), fr"quantity = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"quantity"), fr"${value: Int}::int4"))
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"datecreated"), fr"datecreated = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"datecreated"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -60,7 +60,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.shoppingcartitem(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
          """
     }
@@ -88,7 +88,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".query[ShoppingcartitemRow].option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid in $shoppingcartitemids".query[ShoppingcartitemRow].stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = ANY($shoppingcartitemids)".query[ShoppingcartitemRow].stream
   }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
@@ -118,7 +118,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           } :_*
         )
         sql"""update sales.shoppingcartitem
-              set $updates
+              $updates
               where shoppingcartitemid = $shoppingcartitemid
            """.update.run.map(_ > 0)
     }

@@ -34,20 +34,20 @@ object WorkorderRepoImpl extends WorkorderRepo {
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"orderqty"), fr"orderqty = ${unsaved.orderqty}::int4")),
-      Some((Fragment.const(s"scrappedqty"), fr"scrappedqty = ${unsaved.scrappedqty}::int2")),
-      Some((Fragment.const(s"startdate"), fr"startdate = ${unsaved.startdate}::timestamp")),
-      Some((Fragment.const(s"enddate"), fr"enddate = ${unsaved.enddate}::timestamp")),
-      Some((Fragment.const(s"duedate"), fr"duedate = ${unsaved.duedate}::timestamp")),
-      Some((Fragment.const(s"scrapreasonid"), fr"scrapreasonid = ${unsaved.scrapreasonid}::int2")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"orderqty"), fr"${unsaved.orderqty}::int4")),
+      Some((Fragment.const(s"scrappedqty"), fr"${unsaved.scrappedqty}::int2")),
+      Some((Fragment.const(s"startdate"), fr"${unsaved.startdate}::timestamp")),
+      Some((Fragment.const(s"enddate"), fr"${unsaved.enddate}::timestamp")),
+      Some((Fragment.const(s"duedate"), fr"${unsaved.duedate}::timestamp")),
+      Some((Fragment.const(s"scrapreasonid"), fr"${unsaved.scrapreasonid}::int2")),
       unsaved.workorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"workorderid"), fr"workorderid = ${value: WorkorderId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"workorderid"), fr"${value: WorkorderId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -58,7 +58,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.workorder(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
          """
     }
@@ -89,7 +89,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid".query[WorkorderRow].option
   }
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
-    sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid in $workorderids".query[WorkorderRow].stream
+    sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)".query[WorkorderRow].stream
   }
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid
@@ -125,7 +125,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           } :_*
         )
         sql"""update production.workorder
-              set $updates
+              $updates
               where workorderid = $workorderid
            """.update.run.map(_ > 0)
     }

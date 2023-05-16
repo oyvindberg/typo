@@ -34,15 +34,15 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"resume"), fr"resume = ${unsaved.resume}::xml")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"resume"), fr"${unsaved.resume}::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"jobcandidateid"), fr"jobcandidateid = ${value: JobcandidateId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"jobcandidateid"), fr"${value: JobcandidateId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -53,7 +53,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.jobcandidate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning jobcandidateid, businessentityid, resume, modifieddate
          """
     }
@@ -79,7 +79,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".query[JobcandidateRow].option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid in $jobcandidateids".query[JobcandidateRow].stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = ANY($jobcandidateids)".query[JobcandidateRow].stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
@@ -105,7 +105,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           } :_*
         )
         sql"""update humanresources.jobcandidate
-              set $updates
+              $updates
               where jobcandidateid = $jobcandidateid
            """.update.run.map(_ > 0)
     }

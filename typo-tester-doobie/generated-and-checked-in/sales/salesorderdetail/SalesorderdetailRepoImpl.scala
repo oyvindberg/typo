@@ -26,7 +26,7 @@ import java.util.UUID
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".update.run.map(_ > 0)
+    sql"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
@@ -36,27 +36,27 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
-      Some((Fragment.const(s"salesorderid"), fr"salesorderid = ${unsaved.salesorderid}::int4")),
-      Some((Fragment.const(s"carriertrackingnumber"), fr"carriertrackingnumber = ${unsaved.carriertrackingnumber}")),
-      Some((Fragment.const(s"orderqty"), fr"orderqty = ${unsaved.orderqty}::int2")),
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"specialofferid"), fr"specialofferid = ${unsaved.specialofferid}::int4")),
-      Some((Fragment.const(s"unitprice"), fr"unitprice = ${unsaved.unitprice}::numeric")),
+      Some((Fragment.const(s"salesorderid"), fr"${unsaved.salesorderid}::int4")),
+      Some((Fragment.const(s"carriertrackingnumber"), fr"${unsaved.carriertrackingnumber}")),
+      Some((Fragment.const(s"orderqty"), fr"${unsaved.orderqty}::int2")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"specialofferid"), fr"${unsaved.specialofferid}::int4")),
+      Some((Fragment.const(s"unitprice"), fr"${unsaved.unitprice}::numeric")),
       unsaved.salesorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesorderdetailid"), fr"salesorderdetailid = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesorderdetailid"), fr"${value: Int}::int4"))
       },
       unsaved.unitpricediscount match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"unitpricediscount"), fr"unitpricediscount = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"unitpricediscount"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -67,7 +67,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesorderdetail(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
          """
     }
@@ -96,7 +96,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   
   }
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
-    sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}".query[SalesorderdetailRow].option
+    sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".query[SalesorderdetailRow].option
   }
   override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -109,7 +109,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               unitpricediscount = ${row.unitpricediscount}::numeric,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}
+          where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """
       .update
       .run
@@ -132,8 +132,8 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           } :_*
         )
         sql"""update sales.salesorderdetail
-              set $updates
-              where salesorderid = ${compositeId.salesorderid}, salesorderdetailid = ${compositeId.salesorderdetailid}
+              $updates
+              where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
            """.update.run.map(_ > 0)
     }
   }

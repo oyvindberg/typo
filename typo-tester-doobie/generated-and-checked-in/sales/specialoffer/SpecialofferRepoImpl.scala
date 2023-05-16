@@ -33,31 +33,31 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   }
   override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
     val fs = List(
-      Some((Fragment.const(s"description"), fr"description = ${unsaved.description}")),
-      Some((Fragment.const(s""""type""""), fr""""type" = ${unsaved.`type`}""")),
-      Some((Fragment.const(s"category"), fr"category = ${unsaved.category}")),
-      Some((Fragment.const(s"startdate"), fr"startdate = ${unsaved.startdate}::timestamp")),
-      Some((Fragment.const(s"enddate"), fr"enddate = ${unsaved.enddate}::timestamp")),
-      Some((Fragment.const(s"maxqty"), fr"maxqty = ${unsaved.maxqty}::int4")),
+      Some((Fragment.const(s"description"), fr"${unsaved.description}")),
+      Some((Fragment.const(s""""type""""), fr"${unsaved.`type`}")),
+      Some((Fragment.const(s"category"), fr"${unsaved.category}")),
+      Some((Fragment.const(s"startdate"), fr"${unsaved.startdate}::timestamp")),
+      Some((Fragment.const(s"enddate"), fr"${unsaved.enddate}::timestamp")),
+      Some((Fragment.const(s"maxqty"), fr"${unsaved.maxqty}::int4")),
       unsaved.specialofferid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"specialofferid"), fr"specialofferid = ${value: SpecialofferId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"specialofferid"), fr"${value: SpecialofferId}::int4"))
       },
       unsaved.discountpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"discountpct"), fr"discountpct = ${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"discountpct"), fr"${value: BigDecimal}::numeric"))
       },
       unsaved.minqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"minqty"), fr"minqty = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"minqty"), fr"${value: Int}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -68,7 +68,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.specialoffer(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
          """
     }
@@ -101,7 +101,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".query[SpecialofferRow].option
   }
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
-    sql"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid in $specialofferids""".query[SpecialofferRow].stream
+    sql"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = ANY($specialofferids)""".query[SpecialofferRow].stream
   }
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     val specialofferid = row.specialofferid
@@ -130,7 +130,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           nonEmpty.map {
             case SpecialofferFieldValue.description(value) => fr"description = $value"
             case SpecialofferFieldValue.discountpct(value) => fr"discountpct = $value"
-            case SpecialofferFieldValue.`type`(value) => fr"type = $value"
+            case SpecialofferFieldValue.`type`(value) => fr""""type" = $value"""
             case SpecialofferFieldValue.category(value) => fr"category = $value"
             case SpecialofferFieldValue.startdate(value) => fr"startdate = $value"
             case SpecialofferFieldValue.enddate(value) => fr"enddate = $value"
@@ -141,7 +141,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           } :_*
         )
         sql"""update sales.specialoffer
-              set $updates
+              $updates
               where specialofferid = $specialofferid
            """.update.run.map(_ > 0)
     }

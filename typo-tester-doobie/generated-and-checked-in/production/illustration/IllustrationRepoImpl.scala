@@ -33,14 +33,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
-      Some((Fragment.const(s"diagram"), fr"diagram = ${unsaved.diagram}::xml")),
+      Some((Fragment.const(s"diagram"), fr"${unsaved.diagram}::xml")),
       unsaved.illustrationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"illustrationid"), fr"illustrationid = ${value: IllustrationId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"illustrationid"), fr"${value: IllustrationId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.illustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning illustrationid, diagram, modifieddate
          """
     }
@@ -76,7 +76,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid".query[IllustrationRow].option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate from production.illustration where illustrationid in $illustrationids".query[IllustrationRow].stream
+    sql"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)".query[IllustrationRow].stream
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
@@ -100,7 +100,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           } :_*
         )
         sql"""update production.illustration
-              set $updates
+              $updates
               where illustrationid = $illustrationid
            """.update.run.map(_ > 0)
     }

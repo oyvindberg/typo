@@ -30,47 +30,47 @@ object EmployeeRepoImpl extends EmployeeRepo {
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
-          values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::public.Flag, ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::public.Flag, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
+          values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
        """.query.unique
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"nationalidnumber"), fr"nationalidnumber = ${unsaved.nationalidnumber}")),
-      Some((Fragment.const(s"loginid"), fr"loginid = ${unsaved.loginid}")),
-      Some((Fragment.const(s"jobtitle"), fr"jobtitle = ${unsaved.jobtitle}")),
-      Some((Fragment.const(s"birthdate"), fr"birthdate = ${unsaved.birthdate}::date")),
-      Some((Fragment.const(s"maritalstatus"), fr"maritalstatus = ${unsaved.maritalstatus}::bpchar")),
-      Some((Fragment.const(s"gender"), fr"gender = ${unsaved.gender}::bpchar")),
-      Some((Fragment.const(s"hiredate"), fr"hiredate = ${unsaved.hiredate}::date")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"nationalidnumber"), fr"${unsaved.nationalidnumber}")),
+      Some((Fragment.const(s"loginid"), fr"${unsaved.loginid}")),
+      Some((Fragment.const(s"jobtitle"), fr"${unsaved.jobtitle}")),
+      Some((Fragment.const(s"birthdate"), fr"${unsaved.birthdate}::date")),
+      Some((Fragment.const(s"maritalstatus"), fr"${unsaved.maritalstatus}::bpchar")),
+      Some((Fragment.const(s"gender"), fr"${unsaved.gender}::bpchar")),
+      Some((Fragment.const(s"hiredate"), fr"${unsaved.hiredate}::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"salariedflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"vacationhours"), fr"vacationhours = ${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"vacationhours"), fr"${value: Int}::int2"))
       },
       unsaved.sickleavehours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"sickleavehours"), fr"sickleavehours = ${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"sickleavehours"), fr"${value: Int}::int2"))
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"currentflag = ${value: Flag}::public.Flag"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"""${value: Flag}::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"organizationnode"), fr"organizationnode = ${value: Option[String]}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"organizationnode"), fr"${value: Option[String]}"))
       }
     ).flatten
     
@@ -81,7 +81,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.employee(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
          """
     }
@@ -118,7 +118,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid".query[EmployeeRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid in $businessentityids".query[EmployeeRow].stream
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = ANY($businessentityids)".query[EmployeeRow].stream
   }
   override def update(row: EmployeeRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -130,10 +130,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
               maritalstatus = ${row.maritalstatus}::bpchar,
               gender = ${row.gender}::bpchar,
               hiredate = ${row.hiredate}::date,
-              salariedflag = ${row.salariedflag}::public.Flag,
+              salariedflag = ${row.salariedflag}::"public"."Flag",
               vacationhours = ${row.vacationhours}::int2,
               sickleavehours = ${row.sickleavehours}::int2,
-              currentflag = ${row.currentflag}::public.Flag,
+              currentflag = ${row.currentflag}::"public"."Flag",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp,
               organizationnode = ${row.organizationnode}
@@ -166,7 +166,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
           } :_*
         )
         sql"""update humanresources.employee
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }
@@ -182,10 +182,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
             ${unsaved.maritalstatus}::bpchar,
             ${unsaved.gender}::bpchar,
             ${unsaved.hiredate}::date,
-            ${unsaved.salariedflag}::public.Flag,
+            ${unsaved.salariedflag}::"public"."Flag",
             ${unsaved.vacationhours}::int2,
             ${unsaved.sickleavehours}::int2,
-            ${unsaved.currentflag}::public.Flag,
+            ${unsaved.currentflag}::"public"."Flag",
             ${unsaved.rowguid}::uuid,
             ${unsaved.modifieddate}::timestamp,
             ${unsaved.organizationnode}

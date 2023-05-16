@@ -3,7 +3,6 @@ package internal
 package codegen
 
 object DbLibDoobie extends DbLib {
-  implicit val tableName: ToCode[db.RelationName] = _.value
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
   def SQL(content: sc.Code) =
@@ -112,11 +111,11 @@ object DbLibDoobie extends DbLib {
       case id: IdComputed.Unary =>
         code"${maybeQuoted(id.col.dbName)} = $$${id.paramName}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(", ")}"
+        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(" AND ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${maybeQuoted(x.col.dbName)} in $$${idsParam.name}"
+    code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
   def cast(c: ComputedColumn): sc.Code =
     c.dbCol.tpe match {
@@ -171,13 +170,15 @@ object DbLibDoobie extends DbLib {
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            val fr = frInterpolate(code"${col.dbName.value} = $$value")
+            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = $$value")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
-        val sql = SQL(code"""|update $relName
-                 |set $$updates
-                 |where ${matchId(id)}""".stripMargin)
+        val sql = SQL {
+          code"""|update $relName
+                 |$$updates
+                 |where ${matchId(id)}""".stripMargin
+        }
 
         code"""${varargs.name} match {
               |  case Nil => $pureCIO(false)
@@ -205,12 +206,12 @@ object DbLibDoobie extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, _) =>
         val cases0 = unsaved.restCols.map { col =>
           val colCast = cast(col).render
-          val set = frInterpolate(code"${maybeQuoted(col.dbName)} = $${${unsavedParam.name}.${col.name}}$colCast")
+          val set = frInterpolate(code"$${${unsavedParam.name}.${col.name}}$colCast")
           code"""Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
           val colCast = cast(col).render
-          val setValue = frInterpolate(code"${maybeQuoted(dbCol.name)} = $${value: $origType}$colCast")
+          val setValue = frInterpolate(code"$${value: $origType}$colCast")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
                  |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $setValue))
@@ -219,7 +220,7 @@ object DbLibDoobie extends DbLib {
 
         val sql = SQL {
           code"""|insert into $relName($${fs.map { case (n, _) => n }.intercalate(${frInterpolate(code", ")})})
-                 |set $${fs.map { case (_, f) => f }.intercalate(${frInterpolate(code", ")})}
+                 |values ($${fs.map { case (_, f) => f }.intercalate(${frInterpolate(code", ")})})
                  |returning ${dbNames(cols)}
                  |""".stripMargin
         }

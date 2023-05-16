@@ -45,7 +45,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club where "id" = $id""".query[FootballClubRow].option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" in $ids""".query[FootballClubRow].stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY($ids)""".query[FootballClubRow].stream
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -63,11 +63,11 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case FootballClubFieldValue.name(value) => fr"name = $value"
+            case FootballClubFieldValue.name(value) => fr""""name" = $value"""
           } :_*
         )
         sql"""update myschema.football_club
-              set $updates
+              $updates
               where "id" = $id
            """.update.run.map(_ > 0)
     }

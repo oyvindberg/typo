@@ -33,18 +33,18 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     val fs = List(
-      Some((Fragment.const(s"currencyratedate"), fr"currencyratedate = ${unsaved.currencyratedate}::timestamp")),
-      Some((Fragment.const(s"fromcurrencycode"), fr"fromcurrencycode = ${unsaved.fromcurrencycode}::bpchar")),
-      Some((Fragment.const(s"tocurrencycode"), fr"tocurrencycode = ${unsaved.tocurrencycode}::bpchar")),
-      Some((Fragment.const(s"averagerate"), fr"averagerate = ${unsaved.averagerate}::numeric")),
-      Some((Fragment.const(s"endofdayrate"), fr"endofdayrate = ${unsaved.endofdayrate}::numeric")),
+      Some((Fragment.const(s"currencyratedate"), fr"${unsaved.currencyratedate}::timestamp")),
+      Some((Fragment.const(s"fromcurrencycode"), fr"${unsaved.fromcurrencycode}::bpchar")),
+      Some((Fragment.const(s"tocurrencycode"), fr"${unsaved.tocurrencycode}::bpchar")),
+      Some((Fragment.const(s"averagerate"), fr"${unsaved.averagerate}::numeric")),
+      Some((Fragment.const(s"endofdayrate"), fr"${unsaved.endofdayrate}::numeric")),
       unsaved.currencyrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"currencyrateid"), fr"currencyrateid = ${value: CurrencyrateId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"currencyrateid"), fr"${value: CurrencyrateId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -55,7 +55,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.currencyrate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
          """
     }
@@ -84,7 +84,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid".query[CurrencyrateRow].option
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow] = {
-    sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid in $currencyrateids".query[CurrencyrateRow].stream
+    sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)".query[CurrencyrateRow].stream
   }
   override def update(row: CurrencyrateRow): ConnectionIO[Boolean] = {
     val currencyrateid = row.currencyrateid
@@ -116,7 +116,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           } :_*
         )
         sql"""update sales.currencyrate
-              set $updates
+              $updates
               where currencyrateid = $currencyrateid
            """.update.run.map(_ > 0)
     }

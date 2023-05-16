@@ -27,21 +27,21 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
-          values (${unsaved.salesreasonid}::int4, ${unsaved.name}::public.Name, ${unsaved.reasontype}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate
        """.query.unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"reasontype"), fr"reasontype = ${unsaved.reasontype}::public.Name")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"reasontype"), fr"""${unsaved.reasontype}::"public"."Name"""")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesreasonid"), fr"salesreasonid = ${value: SalesreasonId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesreasonid"), fr"${value: SalesreasonId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -52,7 +52,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning salesreasonid, "name", reasontype, modifieddate
          """
     }
@@ -78,13 +78,13 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".query[SalesreasonRow].option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid in $salesreasonids""".query[SalesreasonRow].stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid = ANY($salesreasonids)""".query[SalesreasonRow].stream
   }
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
     sql"""update sales.salesreason
-          set "name" = ${row.name}::public.Name,
-              reasontype = ${row.reasontype}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
+              reasontype = ${row.reasontype}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where salesreasonid = $salesreasonid
        """
@@ -98,13 +98,13 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case SalesreasonFieldValue.name(value) => fr"name = $value"
+            case SalesreasonFieldValue.name(value) => fr""""name" = $value"""
             case SalesreasonFieldValue.reasontype(value) => fr"reasontype = $value"
             case SalesreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update sales.salesreason
-              set $updates
+              $updates
               where salesreasonid = $salesreasonid
            """.update.run.map(_ > 0)
     }
@@ -113,8 +113,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (
             ${unsaved.salesreasonid}::int4,
-            ${unsaved.name}::public.Name,
-            ${unsaved.reasontype}::public.Name,
+            ${unsaved.name}::"public"."Name",
+            ${unsaved.reasontype}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (salesreasonid)

@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".update.run.map(_ > 0)
+    sql"delete from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
@@ -35,19 +35,19 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"averageleadtime"), fr"averageleadtime = ${unsaved.averageleadtime}::int4")),
-      Some((Fragment.const(s"standardprice"), fr"standardprice = ${unsaved.standardprice}::numeric")),
-      Some((Fragment.const(s"lastreceiptcost"), fr"lastreceiptcost = ${unsaved.lastreceiptcost}::numeric")),
-      Some((Fragment.const(s"lastreceiptdate"), fr"lastreceiptdate = ${unsaved.lastreceiptdate}::timestamp")),
-      Some((Fragment.const(s"minorderqty"), fr"minorderqty = ${unsaved.minorderqty}::int4")),
-      Some((Fragment.const(s"maxorderqty"), fr"maxorderqty = ${unsaved.maxorderqty}::int4")),
-      Some((Fragment.const(s"onorderqty"), fr"onorderqty = ${unsaved.onorderqty}::int4")),
-      Some((Fragment.const(s"unitmeasurecode"), fr"unitmeasurecode = ${unsaved.unitmeasurecode}::bpchar")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s"averageleadtime"), fr"${unsaved.averageleadtime}::int4")),
+      Some((Fragment.const(s"standardprice"), fr"${unsaved.standardprice}::numeric")),
+      Some((Fragment.const(s"lastreceiptcost"), fr"${unsaved.lastreceiptcost}::numeric")),
+      Some((Fragment.const(s"lastreceiptdate"), fr"${unsaved.lastreceiptdate}::timestamp")),
+      Some((Fragment.const(s"minorderqty"), fr"${unsaved.minorderqty}::int4")),
+      Some((Fragment.const(s"maxorderqty"), fr"${unsaved.maxorderqty}::int4")),
+      Some((Fragment.const(s"onorderqty"), fr"${unsaved.onorderqty}::int4")),
+      Some((Fragment.const(s"unitmeasurecode"), fr"${unsaved.unitmeasurecode}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -58,7 +58,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.productvendor(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
          """
     }
@@ -88,7 +88,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   
   }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
-    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}".query[ProductvendorRow].option
+    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".query[ProductvendorRow].option
   }
   override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -102,7 +102,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
               onorderqty = ${row.onorderqty}::int4,
               unitmeasurecode = ${row.unitmeasurecode}::bpchar,
               modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+          where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
        """
       .update
       .run
@@ -126,8 +126,8 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           } :_*
         )
         sql"""update purchasing.productvendor
-              set $updates
-              where productid = ${compositeId.productid}, businessentityid = ${compositeId.businessentityid}
+              $updates
+              where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
            """.update.run.map(_ > 0)
     }
   }

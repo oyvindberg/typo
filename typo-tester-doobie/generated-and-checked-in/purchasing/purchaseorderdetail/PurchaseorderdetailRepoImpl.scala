@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".update.run.map(_ > 0)
+    sql"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
@@ -34,20 +34,20 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow] = {
     val fs = List(
-      Some((Fragment.const(s"purchaseorderid"), fr"purchaseorderid = ${unsaved.purchaseorderid}::int4")),
-      Some((Fragment.const(s"duedate"), fr"duedate = ${unsaved.duedate}::timestamp")),
-      Some((Fragment.const(s"orderqty"), fr"orderqty = ${unsaved.orderqty}::int2")),
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
-      Some((Fragment.const(s"unitprice"), fr"unitprice = ${unsaved.unitprice}::numeric")),
-      Some((Fragment.const(s"receivedqty"), fr"receivedqty = ${unsaved.receivedqty}::numeric")),
-      Some((Fragment.const(s"rejectedqty"), fr"rejectedqty = ${unsaved.rejectedqty}::numeric")),
+      Some((Fragment.const(s"purchaseorderid"), fr"${unsaved.purchaseorderid}::int4")),
+      Some((Fragment.const(s"duedate"), fr"${unsaved.duedate}::timestamp")),
+      Some((Fragment.const(s"orderqty"), fr"${unsaved.orderqty}::int2")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"unitprice"), fr"${unsaved.unitprice}::numeric")),
+      Some((Fragment.const(s"receivedqty"), fr"${unsaved.receivedqty}::numeric")),
+      Some((Fragment.const(s"rejectedqty"), fr"${unsaved.rejectedqty}::numeric")),
       unsaved.purchaseorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderdetailid"), fr"purchaseorderdetailid = ${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderdetailid"), fr"${value: Int}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -58,7 +58,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.purchaseorderdetail(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
          """
     }
@@ -86,7 +86,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   
   }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
-    sql"select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query[PurchaseorderdetailRow].option
+    sql"select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query[PurchaseorderdetailRow].option
   }
   override def update(row: PurchaseorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -98,7 +98,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
               receivedqty = ${row.receivedqty}::numeric,
               rejectedqty = ${row.rejectedqty}::numeric,
               modifieddate = ${row.modifieddate}::timestamp
-          where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+          where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
        """
       .update
       .run
@@ -120,8 +120,8 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           } :_*
         )
         sql"""update purchasing.purchaseorderdetail
-              set $updates
-              where purchaseorderid = ${compositeId.purchaseorderid}, purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+              $updates
+              where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
            """.update.run.map(_ > 0)
     }
   }

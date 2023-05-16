@@ -23,7 +23,7 @@ import java.util.UUID
 
 object CViewRepoImpl extends CViewRepo {
   override def selectAll: Stream[ConnectionIO, CViewRow] = {
-    sql"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate from sa.c""".query[CViewRow].stream
+    sql"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate from sa."c"""".query[CViewRow].stream
   }
   override def selectByFieldValues(fieldValues: List[CViewFieldOrIdValue[_]]): Stream[ConnectionIO, CViewRow] = {
     val where = fragments.whereAnd(
@@ -37,7 +37,7 @@ object CViewRepoImpl extends CViewRepo {
         case CViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
       } :_*
     )
-    sql"select * from sa.c $where".query[CViewRow].stream
+    sql"""select * from sa."c" $where""".query[CViewRow].stream
   
   }
   implicit val read: Read[CViewRow] =

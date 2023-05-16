@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Boolean] = {
-    sql"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".update.run.map(_ > 0)
+    sql"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
@@ -35,12 +35,12 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
-      Some((Fragment.const(s"productmodelid"), fr"productmodelid = ${unsaved.productmodelid}::int4")),
-      Some((Fragment.const(s"productdescriptionid"), fr"productdescriptionid = ${unsaved.productdescriptionid}::int4")),
-      Some((Fragment.const(s"cultureid"), fr"cultureid = ${unsaved.cultureid}::bpchar")),
+      Some((Fragment.const(s"productmodelid"), fr"${unsaved.productmodelid}::int4")),
+      Some((Fragment.const(s"productdescriptionid"), fr"${unsaved.productdescriptionid}::int4")),
+      Some((Fragment.const(s"cultureid"), fr"${unsaved.cultureid}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productmodelproductdescriptionculture(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productmodelid, productdescriptionid, cultureid, modifieddate
          """
     }
@@ -74,13 +74,13 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}".query[ProductmodelproductdescriptioncultureRow].option
+    sql"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".query[ProductmodelproductdescriptioncultureRow].option
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelproductdescriptionculture
           set modifieddate = ${row.modifieddate}::timestamp
-          where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+          where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
        """
       .update
       .run
@@ -96,8 +96,8 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           } :_*
         )
         sql"""update production.productmodelproductdescriptionculture
-              set $updates
-              where productmodelid = ${compositeId.productmodelid}, productdescriptionid = ${compositeId.productdescriptionid}, cultureid = ${compositeId.cultureid}
+              $updates
+              where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
            """.update.run.map(_ > 0)
     }
   }

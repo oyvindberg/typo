@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
-    sql"delete from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".update.run.map(_ > 0)
+    sql"delete from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
@@ -34,14 +34,14 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"productid = ${unsaved.productid}::int4")),
+      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"documentnode = ${value: DocumentId}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"${value: DocumentId}"))
       }
     ).flatten
     
@@ -52,7 +52,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productdocument(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productid, modifieddate, documentnode
          """
     }
@@ -74,13 +74,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
-    sql"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
+    sql"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
   }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument
           set modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+          where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
        """
       .update
       .run
@@ -96,8 +96,8 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           } :_*
         )
         sql"""update production.productdocument
-              set $updates
-              where productid = ${compositeId.productid}, documentnode = ${compositeId.documentnode}
+              $updates
+              where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
            """.update.run.map(_ > 0)
     }
   }

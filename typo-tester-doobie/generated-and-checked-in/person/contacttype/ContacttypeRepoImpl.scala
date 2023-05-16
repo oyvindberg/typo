@@ -27,20 +27,20 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
-          values (${unsaved.contacttypeid}::int4, ${unsaved.name}::public.Name, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning contacttypeid, "name", modifieddate
        """.query.unique
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.contacttypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"contacttypeid"), fr"contacttypeid = ${value: ContacttypeId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"contacttypeid"), fr"${value: ContacttypeId}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -51,7 +51,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.contacttype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning contacttypeid, "name", modifieddate
          """
     }
@@ -76,12 +76,12 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid = $contacttypeid""".query[ContacttypeRow].option
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid in $contacttypeids""".query[ContacttypeRow].stream
+    sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)""".query[ContacttypeRow].stream
   }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
     sql"""update person.contacttype
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
           where contacttypeid = $contacttypeid
        """
@@ -95,12 +95,12 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case ContacttypeFieldValue.name(value) => fr"name = $value"
+            case ContacttypeFieldValue.name(value) => fr""""name" = $value"""
             case ContacttypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update person.contacttype
-              set $updates
+              $updates
               where contacttypeid = $contacttypeid
            """.update.run.map(_ > 0)
     }
@@ -109,7 +109,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (
             ${unsaved.contacttypeid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.modifieddate}::timestamp
           )
           on conflict (contacttypeid)

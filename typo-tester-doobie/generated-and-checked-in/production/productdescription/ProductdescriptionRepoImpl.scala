@@ -33,18 +33,18 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow] = {
     val fs = List(
-      Some((Fragment.const(s"description"), fr"description = ${unsaved.description}")),
+      Some((Fragment.const(s"description"), fr"${unsaved.description}")),
       unsaved.productdescriptionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productdescriptionid"), fr"productdescriptionid = ${value: ProductdescriptionId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productdescriptionid"), fr"${value: ProductdescriptionId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -55,7 +55,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productdescription(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning productdescriptionid, description, rowguid, modifieddate
          """
     }
@@ -81,7 +81,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid".query[ProductdescriptionRow].option
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
-    sql"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid in $productdescriptionids".query[ProductdescriptionRow].stream
+    sql"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = ANY($productdescriptionids)".query[ProductdescriptionRow].stream
   }
   override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
     val productdescriptionid = row.productdescriptionid
@@ -107,7 +107,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           } :_*
         )
         sql"""update production.productdescription
-              set $updates
+              $updates
               where productdescriptionid = $productdescriptionid
            """.update.run.map(_ > 0)
     }

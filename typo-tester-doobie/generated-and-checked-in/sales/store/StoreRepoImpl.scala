@@ -30,23 +30,23 @@ object StoreRepoImpl extends StoreRepo {
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.name}::public.Name, ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"businessentityid = ${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
-      Some((Fragment.const(s"salespersonid"), fr"salespersonid = ${unsaved.salespersonid}::int4")),
-      Some((Fragment.const(s"demographics"), fr"demographics = ${unsaved.demographics}::xml")),
+      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"salespersonid"), fr"${unsaved.salespersonid}::int4")),
+      Some((Fragment.const(s"demographics"), fr"${unsaved.demographics}::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -57,7 +57,7 @@ object StoreRepoImpl extends StoreRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.store(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
          """
     }
@@ -85,12 +85,12 @@ object StoreRepoImpl extends StoreRepo {
     sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid""".query[StoreRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid in $businessentityids""".query[StoreRow].stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = ANY($businessentityids)""".query[StoreRow].stream
   }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.store
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               salespersonid = ${row.salespersonid}::int4,
               demographics = ${row.demographics}::xml,
               rowguid = ${row.rowguid}::uuid,
@@ -107,7 +107,7 @@ object StoreRepoImpl extends StoreRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case StoreFieldValue.name(value) => fr"name = $value"
+            case StoreFieldValue.name(value) => fr""""name" = $value"""
             case StoreFieldValue.salespersonid(value) => fr"salespersonid = $value"
             case StoreFieldValue.demographics(value) => fr"demographics = $value"
             case StoreFieldValue.rowguid(value) => fr"rowguid = $value"
@@ -115,7 +115,7 @@ object StoreRepoImpl extends StoreRepo {
           } :_*
         )
         sql"""update sales.store
-              set $updates
+              $updates
               where businessentityid = $businessentityid
            """.update.run.map(_ > 0)
     }
@@ -124,7 +124,7 @@ object StoreRepoImpl extends StoreRepo {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (
             ${unsaved.businessentityid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.salespersonid}::int4,
             ${unsaved.demographics}::xml,
             ${unsaved.rowguid}::uuid,

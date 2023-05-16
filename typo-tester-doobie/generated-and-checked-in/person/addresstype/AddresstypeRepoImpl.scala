@@ -28,24 +28,24 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
-          values (${unsaved.addresstypeid}::int4, ${unsaved.name}::public.Name, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate
        """.query.unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr""""name" = ${unsaved.name}::public.Name""")),
+      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.addresstypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"addresstypeid"), fr"addresstypeid = ${value: AddresstypeId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"addresstypeid"), fr"${value: AddresstypeId}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"rowguid = ${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"modifieddate = ${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
       }
     ).flatten
     
@@ -56,7 +56,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.addresstype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            set ${fs.map { case (_, f) => f }.intercalate(fr", ")}
+            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
             returning addresstypeid, "name", rowguid, modifieddate
          """
     }
@@ -82,12 +82,12 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".query[AddresstypeRow].option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid in $addresstypeids""".query[AddresstypeRow].stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid = ANY($addresstypeids)""".query[AddresstypeRow].stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
     sql"""update person.addresstype
-          set "name" = ${row.name}::public.Name,
+          set "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
           where addresstypeid = $addresstypeid
@@ -102,13 +102,13 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       case nonEmpty =>
         val updates = fragments.set(
           nonEmpty.map {
-            case AddresstypeFieldValue.name(value) => fr"name = $value"
+            case AddresstypeFieldValue.name(value) => fr""""name" = $value"""
             case AddresstypeFieldValue.rowguid(value) => fr"rowguid = $value"
             case AddresstypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
           } :_*
         )
         sql"""update person.addresstype
-              set $updates
+              $updates
               where addresstypeid = $addresstypeid
            """.update.run.map(_ > 0)
     }
@@ -117,7 +117,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (
             ${unsaved.addresstypeid}::int4,
-            ${unsaved.name}::public.Name,
+            ${unsaved.name}::"public"."Name",
             ${unsaved.rowguid}::uuid,
             ${unsaved.modifieddate}::timestamp
           )
