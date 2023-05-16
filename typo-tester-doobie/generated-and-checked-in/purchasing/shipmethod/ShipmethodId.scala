@@ -7,21 +7,13 @@ package adventureworks
 package purchasing
 package shipmethod
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `purchasing.shipmethod` */
 case class ShipmethodId(value: Int) extends AnyVal
 object ShipmethodId {
   implicit val ordering: Ordering[ShipmethodId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[ShipmethodId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[ShipmethodId]] = Meta[Array[Int]].get.map(_.map(ShipmethodId.apply))
-  implicit val put: Put[ShipmethodId] = Put[Int].contramap(_.value)
-  implicit val get: Get[ShipmethodId] = Get[Int].map(ShipmethodId.apply)
-  implicit val write: Write[ShipmethodId] = Write[Int].contramap(_.value)
-  implicit val read: Read[ShipmethodId] = Read[Int].map(ShipmethodId.apply)
+  implicit val metaArray: Meta[Array[ShipmethodId]] = Meta[Array[Int]].imap(_.map(ShipmethodId.apply))(_.map(_.value))
+  implicit val meta: Meta[ShipmethodId] = Meta[Int].imap(ShipmethodId.apply)(_.value)
 }

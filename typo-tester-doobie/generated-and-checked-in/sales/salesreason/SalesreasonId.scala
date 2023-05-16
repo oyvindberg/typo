@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package salesreason
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.salesreason` */
 case class SalesreasonId(value: Int) extends AnyVal
 object SalesreasonId {
   implicit val ordering: Ordering[SalesreasonId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[SalesreasonId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[SalesreasonId]] = Meta[Array[Int]].get.map(_.map(SalesreasonId.apply))
-  implicit val put: Put[SalesreasonId] = Put[Int].contramap(_.value)
-  implicit val get: Get[SalesreasonId] = Get[Int].map(SalesreasonId.apply)
-  implicit val write: Write[SalesreasonId] = Write[Int].contramap(_.value)
-  implicit val read: Read[SalesreasonId] = Read[Int].map(SalesreasonId.apply)
+  implicit val metaArray: Meta[Array[SalesreasonId]] = Meta[Array[Int]].imap(_.map(SalesreasonId.apply))(_.map(_.value))
+  implicit val meta: Meta[SalesreasonId] = Meta[Int].imap(SalesreasonId.apply)(_.value)
 }

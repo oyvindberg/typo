@@ -7,21 +7,13 @@ package adventureworks
 package production
 package workorder
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.workorder` */
 case class WorkorderId(value: Int) extends AnyVal
 object WorkorderId {
   implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[WorkorderId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[WorkorderId]] = Meta[Array[Int]].get.map(_.map(WorkorderId.apply))
-  implicit val put: Put[WorkorderId] = Put[Int].contramap(_.value)
-  implicit val get: Get[WorkorderId] = Get[Int].map(WorkorderId.apply)
-  implicit val write: Write[WorkorderId] = Write[Int].contramap(_.value)
-  implicit val read: Read[WorkorderId] = Read[Int].map(WorkorderId.apply)
+  implicit val metaArray: Meta[Array[WorkorderId]] = Meta[Array[Int]].imap(_.map(WorkorderId.apply))(_.map(_.value))
+  implicit val meta: Meta[WorkorderId] = Meta[Int].imap(WorkorderId.apply)(_.value)
 }

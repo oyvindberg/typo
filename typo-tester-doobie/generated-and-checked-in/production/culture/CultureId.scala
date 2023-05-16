@@ -7,21 +7,13 @@ package adventureworks
 package production
 package culture
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.culture` */
 case class CultureId(value: /* bpchar */ String) extends AnyVal
 object CultureId {
   implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[CultureId]] = Meta[Array[/* bpchar */ String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[CultureId]] = Meta[Array[/* bpchar */ String]].get.map(_.map(CultureId.apply))
-  implicit val put: Put[CultureId] = Put[/* bpchar */ String].contramap(_.value)
-  implicit val get: Get[CultureId] = Get[/* bpchar */ String].map(CultureId.apply)
-  implicit val write: Write[CultureId] = Write[/* bpchar */ String].contramap(_.value)
-  implicit val read: Read[CultureId] = Read[/* bpchar */ String].map(CultureId.apply)
+  implicit val metaArray: Meta[Array[CultureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(CultureId.apply))(_.map(_.value))
+  implicit val meta: Meta[CultureId] = Meta[/* bpchar */ String].imap(CultureId.apply)(_.value)
 }

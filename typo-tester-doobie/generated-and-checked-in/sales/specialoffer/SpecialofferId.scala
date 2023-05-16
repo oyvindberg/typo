@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package specialoffer
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.specialoffer` */
 case class SpecialofferId(value: Int) extends AnyVal
 object SpecialofferId {
   implicit val ordering: Ordering[SpecialofferId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[SpecialofferId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[SpecialofferId]] = Meta[Array[Int]].get.map(_.map(SpecialofferId.apply))
-  implicit val put: Put[SpecialofferId] = Put[Int].contramap(_.value)
-  implicit val get: Get[SpecialofferId] = Get[Int].map(SpecialofferId.apply)
-  implicit val write: Write[SpecialofferId] = Write[Int].contramap(_.value)
-  implicit val read: Read[SpecialofferId] = Read[Int].map(SpecialofferId.apply)
+  implicit val metaArray: Meta[Array[SpecialofferId]] = Meta[Array[Int]].imap(_.map(SpecialofferId.apply))(_.map(_.value))
+  implicit val meta: Meta[SpecialofferId] = Meta[Int].imap(SpecialofferId.apply)(_.value)
 }

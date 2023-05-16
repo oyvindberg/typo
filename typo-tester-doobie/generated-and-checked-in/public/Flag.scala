@@ -6,11 +6,7 @@
 package adventureworks
 package public
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Domain `public.Flag`
   * No constraint
@@ -19,10 +15,6 @@ case class Flag(value: Boolean) extends AnyVal
 object Flag {
   implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[Flag] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[Flag]] = Meta[Array[Boolean]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[Flag]] = Meta[Array[Boolean]].get.map(_.map(Flag.apply))
-  implicit val put: Put[Flag] = Put[Boolean].contramap(_.value)
-  implicit val get: Get[Flag] = Get[Boolean].map(Flag.apply)
-  implicit val write: Write[Flag] = Write[Boolean].contramap(_.value)
-  implicit val read: Read[Flag] = Read[Boolean].map(Flag.apply)
+  implicit val metaArray: Meta[Array[Flag]] = Meta[Array[Boolean]].imap(_.map(Flag.apply))(_.map(_.value))
+  implicit val meta: Meta[Flag] = Meta[Boolean].imap(Flag.apply)(_.value)
 }

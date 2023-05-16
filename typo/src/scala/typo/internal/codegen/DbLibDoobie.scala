@@ -52,20 +52,12 @@ object DbLibDoobie extends DbLib {
       case _                  => None
     }
 
-    val arrayInstances = maybeArrayMeta match {
-      case Some(arrayMeta) =>
-        List(
-          code"implicit val putArray: ${Put.of(sc.Type.Array.of(wrapperType))} = $arrayMeta.put.contramap(_.map(_.value))",
-          code"implicit val getArray: ${Get.of(sc.Type.Array.of(wrapperType))} = $arrayMeta.get.map(_.map(${wrapperType}.apply))"
-        )
-      case None => Nil
+    val arrayInstances = maybeArrayMeta.map { arrayMeta =>
+      code"implicit val metaArray: ${Meta.of(sc.Type.Array.of(wrapperType))} = $arrayMeta.imap(_.map($wrapperType.apply))(_.map(_.value))"
     }
 
-    arrayInstances ++ List(
-      code"""implicit val put: ${Put.of(wrapperType)} = ${Put.of(underlying)}.contramap(_.value)""",
-      code"""implicit val get: ${Get.of(wrapperType)} = ${Get.of(underlying)}.map($wrapperType.apply)""",
-      code"""implicit val write: ${Write.of(wrapperType)} = ${Write.of(underlying)}.contramap(_.value)""",
-      code"""implicit val read: ${Read.of(wrapperType)} = ${Read.of(underlying)}.map($wrapperType.apply)"""
+    arrayInstances.toList ++ List(
+      code"""implicit val meta: ${Meta.of(wrapperType)} = ${Meta.of(underlying)}.imap($wrapperType.apply)(_.value)"""
     )
   }
 

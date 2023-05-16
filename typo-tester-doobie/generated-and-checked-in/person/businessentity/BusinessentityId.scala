@@ -7,21 +7,13 @@ package adventureworks
 package person
 package businessentity
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.businessentity` */
 case class BusinessentityId(value: Int) extends AnyVal
 object BusinessentityId {
   implicit val ordering: Ordering[BusinessentityId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[BusinessentityId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[BusinessentityId]] = Meta[Array[Int]].get.map(_.map(BusinessentityId.apply))
-  implicit val put: Put[BusinessentityId] = Put[Int].contramap(_.value)
-  implicit val get: Get[BusinessentityId] = Get[Int].map(BusinessentityId.apply)
-  implicit val write: Write[BusinessentityId] = Write[Int].contramap(_.value)
-  implicit val read: Read[BusinessentityId] = Read[Int].map(BusinessentityId.apply)
+  implicit val metaArray: Meta[Array[BusinessentityId]] = Meta[Array[Int]].imap(_.map(BusinessentityId.apply))(_.map(_.value))
+  implicit val meta: Meta[BusinessentityId] = Meta[Int].imap(BusinessentityId.apply)(_.value)
 }

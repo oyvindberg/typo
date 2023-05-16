@@ -7,21 +7,13 @@ package adventureworks
 package production
 package productsubcategory
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.productsubcategory` */
 case class ProductsubcategoryId(value: Int) extends AnyVal
 object ProductsubcategoryId {
   implicit val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[ProductsubcategoryId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[ProductsubcategoryId]] = Meta[Array[Int]].get.map(_.map(ProductsubcategoryId.apply))
-  implicit val put: Put[ProductsubcategoryId] = Put[Int].contramap(_.value)
-  implicit val get: Get[ProductsubcategoryId] = Get[Int].map(ProductsubcategoryId.apply)
-  implicit val write: Write[ProductsubcategoryId] = Write[Int].contramap(_.value)
-  implicit val read: Read[ProductsubcategoryId] = Read[Int].map(ProductsubcategoryId.apply)
+  implicit val metaArray: Meta[Array[ProductsubcategoryId]] = Meta[Array[Int]].imap(_.map(ProductsubcategoryId.apply))(_.map(_.value))
+  implicit val meta: Meta[ProductsubcategoryId] = Meta[Int].imap(ProductsubcategoryId.apply)(_.value)
 }

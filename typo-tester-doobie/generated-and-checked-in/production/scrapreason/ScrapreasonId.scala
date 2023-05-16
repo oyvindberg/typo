@@ -7,21 +7,13 @@ package adventureworks
 package production
 package scrapreason
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.scrapreason` */
 case class ScrapreasonId(value: Int) extends AnyVal
 object ScrapreasonId {
   implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[ScrapreasonId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[ScrapreasonId]] = Meta[Array[Int]].get.map(_.map(ScrapreasonId.apply))
-  implicit val put: Put[ScrapreasonId] = Put[Int].contramap(_.value)
-  implicit val get: Get[ScrapreasonId] = Get[Int].map(ScrapreasonId.apply)
-  implicit val write: Write[ScrapreasonId] = Write[Int].contramap(_.value)
-  implicit val read: Read[ScrapreasonId] = Read[Int].map(ScrapreasonId.apply)
+  implicit val metaArray: Meta[Array[ScrapreasonId]] = Meta[Array[Int]].imap(_.map(ScrapreasonId.apply))(_.map(_.value))
+  implicit val meta: Meta[ScrapreasonId] = Meta[Int].imap(ScrapreasonId.apply)(_.value)
 }

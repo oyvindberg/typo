@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package creditcard
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
   implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[CreditcardId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[CreditcardId]] = Meta[Array[Int]].get.map(_.map(CreditcardId.apply))
-  implicit val put: Put[CreditcardId] = Put[Int].contramap(_.value)
-  implicit val get: Get[CreditcardId] = Get[Int].map(CreditcardId.apply)
-  implicit val write: Write[CreditcardId] = Write[Int].contramap(_.value)
-  implicit val read: Read[CreditcardId] = Read[Int].map(CreditcardId.apply)
+  implicit val metaArray: Meta[Array[CreditcardId]] = Meta[Array[Int]].imap(_.map(CreditcardId.apply))(_.map(_.value))
+  implicit val meta: Meta[CreditcardId] = Meta[Int].imap(CreditcardId.apply)(_.value)
 }

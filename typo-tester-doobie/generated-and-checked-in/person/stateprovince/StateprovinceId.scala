@@ -7,21 +7,13 @@ package adventureworks
 package person
 package stateprovince
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.stateprovince` */
 case class StateprovinceId(value: Int) extends AnyVal
 object StateprovinceId {
   implicit val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[StateprovinceId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[StateprovinceId]] = Meta[Array[Int]].get.map(_.map(StateprovinceId.apply))
-  implicit val put: Put[StateprovinceId] = Put[Int].contramap(_.value)
-  implicit val get: Get[StateprovinceId] = Get[Int].map(StateprovinceId.apply)
-  implicit val write: Write[StateprovinceId] = Write[Int].contramap(_.value)
-  implicit val read: Read[StateprovinceId] = Read[Int].map(StateprovinceId.apply)
+  implicit val metaArray: Meta[Array[StateprovinceId]] = Meta[Array[Int]].imap(_.map(StateprovinceId.apply))(_.map(_.value))
+  implicit val meta: Meta[StateprovinceId] = Meta[Int].imap(StateprovinceId.apply)(_.value)
 }

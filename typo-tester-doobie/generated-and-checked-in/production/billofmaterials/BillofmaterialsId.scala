@@ -7,21 +7,13 @@ package adventureworks
 package production
 package billofmaterials
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.billofmaterials` */
 case class BillofmaterialsId(value: Int) extends AnyVal
 object BillofmaterialsId {
   implicit val ordering: Ordering[BillofmaterialsId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[BillofmaterialsId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[BillofmaterialsId]] = Meta[Array[Int]].get.map(_.map(BillofmaterialsId.apply))
-  implicit val put: Put[BillofmaterialsId] = Put[Int].contramap(_.value)
-  implicit val get: Get[BillofmaterialsId] = Get[Int].map(BillofmaterialsId.apply)
-  implicit val write: Write[BillofmaterialsId] = Write[Int].contramap(_.value)
-  implicit val read: Read[BillofmaterialsId] = Read[Int].map(BillofmaterialsId.apply)
+  implicit val metaArray: Meta[Array[BillofmaterialsId]] = Meta[Array[Int]].imap(_.map(BillofmaterialsId.apply))(_.map(_.value))
+  implicit val meta: Meta[BillofmaterialsId] = Meta[Int].imap(BillofmaterialsId.apply)(_.value)
 }

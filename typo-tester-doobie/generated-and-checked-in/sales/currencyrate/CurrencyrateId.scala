@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package currencyrate
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.currencyrate` */
 case class CurrencyrateId(value: Int) extends AnyVal
 object CurrencyrateId {
   implicit val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[CurrencyrateId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[CurrencyrateId]] = Meta[Array[Int]].get.map(_.map(CurrencyrateId.apply))
-  implicit val put: Put[CurrencyrateId] = Put[Int].contramap(_.value)
-  implicit val get: Get[CurrencyrateId] = Get[Int].map(CurrencyrateId.apply)
-  implicit val write: Write[CurrencyrateId] = Write[Int].contramap(_.value)
-  implicit val read: Read[CurrencyrateId] = Read[Int].map(CurrencyrateId.apply)
+  implicit val metaArray: Meta[Array[CurrencyrateId]] = Meta[Array[Int]].imap(_.map(CurrencyrateId.apply))(_.map(_.value))
+  implicit val meta: Meta[CurrencyrateId] = Meta[Int].imap(CurrencyrateId.apply)(_.value)
 }

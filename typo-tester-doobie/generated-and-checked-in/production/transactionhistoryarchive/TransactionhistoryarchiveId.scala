@@ -7,21 +7,13 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
   implicit val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].get.map(_.map(TransactionhistoryarchiveId.apply))
-  implicit val put: Put[TransactionhistoryarchiveId] = Put[Int].contramap(_.value)
-  implicit val get: Get[TransactionhistoryarchiveId] = Get[Int].map(TransactionhistoryarchiveId.apply)
-  implicit val write: Write[TransactionhistoryarchiveId] = Write[Int].contramap(_.value)
-  implicit val read: Read[TransactionhistoryarchiveId] = Read[Int].map(TransactionhistoryarchiveId.apply)
+  implicit val metaArray: Meta[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].imap(_.map(TransactionhistoryarchiveId.apply))(_.map(_.value))
+  implicit val meta: Meta[TransactionhistoryarchiveId] = Meta[Int].imap(TransactionhistoryarchiveId.apply)(_.value)
 }

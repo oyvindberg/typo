@@ -7,21 +7,13 @@ package adventureworks
 package person
 package phonenumbertype
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.phonenumbertype` */
 case class PhonenumbertypeId(value: Int) extends AnyVal
 object PhonenumbertypeId {
   implicit val ordering: Ordering[PhonenumbertypeId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[PhonenumbertypeId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[PhonenumbertypeId]] = Meta[Array[Int]].get.map(_.map(PhonenumbertypeId.apply))
-  implicit val put: Put[PhonenumbertypeId] = Put[Int].contramap(_.value)
-  implicit val get: Get[PhonenumbertypeId] = Get[Int].map(PhonenumbertypeId.apply)
-  implicit val write: Write[PhonenumbertypeId] = Write[Int].contramap(_.value)
-  implicit val read: Read[PhonenumbertypeId] = Read[Int].map(PhonenumbertypeId.apply)
+  implicit val metaArray: Meta[Array[PhonenumbertypeId]] = Meta[Array[Int]].imap(_.map(PhonenumbertypeId.apply))(_.map(_.value))
+  implicit val meta: Meta[PhonenumbertypeId] = Meta[Int].imap(PhonenumbertypeId.apply)(_.value)
 }

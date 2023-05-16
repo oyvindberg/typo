@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package salesorderheader
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.salesorderheader` */
 case class SalesorderheaderId(value: Int) extends AnyVal
 object SalesorderheaderId {
   implicit val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[SalesorderheaderId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[SalesorderheaderId]] = Meta[Array[Int]].get.map(_.map(SalesorderheaderId.apply))
-  implicit val put: Put[SalesorderheaderId] = Put[Int].contramap(_.value)
-  implicit val get: Get[SalesorderheaderId] = Get[Int].map(SalesorderheaderId.apply)
-  implicit val write: Write[SalesorderheaderId] = Write[Int].contramap(_.value)
-  implicit val read: Read[SalesorderheaderId] = Read[Int].map(SalesorderheaderId.apply)
+  implicit val metaArray: Meta[Array[SalesorderheaderId]] = Meta[Array[Int]].imap(_.map(SalesorderheaderId.apply))(_.map(_.value))
+  implicit val meta: Meta[SalesorderheaderId] = Meta[Int].imap(SalesorderheaderId.apply)(_.value)
 }

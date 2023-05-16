@@ -8,21 +8,13 @@ package hardcoded
 package myschema
 package football_club
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `myschema.football_club` */
 case class FootballClubId(value: Long) extends AnyVal
 object FootballClubId {
   implicit val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[FootballClubId]] = Meta[Array[Long]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[FootballClubId]] = Meta[Array[Long]].get.map(_.map(FootballClubId.apply))
-  implicit val put: Put[FootballClubId] = Put[Long].contramap(_.value)
-  implicit val get: Get[FootballClubId] = Get[Long].map(FootballClubId.apply)
-  implicit val write: Write[FootballClubId] = Write[Long].contramap(_.value)
-  implicit val read: Read[FootballClubId] = Read[Long].map(FootballClubId.apply)
+  implicit val metaArray: Meta[Array[FootballClubId]] = Meta[Array[Long]].imap(_.map(FootballClubId.apply))(_.map(_.value))
+  implicit val meta: Meta[FootballClubId] = Meta[Long].imap(FootballClubId.apply)(_.value)
 }

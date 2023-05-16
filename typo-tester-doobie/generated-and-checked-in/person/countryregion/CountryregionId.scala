@@ -7,21 +7,13 @@ package adventureworks
 package person
 package countryregion
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.countryregion` */
 case class CountryregionId(value: String) extends AnyVal
 object CountryregionId {
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[CountryregionId]] = Meta[Array[String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[CountryregionId]] = Meta[Array[String]].get.map(_.map(CountryregionId.apply))
-  implicit val put: Put[CountryregionId] = Put[String].contramap(_.value)
-  implicit val get: Get[CountryregionId] = Get[String].map(CountryregionId.apply)
-  implicit val write: Write[CountryregionId] = Write[String].contramap(_.value)
-  implicit val read: Read[CountryregionId] = Read[String].map(CountryregionId.apply)
+  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
+  implicit val meta: Meta[CountryregionId] = Meta[String].imap(CountryregionId.apply)(_.value)
 }

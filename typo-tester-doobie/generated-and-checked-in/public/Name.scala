@@ -6,11 +6,7 @@
 package adventureworks
 package public
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Domain `public.Name`
   * No constraint
@@ -19,10 +15,6 @@ case class Name(value: String) extends AnyVal
 object Name {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[Name] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[Name]] = Meta[Array[String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[Name]] = Meta[Array[String]].get.map(_.map(Name.apply))
-  implicit val put: Put[Name] = Put[String].contramap(_.value)
-  implicit val get: Get[Name] = Get[String].map(Name.apply)
-  implicit val write: Write[Name] = Write[String].contramap(_.value)
-  implicit val read: Read[Name] = Read[String].map(Name.apply)
+  implicit val metaArray: Meta[Array[Name]] = Meta[Array[String]].imap(_.map(Name.apply))(_.map(_.value))
+  implicit val meta: Meta[Name] = Meta[String].imap(Name.apply)(_.value)
 }

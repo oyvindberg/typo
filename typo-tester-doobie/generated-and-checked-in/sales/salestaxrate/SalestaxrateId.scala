@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package salestaxrate
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.salestaxrate` */
 case class SalestaxrateId(value: Int) extends AnyVal
 object SalestaxrateId {
   implicit val ordering: Ordering[SalestaxrateId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[SalestaxrateId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[SalestaxrateId]] = Meta[Array[Int]].get.map(_.map(SalestaxrateId.apply))
-  implicit val put: Put[SalestaxrateId] = Put[Int].contramap(_.value)
-  implicit val get: Get[SalestaxrateId] = Get[Int].map(SalestaxrateId.apply)
-  implicit val write: Write[SalestaxrateId] = Write[Int].contramap(_.value)
-  implicit val read: Read[SalestaxrateId] = Read[Int].map(SalestaxrateId.apply)
+  implicit val metaArray: Meta[Array[SalestaxrateId]] = Meta[Array[Int]].imap(_.map(SalestaxrateId.apply))(_.map(_.value))
+  implicit val meta: Meta[SalestaxrateId] = Meta[Int].imap(SalestaxrateId.apply)(_.value)
 }

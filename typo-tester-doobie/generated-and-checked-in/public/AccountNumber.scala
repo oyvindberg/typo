@@ -6,11 +6,7 @@
 package adventureworks
 package public
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Domain `public.AccountNumber`
   * No constraint
@@ -19,10 +15,6 @@ case class AccountNumber(value: String) extends AnyVal
 object AccountNumber {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[AccountNumber] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[AccountNumber]] = Meta[Array[String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[AccountNumber]] = Meta[Array[String]].get.map(_.map(AccountNumber.apply))
-  implicit val put: Put[AccountNumber] = Put[String].contramap(_.value)
-  implicit val get: Get[AccountNumber] = Get[String].map(AccountNumber.apply)
-  implicit val write: Write[AccountNumber] = Write[String].contramap(_.value)
-  implicit val read: Read[AccountNumber] = Read[String].map(AccountNumber.apply)
+  implicit val metaArray: Meta[Array[AccountNumber]] = Meta[Array[String]].imap(_.map(AccountNumber.apply))(_.map(_.value))
+  implicit val meta: Meta[AccountNumber] = Meta[String].imap(AccountNumber.apply)(_.value)
 }

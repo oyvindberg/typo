@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package shoppingcartitem
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.shoppingcartitem` */
 case class ShoppingcartitemId(value: Int) extends AnyVal
 object ShoppingcartitemId {
   implicit val ordering: Ordering[ShoppingcartitemId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[ShoppingcartitemId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[ShoppingcartitemId]] = Meta[Array[Int]].get.map(_.map(ShoppingcartitemId.apply))
-  implicit val put: Put[ShoppingcartitemId] = Put[Int].contramap(_.value)
-  implicit val get: Get[ShoppingcartitemId] = Get[Int].map(ShoppingcartitemId.apply)
-  implicit val write: Write[ShoppingcartitemId] = Write[Int].contramap(_.value)
-  implicit val read: Read[ShoppingcartitemId] = Read[Int].map(ShoppingcartitemId.apply)
+  implicit val metaArray: Meta[Array[ShoppingcartitemId]] = Meta[Array[Int]].imap(_.map(ShoppingcartitemId.apply))(_.map(_.value))
+  implicit val meta: Meta[ShoppingcartitemId] = Meta[Int].imap(ShoppingcartitemId.apply)(_.value)
 }

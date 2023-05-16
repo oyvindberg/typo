@@ -7,21 +7,13 @@ package adventureworks
 package sales
 package customer
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `sales.customer` */
 case class CustomerId(value: Int) extends AnyVal
 object CustomerId {
   implicit val ordering: Ordering[CustomerId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[CustomerId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[CustomerId]] = Meta[Array[Int]].get.map(_.map(CustomerId.apply))
-  implicit val put: Put[CustomerId] = Put[Int].contramap(_.value)
-  implicit val get: Get[CustomerId] = Get[Int].map(CustomerId.apply)
-  implicit val write: Write[CustomerId] = Write[Int].contramap(_.value)
-  implicit val read: Read[CustomerId] = Read[Int].map(CustomerId.apply)
+  implicit val metaArray: Meta[Array[CustomerId]] = Meta[Array[Int]].imap(_.map(CustomerId.apply))(_.map(_.value))
+  implicit val meta: Meta[CustomerId] = Meta[Int].imap(CustomerId.apply)(_.value)
 }

@@ -7,21 +7,13 @@ package adventureworks
 package person
 package addresstype
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.addresstype` */
 case class AddresstypeId(value: Int) extends AnyVal
 object AddresstypeId {
   implicit val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[AddresstypeId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[AddresstypeId]] = Meta[Array[Int]].get.map(_.map(AddresstypeId.apply))
-  implicit val put: Put[AddresstypeId] = Put[Int].contramap(_.value)
-  implicit val get: Get[AddresstypeId] = Get[Int].map(AddresstypeId.apply)
-  implicit val write: Write[AddresstypeId] = Write[Int].contramap(_.value)
-  implicit val read: Read[AddresstypeId] = Read[Int].map(AddresstypeId.apply)
+  implicit val metaArray: Meta[Array[AddresstypeId]] = Meta[Array[Int]].imap(_.map(AddresstypeId.apply))(_.map(_.value))
+  implicit val meta: Meta[AddresstypeId] = Meta[Int].imap(AddresstypeId.apply)(_.value)
 }

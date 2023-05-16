@@ -7,21 +7,13 @@ package adventureworks
 package production
 package unitmeasure
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[UnitmeasureId]] = Meta[Array[/* bpchar */ String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[UnitmeasureId]] = Meta[Array[/* bpchar */ String]].get.map(_.map(UnitmeasureId.apply))
-  implicit val put: Put[UnitmeasureId] = Put[/* bpchar */ String].contramap(_.value)
-  implicit val get: Get[UnitmeasureId] = Get[/* bpchar */ String].map(UnitmeasureId.apply)
-  implicit val write: Write[UnitmeasureId] = Write[/* bpchar */ String].contramap(_.value)
-  implicit val read: Read[UnitmeasureId] = Read[/* bpchar */ String].map(UnitmeasureId.apply)
+  implicit val metaArray: Meta[Array[UnitmeasureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(UnitmeasureId.apply))(_.map(_.value))
+  implicit val meta: Meta[UnitmeasureId] = Meta[/* bpchar */ String].imap(UnitmeasureId.apply)(_.value)
 }

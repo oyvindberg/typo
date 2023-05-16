@@ -7,21 +7,13 @@ package adventureworks
 package humanresources
 package department
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `humanresources.department` */
 case class DepartmentId(value: Int) extends AnyVal
 object DepartmentId {
   implicit val ordering: Ordering[DepartmentId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[DepartmentId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[DepartmentId]] = Meta[Array[Int]].get.map(_.map(DepartmentId.apply))
-  implicit val put: Put[DepartmentId] = Put[Int].contramap(_.value)
-  implicit val get: Get[DepartmentId] = Get[Int].map(DepartmentId.apply)
-  implicit val write: Write[DepartmentId] = Write[Int].contramap(_.value)
-  implicit val read: Read[DepartmentId] = Read[Int].map(DepartmentId.apply)
+  implicit val metaArray: Meta[Array[DepartmentId]] = Meta[Array[Int]].imap(_.map(DepartmentId.apply))(_.map(_.value))
+  implicit val meta: Meta[DepartmentId] = Meta[Int].imap(DepartmentId.apply)(_.value)
 }

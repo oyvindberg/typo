@@ -7,21 +7,13 @@ package adventureworks
 package production
 package document
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
   implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[DocumentId]] = Meta[Array[String]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[DocumentId]] = Meta[Array[String]].get.map(_.map(DocumentId.apply))
-  implicit val put: Put[DocumentId] = Put[String].contramap(_.value)
-  implicit val get: Get[DocumentId] = Get[String].map(DocumentId.apply)
-  implicit val write: Write[DocumentId] = Write[String].contramap(_.value)
-  implicit val read: Read[DocumentId] = Read[String].map(DocumentId.apply)
+  implicit val metaArray: Meta[Array[DocumentId]] = Meta[Array[String]].imap(_.map(DocumentId.apply))(_.map(_.value))
+  implicit val meta: Meta[DocumentId] = Meta[String].imap(DocumentId.apply)(_.value)
 }

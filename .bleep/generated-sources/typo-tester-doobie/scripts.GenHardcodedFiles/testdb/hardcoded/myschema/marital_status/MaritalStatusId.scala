@@ -8,21 +8,13 @@ package hardcoded
 package myschema
 package marital_status
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `myschema.marital_status` */
 case class MaritalStatusId(value: Long) extends AnyVal
 object MaritalStatusId {
   implicit val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[MaritalStatusId]] = Meta[Array[Long]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[MaritalStatusId]] = Meta[Array[Long]].get.map(_.map(MaritalStatusId.apply))
-  implicit val put: Put[MaritalStatusId] = Put[Long].contramap(_.value)
-  implicit val get: Get[MaritalStatusId] = Get[Long].map(MaritalStatusId.apply)
-  implicit val write: Write[MaritalStatusId] = Write[Long].contramap(_.value)
-  implicit val read: Read[MaritalStatusId] = Read[Long].map(MaritalStatusId.apply)
+  implicit val metaArray: Meta[Array[MaritalStatusId]] = Meta[Array[Long]].imap(_.map(MaritalStatusId.apply))(_.map(_.value))
+  implicit val meta: Meta[MaritalStatusId] = Meta[Long].imap(MaritalStatusId.apply)(_.value)
 }

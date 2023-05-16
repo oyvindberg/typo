@@ -7,21 +7,13 @@ package adventureworks
 package person
 package contacttype
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `person.contacttype` */
 case class ContacttypeId(value: Int) extends AnyVal
 object ContacttypeId {
   implicit val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[ContacttypeId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[ContacttypeId]] = Meta[Array[Int]].get.map(_.map(ContacttypeId.apply))
-  implicit val put: Put[ContacttypeId] = Put[Int].contramap(_.value)
-  implicit val get: Get[ContacttypeId] = Get[Int].map(ContacttypeId.apply)
-  implicit val write: Write[ContacttypeId] = Write[Int].contramap(_.value)
-  implicit val read: Read[ContacttypeId] = Read[Int].map(ContacttypeId.apply)
+  implicit val metaArray: Meta[Array[ContacttypeId]] = Meta[Array[Int]].imap(_.map(ContacttypeId.apply))(_.map(_.value))
+  implicit val meta: Meta[ContacttypeId] = Meta[Int].imap(ContacttypeId.apply)(_.value)
 }

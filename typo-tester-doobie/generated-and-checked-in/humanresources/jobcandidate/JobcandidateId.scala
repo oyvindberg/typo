@@ -7,21 +7,13 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import doobie.Get
 import doobie.Meta
-import doobie.Put
-import doobie.Read
-import doobie.Write
 
 /** Type for the primary key of table `humanresources.jobcandidate` */
 case class JobcandidateId(value: Int) extends AnyVal
 object JobcandidateId {
   implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
   
-  implicit val putArray: Put[Array[JobcandidateId]] = Meta[Array[Int]].put.contramap(_.map(_.value))
-  implicit val getArray: Get[Array[JobcandidateId]] = Meta[Array[Int]].get.map(_.map(JobcandidateId.apply))
-  implicit val put: Put[JobcandidateId] = Put[Int].contramap(_.value)
-  implicit val get: Get[JobcandidateId] = Get[Int].map(JobcandidateId.apply)
-  implicit val write: Write[JobcandidateId] = Write[Int].contramap(_.value)
-  implicit val read: Read[JobcandidateId] = Read[Int].map(JobcandidateId.apply)
+  implicit val metaArray: Meta[Array[JobcandidateId]] = Meta[Array[Int]].imap(_.map(JobcandidateId.apply))(_.map(_.value))
+  implicit val meta: Meta[JobcandidateId] = Meta[Int].imap(JobcandidateId.apply)(_.value)
 }
