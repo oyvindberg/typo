@@ -4,19 +4,17 @@
 - safely interact with your Postgres database
 - avoid having to write repetitive and error-prone code
 
-(`typo` is however just starting out - the functionality described here is not fully developed and tested. Get involved if you want to change that!)
-
 ## Build safer systems
 
-We use the compiler to verify our programs. All is great, until you need to interact with the outside world, which can be messy.
+We use the compiler to verify our programs. All is great, until you need to interact with the messy outside world.
 
 One of the best tools we have available to help the compiler verify our interactions with the outside world is contract-driven development.
 
-Say our API is described by an OpenApi definition.
+Say an API is described by an OpenApi definition.
 If you use that to generate code for the HTTP layer you guarantee that you implement it correctly because otherwise the compiler can help you!
 
 `typo` intends to provide the same safety in the database layer. 
-It does this by generating correct code for all your tables and views based on postgres metadata tables.
+It does this by generating correct code for all your tables, views and queries based on postgres metadata tables.
 
 ## Write less boilerplate code
 
@@ -29,10 +27,11 @@ However, this is not how we normally (R)ead data!
 Typically, you'll join some tables based on some conditions and extract some data. All normal and fine, but how can `typo` help here?
 
 Let's accept that SQL is king in this domain. Let's write SQL in SQL files! 
-Let's put an example in [`${PROJECT_HOME}/sql/person_detail.sql`](adventureworks_sql/person_detail.sql) with this content:
+Let's take an example, [`${PROJECT_HOME}/sql/person_detail.sql`](adventureworks_sql/person_detail.sql).
 
-You point the `typo` to that folder, and it'll generate a case class, row mapper, and a repo with sql code
+You point the `typo` at the `sql` folder, it'll discover all the SQL files and generate a case classes, row mappers, and everything else you need.
 
+Say it looks like this:
 ```sql
 SELECT s.businessentityid,
        p.title,
@@ -50,11 +49,12 @@ FROM sales.salesperson s
          JOIN person.address a ON a.addressid = bea.addressid
 where s.businessentityid = :businessentityid
 ```
+(note that `:businessentityid` is a named parameter. `typo` will generate a method with a parameter of the correct type)
 
-You'll then get a row class like this. It'll also generate code and references to all the tables and views you use in your queries.
+You'll then get a row class like this: 
 
 ```scala
-case class PersonDetailRow(
+case class PersonDetailSqlRow(
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.title]] */
@@ -75,33 +75,153 @@ case class PersonDetailRow(
   postalcode: String
 )
 ```
-and you will get a repo with a method like this:
+and a repo with a method like this, for doobie:
 ```scala
-trait PersonDetailRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[Int])(implicit c: Connection): List[PersonDetailRow]
+trait PersonDetailSqlRepo {
+  def apply(businessentityid: /* nullability unknown */ Option[Int]): Stream[ConnectionIO, PersonDetailSqlRow]
+}
+```
+or this, for anorm:
+```scala
+trait PersonDetailSqlRepo {
+  def apply(businessentityid: /* nullability unknown */ Option[Int])(implicit c: Connection): List[PersonDetailSqlRow]
+}
+
+```
+
+You also get an implementation of course. 
+
+Note that postgres is not able to decide nullability for parameters. You can override that (and any other type) through customization.
+
+## Tables
+
+Given a table like this:
+```sql
+create table address
+(
+    addressid       serial
+        constraint "PK_Address_AddressID" primary key,
+    addressline1    varchar(60)                          not null,
+    addressline2    varchar(60),
+    city            varchar(30)                          not null,
+    stateprovinceid integer                              not null 
+        constraint "FK_Address_StateProvince_StateProvinceID" references stateprovince,
+    postalcode      varchar(15)                          not null,
+    spatiallocation bytea,
+    rowguid         uuid      default uuid_generate_v1() not null,
+    modifieddate    timestamp default now()              not null
+);
+
+comment on table address is 'Street address information for customers, employees, and vendors.';
+comment on column address.addressid is 'Primary key for Address records.';
+comment on column address.addressline1 is 'First street address line.';
+comment on column address.addressline2 is 'Second street address line.';
+comment on column address.city is 'Name of the city.';
+comment on column address.stateprovinceid is 'Unique identification number for the state or province. Foreign key to StateProvince table.';
+comment on column address.postalcode is 'Postal code for the street address.';
+comment on column address.spatiallocation is 'Latitude and longitude of this address.';
+```
+
+You'll get a row class like this:
+```scala
+case class AddressRow(
+  /** Primary key for Address records. */
+  addressid: AddressId,
+  /** First street address line. */
+  addressline1: String,
+  /** Second street address line. */
+  addressline2: Option[String],
+  /** Name of the city. */
+  city: String,
+  /** Unique identification number for the state or province. Foreign key to StateProvince table.
+      Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
+  stateprovinceid: StateprovinceId,
+  /** Postal code for the street address. */
+  postalcode: String,
+  /** Latitude and longitude of this address. */
+  spatiallocation: Option[Array[Byte]],
+  rowguid: UUID,
+  modifieddate: LocalDateTime
+)
+
+```
+and a repo like this:
+```scala
+trait AddressRepo {
+  def delete(addressid: AddressId): ConnectionIO[Boolean]
+  def insert(unsaved: AddressRow): ConnectionIO[AddressRow]
+  def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow]
+  def selectAll: Stream[ConnectionIO, AddressRow]
+  def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]]): Stream[ConnectionIO, AddressRow]
+  def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]]
+  def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow]
+  def update(row: AddressRow): ConnectionIO[Boolean]
+  def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]]): ConnectionIO[Boolean]
+  def upsert(unsaved: AddressRow): ConnectionIO[AddressRow]
 }
 ```
 
-along with an implementation. Note that postgres is not able to decide nullability for parameters. You can override that (and any other type) through customization.
-
+Since the table has auto-increment ID and default values, you will typically use this structure to insert new rows
+```scala
+/** This class corresponds to a row in table `person.address` which has not been persisted yet */
+case class AddressRowUnsaved(
+  /** First street address line. */
+  addressline1: String,
+  /** Second street address line. */
+  addressline2: Option[String],
+  /** Name of the city. */
+  city: String,
+  /** Unique identification number for the state or province. Foreign key to StateProvince table.
+      Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
+  stateprovinceid: StateprovinceId,
+  /** Postal code for the street address. */
+  postalcode: String,
+  /** Latitude and longitude of this address. */
+  spatiallocation: Option[Array[Byte]],
+  /** Default: nextval('person.address_addressid_seq'::regclass)
+      Primary key for Address records. */
+  addressid: Defaulted[AddressId] = Defaulted.UseDefault,
+  /** Default: uuid_generate_v1() */
+  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  /** Default: now() */
+  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+)
+```
 
 ## Other features
 
-Since we have the structure of everything, we might as well generate more code:
+Since we have the structure of everything, we might as well generate more and more code:
 - mock repositories based on a `mutable.Map`
 - scalacheck instances
 - json codecs
 - logging statements
 - unique query names
 
+Of that list, mock repositories and json codecs are implemented.
+
+### Mock repositories
+You can wire these in to run tests without touching the database:
+```scala
+class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
+                      map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
+  override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
+    delay(map.remove(addressid).isDefined)
+  }
+  // ...
+}
+```
+Again since there are auto-increment ID's and defaulted values, you'll need to specify how to fill them in.
+If you have a more table that won't be needed.
+Otherwise everything is taken care of.
+
 ### JSON codecs
-Of that list, only json codecs are implemented.
 This has the potential of being insanely useful. This can lead to generic code across all tables, so you can have one API endpoint which can
 patch any row in any table (as long as you allow it) in a type-safe manner!
 
+Much experimentation is needed on that front though. for now you can get json codecs for `play-json`, with circe upcoming.
+
 ## Library-agnostic
 
-This first prototype of `typo` generates code for the `anorm` database library. 
-There is not really much code needed to expand that to any (type class-based) database library!
+This first prototype of `typo` generates code for the `anorm` and `doobie` database libraries.
 
-A port to doobie is underway, probably with skunk next.
+Next planned database library is `skunk`.
