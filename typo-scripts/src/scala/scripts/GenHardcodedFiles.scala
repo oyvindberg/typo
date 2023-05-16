@@ -111,27 +111,30 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
          | */
          |""".stripMargin
 
-    val generated: Generated = {
-      fromData(
-        Options(
-          pkg = "testdb.hardcoded",
-          JsonLibName.PlayJson,
-          DbLibName.Anorm,
-          naming = pkg =>
-            new Naming(pkg) {
-              override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)
-            },
-          header = header
-        ),
-        relations = all,
-        enums = enums,
-        domains = Nil,
-        sqlScripts = Nil,
-        Selector.All
-      )
-    }
-
     targets.foreach { target =>
+      val (dbLib, jsonLib) =
+        if (target.project.value.endsWith("doobie"))
+          (DbLibName.Doobie, JsonLibName.None)
+        else (DbLibName.Anorm, JsonLibName.PlayJson)
+      val generated: Generated =
+        fromData(
+          Options(
+            pkg = "testdb.hardcoded",
+            jsonLib,
+            dbLib,
+            naming = pkg =>
+              new Naming(pkg) {
+                override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)
+              },
+            header = header
+          ),
+          relations = all,
+          enums = enums,
+          domains = Nil,
+          sqlScripts = Nil,
+          Selector.All
+        )
+
       generated.overwriteFolder(
         target.sources,
         // todo: bleep should use something better than timestamps
