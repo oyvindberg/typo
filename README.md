@@ -4,6 +4,8 @@
 - safely interact with your Postgres database
 - avoid having to write repetitive and error-prone code
 
+(for getting started instructions see bottom of file)
+
 ## Build safer systems
 
 We use the compiler to verify our programs. All is great, until you need to interact with the messy outside world.
@@ -304,3 +306,7 @@ import scala.sys.process.*
 List("git", "add", targetDir.toString).!!
 
 ```
+
+### Contributing/building
+
+See [contributing](./contributing.md)

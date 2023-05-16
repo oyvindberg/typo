@@ -52,6 +52,9 @@ scripts:
   generate-sources:
     main: scripts.GeneratedSources
     project: typo-scripts
+  generate-adventureworks:
+    main: scripts.GeneratedAdventureWorks
+    project: typo-scripts
   my-publish-local:
     main: scripts.PublishLocal
     project: typo-scripts
