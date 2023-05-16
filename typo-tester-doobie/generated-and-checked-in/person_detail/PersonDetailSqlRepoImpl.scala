@@ -11,12 +11,13 @@ import adventureworks.public.Name
 import doobie.Get
 import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.query.Query0
+import fs2.Stream
 import java.sql.ResultSet
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def apply(businessentityid: /* nullability unknown */ Option[Int]): Query0[PersonDetailSqlRow] = {
+  override def apply(businessentityid: /* nullability unknown */ Option[Int]): Stream[ConnectionIO, PersonDetailSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid,
                    p.title,
@@ -34,7 +35,7 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.address a ON a.addressid = bea.addressid
             where s.businessentityid = $businessentityid
          """
-    sql.query[PersonDetailSqlRow]
+    sql.query[PersonDetailSqlRow].stream
   
   }
   implicit val read: Read[PersonDetailSqlRow] =

@@ -6,8 +6,9 @@
 package adventureworks
 package person_detail
 
-import doobie.util.query.Query0
+import doobie.free.connection.ConnectionIO
+import fs2.Stream
 
 trait PersonDetailSqlRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[Int]): Query0[PersonDetailSqlRow]
+  def apply(businessentityid: /* nullability unknown */ Option[Int]): Stream[ConnectionIO, PersonDetailSqlRow]
 }

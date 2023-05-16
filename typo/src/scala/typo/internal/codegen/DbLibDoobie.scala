@@ -95,7 +95,7 @@ object DbLibDoobie extends DbLib {
         case Nil      => sc.Code.Empty
         case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
       }
-      code"def apply($params): ${Query0.of(sqlScript.RowName)}"
+      code"def apply($params): ${fs2Stream.of(ConnectionIO, sqlScript.RowName)}"
   }
 
   def matchId(id: IdComputed): sc.Code =
@@ -281,7 +281,7 @@ object DbLibDoobie extends DbLib {
         }
         code"""|val sql =
                |  ${SQL(renderedScript)}
-               |sql.query[${sqlScript.RowName}]
+               |sql.query[${sqlScript.RowName}].stream
                |""".stripMargin
     }
 
