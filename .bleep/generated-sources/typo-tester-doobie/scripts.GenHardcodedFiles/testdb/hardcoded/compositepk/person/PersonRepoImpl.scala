@@ -22,7 +22,7 @@ import testdb.hardcoded.Defaulted
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId): ConnectionIO[Boolean] = {
-    sql"""delete from compositepk.person where "one" = ${compositeId.one}, two = ${compositeId.two}""".update.run.map(_ > 0)
+    sql"""delete from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")
@@ -72,13 +72,13 @@ object PersonRepoImpl extends PersonRepo {
   
   }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one}, two = ${compositeId.two}""".query[PersonRow].option
+    sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".query[PersonRow].option
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update compositepk.person
           set "name" = ${row.name}
-          where "one" = ${compositeId.one}, two = ${compositeId.two}
+          where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """
       .update
       .run
@@ -95,7 +95,7 @@ object PersonRepoImpl extends PersonRepo {
         )
         sql"""update compositepk.person
               $updates
-              where "one" = ${compositeId.one}, two = ${compositeId.two}
+              where "one" = ${compositeId.one} AND two = ${compositeId.two}
            """.update.run.map(_ > 0)
     }
   }

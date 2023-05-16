@@ -209,7 +209,7 @@ object DbLibDoobie extends DbLib {
           val set = frInterpolate(code"$${${unsavedParam.name}.${col.name}}$colCast")
           code"""Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $set))"""
         }
-        val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
+        val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val colCast = cast(col).render
           val setValue = frInterpolate(code"$${value: $origType}$colCast")
           code"""|${unsavedParam.name}.$ident match {
