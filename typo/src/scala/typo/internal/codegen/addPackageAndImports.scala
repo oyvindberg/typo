@@ -45,7 +45,7 @@ object addPackageAndImports {
       case sc.Param(name, tpe, maybeDefault)        => sc.Param(name, shortenNames(tpe, f), maybeDefault.map(code => code.mapTrees(shortenNames(_)(f))))
       case x: sc.StrLit                             => x
       case tpe: sc.Type                             => shortenNames(tpe, f)
-      case sc.StringInterpolate(i, prefix, content) => sc.StringInterpolate(shortenNames(i, f), prefix, content)
+      case sc.StringInterpolate(i, prefix, content) => sc.StringInterpolate(shortenNames(i, f), prefix, content.mapTrees(shortenNames(_)(f)))
     }
 
   // traverse type tree and rewrite qualified names

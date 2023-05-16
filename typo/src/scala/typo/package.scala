@@ -36,7 +36,8 @@ package object typo {
         case JsonLibName.None     => JsonLib.None
       },
       dbLib = publicOptions.dbLib match {
-        case DbLibName.Anorm => DbLibAnorm
+        case DbLibName.Anorm  => DbLibAnorm
+        case DbLibName.Doobie => DbLibDoobie
       },
       naming = naming,
       typeOverride = publicOptions.typeOverride,

@@ -27,7 +27,10 @@ object sc {
     def name = idents.last
   }
   object QIdent {
-    def of(idents: Ident*): QIdent = QIdent(idents.toList)
+    def apply(str: String): QIdent =
+      sc.QIdent(str.split('.').toList.map(Ident.apply))
+    def of(idents: Ident*): QIdent =
+      QIdent(idents.toList)
   }
   case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
 
@@ -53,15 +56,18 @@ object sc {
     object Qualified {
       implicit val ordering: Ordering[Qualified] = scala.Ordering.by(renderTree)
 
-      def apply(value: String): Qualified =
-        Qualified(QIdent(value.split('.').toList.map(Ident.apply)))
+      def apply(str: String): Qualified =
+        Qualified(QIdent(str))
       def apply(value: Ident): Qualified =
         Qualified(QIdent(scala.List(value)))
     }
 
+    val JavaCharacter = Qualified("java.lang.Character")
+    val JavaInteger = Qualified("java.lang.Integer")
     val String = Qualified("java.lang.String")
     val Connection = Qualified("java.sql.Connection")
     val PreparedStatement = Qualified("java.sql.PreparedStatement")
+    val ResultSet = sc.Type.Qualified("java.sql.ResultSet")
     val JavaTime = Qualified("java.sql.Time")
     val Types = Qualified("java.sql.Types")
     val LocalDate = Qualified("java.time.LocalDate")
@@ -122,7 +128,10 @@ object sc {
         Double,
         Either,
         Float,
+        Function1,
         Int,
+        JavaCharacter,
+        JavaInteger,
         Left,
         List,
         Long,
@@ -155,14 +164,14 @@ object sc {
 
     def boxedType(tpe: sc.Type): Option[Qualified] =
       tpe match {
-        case Int                      => scala.Some(Qualified("java.lang.Integer"))
+        case Int                      => scala.Some(JavaInteger)
         case Long                     => scala.Some(Qualified("java.lang.Long"))
         case Float                    => scala.Some(Qualified("java.lang.Float"))
         case Double                   => scala.Some(Qualified("java.lang.Double"))
         case Boolean                  => scala.Some(Qualified("java.lang.Boolean"))
         case Short                    => scala.Some(Qualified("java.lang.Short"))
         case Byte                     => scala.Some(Qualified("java.lang.Byte"))
-        case Char                     => scala.Some(Qualified("java.lang.Character"))
+        case Char                     => scala.Some(JavaCharacter)
         case Commented(underlying, _) => boxedType(underlying)
         case ByName(underlying)       => boxedType(underlying)
         case UserDefined(underlying)  => boxedType(underlying)
@@ -177,6 +186,16 @@ object sc {
       case Commented(underlying, _)  => containsUserDefined(underlying)
       case ByName(underlying)        => containsUserDefined(underlying)
       case UserDefined(_)            => true
+    }
+
+    def base(tpe: sc.Type): sc.Type = tpe match {
+      case Wildcard                 => tpe
+      case TApply(underlying, _)    => base(underlying)
+      case Qualified(_)             => tpe
+      case Abstract(_)              => tpe
+      case Commented(underlying, _) => base(underlying)
+      case ByName(underlying)       => base(underlying)
+      case UserDefined(_)           => tpe
     }
   }
 

@@ -25,12 +25,23 @@ projects:
     dependsOn: typo
     extends: template-nocross
   # scripts generate code into this project, and there are hand-written tests as well
-  typo-tester:
+  typo-tester-anorm:
     dependencies:
     - com.typesafe.play::play-json:2.10.0-RC7
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.2.13
+    extends: template-nocross
+    isTestProject: true
+    sourcegen:
+      main: scripts.GenHardcodedFiles
+      project: typo-scripts
+    sources: ./generated-and-checked-in
+  typo-tester-doobie:
+    dependencies:
+    - org.postgresql:postgresql:42.6.0
+    - org.scalatest::scalatest:3.2.13
+    - org.tpolecat::doobie-postgres:1.0.0-RC2
     extends: template-nocross
     isTestProject: true
     sourcegen:
