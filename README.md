@@ -160,6 +160,7 @@ trait AddressRepo {
   def upsert(unsaved: AddressRow): ConnectionIO[AddressRow]
 }
 ```
+(For reference, the implementation is [here](./typo-tester-doobie/generated-and-checked-in/person/address/AddressRepoImpl.scala))
 
 Since the table has auto-increment ID and default values, you will typically use this structure to insert new rows
 ```scala
@@ -225,3 +226,81 @@ Much experimentation is needed on that front though. for now you can get json co
 This first prototype of `typo` generates code for the `anorm` and `doobie` database libraries.
 
 Next planned database library is `skunk`.
+
+## Getting started
+There is no sbt plugin yet, so you'll have to run the code generator manually.
+
+This scala-cli script should get you started:
+```scala
+//> using dep "com.olvind.typo::typo:0.0.3"
+//> using scala "3.2.2"
+//> using jvm "graalvm-java17:22.3.1"
+
+import typo.*
+import typo.internal.FileSync
+
+import java.nio.file.Path
+import java.sql.{Connection, DriverManager}
+import java.util
+
+// pick tables and views you code generated for here.
+val selector: Selector = relation =>
+  relation.schema.contains("myschema") ||
+    relation.value == "other_schema.table"
+
+// here you can override types for specific columns
+// note that these will propagate down through foreign keys and column dependencies
+val rewriteColumnTypes = TypeOverride.relation {
+  case ("myschema.table", "id") => "com.mytable.Id"
+}
+
+// override types for columns read from sql files
+val rewriteColumnTypesFromSqlFile = TypeOverride.sqlFile {
+  case (_, "my_column") => "com.foo.MyType"
+}
+
+// if postgres gets the nullability wrong in an sql file (it happens, unfortunately), you can override it here
+val overrideNullabilityFromSqlFiles = NullabilityOverride.sqlFile {
+  case (RelPath(List("sql", "myscript")), "myparam") => Nullability.Nullable
+}
+
+// setup a connection to your database
+given Connection = {
+  val url = "jdbc:postgresql://localhost/public"
+  val props = new util.Properties
+  props.setProperty("user", "postgres")
+  props.setProperty("password", "postgres")
+  DriverManager.getConnection(url, props)
+}
+
+val options = Options(
+  pkg = "destination.package",
+  JsonLibName.None,
+  DbLibName.Anorm,
+  naming = pkg =>
+    new Naming(pkg) {
+      // you can override any part of naming here. add/remove suffixes, change casing, etc.
+    },
+  typeOverride = rewriteColumnTypes.orElse(rewriteColumnTypesFromSqlFile),
+  nullabilityOverride = NullabilityOverride.sqlFileParam { case _ => Nullability.NoNulls }.orElse(overrideNullabilityFromSqlFiles)
+)
+
+val cwd = Path.of(sys.props("user.dir"))
+
+// all files in this dir will be overwritten!
+val targetDir = cwd.resolve("mymodule/src/main/scala/generated")
+
+// run conversion
+typo
+  .fromDbAndScripts(
+    options,
+    scriptsPath = cwd.resolve("sql"),
+    selector
+  )
+  .overwriteFolder(folder = targetDir, soft = true) // soft = true plays better with intellij. typo will overwrite only changes files, so there is less to reindex
+
+// add to git
+import scala.sys.process.*
+List("git", "add", targetDir.toString).!!
+
+```
