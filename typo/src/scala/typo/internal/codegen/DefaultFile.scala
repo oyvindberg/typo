@@ -2,20 +2,20 @@ package typo
 package internal
 package codegen
 
-case class DefaultFile(dc: ComputedDefault, jsonLib: JsonLib) {
+case class DefaultFile(default: ComputedDefault, jsonLib: JsonLib) {
   val contents =
     code"""
 /**
  * This signals a value where if you don't provide it, postgres will generate it for you
  */
-sealed trait ${dc.Defaulted.name}[+T]
+sealed trait ${default.Defaulted.name}[+T]
 
-object ${dc.Defaulted.name} {
-  case class ${dc.Provided}[T](value: T) extends ${dc.Defaulted.name}[T]
-  case object ${dc.UseDefault} extends ${dc.Defaulted.name}[Nothing]
-  ${jsonLib.defaultedInstance(dc.Defaulted, dc.Provided, dc.UseDefault).mkCode("\n")}
+object ${default.Defaulted.name} {
+  case class ${default.Provided}[T](value: T) extends ${default.Defaulted.name}[T]
+  case object ${default.UseDefault} extends ${default.Defaulted.name}[Nothing]
+  ${jsonLib.defaultedInstance(default).mkCode("\n")}
 }
 """
 
-  val file = sc.File(dc.Defaulted, contents, secondaryTypes = Nil)
+  val file = sc.File(default.Defaulted, contents, secondaryTypes = Nil)
 }
