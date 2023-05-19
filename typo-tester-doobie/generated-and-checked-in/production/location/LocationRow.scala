@@ -8,6 +8,10 @@ package production
 package location
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class LocationRow(
@@ -22,4 +26,24 @@ case class LocationRow(
   modifieddate: LocalDateTime
 )
 
-
+object LocationRow {
+  implicit val decoder: Decoder[LocationRow] =
+    (c: HCursor) =>
+      for {
+        locationid <- c.downField("locationid").as[LocationId]
+        name <- c.downField("name").as[Name]
+        costrate <- c.downField("costrate").as[BigDecimal]
+        availability <- c.downField("availability").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield LocationRow(locationid, name, costrate, availability, modifieddate)
+  implicit val encoder: Encoder[LocationRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "locationid" := row.locationid,
+        "name" := row.name,
+        "costrate" := row.costrate,
+        "availability" := row.availability,
+        "modifieddate" := row.modifieddate
+      )}
+}

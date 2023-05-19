@@ -10,6 +10,10 @@ package productinventory
 import adventureworks.Defaulted
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -53,4 +57,28 @@ case class ProductinventoryRowUnsaved(
                      }
     )
 }
-
+object ProductinventoryRowUnsaved {
+  implicit val decoder: Decoder[ProductinventoryRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        locationid <- c.downField("locationid").as[LocationId]
+        shelf <- c.downField("shelf").as[String]
+        bin <- c.downField("bin").as[Int]
+        quantity <- c.downField("quantity").as[Defaulted[Int]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductinventoryRowUnsaved(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductinventoryRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "locationid" := row.locationid,
+        "shelf" := row.shelf,
+        "bin" := row.bin,
+        "quantity" := row.quantity,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

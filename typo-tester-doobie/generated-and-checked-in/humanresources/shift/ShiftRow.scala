@@ -8,6 +8,10 @@ package humanresources
 package shift
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -23,4 +27,24 @@ case class ShiftRow(
   modifieddate: LocalDateTime
 )
 
-
+object ShiftRow {
+  implicit val decoder: Decoder[ShiftRow] =
+    (c: HCursor) =>
+      for {
+        shiftid <- c.downField("shiftid").as[ShiftId]
+        name <- c.downField("name").as[Name]
+        starttime <- c.downField("starttime").as[LocalTime]
+        endtime <- c.downField("endtime").as[LocalTime]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ShiftRow(shiftid, name, starttime, endtime, modifieddate)
+  implicit val encoder: Encoder[ShiftRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "shiftid" := row.shiftid,
+        "name" := row.name,
+        "starttime" := row.starttime,
+        "endtime" := row.endtime,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -7,6 +7,10 @@ package adventureworks
 package production
 package productdescription
 
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,4 +23,22 @@ case class ProductdescriptionRow(
   modifieddate: LocalDateTime
 )
 
-
+object ProductdescriptionRow {
+  implicit val decoder: Decoder[ProductdescriptionRow] =
+    (c: HCursor) =>
+      for {
+        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
+        description <- c.downField("description").as[String]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductdescriptionRow(productdescriptionid, description, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductdescriptionRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productdescriptionid" := row.productdescriptionid,
+        "description" := row.description,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

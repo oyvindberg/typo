@@ -10,10 +10,28 @@ package personphone
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `person.personphone` */
 case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: Phone, phonenumbertypeid: PhonenumbertypeId)
 object PersonphoneId {
   implicit def ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
-  
+  implicit val decoder: Decoder[PersonphoneId] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        phonenumber <- c.downField("phonenumber").as[Phone]
+        phonenumbertypeid <- c.downField("phonenumbertypeid").as[PhonenumbertypeId]
+      } yield PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
+  implicit val encoder: Encoder[PersonphoneId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "phonenumber" := row.phonenumber,
+        "phonenumbertypeid" := row.phonenumbertypeid
+      )}
 }

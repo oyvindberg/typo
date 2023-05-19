@@ -9,6 +9,10 @@ package salesterritory
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -34,4 +38,34 @@ case class SalesterritoryRow(
   modifieddate: LocalDateTime
 )
 
-
+object SalesterritoryRow {
+  implicit val decoder: Decoder[SalesterritoryRow] =
+    (c: HCursor) =>
+      for {
+        territoryid <- c.downField("territoryid").as[SalesterritoryId]
+        name <- c.downField("name").as[Name]
+        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
+        group <- c.downField("group").as[String]
+        salesytd <- c.downField("salesytd").as[BigDecimal]
+        saleslastyear <- c.downField("saleslastyear").as[BigDecimal]
+        costytd <- c.downField("costytd").as[BigDecimal]
+        costlastyear <- c.downField("costlastyear").as[BigDecimal]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesterritoryRow(territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalesterritoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "territoryid" := row.territoryid,
+        "name" := row.name,
+        "countryregioncode" := row.countryregioncode,
+        "group" := row.group,
+        "salesytd" := row.salesytd,
+        "saleslastyear" := row.saleslastyear,
+        "costytd" := row.costytd,
+        "costlastyear" := row.costlastyear,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

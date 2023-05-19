@@ -9,6 +9,10 @@ package sm
 
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,4 +32,28 @@ case class SmViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SmViewRow {
+  implicit val decoder: Decoder[SmViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
+        name <- c.downField("name").as[Option[Name]]
+        shipbase <- c.downField("shipbase").as[Option[BigDecimal]]
+        shiprate <- c.downField("shiprate").as[Option[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SmViewRow(id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate)
+  implicit val encoder: Encoder[SmViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "shipmethodid" := row.shipmethodid,
+        "name" := row.name,
+        "shipbase" := row.shipbase,
+        "shiprate" := row.shiprate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -10,6 +10,10 @@ package salesorderheadersalesreason
 import adventureworks.Defaulted
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.salesorderheadersalesreason` which has not been persisted yet */
@@ -33,4 +37,20 @@ case class SalesorderheadersalesreasonRowUnsaved(
                      }
     )
 }
-
+object SalesorderheadersalesreasonRowUnsaved {
+  implicit val decoder: Decoder[SalesorderheadersalesreasonRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
+        salesreasonid <- c.downField("salesreasonid").as[SalesreasonId]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield SalesorderheadersalesreasonRowUnsaved(salesorderid, salesreasonid, modifieddate)
+  implicit val encoder: Encoder[SalesorderheadersalesreasonRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "salesreasonid" := row.salesreasonid,
+        "modifieddate" := row.modifieddate
+      )}
+}

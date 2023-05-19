@@ -10,10 +10,28 @@ package productmodelproductdescriptionculture
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `production.productmodelproductdescriptionculture` */
 case class ProductmodelproductdescriptioncultureId(productmodelid: ProductmodelId, productdescriptionid: ProductdescriptionId, cultureid: CultureId)
 object ProductmodelproductdescriptioncultureId {
   implicit def ordering: Ordering[ProductmodelproductdescriptioncultureId] = Ordering.by(x => (x.productmodelid, x.productdescriptionid, x.cultureid))
-  
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureId] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
+        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
+        cultureid <- c.downField("cultureid").as[CultureId]
+      } yield ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "productdescriptionid" := row.productdescriptionid,
+        "cultureid" := row.cultureid
+      )}
 }

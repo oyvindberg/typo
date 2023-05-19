@@ -10,6 +10,10 @@ package pv
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PvViewRow(
@@ -38,4 +42,38 @@ case class PvViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PvViewRow {
+  implicit val decoder: Decoder[PvViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        averageleadtime <- c.downField("averageleadtime").as[Option[Int]]
+        standardprice <- c.downField("standardprice").as[Option[BigDecimal]]
+        lastreceiptcost <- c.downField("lastreceiptcost").as[Option[BigDecimal]]
+        lastreceiptdate <- c.downField("lastreceiptdate").as[Option[LocalDateTime]]
+        minorderqty <- c.downField("minorderqty").as[Option[Int]]
+        maxorderqty <- c.downField("maxorderqty").as[Option[Int]]
+        onorderqty <- c.downField("onorderqty").as[Option[Int]]
+        unitmeasurecode <- c.downField("unitmeasurecode").as[Option[UnitmeasureId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PvViewRow(id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
+  implicit val encoder: Encoder[PvViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productid" := row.productid,
+        "businessentityid" := row.businessentityid,
+        "averageleadtime" := row.averageleadtime,
+        "standardprice" := row.standardprice,
+        "lastreceiptcost" := row.lastreceiptcost,
+        "lastreceiptdate" := row.lastreceiptdate,
+        "minorderqty" := row.minorderqty,
+        "maxorderqty" := row.maxorderqty,
+        "onorderqty" := row.onorderqty,
+        "unitmeasurecode" := row.unitmeasurecode,
+        "modifieddate" := row.modifieddate
+      )}
+}

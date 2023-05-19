@@ -8,6 +8,10 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productphoto` which has not been persisted yet */
@@ -42,4 +46,26 @@ case class ProductphotoRowUnsaved(
                      }
     )
 }
-
+object ProductphotoRowUnsaved {
+  implicit val decoder: Decoder[ProductphotoRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Array[Byte]]]
+        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[String]]
+        largephoto <- c.downField("largephoto").as[Option[Array[Byte]]]
+        largephotofilename <- c.downField("largephotofilename").as[Option[String]]
+        productphotoid <- c.downField("productphotoid").as[Defaulted[ProductphotoId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)
+  implicit val encoder: Encoder[ProductphotoRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "thumbnailphoto" := row.thumbnailphoto,
+        "thumbnailphotofilename" := row.thumbnailphotofilename,
+        "largephoto" := row.largephoto,
+        "largephotofilename" := row.largephotofilename,
+        "productphotoid" := row.productphotoid,
+        "modifieddate" := row.modifieddate
+      )}
+}

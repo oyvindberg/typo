@@ -9,6 +9,10 @@ package salesorderheadersalesreason
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class SalesorderheadersalesreasonRow(
@@ -23,4 +27,20 @@ case class SalesorderheadersalesreasonRow(
    val compositeId: SalesorderheadersalesreasonId = SalesorderheadersalesreasonId(salesorderid, salesreasonid)
  }
 
-
+object SalesorderheadersalesreasonRow {
+  implicit val decoder: Decoder[SalesorderheadersalesreasonRow] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
+        salesreasonid <- c.downField("salesreasonid").as[SalesreasonId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesorderheadersalesreasonRow(salesorderid, salesreasonid, modifieddate)
+  implicit val encoder: Encoder[SalesorderheadersalesreasonRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "salesreasonid" := row.salesreasonid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package department
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `humanresources.department` which has not been persisted yet */
@@ -37,4 +41,22 @@ case class DepartmentRowUnsaved(
                      }
     )
 }
-
+object DepartmentRowUnsaved {
+  implicit val decoder: Decoder[DepartmentRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        groupname <- c.downField("groupname").as[Name]
+        departmentid <- c.downField("departmentid").as[Defaulted[DepartmentId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
+  implicit val encoder: Encoder[DepartmentRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "groupname" := row.groupname,
+        "departmentid" := row.departmentid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -10,6 +10,10 @@ package poh
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PohViewRow(
@@ -40,4 +44,40 @@ case class PohViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PohViewRow {
+  implicit val decoder: Decoder[PohViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        purchaseorderid <- c.downField("purchaseorderid").as[Option[PurchaseorderheaderId]]
+        revisionnumber <- c.downField("revisionnumber").as[Option[Int]]
+        status <- c.downField("status").as[Option[Int]]
+        employeeid <- c.downField("employeeid").as[Option[BusinessentityId]]
+        vendorid <- c.downField("vendorid").as[Option[BusinessentityId]]
+        shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
+        orderdate <- c.downField("orderdate").as[Option[LocalDateTime]]
+        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
+        subtotal <- c.downField("subtotal").as[Option[BigDecimal]]
+        taxamt <- c.downField("taxamt").as[Option[BigDecimal]]
+        freight <- c.downField("freight").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PohViewRow(id, purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
+  implicit val encoder: Encoder[PohViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "purchaseorderid" := row.purchaseorderid,
+        "revisionnumber" := row.revisionnumber,
+        "status" := row.status,
+        "employeeid" := row.employeeid,
+        "vendorid" := row.vendorid,
+        "shipmethodid" := row.shipmethodid,
+        "orderdate" := row.orderdate,
+        "shipdate" := row.shipdate,
+        "subtotal" := row.subtotal,
+        "taxamt" := row.taxamt,
+        "freight" := row.freight,
+        "modifieddate" := row.modifieddate
+      )}
+}

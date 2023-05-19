@@ -9,6 +9,10 @@ package billofmaterials
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class BillofmaterialsRow(
@@ -34,4 +38,32 @@ case class BillofmaterialsRow(
   modifieddate: LocalDateTime
 )
 
-
+object BillofmaterialsRow {
+  implicit val decoder: Decoder[BillofmaterialsRow] =
+    (c: HCursor) =>
+      for {
+        billofmaterialsid <- c.downField("billofmaterialsid").as[BillofmaterialsId]
+        productassemblyid <- c.downField("productassemblyid").as[Option[ProductId]]
+        componentid <- c.downField("componentid").as[ProductId]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
+        bomlevel <- c.downField("bomlevel").as[Int]
+        perassemblyqty <- c.downField("perassemblyqty").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield BillofmaterialsRow(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
+  implicit val encoder: Encoder[BillofmaterialsRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "billofmaterialsid" := row.billofmaterialsid,
+        "productassemblyid" := row.productassemblyid,
+        "componentid" := row.componentid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "unitmeasurecode" := row.unitmeasurecode,
+        "bomlevel" := row.bomlevel,
+        "perassemblyqty" := row.perassemblyqty,
+        "modifieddate" := row.modifieddate
+      )}
+}

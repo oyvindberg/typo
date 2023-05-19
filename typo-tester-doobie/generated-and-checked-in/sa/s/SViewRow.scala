@@ -9,6 +9,10 @@ package s
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -29,4 +33,28 @@ case class SViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SViewRow {
+  implicit val decoder: Decoder[SViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        name <- c.downField("name").as[Option[Name]]
+        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
+        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SViewRow(id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate)
+  implicit val encoder: Encoder[SViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "name" := row.name,
+        "salespersonid" := row.salespersonid,
+        "demographics" := row.demographics,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

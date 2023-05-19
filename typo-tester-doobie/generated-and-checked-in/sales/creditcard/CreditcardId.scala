@@ -8,12 +8,17 @@ package sales
 package creditcard
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
   implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[CreditcardId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[CreditcardId] =
+    Decoder[Int].map(CreditcardId(_))
   implicit val metaArray: Meta[Array[CreditcardId]] = Meta[Array[Int]].imap(_.map(CreditcardId.apply))(_.map(_.value))
   implicit val meta: Meta[CreditcardId] = Meta[Int].imap(CreditcardId.apply)(_.value)
 }

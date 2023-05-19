@@ -8,12 +8,17 @@ package person
 package stateprovince
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `person.stateprovince` */
 case class StateprovinceId(value: Int) extends AnyVal
 object StateprovinceId {
   implicit val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[StateprovinceId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[StateprovinceId] =
+    Decoder[Int].map(StateprovinceId(_))
   implicit val metaArray: Meta[Array[StateprovinceId]] = Meta[Array[Int]].imap(_.map(StateprovinceId.apply))(_.map(_.value))
   implicit val meta: Meta[StateprovinceId] = Meta[Int].imap(StateprovinceId.apply)(_.value)
 }

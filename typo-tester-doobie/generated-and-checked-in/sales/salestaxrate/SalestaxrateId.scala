@@ -8,12 +8,17 @@ package sales
 package salestaxrate
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `sales.salestaxrate` */
 case class SalestaxrateId(value: Int) extends AnyVal
 object SalestaxrateId {
   implicit val ordering: Ordering[SalestaxrateId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[SalestaxrateId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[SalestaxrateId] =
+    Decoder[Int].map(SalestaxrateId(_))
   implicit val metaArray: Meta[Array[SalestaxrateId]] = Meta[Array[Int]].imap(_.map(SalestaxrateId.apply))(_.map(_.value))
   implicit val meta: Meta[SalestaxrateId] = Meta[Int].imap(SalestaxrateId.apply)(_.value)
 }

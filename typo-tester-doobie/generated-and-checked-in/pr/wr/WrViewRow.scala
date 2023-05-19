@@ -9,6 +9,10 @@ package wr
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class WrViewRow(
@@ -39,4 +43,40 @@ case class WrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object WrViewRow {
+  implicit val decoder: Decoder[WrViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        workorderid <- c.downField("workorderid").as[Option[WorkorderId]]
+        productid <- c.downField("productid").as[Option[Int]]
+        operationsequence <- c.downField("operationsequence").as[Option[Int]]
+        locationid <- c.downField("locationid").as[Option[LocationId]]
+        scheduledstartdate <- c.downField("scheduledstartdate").as[Option[LocalDateTime]]
+        scheduledenddate <- c.downField("scheduledenddate").as[Option[LocalDateTime]]
+        actualstartdate <- c.downField("actualstartdate").as[Option[LocalDateTime]]
+        actualenddate <- c.downField("actualenddate").as[Option[LocalDateTime]]
+        actualresourcehrs <- c.downField("actualresourcehrs").as[Option[BigDecimal]]
+        plannedcost <- c.downField("plannedcost").as[Option[BigDecimal]]
+        actualcost <- c.downField("actualcost").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield WrViewRow(id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
+  implicit val encoder: Encoder[WrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "workorderid" := row.workorderid,
+        "productid" := row.productid,
+        "operationsequence" := row.operationsequence,
+        "locationid" := row.locationid,
+        "scheduledstartdate" := row.scheduledstartdate,
+        "scheduledenddate" := row.scheduledenddate,
+        "actualstartdate" := row.actualstartdate,
+        "actualenddate" := row.actualenddate,
+        "actualresourcehrs" := row.actualresourcehrs,
+        "plannedcost" := row.plannedcost,
+        "actualcost" := row.actualcost,
+        "modifieddate" := row.modifieddate
+      )}
+}

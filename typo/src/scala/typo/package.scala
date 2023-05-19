@@ -32,6 +32,7 @@ package object typo {
     val options = InternalOptions(
       pkg = pkg,
       jsonLib = publicOptions.jsonLib match {
+        case JsonLibName.Circe    => JsonLibCirce
         case JsonLibName.PlayJson => JsonLibPlay
         case JsonLibName.None     => JsonLib.None
       },

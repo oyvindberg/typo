@@ -11,6 +11,10 @@ import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
@@ -41,4 +45,22 @@ case class ProductproductphotoRowUnsaved(
                      }
     )
 }
-
+object ProductproductphotoRowUnsaved {
+  implicit val decoder: Decoder[ProductproductphotoRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        productphotoid <- c.downField("productphotoid").as[ProductphotoId]
+        primary <- c.downField("primary").as[Defaulted[Flag]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductproductphotoRowUnsaved(productid, productphotoid, primary, modifieddate)
+  implicit val encoder: Encoder[ProductproductphotoRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "productphotoid" := row.productphotoid,
+        "primary" := row.primary,
+        "modifieddate" := row.modifieddate
+      )}
+}

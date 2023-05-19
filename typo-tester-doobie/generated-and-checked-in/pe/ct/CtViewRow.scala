@@ -9,6 +9,10 @@ package ct
 
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CtViewRow(
@@ -21,4 +25,22 @@ case class CtViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object CtViewRow {
+  implicit val decoder: Decoder[CtViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        contacttypeid <- c.downField("contacttypeid").as[Option[ContacttypeId]]
+        name <- c.downField("name").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield CtViewRow(id, contacttypeid, name, modifieddate)
+  implicit val encoder: Encoder[CtViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "contacttypeid" := row.contacttypeid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

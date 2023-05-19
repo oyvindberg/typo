@@ -9,6 +9,10 @@ package personcreditcard
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PersoncreditcardRow(
@@ -23,4 +27,20 @@ case class PersoncreditcardRow(
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)
  }
 
-
+object PersoncreditcardRow {
+  implicit val decoder: Decoder[PersoncreditcardRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        creditcardid <- c.downField("creditcardid").as[CreditcardId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield PersoncreditcardRow(businessentityid, creditcardid, modifieddate)
+  implicit val encoder: Encoder[PersoncreditcardRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "creditcardid" := row.creditcardid,
+        "modifieddate" := row.modifieddate
+      )}
+}

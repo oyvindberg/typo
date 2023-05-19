@@ -9,6 +9,10 @@ package productlistpricehistory
 
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productlistpricehistory` which has not been persisted yet */
@@ -37,4 +41,24 @@ case class ProductlistpricehistoryRowUnsaved(
                      }
     )
 }
-
+object ProductlistpricehistoryRowUnsaved {
+  implicit val decoder: Decoder[ProductlistpricehistoryRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        listprice <- c.downField("listprice").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductlistpricehistoryRowUnsaved(productid, startdate, enddate, listprice, modifieddate)
+  implicit val encoder: Encoder[ProductlistpricehistoryRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "listprice" := row.listprice,
+        "modifieddate" := row.modifieddate
+      )}
+}

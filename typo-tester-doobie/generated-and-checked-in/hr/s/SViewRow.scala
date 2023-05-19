@@ -9,6 +9,10 @@ package s
 
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -26,4 +30,26 @@ case class SViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SViewRow {
+  implicit val decoder: Decoder[SViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        shiftid <- c.downField("shiftid").as[Option[ShiftId]]
+        name <- c.downField("name").as[Option[Name]]
+        starttime <- c.downField("starttime").as[Option[LocalTime]]
+        endtime <- c.downField("endtime").as[Option[LocalTime]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SViewRow(id, shiftid, name, starttime, endtime, modifieddate)
+  implicit val encoder: Encoder[SViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "shiftid" := row.shiftid,
+        "name" := row.name,
+        "starttime" := row.starttime,
+        "endtime" := row.endtime,
+        "modifieddate" := row.modifieddate
+      )}
+}

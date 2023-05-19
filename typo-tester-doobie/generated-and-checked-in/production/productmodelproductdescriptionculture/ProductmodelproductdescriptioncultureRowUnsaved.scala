@@ -11,6 +11,10 @@ import adventureworks.Defaulted
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productmodelproductdescriptionculture` which has not been persisted yet */
@@ -38,4 +42,22 @@ case class ProductmodelproductdescriptioncultureRowUnsaved(
                      }
     )
 }
-
+object ProductmodelproductdescriptioncultureRowUnsaved {
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
+        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
+        cultureid <- c.downField("cultureid").as[CultureId]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductmodelproductdescriptioncultureRowUnsaved(productmodelid, productdescriptionid, cultureid, modifieddate)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "productdescriptionid" := row.productdescriptionid,
+        "cultureid" := row.cultureid,
+        "modifieddate" := row.modifieddate
+      )}
+}

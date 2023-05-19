@@ -9,6 +9,10 @@ package pc
 
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -24,4 +28,24 @@ case class PcViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PcViewRow {
+  implicit val decoder: Decoder[PcViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productcategoryid <- c.downField("productcategoryid").as[Option[ProductcategoryId]]
+        name <- c.downField("name").as[Option[Name]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PcViewRow(id, productcategoryid, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[PcViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productcategoryid" := row.productcategoryid,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

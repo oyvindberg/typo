@@ -9,6 +9,10 @@ package specialofferproduct
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,4 +29,22 @@ case class SpecialofferproductRow(
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
  }
 
-
+object SpecialofferproductRow {
+  implicit val decoder: Decoder[SpecialofferproductRow] =
+    (c: HCursor) =>
+      for {
+        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
+        productid <- c.downField("productid").as[ProductId]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SpecialofferproductRow(specialofferid, productid, rowguid, modifieddate)
+  implicit val encoder: Encoder[SpecialofferproductRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "specialofferid" := row.specialofferid,
+        "productid" := row.productid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

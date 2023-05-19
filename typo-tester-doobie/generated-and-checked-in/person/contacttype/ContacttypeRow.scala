@@ -8,6 +8,10 @@ package person
 package contacttype
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ContacttypeRow(
@@ -18,4 +22,20 @@ case class ContacttypeRow(
   modifieddate: LocalDateTime
 )
 
-
+object ContacttypeRow {
+  implicit val decoder: Decoder[ContacttypeRow] =
+    (c: HCursor) =>
+      for {
+        contacttypeid <- c.downField("contacttypeid").as[ContacttypeId]
+        name <- c.downField("name").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ContacttypeRow(contacttypeid, name, modifieddate)
+  implicit val encoder: Encoder[ContacttypeRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "contacttypeid" := row.contacttypeid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -8,11 +8,28 @@ package hardcoded
 package myschema
 package football_club
 
-
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class FootballClubRow(
   id: FootballClubId,
   name: String
 )
 
-
+object FootballClubRow {
+  implicit val decoder: Decoder[FootballClubRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[FootballClubId]
+        name <- c.downField("name").as[String]
+      } yield FootballClubRow(id, name)
+  implicit val encoder: Encoder[FootballClubRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "name" := row.name
+      )}
+}

@@ -8,6 +8,10 @@ package production
 package culture
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CultureRow(
@@ -18,4 +22,20 @@ case class CultureRow(
   modifieddate: LocalDateTime
 )
 
-
+object CultureRow {
+  implicit val decoder: Decoder[CultureRow] =
+    (c: HCursor) =>
+      for {
+        cultureid <- c.downField("cultureid").as[CultureId]
+        name <- c.downField("name").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CultureRow(cultureid, name, modifieddate)
+  implicit val encoder: Encoder[CultureRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "cultureid" := row.cultureid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

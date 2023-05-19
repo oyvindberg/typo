@@ -9,6 +9,10 @@ package location
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.location` which has not been persisted yet */
@@ -48,4 +52,24 @@ case class LocationRowUnsaved(
                      }
     )
 }
-
+object LocationRowUnsaved {
+  implicit val decoder: Decoder[LocationRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        locationid <- c.downField("locationid").as[Defaulted[LocationId]]
+        costrate <- c.downField("costrate").as[Defaulted[BigDecimal]]
+        availability <- c.downField("availability").as[Defaulted[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield LocationRowUnsaved(name, locationid, costrate, availability, modifieddate)
+  implicit val encoder: Encoder[LocationRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "locationid" := row.locationid,
+        "costrate" := row.costrate,
+        "availability" := row.availability,
+        "modifieddate" := row.modifieddate
+      )}
+}

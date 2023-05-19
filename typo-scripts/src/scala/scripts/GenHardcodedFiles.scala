@@ -114,7 +114,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
     targets.foreach { target =>
       val (dbLib, jsonLib) =
         if (target.project.value.endsWith("doobie"))
-          (DbLibName.Doobie, JsonLibName.None)
+          (DbLibName.Doobie, JsonLibName.Circe)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val generated: Generated =
         fromData(

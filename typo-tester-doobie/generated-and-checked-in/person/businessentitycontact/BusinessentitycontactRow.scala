@@ -9,6 +9,10 @@ package businessentitycontact
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,4 +32,24 @@ case class BusinessentitycontactRow(
    val compositeId: BusinessentitycontactId = BusinessentitycontactId(businessentityid, personid, contacttypeid)
  }
 
-
+object BusinessentitycontactRow {
+  implicit val decoder: Decoder[BusinessentitycontactRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        personid <- c.downField("personid").as[BusinessentityId]
+        contacttypeid <- c.downField("contacttypeid").as[ContacttypeId]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield BusinessentitycontactRow(businessentityid, personid, contacttypeid, rowguid, modifieddate)
+  implicit val encoder: Encoder[BusinessentitycontactRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "personid" := row.personid,
+        "contacttypeid" := row.contacttypeid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

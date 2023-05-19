@@ -10,6 +10,10 @@ package tr
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,4 +35,30 @@ case class TrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object TrViewRow {
+  implicit val decoder: Decoder[TrViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        salestaxrateid <- c.downField("salestaxrateid").as[Option[SalestaxrateId]]
+        stateprovinceid <- c.downField("stateprovinceid").as[Option[StateprovinceId]]
+        taxtype <- c.downField("taxtype").as[Option[Int]]
+        taxrate <- c.downField("taxrate").as[Option[BigDecimal]]
+        name <- c.downField("name").as[Option[Name]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield TrViewRow(id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[TrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "salestaxrateid" := row.salestaxrateid,
+        "stateprovinceid" := row.stateprovinceid,
+        "taxtype" := row.taxtype,
+        "taxrate" := row.taxrate,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

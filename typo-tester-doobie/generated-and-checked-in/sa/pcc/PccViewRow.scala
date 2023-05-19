@@ -9,6 +9,10 @@ package pcc
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PccViewRow(
@@ -21,4 +25,22 @@ case class PccViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PccViewRow {
+  implicit val decoder: Decoder[PccViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PccViewRow(id, businessentityid, creditcardid, modifieddate)
+  implicit val encoder: Encoder[PccViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "creditcardid" := row.creditcardid,
+        "modifieddate" := row.modifieddate
+      )}
+}

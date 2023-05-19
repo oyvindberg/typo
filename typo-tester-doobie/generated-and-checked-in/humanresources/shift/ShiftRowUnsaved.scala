@@ -9,6 +9,10 @@ package shift
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -41,4 +45,24 @@ case class ShiftRowUnsaved(
                      }
     )
 }
-
+object ShiftRowUnsaved {
+  implicit val decoder: Decoder[ShiftRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        starttime <- c.downField("starttime").as[LocalTime]
+        endtime <- c.downField("endtime").as[LocalTime]
+        shiftid <- c.downField("shiftid").as[Defaulted[ShiftId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ShiftRowUnsaved(name, starttime, endtime, shiftid, modifieddate)
+  implicit val encoder: Encoder[ShiftRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "starttime" := row.starttime,
+        "endtime" := row.endtime,
+        "shiftid" := row.shiftid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package productmodel
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -48,4 +52,26 @@ case class ProductmodelRowUnsaved(
                      }
     )
 }
-
+object ProductmodelRowUnsaved {
+  implicit val decoder: Decoder[ProductmodelRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        catalogdescription <- c.downField("catalogdescription").as[Option[PgSQLXML]]
+        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        productmodelid <- c.downField("productmodelid").as[Defaulted[ProductmodelId]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductmodelRowUnsaved(name, catalogdescription, instructions, productmodelid, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductmodelRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "catalogdescription" := row.catalogdescription,
+        "instructions" := row.instructions,
+        "productmodelid" := row.productmodelid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

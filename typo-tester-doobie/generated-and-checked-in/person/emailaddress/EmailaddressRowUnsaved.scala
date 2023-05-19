@@ -9,6 +9,10 @@ package emailaddress
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -45,4 +49,24 @@ case class EmailaddressRowUnsaved(
                      }
     )
 }
-
+object EmailaddressRowUnsaved {
+  implicit val decoder: Decoder[EmailaddressRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddressid <- c.downField("emailaddressid").as[Defaulted[Int]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield EmailaddressRowUnsaved(businessentityid, emailaddress, emailaddressid, rowguid, modifieddate)
+  implicit val encoder: Encoder[EmailaddressRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "emailaddress" := row.emailaddress,
+        "emailaddressid" := row.emailaddressid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

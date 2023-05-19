@@ -9,6 +9,10 @@ package vadditionalcontactinfo
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -39,4 +43,48 @@ case class VadditionalcontactinfoViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object VadditionalcontactinfoViewRow {
+  implicit val decoder: Decoder[VadditionalcontactinfoViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        firstname <- c.downField("firstname").as[Option[Name]]
+        middlename <- c.downField("middlename").as[Option[Name]]
+        lastname <- c.downField("lastname").as[Option[Name]]
+        telephonenumber <- c.downField("telephonenumber").as[Option[PgSQLXML]]
+        telephonespecialinstructions <- c.downField("telephonespecialinstructions").as[Option[String]]
+        street <- c.downField("street").as[Option[PgSQLXML]]
+        city <- c.downField("city").as[Option[PgSQLXML]]
+        stateprovince <- c.downField("stateprovince").as[Option[PgSQLXML]]
+        postalcode <- c.downField("postalcode").as[Option[PgSQLXML]]
+        countryregion <- c.downField("countryregion").as[Option[PgSQLXML]]
+        homeaddressspecialinstructions <- c.downField("homeaddressspecialinstructions").as[Option[PgSQLXML]]
+        emailaddress <- c.downField("emailaddress").as[Option[PgSQLXML]]
+        emailspecialinstructions <- c.downField("emailspecialinstructions").as[Option[String]]
+        emailtelephonenumber <- c.downField("emailtelephonenumber").as[Option[PgSQLXML]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield VadditionalcontactinfoViewRow(businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate)
+  implicit val encoder: Encoder[VadditionalcontactinfoViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "firstname" := row.firstname,
+        "middlename" := row.middlename,
+        "lastname" := row.lastname,
+        "telephonenumber" := row.telephonenumber,
+        "telephonespecialinstructions" := row.telephonespecialinstructions,
+        "street" := row.street,
+        "city" := row.city,
+        "stateprovince" := row.stateprovince,
+        "postalcode" := row.postalcode,
+        "countryregion" := row.countryregion,
+        "homeaddressspecialinstructions" := row.homeaddressspecialinstructions,
+        "emailaddress" := row.emailaddress,
+        "emailspecialinstructions" := row.emailspecialinstructions,
+        "emailtelephonenumber" := row.emailtelephonenumber,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

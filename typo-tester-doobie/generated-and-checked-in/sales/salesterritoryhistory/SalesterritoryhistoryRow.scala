@@ -9,6 +9,10 @@ package salesterritoryhistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -29,4 +33,26 @@ case class SalesterritoryhistoryRow(
    val compositeId: SalesterritoryhistoryId = SalesterritoryhistoryId(businessentityid, startdate, territoryid)
  }
 
-
+object SalesterritoryhistoryRow {
+  implicit val decoder: Decoder[SalesterritoryhistoryRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        territoryid <- c.downField("territoryid").as[SalesterritoryId]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesterritoryhistoryRow(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalesterritoryhistoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "territoryid" := row.territoryid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package sr
 
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class SrViewRow(
@@ -23,4 +27,24 @@ case class SrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SrViewRow {
+  implicit val decoder: Decoder[SrViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        salesreasonid <- c.downField("salesreasonid").as[Option[SalesreasonId]]
+        name <- c.downField("name").as[Option[Name]]
+        reasontype <- c.downField("reasontype").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SrViewRow(id, salesreasonid, name, reasontype, modifieddate)
+  implicit val encoder: Encoder[SrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "salesreasonid" := row.salesreasonid,
+        "name" := row.name,
+        "reasontype" := row.reasontype,
+        "modifieddate" := row.modifieddate
+      )}
+}

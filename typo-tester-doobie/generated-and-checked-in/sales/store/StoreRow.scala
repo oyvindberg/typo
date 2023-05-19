@@ -9,6 +9,10 @@ package store
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -28,4 +32,26 @@ case class StoreRow(
   modifieddate: LocalDateTime
 )
 
-
+object StoreRow {
+  implicit val decoder: Decoder[StoreRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        name <- c.downField("name").as[Name]
+        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
+        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield StoreRow(businessentityid, name, salespersonid, demographics, rowguid, modifieddate)
+  implicit val encoder: Encoder[StoreRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "name" := row.name,
+        "salespersonid" := row.salespersonid,
+        "demographics" := row.demographics,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

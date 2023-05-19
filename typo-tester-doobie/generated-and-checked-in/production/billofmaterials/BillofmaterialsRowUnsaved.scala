@@ -10,6 +10,10 @@ package billofmaterials
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.billofmaterials` which has not been persisted yet */
@@ -64,4 +68,32 @@ case class BillofmaterialsRowUnsaved(
                      }
     )
 }
-
+object BillofmaterialsRowUnsaved {
+  implicit val decoder: Decoder[BillofmaterialsRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productassemblyid <- c.downField("productassemblyid").as[Option[ProductId]]
+        componentid <- c.downField("componentid").as[ProductId]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
+        bomlevel <- c.downField("bomlevel").as[Int]
+        billofmaterialsid <- c.downField("billofmaterialsid").as[Defaulted[BillofmaterialsId]]
+        startdate <- c.downField("startdate").as[Defaulted[LocalDateTime]]
+        perassemblyqty <- c.downField("perassemblyqty").as[Defaulted[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
+  implicit val encoder: Encoder[BillofmaterialsRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productassemblyid" := row.productassemblyid,
+        "componentid" := row.componentid,
+        "enddate" := row.enddate,
+        "unitmeasurecode" := row.unitmeasurecode,
+        "bomlevel" := row.bomlevel,
+        "billofmaterialsid" := row.billofmaterialsid,
+        "startdate" := row.startdate,
+        "perassemblyqty" := row.perassemblyqty,
+        "modifieddate" := row.modifieddate
+      )}
+}

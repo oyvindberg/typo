@@ -7,7 +7,10 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
-
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class VsalespersonsalesbyfiscalyearsViewRow(
   SalesPersonID: Option[Int],
@@ -19,4 +22,28 @@ case class VsalespersonsalesbyfiscalyearsViewRow(
   `2014`: Option[BigDecimal]
 )
 
-
+object VsalespersonsalesbyfiscalyearsViewRow {
+  implicit val decoder: Decoder[VsalespersonsalesbyfiscalyearsViewRow] =
+    (c: HCursor) =>
+      for {
+        SalesPersonID <- c.downField("SalesPersonID").as[Option[Int]]
+        FullName <- c.downField("FullName").as[Option[String]]
+        JobTitle <- c.downField("JobTitle").as[Option[String]]
+        SalesTerritory <- c.downField("SalesTerritory").as[Option[String]]
+        `2012` <- c.downField("2012").as[Option[BigDecimal]]
+        `2013` <- c.downField("2013").as[Option[BigDecimal]]
+        `2014` <- c.downField("2014").as[Option[BigDecimal]]
+      } yield VsalespersonsalesbyfiscalyearsViewRow(SalesPersonID, FullName, JobTitle, SalesTerritory, `2012`, `2013`, `2014`)
+  implicit val encoder: Encoder[VsalespersonsalesbyfiscalyearsViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "SalesPersonID" := row.SalesPersonID,
+        "FullName" := row.FullName,
+        "JobTitle" := row.JobTitle,
+        "SalesTerritory" := row.SalesTerritory,
+        "2012" := row.`2012`,
+        "2013" := row.`2013`,
+        "2014" := row.`2014`
+      )}
+}

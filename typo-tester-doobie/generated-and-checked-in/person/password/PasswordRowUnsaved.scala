@@ -9,6 +9,10 @@ package password
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -40,4 +44,24 @@ case class PasswordRowUnsaved(
                      }
     )
 }
-
+object PasswordRowUnsaved {
+  implicit val decoder: Decoder[PasswordRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        passwordhash <- c.downField("passwordhash").as[String]
+        passwordsalt <- c.downField("passwordsalt").as[String]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield PasswordRowUnsaved(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+  implicit val encoder: Encoder[PasswordRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "passwordhash" := row.passwordhash,
+        "passwordsalt" := row.passwordsalt,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

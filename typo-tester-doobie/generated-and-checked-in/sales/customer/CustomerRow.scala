@@ -9,6 +9,10 @@ package customer
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,4 +32,26 @@ case class CustomerRow(
   modifieddate: LocalDateTime
 )
 
-
+object CustomerRow {
+  implicit val decoder: Decoder[CustomerRow] =
+    (c: HCursor) =>
+      for {
+        customerid <- c.downField("customerid").as[CustomerId]
+        personid <- c.downField("personid").as[Option[BusinessentityId]]
+        storeid <- c.downField("storeid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CustomerRow(customerid, personid, storeid, territoryid, rowguid, modifieddate)
+  implicit val encoder: Encoder[CustomerRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "customerid" := row.customerid,
+        "personid" := row.personid,
+        "storeid" := row.storeid,
+        "territoryid" := row.territoryid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

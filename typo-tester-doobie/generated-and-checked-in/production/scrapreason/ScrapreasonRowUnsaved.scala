@@ -9,6 +9,10 @@ package scrapreason
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.scrapreason` which has not been persisted yet */
@@ -34,4 +38,20 @@ case class ScrapreasonRowUnsaved(
                      }
     )
 }
-
+object ScrapreasonRowUnsaved {
+  implicit val decoder: Decoder[ScrapreasonRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        scrapreasonid <- c.downField("scrapreasonid").as[Defaulted[ScrapreasonId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ScrapreasonRowUnsaved(name, scrapreasonid, modifieddate)
+  implicit val encoder: Encoder[ScrapreasonRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "scrapreasonid" := row.scrapreasonid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,10 +9,26 @@ package productdocument
 
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `production.productdocument` */
 case class ProductdocumentId(productid: ProductId, documentnode: DocumentId)
 object ProductdocumentId {
   implicit def ordering: Ordering[ProductdocumentId] = Ordering.by(x => (x.productid, x.documentnode))
-  
+  implicit val decoder: Decoder[ProductdocumentId] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        documentnode <- c.downField("documentnode").as[DocumentId]
+      } yield ProductdocumentId(productid, documentnode)
+  implicit val encoder: Encoder[ProductdocumentId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "documentnode" := row.documentnode
+      )}
 }

@@ -8,6 +8,10 @@ package hardcoded
 package compositepk
 package person
 
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import testdb.hardcoded.Defaulted
 
 /** This class corresponds to a row in table `compositepk.person` which has not been persisted yet */
@@ -31,4 +35,20 @@ case class PersonRowUnsaved(
             }
     )
 }
-
+object PersonRowUnsaved {
+  implicit val decoder: Decoder[PersonRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Option[String]]
+        one <- c.downField("one").as[Defaulted[Long]]
+        two <- c.downField("two").as[Defaulted[Option[String]]]
+      } yield PersonRowUnsaved(name, one, two)
+  implicit val encoder: Encoder[PersonRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "one" := row.one,
+        "two" := row.two
+      )}
+}

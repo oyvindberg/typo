@@ -8,12 +8,17 @@ package humanresources
 package department
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.department` */
 case class DepartmentId(value: Int) extends AnyVal
 object DepartmentId {
   implicit val ordering: Ordering[DepartmentId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[DepartmentId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[DepartmentId] =
+    Decoder[Int].map(DepartmentId(_))
   implicit val metaArray: Meta[Array[DepartmentId]] = Meta[Array[Int]].imap(_.map(DepartmentId.apply))(_.map(_.value))
   implicit val meta: Meta[DepartmentId] = Meta[Int].imap(DepartmentId.apply)(_.value)
 }

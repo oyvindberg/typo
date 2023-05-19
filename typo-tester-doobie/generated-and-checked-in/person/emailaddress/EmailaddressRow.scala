@@ -8,6 +8,10 @@ package person
 package emailaddress
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,4 +29,24 @@ case class EmailaddressRow(
    val compositeId: EmailaddressId = EmailaddressId(businessentityid, emailaddressid)
  }
 
-
+object EmailaddressRow {
+  implicit val decoder: Decoder[EmailaddressRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        emailaddressid <- c.downField("emailaddressid").as[Int]
+        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield EmailaddressRow(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+  implicit val encoder: Encoder[EmailaddressRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "emailaddressid" := row.emailaddressid,
+        "emailaddress" := row.emailaddress,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

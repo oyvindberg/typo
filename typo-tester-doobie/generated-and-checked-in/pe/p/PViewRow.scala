@@ -10,6 +10,10 @@ package p
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -44,4 +48,42 @@ case class PViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PViewRow {
+  implicit val decoder: Decoder[PViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        persontype <- c.downField("persontype").as[Option[/* bpchar */ String]]
+        namestyle <- c.downField("namestyle").as[NameStyle]
+        title <- c.downField("title").as[Option[String]]
+        firstname <- c.downField("firstname").as[Option[Name]]
+        middlename <- c.downField("middlename").as[Option[Name]]
+        lastname <- c.downField("lastname").as[Option[Name]]
+        suffix <- c.downField("suffix").as[Option[String]]
+        emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
+        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[PgSQLXML]]
+        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PViewRow(id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
+  implicit val encoder: Encoder[PViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "persontype" := row.persontype,
+        "namestyle" := row.namestyle,
+        "title" := row.title,
+        "firstname" := row.firstname,
+        "middlename" := row.middlename,
+        "lastname" := row.lastname,
+        "suffix" := row.suffix,
+        "emailpromotion" := row.emailpromotion,
+        "additionalcontactinfo" := row.additionalcontactinfo,
+        "demographics" := row.demographics,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

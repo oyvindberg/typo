@@ -10,6 +10,10 @@ package sod
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -37,4 +41,36 @@ case class SodViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SodViewRow {
+  implicit val decoder: Decoder[SodViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
+        salesorderdetailid <- c.downField("salesorderdetailid").as[Option[Int]]
+        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[String]]
+        orderqty <- c.downField("orderqty").as[Option[Int]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        specialofferid <- c.downField("specialofferid").as[Option[SpecialofferId]]
+        unitprice <- c.downField("unitprice").as[Option[BigDecimal]]
+        unitpricediscount <- c.downField("unitpricediscount").as[Option[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SodViewRow(id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
+  implicit val encoder: Encoder[SodViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "salesorderid" := row.salesorderid,
+        "salesorderdetailid" := row.salesorderdetailid,
+        "carriertrackingnumber" := row.carriertrackingnumber,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "specialofferid" := row.specialofferid,
+        "unitprice" := row.unitprice,
+        "unitpricediscount" := row.unitpricediscount,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

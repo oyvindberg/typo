@@ -8,6 +8,10 @@ package person
 package businessentity
 
 import adventureworks.Defaulted
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -37,4 +41,20 @@ case class BusinessentityRowUnsaved(
                      }
     )
 }
-
+object BusinessentityRowUnsaved {
+  implicit val decoder: Decoder[BusinessentityRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Defaulted[BusinessentityId]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield BusinessentityRowUnsaved(businessentityid, rowguid, modifieddate)
+  implicit val encoder: Encoder[BusinessentityRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

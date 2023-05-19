@@ -8,6 +8,10 @@ package sales
 package currencyrate
 
 import adventureworks.sales.currency.CurrencyId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CurrencyrateRow(
@@ -28,4 +32,28 @@ case class CurrencyrateRow(
   modifieddate: LocalDateTime
 )
 
-
+object CurrencyrateRow {
+  implicit val decoder: Decoder[CurrencyrateRow] =
+    (c: HCursor) =>
+      for {
+        currencyrateid <- c.downField("currencyrateid").as[CurrencyrateId]
+        currencyratedate <- c.downField("currencyratedate").as[LocalDateTime]
+        fromcurrencycode <- c.downField("fromcurrencycode").as[CurrencyId]
+        tocurrencycode <- c.downField("tocurrencycode").as[CurrencyId]
+        averagerate <- c.downField("averagerate").as[BigDecimal]
+        endofdayrate <- c.downField("endofdayrate").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CurrencyrateRow(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
+  implicit val encoder: Encoder[CurrencyrateRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "currencyrateid" := row.currencyrateid,
+        "currencyratedate" := row.currencyratedate,
+        "fromcurrencycode" := row.fromcurrencycode,
+        "tocurrencycode" := row.tocurrencycode,
+        "averagerate" := row.averagerate,
+        "endofdayrate" := row.endofdayrate,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -10,6 +10,10 @@ package purchaseorderheader
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.purchaseorderheader` which has not been persisted yet */
@@ -89,4 +93,38 @@ case class PurchaseorderheaderRowUnsaved(
                      }
     )
 }
-
+object PurchaseorderheaderRowUnsaved {
+  implicit val decoder: Decoder[PurchaseorderheaderRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        employeeid <- c.downField("employeeid").as[BusinessentityId]
+        vendorid <- c.downField("vendorid").as[BusinessentityId]
+        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
+        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
+        purchaseorderid <- c.downField("purchaseorderid").as[Defaulted[PurchaseorderheaderId]]
+        revisionnumber <- c.downField("revisionnumber").as[Defaulted[Int]]
+        status <- c.downField("status").as[Defaulted[Int]]
+        orderdate <- c.downField("orderdate").as[Defaulted[LocalDateTime]]
+        subtotal <- c.downField("subtotal").as[Defaulted[BigDecimal]]
+        taxamt <- c.downField("taxamt").as[Defaulted[BigDecimal]]
+        freight <- c.downField("freight").as[Defaulted[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield PurchaseorderheaderRowUnsaved(employeeid, vendorid, shipmethodid, shipdate, purchaseorderid, revisionnumber, status, orderdate, subtotal, taxamt, freight, modifieddate)
+  implicit val encoder: Encoder[PurchaseorderheaderRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "employeeid" := row.employeeid,
+        "vendorid" := row.vendorid,
+        "shipmethodid" := row.shipmethodid,
+        "shipdate" := row.shipdate,
+        "purchaseorderid" := row.purchaseorderid,
+        "revisionnumber" := row.revisionnumber,
+        "status" := row.status,
+        "orderdate" := row.orderdate,
+        "subtotal" := row.subtotal,
+        "taxamt" := row.taxamt,
+        "freight" := row.freight,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -7,6 +7,8 @@ package adventureworks
 package public
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Domain `public.NameStyle`
   * No constraint
@@ -14,7 +16,10 @@ import doobie.Meta
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
   implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[NameStyle] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[NameStyle] =
+    Encoder[Boolean].contramap(_.value)
+  implicit val decoder: Decoder[NameStyle] =
+    Decoder[Boolean].map(NameStyle(_))
   implicit val metaArray: Meta[Array[NameStyle]] = Meta[Array[Boolean]].imap(_.map(NameStyle.apply))(_.map(_.value))
   implicit val meta: Meta[NameStyle] = Meta[Boolean].imap(NameStyle.apply)(_.value)
 }

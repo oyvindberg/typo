@@ -8,12 +8,17 @@ package production
 package productsubcategory
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `production.productsubcategory` */
 case class ProductsubcategoryId(value: Int) extends AnyVal
 object ProductsubcategoryId {
   implicit val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[ProductsubcategoryId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[ProductsubcategoryId] =
+    Decoder[Int].map(ProductsubcategoryId(_))
   implicit val metaArray: Meta[Array[ProductsubcategoryId]] = Meta[Array[Int]].imap(_.map(ProductsubcategoryId.apply))(_.map(_.value))
   implicit val meta: Meta[ProductsubcategoryId] = Meta[Int].imap(ProductsubcategoryId.apply)(_.value)
 }

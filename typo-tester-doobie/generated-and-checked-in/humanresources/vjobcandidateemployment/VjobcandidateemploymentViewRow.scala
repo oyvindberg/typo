@@ -8,6 +8,10 @@ package humanresources
 package vjobcandidateemployment
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 
 case class VjobcandidateemploymentViewRow(
@@ -25,4 +29,36 @@ case class VjobcandidateemploymentViewRow(
   `Emp.Loc.City`: Option[String]
 )
 
-
+object VjobcandidateemploymentViewRow {
+  implicit val decoder: Decoder[VjobcandidateemploymentViewRow] =
+    (c: HCursor) =>
+      for {
+        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
+        `Emp.StartDate` <- c.downField("Emp.StartDate").as[Option[LocalDate]]
+        `Emp.EndDate` <- c.downField("Emp.EndDate").as[Option[LocalDate]]
+        `Emp.OrgName` <- c.downField("Emp.OrgName").as[Option[String]]
+        `Emp.JobTitle` <- c.downField("Emp.JobTitle").as[Option[String]]
+        `Emp.Responsibility` <- c.downField("Emp.Responsibility").as[Option[String]]
+        `Emp.FunctionCategory` <- c.downField("Emp.FunctionCategory").as[Option[String]]
+        `Emp.IndustryCategory` <- c.downField("Emp.IndustryCategory").as[Option[String]]
+        `Emp.Loc.CountryRegion` <- c.downField("Emp.Loc.CountryRegion").as[Option[String]]
+        `Emp.Loc.State` <- c.downField("Emp.Loc.State").as[Option[String]]
+        `Emp.Loc.City` <- c.downField("Emp.Loc.City").as[Option[String]]
+      } yield VjobcandidateemploymentViewRow(jobcandidateid, `Emp.StartDate`, `Emp.EndDate`, `Emp.OrgName`, `Emp.JobTitle`, `Emp.Responsibility`, `Emp.FunctionCategory`, `Emp.IndustryCategory`, `Emp.Loc.CountryRegion`, `Emp.Loc.State`, `Emp.Loc.City`)
+  implicit val encoder: Encoder[VjobcandidateemploymentViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "jobcandidateid" := row.jobcandidateid,
+        "Emp.StartDate" := row.`Emp.StartDate`,
+        "Emp.EndDate" := row.`Emp.EndDate`,
+        "Emp.OrgName" := row.`Emp.OrgName`,
+        "Emp.JobTitle" := row.`Emp.JobTitle`,
+        "Emp.Responsibility" := row.`Emp.Responsibility`,
+        "Emp.FunctionCategory" := row.`Emp.FunctionCategory`,
+        "Emp.IndustryCategory" := row.`Emp.IndustryCategory`,
+        "Emp.Loc.CountryRegion" := row.`Emp.Loc.CountryRegion`,
+        "Emp.Loc.State" := row.`Emp.Loc.State`,
+        "Emp.Loc.City" := row.`Emp.Loc.City`
+      )}
+}

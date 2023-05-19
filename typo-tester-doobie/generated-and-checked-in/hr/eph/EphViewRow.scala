@@ -8,6 +8,10 @@ package hr
 package eph
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class EphViewRow(
@@ -24,4 +28,26 @@ case class EphViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object EphViewRow {
+  implicit val decoder: Decoder[EphViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        ratechangedate <- c.downField("ratechangedate").as[Option[LocalDateTime]]
+        rate <- c.downField("rate").as[Option[BigDecimal]]
+        payfrequency <- c.downField("payfrequency").as[Option[Int]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield EphViewRow(id, businessentityid, ratechangedate, rate, payfrequency, modifieddate)
+  implicit val encoder: Encoder[EphViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "ratechangedate" := row.ratechangedate,
+        "rate" := row.rate,
+        "payfrequency" := row.payfrequency,
+        "modifieddate" := row.modifieddate
+      )}
+}

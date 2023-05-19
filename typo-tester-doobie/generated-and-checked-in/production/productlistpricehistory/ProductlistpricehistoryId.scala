@@ -8,11 +8,27 @@ package production
 package productlistpricehistory
 
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** Type for the composite primary key of table `production.productlistpricehistory` */
 case class ProductlistpricehistoryId(productid: ProductId, startdate: LocalDateTime)
 object ProductlistpricehistoryId {
   implicit def ordering: Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
-  
+  implicit val decoder: Decoder[ProductlistpricehistoryId] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+      } yield ProductlistpricehistoryId(productid, startdate)
+  implicit val encoder: Encoder[ProductlistpricehistoryId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "startdate" := row.startdate
+      )}
 }
