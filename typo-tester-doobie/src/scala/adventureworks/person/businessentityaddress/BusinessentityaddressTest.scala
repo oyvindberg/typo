@@ -4,7 +4,7 @@ import adventureworks.person.address.{AddressRepoImpl, AddressRowUnsaved}
 import adventureworks.person.addresstype.{AddresstypeRepoImpl, AddresstypeRowUnsaved}
 import adventureworks.person.businessentity.{BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.countryregion.{CountryregionId, CountryregionRepoImpl, CountryregionRowUnsaved}
-import adventureworks.person.stateprovince.{StateprovinceRepoImpl, StateprovinceRowUnsaved}
+import adventureworks.person.stateprovince.{StateprovinceId, StateprovinceRepoImpl, StateprovinceRowUnsaved}
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.{SalesterritoryRepoImpl, SalesterritoryRowUnsaved}
 import adventureworks.{Defaulted, withConnection}
@@ -18,6 +18,22 @@ import java.util.UUID
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = BusinessentityaddressRepoImpl
 
+  test("json") {
+    val initial = AddressRowUnsaved(
+      addressline1 = "addressline1",
+      addressline2 = Some("addressline2"),
+      city = "city",
+      stateprovinceid = StateprovinceId(1),
+      postalcode = "postalcode",
+      spatiallocation = None
+    )
+    import io.circe.syntax.*
+    initial.asJson.as[AddressRowUnsaved] match {
+      case Right(roundtripped) => assert(roundtripped === initial)
+      case Left(error)         => fail(error)
+    }
+
+  }
   test("works") {
     withConnection {
       for {

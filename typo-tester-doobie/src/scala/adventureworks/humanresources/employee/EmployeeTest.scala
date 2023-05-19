@@ -16,6 +16,34 @@ import doobie.free.connection.delay
 class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = EmployeeRepoImpl
 
+  test("json") {
+    val initial = PersonRowUnsaved(
+      businessentityid = BusinessentityId(1),
+      persontype = "SC",
+      title = None,
+      firstname = Name("firstname"),
+      middlename = Some(Name("middlename")),
+      lastname = Name("lastname"),
+      suffix = Some("suffix"),
+      additionalcontactinfo = Some(new PgSQLXML(null, "<additionalcontactinfo/>")),
+      demographics = None,
+      namestyle = Defaulted.UseDefault,
+      emailpromotion = Defaulted.UseDefault,
+      rowguid = Defaulted.UseDefault,
+      modifieddate = Defaulted.UseDefault
+    )
+
+    // the xml structure doesn't have a stable equals method, so we need to use the json representation
+    import io.circe.syntax.*
+    val initialJson = initial.asJson
+    initialJson.as[PersonRowUnsaved] match {
+      case Right(roundtripped) =>
+        val roundtrippedAsJson = roundtripped.asJson
+        assert(roundtrippedAsJson === initialJson)
+      case Left(error) => fail(error)
+    }
+  }
+
   test("works") {
     withConnection {
       for {
