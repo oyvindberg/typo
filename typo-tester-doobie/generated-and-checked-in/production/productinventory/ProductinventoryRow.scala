@@ -9,6 +9,10 @@ package productinventory
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,4 +35,28 @@ case class ProductinventoryRow(
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)
  }
 
-
+object ProductinventoryRow {
+  implicit val decoder: Decoder[ProductinventoryRow] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        locationid <- c.downField("locationid").as[LocationId]
+        shelf <- c.downField("shelf").as[String]
+        bin <- c.downField("bin").as[Int]
+        quantity <- c.downField("quantity").as[Int]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductinventoryRow(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductinventoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "locationid" := row.locationid,
+        "shelf" := row.shelf,
+        "bin" := row.bin,
+        "quantity" := row.quantity,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

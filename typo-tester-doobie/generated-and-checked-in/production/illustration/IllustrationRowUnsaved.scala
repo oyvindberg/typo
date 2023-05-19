@@ -8,6 +8,10 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import org.postgresql.jdbc.PgSQLXML
 
@@ -34,4 +38,20 @@ case class IllustrationRowUnsaved(
                      }
     )
 }
-
+object IllustrationRowUnsaved {
+  implicit val decoder: Decoder[IllustrationRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        diagram <- c.downField("diagram").as[Option[PgSQLXML]]
+        illustrationid <- c.downField("illustrationid").as[Defaulted[IllustrationId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
+  implicit val encoder: Encoder[IllustrationRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "diagram" := row.diagram,
+        "illustrationid" := row.illustrationid,
+        "modifieddate" := row.modifieddate
+      )}
+}

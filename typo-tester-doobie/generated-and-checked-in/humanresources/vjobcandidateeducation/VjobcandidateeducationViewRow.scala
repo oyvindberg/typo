@@ -8,6 +8,10 @@ package humanresources
 package vjobcandidateeducation
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 
 case class VjobcandidateeducationViewRow(
@@ -27,4 +31,40 @@ case class VjobcandidateeducationViewRow(
   `Edu.Loc.City`: Option[String]
 )
 
-
+object VjobcandidateeducationViewRow {
+  implicit val decoder: Decoder[VjobcandidateeducationViewRow] =
+    (c: HCursor) =>
+      for {
+        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
+        `Edu.Level` <- c.downField("Edu.Level").as[Option[String]]
+        `Edu.StartDate` <- c.downField("Edu.StartDate").as[Option[LocalDate]]
+        `Edu.EndDate` <- c.downField("Edu.EndDate").as[Option[LocalDate]]
+        `Edu.Degree` <- c.downField("Edu.Degree").as[Option[String]]
+        `Edu.Major` <- c.downField("Edu.Major").as[Option[String]]
+        `Edu.Minor` <- c.downField("Edu.Minor").as[Option[String]]
+        `Edu.GPA` <- c.downField("Edu.GPA").as[Option[String]]
+        `Edu.GPAScale` <- c.downField("Edu.GPAScale").as[Option[String]]
+        `Edu.School` <- c.downField("Edu.School").as[Option[String]]
+        `Edu.Loc.CountryRegion` <- c.downField("Edu.Loc.CountryRegion").as[Option[String]]
+        `Edu.Loc.State` <- c.downField("Edu.Loc.State").as[Option[String]]
+        `Edu.Loc.City` <- c.downField("Edu.Loc.City").as[Option[String]]
+      } yield VjobcandidateeducationViewRow(jobcandidateid, `Edu.Level`, `Edu.StartDate`, `Edu.EndDate`, `Edu.Degree`, `Edu.Major`, `Edu.Minor`, `Edu.GPA`, `Edu.GPAScale`, `Edu.School`, `Edu.Loc.CountryRegion`, `Edu.Loc.State`, `Edu.Loc.City`)
+  implicit val encoder: Encoder[VjobcandidateeducationViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "jobcandidateid" := row.jobcandidateid,
+        "Edu.Level" := row.`Edu.Level`,
+        "Edu.StartDate" := row.`Edu.StartDate`,
+        "Edu.EndDate" := row.`Edu.EndDate`,
+        "Edu.Degree" := row.`Edu.Degree`,
+        "Edu.Major" := row.`Edu.Major`,
+        "Edu.Minor" := row.`Edu.Minor`,
+        "Edu.GPA" := row.`Edu.GPA`,
+        "Edu.GPAScale" := row.`Edu.GPAScale`,
+        "Edu.School" := row.`Edu.School`,
+        "Edu.Loc.CountryRegion" := row.`Edu.Loc.CountryRegion`,
+        "Edu.Loc.State" := row.`Edu.Loc.State`,
+        "Edu.Loc.City" := row.`Edu.Loc.City`
+      )}
+}

@@ -10,6 +10,10 @@ package pp
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PpViewRow(
@@ -24,4 +28,24 @@ case class PpViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PpViewRow {
+  implicit val decoder: Decoder[PpViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        phonenumber <- c.downField("phonenumber").as[Option[Phone]]
+        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Option[PhonenumbertypeId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PpViewRow(id, businessentityid, phonenumber, phonenumbertypeid, modifieddate)
+  implicit val encoder: Encoder[PpViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "phonenumber" := row.phonenumber,
+        "phonenumbertypeid" := row.phonenumbertypeid,
+        "modifieddate" := row.modifieddate
+      )}
+}

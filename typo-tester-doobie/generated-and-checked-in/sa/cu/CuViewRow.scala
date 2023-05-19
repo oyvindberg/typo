@@ -9,6 +9,10 @@ package cu
 
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CuViewRow(
@@ -21,4 +25,22 @@ case class CuViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object CuViewRow {
+  implicit val decoder: Decoder[CuViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[/* bpchar */ String]]
+        currencycode <- c.downField("currencycode").as[Option[CurrencyId]]
+        name <- c.downField("name").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield CuViewRow(id, currencycode, name, modifieddate)
+  implicit val encoder: Encoder[CuViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "currencycode" := row.currencycode,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

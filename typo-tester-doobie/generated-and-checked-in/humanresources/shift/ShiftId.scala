@@ -8,12 +8,17 @@ package humanresources
 package shift
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.shift` */
 case class ShiftId(value: Int) extends AnyVal
 object ShiftId {
   implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[ShiftId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[ShiftId] =
+    Decoder[Int].map(ShiftId(_))
   implicit val metaArray: Meta[Array[ShiftId]] = Meta[Array[Int]].imap(_.map(ShiftId.apply))(_.map(_.value))
   implicit val meta: Meta[ShiftId] = Meta[Int].imap(ShiftId.apply)(_.value)
 }

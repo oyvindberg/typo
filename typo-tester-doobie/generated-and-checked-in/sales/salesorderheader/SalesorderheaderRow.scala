@@ -17,6 +17,10 @@ import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -79,4 +83,64 @@ case class SalesorderheaderRow(
   modifieddate: LocalDateTime
 )
 
-
+object SalesorderheaderRow {
+  implicit val decoder: Decoder[SalesorderheaderRow] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
+        revisionnumber <- c.downField("revisionnumber").as[Int]
+        orderdate <- c.downField("orderdate").as[LocalDateTime]
+        duedate <- c.downField("duedate").as[LocalDateTime]
+        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
+        status <- c.downField("status").as[Int]
+        onlineorderflag <- c.downField("onlineorderflag").as[Flag]
+        purchaseordernumber <- c.downField("purchaseordernumber").as[Option[OrderNumber]]
+        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
+        customerid <- c.downField("customerid").as[CustomerId]
+        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        billtoaddressid <- c.downField("billtoaddressid").as[AddressId]
+        shiptoaddressid <- c.downField("shiptoaddressid").as[AddressId]
+        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
+        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
+        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[String]]
+        currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
+        subtotal <- c.downField("subtotal").as[BigDecimal]
+        taxamt <- c.downField("taxamt").as[BigDecimal]
+        freight <- c.downField("freight").as[BigDecimal]
+        totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
+        comment <- c.downField("comment").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesorderheaderRow(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalesorderheaderRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "revisionnumber" := row.revisionnumber,
+        "orderdate" := row.orderdate,
+        "duedate" := row.duedate,
+        "shipdate" := row.shipdate,
+        "status" := row.status,
+        "onlineorderflag" := row.onlineorderflag,
+        "purchaseordernumber" := row.purchaseordernumber,
+        "accountnumber" := row.accountnumber,
+        "customerid" := row.customerid,
+        "salespersonid" := row.salespersonid,
+        "territoryid" := row.territoryid,
+        "billtoaddressid" := row.billtoaddressid,
+        "shiptoaddressid" := row.shiptoaddressid,
+        "shipmethodid" := row.shipmethodid,
+        "creditcardid" := row.creditcardid,
+        "creditcardapprovalcode" := row.creditcardapprovalcode,
+        "currencyrateid" := row.currencyrateid,
+        "subtotal" := row.subtotal,
+        "taxamt" := row.taxamt,
+        "freight" := row.freight,
+        "totaldue" := row.totaldue,
+        "comment" := row.comment,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

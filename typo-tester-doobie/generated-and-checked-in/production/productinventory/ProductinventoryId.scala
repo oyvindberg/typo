@@ -9,10 +9,26 @@ package productinventory
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `production.productinventory` */
 case class ProductinventoryId(productid: ProductId, locationid: LocationId)
 object ProductinventoryId {
   implicit def ordering: Ordering[ProductinventoryId] = Ordering.by(x => (x.productid, x.locationid))
-  
+  implicit val decoder: Decoder[ProductinventoryId] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        locationid <- c.downField("locationid").as[LocationId]
+      } yield ProductinventoryId(productid, locationid)
+  implicit val encoder: Encoder[ProductinventoryId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "locationid" := row.locationid
+      )}
 }

@@ -9,6 +9,10 @@ package currencyrate
 
 import adventureworks.Defaulted
 import adventureworks.sales.currency.CurrencyId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.currencyrate` which has not been persisted yet */
@@ -48,4 +52,28 @@ case class CurrencyrateRowUnsaved(
                      }
     )
 }
-
+object CurrencyrateRowUnsaved {
+  implicit val decoder: Decoder[CurrencyrateRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        currencyratedate <- c.downField("currencyratedate").as[LocalDateTime]
+        fromcurrencycode <- c.downField("fromcurrencycode").as[CurrencyId]
+        tocurrencycode <- c.downField("tocurrencycode").as[CurrencyId]
+        averagerate <- c.downField("averagerate").as[BigDecimal]
+        endofdayrate <- c.downField("endofdayrate").as[BigDecimal]
+        currencyrateid <- c.downField("currencyrateid").as[Defaulted[CurrencyrateId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield CurrencyrateRowUnsaved(currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, currencyrateid, modifieddate)
+  implicit val encoder: Encoder[CurrencyrateRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "currencyratedate" := row.currencyratedate,
+        "fromcurrencycode" := row.fromcurrencycode,
+        "tocurrencycode" := row.tocurrencycode,
+        "averagerate" := row.averagerate,
+        "endofdayrate" := row.endofdayrate,
+        "currencyrateid" := row.currencyrateid,
+        "modifieddate" := row.modifieddate
+      )}
+}

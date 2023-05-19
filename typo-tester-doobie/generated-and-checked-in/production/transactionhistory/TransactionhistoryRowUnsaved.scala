@@ -9,6 +9,10 @@ package transactionhistory
 
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.transactionhistory` which has not been persisted yet */
@@ -61,4 +65,32 @@ case class TransactionhistoryRowUnsaved(
                      }
     )
 }
-
+object TransactionhistoryRowUnsaved {
+  implicit val decoder: Decoder[TransactionhistoryRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        referenceorderid <- c.downField("referenceorderid").as[Int]
+        transactiontype <- c.downField("transactiontype").as[/* bpchar */ String]
+        quantity <- c.downField("quantity").as[Int]
+        actualcost <- c.downField("actualcost").as[BigDecimal]
+        transactionid <- c.downField("transactionid").as[Defaulted[TransactionhistoryId]]
+        referenceorderlineid <- c.downField("referenceorderlineid").as[Defaulted[Int]]
+        transactiondate <- c.downField("transactiondate").as[Defaulted[LocalDateTime]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield TransactionhistoryRowUnsaved(productid, referenceorderid, transactiontype, quantity, actualcost, transactionid, referenceorderlineid, transactiondate, modifieddate)
+  implicit val encoder: Encoder[TransactionhistoryRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "referenceorderid" := row.referenceorderid,
+        "transactiontype" := row.transactiontype,
+        "quantity" := row.quantity,
+        "actualcost" := row.actualcost,
+        "transactionid" := row.transactionid,
+        "referenceorderlineid" := row.referenceorderlineid,
+        "transactiondate" := row.transactiondate,
+        "modifieddate" := row.modifieddate
+      )}
+}

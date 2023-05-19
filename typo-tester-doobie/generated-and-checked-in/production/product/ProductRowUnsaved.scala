@@ -13,6 +13,10 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -120,4 +124,64 @@ case class ProductRowUnsaved(
                      }
     )
 }
-
+object ProductRowUnsaved {
+  implicit val decoder: Decoder[ProductRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        productnumber <- c.downField("productnumber").as[String]
+        color <- c.downField("color").as[Option[String]]
+        safetystocklevel <- c.downField("safetystocklevel").as[Int]
+        reorderpoint <- c.downField("reorderpoint").as[Int]
+        standardcost <- c.downField("standardcost").as[BigDecimal]
+        listprice <- c.downField("listprice").as[BigDecimal]
+        size <- c.downField("size").as[Option[String]]
+        sizeunitmeasurecode <- c.downField("sizeunitmeasurecode").as[Option[UnitmeasureId]]
+        weightunitmeasurecode <- c.downField("weightunitmeasurecode").as[Option[UnitmeasureId]]
+        weight <- c.downField("weight").as[Option[BigDecimal]]
+        daystomanufacture <- c.downField("daystomanufacture").as[Int]
+        productline <- c.downField("productline").as[Option[/* bpchar */ String]]
+        `class` <- c.downField("class").as[Option[/* bpchar */ String]]
+        style <- c.downField("style").as[Option[/* bpchar */ String]]
+        productsubcategoryid <- c.downField("productsubcategoryid").as[Option[ProductsubcategoryId]]
+        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
+        sellstartdate <- c.downField("sellstartdate").as[LocalDateTime]
+        sellenddate <- c.downField("sellenddate").as[Option[LocalDateTime]]
+        discontinueddate <- c.downField("discontinueddate").as[Option[LocalDateTime]]
+        productid <- c.downField("productid").as[Defaulted[ProductId]]
+        makeflag <- c.downField("makeflag").as[Defaulted[Flag]]
+        finishedgoodsflag <- c.downField("finishedgoodsflag").as[Defaulted[Flag]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductRowUnsaved(name, productnumber, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, `class`, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, productid, makeflag, finishedgoodsflag, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "productnumber" := row.productnumber,
+        "color" := row.color,
+        "safetystocklevel" := row.safetystocklevel,
+        "reorderpoint" := row.reorderpoint,
+        "standardcost" := row.standardcost,
+        "listprice" := row.listprice,
+        "size" := row.size,
+        "sizeunitmeasurecode" := row.sizeunitmeasurecode,
+        "weightunitmeasurecode" := row.weightunitmeasurecode,
+        "weight" := row.weight,
+        "daystomanufacture" := row.daystomanufacture,
+        "productline" := row.productline,
+        "class" := row.`class`,
+        "style" := row.style,
+        "productsubcategoryid" := row.productsubcategoryid,
+        "productmodelid" := row.productmodelid,
+        "sellstartdate" := row.sellstartdate,
+        "sellenddate" := row.sellenddate,
+        "discontinueddate" := row.discontinueddate,
+        "productid" := row.productid,
+        "makeflag" := row.makeflag,
+        "finishedgoodsflag" := row.finishedgoodsflag,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

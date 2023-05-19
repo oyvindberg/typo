@@ -10,6 +10,10 @@ package bom
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class BomViewRow(
@@ -34,4 +38,34 @@ case class BomViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object BomViewRow {
+  implicit val decoder: Decoder[BomViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        billofmaterialsid <- c.downField("billofmaterialsid").as[Option[BillofmaterialsId]]
+        productassemblyid <- c.downField("productassemblyid").as[Option[ProductId]]
+        componentid <- c.downField("componentid").as[Option[ProductId]]
+        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        unitmeasurecode <- c.downField("unitmeasurecode").as[Option[UnitmeasureId]]
+        bomlevel <- c.downField("bomlevel").as[Option[Int]]
+        perassemblyqty <- c.downField("perassemblyqty").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield BomViewRow(id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
+  implicit val encoder: Encoder[BomViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "billofmaterialsid" := row.billofmaterialsid,
+        "productassemblyid" := row.productassemblyid,
+        "componentid" := row.componentid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "unitmeasurecode" := row.unitmeasurecode,
+        "bomlevel" := row.bomlevel,
+        "perassemblyqty" := row.perassemblyqty,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package pod
 
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PodViewRow(
@@ -33,4 +37,34 @@ case class PodViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PodViewRow {
+  implicit val decoder: Decoder[PodViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        purchaseorderid <- c.downField("purchaseorderid").as[Option[PurchaseorderheaderId]]
+        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Option[Int]]
+        duedate <- c.downField("duedate").as[Option[LocalDateTime]]
+        orderqty <- c.downField("orderqty").as[Option[Int]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        unitprice <- c.downField("unitprice").as[Option[BigDecimal]]
+        receivedqty <- c.downField("receivedqty").as[Option[BigDecimal]]
+        rejectedqty <- c.downField("rejectedqty").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PodViewRow(id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
+  implicit val encoder: Encoder[PodViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "purchaseorderid" := row.purchaseorderid,
+        "purchaseorderdetailid" := row.purchaseorderdetailid,
+        "duedate" := row.duedate,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "unitprice" := row.unitprice,
+        "receivedqty" := row.receivedqty,
+        "rejectedqty" := row.rejectedqty,
+        "modifieddate" := row.modifieddate
+      )}
+}

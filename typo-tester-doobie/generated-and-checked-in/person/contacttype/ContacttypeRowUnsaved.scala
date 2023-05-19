@@ -9,6 +9,10 @@ package contacttype
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `person.contacttype` which has not been persisted yet */
@@ -34,4 +38,20 @@ case class ContacttypeRowUnsaved(
                      }
     )
 }
-
+object ContacttypeRowUnsaved {
+  implicit val decoder: Decoder[ContacttypeRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        contacttypeid <- c.downField("contacttypeid").as[Defaulted[ContacttypeId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ContacttypeRowUnsaved(name, contacttypeid, modifieddate)
+  implicit val encoder: Encoder[ContacttypeRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "contacttypeid" := row.contacttypeid,
+        "modifieddate" := row.modifieddate
+      )}
+}

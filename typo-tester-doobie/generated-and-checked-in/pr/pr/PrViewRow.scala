@@ -10,6 +10,10 @@ package pr
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PrViewRow(
@@ -32,4 +36,32 @@ case class PrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PrViewRow {
+  implicit val decoder: Decoder[PrViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productreviewid <- c.downField("productreviewid").as[Option[ProductreviewId]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        reviewername <- c.downField("reviewername").as[Option[Name]]
+        reviewdate <- c.downField("reviewdate").as[Option[LocalDateTime]]
+        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        rating <- c.downField("rating").as[Option[Int]]
+        comments <- c.downField("comments").as[Option[String]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PrViewRow(id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
+  implicit val encoder: Encoder[PrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productreviewid" := row.productreviewid,
+        "productid" := row.productid,
+        "reviewername" := row.reviewername,
+        "reviewdate" := row.reviewdate,
+        "emailaddress" := row.emailaddress,
+        "rating" := row.rating,
+        "comments" := row.comments,
+        "modifieddate" := row.modifieddate
+      )}
+}

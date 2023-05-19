@@ -9,6 +9,10 @@ package pnt
 
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PntViewRow(
@@ -21,4 +25,22 @@ case class PntViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PntViewRow {
+  implicit val decoder: Decoder[PntViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Option[PhonenumbertypeId]]
+        name <- c.downField("name").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PntViewRow(id, phonenumbertypeid, name, modifieddate)
+  implicit val encoder: Encoder[PntViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "phonenumbertypeid" := row.phonenumbertypeid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

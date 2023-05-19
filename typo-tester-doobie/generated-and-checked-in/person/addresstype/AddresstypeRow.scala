@@ -8,6 +8,10 @@ package person
 package addresstype
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,4 +24,22 @@ case class AddresstypeRow(
   modifieddate: LocalDateTime
 )
 
-
+object AddresstypeRow {
+  implicit val decoder: Decoder[AddresstypeRow] =
+    (c: HCursor) =>
+      for {
+        addresstypeid <- c.downField("addresstypeid").as[AddresstypeId]
+        name <- c.downField("name").as[Name]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield AddresstypeRow(addresstypeid, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[AddresstypeRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "addresstypeid" := row.addresstypeid,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

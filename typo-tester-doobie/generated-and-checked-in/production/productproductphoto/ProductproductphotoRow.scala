@@ -10,6 +10,10 @@ package productproductphoto
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductproductphotoRow(
@@ -26,4 +30,22 @@ case class ProductproductphotoRow(
    val compositeId: ProductproductphotoId = ProductproductphotoId(productid, productphotoid)
  }
 
-
+object ProductproductphotoRow {
+  implicit val decoder: Decoder[ProductproductphotoRow] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        productphotoid <- c.downField("productphotoid").as[ProductphotoId]
+        primary <- c.downField("primary").as[Flag]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductproductphotoRow(productid, productphotoid, primary, modifieddate)
+  implicit val encoder: Encoder[ProductproductphotoRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "productphotoid" := row.productphotoid,
+        "primary" := row.primary,
+        "modifieddate" := row.modifieddate
+      )}
+}

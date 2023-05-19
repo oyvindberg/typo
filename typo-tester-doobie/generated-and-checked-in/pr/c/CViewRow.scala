@@ -9,6 +9,10 @@ package c
 
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CViewRow(
@@ -21,4 +25,22 @@ case class CViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object CViewRow {
+  implicit val decoder: Decoder[CViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[/* bpchar */ String]]
+        cultureid <- c.downField("cultureid").as[Option[CultureId]]
+        name <- c.downField("name").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield CViewRow(id, cultureid, name, modifieddate)
+  implicit val encoder: Encoder[CViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "cultureid" := row.cultureid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

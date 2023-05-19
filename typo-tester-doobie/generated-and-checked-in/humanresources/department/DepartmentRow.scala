@@ -8,6 +8,10 @@ package humanresources
 package department
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class DepartmentRow(
@@ -20,4 +24,22 @@ case class DepartmentRow(
   modifieddate: LocalDateTime
 )
 
-
+object DepartmentRow {
+  implicit val decoder: Decoder[DepartmentRow] =
+    (c: HCursor) =>
+      for {
+        departmentid <- c.downField("departmentid").as[DepartmentId]
+        name <- c.downField("name").as[Name]
+        groupname <- c.downField("groupname").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield DepartmentRow(departmentid, name, groupname, modifieddate)
+  implicit val encoder: Encoder[DepartmentRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "departmentid" := row.departmentid,
+        "name" := row.name,
+        "groupname" := row.groupname,
+        "modifieddate" := row.modifieddate
+      )}
+}

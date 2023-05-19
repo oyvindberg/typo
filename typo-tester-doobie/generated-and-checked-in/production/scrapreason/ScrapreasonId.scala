@@ -8,12 +8,17 @@ package production
 package scrapreason
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `production.scrapreason` */
 case class ScrapreasonId(value: Int) extends AnyVal
 object ScrapreasonId {
   implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[ScrapreasonId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[ScrapreasonId] =
+    Decoder[Int].map(ScrapreasonId(_))
   implicit val metaArray: Meta[Array[ScrapreasonId]] = Meta[Array[Int]].imap(_.map(ScrapreasonId.apply))(_.map(_.value))
   implicit val meta: Meta[ScrapreasonId] = Meta[Int].imap(ScrapreasonId.apply)(_.value)
 }

@@ -8,6 +8,10 @@ package pe
 package e
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,4 +29,26 @@ case class EViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object EViewRow {
+  implicit val decoder: Decoder[EViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        emailaddressid <- c.downField("emailaddressid").as[Option[Int]]
+        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield EViewRow(id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+  implicit val encoder: Encoder[EViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "emailaddressid" := row.emailaddressid,
+        "emailaddress" := row.emailaddress,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

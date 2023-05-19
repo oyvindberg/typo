@@ -10,6 +10,10 @@ package productmodelillustration
 import adventureworks.Defaulted
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productmodelillustration` which has not been persisted yet */
@@ -33,4 +37,20 @@ case class ProductmodelillustrationRowUnsaved(
                      }
     )
 }
-
+object ProductmodelillustrationRowUnsaved {
+  implicit val decoder: Decoder[ProductmodelillustrationRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
+        illustrationid <- c.downField("illustrationid").as[IllustrationId]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductmodelillustrationRowUnsaved(productmodelid, illustrationid, modifieddate)
+  implicit val encoder: Encoder[ProductmodelillustrationRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "illustrationid" := row.illustrationid,
+        "modifieddate" := row.modifieddate
+      )}
+}

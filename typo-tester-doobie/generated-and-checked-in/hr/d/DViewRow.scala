@@ -9,6 +9,10 @@ package d
 
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class DViewRow(
@@ -23,4 +27,24 @@ case class DViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object DViewRow {
+  implicit val decoder: Decoder[DViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        departmentid <- c.downField("departmentid").as[Option[DepartmentId]]
+        name <- c.downField("name").as[Option[Name]]
+        groupname <- c.downField("groupname").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield DViewRow(id, departmentid, name, groupname, modifieddate)
+  implicit val encoder: Encoder[DViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "departmentid" := row.departmentid,
+        "name" := row.name,
+        "groupname" := row.groupname,
+        "modifieddate" := row.modifieddate
+      )}
+}

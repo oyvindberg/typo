@@ -9,6 +9,10 @@ package sth
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,4 +32,28 @@ case class SthViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SthViewRow {
+  implicit val decoder: Decoder[SthViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SthViewRow(id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
+  implicit val encoder: Encoder[SthViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "territoryid" := row.territoryid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

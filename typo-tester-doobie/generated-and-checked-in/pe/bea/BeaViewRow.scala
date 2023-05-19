@@ -10,6 +10,10 @@ package bea
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -27,4 +31,26 @@ case class BeaViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object BeaViewRow {
+  implicit val decoder: Decoder[BeaViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        addressid <- c.downField("addressid").as[Option[AddressId]]
+        addresstypeid <- c.downField("addresstypeid").as[Option[AddresstypeId]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield BeaViewRow(id, businessentityid, addressid, addresstypeid, rowguid, modifieddate)
+  implicit val encoder: Encoder[BeaViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "addressid" := row.addressid,
+        "addresstypeid" := row.addresstypeid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

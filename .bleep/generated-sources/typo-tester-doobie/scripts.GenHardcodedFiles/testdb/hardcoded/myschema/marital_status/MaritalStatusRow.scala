@@ -8,10 +8,25 @@ package hardcoded
 package myschema
 package marital_status
 
-
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class MaritalStatusRow(
   id: MaritalStatusId
 )
 
-
+object MaritalStatusRow {
+  implicit val decoder: Decoder[MaritalStatusRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[MaritalStatusId]
+      } yield MaritalStatusRow(id)
+  implicit val encoder: Encoder[MaritalStatusRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id
+      )}
+}

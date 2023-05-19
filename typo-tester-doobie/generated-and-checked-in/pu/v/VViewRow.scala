@@ -11,6 +11,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class VViewRow(
@@ -33,4 +37,32 @@ case class VViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object VViewRow {
+  implicit val decoder: Decoder[VViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
+        name <- c.downField("name").as[Option[Name]]
+        creditrating <- c.downField("creditrating").as[Option[Int]]
+        preferredvendorstatus <- c.downField("preferredvendorstatus").as[Flag]
+        activeflag <- c.downField("activeflag").as[Flag]
+        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[String]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield VViewRow(id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
+  implicit val encoder: Encoder[VViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "accountnumber" := row.accountnumber,
+        "name" := row.name,
+        "creditrating" := row.creditrating,
+        "preferredvendorstatus" := row.preferredvendorstatus,
+        "activeflag" := row.activeflag,
+        "purchasingwebserviceurl" := row.purchasingwebserviceurl,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package vstorewithdemographics
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import org.postgresql.util.PGmoney
 
 case class VstorewithdemographicsViewRow(
@@ -28,4 +32,38 @@ case class VstorewithdemographicsViewRow(
   NumberEmployees: Option[Int]
 )
 
-
+object VstorewithdemographicsViewRow {
+  implicit val decoder: Decoder[VstorewithdemographicsViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        name <- c.downField("name").as[Option[Name]]
+        AnnualSales <- c.downField("AnnualSales").as[Option[PGmoney]]
+        AnnualRevenue <- c.downField("AnnualRevenue").as[Option[PGmoney]]
+        BankName <- c.downField("BankName").as[Option[String]]
+        BusinessType <- c.downField("BusinessType").as[Option[String]]
+        YearOpened <- c.downField("YearOpened").as[Option[Int]]
+        Specialty <- c.downField("Specialty").as[Option[String]]
+        SquareFeet <- c.downField("SquareFeet").as[Option[Int]]
+        Brands <- c.downField("Brands").as[Option[String]]
+        Internet <- c.downField("Internet").as[Option[String]]
+        NumberEmployees <- c.downField("NumberEmployees").as[Option[Int]]
+      } yield VstorewithdemographicsViewRow(businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees)
+  implicit val encoder: Encoder[VstorewithdemographicsViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "name" := row.name,
+        "AnnualSales" := row.AnnualSales,
+        "AnnualRevenue" := row.AnnualRevenue,
+        "BankName" := row.BankName,
+        "BusinessType" := row.BusinessType,
+        "YearOpened" := row.YearOpened,
+        "Specialty" := row.Specialty,
+        "SquareFeet" := row.SquareFeet,
+        "Brands" := row.Brands,
+        "Internet" := row.Internet,
+        "NumberEmployees" := row.NumberEmployees
+      )}
+}

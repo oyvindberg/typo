@@ -10,6 +10,10 @@ package productsubcategory
 import adventureworks.Defaulted
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -46,4 +50,24 @@ case class ProductsubcategoryRowUnsaved(
                      }
     )
 }
-
+object ProductsubcategoryRowUnsaved {
+  implicit val decoder: Decoder[ProductsubcategoryRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productcategoryid <- c.downField("productcategoryid").as[ProductcategoryId]
+        name <- c.downField("name").as[Name]
+        productsubcategoryid <- c.downField("productsubcategoryid").as[Defaulted[ProductsubcategoryId]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductsubcategoryRowUnsaved(productcategoryid, name, productsubcategoryid, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductsubcategoryRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productcategoryid" := row.productcategoryid,
+        "name" := row.name,
+        "productsubcategoryid" := row.productsubcategoryid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

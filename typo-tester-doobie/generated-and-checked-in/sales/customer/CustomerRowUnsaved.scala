@@ -10,6 +10,10 @@ package customer
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -51,4 +55,26 @@ case class CustomerRowUnsaved(
                      }
     )
 }
-
+object CustomerRowUnsaved {
+  implicit val decoder: Decoder[CustomerRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        personid <- c.downField("personid").as[Option[BusinessentityId]]
+        storeid <- c.downField("storeid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        customerid <- c.downField("customerid").as[Defaulted[CustomerId]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield CustomerRowUnsaved(personid, storeid, territoryid, customerid, rowguid, modifieddate)
+  implicit val encoder: Encoder[CustomerRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "personid" := row.personid,
+        "storeid" := row.storeid,
+        "territoryid" := row.territoryid,
+        "customerid" := row.customerid,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

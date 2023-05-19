@@ -8,6 +8,10 @@ package sa
 package cc
 
 import adventureworks.sales.creditcard.CreditcardId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CcViewRow(
@@ -26,4 +30,28 @@ case class CcViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object CcViewRow {
+  implicit val decoder: Decoder[CcViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
+        cardtype <- c.downField("cardtype").as[Option[String]]
+        cardnumber <- c.downField("cardnumber").as[Option[String]]
+        expmonth <- c.downField("expmonth").as[Option[Int]]
+        expyear <- c.downField("expyear").as[Option[Int]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield CcViewRow(id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
+  implicit val encoder: Encoder[CcViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "creditcardid" := row.creditcardid,
+        "cardtype" := row.cardtype,
+        "cardnumber" := row.cardnumber,
+        "expmonth" := row.expmonth,
+        "expyear" := row.expyear,
+        "modifieddate" := row.modifieddate
+      )}
+}

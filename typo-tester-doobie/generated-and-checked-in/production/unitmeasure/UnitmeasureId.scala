@@ -8,12 +8,17 @@ package production
 package unitmeasure
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[UnitmeasureId] =
+    Encoder[/* bpchar */ String].contramap(_.value)
+  implicit val decoder: Decoder[UnitmeasureId] =
+    Decoder[/* bpchar */ String].map(UnitmeasureId(_))
   implicit val metaArray: Meta[Array[UnitmeasureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(UnitmeasureId.apply))(_.map(_.value))
   implicit val meta: Meta[UnitmeasureId] = Meta[/* bpchar */ String].imap(UnitmeasureId.apply)(_.value)
 }

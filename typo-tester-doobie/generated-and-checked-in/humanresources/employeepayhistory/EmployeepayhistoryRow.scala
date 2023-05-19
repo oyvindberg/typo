@@ -8,6 +8,10 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class EmployeepayhistoryRow(
@@ -25,4 +29,24 @@ case class EmployeepayhistoryRow(
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
  }
 
-
+object EmployeepayhistoryRow {
+  implicit val decoder: Decoder[EmployeepayhistoryRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        ratechangedate <- c.downField("ratechangedate").as[LocalDateTime]
+        rate <- c.downField("rate").as[BigDecimal]
+        payfrequency <- c.downField("payfrequency").as[Int]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield EmployeepayhistoryRow(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
+  implicit val encoder: Encoder[EmployeepayhistoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "ratechangedate" := row.ratechangedate,
+        "rate" := row.rate,
+        "payfrequency" := row.payfrequency,
+        "modifieddate" := row.modifieddate
+      )}
+}

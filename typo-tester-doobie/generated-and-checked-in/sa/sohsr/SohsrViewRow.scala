@@ -9,6 +9,10 @@ package sohsr
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class SohsrViewRow(
@@ -20,4 +24,20 @@ case class SohsrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SohsrViewRow {
+  implicit val decoder: Decoder[SohsrViewRow] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
+        salesreasonid <- c.downField("salesreasonid").as[Option[SalesreasonId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SohsrViewRow(salesorderid, salesreasonid, modifieddate)
+  implicit val encoder: Encoder[SohsrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "salesreasonid" := row.salesreasonid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package cr
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CrViewRow(
@@ -20,4 +24,20 @@ case class CrViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object CrViewRow {
+  implicit val decoder: Decoder[CrViewRow] =
+    (c: HCursor) =>
+      for {
+        countryregioncode <- c.downField("countryregioncode").as[Option[CountryregionId]]
+        name <- c.downField("name").as[Option[Name]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield CrViewRow(countryregioncode, name, modifieddate)
+  implicit val encoder: Encoder[CrViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "countryregioncode" := row.countryregioncode,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package vstorewithaddresses
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class VstorewithaddressesViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
@@ -28,4 +32,32 @@ case class VstorewithaddressesViewRow(
   countryregionname: Option[Name]
 )
 
-
+object VstorewithaddressesViewRow {
+  implicit val decoder: Decoder[VstorewithaddressesViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        name <- c.downField("name").as[Option[Name]]
+        addresstype <- c.downField("addresstype").as[Option[Name]]
+        addressline1 <- c.downField("addressline1").as[Option[String]]
+        addressline2 <- c.downField("addressline2").as[Option[String]]
+        city <- c.downField("city").as[Option[String]]
+        stateprovincename <- c.downField("stateprovincename").as[Option[Name]]
+        postalcode <- c.downField("postalcode").as[Option[String]]
+        countryregionname <- c.downField("countryregionname").as[Option[Name]]
+      } yield VstorewithaddressesViewRow(businessentityid, name, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname)
+  implicit val encoder: Encoder[VstorewithaddressesViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "name" := row.name,
+        "addresstype" := row.addresstype,
+        "addressline1" := row.addressline1,
+        "addressline2" := row.addressline2,
+        "city" := row.city,
+        "stateprovincename" := row.stateprovincename,
+        "postalcode" := row.postalcode,
+        "countryregionname" := row.countryregionname
+      )}
+}

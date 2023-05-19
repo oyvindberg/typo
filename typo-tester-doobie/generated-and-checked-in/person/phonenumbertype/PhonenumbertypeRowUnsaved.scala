@@ -9,6 +9,10 @@ package phonenumbertype
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `person.phonenumbertype` which has not been persisted yet */
@@ -34,4 +38,20 @@ case class PhonenumbertypeRowUnsaved(
                      }
     )
 }
-
+object PhonenumbertypeRowUnsaved {
+  implicit val decoder: Decoder[PhonenumbertypeRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Defaulted[PhonenumbertypeId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield PhonenumbertypeRowUnsaved(name, phonenumbertypeid, modifieddate)
+  implicit val encoder: Encoder[PhonenumbertypeRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "phonenumbertypeid" := row.phonenumbertypeid,
+        "modifieddate" := row.modifieddate
+      )}
+}

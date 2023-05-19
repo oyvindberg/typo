@@ -9,6 +9,10 @@ package purchaseorderdetail
 
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PurchaseorderdetailRow(
@@ -35,4 +39,32 @@ case class PurchaseorderdetailRow(
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)
  }
 
-
+object PurchaseorderdetailRow {
+  implicit val decoder: Decoder[PurchaseorderdetailRow] =
+    (c: HCursor) =>
+      for {
+        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
+        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Int]
+        duedate <- c.downField("duedate").as[LocalDateTime]
+        orderqty <- c.downField("orderqty").as[Int]
+        productid <- c.downField("productid").as[ProductId]
+        unitprice <- c.downField("unitprice").as[BigDecimal]
+        receivedqty <- c.downField("receivedqty").as[BigDecimal]
+        rejectedqty <- c.downField("rejectedqty").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield PurchaseorderdetailRow(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
+  implicit val encoder: Encoder[PurchaseorderdetailRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "purchaseorderid" := row.purchaseorderid,
+        "purchaseorderdetailid" := row.purchaseorderdetailid,
+        "duedate" := row.duedate,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "unitprice" := row.unitprice,
+        "receivedqty" := row.receivedqty,
+        "rejectedqty" := row.rejectedqty,
+        "modifieddate" := row.modifieddate
+      )}
+}

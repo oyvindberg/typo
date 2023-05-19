@@ -9,6 +9,10 @@ package productdocument
 
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductdocumentRow(
@@ -23,4 +27,20 @@ case class ProductdocumentRow(
    val compositeId: ProductdocumentId = ProductdocumentId(productid, documentnode)
  }
 
-
+object ProductdocumentRow {
+  implicit val decoder: Decoder[ProductdocumentRow] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+        documentnode <- c.downField("documentnode").as[DocumentId]
+      } yield ProductdocumentRow(productid, modifieddate, documentnode)
+  implicit val encoder: Encoder[ProductdocumentRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "modifieddate" := row.modifieddate,
+        "documentnode" := row.documentnode
+      )}
+}

@@ -9,6 +9,10 @@ package currency
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.currency` which has not been persisted yet */
@@ -30,4 +34,20 @@ case class CurrencyRowUnsaved(
                      }
     )
 }
-
+object CurrencyRowUnsaved {
+  implicit val decoder: Decoder[CurrencyRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        currencycode <- c.downField("currencycode").as[CurrencyId]
+        name <- c.downField("name").as[Name]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield CurrencyRowUnsaved(currencycode, name, modifieddate)
+  implicit val encoder: Encoder[CurrencyRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "currencycode" := row.currencycode,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

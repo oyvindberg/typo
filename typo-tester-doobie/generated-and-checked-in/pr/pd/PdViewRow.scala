@@ -8,6 +8,10 @@ package pr
 package pd
 
 import adventureworks.production.productdescription.ProductdescriptionId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -23,4 +27,24 @@ case class PdViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PdViewRow {
+  implicit val decoder: Decoder[PdViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productdescriptionid <- c.downField("productdescriptionid").as[Option[ProductdescriptionId]]
+        description <- c.downField("description").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PdViewRow(id, productdescriptionid, description, rowguid, modifieddate)
+  implicit val encoder: Encoder[PdViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productdescriptionid" := row.productdescriptionid,
+        "description" := row.description,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

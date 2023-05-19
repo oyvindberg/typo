@@ -9,6 +9,10 @@ package countryregioncurrency
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CountryregioncurrencyRow(
@@ -23,4 +27,20 @@ case class CountryregioncurrencyRow(
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)
  }
 
-
+object CountryregioncurrencyRow {
+  implicit val decoder: Decoder[CountryregioncurrencyRow] =
+    (c: HCursor) =>
+      for {
+        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
+        currencycode <- c.downField("currencycode").as[CurrencyId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CountryregioncurrencyRow(countryregioncode, currencycode, modifieddate)
+  implicit val encoder: Encoder[CountryregioncurrencyRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "countryregioncode" := row.countryregioncode,
+        "currencycode" := row.currencycode,
+        "modifieddate" := row.modifieddate
+      )}
+}

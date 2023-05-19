@@ -9,6 +9,10 @@ package productreview
 
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductreviewRow(
@@ -30,4 +34,30 @@ case class ProductreviewRow(
   modifieddate: LocalDateTime
 )
 
-
+object ProductreviewRow {
+  implicit val decoder: Decoder[ProductreviewRow] =
+    (c: HCursor) =>
+      for {
+        productreviewid <- c.downField("productreviewid").as[ProductreviewId]
+        productid <- c.downField("productid").as[ProductId]
+        reviewername <- c.downField("reviewername").as[Name]
+        reviewdate <- c.downField("reviewdate").as[LocalDateTime]
+        emailaddress <- c.downField("emailaddress").as[String]
+        rating <- c.downField("rating").as[Int]
+        comments <- c.downField("comments").as[Option[String]]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductreviewRow(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
+  implicit val encoder: Encoder[ProductreviewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productreviewid" := row.productreviewid,
+        "productid" := row.productid,
+        "reviewername" := row.reviewername,
+        "reviewdate" := row.reviewdate,
+        "emailaddress" := row.emailaddress,
+        "rating" := row.rating,
+        "comments" := row.comments,
+        "modifieddate" := row.modifieddate
+      )}
+}

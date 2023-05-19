@@ -9,6 +9,10 @@ package salestaxrate
 
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,4 +32,28 @@ case class SalestaxrateRow(
   modifieddate: LocalDateTime
 )
 
-
+object SalestaxrateRow {
+  implicit val decoder: Decoder[SalestaxrateRow] =
+    (c: HCursor) =>
+      for {
+        salestaxrateid <- c.downField("salestaxrateid").as[SalestaxrateId]
+        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
+        taxtype <- c.downField("taxtype").as[Int]
+        taxrate <- c.downField("taxrate").as[BigDecimal]
+        name <- c.downField("name").as[Name]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalestaxrateRow(salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalestaxrateRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salestaxrateid" := row.salestaxrateid,
+        "stateprovinceid" := row.stateprovinceid,
+        "taxtype" := row.taxtype,
+        "taxrate" := row.taxrate,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

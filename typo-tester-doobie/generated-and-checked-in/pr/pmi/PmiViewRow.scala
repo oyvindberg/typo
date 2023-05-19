@@ -9,6 +9,10 @@ package pmi
 
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PmiViewRow(
@@ -20,4 +24,20 @@ case class PmiViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PmiViewRow {
+  implicit val decoder: Decoder[PmiViewRow] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
+        illustrationid <- c.downField("illustrationid").as[Option[IllustrationId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PmiViewRow(productmodelid, illustrationid, modifieddate)
+  implicit val encoder: Encoder[PmiViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "illustrationid" := row.illustrationid,
+        "modifieddate" := row.modifieddate
+      )}
+}

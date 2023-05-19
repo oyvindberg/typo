@@ -10,6 +10,10 @@ package workorder
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.workorder` which has not been persisted yet */
@@ -55,4 +59,32 @@ case class WorkorderRowUnsaved(
                      }
     )
 }
-
+object WorkorderRowUnsaved {
+  implicit val decoder: Decoder[WorkorderRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        orderqty <- c.downField("orderqty").as[Int]
+        scrappedqty <- c.downField("scrappedqty").as[Int]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        duedate <- c.downField("duedate").as[LocalDateTime]
+        scrapreasonid <- c.downField("scrapreasonid").as[Option[ScrapreasonId]]
+        workorderid <- c.downField("workorderid").as[Defaulted[WorkorderId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield WorkorderRowUnsaved(productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, workorderid, modifieddate)
+  implicit val encoder: Encoder[WorkorderRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "orderqty" := row.orderqty,
+        "scrappedqty" := row.scrappedqty,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "duedate" := row.duedate,
+        "scrapreasonid" := row.scrapreasonid,
+        "workorderid" := row.workorderid,
+        "modifieddate" := row.modifieddate
+      )}
+}

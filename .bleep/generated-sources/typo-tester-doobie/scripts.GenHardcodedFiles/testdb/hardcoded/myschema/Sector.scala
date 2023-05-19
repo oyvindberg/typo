@@ -11,6 +11,8 @@ import doobie.Get
 import doobie.Put
 import doobie.Read
 import doobie.Write
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Enum `myschema.sector`
   *  - PUBLIC
@@ -31,5 +33,8 @@ object Sector {
   implicit val get: Get[Sector] = Get[String].temap { str => ByName.get(str).toRight(s"$str was not among ${ByName.keys}") }
   implicit val write: Write[Sector] = Write[String].contramap(_.value)
   implicit val read: Read[Sector] = Read[String].map(x => ByName.getOrElse(x, throw new IllegalArgumentException(s"$x was not among ${ByName.keys}")))
-  
+  implicit val decoder: Decoder[Sector] =
+    Decoder[String].emap(str => ByName.get(str).toRight(s"'$str' does not match any of the following legal values: $Names"))
+  implicit val encoder: Encoder[Sector] =
+    Encoder[String].contramap(_.value)
 }

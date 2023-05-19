@@ -10,10 +10,28 @@ package businessentityaddress
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `person.businessentityaddress` */
 case class BusinessentityaddressId(businessentityid: BusinessentityId, addressid: AddressId, addresstypeid: AddresstypeId)
 object BusinessentityaddressId {
   implicit def ordering: Ordering[BusinessentityaddressId] = Ordering.by(x => (x.businessentityid, x.addressid, x.addresstypeid))
-  
+  implicit val decoder: Decoder[BusinessentityaddressId] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        addressid <- c.downField("addressid").as[AddressId]
+        addresstypeid <- c.downField("addresstypeid").as[AddresstypeId]
+      } yield BusinessentityaddressId(businessentityid, addressid, addresstypeid)
+  implicit val encoder: Encoder[BusinessentityaddressId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "addressid" := row.addressid,
+        "addresstypeid" := row.addresstypeid
+      )}
 }

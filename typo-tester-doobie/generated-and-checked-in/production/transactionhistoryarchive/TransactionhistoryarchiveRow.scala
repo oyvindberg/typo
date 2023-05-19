@@ -7,6 +7,10 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class TransactionhistoryarchiveRow(
@@ -29,4 +33,32 @@ case class TransactionhistoryarchiveRow(
   modifieddate: LocalDateTime
 )
 
-
+object TransactionhistoryarchiveRow {
+  implicit val decoder: Decoder[TransactionhistoryarchiveRow] =
+    (c: HCursor) =>
+      for {
+        transactionid <- c.downField("transactionid").as[TransactionhistoryarchiveId]
+        productid <- c.downField("productid").as[Int]
+        referenceorderid <- c.downField("referenceorderid").as[Int]
+        referenceorderlineid <- c.downField("referenceorderlineid").as[Int]
+        transactiondate <- c.downField("transactiondate").as[LocalDateTime]
+        transactiontype <- c.downField("transactiontype").as[/* bpchar */ String]
+        quantity <- c.downField("quantity").as[Int]
+        actualcost <- c.downField("actualcost").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield TransactionhistoryarchiveRow(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
+  implicit val encoder: Encoder[TransactionhistoryarchiveRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "transactionid" := row.transactionid,
+        "productid" := row.productid,
+        "referenceorderid" := row.referenceorderid,
+        "referenceorderlineid" := row.referenceorderlineid,
+        "transactiondate" := row.transactiondate,
+        "transactiontype" := row.transactiontype,
+        "quantity" := row.quantity,
+        "actualcost" := row.actualcost,
+        "modifieddate" := row.modifieddate
+      )}
+}

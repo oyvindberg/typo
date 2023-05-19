@@ -10,6 +10,10 @@ package productreview
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productreview` which has not been persisted yet */
@@ -55,4 +59,30 @@ case class ProductreviewRowUnsaved(
                      }
     )
 }
-
+object ProductreviewRowUnsaved {
+  implicit val decoder: Decoder[ProductreviewRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        reviewername <- c.downField("reviewername").as[Name]
+        emailaddress <- c.downField("emailaddress").as[String]
+        rating <- c.downField("rating").as[Int]
+        comments <- c.downField("comments").as[Option[String]]
+        productreviewid <- c.downField("productreviewid").as[Defaulted[ProductreviewId]]
+        reviewdate <- c.downField("reviewdate").as[Defaulted[LocalDateTime]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ProductreviewRowUnsaved(productid, reviewername, emailaddress, rating, comments, productreviewid, reviewdate, modifieddate)
+  implicit val encoder: Encoder[ProductreviewRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "reviewername" := row.reviewername,
+        "emailaddress" := row.emailaddress,
+        "rating" := row.rating,
+        "comments" := row.comments,
+        "productreviewid" := row.productreviewid,
+        "reviewdate" := row.reviewdate,
+        "modifieddate" := row.modifieddate
+      )}
+}

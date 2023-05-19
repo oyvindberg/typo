@@ -8,6 +8,10 @@ package sales
 package salesreason
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class SalesreasonRow(
@@ -20,4 +24,22 @@ case class SalesreasonRow(
   modifieddate: LocalDateTime
 )
 
-
+object SalesreasonRow {
+  implicit val decoder: Decoder[SalesreasonRow] =
+    (c: HCursor) =>
+      for {
+        salesreasonid <- c.downField("salesreasonid").as[SalesreasonId]
+        name <- c.downField("name").as[Name]
+        reasontype <- c.downField("reasontype").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesreasonRow(salesreasonid, name, reasontype, modifieddate)
+  implicit val encoder: Encoder[SalesreasonRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesreasonid" := row.salesreasonid,
+        "name" := row.name,
+        "reasontype" := row.reasontype,
+        "modifieddate" := row.modifieddate
+      )}
+}

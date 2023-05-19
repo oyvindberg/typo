@@ -8,6 +8,10 @@ package sa
 package spqh
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,4 +29,26 @@ case class SpqhViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SpqhViewRow {
+  implicit val decoder: Decoder[SpqhViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        quotadate <- c.downField("quotadate").as[Option[LocalDateTime]]
+        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SpqhViewRow(id, businessentityid, quotadate, salesquota, rowguid, modifieddate)
+  implicit val encoder: Encoder[SpqhViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "quotadate" := row.quotadate,
+        "salesquota" := row.salesquota,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

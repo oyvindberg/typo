@@ -8,12 +8,17 @@ package person
 package addresstype
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `person.addresstype` */
 case class AddresstypeId(value: Int) extends AnyVal
 object AddresstypeId {
   implicit val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[AddresstypeId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[AddresstypeId] =
+    Decoder[Int].map(AddresstypeId(_))
   implicit val metaArray: Meta[Array[AddresstypeId]] = Meta[Array[Int]].imap(_.map(AddresstypeId.apply))(_.map(_.value))
   implicit val meta: Meta[AddresstypeId] = Meta[Int].imap(AddresstypeId.apply)(_.value)
 }

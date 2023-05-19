@@ -8,6 +8,10 @@ package production
 package productmodel
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -25,4 +29,26 @@ case class ProductmodelRow(
   modifieddate: LocalDateTime
 )
 
-
+object ProductmodelRow {
+  implicit val decoder: Decoder[ProductmodelRow] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
+        name <- c.downField("name").as[Name]
+        catalogdescription <- c.downField("catalogdescription").as[Option[PgSQLXML]]
+        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductmodelRow(productmodelid, name, catalogdescription, instructions, rowguid, modifieddate)
+  implicit val encoder: Encoder[ProductmodelRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "name" := row.name,
+        "catalogdescription" := row.catalogdescription,
+        "instructions" := row.instructions,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

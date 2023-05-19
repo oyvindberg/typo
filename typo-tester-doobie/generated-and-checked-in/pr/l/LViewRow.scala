@@ -9,6 +9,10 @@ package l
 
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class LViewRow(
@@ -25,4 +29,26 @@ case class LViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object LViewRow {
+  implicit val decoder: Decoder[LViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        locationid <- c.downField("locationid").as[Option[LocationId]]
+        name <- c.downField("name").as[Option[Name]]
+        costrate <- c.downField("costrate").as[Option[BigDecimal]]
+        availability <- c.downField("availability").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield LViewRow(id, locationid, name, costrate, availability, modifieddate)
+  implicit val encoder: Encoder[LViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "locationid" := row.locationid,
+        "name" := row.name,
+        "costrate" := row.costrate,
+        "availability" := row.availability,
+        "modifieddate" := row.modifieddate
+      )}
+}

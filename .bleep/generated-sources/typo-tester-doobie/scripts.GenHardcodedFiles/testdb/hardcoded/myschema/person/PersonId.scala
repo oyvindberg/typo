@@ -9,12 +9,17 @@ package myschema
 package person
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `myschema.person` */
 case class PersonId(value: Long) extends AnyVal
 object PersonId {
   implicit val ordering: Ordering[PersonId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[PersonId] =
+    Encoder[Long].contramap(_.value)
+  implicit val decoder: Decoder[PersonId] =
+    Decoder[Long].map(PersonId(_))
   implicit val metaArray: Meta[Array[PersonId]] = Meta[Array[Long]].imap(_.map(PersonId.apply))(_.map(_.value))
   implicit val meta: Meta[PersonId] = Meta[Long].imap(PersonId.apply)(_.value)
 }

@@ -8,6 +8,10 @@ package pr
 package pch
 
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PchViewRow(
@@ -24,4 +28,26 @@ case class PchViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PchViewRow {
+  implicit val decoder: Decoder[PchViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        standardcost <- c.downField("standardcost").as[Option[BigDecimal]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PchViewRow(id, productid, startdate, enddate, standardcost, modifieddate)
+  implicit val encoder: Encoder[PchViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productid" := row.productid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "standardcost" := row.standardcost,
+        "modifieddate" := row.modifieddate
+      )}
+}

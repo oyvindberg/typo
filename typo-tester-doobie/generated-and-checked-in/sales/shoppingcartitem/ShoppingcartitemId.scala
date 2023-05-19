@@ -8,12 +8,17 @@ package sales
 package shoppingcartitem
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `sales.shoppingcartitem` */
 case class ShoppingcartitemId(value: Int) extends AnyVal
 object ShoppingcartitemId {
   implicit val ordering: Ordering[ShoppingcartitemId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[ShoppingcartitemId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[ShoppingcartitemId] =
+    Decoder[Int].map(ShoppingcartitemId(_))
   implicit val metaArray: Meta[Array[ShoppingcartitemId]] = Meta[Array[Int]].imap(_.map(ShoppingcartitemId.apply))(_.map(_.value))
   implicit val meta: Meta[ShoppingcartitemId] = Meta[Int].imap(ShoppingcartitemId.apply)(_.value)
 }

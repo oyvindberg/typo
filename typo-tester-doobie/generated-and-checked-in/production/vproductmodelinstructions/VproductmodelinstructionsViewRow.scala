@@ -9,6 +9,10 @@ package vproductmodelinstructions
 
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 import org.postgresql.jdbc.PgSQLXML
@@ -32,4 +36,36 @@ case class VproductmodelinstructionsViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object VproductmodelinstructionsViewRow {
+  implicit val decoder: Decoder[VproductmodelinstructionsViewRow] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
+        name <- c.downField("name").as[Option[Name]]
+        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        LocationID <- c.downField("LocationID").as[Option[Int]]
+        SetupHours <- c.downField("SetupHours").as[Option[BigDecimal]]
+        MachineHours <- c.downField("MachineHours").as[Option[BigDecimal]]
+        LaborHours <- c.downField("LaborHours").as[Option[BigDecimal]]
+        LotSize <- c.downField("LotSize").as[Option[Int]]
+        Step <- c.downField("Step").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield VproductmodelinstructionsViewRow(productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate)
+  implicit val encoder: Encoder[VproductmodelinstructionsViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "name" := row.name,
+        "instructions" := row.instructions,
+        "LocationID" := row.LocationID,
+        "SetupHours" := row.SetupHours,
+        "MachineHours" := row.MachineHours,
+        "LaborHours" := row.LaborHours,
+        "LotSize" := row.LotSize,
+        "Step" := row.Step,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

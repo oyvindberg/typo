@@ -9,6 +9,10 @@ package at
 
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -24,4 +28,24 @@ case class AtViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object AtViewRow {
+  implicit val decoder: Decoder[AtViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        addresstypeid <- c.downField("addresstypeid").as[Option[AddresstypeId]]
+        name <- c.downField("name").as[Option[Name]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield AtViewRow(id, addresstypeid, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[AtViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "addresstypeid" := row.addresstypeid,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

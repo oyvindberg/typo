@@ -39,6 +39,7 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-doobie:
     dependencies:
+    - io.circe::circe-core:0.15.0-M1
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.2.13
     - org.tpolecat::doobie-postgres:1.0.0-RC2

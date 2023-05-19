@@ -9,6 +9,10 @@ package shipmethod
 
 import adventureworks.Defaulted
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -55,4 +59,26 @@ case class ShipmethodRowUnsaved(
                      }
     )
 }
-
+object ShipmethodRowUnsaved {
+  implicit val decoder: Decoder[ShipmethodRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        name <- c.downField("name").as[Name]
+        shipmethodid <- c.downField("shipmethodid").as[Defaulted[ShipmethodId]]
+        shipbase <- c.downField("shipbase").as[Defaulted[BigDecimal]]
+        shiprate <- c.downField("shiprate").as[Defaulted[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ShipmethodRowUnsaved(name, shipmethodid, shipbase, shiprate, rowguid, modifieddate)
+  implicit val encoder: Encoder[ShipmethodRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "name" := row.name,
+        "shipmethodid" := row.shipmethodid,
+        "shipbase" := row.shipbase,
+        "shiprate" := row.shiprate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

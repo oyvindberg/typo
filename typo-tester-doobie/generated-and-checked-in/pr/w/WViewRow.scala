@@ -10,6 +10,10 @@ package w
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class WViewRow(
@@ -34,4 +38,34 @@ case class WViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object WViewRow {
+  implicit val decoder: Decoder[WViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        workorderid <- c.downField("workorderid").as[Option[WorkorderId]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        orderqty <- c.downField("orderqty").as[Option[Int]]
+        scrappedqty <- c.downField("scrappedqty").as[Option[Int]]
+        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        duedate <- c.downField("duedate").as[Option[LocalDateTime]]
+        scrapreasonid <- c.downField("scrapreasonid").as[Option[ScrapreasonId]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield WViewRow(id, workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
+  implicit val encoder: Encoder[WViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "workorderid" := row.workorderid,
+        "productid" := row.productid,
+        "orderqty" := row.orderqty,
+        "scrappedqty" := row.scrappedqty,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "duedate" := row.duedate,
+        "scrapreasonid" := row.scrapreasonid,
+        "modifieddate" := row.modifieddate
+      )}
+}

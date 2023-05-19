@@ -8,6 +8,10 @@ package person_detail
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class PersonDetailSqlRow(
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
@@ -30,4 +34,32 @@ case class PersonDetailSqlRow(
   postalcode: String
 )
 
-
+object PersonDetailSqlRow {
+  implicit val decoder: Decoder[PersonDetailSqlRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        title <- c.downField("title").as[Option[String]]
+        firstname <- c.downField("firstname").as[Name]
+        middlename <- c.downField("middlename").as[Option[Name]]
+        lastname <- c.downField("lastname").as[Name]
+        jobtitle <- c.downField("jobtitle").as[String]
+        addressline1 <- c.downField("addressline1").as[String]
+        city <- c.downField("city").as[String]
+        postalcode <- c.downField("postalcode").as[String]
+      } yield PersonDetailSqlRow(businessentityid, title, firstname, middlename, lastname, jobtitle, addressline1, city, postalcode)
+  implicit val encoder: Encoder[PersonDetailSqlRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "title" := row.title,
+        "firstname" := row.firstname,
+        "middlename" := row.middlename,
+        "lastname" := row.lastname,
+        "jobtitle" := row.jobtitle,
+        "addressline1" := row.addressline1,
+        "city" := row.city,
+        "postalcode" := row.postalcode
+      )}
+}

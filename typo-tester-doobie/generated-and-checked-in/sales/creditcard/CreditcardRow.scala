@@ -7,6 +7,10 @@ package adventureworks
 package sales
 package creditcard
 
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CreditcardRow(
@@ -23,4 +27,26 @@ case class CreditcardRow(
   modifieddate: LocalDateTime
 )
 
-
+object CreditcardRow {
+  implicit val decoder: Decoder[CreditcardRow] =
+    (c: HCursor) =>
+      for {
+        creditcardid <- c.downField("creditcardid").as[CreditcardId]
+        cardtype <- c.downField("cardtype").as[String]
+        cardnumber <- c.downField("cardnumber").as[String]
+        expmonth <- c.downField("expmonth").as[Int]
+        expyear <- c.downField("expyear").as[Int]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CreditcardRow(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
+  implicit val encoder: Encoder[CreditcardRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "creditcardid" := row.creditcardid,
+        "cardtype" := row.cardtype,
+        "cardnumber" := row.cardnumber,
+        "expmonth" := row.expmonth,
+        "expyear" := row.expyear,
+        "modifieddate" := row.modifieddate
+      )}
+}

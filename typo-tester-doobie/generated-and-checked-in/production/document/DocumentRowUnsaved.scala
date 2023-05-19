@@ -10,6 +10,10 @@ package document
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -79,4 +83,40 @@ case class DocumentRowUnsaved(
                      }
     )
 }
-
+object DocumentRowUnsaved {
+  implicit val decoder: Decoder[DocumentRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        title <- c.downField("title").as[String]
+        owner <- c.downField("owner").as[BusinessentityId]
+        filename <- c.downField("filename").as[String]
+        fileextension <- c.downField("fileextension").as[Option[String]]
+        revision <- c.downField("revision").as[/* bpchar */ String]
+        status <- c.downField("status").as[Int]
+        documentsummary <- c.downField("documentsummary").as[Option[String]]
+        document <- c.downField("document").as[Option[Array[Byte]]]
+        folderflag <- c.downField("folderflag").as[Defaulted[Flag]]
+        changenumber <- c.downField("changenumber").as[Defaulted[Int]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+        documentnode <- c.downField("documentnode").as[Defaulted[DocumentId]]
+      } yield DocumentRowUnsaved(title, owner, filename, fileextension, revision, status, documentsummary, document, folderflag, changenumber, rowguid, modifieddate, documentnode)
+  implicit val encoder: Encoder[DocumentRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "title" := row.title,
+        "owner" := row.owner,
+        "filename" := row.filename,
+        "fileextension" := row.fileextension,
+        "revision" := row.revision,
+        "status" := row.status,
+        "documentsummary" := row.documentsummary,
+        "document" := row.document,
+        "folderflag" := row.folderflag,
+        "changenumber" := row.changenumber,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate,
+        "documentnode" := row.documentnode
+      )}
+}

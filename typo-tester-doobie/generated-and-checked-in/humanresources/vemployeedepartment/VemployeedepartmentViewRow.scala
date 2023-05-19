@@ -9,6 +9,10 @@ package vemployeedepartment
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 
 case class VemployeedepartmentViewRow(
@@ -33,4 +37,34 @@ case class VemployeedepartmentViewRow(
   startdate: Option[LocalDate]
 )
 
-
+object VemployeedepartmentViewRow {
+  implicit val decoder: Decoder[VemployeedepartmentViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        title <- c.downField("title").as[Option[String]]
+        firstname <- c.downField("firstname").as[Option[Name]]
+        middlename <- c.downField("middlename").as[Option[Name]]
+        lastname <- c.downField("lastname").as[Option[Name]]
+        suffix <- c.downField("suffix").as[Option[String]]
+        jobtitle <- c.downField("jobtitle").as[Option[String]]
+        department <- c.downField("department").as[Option[Name]]
+        groupname <- c.downField("groupname").as[Option[Name]]
+        startdate <- c.downField("startdate").as[Option[LocalDate]]
+      } yield VemployeedepartmentViewRow(businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate)
+  implicit val encoder: Encoder[VemployeedepartmentViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "title" := row.title,
+        "firstname" := row.firstname,
+        "middlename" := row.middlename,
+        "lastname" := row.lastname,
+        "suffix" := row.suffix,
+        "jobtitle" := row.jobtitle,
+        "department" := row.department,
+        "groupname" := row.groupname,
+        "startdate" := row.startdate
+      )}
+}

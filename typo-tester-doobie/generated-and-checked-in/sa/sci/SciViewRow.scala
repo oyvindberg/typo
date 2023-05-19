@@ -9,6 +9,10 @@ package sci
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class SciViewRow(
@@ -27,4 +31,28 @@ case class SciViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SciViewRow {
+  implicit val decoder: Decoder[SciViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        shoppingcartitemid <- c.downField("shoppingcartitemid").as[Option[ShoppingcartitemId]]
+        shoppingcartid <- c.downField("shoppingcartid").as[Option[String]]
+        quantity <- c.downField("quantity").as[Option[Int]]
+        productid <- c.downField("productid").as[Option[ProductId]]
+        datecreated <- c.downField("datecreated").as[Option[LocalDateTime]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SciViewRow(id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
+  implicit val encoder: Encoder[SciViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "shoppingcartitemid" := row.shoppingcartitemid,
+        "shoppingcartid" := row.shoppingcartid,
+        "quantity" := row.quantity,
+        "productid" := row.productid,
+        "datecreated" := row.datecreated,
+        "modifieddate" := row.modifieddate
+      )}
+}

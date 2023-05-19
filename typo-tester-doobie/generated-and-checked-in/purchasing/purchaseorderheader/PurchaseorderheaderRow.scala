@@ -9,6 +9,10 @@ package purchaseorderheader
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class PurchaseorderheaderRow(
@@ -40,4 +44,38 @@ case class PurchaseorderheaderRow(
   modifieddate: LocalDateTime
 )
 
-
+object PurchaseorderheaderRow {
+  implicit val decoder: Decoder[PurchaseorderheaderRow] =
+    (c: HCursor) =>
+      for {
+        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
+        revisionnumber <- c.downField("revisionnumber").as[Int]
+        status <- c.downField("status").as[Int]
+        employeeid <- c.downField("employeeid").as[BusinessentityId]
+        vendorid <- c.downField("vendorid").as[BusinessentityId]
+        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
+        orderdate <- c.downField("orderdate").as[LocalDateTime]
+        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
+        subtotal <- c.downField("subtotal").as[BigDecimal]
+        taxamt <- c.downField("taxamt").as[BigDecimal]
+        freight <- c.downField("freight").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield PurchaseorderheaderRow(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
+  implicit val encoder: Encoder[PurchaseorderheaderRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "purchaseorderid" := row.purchaseorderid,
+        "revisionnumber" := row.revisionnumber,
+        "status" := row.status,
+        "employeeid" := row.employeeid,
+        "vendorid" := row.vendorid,
+        "shipmethodid" := row.shipmethodid,
+        "orderdate" := row.orderdate,
+        "shipdate" := row.shipdate,
+        "subtotal" := row.subtotal,
+        "taxamt" := row.taxamt,
+        "freight" := row.freight,
+        "modifieddate" := row.modifieddate
+      )}
+}

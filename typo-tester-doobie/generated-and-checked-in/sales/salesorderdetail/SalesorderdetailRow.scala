@@ -10,6 +10,10 @@ package salesorderdetail
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,4 +43,34 @@ case class SalesorderdetailRow(
    val compositeId: SalesorderdetailId = SalesorderdetailId(salesorderid, salesorderdetailid)
  }
 
-
+object SalesorderdetailRow {
+  implicit val decoder: Decoder[SalesorderdetailRow] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
+        salesorderdetailid <- c.downField("salesorderdetailid").as[Int]
+        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[String]]
+        orderqty <- c.downField("orderqty").as[Int]
+        productid <- c.downField("productid").as[ProductId]
+        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
+        unitprice <- c.downField("unitprice").as[BigDecimal]
+        unitpricediscount <- c.downField("unitpricediscount").as[BigDecimal]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SalesorderdetailRow(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalesorderdetailRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "salesorderdetailid" := row.salesorderdetailid,
+        "carriertrackingnumber" := row.carriertrackingnumber,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "specialofferid" := row.specialofferid,
+        "unitprice" := row.unitprice,
+        "unitpricediscount" := row.unitpricediscount,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

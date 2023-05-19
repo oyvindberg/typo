@@ -8,12 +8,17 @@ package production
 package transactionhistoryarchive
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
   implicit val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[TransactionhistoryarchiveId] =
+    Encoder[Int].contramap(_.value)
+  implicit val decoder: Decoder[TransactionhistoryarchiveId] =
+    Decoder[Int].map(TransactionhistoryarchiveId(_))
   implicit val metaArray: Meta[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].imap(_.map(TransactionhistoryarchiveId.apply))(_.map(_.value))
   implicit val meta: Meta[TransactionhistoryarchiveId] = Meta[Int].imap(TransactionhistoryarchiveId.apply)(_.value)
 }

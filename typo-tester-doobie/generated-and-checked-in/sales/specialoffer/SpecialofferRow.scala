@@ -7,6 +7,10 @@ package adventureworks
 package sales
 package specialoffer
 
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -33,4 +37,36 @@ case class SpecialofferRow(
   modifieddate: LocalDateTime
 )
 
-
+object SpecialofferRow {
+  implicit val decoder: Decoder[SpecialofferRow] =
+    (c: HCursor) =>
+      for {
+        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
+        description <- c.downField("description").as[String]
+        discountpct <- c.downField("discountpct").as[BigDecimal]
+        `type` <- c.downField("type").as[String]
+        category <- c.downField("category").as[String]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[LocalDateTime]
+        minqty <- c.downField("minqty").as[Int]
+        maxqty <- c.downField("maxqty").as[Option[Int]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield SpecialofferRow(specialofferid, description, discountpct, `type`, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
+  implicit val encoder: Encoder[SpecialofferRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "specialofferid" := row.specialofferid,
+        "description" := row.description,
+        "discountpct" := row.discountpct,
+        "type" := row.`type`,
+        "category" := row.category,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "minqty" := row.minqty,
+        "maxqty" := row.maxqty,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

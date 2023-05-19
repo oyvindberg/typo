@@ -8,6 +8,10 @@ package pr
 package i
 
 import adventureworks.production.illustration.IllustrationId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import org.postgresql.jdbc.PgSQLXML
 
@@ -21,4 +25,22 @@ case class IViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object IViewRow {
+  implicit val decoder: Decoder[IViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        illustrationid <- c.downField("illustrationid").as[Option[IllustrationId]]
+        diagram <- c.downField("diagram").as[Option[PgSQLXML]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield IViewRow(id, illustrationid, diagram, modifieddate)
+  implicit val encoder: Encoder[IViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "illustrationid" := row.illustrationid,
+        "diagram" := row.diagram,
+        "modifieddate" := row.modifieddate
+      )}
+}

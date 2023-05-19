@@ -9,6 +9,10 @@ package jobcandidate
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import org.postgresql.jdbc.PgSQLXML
 
@@ -39,4 +43,22 @@ case class JobcandidateRowUnsaved(
                      }
     )
 }
-
+object JobcandidateRowUnsaved {
+  implicit val decoder: Decoder[JobcandidateRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        resume <- c.downField("resume").as[Option[PgSQLXML]]
+        jobcandidateid <- c.downField("jobcandidateid").as[Defaulted[JobcandidateId]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)
+  implicit val encoder: Encoder[JobcandidateRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "resume" := row.resume,
+        "jobcandidateid" := row.jobcandidateid,
+        "modifieddate" := row.modifieddate
+      )}
+}

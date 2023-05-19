@@ -10,6 +10,10 @@ package employeedepartmenthistory
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -32,4 +36,26 @@ case class EmployeedepartmenthistoryRow(
    val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
  }
 
-
+object EmployeedepartmenthistoryRow {
+  implicit val decoder: Decoder[EmployeedepartmenthistoryRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        departmentid <- c.downField("departmentid").as[DepartmentId]
+        shiftid <- c.downField("shiftid").as[ShiftId]
+        startdate <- c.downField("startdate").as[LocalDate]
+        enddate <- c.downField("enddate").as[Option[LocalDate]]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield EmployeedepartmenthistoryRow(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
+  implicit val encoder: Encoder[EmployeedepartmenthistoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "departmentid" := row.departmentid,
+        "shiftid" := row.shiftid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "modifieddate" := row.modifieddate
+      )}
+}

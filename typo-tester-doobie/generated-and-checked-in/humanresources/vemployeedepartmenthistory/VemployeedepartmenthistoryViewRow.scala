@@ -9,6 +9,10 @@ package vemployeedepartmenthistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 
 case class VemployeedepartmenthistoryViewRow(
@@ -34,4 +38,36 @@ case class VemployeedepartmenthistoryViewRow(
   enddate: Option[LocalDate]
 )
 
-
+object VemployeedepartmenthistoryViewRow {
+  implicit val decoder: Decoder[VemployeedepartmenthistoryViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        title <- c.downField("title").as[Option[String]]
+        firstname <- c.downField("firstname").as[Option[Name]]
+        middlename <- c.downField("middlename").as[Option[Name]]
+        lastname <- c.downField("lastname").as[Option[Name]]
+        suffix <- c.downField("suffix").as[Option[String]]
+        shift <- c.downField("shift").as[Option[Name]]
+        department <- c.downField("department").as[Option[Name]]
+        groupname <- c.downField("groupname").as[Option[Name]]
+        startdate <- c.downField("startdate").as[Option[LocalDate]]
+        enddate <- c.downField("enddate").as[Option[LocalDate]]
+      } yield VemployeedepartmenthistoryViewRow(businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate)
+  implicit val encoder: Encoder[VemployeedepartmenthistoryViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "title" := row.title,
+        "firstname" := row.firstname,
+        "middlename" := row.middlename,
+        "lastname" := row.lastname,
+        "suffix" := row.suffix,
+        "shift" := row.shift,
+        "department" := row.department,
+        "groupname" := row.groupname,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate
+      )}
+}

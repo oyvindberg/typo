@@ -9,6 +9,10 @@ package sp
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -34,4 +38,34 @@ case class SpViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SpViewRow {
+  implicit val decoder: Decoder[SpViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
+        bonus <- c.downField("bonus").as[Option[BigDecimal]]
+        commissionpct <- c.downField("commissionpct").as[Option[BigDecimal]]
+        salesytd <- c.downField("salesytd").as[Option[BigDecimal]]
+        saleslastyear <- c.downField("saleslastyear").as[Option[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SpViewRow(id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
+  implicit val encoder: Encoder[SpViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "businessentityid" := row.businessentityid,
+        "territoryid" := row.territoryid,
+        "salesquota" := row.salesquota,
+        "bonus" := row.bonus,
+        "commissionpct" := row.commissionpct,
+        "salesytd" := row.salesytd,
+        "saleslastyear" := row.saleslastyear,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

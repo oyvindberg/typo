@@ -10,6 +10,10 @@ package productmodelproductdescriptionculture
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductmodelproductdescriptioncultureRow(
@@ -27,4 +31,22 @@ case class ProductmodelproductdescriptioncultureRow(
    val compositeId: ProductmodelproductdescriptioncultureId = ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
  }
 
-
+object ProductmodelproductdescriptioncultureRow {
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
+        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
+        cultureid <- c.downField("cultureid").as[CultureId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductmodelproductdescriptioncultureRow(productmodelid, productdescriptionid, cultureid, modifieddate)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "productdescriptionid" := row.productdescriptionid,
+        "cultureid" := row.cultureid,
+        "modifieddate" := row.modifieddate
+      )}
+}

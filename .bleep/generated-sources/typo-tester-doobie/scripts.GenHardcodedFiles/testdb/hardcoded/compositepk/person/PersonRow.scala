@@ -8,7 +8,10 @@ package hardcoded
 package compositepk
 package person
 
-
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 case class PersonRow(
   one: Long,
@@ -18,4 +21,20 @@ case class PersonRow(
    val compositeId: PersonId = PersonId(one, two)
  }
 
-
+object PersonRow {
+  implicit val decoder: Decoder[PersonRow] =
+    (c: HCursor) =>
+      for {
+        one <- c.downField("one").as[Long]
+        two <- c.downField("two").as[Option[String]]
+        name <- c.downField("name").as[Option[String]]
+      } yield PersonRow(one, two, name)
+  implicit val encoder: Encoder[PersonRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "one" := row.one,
+        "two" := row.two,
+        "name" := row.name
+      )}
+}

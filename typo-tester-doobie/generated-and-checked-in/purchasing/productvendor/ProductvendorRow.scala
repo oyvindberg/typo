@@ -10,6 +10,10 @@ package productvendor
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductvendorRow(
@@ -41,4 +45,36 @@ case class ProductvendorRow(
    val compositeId: ProductvendorId = ProductvendorId(productid, businessentityid)
  }
 
-
+object ProductvendorRow {
+  implicit val decoder: Decoder[ProductvendorRow] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        averageleadtime <- c.downField("averageleadtime").as[Int]
+        standardprice <- c.downField("standardprice").as[BigDecimal]
+        lastreceiptcost <- c.downField("lastreceiptcost").as[Option[BigDecimal]]
+        lastreceiptdate <- c.downField("lastreceiptdate").as[Option[LocalDateTime]]
+        minorderqty <- c.downField("minorderqty").as[Int]
+        maxorderqty <- c.downField("maxorderqty").as[Int]
+        onorderqty <- c.downField("onorderqty").as[Option[Int]]
+        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductvendorRow(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
+  implicit val encoder: Encoder[ProductvendorRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "businessentityid" := row.businessentityid,
+        "averageleadtime" := row.averageleadtime,
+        "standardprice" := row.standardprice,
+        "lastreceiptcost" := row.lastreceiptcost,
+        "lastreceiptdate" := row.lastreceiptdate,
+        "minorderqty" := row.minorderqty,
+        "maxorderqty" := row.maxorderqty,
+        "onorderqty" := row.onorderqty,
+        "unitmeasurecode" := row.unitmeasurecode,
+        "modifieddate" := row.modifieddate
+      )}
+}

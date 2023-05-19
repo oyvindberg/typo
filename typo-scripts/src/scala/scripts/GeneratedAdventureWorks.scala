@@ -30,7 +30,7 @@ object GeneratedAdventureWorks {
 
         List(
           (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
-          (typo.DbLibName.Doobie, typo.JsonLibName.None, "typo-tester-doobie")
+          (typo.DbLibName.Doobie, typo.JsonLibName.Circe, "typo-tester-doobie")
         ).foreach { case (dbLib, jsonLib, projectPath) =>
           val options = typo.Options(pkg = "adventureworks", jsonLib, dbLib)
           val typoSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")

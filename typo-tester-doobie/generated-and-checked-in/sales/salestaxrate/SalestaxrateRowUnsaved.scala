@@ -10,6 +10,10 @@ package salestaxrate
 import adventureworks.Defaulted
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -56,4 +60,28 @@ case class SalestaxrateRowUnsaved(
                      }
     )
 }
-
+object SalestaxrateRowUnsaved {
+  implicit val decoder: Decoder[SalestaxrateRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
+        taxtype <- c.downField("taxtype").as[Int]
+        name <- c.downField("name").as[Name]
+        salestaxrateid <- c.downField("salestaxrateid").as[Defaulted[SalestaxrateId]]
+        taxrate <- c.downField("taxrate").as[Defaulted[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield SalestaxrateRowUnsaved(stateprovinceid, taxtype, name, salestaxrateid, taxrate, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalestaxrateRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "stateprovinceid" := row.stateprovinceid,
+        "taxtype" := row.taxtype,
+        "name" := row.name,
+        "salestaxrateid" := row.salestaxrateid,
+        "taxrate" := row.taxrate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

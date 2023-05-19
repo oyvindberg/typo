@@ -8,6 +8,10 @@ package purchasing
 package shipmethod
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -24,4 +28,26 @@ case class ShipmethodRow(
   modifieddate: LocalDateTime
 )
 
-
+object ShipmethodRow {
+  implicit val decoder: Decoder[ShipmethodRow] =
+    (c: HCursor) =>
+      for {
+        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
+        name <- c.downField("name").as[Name]
+        shipbase <- c.downField("shipbase").as[BigDecimal]
+        shiprate <- c.downField("shiprate").as[BigDecimal]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ShipmethodRow(shipmethodid, name, shipbase, shiprate, rowguid, modifieddate)
+  implicit val encoder: Encoder[ShipmethodRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "shipmethodid" := row.shipmethodid,
+        "name" := row.name,
+        "shipbase" := row.shipbase,
+        "shiprate" := row.shiprate,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

@@ -9,6 +9,10 @@ package document
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -41,4 +45,40 @@ case class DocumentRow(
   documentnode: DocumentId
 )
 
-
+object DocumentRow {
+  implicit val decoder: Decoder[DocumentRow] =
+    (c: HCursor) =>
+      for {
+        title <- c.downField("title").as[String]
+        owner <- c.downField("owner").as[BusinessentityId]
+        folderflag <- c.downField("folderflag").as[Flag]
+        filename <- c.downField("filename").as[String]
+        fileextension <- c.downField("fileextension").as[Option[String]]
+        revision <- c.downField("revision").as[/* bpchar */ String]
+        changenumber <- c.downField("changenumber").as[Int]
+        status <- c.downField("status").as[Int]
+        documentsummary <- c.downField("documentsummary").as[Option[String]]
+        document <- c.downField("document").as[Option[Array[Byte]]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+        documentnode <- c.downField("documentnode").as[DocumentId]
+      } yield DocumentRow(title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode)
+  implicit val encoder: Encoder[DocumentRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "title" := row.title,
+        "owner" := row.owner,
+        "folderflag" := row.folderflag,
+        "filename" := row.filename,
+        "fileextension" := row.fileextension,
+        "revision" := row.revision,
+        "changenumber" := row.changenumber,
+        "status" := row.status,
+        "documentsummary" := row.documentsummary,
+        "document" := row.document,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate,
+        "documentnode" := row.documentnode
+      )}
+}

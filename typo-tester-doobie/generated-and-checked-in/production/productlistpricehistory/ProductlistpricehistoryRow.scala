@@ -8,6 +8,10 @@ package production
 package productlistpricehistory
 
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ProductlistpricehistoryRow(
@@ -25,4 +29,24 @@ case class ProductlistpricehistoryRow(
    val compositeId: ProductlistpricehistoryId = ProductlistpricehistoryId(productid, startdate)
  }
 
-
+object ProductlistpricehistoryRow {
+  implicit val decoder: Decoder[ProductlistpricehistoryRow] =
+    (c: HCursor) =>
+      for {
+        productid <- c.downField("productid").as[ProductId]
+        startdate <- c.downField("startdate").as[LocalDateTime]
+        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
+        listprice <- c.downField("listprice").as[BigDecimal]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ProductlistpricehistoryRow(productid, startdate, enddate, listprice, modifieddate)
+  implicit val encoder: Encoder[ProductlistpricehistoryRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productid" := row.productid,
+        "startdate" := row.startdate,
+        "enddate" := row.enddate,
+        "listprice" := row.listprice,
+        "modifieddate" := row.modifieddate
+      )}
+}

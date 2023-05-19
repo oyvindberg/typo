@@ -7,6 +7,8 @@ package adventureworks
 package public
 
 import doobie.Meta
+import io.circe.Decoder
+import io.circe.Encoder
 
 /** Domain `public.Phone`
   * No constraint
@@ -14,7 +16,10 @@ import doobie.Meta
 case class Phone(value: String) extends AnyVal
 object Phone {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[Phone] = Ordering.by(_.value)
-  
+  implicit val encoder: Encoder[Phone] =
+    Encoder[String].contramap(_.value)
+  implicit val decoder: Decoder[Phone] =
+    Decoder[String].map(Phone(_))
   implicit val metaArray: Meta[Array[Phone]] = Meta[Array[String]].imap(_.map(Phone.apply))(_.map(_.value))
   implicit val meta: Meta[Phone] = Meta[String].imap(Phone.apply)(_.value)
 }

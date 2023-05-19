@@ -8,6 +8,10 @@ package production
 package scrapreason
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class ScrapreasonRow(
@@ -18,4 +22,20 @@ case class ScrapreasonRow(
   modifieddate: LocalDateTime
 )
 
-
+object ScrapreasonRow {
+  implicit val decoder: Decoder[ScrapreasonRow] =
+    (c: HCursor) =>
+      for {
+        scrapreasonid <- c.downField("scrapreasonid").as[ScrapreasonId]
+        name <- c.downField("name").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield ScrapreasonRow(scrapreasonid, name, modifieddate)
+  implicit val encoder: Encoder[ScrapreasonRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "scrapreasonid" := row.scrapreasonid,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

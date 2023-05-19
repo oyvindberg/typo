@@ -18,6 +18,10 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -75,4 +79,66 @@ case class SohViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object SohViewRow {
+  implicit val decoder: Decoder[SohViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
+        revisionnumber <- c.downField("revisionnumber").as[Option[Int]]
+        orderdate <- c.downField("orderdate").as[Option[LocalDateTime]]
+        duedate <- c.downField("duedate").as[Option[LocalDateTime]]
+        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
+        status <- c.downField("status").as[Option[Int]]
+        onlineorderflag <- c.downField("onlineorderflag").as[Flag]
+        purchaseordernumber <- c.downField("purchaseordernumber").as[Option[OrderNumber]]
+        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
+        customerid <- c.downField("customerid").as[Option[CustomerId]]
+        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
+        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
+        billtoaddressid <- c.downField("billtoaddressid").as[Option[AddressId]]
+        shiptoaddressid <- c.downField("shiptoaddressid").as[Option[AddressId]]
+        shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
+        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
+        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[String]]
+        currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
+        subtotal <- c.downField("subtotal").as[Option[BigDecimal]]
+        taxamt <- c.downField("taxamt").as[Option[BigDecimal]]
+        freight <- c.downField("freight").as[Option[BigDecimal]]
+        totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
+        comment <- c.downField("comment").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield SohViewRow(id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate)
+  implicit val encoder: Encoder[SohViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "salesorderid" := row.salesorderid,
+        "revisionnumber" := row.revisionnumber,
+        "orderdate" := row.orderdate,
+        "duedate" := row.duedate,
+        "shipdate" := row.shipdate,
+        "status" := row.status,
+        "onlineorderflag" := row.onlineorderflag,
+        "purchaseordernumber" := row.purchaseordernumber,
+        "accountnumber" := row.accountnumber,
+        "customerid" := row.customerid,
+        "salespersonid" := row.salespersonid,
+        "territoryid" := row.territoryid,
+        "billtoaddressid" := row.billtoaddressid,
+        "shiptoaddressid" := row.shiptoaddressid,
+        "shipmethodid" := row.shipmethodid,
+        "creditcardid" := row.creditcardid,
+        "creditcardapprovalcode" := row.creditcardapprovalcode,
+        "currencyrateid" := row.currencyrateid,
+        "subtotal" := row.subtotal,
+        "taxamt" := row.taxamt,
+        "freight" := row.freight,
+        "totaldue" := row.totaldue,
+        "comment" := row.comment,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

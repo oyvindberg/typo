@@ -9,6 +9,10 @@ package vproductmodelcatalogdescription
 
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -44,4 +48,64 @@ case class VproductmodelcatalogdescriptionViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object VproductmodelcatalogdescriptionViewRow {
+  implicit val decoder: Decoder[VproductmodelcatalogdescriptionViewRow] =
+    (c: HCursor) =>
+      for {
+        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
+        name <- c.downField("name").as[Option[Name]]
+        Summary <- c.downField("Summary").as[Option[String]]
+        manufacturer <- c.downField("manufacturer").as[Option[String]]
+        copyright <- c.downField("copyright").as[Option[String]]
+        producturl <- c.downField("producturl").as[Option[String]]
+        warrantyperiod <- c.downField("warrantyperiod").as[Option[String]]
+        warrantydescription <- c.downField("warrantydescription").as[Option[String]]
+        noofyears <- c.downField("noofyears").as[Option[String]]
+        maintenancedescription <- c.downField("maintenancedescription").as[Option[String]]
+        wheel <- c.downField("wheel").as[Option[String]]
+        saddle <- c.downField("saddle").as[Option[String]]
+        pedal <- c.downField("pedal").as[Option[String]]
+        bikeframe <- c.downField("bikeframe").as[Option[String]]
+        crankset <- c.downField("crankset").as[Option[String]]
+        pictureangle <- c.downField("pictureangle").as[Option[String]]
+        picturesize <- c.downField("picturesize").as[Option[String]]
+        productphotoid <- c.downField("productphotoid").as[Option[String]]
+        material <- c.downField("material").as[Option[String]]
+        color <- c.downField("color").as[Option[String]]
+        productline <- c.downField("productline").as[Option[String]]
+        style <- c.downField("style").as[Option[String]]
+        riderexperience <- c.downField("riderexperience").as[Option[String]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield VproductmodelcatalogdescriptionViewRow(productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate)
+  implicit val encoder: Encoder[VproductmodelcatalogdescriptionViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "productmodelid" := row.productmodelid,
+        "name" := row.name,
+        "Summary" := row.Summary,
+        "manufacturer" := row.manufacturer,
+        "copyright" := row.copyright,
+        "producturl" := row.producturl,
+        "warrantyperiod" := row.warrantyperiod,
+        "warrantydescription" := row.warrantydescription,
+        "noofyears" := row.noofyears,
+        "maintenancedescription" := row.maintenancedescription,
+        "wheel" := row.wheel,
+        "saddle" := row.saddle,
+        "pedal" := row.pedal,
+        "bikeframe" := row.bikeframe,
+        "crankset" := row.crankset,
+        "pictureangle" := row.pictureangle,
+        "picturesize" := row.picturesize,
+        "productphotoid" := row.productphotoid,
+        "material" := row.material,
+        "color" := row.color,
+        "productline" := row.productline,
+        "style" := row.style,
+        "riderexperience" := row.riderexperience,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

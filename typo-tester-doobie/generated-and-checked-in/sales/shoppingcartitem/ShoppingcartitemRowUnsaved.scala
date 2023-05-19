@@ -9,6 +9,10 @@ package shoppingcartitem
 
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.shoppingcartitem` which has not been persisted yet */
@@ -52,4 +56,26 @@ case class ShoppingcartitemRowUnsaved(
                      }
     )
 }
-
+object ShoppingcartitemRowUnsaved {
+  implicit val decoder: Decoder[ShoppingcartitemRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        shoppingcartid <- c.downField("shoppingcartid").as[String]
+        productid <- c.downField("productid").as[ProductId]
+        shoppingcartitemid <- c.downField("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]]
+        quantity <- c.downField("quantity").as[Defaulted[Int]]
+        datecreated <- c.downField("datecreated").as[Defaulted[LocalDateTime]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield ShoppingcartitemRowUnsaved(shoppingcartid, productid, shoppingcartitemid, quantity, datecreated, modifieddate)
+  implicit val encoder: Encoder[ShoppingcartitemRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "shoppingcartid" := row.shoppingcartid,
+        "productid" := row.productid,
+        "shoppingcartitemid" := row.shoppingcartitemid,
+        "quantity" := row.quantity,
+        "datecreated" := row.datecreated,
+        "modifieddate" := row.modifieddate
+      )}
+}

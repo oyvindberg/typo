@@ -214,14 +214,13 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
 }
 ```
 Again since there are auto-increment ID's and defaulted values, you'll need to specify how to fill them in.
-If you have a more table that won't be needed.
-Otherwise everything is taken care of.
+If you have a more plain table that won't be needed. Otherwise everything is taken care of.
 
 ### JSON codecs
 This has the potential of being insanely useful. This can lead to generic code across all tables, so you can have one API endpoint which can
 patch any row in any table (as long as you allow it) in a type-safe manner!
 
-Much experimentation is needed on that front though. for now you can get json codecs for `play-json`, with circe upcoming.
+Much experimentation is needed on that front though. for now you can get json codecs for `play-json` and `circe`.
 
 ## Library-agnostic
 

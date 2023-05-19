@@ -11,6 +11,10 @@ import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -68,4 +72,34 @@ case class SalesorderdetailRowUnsaved(
                      }
     )
 }
-
+object SalesorderdetailRowUnsaved {
+  implicit val decoder: Decoder[SalesorderdetailRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
+        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[String]]
+        orderqty <- c.downField("orderqty").as[Int]
+        productid <- c.downField("productid").as[ProductId]
+        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
+        unitprice <- c.downField("unitprice").as[BigDecimal]
+        salesorderdetailid <- c.downField("salesorderdetailid").as[Defaulted[Int]]
+        unitpricediscount <- c.downField("unitpricediscount").as[Defaulted[BigDecimal]]
+        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield SalesorderdetailRowUnsaved(salesorderid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, salesorderdetailid, unitpricediscount, rowguid, modifieddate)
+  implicit val encoder: Encoder[SalesorderdetailRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "salesorderid" := row.salesorderid,
+        "carriertrackingnumber" := row.carriertrackingnumber,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "specialofferid" := row.specialofferid,
+        "unitprice" := row.unitprice,
+        "salesorderdetailid" := row.salesorderdetailid,
+        "unitpricediscount" := row.unitpricediscount,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

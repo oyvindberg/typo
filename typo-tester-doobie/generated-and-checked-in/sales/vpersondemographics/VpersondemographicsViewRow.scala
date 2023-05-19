@@ -8,6 +8,10 @@ package sales
 package vpersondemographics
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDate
 import org.postgresql.util.PGmoney
 
@@ -28,4 +32,40 @@ case class VpersondemographicsViewRow(
   numbercarsowned: Option[Int]
 )
 
-
+object VpersondemographicsViewRow {
+  implicit val decoder: Decoder[VpersondemographicsViewRow] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        totalpurchaseytd <- c.downField("totalpurchaseytd").as[Option[PGmoney]]
+        datefirstpurchase <- c.downField("datefirstpurchase").as[Option[LocalDate]]
+        birthdate <- c.downField("birthdate").as[Option[LocalDate]]
+        maritalstatus <- c.downField("maritalstatus").as[Option[String]]
+        yearlyincome <- c.downField("yearlyincome").as[Option[String]]
+        gender <- c.downField("gender").as[Option[String]]
+        totalchildren <- c.downField("totalchildren").as[Option[Int]]
+        numberchildrenathome <- c.downField("numberchildrenathome").as[Option[Int]]
+        education <- c.downField("education").as[Option[String]]
+        occupation <- c.downField("occupation").as[Option[String]]
+        homeownerflag <- c.downField("homeownerflag").as[Option[Boolean]]
+        numbercarsowned <- c.downField("numbercarsowned").as[Option[Int]]
+      } yield VpersondemographicsViewRow(businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned)
+  implicit val encoder: Encoder[VpersondemographicsViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "totalpurchaseytd" := row.totalpurchaseytd,
+        "datefirstpurchase" := row.datefirstpurchase,
+        "birthdate" := row.birthdate,
+        "maritalstatus" := row.maritalstatus,
+        "yearlyincome" := row.yearlyincome,
+        "gender" := row.gender,
+        "totalchildren" := row.totalchildren,
+        "numberchildrenathome" := row.numberchildrenathome,
+        "education" := row.education,
+        "occupation" := row.occupation,
+        "homeownerflag" := row.homeownerflag,
+        "numbercarsowned" := row.numbercarsowned
+      )}
+}

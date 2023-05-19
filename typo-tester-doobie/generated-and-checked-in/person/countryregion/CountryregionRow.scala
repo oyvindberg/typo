@@ -8,6 +8,10 @@ package person
 package countryregion
 
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class CountryregionRow(
@@ -18,4 +22,20 @@ case class CountryregionRow(
   modifieddate: LocalDateTime
 )
 
-
+object CountryregionRow {
+  implicit val decoder: Decoder[CountryregionRow] =
+    (c: HCursor) =>
+      for {
+        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
+        name <- c.downField("name").as[Name]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield CountryregionRow(countryregioncode, name, modifieddate)
+  implicit val encoder: Encoder[CountryregionRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "countryregioncode" := row.countryregioncode,
+        "name" := row.name,
+        "modifieddate" := row.modifieddate
+      )}
+}

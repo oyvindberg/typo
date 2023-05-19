@@ -9,6 +9,10 @@ package jc
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import org.postgresql.jdbc.PgSQLXML
 
@@ -24,4 +28,24 @@ case class JcViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object JcViewRow {
+  implicit val decoder: Decoder[JcViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        resume <- c.downField("resume").as[Option[PgSQLXML]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield JcViewRow(id, jobcandidateid, businessentityid, resume, modifieddate)
+  implicit val encoder: Encoder[JcViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "jobcandidateid" := row.jobcandidateid,
+        "businessentityid" := row.businessentityid,
+        "resume" := row.resume,
+        "modifieddate" := row.modifieddate
+      )}
+}

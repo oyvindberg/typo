@@ -8,10 +8,26 @@ package person
 package emailaddress
 
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 
 /** Type for the composite primary key of table `person.emailaddress` */
 case class EmailaddressId(businessentityid: BusinessentityId, emailaddressid: Int)
 object EmailaddressId {
   implicit def ordering: Ordering[EmailaddressId] = Ordering.by(x => (x.businessentityid, x.emailaddressid))
-  
+  implicit val decoder: Decoder[EmailaddressId] =
+    (c: HCursor) =>
+      for {
+        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
+        emailaddressid <- c.downField("emailaddressid").as[Int]
+      } yield EmailaddressId(businessentityid, emailaddressid)
+  implicit val encoder: Encoder[EmailaddressId] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "businessentityid" := row.businessentityid,
+        "emailaddressid" := row.emailaddressid
+      )}
 }

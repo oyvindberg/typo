@@ -10,6 +10,10 @@ package psc
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -27,4 +31,26 @@ case class PscViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object PscViewRow {
+  implicit val decoder: Decoder[PscViewRow] =
+    (c: HCursor) =>
+      for {
+        id <- c.downField("id").as[Option[Int]]
+        productsubcategoryid <- c.downField("productsubcategoryid").as[Option[ProductsubcategoryId]]
+        productcategoryid <- c.downField("productcategoryid").as[Option[ProductcategoryId]]
+        name <- c.downField("name").as[Option[Name]]
+        rowguid <- c.downField("rowguid").as[Option[UUID]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield PscViewRow(id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate)
+  implicit val encoder: Encoder[PscViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "id" := row.id,
+        "productsubcategoryid" := row.productsubcategoryid,
+        "productcategoryid" := row.productcategoryid,
+        "name" := row.name,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

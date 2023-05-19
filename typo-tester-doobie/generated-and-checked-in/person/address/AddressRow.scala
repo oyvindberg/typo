@@ -8,6 +8,10 @@ package person
 package address
 
 import adventureworks.person.stateprovince.StateprovinceId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,4 +35,32 @@ case class AddressRow(
   modifieddate: LocalDateTime
 )
 
-
+object AddressRow {
+  implicit val decoder: Decoder[AddressRow] =
+    (c: HCursor) =>
+      for {
+        addressid <- c.downField("addressid").as[AddressId]
+        addressline1 <- c.downField("addressline1").as[String]
+        addressline2 <- c.downField("addressline2").as[Option[String]]
+        city <- c.downField("city").as[String]
+        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
+        postalcode <- c.downField("postalcode").as[String]
+        spatiallocation <- c.downField("spatiallocation").as[Option[Array[Byte]]]
+        rowguid <- c.downField("rowguid").as[UUID]
+        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
+      } yield AddressRow(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
+  implicit val encoder: Encoder[AddressRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "addressid" := row.addressid,
+        "addressline1" := row.addressline1,
+        "addressline2" := row.addressline2,
+        "city" := row.city,
+        "stateprovinceid" := row.stateprovinceid,
+        "postalcode" := row.postalcode,
+        "spatiallocation" := row.spatiallocation,
+        "rowguid" := row.rowguid,
+        "modifieddate" := row.modifieddate
+      )}
+}

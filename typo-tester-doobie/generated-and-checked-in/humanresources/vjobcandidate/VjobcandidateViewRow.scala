@@ -9,6 +9,10 @@ package vjobcandidate
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 case class VjobcandidateViewRow(
@@ -33,4 +37,46 @@ case class VjobcandidateViewRow(
   modifieddate: Option[LocalDateTime]
 )
 
-
+object VjobcandidateViewRow {
+  implicit val decoder: Decoder[VjobcandidateViewRow] =
+    (c: HCursor) =>
+      for {
+        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
+        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
+        `Name.Prefix` <- c.downField("Name.Prefix").as[Option[String]]
+        `Name.First` <- c.downField("Name.First").as[Option[String]]
+        `Name.Middle` <- c.downField("Name.Middle").as[Option[String]]
+        `Name.Last` <- c.downField("Name.Last").as[Option[String]]
+        `Name.Suffix` <- c.downField("Name.Suffix").as[Option[String]]
+        Skills <- c.downField("Skills").as[Option[String]]
+        `Addr.Type` <- c.downField("Addr.Type").as[Option[String]]
+        `Addr.Loc.CountryRegion` <- c.downField("Addr.Loc.CountryRegion").as[Option[String]]
+        `Addr.Loc.State` <- c.downField("Addr.Loc.State").as[Option[String]]
+        `Addr.Loc.City` <- c.downField("Addr.Loc.City").as[Option[String]]
+        `Addr.PostalCode` <- c.downField("Addr.PostalCode").as[Option[String]]
+        EMail <- c.downField("EMail").as[Option[String]]
+        WebSite <- c.downField("WebSite").as[Option[String]]
+        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
+      } yield VjobcandidateViewRow(jobcandidateid, businessentityid, `Name.Prefix`, `Name.First`, `Name.Middle`, `Name.Last`, `Name.Suffix`, Skills, `Addr.Type`, `Addr.Loc.CountryRegion`, `Addr.Loc.State`, `Addr.Loc.City`, `Addr.PostalCode`, EMail, WebSite, modifieddate)
+  implicit val encoder: Encoder[VjobcandidateViewRow] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "jobcandidateid" := row.jobcandidateid,
+        "businessentityid" := row.businessentityid,
+        "Name.Prefix" := row.`Name.Prefix`,
+        "Name.First" := row.`Name.First`,
+        "Name.Middle" := row.`Name.Middle`,
+        "Name.Last" := row.`Name.Last`,
+        "Name.Suffix" := row.`Name.Suffix`,
+        "Skills" := row.Skills,
+        "Addr.Type" := row.`Addr.Type`,
+        "Addr.Loc.CountryRegion" := row.`Addr.Loc.CountryRegion`,
+        "Addr.Loc.State" := row.`Addr.Loc.State`,
+        "Addr.Loc.City" := row.`Addr.Loc.City`,
+        "Addr.PostalCode" := row.`Addr.PostalCode`,
+        "EMail" := row.EMail,
+        "WebSite" := row.WebSite,
+        "modifieddate" := row.modifieddate
+      )}
+}

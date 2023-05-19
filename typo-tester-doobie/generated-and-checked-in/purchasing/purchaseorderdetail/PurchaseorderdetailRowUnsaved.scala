@@ -10,6 +10,10 @@ package purchaseorderdetail
 import adventureworks.Defaulted
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.Json
 import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.purchaseorderdetail` which has not been persisted yet */
@@ -55,4 +59,32 @@ case class PurchaseorderdetailRowUnsaved(
                      }
     )
 }
-
+object PurchaseorderdetailRowUnsaved {
+  implicit val decoder: Decoder[PurchaseorderdetailRowUnsaved] =
+    (c: HCursor) =>
+      for {
+        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
+        duedate <- c.downField("duedate").as[LocalDateTime]
+        orderqty <- c.downField("orderqty").as[Int]
+        productid <- c.downField("productid").as[ProductId]
+        unitprice <- c.downField("unitprice").as[BigDecimal]
+        receivedqty <- c.downField("receivedqty").as[BigDecimal]
+        rejectedqty <- c.downField("rejectedqty").as[BigDecimal]
+        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Defaulted[Int]]
+        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
+      } yield PurchaseorderdetailRowUnsaved(purchaseorderid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, purchaseorderdetailid, modifieddate)
+  implicit val encoder: Encoder[PurchaseorderdetailRowUnsaved] = {
+    import io.circe.syntax._
+    row =>
+      Json.obj(
+        "purchaseorderid" := row.purchaseorderid,
+        "duedate" := row.duedate,
+        "orderqty" := row.orderqty,
+        "productid" := row.productid,
+        "unitprice" := row.unitprice,
+        "receivedqty" := row.receivedqty,
+        "rejectedqty" := row.rejectedqty,
+        "purchaseorderdetailid" := row.purchaseorderdetailid,
+        "modifieddate" := row.modifieddate
+      )}
+}
