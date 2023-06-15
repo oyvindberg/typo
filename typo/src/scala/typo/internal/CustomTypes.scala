@@ -279,6 +279,7 @@ class CustomTypes(pkg: sc.QIdent) {
     )
   lazy val TypoJson = obj("json", "TypoJson")
   lazy val TypoJsonb = obj("jsonb", "TypoJsonb")
+  lazy val TypoInet = obj("inet", "TypoInet").copy(toTypoInArray = None)
 
   val All: List[CustomType] =
     List(
@@ -294,6 +295,7 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoXml,
       TypoJson,
       TypoJsonb,
-      TypoHStore
+      TypoHStore,
+      TypoInet
     )
 }

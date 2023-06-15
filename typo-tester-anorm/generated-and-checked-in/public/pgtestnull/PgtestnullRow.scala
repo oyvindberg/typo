@@ -10,6 +10,7 @@ package pgtestnull
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -41,6 +42,7 @@ case class PgtestnullRow(
   json: Option[TypoJson],
   jsonb: Option[TypoJsonb],
   hstore: Option[TypoHStore],
+  inet: Option[TypoInet],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
   linees: Option[Array[TypoLine]],
@@ -53,7 +55,8 @@ case class PgtestnullRow(
   xmles: Option[Array[TypoXml]],
   jsones: Option[Array[TypoJson]],
   jsonbes: Option[Array[TypoJsonb]],
-  hstores: Option[Array[TypoHStore]]
+  hstores: Option[Array[TypoHStore]],
+  inets: Option[Array[TypoInet]]
 )
 
 object PgtestnullRow {
@@ -73,6 +76,7 @@ object PgtestnullRow {
         "json" -> o.json,
         "jsonb" -> o.jsonb,
         "hstore" -> o.hstore,
+        "inet" -> o.inet,
         "boxes" -> o.boxes,
         "circlees" -> o.circlees,
         "linees" -> o.linees,
@@ -85,7 +89,8 @@ object PgtestnullRow {
         "xmles" -> o.xmles,
         "jsones" -> o.jsones,
         "jsonbes" -> o.jsonbes,
-        "hstores" -> o.hstores
+        "hstores" -> o.hstores,
+        "inets" -> o.inets
       )
   
     override def reads(json: JsValue): JsResult[PgtestnullRow] = {
@@ -105,6 +110,7 @@ object PgtestnullRow {
             json = json.\("json").toOption.map(_.as[TypoJson]),
             jsonb = json.\("jsonb").toOption.map(_.as[TypoJsonb]),
             hstore = json.\("hstore").toOption.map(_.as[TypoHStore]),
+            inet = json.\("inet").toOption.map(_.as[TypoInet]),
             boxes = json.\("boxes").toOption.map(_.as[Array[TypoBox]]),
             circlees = json.\("circlees").toOption.map(_.as[Array[TypoCircle]]),
             linees = json.\("linees").toOption.map(_.as[Array[TypoLine]]),
@@ -117,7 +123,8 @@ object PgtestnullRow {
             xmles = json.\("xmles").toOption.map(_.as[Array[TypoXml]]),
             jsones = json.\("jsones").toOption.map(_.as[Array[TypoJson]]),
             jsonbes = json.\("jsonbes").toOption.map(_.as[Array[TypoJsonb]]),
-            hstores = json.\("hstores").toOption.map(_.as[Array[TypoHStore]])
+            hstores = json.\("hstores").toOption.map(_.as[Array[TypoHStore]]),
+            inets = json.\("inets").toOption.map(_.as[Array[TypoInet]])
           )
         )
       )

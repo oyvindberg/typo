@@ -10,6 +10,7 @@ package pgtest
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -38,6 +39,7 @@ object PgtestFieldValue {
   case class json(override val value: TypoJson) extends PgtestFieldValue("json", value)
   case class jsonb(override val value: TypoJsonb) extends PgtestFieldValue("jsonb", value)
   case class hstore(override val value: TypoHStore) extends PgtestFieldValue("hstore", value)
+  case class inet(override val value: TypoInet) extends PgtestFieldValue("inet", value)
   case class boxes(override val value: Array[TypoBox]) extends PgtestFieldValue("boxes", value)
   case class circlees(override val value: Array[TypoCircle]) extends PgtestFieldValue("circlees", value)
   case class linees(override val value: Array[TypoLine]) extends PgtestFieldValue("linees", value)
@@ -51,4 +53,5 @@ object PgtestFieldValue {
   case class jsones(override val value: Array[TypoJson]) extends PgtestFieldValue("jsones", value)
   case class jsonbes(override val value: Array[TypoJsonb]) extends PgtestFieldValue("jsonbes", value)
   case class hstores(override val value: Array[TypoHStore]) extends PgtestFieldValue("hstores", value)
+  case class inets(override val value: Array[TypoInet]) extends PgtestFieldValue("inets", value)
 }

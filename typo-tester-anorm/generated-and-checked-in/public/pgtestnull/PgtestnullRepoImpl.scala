@@ -10,6 +10,7 @@ package pgtestnull
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -29,15 +30,15 @@ import java.sql.Connection
 
 object PgtestnullRepoImpl extends PgtestnullRepo {
   override def insert(unsaved: PgtestnullRow)(implicit c: Connection): PgtestnullRow = {
-    SQL"""insert into "public".pgtestnull(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores)
-          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore)
-          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+    SQL"""insert into "public".pgtestnull(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets)
+          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet)
+          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
        """
       .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgtestnullRow] = {
-    SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+    SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtestnull
        """.as(rowParser.*)
   }
@@ -59,6 +60,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           case PgtestnullFieldValue.json(value) => NamedParameter("json", ParameterValue.from(value))
           case PgtestnullFieldValue.jsonb(value) => NamedParameter("jsonb", ParameterValue.from(value))
           case PgtestnullFieldValue.hstore(value) => NamedParameter("hstore", ParameterValue.from(value))
+          case PgtestnullFieldValue.inet(value) => NamedParameter("inet", ParameterValue.from(value))
           case PgtestnullFieldValue.boxes(value) => NamedParameter("boxes", ParameterValue.from(value))
           case PgtestnullFieldValue.circlees(value) => NamedParameter("circlees", ParameterValue.from(value))
           case PgtestnullFieldValue.linees(value) => NamedParameter("linees", ParameterValue.from(value))
@@ -72,9 +74,10 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           case PgtestnullFieldValue.jsones(value) => NamedParameter("jsones", ParameterValue.from(value))
           case PgtestnullFieldValue.jsonbes(value) => NamedParameter("jsonbes", ParameterValue.from(value))
           case PgtestnullFieldValue.hstores(value) => NamedParameter("hstores", ParameterValue.from(value))
+          case PgtestnullFieldValue.inets(value) => NamedParameter("inets", ParameterValue.from(value))
         }
         val quote = '"'.toString
-        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
                     from "public".pgtestnull
                     where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
@@ -103,6 +106,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           json = row[Option[TypoJson]]("json"),
           jsonb = row[Option[TypoJsonb]]("jsonb"),
           hstore = row[Option[TypoHStore]]("hstore"),
+          inet = row[Option[TypoInet]]("inet"),
           boxes = row[Option[Array[TypoBox]]]("boxes"),
           circlees = row[Option[Array[TypoCircle]]]("circlees"),
           linees = row[Option[Array[TypoLine]]]("linees"),
@@ -115,7 +119,8 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           xmles = row[Option[Array[TypoXml]]]("xmles"),
           jsones = row[Option[Array[TypoJson]]]("jsones"),
           jsonbes = row[Option[Array[TypoJsonb]]]("jsonbes"),
-          hstores = row[Option[Array[TypoHStore]]]("hstores")
+          hstores = row[Option[Array[TypoHStore]]]("hstores"),
+          inets = row[Option[Array[TypoInet]]]("inets")
         )
       )
     }

@@ -28,6 +28,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         json = TypoJson("""{"a": 1}"""),
         jsonb = TypoJsonb("""{"a": 2}"""),
         hstore = TypoHStore(Map("a" -> "1", "b" -> "2")),
+        inet = TypoInet("::10.2.3.4"),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
         linees = Array(TypoLine(3.0, 4.5, 5.5)),
@@ -40,7 +41,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = Array(TypoXml("<xml/>")),
         jsones = Array(TypoJson("""{"a": 1}""")),
         jsonbes = Array(TypoJsonb("""{"a": 2}""")),
-        hstores = Array() // todo
+        hstores = Array(), // todo
+        inets = Array(TypoInet("::10.2.3.4"))
       )
       val after = PgtestRepoImpl.insert(before)
 
@@ -57,6 +59,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.json === before.json)
       assert(after.jsonb === before.jsonb)
       assert(after.hstore === before.hstore)
+      assert(after.inet === before.inet)
       assert(after.boxes === before.boxes)
       assert(after.circlees === before.circlees)
       assert(after.linees === before.linees)
@@ -70,7 +73,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.jsones === before.jsones)
       assert(after.jsonbes === before.jsonbes)
       assert(after.hstores === before.hstores)
-
+      assert(after.inets === before.inets)
     }
   }
 
@@ -90,6 +93,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         json = None,
         jsonb = None,
         hstore = None,
+        inet = None,
         boxes = None,
         circlees = None,
         linees = None,
@@ -102,7 +106,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = None,
         jsones = None,
         jsonbes = None,
-        hstores = None
+        hstores = None,
+        inets = None
       )
       val after = PgtestnullRepoImpl.insert(before)
       assert(after === before)
@@ -125,6 +130,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         json = Some(TypoJson("""{"a": 1}""")),
         jsonb = Some(TypoJsonb("""{"a": 2}""")),
         hstore = Some(TypoHStore(Map("a" -> "1", "b" -> "2"))),
+        inet = Some(TypoInet("::10.2.3.4")),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
         linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
@@ -137,7 +143,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = Some(Array(TypoXml("<xml/>"))),
         jsones = Some(Array(TypoJson("""{"a": 1}"""))),
         jsonbes = Some(Array(TypoJsonb("""{"a": 2}"""))),
-        hstores = Some(Array())
+        hstores = Some(Array()),
+        inets = Some(Array(TypoInet("::10.2.3.4")))
       )
       val after = PgtestnullRepoImpl.insert(before)
       assert(after.box === before.box)
@@ -153,6 +160,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.json === before.json)
       assert(after.jsonb === before.jsonb)
       assert(after.hstore === before.hstore)
+      assert(after.inet === before.inet)
       assert(after.boxes.map(_.toList) === before.boxes.map(_.toList))
       assert(after.circlees.map(_.toList) === before.circlees.map(_.toList))
       assert(after.linees.map(_.toList) === before.linees.map(_.toList))
@@ -166,6 +174,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.jsones.map(_.toList) === before.jsones.map(_.toList))
       assert(after.jsonbes.map(_.toList) === before.jsonbes.map(_.toList))
       assert(after.hstores.map(_.toList) === before.hstores.map(_.toList))
+      assert(after.inets.map(_.toList) === before.inets.map(_.toList))
     }
   }
 

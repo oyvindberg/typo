@@ -10,6 +10,7 @@ package pgtestnull
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -31,13 +32,13 @@ import java.sql.ResultSet
 
 object PgtestnullRepoImpl extends PgtestnullRepo {
   override def insert(unsaved: PgtestnullRow): ConnectionIO[PgtestnullRow] = {
-    sql"""insert into "public".pgtestnull(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores)
-          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore)
-          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+    sql"""insert into "public".pgtestnull(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets)
+          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet)
+          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
        """.query.unique
   }
   override def selectAll: Stream[ConnectionIO, PgtestnullRow] = {
-    sql"""select box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores from "public".pgtestnull""".query[PgtestnullRow].stream
+    sql"""select box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets from "public".pgtestnull""".query[PgtestnullRow].stream
   }
   override def selectByFieldValues(fieldValues: List[PgtestnullFieldOrIdValue[_]]): Stream[ConnectionIO, PgtestnullRow] = {
     val where = fragments.whereAnd(
@@ -55,6 +56,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         case PgtestnullFieldValue.json(value) => fr"json = $value"
         case PgtestnullFieldValue.jsonb(value) => fr"jsonb = $value"
         case PgtestnullFieldValue.hstore(value) => fr"hstore = $value"
+        case PgtestnullFieldValue.inet(value) => fr"inet = $value"
         case PgtestnullFieldValue.boxes(value) => fr"boxes = $value"
         case PgtestnullFieldValue.circlees(value) => fr"circlees = $value"
         case PgtestnullFieldValue.linees(value) => fr"linees = $value"
@@ -68,6 +70,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         case PgtestnullFieldValue.jsones(value) => fr"jsones = $value"
         case PgtestnullFieldValue.jsonbes(value) => fr"jsonbes = $value"
         case PgtestnullFieldValue.hstores(value) => fr"hstores = $value"
+        case PgtestnullFieldValue.inets(value) => fr"inets = $value"
       } :_*
     )
     sql"""select * from "public".pgtestnull $where""".query[PgtestnullRow].stream
@@ -89,6 +92,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         (Get[TypoJson], Nullability.Nullable),
         (Get[TypoJsonb], Nullability.Nullable),
         (Get[TypoHStore], Nullability.Nullable),
+        (Get[TypoInet], Nullability.Nullable),
         (Get[Array[TypoBox]], Nullability.Nullable),
         (Get[Array[TypoCircle]], Nullability.Nullable),
         (Get[Array[TypoLine]], Nullability.Nullable),
@@ -101,7 +105,8 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         (Get[Array[TypoXml]], Nullability.Nullable),
         (Get[Array[TypoJson]], Nullability.Nullable),
         (Get[Array[TypoJsonb]], Nullability.Nullable),
-        (Get[Array[TypoHStore]], Nullability.Nullable)
+        (Get[Array[TypoHStore]], Nullability.Nullable),
+        (Get[Array[TypoInet]], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PgtestnullRow(
         box = Get[TypoBox].unsafeGetNullable(rs, i + 0),
@@ -117,19 +122,21 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         json = Get[TypoJson].unsafeGetNullable(rs, i + 10),
         jsonb = Get[TypoJsonb].unsafeGetNullable(rs, i + 11),
         hstore = Get[TypoHStore].unsafeGetNullable(rs, i + 12),
-        boxes = Get[Array[TypoBox]].unsafeGetNullable(rs, i + 13),
-        circlees = Get[Array[TypoCircle]].unsafeGetNullable(rs, i + 14),
-        linees = Get[Array[TypoLine]].unsafeGetNullable(rs, i + 15),
-        lseges = Get[Array[TypoLineSegment]].unsafeGetNullable(rs, i + 16),
-        pathes = Get[Array[TypoPath]].unsafeGetNullable(rs, i + 17),
-        pointes = Get[Array[TypoPoint]].unsafeGetNullable(rs, i + 18),
-        polygones = Get[Array[TypoPolygon]].unsafeGetNullable(rs, i + 19),
-        intervales = Get[Array[TypoInterval]].unsafeGetNullable(rs, i + 20),
-        moneyes = Get[Array[TypoMoney]].unsafeGetNullable(rs, i + 21),
-        xmles = Get[Array[TypoXml]].unsafeGetNullable(rs, i + 22),
-        jsones = Get[Array[TypoJson]].unsafeGetNullable(rs, i + 23),
-        jsonbes = Get[Array[TypoJsonb]].unsafeGetNullable(rs, i + 24),
-        hstores = Get[Array[TypoHStore]].unsafeGetNullable(rs, i + 25)
+        inet = Get[TypoInet].unsafeGetNullable(rs, i + 13),
+        boxes = Get[Array[TypoBox]].unsafeGetNullable(rs, i + 14),
+        circlees = Get[Array[TypoCircle]].unsafeGetNullable(rs, i + 15),
+        linees = Get[Array[TypoLine]].unsafeGetNullable(rs, i + 16),
+        lseges = Get[Array[TypoLineSegment]].unsafeGetNullable(rs, i + 17),
+        pathes = Get[Array[TypoPath]].unsafeGetNullable(rs, i + 18),
+        pointes = Get[Array[TypoPoint]].unsafeGetNullable(rs, i + 19),
+        polygones = Get[Array[TypoPolygon]].unsafeGetNullable(rs, i + 20),
+        intervales = Get[Array[TypoInterval]].unsafeGetNullable(rs, i + 21),
+        moneyes = Get[Array[TypoMoney]].unsafeGetNullable(rs, i + 22),
+        xmles = Get[Array[TypoXml]].unsafeGetNullable(rs, i + 23),
+        jsones = Get[Array[TypoJson]].unsafeGetNullable(rs, i + 24),
+        jsonbes = Get[Array[TypoJsonb]].unsafeGetNullable(rs, i + 25),
+        hstores = Get[Array[TypoHStore]].unsafeGetNullable(rs, i + 26),
+        inets = Get[Array[TypoInet]].unsafeGetNullable(rs, i + 27)
       )
     )
   

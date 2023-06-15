@@ -10,6 +10,7 @@ package pgtestnull
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -38,6 +39,7 @@ object PgtestnullFieldValue {
   case class json(override val value: Option[TypoJson]) extends PgtestnullFieldValue("json", value)
   case class jsonb(override val value: Option[TypoJsonb]) extends PgtestnullFieldValue("jsonb", value)
   case class hstore(override val value: Option[TypoHStore]) extends PgtestnullFieldValue("hstore", value)
+  case class inet(override val value: Option[TypoInet]) extends PgtestnullFieldValue("inet", value)
   case class boxes(override val value: Option[Array[TypoBox]]) extends PgtestnullFieldValue("boxes", value)
   case class circlees(override val value: Option[Array[TypoCircle]]) extends PgtestnullFieldValue("circlees", value)
   case class linees(override val value: Option[Array[TypoLine]]) extends PgtestnullFieldValue("linees", value)
@@ -51,4 +53,5 @@ object PgtestnullFieldValue {
   case class jsones(override val value: Option[Array[TypoJson]]) extends PgtestnullFieldValue("jsones", value)
   case class jsonbes(override val value: Option[Array[TypoJsonb]]) extends PgtestnullFieldValue("jsonbes", value)
   case class hstores(override val value: Option[Array[TypoHStore]]) extends PgtestnullFieldValue("hstores", value)
+  case class inets(override val value: Option[Array[TypoInet]]) extends PgtestnullFieldValue("inets", value)
 }

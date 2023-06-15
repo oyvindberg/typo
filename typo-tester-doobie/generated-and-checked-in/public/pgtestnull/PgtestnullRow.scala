@@ -10,6 +10,7 @@ package pgtestnull
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -39,6 +40,7 @@ case class PgtestnullRow(
   json: Option[TypoJson],
   jsonb: Option[TypoJsonb],
   hstore: Option[TypoHStore],
+  inet: Option[TypoInet],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
   linees: Option[Array[TypoLine]],
@@ -51,7 +53,8 @@ case class PgtestnullRow(
   xmles: Option[Array[TypoXml]],
   jsones: Option[Array[TypoJson]],
   jsonbes: Option[Array[TypoJsonb]],
-  hstores: Option[Array[TypoHStore]]
+  hstores: Option[Array[TypoHStore]],
+  inets: Option[Array[TypoInet]]
 )
 
 object PgtestnullRow {
@@ -71,6 +74,7 @@ object PgtestnullRow {
         json <- c.downField("json").as[Option[TypoJson]]
         jsonb <- c.downField("jsonb").as[Option[TypoJsonb]]
         hstore <- c.downField("hstore").as[Option[TypoHStore]]
+        inet <- c.downField("inet").as[Option[TypoInet]]
         boxes <- c.downField("boxes").as[Option[Array[TypoBox]]]
         circlees <- c.downField("circlees").as[Option[Array[TypoCircle]]]
         linees <- c.downField("linees").as[Option[Array[TypoLine]]]
@@ -84,7 +88,8 @@ object PgtestnullRow {
         jsones <- c.downField("jsones").as[Option[Array[TypoJson]]]
         jsonbes <- c.downField("jsonbes").as[Option[Array[TypoJsonb]]]
         hstores <- c.downField("hstores").as[Option[Array[TypoHStore]]]
-      } yield PgtestnullRow(box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores)
+        inets <- c.downField("inets").as[Option[Array[TypoInet]]]
+      } yield PgtestnullRow(box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets)
   implicit val encoder: Encoder[PgtestnullRow] = {
     import io.circe.syntax._
     row =>
@@ -102,6 +107,7 @@ object PgtestnullRow {
         "json" := row.json,
         "jsonb" := row.jsonb,
         "hstore" := row.hstore,
+        "inet" := row.inet,
         "boxes" := row.boxes,
         "circlees" := row.circlees,
         "linees" := row.linees,
@@ -114,6 +120,7 @@ object PgtestnullRow {
         "xmles" := row.xmles,
         "jsones" := row.jsones,
         "jsonbes" := row.jsonbes,
-        "hstores" := row.hstores
+        "hstores" := row.hstores,
+        "inets" := row.inets
       )}
 }

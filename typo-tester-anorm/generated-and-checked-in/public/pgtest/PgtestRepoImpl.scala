@@ -10,6 +10,7 @@ package pgtest
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -29,15 +30,15 @@ import java.sql.Connection
 
 object PgtestRepoImpl extends PgtestRepo {
   override def insert(unsaved: PgtestRow)(implicit c: Connection): PgtestRow = {
-    SQL"""insert into "public".pgtest(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores)
-          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore)
-          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+    SQL"""insert into "public".pgtest(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets)
+          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet)
+          returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
        """
       .executeInsert(rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgtestRow] = {
-    SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+    SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtest
        """.as(rowParser.*)
   }
@@ -59,6 +60,7 @@ object PgtestRepoImpl extends PgtestRepo {
           case PgtestFieldValue.json(value) => NamedParameter("json", ParameterValue.from(value))
           case PgtestFieldValue.jsonb(value) => NamedParameter("jsonb", ParameterValue.from(value))
           case PgtestFieldValue.hstore(value) => NamedParameter("hstore", ParameterValue.from(value))
+          case PgtestFieldValue.inet(value) => NamedParameter("inet", ParameterValue.from(value))
           case PgtestFieldValue.boxes(value) => NamedParameter("boxes", ParameterValue.from(value))
           case PgtestFieldValue.circlees(value) => NamedParameter("circlees", ParameterValue.from(value))
           case PgtestFieldValue.linees(value) => NamedParameter("linees", ParameterValue.from(value))
@@ -72,9 +74,10 @@ object PgtestRepoImpl extends PgtestRepo {
           case PgtestFieldValue.jsones(value) => NamedParameter("jsones", ParameterValue.from(value))
           case PgtestFieldValue.jsonbes(value) => NamedParameter("jsonbes", ParameterValue.from(value))
           case PgtestFieldValue.hstores(value) => NamedParameter("hstores", ParameterValue.from(value))
+          case PgtestFieldValue.inets(value) => NamedParameter("inets", ParameterValue.from(value))
         }
         val quote = '"'.toString
-        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores
+        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
                     from "public".pgtest
                     where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
@@ -103,6 +106,7 @@ object PgtestRepoImpl extends PgtestRepo {
           json = row[TypoJson]("json"),
           jsonb = row[TypoJsonb]("jsonb"),
           hstore = row[TypoHStore]("hstore"),
+          inet = row[TypoInet]("inet"),
           boxes = row[Array[TypoBox]]("boxes"),
           circlees = row[Array[TypoCircle]]("circlees"),
           linees = row[Array[TypoLine]]("linees"),
@@ -115,7 +119,8 @@ object PgtestRepoImpl extends PgtestRepo {
           xmles = row[Array[TypoXml]]("xmles"),
           jsones = row[Array[TypoJson]]("jsones"),
           jsonbes = row[Array[TypoJsonb]]("jsonbes"),
-          hstores = row[Array[TypoHStore]]("hstores")
+          hstores = row[Array[TypoHStore]]("hstores"),
+          inets = row[Array[TypoInet]]("inets")
         )
       )
     }

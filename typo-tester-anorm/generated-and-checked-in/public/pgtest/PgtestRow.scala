@@ -10,6 +10,7 @@ package pgtest
 import adventureworks.TypoBox
 import adventureworks.TypoCircle
 import adventureworks.TypoHStore
+import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoJson
 import adventureworks.TypoJsonb
@@ -41,6 +42,7 @@ case class PgtestRow(
   json: TypoJson,
   jsonb: TypoJsonb,
   hstore: TypoHStore,
+  inet: TypoInet,
   boxes: Array[TypoBox],
   circlees: Array[TypoCircle],
   linees: Array[TypoLine],
@@ -53,7 +55,8 @@ case class PgtestRow(
   xmles: Array[TypoXml],
   jsones: Array[TypoJson],
   jsonbes: Array[TypoJsonb],
-  hstores: Array[TypoHStore]
+  hstores: Array[TypoHStore],
+  inets: Array[TypoInet]
 )
 
 object PgtestRow {
@@ -73,6 +76,7 @@ object PgtestRow {
         "json" -> o.json,
         "jsonb" -> o.jsonb,
         "hstore" -> o.hstore,
+        "inet" -> o.inet,
         "boxes" -> o.boxes,
         "circlees" -> o.circlees,
         "linees" -> o.linees,
@@ -85,7 +89,8 @@ object PgtestRow {
         "xmles" -> o.xmles,
         "jsones" -> o.jsones,
         "jsonbes" -> o.jsonbes,
-        "hstores" -> o.hstores
+        "hstores" -> o.hstores,
+        "inets" -> o.inets
       )
   
     override def reads(json: JsValue): JsResult[PgtestRow] = {
@@ -105,6 +110,7 @@ object PgtestRow {
             json = json.\("json").as[TypoJson],
             jsonb = json.\("jsonb").as[TypoJsonb],
             hstore = json.\("hstore").as[TypoHStore],
+            inet = json.\("inet").as[TypoInet],
             boxes = json.\("boxes").as[Array[TypoBox]],
             circlees = json.\("circlees").as[Array[TypoCircle]],
             linees = json.\("linees").as[Array[TypoLine]],
@@ -117,7 +123,8 @@ object PgtestRow {
             xmles = json.\("xmles").as[Array[TypoXml]],
             jsones = json.\("jsones").as[Array[TypoJson]],
             jsonbes = json.\("jsonbes").as[Array[TypoJsonb]],
-            hstores = json.\("hstores").as[Array[TypoHStore]]
+            hstores = json.\("hstores").as[Array[TypoHStore]],
+            inets = json.\("inets").as[Array[TypoInet]]
           )
         )
       )
