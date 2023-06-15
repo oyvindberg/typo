@@ -28,5 +28,4 @@ object TableConstraintsViewFieldValue {
   case class isDeferrable(override val value: Option[YesOrNo]) extends TableConstraintsViewFieldValue("is_deferrable", value)
   case class initiallyDeferred(override val value: Option[YesOrNo]) extends TableConstraintsViewFieldValue("initially_deferred", value)
   case class enforced(override val value: Option[YesOrNo]) extends TableConstraintsViewFieldValue("enforced", value)
-  case class nullsDistinct(override val value: Option[YesOrNo]) extends TableConstraintsViewFieldValue("nulls_distinct", value)
 }

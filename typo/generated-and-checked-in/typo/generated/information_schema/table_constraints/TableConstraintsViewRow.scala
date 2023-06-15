@@ -40,9 +40,7 @@ case class TableConstraintsViewRow(
   /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"initially_deferred","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
   initiallyDeferred: Option[YesOrNo],
   /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"enforced","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  enforced: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"nulls_distinct","ordinal_position":11,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  nullsDistinct: Option[YesOrNo]
+  enforced: Option[YesOrNo]
 )
 
 object TableConstraintsViewRow {
@@ -58,8 +56,7 @@ object TableConstraintsViewRow {
         "constraint_type" -> o.constraintType,
         "is_deferrable" -> o.isDeferrable,
         "initially_deferred" -> o.initiallyDeferred,
-        "enforced" -> o.enforced,
-        "nulls_distinct" -> o.nullsDistinct
+        "enforced" -> o.enforced
       )
   
     override def reads(json: JsValue): JsResult[TableConstraintsViewRow] = {
@@ -75,8 +72,7 @@ object TableConstraintsViewRow {
             constraintType = json.\("constraint_type").toOption.map(_.as[CharacterData]),
             isDeferrable = json.\("is_deferrable").toOption.map(_.as[YesOrNo]),
             initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[YesOrNo]),
-            enforced = json.\("enforced").toOption.map(_.as[YesOrNo]),
-            nullsDistinct = json.\("nulls_distinct").toOption.map(_.as[YesOrNo])
+            enforced = json.\("enforced").toOption.map(_.as[YesOrNo])
           )
         )
       )
