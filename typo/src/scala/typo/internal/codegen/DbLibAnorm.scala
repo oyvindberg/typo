@@ -348,23 +348,23 @@ object DbLibAnorm extends DbLib {
     def out(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)}"
 
     val arrayTypes = List[(sc.Type.Qualified, sc.StrLit)](
-      (sc.Type.String, sc.StrLit("_varchar")),
-      (sc.Type.Float, sc.StrLit("_float4")),
-      (sc.Type.Short, sc.StrLit("_int2")),
-      (sc.Type.Int, sc.StrLit("_int4")),
-      (sc.Type.Long, sc.StrLit("_int8")),
-      (sc.Type.Boolean, sc.StrLit("_bool")),
-      (sc.Type.Double, sc.StrLit("_float8")),
-      (sc.Type.UUID, sc.StrLit("_uuid")),
-      (sc.Type.BigDecimal, sc.StrLit("_decimal")),
-      (sc.Type.PGobject, sc.StrLit("_aclitem"))
+      (sc.Type.String, sc.StrLit("varchar")),
+      (sc.Type.Float, sc.StrLit("float4")),
+      (sc.Type.Short, sc.StrLit("int2")),
+      (sc.Type.Int, sc.StrLit("int4")),
+      (sc.Type.Long, sc.StrLit("int8")),
+      (sc.Type.Boolean, sc.StrLit("bool")),
+      (sc.Type.Double, sc.StrLit("float8")),
+      (sc.Type.UUID, sc.StrLit("uuid")),
+      (sc.Type.BigDecimal, sc.StrLit("decimal")),
+      (sc.Type.PGobject, sc.StrLit("aclitem"))
     )
 
     val arrayInstances = arrayTypes.map { case (tpe, elemType) =>
       val arrayType = sc.Type.Array.of(tpe)
       val boxedType = sc.Type.boxedType(tpe).getOrElse(sc.Type.AnyRef)
       code"""|implicit val ${tpe.value.name}Array: ${out(arrayType)} = new ${out(arrayType)} {
-             |  override def sqlType: ${sc.Type.String} = $elemType
+             |  override def sqlType: ${sc.Type.String} = ${elemType.prefixed("_")}
              |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
              |  override def set(ps: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $arrayType): ${sc.Type.Unit} =
              |    ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $boxedType)))
@@ -374,11 +374,19 @@ object DbLibAnorm extends DbLib {
 
     val postgresTypes = PostgresTypes.all.map { case (typeName, tpe) =>
       val either = sc.Type.Either.of(SqlRequestError, tpe)
+      val cast = if (tpe == sc.Type.PGmoney) {
+        code"""|v1 match {
+               |  case v: ${sc.Type.Double} => ${sc.Type.Right}(new ${sc.Type.PGmoney}(v))
+               |  case v => ${sc.Type.Left}($TypeDoesNotMatch(s"Cannot convert $$v to ${tpe.value.name}"))
+               |}""".stripMargin
+      } else
+        code"""${sc.Type.Right}(v1.asInstanceOf[$tpe])"""
+
       code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
              |  override def sqlType: ${sc.Type.String} = $typeName
              |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
              |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
+             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = $cast
              |}
              |""".stripMargin
     }

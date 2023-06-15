@@ -34,7 +34,10 @@ object sc {
   }
   case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
 
-  case class StrLit(str: String) extends Tree
+  case class StrLit(str: String) extends Tree {
+    def prefixed(prefix: String) = StrLit(prefix + str)
+  }
+
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
 
   sealed trait Type extends Tree {
