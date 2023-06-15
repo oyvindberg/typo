@@ -7,11 +7,11 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +25,7 @@ case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.name]] */
   name: Option[Name],
   /** Points to [[productmodel.ProductmodelRow.instructions]] */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   LocationID: Option[Int],
   SetupHours: Option[BigDecimal],
   MachineHours: Option[BigDecimal],
@@ -61,7 +61,7 @@ object VproductmodelinstructionsViewRow {
           VproductmodelinstructionsViewRow(
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
             name = json.\("name").toOption.map(_.as[Name]),
-            instructions = json.\("instructions").toOption.map(_.as[PgSQLXML]),
+            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
             LocationID = json.\("LocationID").toOption.map(_.as[Int]),
             SetupHours = json.\("SetupHours").toOption.map(_.as[BigDecimal]),
             MachineHours = json.\("MachineHours").toOption.map(_.as[BigDecimal]),

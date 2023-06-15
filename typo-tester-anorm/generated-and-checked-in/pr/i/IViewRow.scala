@@ -7,9 +7,9 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,7 +22,7 @@ case class IViewRow(
   /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
   illustrationid: Option[IllustrationId],
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
-  diagram: Option[PgSQLXML],
+  diagram: Option[TypoXml],
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -43,7 +43,7 @@ object IViewRow {
           IViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
-            diagram = json.\("diagram").toOption.map(_.as[PgSQLXML]),
+            diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

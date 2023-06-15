@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -17,7 +18,6 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object SViewRepoImpl extends SViewRepo {
   override def selectAll(implicit c: Connection): List[SViewRow] = {
@@ -59,7 +59,7 @@ object SViewRepoImpl extends SViewRepo {
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
           name = row[Option[Name]]("name"),
           salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[PgSQLXML]]("demographics"),
+          demographics = row[Option[TypoXml]]("demographics"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

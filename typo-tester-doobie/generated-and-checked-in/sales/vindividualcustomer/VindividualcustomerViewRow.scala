@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -14,7 +15,6 @@ import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import org.postgresql.jdbc.PgSQLXML
 
 case class VindividualcustomerViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -48,7 +48,7 @@ case class VindividualcustomerViewRow(
   postalcode: Option[String],
   countryregionname: Option[Name],
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[PgSQLXML]
+  demographics: Option[TypoXml]
 )
 
 object VindividualcustomerViewRow {
@@ -72,7 +72,7 @@ object VindividualcustomerViewRow {
         stateprovincename <- c.downField("stateprovincename").as[Option[Name]]
         postalcode <- c.downField("postalcode").as[Option[String]]
         countryregionname <- c.downField("countryregionname").as[Option[Name]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
       } yield VindividualcustomerViewRow(businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics)
   implicit val encoder: Encoder[VindividualcustomerViewRow] = {
     import io.circe.syntax._

@@ -7,9 +7,9 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import org.postgresql.util.PGmoney
 
 sealed abstract class VstorewithdemographicsViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VstorewithdemographicsViewFieldValue[T](name: String, value: T) extends VstorewithdemographicsViewFieldOrIdValue(name, value)
@@ -17,8 +17,8 @@ sealed abstract class VstorewithdemographicsViewFieldValue[T](name: String, valu
 object VstorewithdemographicsViewFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VstorewithdemographicsViewFieldValue("businessentityid", value)
   case class name(override val value: Option[Name]) extends VstorewithdemographicsViewFieldValue("name", value)
-  case class AnnualSales(override val value: Option[PGmoney]) extends VstorewithdemographicsViewFieldValue("AnnualSales", value)
-  case class AnnualRevenue(override val value: Option[PGmoney]) extends VstorewithdemographicsViewFieldValue("AnnualRevenue", value)
+  case class AnnualSales(override val value: Option[TypoMoney]) extends VstorewithdemographicsViewFieldValue("AnnualSales", value)
+  case class AnnualRevenue(override val value: Option[TypoMoney]) extends VstorewithdemographicsViewFieldValue("AnnualRevenue", value)
   case class BankName(override val value: Option[String]) extends VstorewithdemographicsViewFieldValue("BankName", value)
   case class BusinessType(override val value: Option[String]) extends VstorewithdemographicsViewFieldValue("BusinessType", value)
   case class YearOpened(override val value: Option[Int]) extends VstorewithdemographicsViewFieldValue("YearOpened", value)

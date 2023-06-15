@@ -22,9 +22,19 @@ object DbLibDoobie extends DbLib {
   val pureCIO = sc.Type.Qualified("doobie.free.connection.pure")
   val delayCIO = sc.Type.Qualified("doobie.free.connection.delay")
   val fs2Stream = sc.Type.Qualified("fs2.Stream")
+  val NonEmptyList = sc.Type.Qualified("cats.data.NonEmptyList")
 
-  def dbNames(cols: NonEmptyList[ComputedColumn]): sc.Code =
-    cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
+  def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
+    cols
+      .map { c =>
+        val cast = (isRead, c.dbCol.tpe) match {
+          case (true, db.Type.PGmoney)                => code"::numeric"
+          case (true, db.Type.Array(db.Type.PGmoney)) => code"::numeric[]"
+          case _                                      => sc.Code.Empty
+        }
+        maybeQuoted(c.dbName) ++ cast
+      }
+      .mkCode(", ")
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     List(
@@ -113,6 +123,8 @@ object DbLibDoobie extends DbLib {
     c.dbCol.tpe match {
       case db.Type.EnumRef(name)                               => code"::$name"
       case db.Type.DomainRef(name)                             => code"::$name"
+      case db.Type.PGmoney                                     => code"::numeric"
+      case db.Type.Array(db.Type.PGmoney)                      => code"::numeric[]"
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => sc.Code.Empty
       case _ =>
         c.dbCol.udtName match {
@@ -213,12 +225,12 @@ object DbLibDoobie extends DbLib {
         val sql = SQL {
           code"""|insert into $relName($${fs.map { case (n, _) => n }.intercalate(${frInterpolate(code", ")})})
                  |values ($${fs.map { case (_, f) => f }.intercalate(${frInterpolate(code", ")})})
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
         val sqlEmpty = SQL {
           code"""|insert into $relName default values
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -244,14 +256,14 @@ object DbLibDoobie extends DbLib {
           .map { c => code"${maybeQuoted(c.dbName)} = EXCLUDED.${maybeQuoted(c.dbName)}" }
 
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols)})
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
-                 |on conflict (${dbNames(id.cols)})
+                 |on conflict (${dbNames(id.cols, isRead = false)})
                  |do update set
                  |  ${pickExcludedCols.mkCode(",\n")}
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -262,9 +274,9 @@ object DbLibDoobie extends DbLib {
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols)})
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (${values.mkCode(", ")})
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -287,15 +299,6 @@ object DbLibDoobie extends DbLib {
 
   override def missingInstances: List[sc.Code] = {
     List(
-      code"""implicit val PgSQLXMLMeta: ${Meta.of(sc.Type.PgSQLXML)} = $Meta.Advanced.other[${sc.Type.PgSQLXML}]("xml")""",
-      code"""implicit val PGmoneyMeta: ${Meta.of(sc.Type.PGmoney)} = $Meta.Advanced.other[${sc.Type.PGmoney}]("money")""",
-      code"implicit val PGboxType: $Meta[${sc.Type.PGbox}]  = doobie.postgres.implicits.PGboxType",
-      code"implicit val PGcircleType: $Meta[${sc.Type.PGcircle}]  = doobie.postgres.implicits.PGcircleType",
-      code"implicit val PGlsegType: $Meta[${sc.Type.PGlseg}]  = doobie.postgres.implicits.PGlsegType",
-      code"implicit val PGpathType: $Meta[${sc.Type.PGpath}]  = doobie.postgres.implicits.PGpathType",
-      code"implicit val PGpointType: $Meta[${sc.Type.PGpoint}]  = doobie.postgres.implicits.PGpointType",
-      code"implicit val PGpolygonType: $Meta[${sc.Type.PGpolygon}] = doobie.postgres.implicits.PGpolygonType",
-      code"implicit val PGIntervalType: $Meta[${sc.Type.PGInterval}] = doobie.postgres.implicits.PGIntervalType",
       code"implicit val UuidType: $Meta[java.util.UUID] = doobie.postgres.implicits.UuidType",
       code"implicit val InetType: $Meta[java.net.InetAddress] = doobie.postgres.implicits.InetType",
       code"implicit val unliftedBooleanArrayType: $Meta[Array[java.lang.Boolean]] = doobie.postgres.implicits.unliftedBooleanArrayType",
@@ -326,8 +329,6 @@ object DbLibDoobie extends DbLib {
       code"implicit val liftedUnboxedDoubleArrayType: $Meta[Array[Option[scala.Double]]] = doobie.postgres.implicits.liftedUnboxedDoubleArrayType",
       code"implicit val bigDecimalMeta: $Meta[Array[BigDecimal]] = doobie.postgres.implicits.bigDecimalMeta",
       code"implicit val optionBigDecimalMeta: $Meta[Array[Option[BigDecimal]]] = doobie.postgres.implicits.optionBigDecimalMeta",
-      code"implicit val hstoreMetaJava: $Meta[java.util.Map[String, String]] = doobie.postgres.implicits.hstoreMetaJava",
-      code"implicit val hstoreMeta: $Meta[Map[String, String]] = doobie.postgres.implicits.hstoreMeta",
       // time
       code"implicit val JavaTimeOffsetDateTimeMeta: $Meta[java.time.OffsetDateTime] = doobie.postgres.implicits.JavaTimeOffsetDateTimeMeta",
       code"implicit val JavaTimeInstantMeta: $Meta[java.time.Instant] = doobie.postgres.implicits.JavaTimeInstantMeta",
@@ -452,4 +453,40 @@ object DbLibDoobie extends DbLib {
     }
   }
 
+  override def customTypeInstances(ct: CustomType): List[sc.Code] = {
+
+    val tpe = ct.typoType
+
+    val v = sc.Ident("v")
+    val sqlTypeLit = sc.StrLit(ct.sqlType)
+    val single = {
+      List(
+        code"""|implicit val ${tpe.value.name}Get: ${Get.of(tpe)} =
+               |  $Get.Advanced.other[${ct.toTypo.jdbcType}](cats.data.NonEmptyList.one($sqlTypeLit))
+               |    .map($v => ${ct.toTypo0(v)})
+               |""".stripMargin,
+        code"""|implicit val ${tpe.value.name}Put: ${Put.of(tpe)} =
+               |  $Put.Advanced.other[${ct.fromTypo.jdbcType}]($NonEmptyList.one($sqlTypeLit))
+               |    .contramap($v => ${ct.fromTypo0(v)})
+               |""".stripMargin
+      )
+    }
+    val array = {
+      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+      val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
+      List(
+        code"""|implicit val ${tpe.value.name}GetArray: ${Get.of(sc.Type.Array.of(tpe))} =
+               |  $Get.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
+               |    .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
+               |""".stripMargin,
+        code"""|implicit val ${tpe.value.name}PutArray: ${Put.of(sc.Type.Array.of(tpe))} =
+               |  $Put.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
+               |    .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))
+               |""".stripMargin
+      )
+    }
+
+    single ++ array
+  }
 }

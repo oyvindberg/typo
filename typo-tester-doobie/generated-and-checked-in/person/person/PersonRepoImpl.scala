@@ -8,6 +8,7 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -23,7 +24,6 @@ import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
@@ -201,8 +201,8 @@ object PersonRepoImpl extends PersonRepo {
         (Get[Name], Nullability.NoNulls),
         (Get[String], Nullability.Nullable),
         (Get[Int], Nullability.NoNulls),
-        (Get[PgSQLXML], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
@@ -216,8 +216,8 @@ object PersonRepoImpl extends PersonRepo {
         lastname = Get[Name].unsafeGetNonNullable(rs, i + 6),
         suffix = Get[String].unsafeGetNullable(rs, i + 7),
         emailpromotion = Get[Int].unsafeGetNonNullable(rs, i + 8),
-        additionalcontactinfo = Get[PgSQLXML].unsafeGetNullable(rs, i + 9),
-        demographics = Get[PgSQLXML].unsafeGetNullable(rs, i + 10),
+        additionalcontactinfo = Get[TypoXml].unsafeGetNullable(rs, i + 9),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 10),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 11),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 12)
       )

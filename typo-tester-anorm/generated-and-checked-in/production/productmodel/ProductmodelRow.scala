@@ -7,10 +7,10 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,9 +24,9 @@ case class ProductmodelRow(
   /** Product model description. */
   name: Name,
   /** Detailed product catalog information in xml format. */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Manufacturing instructions in xml format. */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -49,8 +49,8 @@ object ProductmodelRow {
           ProductmodelRow(
             productmodelid = json.\("productmodelid").as[ProductmodelId],
             name = json.\("name").as[Name],
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[PgSQLXML]),
-            instructions = json.\("instructions").toOption.map(_.as[PgSQLXML]),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
+            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

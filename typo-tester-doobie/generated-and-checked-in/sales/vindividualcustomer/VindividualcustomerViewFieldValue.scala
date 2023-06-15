@@ -7,10 +7,10 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class VindividualcustomerViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VindividualcustomerViewFieldValue[T](name: String, value: T) extends VindividualcustomerViewFieldOrIdValue(name, value)
@@ -33,5 +33,5 @@ object VindividualcustomerViewFieldValue {
   case class stateprovincename(override val value: Option[Name]) extends VindividualcustomerViewFieldValue("stateprovincename", value)
   case class postalcode(override val value: Option[String]) extends VindividualcustomerViewFieldValue("postalcode", value)
   case class countryregionname(override val value: Option[Name]) extends VindividualcustomerViewFieldValue("countryregionname", value)
-  case class demographics(override val value: Option[PgSQLXML]) extends VindividualcustomerViewFieldValue("demographics", value)
+  case class demographics(override val value: Option[TypoXml]) extends VindividualcustomerViewFieldValue("demographics", value)
 }

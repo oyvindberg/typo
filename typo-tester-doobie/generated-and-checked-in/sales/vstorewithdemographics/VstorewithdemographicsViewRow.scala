@@ -7,21 +7,21 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import org.postgresql.util.PGmoney
 
 case class VstorewithdemographicsViewRow(
   /** Points to [[store.StoreRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[store.StoreRow.name]] */
   name: Option[Name],
-  AnnualSales: Option[PGmoney],
-  AnnualRevenue: Option[PGmoney],
+  AnnualSales: Option[TypoMoney],
+  AnnualRevenue: Option[TypoMoney],
   BankName: Option[String],
   BusinessType: Option[String],
   YearOpened: Option[Int],
@@ -38,8 +38,8 @@ object VstorewithdemographicsViewRow {
       for {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
         name <- c.downField("name").as[Option[Name]]
-        AnnualSales <- c.downField("AnnualSales").as[Option[PGmoney]]
-        AnnualRevenue <- c.downField("AnnualRevenue").as[Option[PGmoney]]
+        AnnualSales <- c.downField("AnnualSales").as[Option[TypoMoney]]
+        AnnualRevenue <- c.downField("AnnualRevenue").as[Option[TypoMoney]]
         BankName <- c.downField("BankName").as[Option[String]]
         BusinessType <- c.downField("BusinessType").as[Option[String]]
         YearOpened <- c.downField("YearOpened").as[Option[Int]]

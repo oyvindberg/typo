@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pm
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -15,7 +16,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class PmViewRow(
   id: Option[Int],
@@ -24,9 +24,9 @@ case class PmViewRow(
   /** Points to [[production.productmodel.ProductmodelRow.name]] */
   name: Option[Name],
   /** Points to [[production.productmodel.ProductmodelRow.catalogdescription]] */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Points to [[production.productmodel.ProductmodelRow.instructions]] */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   /** Points to [[production.productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productmodel.ProductmodelRow.modifieddate]] */
@@ -40,8 +40,8 @@ object PmViewRow {
         id <- c.downField("id").as[Option[Int]]
         productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
         name <- c.downField("name").as[Option[Name]]
-        catalogdescription <- c.downField("catalogdescription").as[Option[PgSQLXML]]
-        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        catalogdescription <- c.downField("catalogdescription").as[Option[TypoXml]]
+        instructions <- c.downField("instructions").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PmViewRow(id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate)

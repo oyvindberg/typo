@@ -8,6 +8,7 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.Get
@@ -22,7 +23,6 @@ import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
@@ -146,7 +146,7 @@ object StoreRepoImpl extends StoreRepo {
         (Get[BusinessentityId], Nullability.NoNulls),
         (Get[Name], Nullability.NoNulls),
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
@@ -154,7 +154,7 @@ object StoreRepoImpl extends StoreRepo {
         businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
         name = Get[Name].unsafeGetNonNullable(rs, i + 1),
         salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        demographics = Get[PgSQLXML].unsafeGetNullable(rs, i + 3),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 3),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
       )

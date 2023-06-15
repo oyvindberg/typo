@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import doobie.Get
 import doobie.Read
@@ -17,7 +18,6 @@ import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object IViewRepoImpl extends IViewRepo {
   override def selectAll: Stream[ConnectionIO, IViewRow] = {
@@ -40,13 +40,13 @@ object IViewRepoImpl extends IViewRepo {
       gets = List(
         (Get[Int], Nullability.Nullable),
         (Get[IllustrationId], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => IViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-        diagram = Get[PgSQLXML].unsafeGetNullable(rs, i + 2),
+        diagram = Get[TypoXml].unsafeGetNullable(rs, i + 2),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
       )
     )

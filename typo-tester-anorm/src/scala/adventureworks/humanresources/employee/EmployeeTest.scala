@@ -3,7 +3,7 @@ package adventureworks.humanresources.employee
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.{Defaulted, TypoXml, withConnection}
 import org.postgresql.jdbc.PgSQLXML
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
@@ -35,7 +35,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           middlename = Some(Name("middlename")),
           lastname = Name("lastname"),
           suffix = Some("suffix"),
-          additionalcontactinfo = Some(new PgSQLXML(null, "<additionalcontactinfo/>")),
+          additionalcontactinfo = Some(TypoXml("<additionalcontactinfo/>")),
           demographics = None,
           namestyle = Defaulted.UseDefault,
           emailpromotion = Defaulted.UseDefault,

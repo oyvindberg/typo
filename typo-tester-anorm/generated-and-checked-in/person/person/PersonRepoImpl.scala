@@ -8,6 +8,7 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -21,7 +22,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
@@ -235,8 +235,8 @@ object PersonRepoImpl extends PersonRepo {
           lastname = row[Name]("lastname"),
           suffix = row[Option[String]]("suffix"),
           emailpromotion = row[Int]("emailpromotion"),
-          additionalcontactinfo = row[Option[PgSQLXML]]("additionalcontactinfo"),
-          demographics = row[Option[PgSQLXML]]("demographics"),
+          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
+          demographics = row[Option[TypoXml]]("demographics"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

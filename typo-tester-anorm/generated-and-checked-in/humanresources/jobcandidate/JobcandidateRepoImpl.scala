@@ -8,6 +8,7 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -18,7 +19,6 @@ import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
@@ -165,7 +165,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         JobcandidateRow(
           jobcandidateid = row[JobcandidateId]("jobcandidateid"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[PgSQLXML]]("resume"),
+          resume = row[Option[TypoXml]]("resume"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
       )

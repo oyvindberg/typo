@@ -8,6 +8,7 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
@@ -15,16 +16,15 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 /** This class corresponds to a row in table `production.productmodel` which has not been persisted yet */
 case class ProductmodelRowUnsaved(
   /** Product model description. */
   name: Name,
   /** Detailed product catalog information in xml format. */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Manufacturing instructions in xml format. */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   /** Default: nextval('production.productmodel_productmodelid_seq'::regclass)
       Primary key for ProductModel records. */
   productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
@@ -57,8 +57,8 @@ object ProductmodelRowUnsaved {
     (c: HCursor) =>
       for {
         name <- c.downField("name").as[Name]
-        catalogdescription <- c.downField("catalogdescription").as[Option[PgSQLXML]]
-        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        catalogdescription <- c.downField("catalogdescription").as[Option[TypoXml]]
+        instructions <- c.downField("instructions").as[Option[TypoXml]]
         productmodelid <- c.downField("productmodelid").as[Defaulted[ProductmodelId]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]

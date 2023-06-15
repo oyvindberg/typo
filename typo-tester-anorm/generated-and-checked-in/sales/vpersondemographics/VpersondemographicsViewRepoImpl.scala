@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -15,11 +16,10 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
 import java.time.LocalDate
-import org.postgresql.util.PGmoney
 
 object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def selectAll(implicit c: Connection): List[VpersondemographicsViewRow] = {
-    SQL"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
+    SQL"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
           from sales.vpersondemographics
        """.as(rowParser.*)
   }
@@ -43,7 +43,7 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
           case VpersondemographicsViewFieldValue.numbercarsowned(value) => NamedParameter("numbercarsowned", ParameterValue.from(value))
         }
         val quote = '"'.toString
-        val q = s"""select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
+        val q = s"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
                     from sales.vpersondemographics
                     where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
@@ -60,7 +60,7 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
       Success(
         VpersondemographicsViewRow(
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          totalpurchaseytd = row[Option[PGmoney]]("totalpurchaseytd"),
+          totalpurchaseytd = row[Option[TypoMoney]]("totalpurchaseytd"),
           datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
           birthdate = row[Option[LocalDate]]("birthdate"),
           maritalstatus = row[Option[String]]("maritalstatus"),

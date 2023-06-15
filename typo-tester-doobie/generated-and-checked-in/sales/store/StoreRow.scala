@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package store
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -15,7 +16,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class StoreRow(
   /** Primary key. Foreign key to Customer.BusinessEntityID.
@@ -27,7 +27,7 @@ case class StoreRow(
       Points to [[salesperson.SalespersonRow.businessentityid]] */
   salespersonid: Option[BusinessentityId],
   /** Demographic informationg about the store such as the number of employees, annual sales and store type. */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -39,7 +39,7 @@ object StoreRow {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
         name <- c.downField("name").as[Name]
         salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield StoreRow(businessentityid, name, salespersonid, demographics, rowguid, modifieddate)

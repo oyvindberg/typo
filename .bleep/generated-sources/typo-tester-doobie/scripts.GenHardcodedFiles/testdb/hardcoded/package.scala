@@ -6,15 +6,6 @@
 package testdb
 
 package object hardcoded {
-  implicit val PgSQLXMLMeta: doobie.Meta[org.postgresql.jdbc.PgSQLXML] = doobie.Meta.Advanced.other[org.postgresql.jdbc.PgSQLXML]("xml")
-  implicit val PGmoneyMeta: doobie.Meta[org.postgresql.util.PGmoney] = doobie.Meta.Advanced.other[org.postgresql.util.PGmoney]("money")
-  implicit val PGboxType: doobie.Meta[org.postgresql.geometric.PGbox]  = doobie.postgres.implicits.PGboxType
-  implicit val PGcircleType: doobie.Meta[org.postgresql.geometric.PGcircle]  = doobie.postgres.implicits.PGcircleType
-  implicit val PGlsegType: doobie.Meta[org.postgresql.geometric.PGlseg]  = doobie.postgres.implicits.PGlsegType
-  implicit val PGpathType: doobie.Meta[org.postgresql.geometric.PGpath]  = doobie.postgres.implicits.PGpathType
-  implicit val PGpointType: doobie.Meta[org.postgresql.geometric.PGpoint]  = doobie.postgres.implicits.PGpointType
-  implicit val PGpolygonType: doobie.Meta[org.postgresql.geometric.PGpolygon] = doobie.postgres.implicits.PGpolygonType
-  implicit val PGIntervalType: doobie.Meta[org.postgresql.util.PGInterval] = doobie.postgres.implicits.PGIntervalType
   implicit val UuidType: doobie.Meta[java.util.UUID] = doobie.postgres.implicits.UuidType
   implicit val InetType: doobie.Meta[java.net.InetAddress] = doobie.postgres.implicits.InetType
   implicit val unliftedBooleanArrayType: doobie.Meta[Array[java.lang.Boolean]] = doobie.postgres.implicits.unliftedBooleanArrayType
@@ -45,73 +36,10 @@ package object hardcoded {
   implicit val liftedUnboxedDoubleArrayType: doobie.Meta[Array[Option[scala.Double]]] = doobie.postgres.implicits.liftedUnboxedDoubleArrayType
   implicit val bigDecimalMeta: doobie.Meta[Array[BigDecimal]] = doobie.postgres.implicits.bigDecimalMeta
   implicit val optionBigDecimalMeta: doobie.Meta[Array[Option[BigDecimal]]] = doobie.postgres.implicits.optionBigDecimalMeta
-  implicit val hstoreMetaJava: doobie.Meta[java.util.Map[String, String]] = doobie.postgres.implicits.hstoreMetaJava
-  implicit val hstoreMeta: doobie.Meta[Map[String, String]] = doobie.postgres.implicits.hstoreMeta
   implicit val JavaTimeOffsetDateTimeMeta: doobie.Meta[java.time.OffsetDateTime] = doobie.postgres.implicits.JavaTimeOffsetDateTimeMeta
   implicit val JavaTimeInstantMeta: doobie.Meta[java.time.Instant] = doobie.postgres.implicits.JavaTimeInstantMeta
   implicit val JavaTimeZonedDateTimeMeta: doobie.Meta[java.time.ZonedDateTime] = doobie.postgres.implicits.JavaTimeZonedDateTimeMeta
   implicit val JavaTimeLocalDateTimeMeta: doobie.Meta[java.time.LocalDateTime] = doobie.postgres.implicits.JavaTimeLocalDateTimeMeta
   implicit val JavaTimeLocalDateMeta: doobie.Meta[java.time.LocalDate] = doobie.postgres.implicits.JavaTimeLocalDateMeta
   implicit val JavaTimeLocalTimeMeta: doobie.Meta[java.time.LocalTime] = doobie.postgres.implicits.JavaTimeLocalTimeMeta
-  implicit val PGboxEncoder: io.circe.Encoder[org.postgresql.geometric.PGbox] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGboxDecoder: io.circe.Decoder[org.postgresql.geometric.PGbox] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGbox(str))
-  implicit val PGcircleEncoder: io.circe.Encoder[org.postgresql.geometric.PGcircle] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGcircleDecoder: io.circe.Decoder[org.postgresql.geometric.PGcircle] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGcircle(str))
-  implicit val PGlineEncoder: io.circe.Encoder[org.postgresql.geometric.PGline] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGlineDecoder: io.circe.Decoder[org.postgresql.geometric.PGline] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGline(str))
-  implicit val PGlsegEncoder: io.circe.Encoder[org.postgresql.geometric.PGlseg] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGlsegDecoder: io.circe.Decoder[org.postgresql.geometric.PGlseg] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGlseg(str))
-  implicit val PGpathEncoder: io.circe.Encoder[org.postgresql.geometric.PGpath] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGpathDecoder: io.circe.Decoder[org.postgresql.geometric.PGpath] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGpath(str))
-  implicit val PGpointEncoder: io.circe.Encoder[org.postgresql.geometric.PGpoint] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGpointDecoder: io.circe.Decoder[org.postgresql.geometric.PGpoint] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGpoint(str))
-  implicit val PGpolygonEncoder: io.circe.Encoder[org.postgresql.geometric.PGpolygon] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGpolygonDecoder: io.circe.Decoder[org.postgresql.geometric.PGpolygon] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.geometric.PGpolygon(str))
-  implicit val PGIntervalEncoder: io.circe.Encoder[org.postgresql.util.PGInterval] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGIntervalDecoder: io.circe.Decoder[org.postgresql.util.PGInterval] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.util.PGInterval(str))
-  implicit val PGmoneyEncoder: io.circe.Encoder[org.postgresql.util.PGmoney] =
-    io.circe.Encoder[java.lang.String].contramap(_.getValue)
-  implicit val PGmoneyDecoder: io.circe.Decoder[org.postgresql.util.PGmoney] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.util.PGmoney(str))
-  implicit val PgSQLXMLEncoder: io.circe.Encoder[org.postgresql.jdbc.PgSQLXML] =
-    io.circe.Encoder[java.lang.String].contramap(_.getString)
-  implicit val PgSQLXMLDecoder: io.circe.Decoder[org.postgresql.jdbc.PgSQLXML] =
-    io.circe.Decoder[java.lang.String].map(str => org.postgresql.jdbc.PgSQLXML(null, str))
-  implicit val hstoreEncoder: io.circe.Encoder[java.util.Map[java.lang.String, java.lang.String]] = {
-    // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
-    import scala.jdk.CollectionConverters._
-    implicitly[io.circe.Encoder[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].contramap(_.asScala.toMap)
-  }
-  implicit val hstoreDecoder: io.circe.Decoder[java.util.Map[java.lang.String, java.lang.String]] = {
-    // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
-    import scala.jdk.CollectionConverters._
-    implicitly[io.circe.Decoder[scala.collection.immutable.Map[java.lang.String, java.lang.String]]].map(_.asJava)
-  }
-  implicit val pgObjectEncoder: io.circe.Encoder[org.postgresql.util.PGobject] =
-    io.circe.Encoder.forProduct2 ("type", "value") (x => (x.getType, x.getValue) )
-  implicit val pgObjectDecoder: io.circe.Decoder[org.postgresql.util.PGobject] =
-    io.circe.Decoder.forProduct2[org.postgresql.util.PGobject, java.lang.String, java.lang.String] ("type", "value") {case (tpe, value) =>
-      val obj = new org.postgresql.util.PGobject
-      obj.setType (tpe)
-      obj.setValue (value)
-      obj
-    }
-  implicit val pgObjectOrdering: scala.math.Ordering[org.postgresql.util.PGobject] =
-    scala.math.Ordering.by(x => (x.getType, x.getValue))
 }

@@ -65,8 +65,11 @@ object sc {
         Qualified(QIdent(scala.List(value)))
     }
 
+    val JavaBigDecimal = Qualified("java.math.BigDecimal")
     val JavaCharacter = Qualified("java.lang.Character")
+    val JavaDouble = Qualified("java.lang.Double")
     val JavaInteger = Qualified("java.lang.Integer")
+
     val String = Qualified("java.lang.String")
     val Connection = Qualified("java.sql.Connection")
     val PreparedStatement = Qualified("java.sql.PreparedStatement")
@@ -77,8 +80,10 @@ object sc {
     val LocalDateTime = Qualified("java.time.LocalDateTime")
     val LocalTime = Qualified("java.time.LocalTime")
     val ZonedDateTime = Qualified("java.time.ZonedDateTime")
+    val JavaHashMap = Qualified("java.util.HashMap")
     val JavaMap = Qualified("java.util.Map")
     val UUID = Qualified("java.util.UUID")
+    val PgArray = Qualified("org.postgresql.jdbc.PgArray")
     val PGbox = Qualified("org.postgresql.geometric.PGbox")
     val PGcircle = Qualified("org.postgresql.geometric.PGcircle")
     val PGline = Qualified("org.postgresql.geometric.PGline")
@@ -170,7 +175,7 @@ object sc {
         case Int                      => scala.Some(JavaInteger)
         case Long                     => scala.Some(Qualified("java.lang.Long"))
         case Float                    => scala.Some(Qualified("java.lang.Float"))
-        case Double                   => scala.Some(Qualified("java.lang.Double"))
+        case Double                   => scala.Some(JavaDouble)
         case Boolean                  => scala.Some(Qualified("java.lang.Boolean"))
         case Short                    => scala.Some(Qualified("java.lang.Short"))
         case Byte                     => scala.Some(Qualified("java.lang.Byte"))

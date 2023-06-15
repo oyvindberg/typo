@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.Get
@@ -17,7 +18,6 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
-import org.postgresql.util.PGmoney
 
 object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
@@ -48,8 +48,8 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
       gets = List(
         (Get[BusinessentityId], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
-        (Get[PGmoney], Nullability.Nullable),
-        (Get[PGmoney], Nullability.Nullable),
+        (Get[TypoMoney], Nullability.Nullable),
+        (Get[TypoMoney], Nullability.Nullable),
         (Get[String], Nullability.Nullable),
         (Get[String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
@@ -62,8 +62,8 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
       unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
         name = Get[Name].unsafeGetNullable(rs, i + 1),
-        AnnualSales = Get[PGmoney].unsafeGetNullable(rs, i + 2),
-        AnnualRevenue = Get[PGmoney].unsafeGetNullable(rs, i + 3),
+        AnnualSales = Get[TypoMoney].unsafeGetNullable(rs, i + 2),
+        AnnualRevenue = Get[TypoMoney].unsafeGetNullable(rs, i + 3),
         BankName = Get[String].unsafeGetNullable(rs, i + 4),
         BusinessType = Get[String].unsafeGetNullable(rs, i + 5),
         YearOpened = Get[Int].unsafeGetNullable(rs, i + 6),

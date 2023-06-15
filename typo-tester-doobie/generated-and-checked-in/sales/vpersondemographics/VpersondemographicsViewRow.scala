@@ -7,18 +7,18 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDate
-import org.postgresql.util.PGmoney
 
 case class VpersondemographicsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  totalpurchaseytd: Option[PGmoney],
+  totalpurchaseytd: Option[TypoMoney],
   datefirstpurchase: Option[LocalDate],
   birthdate: Option[LocalDate],
   maritalstatus: Option[String],
@@ -37,7 +37,7 @@ object VpersondemographicsViewRow {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        totalpurchaseytd <- c.downField("totalpurchaseytd").as[Option[PGmoney]]
+        totalpurchaseytd <- c.downField("totalpurchaseytd").as[Option[TypoMoney]]
         datefirstpurchase <- c.downField("datefirstpurchase").as[Option[LocalDate]]
         birthdate <- c.downField("birthdate").as[Option[LocalDate]]
         maritalstatus <- c.downField("maritalstatus").as[Option[String]]

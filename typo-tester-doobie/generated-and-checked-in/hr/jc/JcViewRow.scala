@@ -7,6 +7,7 @@ package adventureworks
 package hr
 package jc
 
+import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
@@ -14,7 +15,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 case class JcViewRow(
   id: Option[Int],
@@ -23,7 +23,7 @@ case class JcViewRow(
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
-  resume: Option[PgSQLXML],
+  resume: Option[TypoXml],
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -35,7 +35,7 @@ object JcViewRow {
         id <- c.downField("id").as[Option[Int]]
         jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[PgSQLXML]]
+        resume <- c.downField("resume").as[Option[TypoXml]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield JcViewRow(id, jobcandidateid, businessentityid, resume, modifieddate)
   implicit val encoder: Encoder[JcViewRow] = {

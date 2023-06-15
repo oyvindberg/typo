@@ -8,6 +8,7 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.Get
 import doobie.Read
@@ -20,7 +21,6 @@ import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
@@ -131,13 +131,13 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       gets = List(
         (Get[JobcandidateId], Nullability.NoNulls),
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => JobcandidateRow(
         jobcandidateid = Get[JobcandidateId].unsafeGetNonNullable(rs, i + 0),
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        resume = Get[PgSQLXML].unsafeGetNullable(rs, i + 2),
+        resume = Get[TypoXml].unsafeGetNullable(rs, i + 2),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
       )
     )

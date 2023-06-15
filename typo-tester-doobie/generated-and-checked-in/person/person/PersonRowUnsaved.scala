@@ -8,6 +8,7 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -17,7 +18,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 /** This class corresponds to a row in table `person.person` which has not been persisted yet */
 case class PersonRowUnsaved(
@@ -37,9 +37,9 @@ case class PersonRowUnsaved(
   /** Surname suffix. For example, Sr. or Jr. */
   suffix: Option[String],
   /** Additional contact information about the person stored in xml format. */
-  additionalcontactinfo: Option[PgSQLXML],
+  additionalcontactinfo: Option[TypoXml],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Default: false
       0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: Defaulted[NameStyle] = Defaulted.UseDefault,
@@ -91,8 +91,8 @@ object PersonRowUnsaved {
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Name]
         suffix <- c.downField("suffix").as[Option[String]]
-        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[PgSQLXML]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
         namestyle <- c.downField("namestyle").as[Defaulted[NameStyle]]
         emailpromotion <- c.downField("emailpromotion").as[Defaulted[Int]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]

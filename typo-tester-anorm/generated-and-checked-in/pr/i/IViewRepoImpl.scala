@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -15,7 +16,6 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object IViewRepoImpl extends IViewRepo {
   override def selectAll(implicit c: Connection): List[IViewRow] = {
@@ -52,7 +52,7 @@ object IViewRepoImpl extends IViewRepo {
         IViewRow(
           id = row[Option[Int]]("id"),
           illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          diagram = row[Option[PgSQLXML]]("diagram"),
+          diagram = row[Option[TypoXml]]("diagram"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

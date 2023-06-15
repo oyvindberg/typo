@@ -7,10 +7,10 @@ package adventureworks
 package hr
 package jc
 
+import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -25,7 +25,7 @@ case class JcViewRow(
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
-  resume: Option[PgSQLXML],
+  resume: Option[TypoXml],
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -48,7 +48,7 @@ object JcViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            resume = json.\("resume").toOption.map(_.as[PgSQLXML]),
+            resume = json.\("resume").toOption.map(_.as[TypoXml]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

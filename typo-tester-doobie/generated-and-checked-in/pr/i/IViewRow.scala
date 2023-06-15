@@ -7,20 +7,20 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 case class IViewRow(
   id: Option[Int],
   /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
   illustrationid: Option[IllustrationId],
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
-  diagram: Option[PgSQLXML],
+  diagram: Option[TypoXml],
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -31,7 +31,7 @@ object IViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         illustrationid <- c.downField("illustrationid").as[Option[IllustrationId]]
-        diagram <- c.downField("diagram").as[Option[PgSQLXML]]
+        diagram <- c.downField("diagram").as[Option[TypoXml]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield IViewRow(id, illustrationid, diagram, modifieddate)
   implicit val encoder: Encoder[IViewRow] = {

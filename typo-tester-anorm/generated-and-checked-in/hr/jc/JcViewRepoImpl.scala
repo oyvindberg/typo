@@ -7,6 +7,7 @@ package adventureworks
 package hr
 package jc
 
+import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
@@ -16,7 +17,6 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll(implicit c: Connection): List[JcViewRow] = {
@@ -55,7 +55,7 @@ object JcViewRepoImpl extends JcViewRepo {
           id = row[Option[Int]]("id"),
           jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[PgSQLXML]]("resume"),
+          resume = row[Option[TypoXml]]("resume"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

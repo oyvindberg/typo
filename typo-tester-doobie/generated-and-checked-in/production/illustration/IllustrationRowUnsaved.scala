@@ -8,17 +8,17 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 /** This class corresponds to a row in table `production.illustration` which has not been persisted yet */
 case class IllustrationRowUnsaved(
   /** Illustrations used in manufacturing instructions. Stored as XML. */
-  diagram: Option[PgSQLXML],
+  diagram: Option[TypoXml],
   /** Default: nextval('production.illustration_illustrationid_seq'::regclass)
       Primary key for Illustration records. */
   illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
@@ -42,7 +42,7 @@ object IllustrationRowUnsaved {
   implicit val decoder: Decoder[IllustrationRowUnsaved] =
     (c: HCursor) =>
       for {
-        diagram <- c.downField("diagram").as[Option[PgSQLXML]]
+        diagram <- c.downField("diagram").as[Option[TypoXml]]
         illustrationid <- c.downField("illustrationid").as[Defaulted[IllustrationId]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
       } yield IllustrationRowUnsaved(diagram, illustrationid, modifieddate)

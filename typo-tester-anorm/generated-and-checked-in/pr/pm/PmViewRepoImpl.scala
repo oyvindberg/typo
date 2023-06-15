@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pm
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -17,7 +18,6 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object PmViewRepoImpl extends PmViewRepo {
   override def selectAll(implicit c: Connection): List[PmViewRow] = {
@@ -58,8 +58,8 @@ object PmViewRepoImpl extends PmViewRepo {
           id = row[Option[Int]]("id"),
           productmodelid = row[Option[ProductmodelId]]("productmodelid"),
           name = row[Option[Name]]("name"),
-          catalogdescription = row[Option[PgSQLXML]]("catalogdescription"),
-          instructions = row[Option[PgSQLXML]]("instructions"),
+          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
+          instructions = row[Option[TypoXml]]("instructions"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

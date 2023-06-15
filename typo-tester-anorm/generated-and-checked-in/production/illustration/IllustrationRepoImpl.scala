@@ -8,6 +8,7 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,7 +18,6 @@ import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
@@ -157,7 +157,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
       Success(
         IllustrationRow(
           illustrationid = row[IllustrationId]("illustrationid"),
-          diagram = row[Option[PgSQLXML]]("diagram"),
+          diagram = row[Option[TypoXml]]("diagram"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
       )

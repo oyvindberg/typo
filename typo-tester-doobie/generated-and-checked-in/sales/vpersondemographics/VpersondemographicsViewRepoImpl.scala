@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.Get
 import doobie.Read
@@ -17,7 +18,6 @@ import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDate
-import org.postgresql.util.PGmoney
 
 object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VpersondemographicsViewRow] = {
@@ -48,7 +48,7 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
     new Read[VpersondemographicsViewRow](
       gets = List(
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[PGmoney], Nullability.Nullable),
+        (Get[TypoMoney], Nullability.Nullable),
         (Get[LocalDate], Nullability.Nullable),
         (Get[LocalDate], Nullability.Nullable),
         (Get[String], Nullability.Nullable),
@@ -63,7 +63,7 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VpersondemographicsViewRow(
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        totalpurchaseytd = Get[PGmoney].unsafeGetNullable(rs, i + 1),
+        totalpurchaseytd = Get[TypoMoney].unsafeGetNullable(rs, i + 1),
         datefirstpurchase = Get[LocalDate].unsafeGetNullable(rs, i + 2),
         birthdate = Get[LocalDate].unsafeGetNullable(rs, i + 3),
         maritalstatus = Get[String].unsafeGetNullable(rs, i + 4),

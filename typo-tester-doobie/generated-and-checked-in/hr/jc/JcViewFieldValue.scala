@@ -7,10 +7,10 @@ package adventureworks
 package hr
 package jc
 
+import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class JcViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class JcViewFieldValue[T](name: String, value: T) extends JcViewFieldOrIdValue(name, value)
@@ -19,6 +19,6 @@ object JcViewFieldValue {
   case class id(override val value: Option[Int]) extends JcViewFieldValue("id", value)
   case class jobcandidateid(override val value: Option[JobcandidateId]) extends JcViewFieldValue("jobcandidateid", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends JcViewFieldValue("businessentityid", value)
-  case class resume(override val value: Option[PgSQLXML]) extends JcViewFieldValue("resume", value)
+  case class resume(override val value: Option[TypoXml]) extends JcViewFieldValue("resume", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends JcViewFieldValue("modifieddate", value)
 }

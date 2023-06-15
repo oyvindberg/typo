@@ -7,6 +7,7 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -17,7 +18,6 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
@@ -69,17 +69,17 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
           firstname = row[Option[Name]]("firstname"),
           middlename = row[Option[Name]]("middlename"),
           lastname = row[Option[Name]]("lastname"),
-          telephonenumber = row[Option[PgSQLXML]]("telephonenumber"),
+          telephonenumber = row[Option[TypoXml]]("telephonenumber"),
           telephonespecialinstructions = row[Option[String]]("telephonespecialinstructions"),
-          street = row[Option[PgSQLXML]]("street"),
-          city = row[Option[PgSQLXML]]("city"),
-          stateprovince = row[Option[PgSQLXML]]("stateprovince"),
-          postalcode = row[Option[PgSQLXML]]("postalcode"),
-          countryregion = row[Option[PgSQLXML]]("countryregion"),
-          homeaddressspecialinstructions = row[Option[PgSQLXML]]("homeaddressspecialinstructions"),
-          emailaddress = row[Option[PgSQLXML]]("emailaddress"),
+          street = row[Option[TypoXml]]("street"),
+          city = row[Option[TypoXml]]("city"),
+          stateprovince = row[Option[TypoXml]]("stateprovince"),
+          postalcode = row[Option[TypoXml]]("postalcode"),
+          countryregion = row[Option[TypoXml]]("countryregion"),
+          homeaddressspecialinstructions = row[Option[TypoXml]]("homeaddressspecialinstructions"),
+          emailaddress = row[Option[TypoXml]]("emailaddress"),
           emailspecialinstructions = row[Option[String]]("emailspecialinstructions"),
-          emailtelephonenumber = row[Option[PgSQLXML]]("emailtelephonenumber"),
+          emailtelephonenumber = row[Option[TypoXml]]("emailtelephonenumber"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

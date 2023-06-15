@@ -7,11 +7,11 @@ package adventureworks
 package sales
 package store
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class StoreFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class StoreFieldValue[T](name: String, value: T) extends StoreFieldOrIdValue(name, value)
@@ -20,7 +20,7 @@ object StoreFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends StoreFieldOrIdValue("businessentityid", value)
   case class name(override val value: Name) extends StoreFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends StoreFieldValue("salespersonid", value)
-  case class demographics(override val value: Option[PgSQLXML]) extends StoreFieldValue("demographics", value)
+  case class demographics(override val value: Option[TypoXml]) extends StoreFieldValue("demographics", value)
   case class rowguid(override val value: UUID) extends StoreFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends StoreFieldValue("modifieddate", value)
 }

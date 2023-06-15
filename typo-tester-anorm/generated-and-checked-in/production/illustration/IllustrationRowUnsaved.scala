@@ -8,8 +8,8 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +20,7 @@ import scala.util.Try
 /** This class corresponds to a row in table `production.illustration` which has not been persisted yet */
 case class IllustrationRowUnsaved(
   /** Illustrations used in manufacturing instructions. Stored as XML. */
-  diagram: Option[PgSQLXML],
+  diagram: Option[TypoXml],
   /** Default: nextval('production.illustration_illustrationid_seq'::regclass)
       Primary key for Illustration records. */
   illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
@@ -53,7 +53,7 @@ object IllustrationRowUnsaved {
       JsResult.fromTry(
         Try(
           IllustrationRowUnsaved(
-            diagram = json.\("diagram").toOption.map(_.as[PgSQLXML]),
+            diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
             illustrationid = json.\("illustrationid").as[Defaulted[IllustrationId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

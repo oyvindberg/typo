@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -18,7 +19,6 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
-import org.postgresql.jdbc.PgSQLXML
 
 object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
   override def selectAll: Stream[ConnectionIO, VindividualcustomerViewRow] = {
@@ -70,7 +70,7 @@ object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
         (Get[Name], Nullability.Nullable),
         (Get[String], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable)
+        (Get[TypoXml], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VindividualcustomerViewRow(
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
@@ -90,7 +90,7 @@ object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
         stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
         postalcode = Get[String].unsafeGetNullable(rs, i + 15),
         countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
-        demographics = Get[PgSQLXML].unsafeGetNullable(rs, i + 17)
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 17)
       )
     )
   
