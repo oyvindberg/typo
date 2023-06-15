@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -20,7 +21,6 @@ import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
@@ -61,8 +61,8 @@ object PViewRepoImpl extends PViewRepo {
         (Get[Name], Nullability.Nullable),
         (Get[String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
@@ -77,8 +77,8 @@ object PViewRepoImpl extends PViewRepo {
         lastname = Get[Name].unsafeGetNullable(rs, i + 7),
         suffix = Get[String].unsafeGetNullable(rs, i + 8),
         emailpromotion = Get[Int].unsafeGetNullable(rs, i + 9),
-        additionalcontactinfo = Get[PgSQLXML].unsafeGetNullable(rs, i + 10),
-        demographics = Get[PgSQLXML].unsafeGetNullable(rs, i + 11),
+        additionalcontactinfo = Get[TypoXml].unsafeGetNullable(rs, i + 10),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 11),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 12),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 13)
       )

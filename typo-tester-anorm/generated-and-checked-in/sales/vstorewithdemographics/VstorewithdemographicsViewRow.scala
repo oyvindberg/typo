@@ -7,9 +7,9 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import org.postgresql.util.PGmoney
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -22,8 +22,8 @@ case class VstorewithdemographicsViewRow(
   businessentityid: Option[BusinessentityId],
   /** Points to [[store.StoreRow.name]] */
   name: Option[Name],
-  AnnualSales: Option[PGmoney],
-  AnnualRevenue: Option[PGmoney],
+  AnnualSales: Option[TypoMoney],
+  AnnualRevenue: Option[TypoMoney],
   BankName: Option[String],
   BusinessType: Option[String],
   YearOpened: Option[Int],
@@ -58,8 +58,8 @@ object VstorewithdemographicsViewRow {
           VstorewithdemographicsViewRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             name = json.\("name").toOption.map(_.as[Name]),
-            AnnualSales = json.\("AnnualSales").toOption.map(_.as[PGmoney]),
-            AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[PGmoney]),
+            AnnualSales = json.\("AnnualSales").toOption.map(_.as[TypoMoney]),
+            AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[TypoMoney]),
             BankName = json.\("BankName").toOption.map(_.as[String]),
             BusinessType = json.\("BusinessType").toOption.map(_.as[String]),
             YearOpened = json.\("YearOpened").toOption.map(_.as[Int]),

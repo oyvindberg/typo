@@ -22,8 +22,17 @@ object DbLibAnorm extends DbLib {
   def SQL(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
-  def dbNames(cols: NonEmptyList[ComputedColumn]): sc.Code =
-    cols.map(c => maybeQuoted(c.dbName)).mkCode(", ")
+  def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
+    cols
+      .map { c =>
+        val cast = (isRead, c.dbCol.tpe) match {
+          case (true, db.Type.PGmoney)                => code"::numeric"
+          case (true, db.Type.Array(db.Type.PGmoney)) => code"::numeric[]"
+          case _                                      => sc.Code.Empty
+        }
+        maybeQuoted(c.dbName) ++ cast
+      }
+      .mkCode(", ")
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     val column =
@@ -107,6 +116,8 @@ object DbLibAnorm extends DbLib {
     c.dbCol.tpe match {
       case db.Type.EnumRef(name)                               => code"::$name"
       case db.Type.DomainRef(name)                             => code"::$name"
+      case db.Type.PGmoney                                     => code"::numeric"
+      case db.Type.Array(db.Type.PGmoney)                      => code"::numeric[]"
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => sc.Code.Empty
       case _ =>
         c.dbCol.udtName match {
@@ -119,7 +130,7 @@ object DbLibAnorm extends DbLib {
     repoMethod match {
       case RepoMethod.SelectAll(relName, cols, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols)}
+          code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |""".stripMargin
         }
@@ -127,7 +138,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.SelectById(relName, cols, id, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols)}
+          code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |where ${matchId(id)}
                  |""".stripMargin
@@ -136,7 +147,7 @@ object DbLibAnorm extends DbLib {
 
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, _) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols)}
+          code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |where ${matchAnyId(unaryId, idsParam)}
                  |""".stripMargin
@@ -172,7 +183,7 @@ object DbLibAnorm extends DbLib {
           }
 
         val sql = sc.s {
-          code"""|select ${dbNames(cols)}
+          code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |where $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
                  |""".stripMargin
@@ -249,9 +260,9 @@ object DbLibAnorm extends DbLib {
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols)})
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (${values.mkCode(", ")})
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -268,14 +279,14 @@ object DbLibAnorm extends DbLib {
           .map { c => code"${maybeQuoted(c.dbName)} = EXCLUDED.${maybeQuoted(c.dbName)}" }
 
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols)})
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
-                 |on conflict (${dbNames(id.cols)})
+                 |on conflict (${dbNames(id.cols, isRead = false)})
                  |do update set
                  |  ${pickExcludedCols.mkCode(",\n")}
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -301,12 +312,12 @@ object DbLibAnorm extends DbLib {
         val sql = sc.s {
           code"""|insert into $relName($${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                  |values ($${namedParameters.map{ case (np, cast) => s"{$${np.name}}$$cast"}.mkString(", ")})
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
         val sqlEmpty = SQL {
           code"""|insert into $relName default values
-                 |returning ${dbNames(cols)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
@@ -372,60 +383,6 @@ object DbLibAnorm extends DbLib {
              |""".stripMargin
     }
 
-    val postgresTypes = PostgresTypes.all.map { case (typeName, tpe) =>
-      val either = sc.Type.Either.of(SqlRequestError, tpe)
-      val cast = if (tpe == sc.Type.PGmoney) {
-        code"""|v1 match {
-               |  case v: ${sc.Type.Double} => ${sc.Type.Right}(new ${sc.Type.PGmoney}(v))
-               |  case v => ${sc.Type.Left}($TypeDoesNotMatch(s"Cannot convert $$v to ${tpe.value.name}"))
-               |}""".stripMargin
-      } else
-        code"""${sc.Type.Right}(v1.asInstanceOf[$tpe])"""
-
-      code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
-             |  override def sqlType: ${sc.Type.String} = $typeName
-             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = $cast
-             |}
-             |""".stripMargin
-    }
-    val PgSQLXML = {
-      val tpe = sc.Type.PgSQLXML
-      val either = sc.Type.Either.of(SqlRequestError, tpe)
-      code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
-             |  override def sqlType: ${sc.Type.String} = "xml"
-             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.SQLXML
-             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-             |}
-             |""".stripMargin
-
-    }
-    val hstore = {
-      val tpe = sc.Type.JavaMap.of(sc.Type.String, sc.Type.String)
-      val either = sc.Type.Either.of(SqlRequestError, tpe)
-      code"""|implicit val hstoreDb: ${inout(tpe)} = new ${inout(tpe)} {
-             |  override def sqlType: ${sc.Type.String} = "hstore"
-             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-             |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-             |}
-             |""".stripMargin
-    }
-
-    val pgObject = {
-      val tpe = sc.Type.PGobject
-      val either = sc.Type.Either.of(SqlRequestError, tpe)
-      code"""|implicit val pgObjectDb: ${inout(tpe)} = new ${inout(tpe)} {
-           |  override def sqlType: ${sc.Type.String} = "hstore"
-           |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-           |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} = s.setObject(index, v)
-           |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either = ${sc.Type.Right}(v1.asInstanceOf[$tpe])
-           |}
-           |""".stripMargin
-    }
-
     val localTime = {
       val tpe = sc.Type.LocalTime
       val either = sc.Type.Either.of(SqlRequestError, tpe)
@@ -443,7 +400,7 @@ object DbLibAnorm extends DbLib {
            |""".stripMargin
     }
 
-    arrayInstances ++ postgresTypes ++ List(PgSQLXML, hstore, pgObject, localTime)
+    arrayInstances ++ List(localTime)
   }
 
   def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
@@ -527,5 +484,47 @@ object DbLibAnorm extends DbLib {
         // should not happen (tm)
         code"???"
     }
+  }
+
+  override def customTypeInstances(ct: CustomType): List[sc.Code] = {
+    def inout(tpe: sc.Type) = code"${ToStatement.of(tpe)} with ${ParameterMetaData.of(tpe)} with ${Column.of(tpe)}"
+    val tpe = ct.typoType
+    val v = sc.Ident("v")
+    val normal =
+      code"""|implicit val ${tpe.value.name}Db: ${inout(tpe)} = new ${inout(tpe)} {
+             |  override def sqlType: ${sc.Type.String} = ${sc.StrLit(ct.sqlType)}
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, $v: $tpe): ${sc.Type.Unit} =
+             |    s.setObject(index, ${ct.fromTypo0(v)})
+             |  override def apply($v: ${sc.Type.Any}, v2: $MetaDataItem): ${sc.Type.Either.of(SqlRequestError, tpe)} =
+             |    $v match {
+             |      case $v: ${ct.toTypo.jdbcType} => ${sc.Type.Right}(${ct.toTypo0(v)})
+             |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType} from JDBC to produce a ${ct.typoType}, got $${other.getClass.getName}"))
+             |    }
+             |}
+             |""".stripMargin
+    val array = {
+      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+      code"""|implicit val ${tpe.value.name}DbArray: ${inout(sc.Type.Array.of(tpe))} = new ${inout(sc.Type.Array.of(tpe))} {
+             |  override def sqlType: ${sc.Type.String} = ${sc.StrLit("_" + ct.sqlType)}
+             |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
+             |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, $v: ${sc.Type.Array.of(tpe)}): ${sc.Type.Unit} =
+             |    s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)})))
+             |  override def apply($v: ${sc.Type.Any}, v2: $MetaDataItem): ${sc.Type.Either.of(SqlRequestError, sc.Type.Array.of(tpe))} =
+             |    $v match {
+             |      case $v: ${sc.Type.PgArray} =>
+             |       $v.getArray match {
+             |         case $v: ${sc.Type.Array.of(sc.Type.Wildcard)} =>
+             |           ${sc.Type.Right}($v.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
+             |         case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of ${ct.typoType}, got $${other.getClass.getName}"))
+             |       }
+             |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected ${sc.Type.PgArray} from JDBC to produce an array of ${ct.typoType}, got $${other.getClass.getName}"))
+             |    }
+             |}
+             |""".stripMargin
+
+    }
+    List(normal, array)
   }
 }

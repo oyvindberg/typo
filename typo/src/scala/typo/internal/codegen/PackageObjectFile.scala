@@ -10,9 +10,6 @@ object PackageObjectFile {
              |
              |package object ${options.pkg.name} {
              |  ${options.dbLib.toList.flatMap(_.missingInstances).mkCode("\n")}
-             |  ${options.jsonLibs.flatMap(_.missingInstances).mkCode("\n")}
-             |  implicit val pgObjectOrdering: ${sc.Type.Ordering.of(sc.Type.PGobject)} =
-             |    ${sc.Type.Ordering}.by(x => (x.getType, x.getValue))
              |}
              |""".stripMargin
 

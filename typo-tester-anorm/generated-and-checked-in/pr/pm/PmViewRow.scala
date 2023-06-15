@@ -7,11 +7,11 @@ package adventureworks
 package pr
 package pm
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -26,9 +26,9 @@ case class PmViewRow(
   /** Points to [[production.productmodel.ProductmodelRow.name]] */
   name: Option[Name],
   /** Points to [[production.productmodel.ProductmodelRow.catalogdescription]] */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Points to [[production.productmodel.ProductmodelRow.instructions]] */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   /** Points to [[production.productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productmodel.ProductmodelRow.modifieddate]] */
@@ -55,8 +55,8 @@ object PmViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
             name = json.\("name").toOption.map(_.as[Name]),
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[PgSQLXML]),
-            instructions = json.\("instructions").toOption.map(_.as[PgSQLXML]),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
+            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

@@ -33,7 +33,9 @@ package object typo {
       header = publicOptions.header,
       debugTypes = publicOptions.debugTypes
     )
-    val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming)
+    val customTypes = new CustomTypes(options.pkg)
+
+    val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
 
     val default: ComputedDefault =
       ComputedDefault(naming)
@@ -63,11 +65,13 @@ package object typo {
       case tableComputed: ComputedTable => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
       case _                            => Nil
     }
+
     val mostFiles: List[sc.File] =
       List(
         List(DefaultFile(default, options.jsonLibs).file),
         metaDb.enums.map(StringEnumFile(naming, options)),
         metaDb.domains.map(DomainFile(naming, options, scalaTypeMapper)),
+        customTypes.All.map(CustomTypeFile.apply(options)),
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
       ).flatten
@@ -95,13 +99,19 @@ package object typo {
     */
   def minimize(allFiles: List[sc.File], entryPoints: Iterable[sc.File]): List[sc.File] = {
     val toKeep: Set[sc.QIdent] = {
-      val b = Set.newBuilder[sc.QIdent]
+      val b = collection.mutable.HashSet.empty[sc.QIdent]
       b ++= entryPoints.map(_.tpe.value)
+
       entryPoints.foreach { f =>
         def goTree(tree: sc.Tree): Unit = {
           tree match {
-            case sc.Ident(_)  => ()
-            case x: sc.QIdent => b += x
+            case sc.Ident(_) => ()
+            case x: sc.QIdent =>
+              if (!b(x)) {
+                b += x
+                allFiles.find(_.tpe.value == x).foreach(f => go(f.contents))
+              }
+
             case sc.Param(_, tpe, maybeCode) =>
               go(tpe)
               maybeCode.foreach(go)
@@ -138,7 +148,8 @@ package object typo {
 
         go(f.contents)
       }
-      b.result()
+
+      b.toSet
     }
 
     allFiles.filter(f => toKeep(f.tpe.value))

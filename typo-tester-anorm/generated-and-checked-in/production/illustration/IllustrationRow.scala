@@ -7,8 +7,8 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.TypoXml
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +20,7 @@ case class IllustrationRow(
   /** Primary key for Illustration records. */
   illustrationid: IllustrationId,
   /** Illustrations used in manufacturing instructions. Stored as XML. */
-  diagram: Option[PgSQLXML],
+  diagram: Option[TypoXml],
   modifieddate: LocalDateTime
 )
 
@@ -38,7 +38,7 @@ object IllustrationRow {
         Try(
           IllustrationRow(
             illustrationid = json.\("illustrationid").as[IllustrationId],
-            diagram = json.\("diagram").toOption.map(_.as[PgSQLXML]),
+            diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

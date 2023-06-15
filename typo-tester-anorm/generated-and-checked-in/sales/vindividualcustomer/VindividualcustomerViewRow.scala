@@ -7,10 +7,10 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -50,7 +50,7 @@ case class VindividualcustomerViewRow(
   postalcode: Option[String],
   countryregionname: Option[Name],
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[PgSQLXML]
+  demographics: Option[TypoXml]
 )
 
 object VindividualcustomerViewRow {
@@ -98,7 +98,7 @@ object VindividualcustomerViewRow {
             stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
             postalcode = json.\("postalcode").toOption.map(_.as[String]),
             countryregionname = json.\("countryregionname").toOption.map(_.as[Name]),
-            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML])
+            demographics = json.\("demographics").toOption.map(_.as[TypoXml])
           )
         )
       )

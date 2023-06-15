@@ -7,6 +7,7 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import doobie.Get
@@ -19,7 +20,6 @@ import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
@@ -49,7 +49,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
       gets = List(
         (Get[ProductmodelId], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
         (Get[BigDecimal], Nullability.Nullable),
         (Get[BigDecimal], Nullability.Nullable),
@@ -62,7 +62,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
       unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
         productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
         name = Get[Name].unsafeGetNullable(rs, i + 1),
-        instructions = Get[PgSQLXML].unsafeGetNullable(rs, i + 2),
+        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 2),
         LocationID = Get[Int].unsafeGetNullable(rs, i + 3),
         SetupHours = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
         MachineHours = Get[BigDecimal].unsafeGetNullable(rs, i + 5),

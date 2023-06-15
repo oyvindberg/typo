@@ -7,6 +7,7 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -17,7 +18,6 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
@@ -61,7 +61,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
         VproductmodelinstructionsViewRow(
           productmodelid = row[Option[ProductmodelId]]("productmodelid"),
           name = row[Option[Name]]("name"),
-          instructions = row[Option[PgSQLXML]]("instructions"),
+          instructions = row[Option[TypoXml]]("instructions"),
           LocationID = row[Option[Int]]("LocationID"),
           SetupHours = row[Option[BigDecimal]]("SetupHours"),
           MachineHours = row[Option[BigDecimal]]("MachineHours"),

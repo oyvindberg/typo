@@ -8,6 +8,7 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -16,7 +17,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 /** This class corresponds to a row in table `sales.store` which has not been persisted yet */
 case class StoreRowUnsaved(
@@ -29,7 +29,7 @@ case class StoreRowUnsaved(
       Points to [[salesperson.SalespersonRow.businessentityid]] */
   salespersonid: Option[BusinessentityId],
   /** Demographic informationg about the store such as the number of employees, annual sales and store type. */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
@@ -58,7 +58,7 @@ object StoreRowUnsaved {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
         name <- c.downField("name").as[Name]
         salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
       } yield StoreRowUnsaved(businessentityid, name, salespersonid, demographics, rowguid, modifieddate)

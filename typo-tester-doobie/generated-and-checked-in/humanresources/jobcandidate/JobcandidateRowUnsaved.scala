@@ -8,13 +8,13 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 /** This class corresponds to a row in table `humanresources.jobcandidate` which has not been persisted yet */
 case class JobcandidateRowUnsaved(
@@ -22,7 +22,7 @@ case class JobcandidateRowUnsaved(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
-  resume: Option[PgSQLXML],
+  resume: Option[TypoXml],
   /** Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass)
       Primary key for JobCandidate records. */
   jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
@@ -48,7 +48,7 @@ object JobcandidateRowUnsaved {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[PgSQLXML]]
+        resume <- c.downField("resume").as[Option[TypoXml]]
         jobcandidateid <- c.downField("jobcandidateid").as[Defaulted[JobcandidateId]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
       } yield JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
@@ -14,7 +15,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class ProductmodelRow(
   /** Primary key for ProductModel records. */
@@ -22,9 +22,9 @@ case class ProductmodelRow(
   /** Product model description. */
   name: Name,
   /** Detailed product catalog information in xml format. */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Manufacturing instructions in xml format. */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -35,8 +35,8 @@ object ProductmodelRow {
       for {
         productmodelid <- c.downField("productmodelid").as[ProductmodelId]
         name <- c.downField("name").as[Name]
-        catalogdescription <- c.downField("catalogdescription").as[Option[PgSQLXML]]
-        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        catalogdescription <- c.downField("catalogdescription").as[Option[TypoXml]]
+        instructions <- c.downField("instructions").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield ProductmodelRow(productmodelid, name, catalogdescription, instructions, rowguid, modifieddate)

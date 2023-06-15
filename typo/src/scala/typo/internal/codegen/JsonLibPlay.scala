@@ -101,51 +101,32 @@ object JsonLibPlay extends JsonLib {
       code"""implicit val format: ${Format(wrapperType)} = implicitly[${Format(underlying)}].bimap(${wrapperType.value.name}.apply, _.value)"""
     )
 
-  override def missingInstances: List[sc.Code] = {
-    val postgresTypes = PostgresTypes.all.map { case (_, tpe) =>
-      code"""implicit val ${tpe.value.name.value}Format: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(_), _.getValue)"""
-    }
-    val PgSQLXML = {
-      val tpe = sc.Type.PgSQLXML
-      code"""implicit val PgSQLXMLFormat: ${Format(tpe)} = implicitly[${Format(sc.Type.String)}].bimap[$tpe](new $tpe(null, _), _.getString)"""
-    }
+  override def customTypeInstances(ct: CustomType): List[sc.Code] = {
+    val tpe = ct.typoType
+    def as(param: sc.Param): sc.Code =
+      param.tpe match {
+        case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(param.name.value)}).toOption.map(_.as[$of])"""
+        case _                    => code"""json.\\(${sc.StrLit(param.name.value)}).as[${param.tpe}]"""
+      }
 
-    val hstore = {
-      val javaMap = Format(sc.Type.JavaMap.of(sc.Type.String, sc.Type.String))
-      val scalaMap = Format(sc.Type.Map.of(sc.Type.String, sc.Type.String))
+    val format =
+      code"""|implicit val oFormat: ${OFormat(tpe)} = new ${OFormat(tpe)}{
+             |  override def writes(o: $tpe): $JsObject =
+             |    $Json.obj(
+             |      ${ct.params.map(param => code"""${sc.StrLit(param.name.value)} -> o.${param.name}""").mkCode(",\n")}
+             |    )
+             |
+             |  override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
+             |    $JsResult.fromTry(
+             |      ${sc.Type.Try}(
+             |        $tpe(
+             |          ${ct.params.map(param => code"""${param.name} = ${as(param)}""").mkCode(",\n")}
+             |        )
+             |      )
+             |    )
+             |  }
+             |}"""
 
-      code"""|implicit val hstoreFormat: $javaMap = {
-             |  // on 2.12 and getting an error here? add dependency: org.scala-lang.modules::scala-collection-compat
-             |  import scala.jdk.CollectionConverters._
-             |  implicitly[$scalaMap].bimap(_.asJava, _.asScala.toMap)
-             |}""".stripMargin
-    }
-
-    val pgObjectFormat = {
-      val formatType = OFormat(sc.Type.PGobject)
-      code"""implicit val pgObjectFormat: $formatType =
-            |  new $formatType {
-            |    override def writes(o: ${sc.Type.PGobject}): $JsObject =
-            |      $JsObject(${sc.Type.Map}("type" -> $JsString(o.getType), "value" -> $JsString(o.getValue)))
-            |
-            |    override def reads(json: $JsValue): $JsResult[${sc.Type.PGobject}] = json match {
-            |      case $JsObject(fields) =>
-            |        val t = fields.get("type").map(_.as[String])
-            |        val v = fields.get("value").map(_.as[String])
-            |        (t, v) match {
-            |          case (${sc.Type.Some}(t), ${sc.Type.Some}(v)) =>
-            |            val o = new ${sc.Type.PGobject}()
-            |            o.setType(t)
-            |            o.setValue(v)
-            |            $JsSuccess(o)
-            |          case _ => $JsError("Invalid PGobject")
-            |        }
-            |      case _ => $JsError("Invalid PGobject")
-            |    }
-            |  }
-            |""".stripMargin
-    }
-
-    postgresTypes ++ List(PgSQLXML, hstore, pgObjectFormat)
+    List(format)
   }
 }

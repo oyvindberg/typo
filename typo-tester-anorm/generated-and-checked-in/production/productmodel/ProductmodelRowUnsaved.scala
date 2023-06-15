@@ -8,10 +8,10 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,9 +24,9 @@ case class ProductmodelRowUnsaved(
   /** Product model description. */
   name: Name,
   /** Detailed product catalog information in xml format. */
-  catalogdescription: Option[PgSQLXML],
+  catalogdescription: Option[TypoXml],
   /** Manufacturing instructions in xml format. */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   /** Default: nextval('production.productmodel_productmodelid_seq'::regclass)
       Primary key for ProductModel records. */
   productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
@@ -71,8 +71,8 @@ object ProductmodelRowUnsaved {
         Try(
           ProductmodelRowUnsaved(
             name = json.\("name").as[Name],
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[PgSQLXML]),
-            instructions = json.\("instructions").toOption.map(_.as[PgSQLXML]),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
+            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
             productmodelid = json.\("productmodelid").as[Defaulted[ProductmodelId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

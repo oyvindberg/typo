@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package vemployee
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -14,7 +15,6 @@ import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import org.postgresql.jdbc.PgSQLXML
 
 case class VemployeeViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -49,7 +49,7 @@ case class VemployeeViewRow(
   postalcode: Option[String],
   countryregionname: Option[Name],
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[PgSQLXML]
+  additionalcontactinfo: Option[TypoXml]
 )
 
 object VemployeeViewRow {
@@ -73,7 +73,7 @@ object VemployeeViewRow {
         stateprovincename <- c.downField("stateprovincename").as[Option[Name]]
         postalcode <- c.downField("postalcode").as[Option[String]]
         countryregionname <- c.downField("countryregionname").as[Option[Name]]
-        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[PgSQLXML]]
+        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
       } yield VemployeeViewRow(businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, additionalcontactinfo)
   implicit val encoder: Encoder[VemployeeViewRow] = {
     import io.circe.syntax._

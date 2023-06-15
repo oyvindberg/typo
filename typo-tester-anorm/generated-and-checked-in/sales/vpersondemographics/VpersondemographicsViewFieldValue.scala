@@ -7,16 +7,16 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDate
-import org.postgresql.util.PGmoney
 
 sealed abstract class VpersondemographicsViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class VpersondemographicsViewFieldValue[T](name: String, value: T) extends VpersondemographicsViewFieldOrIdValue(name, value)
 
 object VpersondemographicsViewFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VpersondemographicsViewFieldValue("businessentityid", value)
-  case class totalpurchaseytd(override val value: Option[PGmoney]) extends VpersondemographicsViewFieldValue("totalpurchaseytd", value)
+  case class totalpurchaseytd(override val value: Option[TypoMoney]) extends VpersondemographicsViewFieldValue("totalpurchaseytd", value)
   case class datefirstpurchase(override val value: Option[LocalDate]) extends VpersondemographicsViewFieldValue("datefirstpurchase", value)
   case class birthdate(override val value: Option[LocalDate]) extends VpersondemographicsViewFieldValue("birthdate", value)
   case class maritalstatus(override val value: Option[String]) extends VpersondemographicsViewFieldValue("maritalstatus", value)

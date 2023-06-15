@@ -7,10 +7,10 @@ package adventureworks
 package humanresources
 package vemployee
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -51,7 +51,7 @@ case class VemployeeViewRow(
   postalcode: Option[String],
   countryregionname: Option[Name],
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[PgSQLXML]
+  additionalcontactinfo: Option[TypoXml]
 )
 
 object VemployeeViewRow {
@@ -99,7 +99,7 @@ object VemployeeViewRow {
             stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
             postalcode = json.\("postalcode").toOption.map(_.as[String]),
             countryregionname = json.\("countryregionname").toOption.map(_.as[Name]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[PgSQLXML])
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml])
           )
         )
       )

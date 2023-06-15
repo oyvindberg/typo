@@ -8,6 +8,7 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import doobie.Get
 import doobie.Read
 import doobie.enumerated.Nullability
@@ -19,7 +20,6 @@ import doobie.util.fragments
 import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
@@ -123,12 +123,12 @@ object IllustrationRepoImpl extends IllustrationRepo {
     new Read[IllustrationRow](
       gets = List(
         (Get[IllustrationId], Nullability.NoNulls),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
         illustrationid = Get[IllustrationId].unsafeGetNonNullable(rs, i + 0),
-        diagram = Get[PgSQLXML].unsafeGetNullable(rs, i + 1),
+        diagram = Get[TypoXml].unsafeGetNullable(rs, i + 1),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
       )
     )

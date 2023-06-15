@@ -7,9 +7,9 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class IViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class IViewFieldValue[T](name: String, value: T) extends IViewFieldOrIdValue(name, value)
@@ -17,6 +17,6 @@ sealed abstract class IViewFieldValue[T](name: String, value: T) extends IViewFi
 object IViewFieldValue {
   case class id(override val value: Option[Int]) extends IViewFieldValue("id", value)
   case class illustrationid(override val value: Option[IllustrationId]) extends IViewFieldValue("illustrationid", value)
-  case class diagram(override val value: Option[PgSQLXML]) extends IViewFieldValue("diagram", value)
+  case class diagram(override val value: Option[TypoXml]) extends IViewFieldValue("diagram", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends IViewFieldValue("modifieddate", value)
 }

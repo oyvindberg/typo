@@ -7,9 +7,9 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -24,7 +24,7 @@ case class JobcandidateRow(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
-  resume: Option[PgSQLXML],
+  resume: Option[TypoXml],
   modifieddate: LocalDateTime
 )
 
@@ -44,7 +44,7 @@ object JobcandidateRow {
           JobcandidateRow(
             jobcandidateid = json.\("jobcandidateid").as[JobcandidateId],
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            resume = json.\("resume").toOption.map(_.as[PgSQLXML]),
+            resume = json.\("resume").toOption.map(_.as[TypoXml]),
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

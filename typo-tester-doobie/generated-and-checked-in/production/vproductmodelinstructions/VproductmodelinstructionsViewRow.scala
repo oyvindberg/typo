@@ -7,6 +7,7 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -15,7 +16,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
@@ -23,7 +23,7 @@ case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.name]] */
   name: Option[Name],
   /** Points to [[productmodel.ProductmodelRow.instructions]] */
-  instructions: Option[PgSQLXML],
+  instructions: Option[TypoXml],
   LocationID: Option[Int],
   SetupHours: Option[BigDecimal],
   MachineHours: Option[BigDecimal],
@@ -42,7 +42,7 @@ object VproductmodelinstructionsViewRow {
       for {
         productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
         name <- c.downField("name").as[Option[Name]]
-        instructions <- c.downField("instructions").as[Option[PgSQLXML]]
+        instructions <- c.downField("instructions").as[Option[TypoXml]]
         LocationID <- c.downField("LocationID").as[Option[Int]]
         SetupHours <- c.downField("SetupHours").as[Option[BigDecimal]]
         MachineHours <- c.downField("MachineHours").as[Option[BigDecimal]]

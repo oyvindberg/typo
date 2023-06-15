@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package vemployee
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -16,7 +17,6 @@ import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
-import org.postgresql.jdbc.PgSQLXML
 
 object VemployeeViewRepoImpl extends VemployeeViewRepo {
   override def selectAll(implicit c: Connection): List[VemployeeViewRow] = {
@@ -82,7 +82,7 @@ object VemployeeViewRepoImpl extends VemployeeViewRepo {
           stateprovincename = row[Option[Name]]("stateprovincename"),
           postalcode = row[Option[String]]("postalcode"),
           countryregionname = row[Option[Name]]("countryregionname"),
-          additionalcontactinfo = row[Option[PgSQLXML]]("additionalcontactinfo")
+          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo")
         )
       )
     }

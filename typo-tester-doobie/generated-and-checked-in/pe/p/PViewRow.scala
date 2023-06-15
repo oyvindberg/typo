@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -16,7 +17,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class PViewRow(
   id: Option[Int],
@@ -39,9 +39,9 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int],
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[PgSQLXML],
+  additionalcontactinfo: Option[TypoXml],
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Points to [[person.person.PersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.person.PersonRow.modifieddate]] */
@@ -62,8 +62,8 @@ object PViewRow {
         lastname <- c.downField("lastname").as[Option[Name]]
         suffix <- c.downField("suffix").as[Option[String]]
         emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
-        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[PgSQLXML]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PViewRow(id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

@@ -7,11 +7,11 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 sealed abstract class SViewFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class SViewFieldValue[T](name: String, value: T) extends SViewFieldOrIdValue(name, value)
@@ -21,7 +21,7 @@ object SViewFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends SViewFieldValue("businessentityid", value)
   case class name(override val value: Option[Name]) extends SViewFieldValue("name", value)
   case class salespersonid(override val value: Option[BusinessentityId]) extends SViewFieldValue("salespersonid", value)
-  case class demographics(override val value: Option[PgSQLXML]) extends SViewFieldValue("demographics", value)
+  case class demographics(override val value: Option[TypoXml]) extends SViewFieldValue("demographics", value)
   case class rowguid(override val value: Option[UUID]) extends SViewFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends SViewFieldValue("modifieddate", value)
 }

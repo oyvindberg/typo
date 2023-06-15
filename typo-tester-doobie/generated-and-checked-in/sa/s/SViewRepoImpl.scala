@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.Get
@@ -19,7 +20,6 @@ import fs2.Stream
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object SViewRepoImpl extends SViewRepo {
   override def selectAll: Stream[ConnectionIO, SViewRow] = {
@@ -47,7 +47,7 @@ object SViewRepoImpl extends SViewRepo {
         (Get[BusinessentityId], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[PgSQLXML], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
@@ -56,7 +56,7 @@ object SViewRepoImpl extends SViewRepo {
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
         name = Get[Name].unsafeGetNullable(rs, i + 2),
         salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 3),
-        demographics = Get[PgSQLXML].unsafeGetNullable(rs, i + 4),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 4),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
       )

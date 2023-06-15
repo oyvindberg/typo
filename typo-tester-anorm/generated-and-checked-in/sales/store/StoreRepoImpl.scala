@@ -8,6 +8,7 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -20,7 +21,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
@@ -180,7 +180,7 @@ object StoreRepoImpl extends StoreRepo {
           businessentityid = row[BusinessentityId]("businessentityid"),
           name = row[Name]("name"),
           salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[PgSQLXML]]("demographics"),
+          demographics = row[Option[TypoXml]]("demographics"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

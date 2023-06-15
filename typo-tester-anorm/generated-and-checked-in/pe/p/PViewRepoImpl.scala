@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -18,7 +19,6 @@ import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll(implicit c: Connection): List[PViewRow] = {
@@ -73,8 +73,8 @@ object PViewRepoImpl extends PViewRepo {
           lastname = row[Option[Name]]("lastname"),
           suffix = row[Option[String]]("suffix"),
           emailpromotion = row[Option[Int]]("emailpromotion"),
-          additionalcontactinfo = row[Option[PgSQLXML]]("additionalcontactinfo"),
-          demographics = row[Option[PgSQLXML]]("demographics"),
+          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
+          demographics = row[Option[TypoXml]]("demographics"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

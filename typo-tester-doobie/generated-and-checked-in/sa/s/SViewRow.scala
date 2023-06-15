@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -15,7 +16,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class SViewRow(
   id: Option[Int],
@@ -26,7 +26,7 @@ case class SViewRow(
   /** Points to [[sales.store.StoreRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],
   /** Points to [[sales.store.StoreRow.demographics]] */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.store.StoreRow.modifieddate]] */
@@ -41,7 +41,7 @@ object SViewRow {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
         name <- c.downField("name").as[Option[Name]]
         salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
-        demographics <- c.downField("demographics").as[Option[PgSQLXML]]
+        demographics <- c.downField("demographics").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield SViewRow(id, businessentityid, name, salespersonid, demographics, rowguid, modifieddate)

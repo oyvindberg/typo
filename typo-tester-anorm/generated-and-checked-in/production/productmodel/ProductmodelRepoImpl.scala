@@ -8,6 +8,7 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -19,7 +20,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
@@ -181,8 +181,8 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         ProductmodelRow(
           productmodelid = row[ProductmodelId]("productmodelid"),
           name = row[Name]("name"),
-          catalogdescription = row[Option[PgSQLXML]]("catalogdescription"),
-          instructions = row[Option[PgSQLXML]]("instructions"),
+          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
+          instructions = row[Option[TypoXml]]("instructions"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

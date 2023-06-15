@@ -7,6 +7,7 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import io.circe.Decoder
@@ -15,7 +16,6 @@ import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 
 case class VadditionalcontactinfoViewRow(
   /** Points to [[person.PersonRow.businessentityid]] */
@@ -26,17 +26,17 @@ case class VadditionalcontactinfoViewRow(
   middlename: Option[Name],
   /** Points to [[person.PersonRow.lastname]] */
   lastname: Option[Name],
-  telephonenumber: Option[PgSQLXML],
+  telephonenumber: Option[TypoXml],
   telephonespecialinstructions: Option[String],
-  street: Option[PgSQLXML],
-  city: Option[PgSQLXML],
-  stateprovince: Option[PgSQLXML],
-  postalcode: Option[PgSQLXML],
-  countryregion: Option[PgSQLXML],
-  homeaddressspecialinstructions: Option[PgSQLXML],
-  emailaddress: Option[PgSQLXML],
+  street: Option[TypoXml],
+  city: Option[TypoXml],
+  stateprovince: Option[TypoXml],
+  postalcode: Option[TypoXml],
+  countryregion: Option[TypoXml],
+  homeaddressspecialinstructions: Option[TypoXml],
+  emailaddress: Option[TypoXml],
   emailspecialinstructions: Option[String],
-  emailtelephonenumber: Option[PgSQLXML],
+  emailtelephonenumber: Option[TypoXml],
   /** Points to [[person.PersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.PersonRow.modifieddate]] */
@@ -51,17 +51,17 @@ object VadditionalcontactinfoViewRow {
         firstname <- c.downField("firstname").as[Option[Name]]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Option[Name]]
-        telephonenumber <- c.downField("telephonenumber").as[Option[PgSQLXML]]
+        telephonenumber <- c.downField("telephonenumber").as[Option[TypoXml]]
         telephonespecialinstructions <- c.downField("telephonespecialinstructions").as[Option[String]]
-        street <- c.downField("street").as[Option[PgSQLXML]]
-        city <- c.downField("city").as[Option[PgSQLXML]]
-        stateprovince <- c.downField("stateprovince").as[Option[PgSQLXML]]
-        postalcode <- c.downField("postalcode").as[Option[PgSQLXML]]
-        countryregion <- c.downField("countryregion").as[Option[PgSQLXML]]
-        homeaddressspecialinstructions <- c.downField("homeaddressspecialinstructions").as[Option[PgSQLXML]]
-        emailaddress <- c.downField("emailaddress").as[Option[PgSQLXML]]
+        street <- c.downField("street").as[Option[TypoXml]]
+        city <- c.downField("city").as[Option[TypoXml]]
+        stateprovince <- c.downField("stateprovince").as[Option[TypoXml]]
+        postalcode <- c.downField("postalcode").as[Option[TypoXml]]
+        countryregion <- c.downField("countryregion").as[Option[TypoXml]]
+        homeaddressspecialinstructions <- c.downField("homeaddressspecialinstructions").as[Option[TypoXml]]
+        emailaddress <- c.downField("emailaddress").as[Option[TypoXml]]
         emailspecialinstructions <- c.downField("emailspecialinstructions").as[Option[String]]
-        emailtelephonenumber <- c.downField("emailtelephonenumber").as[Option[PgSQLXML]]
+        emailtelephonenumber <- c.downField("emailtelephonenumber").as[Option[TypoXml]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield VadditionalcontactinfoViewRow(businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate)

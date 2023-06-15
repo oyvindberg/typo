@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vindividualcustomer
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -16,7 +17,6 @@ import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
-import org.postgresql.jdbc.PgSQLXML
 
 object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
   override def selectAll(implicit c: Connection): List[VindividualcustomerViewRow] = {
@@ -82,7 +82,7 @@ object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
           stateprovincename = row[Option[Name]]("stateprovincename"),
           postalcode = row[Option[String]]("postalcode"),
           countryregionname = row[Option[Name]]("countryregionname"),
-          demographics = row[Option[PgSQLXML]]("demographics")
+          demographics = row[Option[TypoXml]]("demographics")
         )
       )
     }

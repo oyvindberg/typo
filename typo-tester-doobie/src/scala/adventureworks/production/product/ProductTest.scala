@@ -5,12 +5,12 @@ import adventureworks.production.productmodel.{ProductmodelRepoImpl, Productmode
 import adventureworks.production.productsubcategory.{ProductsubcategoryRepoImpl, ProductsubcategoryRowUnsaved}
 import adventureworks.production.unitmeasure.{UnitmeasureId, UnitmeasureRepoImpl, UnitmeasureRowUnsaved}
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.{Defaulted, TypoXml, withConnection}
 import org.postgresql.jdbc.PgSQLXML
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-
 import doobie.free.connection.delay
+
 import java.sql.{Connection, DriverManager}
 import java.time.LocalDateTime
 import java.util.UUID
@@ -42,8 +42,8 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         productmodel <- ProductmodelRepoImpl.insert(
           ProductmodelRowUnsaved(
             name = Name("name"),
-            catalogdescription = Some(new PgSQLXML(null, "<xml/>")),
-            instructions = Some(new PgSQLXML(null, "<instructions/>"))
+            catalogdescription = Some(new TypoXml("<xml/>")),
+            instructions = Some(new TypoXml("<instructions/>"))
           )
         )
         unsaved1 = ProductRowUnsaved(

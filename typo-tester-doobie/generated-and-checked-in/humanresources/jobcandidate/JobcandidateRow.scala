@@ -7,13 +7,13 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.time.LocalDateTime
-import org.postgresql.jdbc.PgSQLXML
 
 case class JobcandidateRow(
   /** Primary key for JobCandidate records. */
@@ -22,7 +22,7 @@ case class JobcandidateRow(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
-  resume: Option[PgSQLXML],
+  resume: Option[TypoXml],
   modifieddate: LocalDateTime
 )
 
@@ -32,7 +32,7 @@ object JobcandidateRow {
       for {
         jobcandidateid <- c.downField("jobcandidateid").as[JobcandidateId]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[PgSQLXML]]
+        resume <- c.downField("resume").as[Option[TypoXml]]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield JobcandidateRow(jobcandidateid, businessentityid, resume, modifieddate)
   implicit val encoder: Encoder[JobcandidateRow] = {

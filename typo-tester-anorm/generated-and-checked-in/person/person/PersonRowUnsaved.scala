@@ -8,12 +8,12 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,9 +39,9 @@ case class PersonRowUnsaved(
   /** Surname suffix. For example, Sr. or Jr. */
   suffix: Option[String],
   /** Additional contact information about the person stored in xml format. */
-  additionalcontactinfo: Option[PgSQLXML],
+  additionalcontactinfo: Option[TypoXml],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Default: false
       0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: Defaulted[NameStyle] = Defaulted.UseDefault,
@@ -112,8 +112,8 @@ object PersonRowUnsaved {
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").as[Name],
             suffix = json.\("suffix").toOption.map(_.as[String]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[PgSQLXML]),
-            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML]),
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
+            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
             namestyle = json.\("namestyle").as[Defaulted[NameStyle]],
             emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

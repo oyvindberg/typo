@@ -7,9 +7,9 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import java.time.LocalDate
-import org.postgresql.util.PGmoney
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,7 +20,7 @@ import scala.util.Try
 case class VpersondemographicsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  totalpurchaseytd: Option[PGmoney],
+  totalpurchaseytd: Option[TypoMoney],
   datefirstpurchase: Option[LocalDate],
   birthdate: Option[LocalDate],
   maritalstatus: Option[String],
@@ -58,7 +58,7 @@ object VpersondemographicsViewRow {
         Try(
           VpersondemographicsViewRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            totalpurchaseytd = json.\("totalpurchaseytd").toOption.map(_.as[PGmoney]),
+            totalpurchaseytd = json.\("totalpurchaseytd").toOption.map(_.as[TypoMoney]),
             datefirstpurchase = json.\("datefirstpurchase").toOption.map(_.as[LocalDate]),
             birthdate = json.\("birthdate").toOption.map(_.as[LocalDate]),
             maritalstatus = json.\("maritalstatus").toOption.map(_.as[String]),

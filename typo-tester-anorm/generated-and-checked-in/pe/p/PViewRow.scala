@@ -7,12 +7,12 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import java.time.LocalDateTime
 import java.util.UUID
-import org.postgresql.jdbc.PgSQLXML
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -41,9 +41,9 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int],
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[PgSQLXML],
+  additionalcontactinfo: Option[TypoXml],
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[PgSQLXML],
+  demographics: Option[TypoXml],
   /** Points to [[person.person.PersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.person.PersonRow.modifieddate]] */
@@ -84,8 +84,8 @@ object PViewRow {
             lastname = json.\("lastname").toOption.map(_.as[Name]),
             suffix = json.\("suffix").toOption.map(_.as[String]),
             emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[PgSQLXML]),
-            demographics = json.\("demographics").toOption.map(_.as[PgSQLXML]),
+            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
+            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
