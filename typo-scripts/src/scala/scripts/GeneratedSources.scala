@@ -52,8 +52,8 @@ object GeneratedSources {
     val files: typo.Generated = {
       val options = typo.Options(
         pkg = "typo.generated",
-        jsonLib = typo.JsonLibName.PlayJson,
-        dbLib = typo.DbLibName.Anorm,
+        jsonLibs = List(typo.JsonLibName.PlayJson),
+        dbLib = Some(typo.DbLibName.Anorm),
         header = header,
         nullabilityOverride = nullabilityOverride,
         debugTypes = true

@@ -5,8 +5,8 @@ import typo.internal.codegen.{DbLib, JsonLib}
 
 case class InternalOptions(
     pkg: sc.QIdent,
-    jsonLib: JsonLib,
-    dbLib: DbLib,
+    jsonLibs: List[JsonLib],
+    dbLib: Option[DbLib],
     naming: Naming,
     typeOverride: TypeOverride,
     generateMockRepos: Selector,

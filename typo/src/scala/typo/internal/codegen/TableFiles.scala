@@ -79,7 +79,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
              |) {
              |  $toRow
              |}
-             |${obj(unsaved.tpe.name, options.jsonLib.instances(unsaved.tpe, unsaved.allCols))}
+             |${obj(unsaved.tpe.name, options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)))}
              |""".stripMargin
 
     sc.File(unsaved.tpe, str, secondaryTypes = Nil)
@@ -105,8 +105,8 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
                 |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
                 |object ${id.tpe.name} {
                 |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
-                |  ${options.jsonLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
-                |  ${options.dbLib.anyValInstances(wrapperType = id.tpe, underlying = id.underlying).mkCode("\n")}
+                |  ${options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
+                |  ${options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
                 |}
 """.stripMargin
 
@@ -133,7 +133,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
                 |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                 |object ${qident.name} {
                 |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
-                |  ${options.jsonLib.instances(tpe = id.tpe, cols = cols).mkCode("\n")}
+                |  ${options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols)).mkCode("\n")}
                 |}
 """.stripMargin
         Some(sc.File(id.tpe, str, secondaryTypes = Nil))
@@ -141,17 +141,23 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
   }
 
   private val maybeMockRepo: Option[sc.File] =
-    table.maybeId
-      .zip(table.repoMethods)
-      .headOption
-      .filter { _ => options.generateMockRepos.include(table.dbTable.name) }
-      .map { case (id, repoMethods) => relation.RepoMockFile(id, repoMethods) }
+    for {
+      id <- table.maybeId
+      repoMethods <- table.repoMethods
+      dbLib <- options.dbLib
+    } yield relation.RepoMockFile(dbLib, id, repoMethods)
 
   val all: List[sc.File] = List(
     Some(relation.RowFile),
     UnsavedRowFile,
-    table.repoMethods.map(relation.RepoTraitFile),
-    table.repoMethods.map(relation.RepoImplFile),
+    for {
+      repoMethods <- table.repoMethods
+      dbLib <- options.dbLib
+    } yield relation.RepoTraitFile(dbLib, repoMethods),
+    for {
+      repoMethods <- table.repoMethods
+      dbLib <- options.dbLib
+    } yield relation.RepoImplFile(dbLib, repoMethods),
     Some(relation.FieldValueFile),
     maybeMockRepo,
     IdFile

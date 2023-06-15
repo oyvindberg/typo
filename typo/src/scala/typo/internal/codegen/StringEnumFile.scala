@@ -24,8 +24,8 @@ object StringEnumFile {
              |  val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
              |  val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
              |
-             |  ${options.dbLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n")}
-             |  ${options.jsonLib.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName).mkCode("\n")}
+             |  ${options.dbLib.toList.flatMap(_.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName)).mkCode("\n")}
+             |  ${options.jsonLibs.flatMap(_.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName)).mkCode("\n")}
              |}
              |""".stripMargin
 

@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-case class DefaultFile(default: ComputedDefault, jsonLib: JsonLib) {
+case class DefaultFile(default: ComputedDefault, jsonLibs: List[JsonLib]) {
   val contents =
     code"""
 /**
@@ -13,7 +13,7 @@ sealed trait ${default.Defaulted.name}[+T]
 object ${default.Defaulted.name} {
   case class ${default.Provided}[T](value: T) extends ${default.Defaulted.name}[T]
   case object ${default.UseDefault} extends ${default.Defaulted.name}[Nothing]
-  ${jsonLib.defaultedInstance(default).mkCode("\n")}
+  ${jsonLibs.flatMap(_.defaultedInstance(default)).mkCode("\n")}
 }
 """
 

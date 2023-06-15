@@ -21,8 +21,8 @@ object DomainFile {
             |case class ${qident.name}(value: $underlying) extends AnyVal
             |object ${qident.name} {
             |  implicit def ordering(implicit ev: ${sc.Type.Ordering.of(underlying)}): ${sc.Type.Ordering.of(tpe)} = ${sc.Type.Ordering}.by(_.value)
-            |  ${options.jsonLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}
-            |  ${options.dbLib.anyValInstances(wrapperType = tpe, underlying = underlying).mkCode("\n")}
+            |  ${options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)).mkCode("\n")}
+            |  ${options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)).mkCode("\n")}
             |}
 """.stripMargin
 

@@ -31,12 +31,11 @@ package object typo {
     val naming = publicOptions.naming(pkg)
     val options = InternalOptions(
       pkg = pkg,
-      jsonLib = publicOptions.jsonLib match {
+      jsonLibs = publicOptions.jsonLibs.map {
         case JsonLibName.Circe    => JsonLibCirce
         case JsonLibName.PlayJson => JsonLibPlay
-        case JsonLibName.None     => JsonLib.None
       },
-      dbLib = publicOptions.dbLib match {
+      dbLib = publicOptions.dbLib.map {
         case DbLibName.Anorm  => DbLibAnorm
         case DbLibName.Doobie => DbLibDoobie
       },
@@ -75,7 +74,7 @@ package object typo {
     }
     val mostFiles: List[sc.File] =
       List(
-        List(DefaultFile(default, options.jsonLib).file),
+        List(DefaultFile(default, options.jsonLibs).file),
         enums.map(StringEnumFile(naming, options)),
         domains.map(DomainFile(naming, options, scalaTypeMapper)),
         relationFilesByName.map { case (_, f) => f },

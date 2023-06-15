@@ -5,9 +5,13 @@ package codegen
 case class ViewFiles(view: ComputedView, options: InternalOptions) {
   val relation = RelationFiles(view.naming, view.names, options)
   val all: List[sc.File] = List(
-    relation.RowFile,
-    relation.RepoTraitFile(view.repoMethods),
-    relation.RepoImplFile(view.repoMethods),
-    relation.FieldValueFile
-  )
+    Some(relation.RowFile),
+    for {
+      dbLib <- options.dbLib
+    } yield relation.RepoTraitFile(dbLib, view.repoMethods),
+    for {
+      dbLib <- options.dbLib
+    } yield relation.RepoImplFile(dbLib, view.repoMethods),
+    Some(relation.FieldValueFile)
+  ).flatten
 }

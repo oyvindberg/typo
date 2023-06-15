@@ -42,7 +42,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |${obj(names.RowName.name, options.jsonLib.instances(names.RowName, names.cols))}
+            |${obj(names.RowName.name, options.jsonLibs.flatMap(_.instances(names.RowName, names.cols)))}
             |""".stripMargin
 
     sc.File(names.RowName, str, secondaryTypes = Nil)
@@ -65,24 +65,24 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     sc.File(names.FieldValueName, str, secondaryTypes = List(names.FieldOrIdValueName))
   }
 
-  def RepoTraitFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+  def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val str =
       code"""trait ${names.RepoName.name} {
-            |  ${repoMethods.sortedBy(options.dbLib.repoSig).map(options.dbLib.repoSig).mkCode("\n")}
+            |  ${repoMethods.sortedBy(dbLib.repoSig).map(dbLib.repoSig).mkCode("\n")}
             |}
             |""".stripMargin
 
     sc.File(names.RepoName, str, secondaryTypes = Nil)
   }
 
-  def RepoImplFile(repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.sortedBy { options.dbLib.repoSig }.map { repoMethod =>
-      code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-             |  ${options.dbLib.repoImpl(repoMethod)}
+  def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.sortedBy { dbLib.repoSig }.map { repoMethod =>
+      code"""|override ${dbLib.repoSig(repoMethod)} = {
+             |  ${dbLib.repoImpl(repoMethod)}
              |}""".stripMargin
     }
     val allMethods = renderedMethods ++
-      options.dbLib.repoAdditionalMembers(names.maybeId, names.RowName, names.cols)
+      dbLib.repoAdditionalMembers(names.maybeId, names.RowName, names.cols)
 
     val str =
       code"""|object ${names.RepoImplName.name} extends ${names.RepoName} {
@@ -93,16 +93,16 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     sc.File(names.RepoImplName, str, secondaryTypes = Nil)
   }
 
-  def RepoMockFile(idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+  def RepoMockFile(dbLib: DbLib, idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val maybeToRowParam: Option[sc.Param] =
       repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(_, _, unsaved, _, _, _) =>
         sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, names.RowName), None)
       }
 
     val methods: NonEmptyList[sc.Code] =
-      repoMethods.sortedBy { options.dbLib.repoSig }.map { repoMethod =>
-        code"""|override ${options.dbLib.repoSig(repoMethod)} = {
-               |  ${options.dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
+      repoMethods.sortedBy { dbLib.repoSig }.map { repoMethod =>
+        code"""|override ${dbLib.repoSig(repoMethod)} = {
+               |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
                |}""".stripMargin
       }
 
