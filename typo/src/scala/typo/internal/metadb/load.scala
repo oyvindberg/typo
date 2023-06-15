@@ -6,23 +6,17 @@ import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
-import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
 import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRepoImpl, KeyColumnUsageViewRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
 import typo.generated.information_schema.table_constraints.{TableConstraintsViewRepoImpl, TableConstraintsViewRow}
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
+import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
 
+import java.nio.file.Path
 import java.sql.Connection
 
-case class MetaDb(
-    relations: List[db.Relation],
-    enums: List[db.StringEnum],
-    domains: List[db.Domain],
-    typeMapperDb: TypeMapperDb
-)
-
-object MetaDb {
+object load {
   case class Input(
       tableConstraints: List[TableConstraintsViewRow],
       keyColumnUsage: List[KeyColumnUsageViewRow],
@@ -53,8 +47,8 @@ object MetaDb {
     }
   }
 
-  def apply(input: Input): MetaDb = {
-
+  def apply(maybeScriptPath: Option[Path])(implicit c: Connection): MetaDb = {
+    val input = load.Input.fromDb
     val groupedViewRows: Map[db.RelationName, ViewFindAllSqlRow] =
       input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
 
@@ -157,6 +151,11 @@ object MetaDb {
         }
       }
     }
-    MetaDb(relations, enums, domains, typeMapperDb)
+    val sqlScripts = maybeScriptPath match {
+      case Some(scriptPath) => sqlfiles.Load(scriptPath, typeMapperDb)
+      case None             => Nil
+    }
+
+    MetaDb(relations, enums, domains, sqlScripts)
   }
 }

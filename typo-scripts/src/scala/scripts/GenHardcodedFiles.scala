@@ -1,9 +1,9 @@
 package scripts
 
-import bleep._
+import bleep.*
 import bleep.logging.Logger
 import play.api.libs.json.JsNull
-import typo._
+import typo.*
 
 // this runs automatically at build time to instantly see results.
 // it does not need a running database
@@ -116,8 +116,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         if (target.project.value.endsWith("doobie"))
           (DbLibName.Doobie, JsonLibName.Circe)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
+      val metaDb = MetaDb(relations = all, enums = enums, domains = Nil, sqlFiles = Nil)
       val generated: Generated =
-        fromData(
+        fromMetaDb(
           Options(
             pkg = "testdb.hardcoded",
             List(jsonLib),
@@ -128,10 +129,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
               },
             header = header
           ),
-          relations = all,
-          enums = enums,
-          domains = Nil,
-          sqlScripts = Nil,
+          metaDb,
           Selector.All
         )
 

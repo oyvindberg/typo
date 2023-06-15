@@ -2,8 +2,6 @@ package scripts
 
 import bleep.logging.{Logger, Loggers, LogLevel}
 import bleep.{LogPatterns, cli}
-import typo.internal.metadb.MetaDb
-import typo.internal.sqlfiles
 
 import java.net.URI
 import java.net.http.{HttpClient, HttpRequest, HttpResponse}
@@ -24,9 +22,8 @@ object GeneratedAdventureWorks {
         implicit val c: Connection = DriverManager.getConnection(
           "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
         )
-        val metadb = MetaDb(MetaDb.Input.fromDb)
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val sqlScripts = sqlfiles.Load(scriptsPath, metadb.typeMapperDb)
+        val metadb = typo.MetaDb.fromDbAndScripts(scriptsPath)
 
         List(
           (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
@@ -36,7 +33,7 @@ object GeneratedAdventureWorks {
           val typoSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
           typo
-            .fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts, typo.Selector.ExcludePostgresInternal)
+            .fromMetaDb(options, metadb, typo.Selector.ExcludePostgresInternal)
             .overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
 
           cli(

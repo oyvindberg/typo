@@ -1,32 +1,20 @@
 import typo.internal.*
 import typo.internal.codegen.*
-import typo.internal.metadb.MetaDb
-import typo.internal.sqlfiles.SqlFile
+import typo.internal.metadb.load
 
 import java.nio.file.Path
 import java.sql.Connection
 import scala.collection.immutable.SortedMap
 
 package object typo {
-  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
-    val metadb = MetaDb(MetaDb.Input.fromDb)
-    val sqlScripts = sqlfiles.Load(scriptsPath, metadb.typeMapperDb)
-    fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts, selector)
-  }
+  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated =
+    fromMetaDb(options, load(maybeScriptPath = Some(scriptsPath)), selector)
 
-  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
-    val metadb = MetaDb(MetaDb.Input.fromDb)
-    fromData(options, metadb.relations, metadb.enums, metadb.domains, sqlScripts = Nil, selector)
-  }
+  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated =
+    fromMetaDb(options, load(maybeScriptPath = None), selector)
 
-  def fromData(
-      publicOptions: Options,
-      relations: List[db.Relation],
-      enums: List[db.StringEnum],
-      domains: List[db.Domain],
-      sqlScripts: List[SqlFile],
-      selector: Selector
-  ): Generated = {
+  // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
+  def fromMetaDb(publicOptions: Options, metaDb: MetaDb, selector: Selector): Generated = {
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
     val naming = publicOptions.naming(pkg)
     val options = InternalOptions(
@@ -51,7 +39,7 @@ package object typo {
       ComputedDefault(naming)
 
     val computeds: SortedMap[db.RelationName, Lazy[HasSource]] =
-      rewriteDependentData(relations.map(rel => rel.name -> rel).toMap).apply[HasSource] {
+      rewriteDependentData(metaDb.relations.map(rel => rel.name -> rel).toMap).apply[HasSource] {
         case (_, dbTable: db.Table, eval) =>
           ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
         case (_, dbView: db.View, eval) =>
@@ -59,14 +47,17 @@ package object typo {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedScripts = sqlScripts.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply))
+    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.forceGet
     }
     // here we keep only the values which have been evaluated. as such, the selector pattern should be safe
     val computedRelations = computeds.flatMap { case (_, lazyValue) => lazyValue.getIfEvaluated }
 
-    val scriptFiles = computedScripts.flatMap(x => SqlFileFiles(x, naming, options).all)
+    // yeah, sorry about the naming overload. this is a list of output files generated for each input sql file
+    val sqlFileFiles: List[sc.File] =
+      computedSqlFiles.flatMap(x => SqlFileFiles(x, naming, options).all)
+
     val relationFilesByName = computedRelations.flatMap {
       case viewComputed: ComputedView   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
       case tableComputed: ComputedTable => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
@@ -75,14 +66,14 @@ package object typo {
     val mostFiles: List[sc.File] =
       List(
         List(DefaultFile(default, options.jsonLibs).file),
-        enums.map(StringEnumFile(naming, options)),
-        domains.map(DomainFile(naming, options, scalaTypeMapper)),
+        metaDb.enums.map(StringEnumFile(naming, options)),
+        metaDb.domains.map(DomainFile(naming, options, scalaTypeMapper)),
         relationFilesByName.map { case (_, f) => f },
-        scriptFiles
+        sqlFileFiles
       ).flatten
 
     val entryPoints: Iterable[sc.File] =
-      scriptFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
+      sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
 
     val keptMostFiles: List[sc.File] = minimize(mostFiles, entryPoints)
 
