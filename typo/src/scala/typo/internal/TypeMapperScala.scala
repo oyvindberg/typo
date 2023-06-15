@@ -75,7 +75,8 @@ case class TypeMapperScala(
       case db.Type.Int2            => sc.Type.Int // jdbc driver seems to return ints instead of floats
       case db.Type.Int4            => sc.Type.Int
       case db.Type.Int8            => sc.Type.Long
-      case db.Type.Json            => sc.Type.String // wip
+      case db.Type.Json            => sc.Type.String.withComment("json") // wip
+      case db.Type.Jsonb           => sc.Type.String.withComment("jsonb") // wip
       case db.Type.Name            => sc.Type.String
       case db.Type.Numeric         => sc.Type.BigDecimal
       case db.Type.Oid             => sc.Type.Long.withComment("oid")

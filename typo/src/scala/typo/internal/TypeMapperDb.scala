@@ -51,6 +51,7 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
       case "int8" | "bigint" | "bigserial"     => Some(db.Type.Int8)
       case "interval"                          => Some(db.Type.PGInterval)
       case "json"                              => Some(db.Type.Json)
+      case "jsonb"                             => Some(db.Type.Jsonb)
       case "line"                              => Some(db.Type.PGline)
       case "lseg"                              => Some(db.Type.PGlseg)
       case "money"                             => Some(db.Type.PGmoney)

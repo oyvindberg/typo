@@ -22,6 +22,7 @@ object db {
     case object Int4 extends Type
     case object Int8 extends Type
     case object Json extends Type
+    case object Jsonb extends Type
     case object Name extends Type
     case object Numeric extends Type
     case object Oid extends Type
