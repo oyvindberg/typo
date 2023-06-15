@@ -22,7 +22,7 @@ import typo.generated.information_schema.YesOrNo
 
 object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsViewRow] = {
-    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced", nulls_distinct
+    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
           from information_schema.table_constraints
        """.as(rowParser.*)
   }
@@ -41,10 +41,9 @@ object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
           case TableConstraintsViewFieldValue.isDeferrable(value) => NamedParameter("is_deferrable", ParameterValue.from(value))
           case TableConstraintsViewFieldValue.initiallyDeferred(value) => NamedParameter("initially_deferred", ParameterValue.from(value))
           case TableConstraintsViewFieldValue.enforced(value) => NamedParameter("enforced", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.nullsDistinct(value) => NamedParameter("nulls_distinct", ParameterValue.from(value))
         }
         val quote = '"'.toString
-        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced", nulls_distinct
+        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
                     from information_schema.table_constraints
                     where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
@@ -69,8 +68,7 @@ object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
           constraintType = row[Option[CharacterData]]("constraint_type"),
           isDeferrable = row[Option[YesOrNo]]("is_deferrable"),
           initiallyDeferred = row[Option[YesOrNo]]("initially_deferred"),
-          enforced = row[Option[YesOrNo]]("enforced"),
-          nullsDistinct = row[Option[YesOrNo]]("nulls_distinct")
+          enforced = row[Option[YesOrNo]]("enforced")
         )
       )
     }
