@@ -15,8 +15,11 @@ case class ComputedTable(
   val source = Source.Table(dbTable.name)
   val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] =
     dbTable.foreignKeys.flatMap { fk =>
-      val otherTable: Lazy[HasSource] = eval(fk.otherTable)
-      val value = fk.otherCols.map(cn => (otherTable.forceGet.source, cn))
+      val otherTable: HasSource =
+        if (fk.otherTable == dbTable.name) this
+        else eval(fk.otherTable).forceGet(s"${dbTable.name.value} => ${fk.otherTable.value}")
+
+      val value = fk.otherCols.map(cn => (otherTable.source, cn))
       fk.cols.zip(value).toList
     }.toMap
 
