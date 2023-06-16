@@ -5,14 +5,14 @@ jvm:
 projects:
   # these tests do not depend on running codegen, just unit tests and so on
   tests:
-    dependencies: org.scalatest::scalatest:3.2.13
+    dependencies: org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo
     extends: template-nocross
     isTestProject: true
   # main project
   typo:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC7
+    - com.typesafe.play::play-json:2.10.0-RC9
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.6.0
     extends: template-cross
@@ -27,10 +27,10 @@ projects:
   # scripts generate code into this project, and there are hand-written tests as well
   typo-tester-anorm:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC7
+    - com.typesafe.play::play-json:2.10.0-RC9
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.6.0
-    - org.scalatest::scalatest:3.2.13
+    - org.scalatest::scalatest:3.3.0-SNAP4
     extends: template-nocross
     isTestProject: true
     sourcegen:
@@ -41,7 +41,7 @@ projects:
     dependencies:
     - io.circe::circe-core:0.15.0-M1
     - org.postgresql:postgresql:42.6.0
-    - org.scalatest::scalatest:3.2.13
+    - org.scalatest::scalatest:3.3.0-SNAP4
     - org.tpolecat::doobie-postgres:1.0.0-RC2
     extends: template-nocross
     isTestProject: true
@@ -50,13 +50,13 @@ projects:
       project: typo-scripts
     sources: ./generated-and-checked-in
 scripts:
-  generate-sources:
-    main: scripts.GeneratedSources
-    project: typo-scripts
   generate-adventureworks:
     main: scripts.GeneratedAdventureWorks
     project: typo-scripts
     sourceGlobs: ../adventureworks_sql
+  generate-sources:
+    main: scripts.GeneratedSources
+    project: typo-scripts
   my-publish-local:
     main: scripts.PublishLocal
     project: typo-scripts
@@ -73,7 +73,6 @@ templates:
   template-cross:
     cross:
       jvm212:
-        dependencies: org.scala-lang.modules::scala-collection-compat:2.9.0
         scala:
           options: -Xsource:3
           version: 2.12.15
