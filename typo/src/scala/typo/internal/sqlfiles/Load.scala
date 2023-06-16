@@ -55,7 +55,7 @@ object Load {
     try {
       SQL(sql).execute()
       ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
-        val table = db.RelationName(row.tableSchema.map(_.getValue), row.tableName)
+        val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
         (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
       }.toMap
     } catch {

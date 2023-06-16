@@ -367,8 +367,7 @@ object DbLibAnorm extends DbLib {
       (sc.Type.Boolean, sc.StrLit("bool")),
       (sc.Type.Double, sc.StrLit("float8")),
       (sc.Type.UUID, sc.StrLit("uuid")),
-      (sc.Type.BigDecimal, sc.StrLit("decimal")),
-      (sc.Type.PGobject, sc.StrLit("aclitem"))
+      (sc.Type.BigDecimal, sc.StrLit("decimal"))
     )
 
     val arrayInstances = arrayTypes.map { case (tpe, elemType) =>

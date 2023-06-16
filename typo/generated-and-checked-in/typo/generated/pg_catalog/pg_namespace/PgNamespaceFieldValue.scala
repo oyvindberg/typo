@@ -10,7 +10,7 @@ package generated
 package pg_catalog
 package pg_namespace
 
-import org.postgresql.util.PGobject
+import typo.generated.TypoAclItem
 
 sealed abstract class PgNamespaceFieldOrIdValue[T](val name: String, val value: T)
 sealed abstract class PgNamespaceFieldValue[T](name: String, value: T) extends PgNamespaceFieldOrIdValue(name, value)
@@ -19,5 +19,5 @@ object PgNamespaceFieldValue {
   case class oid(override val value: PgNamespaceId) extends PgNamespaceFieldOrIdValue("oid", value)
   case class nspname(override val value: String) extends PgNamespaceFieldValue("nspname", value)
   case class nspowner(override val value: /* oid */ Long) extends PgNamespaceFieldValue("nspowner", value)
-  case class nspacl(override val value: Option[Array[/* aclitem */ PGobject]]) extends PgNamespaceFieldValue("nspacl", value)
+  case class nspacl(override val value: Option[Array[TypoAclItem]]) extends PgNamespaceFieldValue("nspacl", value)
 }

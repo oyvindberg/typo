@@ -36,7 +36,22 @@ object db {
     case object PGpath extends Type
     case object PGpoint extends Type
     case object PGpolygon extends Type
-    case class PgObject(value: String) extends Type
+    case object aclitem extends Type
+    case object anyarray extends Type
+    case object int2vector extends Type
+    case object oidvector extends Type
+    case object pg_node_tree extends Type
+    case object regclass extends Type
+    case object regconfig extends Type
+    case object regdictionary extends Type
+    case object regnamespace extends Type
+    case object regoper extends Type
+    case object regoperator extends Type
+    case object regproc extends Type
+    case object regprocedure extends Type
+    case object regrole extends Type
+    case object regtype extends Type
+    case object xid extends Type
     case class EnumRef(name: RelationName) extends Type
     case object Text extends Type
     case object Time extends Type

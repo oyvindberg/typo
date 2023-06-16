@@ -126,11 +126,11 @@ object load {
           case Some(view) =>
             val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
               input.viewColumnDeps.collect {
-                case x if x.viewSchema.map(_.getValue) == relationName.schema && x.viewName == relationName.name =>
+                case x if x.viewSchema.map(_.value) == relationName.schema && x.viewName == relationName.name =>
                   // TODO: I'm only able to get the column name from one of the two tables involved in the dependency.
                   // I suppose this means that we'll only find the dependency if the column name is the same in both tables.
                   val colName = db.ColName(x.columnName)
-                  val relName = db.RelationName(x.tableSchema.map(_.getValue), x.tableName)
+                  val relName = db.RelationName(x.tableSchema.map(_.value), x.tableName)
                   (colName, (relName, colName))
               }.toMap
 

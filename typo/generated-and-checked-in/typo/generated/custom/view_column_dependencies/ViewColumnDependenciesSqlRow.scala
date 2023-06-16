@@ -10,22 +10,22 @@ package generated
 package custom
 package view_column_dependencies
 
-import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import scala.util.Try
+import typo.generated.TypoRegnamespace
 
 case class ViewColumnDependenciesSqlRow(
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_schema","columnName":"view_schema","columnType":"Other","columnTypeName":"regnamespace","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
-  viewSchema: /* nullability unknown */ Option[/* regnamespace */ PGobject],
+  viewSchema: /* nullability unknown */ Option[TypoRegnamespace],
   /** Points to [[pg_catalog.pg_class.PgClassRow.relname]]
       debug: {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_name","columnName":"view_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */
   viewName: String,
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_schema","columnName":"table_schema","columnType":"Other","columnTypeName":"regnamespace","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
-  tableSchema: /* nullability unknown */ Option[/* regnamespace */ PGobject],
+  tableSchema: /* nullability unknown */ Option[TypoRegnamespace],
   /** Points to [[pg_catalog.pg_class.PgClassRow.relname]]
       debug: {"baseColumnName":"relname","baseRelationName":"pg_catalog.pg_class","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"table_name","columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_class"} */
   tableName: String,
@@ -49,9 +49,9 @@ object ViewColumnDependenciesSqlRow {
       JsResult.fromTry(
         Try(
           ViewColumnDependenciesSqlRow(
-            viewSchema = json.\("view_schema").toOption.map(_.as[/* regnamespace */ PGobject]),
+            viewSchema = json.\("view_schema").toOption.map(_.as[TypoRegnamespace]),
             viewName = json.\("view_name").as[String],
-            tableSchema = json.\("table_schema").toOption.map(_.as[/* regnamespace */ PGobject]),
+            tableSchema = json.\("table_schema").toOption.map(_.as[TypoRegnamespace]),
             tableName = json.\("table_name").as[String],
             columnName = json.\("column_name").as[String]
           )
