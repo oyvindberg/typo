@@ -18,7 +18,7 @@ import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
-import org.postgresql.util.PGobject
+import typo.generated.TypoAclItem
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
@@ -137,7 +137,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           oid = row[PgNamespaceId]("oid"),
           nspname = row[String]("nspname"),
           nspowner = row[/* oid */ Long]("nspowner"),
-          nspacl = row[Option[Array[/* aclitem */ PGobject]]]("nspacl")
+          nspacl = row[Option[Array[TypoAclItem]]]("nspacl")
         )
       )
     }

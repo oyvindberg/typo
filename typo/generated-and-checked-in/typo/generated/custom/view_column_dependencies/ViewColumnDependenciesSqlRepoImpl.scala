@@ -14,7 +14,7 @@ import anorm.RowParser
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
-import org.postgresql.util.PGobject
+import typo.generated.TypoRegnamespace
 
 object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
   override def apply(viewName: /* nullability unknown */ Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
@@ -42,9 +42,9 @@ object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
     RowParser[ViewColumnDependenciesSqlRow] { row =>
       Success(
         ViewColumnDependenciesSqlRow(
-          viewSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]]("view_schema"),
+          viewSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("view_schema"),
           viewName = row[String]("view_name"),
-          tableSchema = row[/* nullability unknown */ Option[/* regnamespace */ PGobject]]("table_schema"),
+          tableSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("table_schema"),
           tableName = row[String]("table_name"),
           columnName = row[String]("column_name")
         )

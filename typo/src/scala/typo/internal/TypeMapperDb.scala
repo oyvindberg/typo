@@ -11,27 +11,6 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
     fromDomain.orElse(dbTypeFrom(c.udtName.get.value, c.characterMaximumLength.map(_.value)))
   }
 
-  val pgObjectTypes = Set(
-    "aclitem", // i.e. "postgres=arwdDxt/postgres"
-    "anyarray",
-    "int2vector",
-    "oidvector", // space separated oids referencing i.e. pg_collation.oid
-    "pg_node_tree", // Expression trees (in nodeToString() representation
-    "regclass",
-    "regconfig",
-    "regdictionary",
-    "regnamespace",
-    "regoper",
-    "regoperator",
-    "regproc",
-    "regproc",
-    "regprocedure",
-    "regrole",
-    "regtype",
-    "regtype",
-    "xid" // transaction ID
-  )
-
   def dbTypeFrom(udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {
     udtName match {
       case "bool"                              => Some(db.Type.Boolean)
@@ -69,7 +48,22 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
       case "uuid"                              => Some(db.Type.UUID)
       case "varchar"                           => Some(db.Type.VarChar(characterMaximumLength))
       case "xml"                               => Some(db.Type.Xml)
-      case str if pgObjectTypes(str)           => Some(db.Type.PgObject(str))
+      case "aclitem"                           => Some(db.Type.aclitem)
+      case "anyarray"                          => Some(db.Type.anyarray)
+      case "int2vector"                        => Some(db.Type.int2vector)
+      case "oidvector"                         => Some(db.Type.oidvector)
+      case "pg_node_tree"                      => Some(db.Type.pg_node_tree)
+      case "regclass"                          => Some(db.Type.regclass)
+      case "regconfig"                         => Some(db.Type.regconfig)
+      case "regdictionary"                     => Some(db.Type.regdictionary)
+      case "regnamespace"                      => Some(db.Type.regnamespace)
+      case "regoper"                           => Some(db.Type.regoper)
+      case "regoperator"                       => Some(db.Type.regoperator)
+      case "regproc"                           => Some(db.Type.regproc)
+      case "regprocedure"                      => Some(db.Type.regprocedure)
+      case "regrole"                           => Some(db.Type.regrole)
+      case "regtype"                           => Some(db.Type.regtype)
+      case "xid"                               => Some(db.Type.xid)
       case str if str.startsWith("_")          => dbTypeFrom(udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
       case typeName =>
         enums

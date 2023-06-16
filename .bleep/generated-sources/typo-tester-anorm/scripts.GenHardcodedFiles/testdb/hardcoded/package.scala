@@ -69,13 +69,6 @@ package object hardcoded {
       ps.setArray(index, ps.getConnection.createArrayOf("decimal", v.map(v => v: scala.AnyRef)))
   }
   
-  implicit val PGobjectArray: anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] = new anorm.ToStatement[scala.Array[org.postgresql.util.PGobject]] with anorm.ParameterMetaData[scala.Array[org.postgresql.util.PGobject]] {
-    override def sqlType: java.lang.String = "_aclitem"
-    override def jdbcType: scala.Int = java.sql.Types.ARRAY
-    override def set(ps: java.sql.PreparedStatement, index: scala.Int, v: scala.Array[org.postgresql.util.PGobject]): scala.Unit =
-      ps.setArray(index, ps.getConnection.createArrayOf("aclitem", v.map(v => v: scala.AnyRef)))
-  }
-  
   implicit val localTimeDb: anorm.ToStatement[java.time.LocalTime] with anorm.ParameterMetaData[java.time.LocalTime] with anorm.Column[java.time.LocalTime] = new anorm.ToStatement[java.time.LocalTime] with anorm.ParameterMetaData[java.time.LocalTime] with anorm.Column[java.time.LocalTime] {
     override def sqlType: java.lang.String = "time"
     override def jdbcType: scala.Int = java.sql.Types.TIME

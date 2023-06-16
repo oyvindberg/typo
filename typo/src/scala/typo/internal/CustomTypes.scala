@@ -280,6 +280,22 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoJson = obj("json", "TypoJson")
   lazy val TypoJsonb = obj("jsonb", "TypoJsonb")
   lazy val TypoInet = obj("inet", "TypoInet").copy(toTypoInArray = None)
+  lazy val TypoAclItem = obj("aclitem", "TypoAclItem")
+  lazy val TypoAnyArray = obj("anyarray", "TypoAnyArray")
+  lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector")
+  lazy val TypoOidVector = obj("oidvector", "TypoOidVector")
+  lazy val TypoPgNodeTree = obj("pg_node_tree", "TypoPgNodeTree")
+  lazy val TypoRegclass = obj("regclass", "TypoRegclass")
+  lazy val TypoRegconfig = obj("regconfig", "TypoRegconfig")
+  lazy val TypoRegdictionary = obj("regdictionary", "TypoRegdictionary")
+  lazy val TypoRegnamespace = obj("regnamespace", "TypoRegnamespace")
+  lazy val TypoRegoper = obj("regoper", "TypoRegoper")
+  lazy val TypoRegoperator = obj("regoperator", "TypoRegoperator")
+  lazy val TypoRegproc = obj("regproc", "TypoRegproc")
+  lazy val TypoRegprocedure = obj("regprocedure", "TypoRegprocedure")
+  lazy val TypoRegrole = obj("regrole", "TypoRegrole")
+  lazy val TypoRegtype = obj("regtype", "TypoRegtype")
+  lazy val TypoXid = obj("xid", "TypoXid")
 
   val All: List[CustomType] =
     List(
@@ -296,6 +312,25 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoJson,
       TypoJsonb,
       TypoHStore,
-      TypoInet
+      TypoInet,
+      TypoJson,
+      TypoJsonb,
+      TypoInet,
+      TypoAclItem,
+      TypoAnyArray,
+      TypoInt2Vector,
+      TypoOidVector,
+      TypoPgNodeTree,
+      TypoRegclass,
+      TypoRegconfig,
+      TypoRegdictionary,
+      TypoRegnamespace,
+      TypoRegoper,
+      TypoRegoperator,
+      TypoRegproc,
+      TypoRegprocedure,
+      TypoRegrole,
+      TypoRegtype,
+      TypoXid
     )
 }
