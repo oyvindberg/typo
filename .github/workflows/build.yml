@@ -58,7 +58,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           name: "${{ steps.get_version.outputs.version-without-v }}"
-          prerelease: true
+          prerelease: false
           generate_release_notes: true
     permissions:
       contents: write
