@@ -56,7 +56,7 @@ object load {
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
     val uniqueKeys = UniqueKeys(input.tableConstraints, input.keyColumnUsage)
     val enums = Enums(input.pgEnums)
-    val enumsByName = enums.map(e => (e.name.name, e)).toMap
+    val enumsByName = enums.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
     val domains = input.domains.map { d =>
       val tpe = TypeMapperDb(enumsByName, Map.empty)
         .dbTypeFrom(

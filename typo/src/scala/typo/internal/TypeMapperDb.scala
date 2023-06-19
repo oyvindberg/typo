@@ -67,7 +67,7 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
       case str if str.startsWith("_")          => dbTypeFrom(udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
       case typeName =>
         enums
-          .get(typeName)
+          .get(typeName.replaceAll("\"", ""))
           .map(`enum` => db.Type.EnumRef(`enum`.name))
           .orElse(domains.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
     }
