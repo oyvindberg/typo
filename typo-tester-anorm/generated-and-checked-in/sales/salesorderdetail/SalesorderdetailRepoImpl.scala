@@ -193,7 +193,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         SalesorderdetailRow(
           salesorderid = row[SalesorderheaderId]("salesorderid"),
           salesorderdetailid = row[Int]("salesorderdetailid"),
-          carriertrackingnumber = row[Option[String]]("carriertrackingnumber"),
+          carriertrackingnumber = row[Option[/* max 25 chars */ String]]("carriertrackingnumber"),
           orderqty = row[Int]("orderqty"),
           productid = row[ProductId]("productid"),
           specialofferid = row[SpecialofferId]("specialofferid"),

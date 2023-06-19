@@ -147,7 +147,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     new Read[ShoppingcartitemRow](
       gets = List(
         (Get[ShoppingcartitemId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[ProductId], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls),
@@ -155,7 +155,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       ),
       unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
         shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
-        shoppingcartid = Get[String].unsafeGetNonNullable(rs, i + 1),
+        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
         quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
         productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
         datecreated = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),

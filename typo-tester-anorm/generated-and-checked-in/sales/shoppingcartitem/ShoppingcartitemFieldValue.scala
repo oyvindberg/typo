@@ -15,7 +15,7 @@ sealed abstract class ShoppingcartitemFieldValue[T](name: String, value: T) exte
 
 object ShoppingcartitemFieldValue {
   case class shoppingcartitemid(override val value: ShoppingcartitemId) extends ShoppingcartitemFieldOrIdValue("shoppingcartitemid", value)
-  case class shoppingcartid(override val value: String) extends ShoppingcartitemFieldValue("shoppingcartid", value)
+  case class shoppingcartid(override val value: /* max 50 chars */ String) extends ShoppingcartitemFieldValue("shoppingcartid", value)
   case class quantity(override val value: Int) extends ShoppingcartitemFieldValue("quantity", value)
   case class productid(override val value: ProductId) extends ShoppingcartitemFieldValue("productid", value)
   case class datecreated(override val value: LocalDateTime) extends ShoppingcartitemFieldValue("datecreated", value)

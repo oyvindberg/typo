@@ -28,7 +28,7 @@ case class StViewRow(
   /** Points to [[sales.salesterritory.SalesterritoryRow.countryregioncode]] */
   countryregioncode: Option[CountryregionId],
   /** Points to [[sales.salesterritory.SalesterritoryRow.group]] */
-  group: Option[String],
+  group: Option[/* max 50 chars */ String],
   /** Points to [[sales.salesterritory.SalesterritoryRow.salesytd]] */
   salesytd: Option[BigDecimal],
   /** Points to [[sales.salesterritory.SalesterritoryRow.saleslastyear]] */
@@ -68,7 +68,7 @@ object StViewRow {
             territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
             name = json.\("name").toOption.map(_.as[Name]),
             countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-            group = json.\("group").toOption.map(_.as[String]),
+            group = json.\("group").toOption.map(_.as[/* max 50 chars */ String]),
             salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
             saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal]),
             costytd = json.\("costytd").toOption.map(_.as[BigDecimal]),

@@ -26,11 +26,11 @@ case class ProductreviewRow(
   /** Date review was submitted. */
   reviewdate: LocalDateTime,
   /** Reviewer's e-mail address. */
-  emailaddress: String,
+  emailaddress: /* max 50 chars */ String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   modifieddate: LocalDateTime
 )
 
@@ -42,9 +42,9 @@ object ProductreviewRow {
         productid <- c.downField("productid").as[ProductId]
         reviewername <- c.downField("reviewername").as[Name]
         reviewdate <- c.downField("reviewdate").as[LocalDateTime]
-        emailaddress <- c.downField("emailaddress").as[String]
+        emailaddress <- c.downField("emailaddress").as[/* max 50 chars */ String]
         rating <- c.downField("rating").as[Int]
-        comments <- c.downField("comments").as[Option[String]]
+        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield ProductreviewRow(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
   implicit val encoder: Encoder[ProductreviewRow] = {

@@ -25,9 +25,9 @@ case class ProductRowUnsaved(
   /** Name of the product. */
   name: Name,
   /** Unique product identification number. */
-  productnumber: String,
+  productnumber: /* max 25 chars */ String,
   /** Product color. */
-  color: Option[String],
+  color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
   safetystocklevel: Int,
   /** Inventory level that triggers a purchase order or work order. */
@@ -37,7 +37,7 @@ case class ProductRowUnsaved(
   /** Selling price. */
   listprice: BigDecimal,
   /** Product size. */
-  size: Option[String],
+  size: Option[/* max 5 chars */ String],
   /** Unit of measure for Size column.
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   sizeunitmeasurecode: Option[UnitmeasureId],
@@ -129,13 +129,13 @@ object ProductRowUnsaved {
     (c: HCursor) =>
       for {
         name <- c.downField("name").as[Name]
-        productnumber <- c.downField("productnumber").as[String]
-        color <- c.downField("color").as[Option[String]]
+        productnumber <- c.downField("productnumber").as[/* max 25 chars */ String]
+        color <- c.downField("color").as[Option[/* max 15 chars */ String]]
         safetystocklevel <- c.downField("safetystocklevel").as[Int]
         reorderpoint <- c.downField("reorderpoint").as[Int]
         standardcost <- c.downField("standardcost").as[BigDecimal]
         listprice <- c.downField("listprice").as[BigDecimal]
-        size <- c.downField("size").as[Option[String]]
+        size <- c.downField("size").as[Option[/* max 5 chars */ String]]
         sizeunitmeasurecode <- c.downField("sizeunitmeasurecode").as[Option[UnitmeasureId]]
         weightunitmeasurecode <- c.downField("weightunitmeasurecode").as[Option[UnitmeasureId]]
         weight <- c.downField("weight").as[Option[BigDecimal]]

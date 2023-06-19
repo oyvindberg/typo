@@ -32,7 +32,7 @@ case class VendorRow(
   /** 0 = Vendor no longer used. 1 = Vendor is actively used. */
   activeflag: Flag,
   /** Vendor URL. */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   modifieddate: LocalDateTime
 )
 
@@ -46,7 +46,7 @@ object VendorRow {
         creditrating <- c.downField("creditrating").as[Int]
         preferredvendorstatus <- c.downField("preferredvendorstatus").as[Flag]
         activeflag <- c.downField("activeflag").as[Flag]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[String]]
+        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield VendorRow(businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
   implicit val encoder: Encoder[VendorRow] = {

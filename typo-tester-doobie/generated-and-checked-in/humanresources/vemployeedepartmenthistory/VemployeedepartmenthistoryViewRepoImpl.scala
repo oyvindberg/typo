@@ -46,11 +46,11 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
     new Read[VemployeedepartmenthistoryViewRow](
       gets = List(
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
@@ -59,11 +59,11 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmenthistoryViewRow(
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[String].unsafeGetNullable(rs, i + 1),
+        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
         firstname = Get[Name].unsafeGetNullable(rs, i + 2),
         middlename = Get[Name].unsafeGetNullable(rs, i + 3),
         lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[String].unsafeGetNullable(rs, i + 5),
+        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
         shift = Get[Name].unsafeGetNullable(rs, i + 6),
         department = Get[Name].unsafeGetNullable(rs, i + 7),
         groupname = Get[Name].unsafeGetNullable(rs, i + 8),

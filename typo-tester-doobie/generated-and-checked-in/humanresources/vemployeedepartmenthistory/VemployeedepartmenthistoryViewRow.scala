@@ -19,7 +19,7 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Option[Name],
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -27,7 +27,7 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Option[Name],
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   shift: Option[Name],
   department: Option[Name],
   /** Points to [[department.DepartmentRow.groupname]] */
@@ -43,11 +43,11 @@ object VemployeedepartmenthistoryViewRow {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
         firstname <- c.downField("firstname").as[Option[Name]]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[String]]
+        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
         shift <- c.downField("shift").as[Option[Name]]
         department <- c.downField("department").as[Option[Name]]
         groupname <- c.downField("groupname").as[Option[Name]]

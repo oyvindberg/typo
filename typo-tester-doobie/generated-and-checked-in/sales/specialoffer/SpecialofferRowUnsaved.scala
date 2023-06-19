@@ -18,11 +18,11 @@ import java.util.UUID
 /** This class corresponds to a row in table `sales.specialoffer` which has not been persisted yet */
 case class SpecialofferRowUnsaved(
   /** Discount description. */
-  description: String,
+  description: /* max 255 chars */ String,
   /** Discount type category. */
-  `type`: String,
+  `type`: /* max 50 chars */ String,
   /** Group the discount applies to such as Reseller or Customer. */
-  category: String,
+  category: /* max 50 chars */ String,
   /** Discount start date. */
   startdate: LocalDateTime,
   /** Discount end date. */
@@ -77,9 +77,9 @@ object SpecialofferRowUnsaved {
   implicit val decoder: Decoder[SpecialofferRowUnsaved] =
     (c: HCursor) =>
       for {
-        description <- c.downField("description").as[String]
-        `type` <- c.downField("type").as[String]
-        category <- c.downField("category").as[String]
+        description <- c.downField("description").as[/* max 255 chars */ String]
+        `type` <- c.downField("type").as[/* max 50 chars */ String]
+        category <- c.downField("category").as[/* max 50 chars */ String]
         startdate <- c.downField("startdate").as[LocalDateTime]
         enddate <- c.downField("enddate").as[LocalDateTime]
         maxqty <- c.downField("maxqty").as[Option[Int]]

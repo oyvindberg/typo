@@ -23,13 +23,13 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 case class PersonRowUnsaved(
   /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
-  name: String,
-  nickName: Option[String],
-  blogUrl: Option[String],
-  email: String,
-  phone: String,
+  name: /* max 100 chars */ String,
+  nickName: Option[/* max 30 chars */ String],
+  blogUrl: Option[/* max 100 chars */ String],
+  email: /* max 254 chars */ String,
+  phone: /* max 8 chars */ String,
   likesPizza: Boolean,
-  workEmail: Option[String],
+  workEmail: Option[/* max 254 chars */ String],
   /** Default: auto-increment */
   id: Defaulted[PersonId] = Defaulted.UseDefault,
   /** Default: some-value
@@ -84,13 +84,13 @@ object PersonRowUnsaved {
         Try(
           PersonRowUnsaved(
             favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
-            name = json.\("name").as[String],
-            nickName = json.\("nick_name").toOption.map(_.as[String]),
-            blogUrl = json.\("blog_url").toOption.map(_.as[String]),
-            email = json.\("email").as[String],
-            phone = json.\("phone").as[String],
+            name = json.\("name").as[/* max 100 chars */ String],
+            nickName = json.\("nick_name").toOption.map(_.as[/* max 30 chars */ String]),
+            blogUrl = json.\("blog_url").toOption.map(_.as[/* max 100 chars */ String]),
+            email = json.\("email").as[/* max 254 chars */ String],
+            phone = json.\("phone").as[/* max 8 chars */ String],
             likesPizza = json.\("likes_pizza").as[Boolean],
-            workEmail = json.\("work_email").toOption.map(_.as[String]),
+            workEmail = json.\("work_email").toOption.map(_.as[/* max 254 chars */ String]),
             id = json.\("id").as[Defaulted[PersonId]],
             maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
             sector = json.\("sector").as[Defaulted[Sector]]

@@ -49,9 +49,9 @@ object PrViewRepoImpl extends PrViewRepo {
         (Get[ProductId], Nullability.Nullable),
         (Get[Name], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 3850 chars */ String], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
@@ -60,9 +60,9 @@ object PrViewRepoImpl extends PrViewRepo {
         productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
         reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
         reviewdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        emailaddress = Get[String].unsafeGetNullable(rs, i + 5),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
         rating = Get[Int].unsafeGetNullable(rs, i + 6),
-        comments = Get[String].unsafeGetNullable(rs, i + 7),
+        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
       )
     )

@@ -50,13 +50,13 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
         (Get[Name], Nullability.Nullable),
         (Get[TypoMoney], Nullability.Nullable),
         (Get[TypoMoney], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[/* max 5 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
@@ -64,13 +64,13 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
         name = Get[Name].unsafeGetNullable(rs, i + 1),
         AnnualSales = Get[TypoMoney].unsafeGetNullable(rs, i + 2),
         AnnualRevenue = Get[TypoMoney].unsafeGetNullable(rs, i + 3),
-        BankName = Get[String].unsafeGetNullable(rs, i + 4),
-        BusinessType = Get[String].unsafeGetNullable(rs, i + 5),
+        BankName = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
+        BusinessType = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 5),
         YearOpened = Get[Int].unsafeGetNullable(rs, i + 6),
-        Specialty = Get[String].unsafeGetNullable(rs, i + 7),
+        Specialty = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 7),
         SquareFeet = Get[Int].unsafeGetNullable(rs, i + 8),
-        Brands = Get[String].unsafeGetNullable(rs, i + 9),
-        Internet = Get[String].unsafeGetNullable(rs, i + 10),
+        Brands = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
+        Internet = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
         NumberEmployees = Get[Int].unsafeGetNullable(rs, i + 11)
       )
     )

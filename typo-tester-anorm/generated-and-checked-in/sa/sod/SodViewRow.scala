@@ -26,7 +26,7 @@ case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   salesorderdetailid: Option[Int],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]] */
-  carriertrackingnumber: Option[String],
+  carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]] */
   orderqty: Option[Int],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]] */
@@ -67,7 +67,7 @@ object SodViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
             salesorderdetailid = json.\("salesorderdetailid").toOption.map(_.as[Int]),
-            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[String]),
+            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
             orderqty = json.\("orderqty").toOption.map(_.as[Int]),
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),

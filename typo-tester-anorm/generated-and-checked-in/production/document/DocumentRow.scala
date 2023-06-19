@@ -20,16 +20,16 @@ import scala.util.Try
 
 case class DocumentRow(
   /** Title of the document. */
-  title: String,
+  title: /* max 50 chars */ String,
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId,
   /** 0 = This is a folder, 1 = This is a document. */
   folderflag: Flag,
   /** File name of the document */
-  filename: String,
+  filename: /* max 400 chars */ String,
   /** File extension indicating the document type. For example, .doc or .txt. */
-  fileextension: Option[String],
+  fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
   revision: /* bpchar */ String,
   /** Engineering change approval number. */
@@ -70,11 +70,11 @@ object DocumentRow {
       JsResult.fromTry(
         Try(
           DocumentRow(
-            title = json.\("title").as[String],
+            title = json.\("title").as[/* max 50 chars */ String],
             owner = json.\("owner").as[BusinessentityId],
             folderflag = json.\("folderflag").as[Flag],
-            filename = json.\("filename").as[String],
-            fileextension = json.\("fileextension").toOption.map(_.as[String]),
+            filename = json.\("filename").as[/* max 400 chars */ String],
+            fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
             revision = json.\("revision").as[/* bpchar */ String],
             changenumber = json.\("changenumber").as[Int],
             status = json.\("status").as[Int],

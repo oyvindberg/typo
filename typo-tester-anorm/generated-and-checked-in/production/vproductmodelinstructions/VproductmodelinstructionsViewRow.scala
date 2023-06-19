@@ -31,7 +31,7 @@ case class VproductmodelinstructionsViewRow(
   MachineHours: Option[BigDecimal],
   LaborHours: Option[BigDecimal],
   LotSize: Option[Int],
-  Step: Option[String],
+  Step: Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
@@ -67,7 +67,7 @@ object VproductmodelinstructionsViewRow {
             MachineHours = json.\("MachineHours").toOption.map(_.as[BigDecimal]),
             LaborHours = json.\("LaborHours").toOption.map(_.as[BigDecimal]),
             LotSize = json.\("LotSize").toOption.map(_.as[Int]),
-            Step = json.\("Step").toOption.map(_.as[String]),
+            Step = json.\("Step").toOption.map(_.as[/* max 1024 chars */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

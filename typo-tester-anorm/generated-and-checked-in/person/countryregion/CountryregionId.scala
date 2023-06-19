@@ -13,15 +13,15 @@ import anorm.ToStatement
 import play.api.libs.json.Format
 
 /** Type for the primary key of table `person.countryregion` */
-case class CountryregionId(value: String) extends AnyVal
+case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
-  implicit val format: Format[CountryregionId] = implicitly[Format[String]].bimap(CountryregionId.apply, _.value)
-  implicit val toStatement: ToStatement[CountryregionId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val column: Column[CountryregionId] = implicitly[Column[String]].map(CountryregionId.apply)
+  implicit val format: Format[CountryregionId] = implicitly[Format[/* max 3 chars */ String]].bimap(CountryregionId.apply, _.value)
+  implicit val toStatement: ToStatement[CountryregionId] = implicitly[ToStatement[/* max 3 chars */ String]].contramap(_.value)
+  implicit val column: Column[CountryregionId] = implicitly[Column[/* max 3 chars */ String]].map(CountryregionId.apply)
   implicit val parameterMetadata: ParameterMetaData[CountryregionId] = new ParameterMetaData[CountryregionId] {
-    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+    override def sqlType: String = implicitly[ParameterMetaData[/* max 3 chars */ String]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[/* max 3 chars */ String]].jdbcType
   }
 
 }

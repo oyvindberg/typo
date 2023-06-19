@@ -21,8 +21,8 @@ object PrViewFieldValue {
   case class productid(override val value: Option[ProductId]) extends PrViewFieldValue("productid", value)
   case class reviewername(override val value: Option[Name]) extends PrViewFieldValue("reviewername", value)
   case class reviewdate(override val value: Option[LocalDateTime]) extends PrViewFieldValue("reviewdate", value)
-  case class emailaddress(override val value: Option[String]) extends PrViewFieldValue("emailaddress", value)
+  case class emailaddress(override val value: Option[/* max 50 chars */ String]) extends PrViewFieldValue("emailaddress", value)
   case class rating(override val value: Option[Int]) extends PrViewFieldValue("rating", value)
-  case class comments(override val value: Option[String]) extends PrViewFieldValue("comments", value)
+  case class comments(override val value: Option[/* max 3850 chars */ String]) extends PrViewFieldValue("comments", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PrViewFieldValue("modifieddate", value)
 }

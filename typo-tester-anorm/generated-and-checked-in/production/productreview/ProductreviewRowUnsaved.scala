@@ -26,11 +26,11 @@ case class ProductreviewRowUnsaved(
   /** Name of the reviewer. */
   reviewername: Name,
   /** Reviewer's e-mail address. */
-  emailaddress: String,
+  emailaddress: /* max 50 chars */ String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   /** Default: nextval('production.productreview_productreviewid_seq'::regclass)
       Primary key for ProductReview records. */
   productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
@@ -81,9 +81,9 @@ object ProductreviewRowUnsaved {
           ProductreviewRowUnsaved(
             productid = json.\("productid").as[ProductId],
             reviewername = json.\("reviewername").as[Name],
-            emailaddress = json.\("emailaddress").as[String],
+            emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
             rating = json.\("rating").as[Int],
-            comments = json.\("comments").toOption.map(_.as[String]),
+            comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
             productreviewid = json.\("productreviewid").as[Defaulted[ProductreviewId]],
             reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

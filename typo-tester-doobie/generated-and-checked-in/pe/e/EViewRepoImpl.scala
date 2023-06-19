@@ -43,7 +43,7 @@ object EViewRepoImpl extends EViewRepo {
         (Get[Int], Nullability.Nullable),
         (Get[BusinessentityId], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
@@ -51,7 +51,7 @@ object EViewRepoImpl extends EViewRepo {
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
         emailaddressid = Get[Int].unsafeGetNullable(rs, i + 2),
-        emailaddress = Get[String].unsafeGetNullable(rs, i + 3),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
       )

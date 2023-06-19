@@ -88,11 +88,11 @@ object FootballClubRepoImpl extends FootballClubRepo {
     new Read[FootballClubRow](
       gets = List(
         (Get[FootballClubId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
+        (Get[/* max 100 chars */ String], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
         id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[String].unsafeGetNonNullable(rs, i + 1)
+        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
       )
     )
   

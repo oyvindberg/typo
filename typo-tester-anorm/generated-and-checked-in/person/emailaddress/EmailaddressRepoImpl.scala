@@ -158,7 +158,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         EmailaddressRow(
           businessentityid = row[BusinessentityId]("businessentityid"),
           emailaddressid = row[Int]("emailaddressid"),
-          emailaddress = row[Option[String]]("emailaddress"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

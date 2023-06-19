@@ -197,11 +197,11 @@ object AddressRepoImpl extends AddressRepo {
       Success(
         AddressRow(
           addressid = row[AddressId]("addressid"),
-          addressline1 = row[String]("addressline1"),
-          addressline2 = row[Option[String]]("addressline2"),
-          city = row[String]("city"),
+          addressline1 = row[/* max 60 chars */ String]("addressline1"),
+          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
+          city = row[/* max 30 chars */ String]("city"),
           stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          postalcode = row[String]("postalcode"),
+          postalcode = row[/* max 15 chars */ String]("postalcode"),
           spatiallocation = row[Option[Array[Byte]]]("spatiallocation"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")

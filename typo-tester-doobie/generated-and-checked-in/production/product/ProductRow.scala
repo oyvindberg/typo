@@ -25,13 +25,13 @@ case class ProductRow(
   /** Name of the product. */
   name: Name,
   /** Unique product identification number. */
-  productnumber: String,
+  productnumber: /* max 25 chars */ String,
   /** 0 = Product is purchased, 1 = Product is manufactured in-house. */
   makeflag: Flag,
   /** 0 = Product is not a salable item. 1 = Product is salable. */
   finishedgoodsflag: Flag,
   /** Product color. */
-  color: Option[String],
+  color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
   safetystocklevel: Int,
   /** Inventory level that triggers a purchase order or work order. */
@@ -41,7 +41,7 @@ case class ProductRow(
   /** Selling price. */
   listprice: BigDecimal,
   /** Product size. */
-  size: Option[String],
+  size: Option[/* max 5 chars */ String],
   /** Unit of measure for Size column.
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   sizeunitmeasurecode: Option[UnitmeasureId],
@@ -80,15 +80,15 @@ object ProductRow {
       for {
         productid <- c.downField("productid").as[ProductId]
         name <- c.downField("name").as[Name]
-        productnumber <- c.downField("productnumber").as[String]
+        productnumber <- c.downField("productnumber").as[/* max 25 chars */ String]
         makeflag <- c.downField("makeflag").as[Flag]
         finishedgoodsflag <- c.downField("finishedgoodsflag").as[Flag]
-        color <- c.downField("color").as[Option[String]]
+        color <- c.downField("color").as[Option[/* max 15 chars */ String]]
         safetystocklevel <- c.downField("safetystocklevel").as[Int]
         reorderpoint <- c.downField("reorderpoint").as[Int]
         standardcost <- c.downField("standardcost").as[BigDecimal]
         listprice <- c.downField("listprice").as[BigDecimal]
-        size <- c.downField("size").as[Option[String]]
+        size <- c.downField("size").as[Option[/* max 5 chars */ String]]
         sizeunitmeasurecode <- c.downField("sizeunitmeasurecode").as[Option[UnitmeasureId]]
         weightunitmeasurecode <- c.downField("weightunitmeasurecode").as[Option[UnitmeasureId]]
         weight <- c.downField("weight").as[Option[BigDecimal]]

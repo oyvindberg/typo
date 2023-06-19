@@ -20,7 +20,7 @@ case class SciViewRow(
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
   shoppingcartitemid: Option[ShoppingcartitemId],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartid]] */
-  shoppingcartid: Option[String],
+  shoppingcartid: Option[/* max 50 chars */ String],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.quantity]] */
   quantity: Option[Int],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.productid]] */
@@ -37,7 +37,7 @@ object SciViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         shoppingcartitemid <- c.downField("shoppingcartitemid").as[Option[ShoppingcartitemId]]
-        shoppingcartid <- c.downField("shoppingcartid").as[Option[String]]
+        shoppingcartid <- c.downField("shoppingcartid").as[Option[/* max 50 chars */ String]]
         quantity <- c.downField("quantity").as[Option[Int]]
         productid <- c.downField("productid").as[Option[ProductId]]
         datecreated <- c.downField("datecreated").as[Option[LocalDateTime]]

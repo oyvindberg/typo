@@ -160,9 +160,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
         (Get[ProductId], Nullability.NoNulls),
         (Get[Name], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 3850 chars */ String], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => ProductreviewRow(
@@ -170,9 +170,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
         productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
         reviewername = Get[Name].unsafeGetNonNullable(rs, i + 2),
         reviewdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
-        emailaddress = Get[String].unsafeGetNonNullable(rs, i + 4),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
         rating = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        comments = Get[String].unsafeGetNullable(rs, i + 6),
+        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 6),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
       )
     )

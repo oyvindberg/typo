@@ -60,7 +60,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardapprovalcode]] */
-  creditcardapprovalcode: Option[String],
+  creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.subtotal]] */
@@ -72,7 +72,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.totaldue]] */
   totaldue: Option[BigDecimal],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]] */
-  comment: Option[String],
+  comment: Option[/* max 128 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
@@ -100,13 +100,13 @@ object SohViewRow {
         shiptoaddressid <- c.downField("shiptoaddressid").as[Option[AddressId]]
         shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
         creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[String]]
+        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[/* max 15 chars */ String]]
         currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
         subtotal <- c.downField("subtotal").as[Option[BigDecimal]]
         taxamt <- c.downField("taxamt").as[Option[BigDecimal]]
         freight <- c.downField("freight").as[Option[BigDecimal]]
         totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
-        comment <- c.downField("comment").as[Option[String]]
+        comment <- c.downField("comment").as[Option[/* max 128 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield SohViewRow(id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate)

@@ -17,7 +17,7 @@ import scala.util.Try
 
 case class FootballClubRow(
   id: FootballClubId,
-  name: String
+  name: /* max 100 chars */ String
 )
 
 object FootballClubRow {
@@ -33,7 +33,7 @@ object FootballClubRow {
         Try(
           FootballClubRow(
             id = json.\("id").as[FootballClubId],
-            name = json.\("name").as[String]
+            name = json.\("name").as[/* max 100 chars */ String]
           )
         )
       )

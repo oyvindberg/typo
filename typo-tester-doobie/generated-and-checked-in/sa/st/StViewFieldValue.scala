@@ -21,7 +21,7 @@ object StViewFieldValue {
   case class territoryid(override val value: Option[SalesterritoryId]) extends StViewFieldValue("territoryid", value)
   case class name(override val value: Option[Name]) extends StViewFieldValue("name", value)
   case class countryregioncode(override val value: Option[CountryregionId]) extends StViewFieldValue("countryregioncode", value)
-  case class group(override val value: Option[String]) extends StViewFieldValue("group", value)
+  case class group(override val value: Option[/* max 50 chars */ String]) extends StViewFieldValue("group", value)
   case class salesytd(override val value: Option[BigDecimal]) extends StViewFieldValue("salesytd", value)
   case class saleslastyear(override val value: Option[BigDecimal]) extends StViewFieldValue("saleslastyear", value)
   case class costytd(override val value: Option[BigDecimal]) extends StViewFieldValue("costytd", value)

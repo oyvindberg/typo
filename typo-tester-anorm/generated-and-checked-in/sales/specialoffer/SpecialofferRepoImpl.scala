@@ -214,10 +214,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       Success(
         SpecialofferRow(
           specialofferid = row[SpecialofferId]("specialofferid"),
-          description = row[String]("description"),
+          description = row[/* max 255 chars */ String]("description"),
           discountpct = row[BigDecimal]("discountpct"),
-          `type` = row[String]("type"),
-          category = row[String]("category"),
+          `type` = row[/* max 50 chars */ String]("type"),
+          category = row[/* max 50 chars */ String]("category"),
           startdate = row[LocalDateTime]("startdate"),
           enddate = row[LocalDateTime]("enddate"),
           minqty = row[Int]("minqty"),

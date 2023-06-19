@@ -27,11 +27,11 @@ case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.reviewdate]] */
   reviewdate: Option[LocalDateTime],
   /** Points to [[production.productreview.ProductreviewRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.rating]] */
   rating: Option[Int],
   /** Points to [[production.productreview.ProductreviewRow.comments]] */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -45,9 +45,9 @@ object PrViewRow {
         productid <- c.downField("productid").as[Option[ProductId]]
         reviewername <- c.downField("reviewername").as[Option[Name]]
         reviewdate <- c.downField("reviewdate").as[Option[LocalDateTime]]
-        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
         rating <- c.downField("rating").as[Option[Int]]
-        comments <- c.downField("comments").as[Option[String]]
+        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PrViewRow(id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
   implicit val encoder: Encoder[PrViewRow] = {

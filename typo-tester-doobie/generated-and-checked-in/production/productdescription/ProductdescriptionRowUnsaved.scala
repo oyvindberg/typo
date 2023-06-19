@@ -18,7 +18,7 @@ import java.util.UUID
 /** This class corresponds to a row in table `production.productdescription` which has not been persisted yet */
 case class ProductdescriptionRowUnsaved(
   /** Description of the product. */
-  description: String,
+  description: /* max 400 chars */ String,
   /** Default: nextval('production.productdescription_productdescriptionid_seq'::regclass)
       Primary key for ProductDescription records. */
   productdescriptionid: Defaulted[ProductdescriptionId] = Defaulted.UseDefault,
@@ -48,7 +48,7 @@ object ProductdescriptionRowUnsaved {
   implicit val decoder: Decoder[ProductdescriptionRowUnsaved] =
     (c: HCursor) =>
       for {
-        description <- c.downField("description").as[String]
+        description <- c.downField("description").as[/* max 400 chars */ String]
         productdescriptionid <- c.downField("productdescriptionid").as[Defaulted[ProductdescriptionId]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]

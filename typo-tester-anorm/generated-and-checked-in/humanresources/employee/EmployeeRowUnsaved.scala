@@ -26,11 +26,11 @@ case class EmployeeRowUnsaved(
       Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Unique national identification number such as a social security number. */
-  nationalidnumber: String,
+  nationalidnumber: /* max 15 chars */ String,
   /** Network login. */
-  loginid: String,
+  loginid: /* max 256 chars */ String,
   /** Work title such as Buyer or Sales Representative. */
-  jobtitle: String,
+  jobtitle: /* max 50 chars */ String,
   /** Date of birth. */
   birthdate: LocalDate,
   /** M = Married, S = Single */
@@ -125,9 +125,9 @@ object EmployeeRowUnsaved {
         Try(
           EmployeeRowUnsaved(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            nationalidnumber = json.\("nationalidnumber").as[String],
-            loginid = json.\("loginid").as[String],
-            jobtitle = json.\("jobtitle").as[String],
+            nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
+            loginid = json.\("loginid").as[/* max 256 chars */ String],
+            jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
             birthdate = json.\("birthdate").as[LocalDate],
             maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
             gender = json.\("gender").as[/* bpchar */ String],

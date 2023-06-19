@@ -18,13 +18,13 @@ case class SpecialofferRow(
   /** Primary key for SpecialOffer records. */
   specialofferid: SpecialofferId,
   /** Discount description. */
-  description: String,
+  description: /* max 255 chars */ String,
   /** Discount precentage. */
   discountpct: BigDecimal,
   /** Discount type category. */
-  `type`: String,
+  `type`: /* max 50 chars */ String,
   /** Group the discount applies to such as Reseller or Customer. */
-  category: String,
+  category: /* max 50 chars */ String,
   /** Discount start date. */
   startdate: LocalDateTime,
   /** Discount end date. */
@@ -42,10 +42,10 @@ object SpecialofferRow {
     (c: HCursor) =>
       for {
         specialofferid <- c.downField("specialofferid").as[SpecialofferId]
-        description <- c.downField("description").as[String]
+        description <- c.downField("description").as[/* max 255 chars */ String]
         discountpct <- c.downField("discountpct").as[BigDecimal]
-        `type` <- c.downField("type").as[String]
-        category <- c.downField("category").as[String]
+        `type` <- c.downField("type").as[/* max 50 chars */ String]
+        category <- c.downField("category").as[/* max 50 chars */ String]
         startdate <- c.downField("startdate").as[LocalDateTime]
         enddate <- c.downField("enddate").as[LocalDateTime]
         minqty <- c.downField("minqty").as[Int]

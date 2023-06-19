@@ -20,11 +20,11 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.specialoffer` which has not been persisted yet */
 case class SpecialofferRowUnsaved(
   /** Discount description. */
-  description: String,
+  description: /* max 255 chars */ String,
   /** Discount type category. */
-  `type`: String,
+  `type`: /* max 50 chars */ String,
   /** Group the discount applies to such as Reseller or Customer. */
-  category: String,
+  category: /* max 50 chars */ String,
   /** Discount start date. */
   startdate: LocalDateTime,
   /** Discount end date. */
@@ -96,9 +96,9 @@ object SpecialofferRowUnsaved {
       JsResult.fromTry(
         Try(
           SpecialofferRowUnsaved(
-            description = json.\("description").as[String],
-            `type` = json.\("type").as[String],
-            category = json.\("category").as[String],
+            description = json.\("description").as[/* max 255 chars */ String],
+            `type` = json.\("type").as[/* max 50 chars */ String],
+            category = json.\("category").as[/* max 50 chars */ String],
             startdate = json.\("startdate").as[LocalDateTime],
             enddate = json.\("enddate").as[LocalDateTime],
             maxqty = json.\("maxqty").toOption.map(_.as[Int]),

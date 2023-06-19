@@ -19,8 +19,8 @@ case class VjobcandidateemploymentViewRow(
   jobcandidateid: Option[JobcandidateId],
   `Emp.StartDate`: Option[LocalDate],
   `Emp.EndDate`: Option[LocalDate],
-  `Emp.OrgName`: Option[String],
-  `Emp.JobTitle`: Option[String],
+  `Emp.OrgName`: Option[/* max 100 chars */ String],
+  `Emp.JobTitle`: Option[/* max 100 chars */ String],
   `Emp.Responsibility`: Option[String],
   `Emp.FunctionCategory`: Option[String],
   `Emp.IndustryCategory`: Option[String],
@@ -36,8 +36,8 @@ object VjobcandidateemploymentViewRow {
         jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
         `Emp.StartDate` <- c.downField("Emp.StartDate").as[Option[LocalDate]]
         `Emp.EndDate` <- c.downField("Emp.EndDate").as[Option[LocalDate]]
-        `Emp.OrgName` <- c.downField("Emp.OrgName").as[Option[String]]
-        `Emp.JobTitle` <- c.downField("Emp.JobTitle").as[Option[String]]
+        `Emp.OrgName` <- c.downField("Emp.OrgName").as[Option[/* max 100 chars */ String]]
+        `Emp.JobTitle` <- c.downField("Emp.JobTitle").as[Option[/* max 100 chars */ String]]
         `Emp.Responsibility` <- c.downField("Emp.Responsibility").as[Option[String]]
         `Emp.FunctionCategory` <- c.downField("Emp.FunctionCategory").as[Option[String]]
         `Emp.IndustryCategory` <- c.downField("Emp.IndustryCategory").as[Option[String]]

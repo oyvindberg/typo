@@ -134,14 +134,14 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       gets = List(
         (Get[BusinessentityId], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => EmailaddressRow(
         businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
         emailaddressid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        emailaddress = Get[String].unsafeGetNullable(rs, i + 2),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
       )

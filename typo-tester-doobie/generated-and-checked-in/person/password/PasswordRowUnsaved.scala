@@ -21,9 +21,9 @@ case class PasswordRowUnsaved(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Password for the e-mail account. */
-  passwordhash: String,
+  passwordhash: /* max 128 chars */ String,
   /** Random value concatenated with the password string before the password is hashed. */
-  passwordsalt: String,
+  passwordsalt: /* max 10 chars */ String,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
@@ -49,8 +49,8 @@ object PasswordRowUnsaved {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        passwordhash <- c.downField("passwordhash").as[String]
-        passwordsalt <- c.downField("passwordsalt").as[String]
+        passwordhash <- c.downField("passwordhash").as[/* max 128 chars */ String]
+        passwordsalt <- c.downField("passwordsalt").as[/* max 10 chars */ String]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
       } yield PasswordRowUnsaved(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

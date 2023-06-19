@@ -21,11 +21,11 @@ case class PpViewRow(
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphoto]] */
   thumbnailphoto: Option[Byte],
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphotofilename]] */
-  thumbnailphotofilename: Option[String],
+  thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.largephoto]] */
   largephoto: Option[Byte],
   /** Points to [[production.productphoto.ProductphotoRow.largephotofilename]] */
-  largephotofilename: Option[String],
+  largephotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -37,9 +37,9 @@ object PpViewRow {
         id <- c.downField("id").as[Option[Int]]
         productphotoid <- c.downField("productphotoid").as[Option[ProductphotoId]]
         thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Byte]]
-        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[String]]
+        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[/* max 50 chars */ String]]
         largephoto <- c.downField("largephoto").as[Option[Byte]]
-        largephotofilename <- c.downField("largephotofilename").as[Option[String]]
+        largephotofilename <- c.downField("largephotofilename").as[Option[/* max 50 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PpViewRow(id, productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
   implicit val encoder: Encoder[PpViewRow] = {

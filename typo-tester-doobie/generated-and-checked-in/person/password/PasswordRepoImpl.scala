@@ -136,15 +136,15 @@ object PasswordRepoImpl extends PasswordRepo {
     new Read[PasswordRow](
       gets = List(
         (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 128 chars */ String], Nullability.NoNulls),
+        (Get[/* max 10 chars */ String], Nullability.NoNulls),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PasswordRow(
         businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        passwordhash = Get[String].unsafeGetNonNullable(rs, i + 1),
-        passwordsalt = Get[String].unsafeGetNonNullable(rs, i + 2),
+        passwordhash = Get[/* max 128 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
       )

@@ -23,6 +23,6 @@ object VendorFieldValue {
   case class creditrating(override val value: Int) extends VendorFieldValue("creditrating", value)
   case class preferredvendorstatus(override val value: Flag) extends VendorFieldValue("preferredvendorstatus", value)
   case class activeflag(override val value: Flag) extends VendorFieldValue("activeflag", value)
-  case class purchasingwebserviceurl(override val value: Option[String]) extends VendorFieldValue("purchasingwebserviceurl", value)
+  case class purchasingwebserviceurl(override val value: Option[/* max 1024 chars */ String]) extends VendorFieldValue("purchasingwebserviceurl", value)
   case class modifieddate(override val value: LocalDateTime) extends VendorFieldValue("modifieddate", value)
 }

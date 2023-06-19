@@ -24,13 +24,13 @@ case class VstorewithdemographicsViewRow(
   name: Option[Name],
   AnnualSales: Option[TypoMoney],
   AnnualRevenue: Option[TypoMoney],
-  BankName: Option[String],
-  BusinessType: Option[String],
+  BankName: Option[/* max 50 chars */ String],
+  BusinessType: Option[/* max 5 chars */ String],
   YearOpened: Option[Int],
-  Specialty: Option[String],
+  Specialty: Option[/* max 50 chars */ String],
   SquareFeet: Option[Int],
-  Brands: Option[String],
-  Internet: Option[String],
+  Brands: Option[/* max 30 chars */ String],
+  Internet: Option[/* max 30 chars */ String],
   NumberEmployees: Option[Int]
 )
 
@@ -60,13 +60,13 @@ object VstorewithdemographicsViewRow {
             name = json.\("name").toOption.map(_.as[Name]),
             AnnualSales = json.\("AnnualSales").toOption.map(_.as[TypoMoney]),
             AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[TypoMoney]),
-            BankName = json.\("BankName").toOption.map(_.as[String]),
-            BusinessType = json.\("BusinessType").toOption.map(_.as[String]),
+            BankName = json.\("BankName").toOption.map(_.as[/* max 50 chars */ String]),
+            BusinessType = json.\("BusinessType").toOption.map(_.as[/* max 5 chars */ String]),
             YearOpened = json.\("YearOpened").toOption.map(_.as[Int]),
-            Specialty = json.\("Specialty").toOption.map(_.as[String]),
+            Specialty = json.\("Specialty").toOption.map(_.as[/* max 50 chars */ String]),
             SquareFeet = json.\("SquareFeet").toOption.map(_.as[Int]),
-            Brands = json.\("Brands").toOption.map(_.as[String]),
-            Internet = json.\("Internet").toOption.map(_.as[String]),
+            Brands = json.\("Brands").toOption.map(_.as[/* max 30 chars */ String]),
+            Internet = json.\("Internet").toOption.map(_.as[/* max 30 chars */ String]),
             NumberEmployees = json.\("NumberEmployees").toOption.map(_.as[Int])
           )
         )

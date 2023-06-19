@@ -24,7 +24,7 @@ case class EmailaddressRow(
   /** Primary key. ID of this email address. */
   emailaddressid: Int,
   /** E-mail address for the person. */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   rowguid: UUID,
   modifieddate: LocalDateTime
 ){
@@ -48,7 +48,7 @@ object EmailaddressRow {
           EmailaddressRow(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
             emailaddressid = json.\("emailaddressid").as[Int],
-            emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

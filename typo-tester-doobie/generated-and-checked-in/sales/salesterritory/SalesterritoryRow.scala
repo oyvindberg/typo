@@ -25,7 +25,7 @@ case class SalesterritoryRow(
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
-  group: String,
+  group: /* max 50 chars */ String,
   /** Sales in the territory year to date. */
   salesytd: BigDecimal,
   /** Sales in the territory the previous year. */
@@ -45,7 +45,7 @@ object SalesterritoryRow {
         territoryid <- c.downField("territoryid").as[SalesterritoryId]
         name <- c.downField("name").as[Name]
         countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        group <- c.downField("group").as[String]
+        group <- c.downField("group").as[/* max 50 chars */ String]
         salesytd <- c.downField("salesytd").as[BigDecimal]
         saleslastyear <- c.downField("saleslastyear").as[BigDecimal]
         costytd <- c.downField("costytd").as[BigDecimal]

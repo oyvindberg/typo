@@ -21,16 +21,16 @@ case class AddressRow(
   /** Primary key for Address records. */
   addressid: AddressId,
   /** First street address line. */
-  addressline1: String,
+  addressline1: /* max 60 chars */ String,
   /** Second street address line. */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Name of the city. */
-  city: String,
+  city: /* max 30 chars */ String,
   /** Unique identification number for the state or province. Foreign key to StateProvince table.
       Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** Postal code for the street address. */
-  postalcode: String,
+  postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
   rowguid: UUID,
@@ -57,11 +57,11 @@ object AddressRow {
         Try(
           AddressRow(
             addressid = json.\("addressid").as[AddressId],
-            addressline1 = json.\("addressline1").as[String],
-            addressline2 = json.\("addressline2").toOption.map(_.as[String]),
-            city = json.\("city").as[String],
+            addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
+            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+            city = json.\("city").as[/* max 30 chars */ String],
             stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            postalcode = json.\("postalcode").as[String],
+            postalcode = json.\("postalcode").as[/* max 15 chars */ String],
             spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]

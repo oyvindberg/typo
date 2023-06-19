@@ -53,7 +53,7 @@ object VsalespersonsalesbyfiscalyearsdataViewRepoImpl extends Vsalespersonsalesb
         VsalespersonsalesbyfiscalyearsdataViewRow(
           salespersonid = row[Option[BusinessentityId]]("salespersonid"),
           fullname = row[Option[String]]("fullname"),
-          jobtitle = row[Option[String]]("jobtitle"),
+          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
           salesterritory = row[Option[Name]]("salesterritory"),
           salestotal = row[Option[BigDecimal]]("salestotal"),
           fiscalyear = row[Option[BigDecimal]]("fiscalyear")

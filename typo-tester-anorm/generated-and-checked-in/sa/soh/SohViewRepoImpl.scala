@@ -99,13 +99,13 @@ object SohViewRepoImpl extends SohViewRepo {
           shiptoaddressid = row[Option[AddressId]]("shiptoaddressid"),
           shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
           creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          creditcardapprovalcode = row[Option[String]]("creditcardapprovalcode"),
+          creditcardapprovalcode = row[Option[/* max 15 chars */ String]]("creditcardapprovalcode"),
           currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
           subtotal = row[Option[BigDecimal]]("subtotal"),
           taxamt = row[Option[BigDecimal]]("taxamt"),
           freight = row[Option[BigDecimal]]("freight"),
           totaldue = row[Option[BigDecimal]]("totaldue"),
-          comment = row[Option[String]]("comment"),
+          comment = row[Option[/* max 128 chars */ String]]("comment"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

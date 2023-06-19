@@ -58,11 +58,11 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
       Success(
         VemployeedepartmenthistoryViewRow(
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[String]]("title"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
           firstname = row[Option[Name]]("firstname"),
           middlename = row[Option[Name]]("middlename"),
           lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[String]]("suffix"),
+          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
           shift = row[Option[Name]]("shift"),
           department = row[Option[Name]]("department"),
           groupname = row[Option[Name]]("groupname"),

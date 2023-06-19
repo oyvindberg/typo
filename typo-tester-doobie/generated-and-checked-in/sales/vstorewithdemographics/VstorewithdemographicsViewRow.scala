@@ -22,13 +22,13 @@ case class VstorewithdemographicsViewRow(
   name: Option[Name],
   AnnualSales: Option[TypoMoney],
   AnnualRevenue: Option[TypoMoney],
-  BankName: Option[String],
-  BusinessType: Option[String],
+  BankName: Option[/* max 50 chars */ String],
+  BusinessType: Option[/* max 5 chars */ String],
   YearOpened: Option[Int],
-  Specialty: Option[String],
+  Specialty: Option[/* max 50 chars */ String],
   SquareFeet: Option[Int],
-  Brands: Option[String],
-  Internet: Option[String],
+  Brands: Option[/* max 30 chars */ String],
+  Internet: Option[/* max 30 chars */ String],
   NumberEmployees: Option[Int]
 )
 
@@ -40,13 +40,13 @@ object VstorewithdemographicsViewRow {
         name <- c.downField("name").as[Option[Name]]
         AnnualSales <- c.downField("AnnualSales").as[Option[TypoMoney]]
         AnnualRevenue <- c.downField("AnnualRevenue").as[Option[TypoMoney]]
-        BankName <- c.downField("BankName").as[Option[String]]
-        BusinessType <- c.downField("BusinessType").as[Option[String]]
+        BankName <- c.downField("BankName").as[Option[/* max 50 chars */ String]]
+        BusinessType <- c.downField("BusinessType").as[Option[/* max 5 chars */ String]]
         YearOpened <- c.downField("YearOpened").as[Option[Int]]
-        Specialty <- c.downField("Specialty").as[Option[String]]
+        Specialty <- c.downField("Specialty").as[Option[/* max 50 chars */ String]]
         SquareFeet <- c.downField("SquareFeet").as[Option[Int]]
-        Brands <- c.downField("Brands").as[Option[String]]
-        Internet <- c.downField("Internet").as[Option[String]]
+        Brands <- c.downField("Brands").as[Option[/* max 30 chars */ String]]
+        Internet <- c.downField("Internet").as[Option[/* max 30 chars */ String]]
         NumberEmployees <- c.downField("NumberEmployees").as[Option[Int]]
       } yield VstorewithdemographicsViewRow(businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees)
   implicit val encoder: Encoder[VstorewithdemographicsViewRow] = {

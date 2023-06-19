@@ -29,7 +29,7 @@ case class PersonRowUnsaved(
   /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact */
   persontype: /* bpchar */ String,
   /** A courtesy title. For example, Mr. or Ms. */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** First name of the person. */
   firstname: Name,
   /** Middle name or middle initial of the person. */
@@ -37,7 +37,7 @@ case class PersonRowUnsaved(
   /** Last name of the person. */
   lastname: Name,
   /** Surname suffix. For example, Sr. or Jr. */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** Additional contact information about the person stored in xml format. */
   additionalcontactinfo: Option[TypoXml],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
@@ -107,11 +107,11 @@ object PersonRowUnsaved {
           PersonRowUnsaved(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
             persontype = json.\("persontype").as[/* bpchar */ String],
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
             firstname = json.\("firstname").as[Name],
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").as[Name],
-            suffix = json.\("suffix").toOption.map(_.as[String]),
+            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
             additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
             demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
             namestyle = json.\("namestyle").as[Defaulted[NameStyle]],

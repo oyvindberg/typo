@@ -29,7 +29,7 @@ case class VproductmodelinstructionsViewRow(
   MachineHours: Option[BigDecimal],
   LaborHours: Option[BigDecimal],
   LotSize: Option[Int],
-  Step: Option[String],
+  Step: Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
@@ -48,7 +48,7 @@ object VproductmodelinstructionsViewRow {
         MachineHours <- c.downField("MachineHours").as[Option[BigDecimal]]
         LaborHours <- c.downField("LaborHours").as[Option[BigDecimal]]
         LotSize <- c.downField("LotSize").as[Option[Int]]
-        Step <- c.downField("Step").as[Option[String]]
+        Step <- c.downField("Step").as[Option[/* max 1024 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield VproductmodelinstructionsViewRow(productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate)

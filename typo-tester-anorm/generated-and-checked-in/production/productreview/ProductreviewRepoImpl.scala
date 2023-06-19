@@ -194,9 +194,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           productid = row[ProductId]("productid"),
           reviewername = row[Name]("reviewername"),
           reviewdate = row[LocalDateTime]("reviewdate"),
-          emailaddress = row[String]("emailaddress"),
+          emailaddress = row[/* max 50 chars */ String]("emailaddress"),
           rating = row[Int]("rating"),
-          comments = row[Option[String]]("comments"),
+          comments = row[Option[/* max 3850 chars */ String]]("comments"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )
       )

@@ -26,7 +26,7 @@ case class SalesorderdetailRow(
   /** Primary key. One incremental unique number per product sold. */
   salesorderdetailid: Int,
   /** Shipment tracking number supplied by the shipper. */
-  carriertrackingnumber: Option[String],
+  carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
   orderqty: Int,
   /** Product sold to customer. Foreign key to Product.ProductID.
@@ -67,7 +67,7 @@ object SalesorderdetailRow {
           SalesorderdetailRow(
             salesorderid = json.\("salesorderid").as[SalesorderheaderId],
             salesorderdetailid = json.\("salesorderdetailid").as[Int],
-            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[String]),
+            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
             orderqty = json.\("orderqty").as[Int],
             productid = json.\("productid").as[ProductId],
             specialofferid = json.\("specialofferid").as[SpecialofferId],

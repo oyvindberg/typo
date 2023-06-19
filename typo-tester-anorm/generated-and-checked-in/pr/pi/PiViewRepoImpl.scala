@@ -58,7 +58,7 @@ object PiViewRepoImpl extends PiViewRepo {
           id = row[Option[Int]]("id"),
           productid = row[Option[ProductId]]("productid"),
           locationid = row[Option[LocationId]]("locationid"),
-          shelf = row[Option[String]]("shelf"),
+          shelf = row[Option[/* max 10 chars */ String]]("shelf"),
           bin = row[Option[Int]]("bin"),
           quantity = row[Option[Int]]("quantity"),
           rowguid = row[Option[UUID]]("rowguid"),

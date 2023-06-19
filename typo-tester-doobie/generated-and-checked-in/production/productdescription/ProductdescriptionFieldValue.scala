@@ -15,7 +15,7 @@ sealed abstract class ProductdescriptionFieldValue[T](name: String, value: T) ex
 
 object ProductdescriptionFieldValue {
   case class productdescriptionid(override val value: ProductdescriptionId) extends ProductdescriptionFieldOrIdValue("productdescriptionid", value)
-  case class description(override val value: String) extends ProductdescriptionFieldValue("description", value)
+  case class description(override val value: /* max 400 chars */ String) extends ProductdescriptionFieldValue("description", value)
   case class rowguid(override val value: UUID) extends ProductdescriptionFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductdescriptionFieldValue("modifieddate", value)
 }

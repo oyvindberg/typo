@@ -18,7 +18,7 @@ object EViewFieldValue {
   case class id(override val value: Option[Int]) extends EViewFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends EViewFieldValue("businessentityid", value)
   case class emailaddressid(override val value: Option[Int]) extends EViewFieldValue("emailaddressid", value)
-  case class emailaddress(override val value: Option[String]) extends EViewFieldValue("emailaddress", value)
+  case class emailaddress(override val value: Option[/* max 50 chars */ String]) extends EViewFieldValue("emailaddress", value)
   case class rowguid(override val value: Option[UUID]) extends EViewFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends EViewFieldValue("modifieddate", value)
 }

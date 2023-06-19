@@ -61,11 +61,11 @@ object DViewRepoImpl extends DViewRepo {
     RowParser[DViewRow] { row =>
       Success(
         DViewRow(
-          title = row[Option[String]]("title"),
+          title = row[Option[/* max 50 chars */ String]]("title"),
           owner = row[Option[BusinessentityId]]("owner"),
           folderflag = row[Flag]("folderflag"),
-          filename = row[Option[String]]("filename"),
-          fileextension = row[Option[String]]("fileextension"),
+          filename = row[Option[/* max 400 chars */ String]]("filename"),
+          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
           revision = row[Option[/* bpchar */ String]]("revision"),
           changenumber = row[Option[Int]]("changenumber"),
           status = row[Option[Int]]("status"),

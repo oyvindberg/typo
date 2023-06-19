@@ -15,7 +15,7 @@ import io.circe.Json
 
 case class FootballClubRow(
   id: FootballClubId,
-  name: String
+  name: /* max 100 chars */ String
 )
 
 object FootballClubRow {
@@ -23,7 +23,7 @@ object FootballClubRow {
     (c: HCursor) =>
       for {
         id <- c.downField("id").as[FootballClubId]
-        name <- c.downField("name").as[String]
+        name <- c.downField("name").as[/* max 100 chars */ String]
       } yield FootballClubRow(id, name)
   implicit val encoder: Encoder[FootballClubRow] = {
     import io.circe.syntax._

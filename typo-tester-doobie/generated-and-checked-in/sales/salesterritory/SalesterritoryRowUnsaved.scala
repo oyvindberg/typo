@@ -25,7 +25,7 @@ case class SalesterritoryRowUnsaved(
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
-  group: String,
+  group: /* max 50 chars */ String,
   /** Default: nextval('sales.salesterritory_territoryid_seq'::regclass)
       Primary key for SalesTerritory records. */
   territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
@@ -87,7 +87,7 @@ object SalesterritoryRowUnsaved {
       for {
         name <- c.downField("name").as[Name]
         countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        group <- c.downField("group").as[String]
+        group <- c.downField("group").as[/* max 50 chars */ String]
         territoryid <- c.downField("territoryid").as[Defaulted[SalesterritoryId]]
         salesytd <- c.downField("salesytd").as[Defaulted[BigDecimal]]
         saleslastyear <- c.downField("saleslastyear").as[Defaulted[BigDecimal]]

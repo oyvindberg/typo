@@ -166,7 +166,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       Success(
         ProductdescriptionRow(
           productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
-          description = row[String]("description"),
+          description = row[/* max 400 chars */ String]("description"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

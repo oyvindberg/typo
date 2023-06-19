@@ -170,8 +170,8 @@ object PasswordRepoImpl extends PasswordRepo {
       Success(
         PasswordRow(
           businessentityid = row[BusinessentityId]("businessentityid"),
-          passwordhash = row[String]("passwordhash"),
-          passwordsalt = row[String]("passwordsalt"),
+          passwordhash = row[/* max 128 chars */ String]("passwordhash"),
+          passwordsalt = row[/* max 10 chars */ String]("passwordsalt"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

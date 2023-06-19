@@ -19,9 +19,9 @@ case class CreditcardRow(
   /** Primary key for CreditCard records. */
   creditcardid: CreditcardId,
   /** Credit card name. */
-  cardtype: String,
+  cardtype: /* max 50 chars */ String,
   /** Credit card number. */
-  cardnumber: String,
+  cardnumber: /* max 25 chars */ String,
   /** Credit card expiration month. */
   expmonth: Int,
   /** Credit card expiration year. */
@@ -46,8 +46,8 @@ object CreditcardRow {
         Try(
           CreditcardRow(
             creditcardid = json.\("creditcardid").as[CreditcardId],
-            cardtype = json.\("cardtype").as[String],
-            cardnumber = json.\("cardnumber").as[String],
+            cardtype = json.\("cardtype").as[/* max 50 chars */ String],
+            cardnumber = json.\("cardnumber").as[/* max 25 chars */ String],
             expmonth = json.\("expmonth").as[Int],
             expyear = json.\("expyear").as[Int],
             modifieddate = json.\("modifieddate").as[LocalDateTime]

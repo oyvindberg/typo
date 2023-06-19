@@ -19,15 +19,15 @@ import java.util.UUID
 
 case class DViewRow(
   /** Points to [[production.document.DocumentRow.title]] */
-  title: Option[String],
+  title: Option[/* max 50 chars */ String],
   /** Points to [[production.document.DocumentRow.owner]] */
   owner: Option[BusinessentityId],
   /** Points to [[production.document.DocumentRow.folderflag]] */
   folderflag: Flag,
   /** Points to [[production.document.DocumentRow.filename]] */
-  filename: Option[String],
+  filename: Option[/* max 400 chars */ String],
   /** Points to [[production.document.DocumentRow.fileextension]] */
-  fileextension: Option[String],
+  fileextension: Option[/* max 8 chars */ String],
   /** Points to [[production.document.DocumentRow.revision]] */
   revision: Option[/* bpchar */ String],
   /** Points to [[production.document.DocumentRow.changenumber]] */
@@ -50,11 +50,11 @@ object DViewRow {
   implicit val decoder: Decoder[DViewRow] =
     (c: HCursor) =>
       for {
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 50 chars */ String]]
         owner <- c.downField("owner").as[Option[BusinessentityId]]
         folderflag <- c.downField("folderflag").as[Flag]
-        filename <- c.downField("filename").as[Option[String]]
-        fileextension <- c.downField("fileextension").as[Option[String]]
+        filename <- c.downField("filename").as[Option[/* max 400 chars */ String]]
+        fileextension <- c.downField("fileextension").as[Option[/* max 8 chars */ String]]
         revision <- c.downField("revision").as[Option[/* bpchar */ String]]
         changenumber <- c.downField("changenumber").as[Option[Int]]
         status <- c.downField("status").as[Option[Int]]

@@ -18,7 +18,7 @@ sealed abstract class ProductinventoryFieldValue[T](name: String, value: T) exte
 object ProductinventoryFieldValue {
   case class productid(override val value: ProductId) extends ProductinventoryFieldOrIdValue("productid", value)
   case class locationid(override val value: LocationId) extends ProductinventoryFieldOrIdValue("locationid", value)
-  case class shelf(override val value: String) extends ProductinventoryFieldValue("shelf", value)
+  case class shelf(override val value: /* max 10 chars */ String) extends ProductinventoryFieldValue("shelf", value)
   case class bin(override val value: Int) extends ProductinventoryFieldValue("bin", value)
   case class quantity(override val value: Int) extends ProductinventoryFieldValue("quantity", value)
   case class rowguid(override val value: UUID) extends ProductinventoryFieldValue("rowguid", value)

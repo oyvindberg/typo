@@ -67,7 +67,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
           MachineHours = row[Option[BigDecimal]]("MachineHours"),
           LaborHours = row[Option[BigDecimal]]("LaborHours"),
           LotSize = row[Option[Int]]("LotSize"),
-          Step = row[Option[String]]("Step"),
+          Step = row[Option[/* max 1024 chars */ String]]("Step"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

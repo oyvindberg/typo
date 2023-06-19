@@ -18,9 +18,9 @@ sealed abstract class EmployeeFieldValue[T](name: String, value: T) extends Empl
 
 object EmployeeFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends EmployeeFieldOrIdValue("businessentityid", value)
-  case class nationalidnumber(override val value: String) extends EmployeeFieldValue("nationalidnumber", value)
-  case class loginid(override val value: String) extends EmployeeFieldValue("loginid", value)
-  case class jobtitle(override val value: String) extends EmployeeFieldValue("jobtitle", value)
+  case class nationalidnumber(override val value: /* max 15 chars */ String) extends EmployeeFieldValue("nationalidnumber", value)
+  case class loginid(override val value: /* max 256 chars */ String) extends EmployeeFieldValue("loginid", value)
+  case class jobtitle(override val value: /* max 50 chars */ String) extends EmployeeFieldValue("jobtitle", value)
   case class birthdate(override val value: LocalDate) extends EmployeeFieldValue("birthdate", value)
   case class maritalstatus(override val value: /* bpchar */ String) extends EmployeeFieldValue("maritalstatus", value)
   case class gender(override val value: /* bpchar */ String) extends EmployeeFieldValue("gender", value)

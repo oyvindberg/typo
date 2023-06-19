@@ -42,25 +42,25 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
     new Read[PersonDetailSqlRow](
       gets = List(
         (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
         (Get[Name], Nullability.NoNulls),
         (Get[Name], Nullability.Nullable),
         (Get[Name], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[/* max 60 chars */ String], Nullability.NoNulls),
+        (Get[/* max 30 chars */ String], Nullability.NoNulls),
+        (Get[/* max 15 chars */ String], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
         businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        title = Get[String].unsafeGetNullable(rs, i + 1),
+        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
         firstname = Get[Name].unsafeGetNonNullable(rs, i + 2),
         middlename = Get[Name].unsafeGetNullable(rs, i + 3),
         lastname = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        jobtitle = Get[String].unsafeGetNonNullable(rs, i + 5),
-        addressline1 = Get[String].unsafeGetNonNullable(rs, i + 6),
-        city = Get[String].unsafeGetNonNullable(rs, i + 7),
-        postalcode = Get[String].unsafeGetNonNullable(rs, i + 8)
+        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 5),
+        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 6),
+        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 7),
+        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 8)
       )
     )
   

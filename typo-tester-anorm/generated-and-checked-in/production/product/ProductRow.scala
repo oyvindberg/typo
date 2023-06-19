@@ -27,13 +27,13 @@ case class ProductRow(
   /** Name of the product. */
   name: Name,
   /** Unique product identification number. */
-  productnumber: String,
+  productnumber: /* max 25 chars */ String,
   /** 0 = Product is purchased, 1 = Product is manufactured in-house. */
   makeflag: Flag,
   /** 0 = Product is not a salable item. 1 = Product is salable. */
   finishedgoodsflag: Flag,
   /** Product color. */
-  color: Option[String],
+  color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
   safetystocklevel: Int,
   /** Inventory level that triggers a purchase order or work order. */
@@ -43,7 +43,7 @@ case class ProductRow(
   /** Selling price. */
   listprice: BigDecimal,
   /** Product size. */
-  size: Option[String],
+  size: Option[/* max 5 chars */ String],
   /** Unit of measure for Size column.
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   sizeunitmeasurecode: Option[UnitmeasureId],
@@ -113,15 +113,15 @@ object ProductRow {
           ProductRow(
             productid = json.\("productid").as[ProductId],
             name = json.\("name").as[Name],
-            productnumber = json.\("productnumber").as[String],
+            productnumber = json.\("productnumber").as[/* max 25 chars */ String],
             makeflag = json.\("makeflag").as[Flag],
             finishedgoodsflag = json.\("finishedgoodsflag").as[Flag],
-            color = json.\("color").toOption.map(_.as[String]),
+            color = json.\("color").toOption.map(_.as[/* max 15 chars */ String]),
             safetystocklevel = json.\("safetystocklevel").as[Int],
             reorderpoint = json.\("reorderpoint").as[Int],
             standardcost = json.\("standardcost").as[BigDecimal],
             listprice = json.\("listprice").as[BigDecimal],
-            size = json.\("size").toOption.map(_.as[String]),
+            size = json.\("size").toOption.map(_.as[/* max 5 chars */ String]),
             sizeunitmeasurecode = json.\("sizeunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             weightunitmeasurecode = json.\("weightunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             weight = json.\("weight").toOption.map(_.as[BigDecimal]),

@@ -63,7 +63,7 @@ object StViewRepoImpl extends StViewRepo {
           territoryid = row[Option[SalesterritoryId]]("territoryid"),
           name = row[Option[Name]]("name"),
           countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          group = row[Option[String]]("group"),
+          group = row[Option[/* max 50 chars */ String]]("group"),
           salesytd = row[Option[BigDecimal]]("salesytd"),
           saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
           costytd = row[Option[BigDecimal]]("costytd"),

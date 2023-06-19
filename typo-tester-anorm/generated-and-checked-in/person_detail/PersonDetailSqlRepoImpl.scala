@@ -40,14 +40,14 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
       Success(
         PersonDetailSqlRow(
           businessentityid = row[BusinessentityId]("businessentityid"),
-          title = row[Option[String]]("title"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
           firstname = row[Name]("firstname"),
           middlename = row[Option[Name]]("middlename"),
           lastname = row[Name]("lastname"),
-          jobtitle = row[String]("jobtitle"),
-          addressline1 = row[String]("addressline1"),
-          city = row[String]("city"),
-          postalcode = row[String]("postalcode")
+          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
+          addressline1 = row[/* max 60 chars */ String]("addressline1"),
+          city = row[/* max 30 chars */ String]("city"),
+          postalcode = row[/* max 15 chars */ String]("postalcode")
         )
       )
     }

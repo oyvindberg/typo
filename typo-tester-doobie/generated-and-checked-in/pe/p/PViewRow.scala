@@ -27,7 +27,7 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.namestyle]] */
   namestyle: NameStyle,
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Option[Name],
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -35,7 +35,7 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Option[Name],
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int],
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
@@ -56,11 +56,11 @@ object PViewRow {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
         persontype <- c.downField("persontype").as[Option[/* bpchar */ String]]
         namestyle <- c.downField("namestyle").as[NameStyle]
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
         firstname <- c.downField("firstname").as[Option[Name]]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[String]]
+        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
         emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
         additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
         demographics <- c.downField("demographics").as[Option[TypoXml]]

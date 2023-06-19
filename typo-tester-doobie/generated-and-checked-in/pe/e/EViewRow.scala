@@ -22,7 +22,7 @@ case class EViewRow(
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
   emailaddressid: Option[Int],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.emailaddress.EmailaddressRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.emailaddress.EmailaddressRow.modifieddate]] */
@@ -36,7 +36,7 @@ object EViewRow {
         id <- c.downField("id").as[Option[Int]]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
         emailaddressid <- c.downField("emailaddressid").as[Option[Int]]
-        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield EViewRow(id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)

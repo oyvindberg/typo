@@ -247,9 +247,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
       Success(
         EmployeeRow(
           businessentityid = row[BusinessentityId]("businessentityid"),
-          nationalidnumber = row[String]("nationalidnumber"),
-          loginid = row[String]("loginid"),
-          jobtitle = row[String]("jobtitle"),
+          nationalidnumber = row[/* max 15 chars */ String]("nationalidnumber"),
+          loginid = row[/* max 256 chars */ String]("loginid"),
+          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
           birthdate = row[LocalDate]("birthdate"),
           maritalstatus = row[/* bpchar */ String]("maritalstatus"),
           gender = row[/* bpchar */ String]("gender"),

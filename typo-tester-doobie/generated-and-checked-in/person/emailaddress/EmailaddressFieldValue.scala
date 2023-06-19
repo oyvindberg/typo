@@ -17,7 +17,7 @@ sealed abstract class EmailaddressFieldValue[T](name: String, value: T) extends 
 object EmailaddressFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends EmailaddressFieldOrIdValue("businessentityid", value)
   case class emailaddressid(override val value: Int) extends EmailaddressFieldOrIdValue("emailaddressid", value)
-  case class emailaddress(override val value: Option[String]) extends EmailaddressFieldValue("emailaddress", value)
+  case class emailaddress(override val value: Option[/* max 50 chars */ String]) extends EmailaddressFieldValue("emailaddress", value)
   case class rowguid(override val value: UUID) extends EmailaddressFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends EmailaddressFieldValue("modifieddate", value)
 }

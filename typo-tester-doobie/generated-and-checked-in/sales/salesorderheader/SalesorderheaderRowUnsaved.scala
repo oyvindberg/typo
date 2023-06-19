@@ -57,14 +57,14 @@ case class SalesorderheaderRowUnsaved(
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Approval code provided by the credit card company. */
-  creditcardapprovalcode: Option[String],
+  creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
       Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
-  comment: Option[String],
+  comment: Option[/* max 128 chars */ String],
   /** Default: nextval('sales.salesorderheader_salesorderid_seq'::regclass)
       Primary key. */
   salesorderid: Defaulted[SalesorderheaderId] = Defaulted.UseDefault,
@@ -168,10 +168,10 @@ object SalesorderheaderRowUnsaved {
         shiptoaddressid <- c.downField("shiptoaddressid").as[AddressId]
         shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
         creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[String]]
+        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[/* max 15 chars */ String]]
         currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
         totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
-        comment <- c.downField("comment").as[Option[String]]
+        comment <- c.downField("comment").as[Option[/* max 128 chars */ String]]
         salesorderid <- c.downField("salesorderid").as[Defaulted[SalesorderheaderId]]
         revisionnumber <- c.downField("revisionnumber").as[Defaulted[Int]]
         orderdate <- c.downField("orderdate").as[Defaulted[LocalDateTime]]

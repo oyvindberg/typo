@@ -163,22 +163,22 @@ object AddressRepoImpl extends AddressRepo {
     new Read[AddressRow](
       gets = List(
         (Get[AddressId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 60 chars */ String], Nullability.NoNulls),
+        (Get[/* max 60 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.NoNulls),
         (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 15 chars */ String], Nullability.NoNulls),
         (Get[Array[Byte]], Nullability.Nullable),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
         addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
-        addressline1 = Get[String].unsafeGetNonNullable(rs, i + 1),
-        addressline2 = Get[String].unsafeGetNullable(rs, i + 2),
-        city = Get[String].unsafeGetNonNullable(rs, i + 3),
+        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
+        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
         stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
-        postalcode = Get[String].unsafeGetNonNullable(rs, i + 5),
+        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
         spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)

@@ -62,7 +62,7 @@ object SodViewRepoImpl extends SodViewRepo {
           id = row[Option[Int]]("id"),
           salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
           salesorderdetailid = row[Option[Int]]("salesorderdetailid"),
-          carriertrackingnumber = row[Option[String]]("carriertrackingnumber"),
+          carriertrackingnumber = row[Option[/* max 25 chars */ String]]("carriertrackingnumber"),
           orderqty = row[Option[Int]]("orderqty"),
           productid = row[Option[ProductId]]("productid"),
           specialofferid = row[Option[SpecialofferId]]("specialofferid"),

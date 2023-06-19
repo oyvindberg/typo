@@ -59,18 +59,18 @@ object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo
       Success(
         VjobcandidateeducationViewRow(
           jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          `Edu.Level` = row[Option[String]]("Edu.Level"),
+          `Edu.Level` = row[Option[/* max 50 chars */ String]]("Edu.Level"),
           `Edu.StartDate` = row[Option[LocalDate]]("Edu.StartDate"),
           `Edu.EndDate` = row[Option[LocalDate]]("Edu.EndDate"),
-          `Edu.Degree` = row[Option[String]]("Edu.Degree"),
-          `Edu.Major` = row[Option[String]]("Edu.Major"),
-          `Edu.Minor` = row[Option[String]]("Edu.Minor"),
-          `Edu.GPA` = row[Option[String]]("Edu.GPA"),
-          `Edu.GPAScale` = row[Option[String]]("Edu.GPAScale"),
-          `Edu.School` = row[Option[String]]("Edu.School"),
-          `Edu.Loc.CountryRegion` = row[Option[String]]("Edu.Loc.CountryRegion"),
-          `Edu.Loc.State` = row[Option[String]]("Edu.Loc.State"),
-          `Edu.Loc.City` = row[Option[String]]("Edu.Loc.City")
+          `Edu.Degree` = row[Option[/* max 50 chars */ String]]("Edu.Degree"),
+          `Edu.Major` = row[Option[/* max 50 chars */ String]]("Edu.Major"),
+          `Edu.Minor` = row[Option[/* max 50 chars */ String]]("Edu.Minor"),
+          `Edu.GPA` = row[Option[/* max 5 chars */ String]]("Edu.GPA"),
+          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]]("Edu.GPAScale"),
+          `Edu.School` = row[Option[/* max 100 chars */ String]]("Edu.School"),
+          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Edu.Loc.CountryRegion"),
+          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]]("Edu.Loc.State"),
+          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]]("Edu.Loc.City")
         )
       )
     }

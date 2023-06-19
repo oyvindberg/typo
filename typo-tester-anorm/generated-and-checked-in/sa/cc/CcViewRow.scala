@@ -21,9 +21,9 @@ case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
-  cardtype: Option[String],
+  cardtype: Option[/* max 50 chars */ String],
   /** Points to [[sales.creditcard.CreditcardRow.cardnumber]] */
-  cardnumber: Option[String],
+  cardnumber: Option[/* max 25 chars */ String],
   /** Points to [[sales.creditcard.CreditcardRow.expmonth]] */
   expmonth: Option[Int],
   /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
@@ -51,8 +51,8 @@ object CcViewRow {
           CcViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            cardtype = json.\("cardtype").toOption.map(_.as[String]),
-            cardnumber = json.\("cardnumber").toOption.map(_.as[String]),
+            cardtype = json.\("cardtype").toOption.map(_.as[/* max 50 chars */ String]),
+            cardnumber = json.\("cardnumber").toOption.map(_.as[/* max 25 chars */ String]),
             expmonth = json.\("expmonth").toOption.map(_.as[Int]),
             expyear = json.\("expyear").toOption.map(_.as[Int]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

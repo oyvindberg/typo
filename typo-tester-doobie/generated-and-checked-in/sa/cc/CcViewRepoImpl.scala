@@ -42,8 +42,8 @@ object CcViewRepoImpl extends CcViewRepo {
       gets = List(
         (Get[Int], Nullability.Nullable),
         (Get[CreditcardId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[/* max 25 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
@@ -51,8 +51,8 @@ object CcViewRepoImpl extends CcViewRepo {
       unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 1),
-        cardtype = Get[String].unsafeGetNullable(rs, i + 2),
-        cardnumber = Get[String].unsafeGetNullable(rs, i + 3),
+        cardtype = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+        cardnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
         expmonth = Get[Int].unsafeGetNullable(rs, i + 4),
         expyear = Get[Int].unsafeGetNullable(rs, i + 5),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)

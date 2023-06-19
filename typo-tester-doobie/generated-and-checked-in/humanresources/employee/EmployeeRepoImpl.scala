@@ -213,9 +213,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
     new Read[EmployeeRow](
       gets = List(
         (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 15 chars */ String], Nullability.NoNulls),
+        (Get[/* max 256 chars */ String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
         (Get[LocalDate], Nullability.NoNulls),
         (Get[/* bpchar */ String], Nullability.NoNulls),
         (Get[/* bpchar */ String], Nullability.NoNulls),
@@ -230,9 +230,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
       ),
       unsafeGet = (rs: ResultSet, i: Int) => EmployeeRow(
         businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        nationalidnumber = Get[String].unsafeGetNonNullable(rs, i + 1),
-        loginid = Get[String].unsafeGetNonNullable(rs, i + 2),
-        jobtitle = Get[String].unsafeGetNonNullable(rs, i + 3),
+        nationalidnumber = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        loginid = Get[/* max 256 chars */ String].unsafeGetNonNullable(rs, i + 2),
+        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
         birthdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 4),
         maritalstatus = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
         gender = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 6),

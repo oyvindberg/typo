@@ -23,14 +23,14 @@ case class VvendorwithaddressesViewRow(
   name: Option[Name],
   addresstype: Option[Name],
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[String],
+  addressline1: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[String],
+  city: Option[/* max 30 chars */ String],
   stateprovincename: Option[Name],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[String],
+  postalcode: Option[/* max 15 chars */ String],
   countryregionname: Option[Name]
 )
 
@@ -56,11 +56,11 @@ object VvendorwithaddressesViewRow {
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             name = json.\("name").toOption.map(_.as[Name]),
             addresstype = json.\("addresstype").toOption.map(_.as[Name]),
-            addressline1 = json.\("addressline1").toOption.map(_.as[String]),
-            addressline2 = json.\("addressline2").toOption.map(_.as[String]),
-            city = json.\("city").toOption.map(_.as[String]),
+            addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
+            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+            city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
             stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
-            postalcode = json.\("postalcode").toOption.map(_.as[String]),
+            postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
             countryregionname = json.\("countryregionname").toOption.map(_.as[Name])
           )
         )

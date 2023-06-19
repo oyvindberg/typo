@@ -27,7 +27,7 @@ case class SalesterritoryRow(
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
-  group: String,
+  group: /* max 50 chars */ String,
   /** Sales in the territory year to date. */
   salesytd: BigDecimal,
   /** Sales in the territory the previous year. */
@@ -63,7 +63,7 @@ object SalesterritoryRow {
             territoryid = json.\("territoryid").as[SalesterritoryId],
             name = json.\("name").as[Name],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            group = json.\("group").as[String],
+            group = json.\("group").as[/* max 50 chars */ String],
             salesytd = json.\("salesytd").as[BigDecimal],
             saleslastyear = json.\("saleslastyear").as[BigDecimal],
             costytd = json.\("costytd").as[BigDecimal],

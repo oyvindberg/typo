@@ -22,7 +22,7 @@ case class VstorewithcontactsViewRow(
   name: Option[Name],
   contacttype: Option[Name],
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Option[Name],
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -30,12 +30,12 @@ case class VstorewithcontactsViewRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Option[Name],
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
   phonenumber: Option[Phone],
   phonenumbertype: Option[Name],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int]
 )
@@ -47,14 +47,14 @@ object VstorewithcontactsViewRow {
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
         name <- c.downField("name").as[Option[Name]]
         contacttype <- c.downField("contacttype").as[Option[Name]]
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
         firstname <- c.downField("firstname").as[Option[Name]]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[String]]
+        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
         phonenumber <- c.downField("phonenumber").as[Option[Phone]]
         phonenumbertype <- c.downField("phonenumbertype").as[Option[Name]]
-        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
         emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
       } yield VstorewithcontactsViewRow(businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion)
   implicit val encoder: Encoder[VstorewithcontactsViewRow] = {

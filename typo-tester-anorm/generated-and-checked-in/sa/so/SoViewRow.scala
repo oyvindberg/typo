@@ -22,13 +22,13 @@ case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
   specialofferid: Option[SpecialofferId],
   /** Points to [[sales.specialoffer.SpecialofferRow.description]] */
-  description: Option[String],
+  description: Option[/* max 255 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.discountpct]] */
   discountpct: Option[BigDecimal],
   /** Points to [[sales.specialoffer.SpecialofferRow.type]] */
-  `type`: Option[String],
+  `type`: Option[/* max 50 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.category]] */
-  category: Option[String],
+  category: Option[/* max 50 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.startdate]] */
   startdate: Option[LocalDateTime],
   /** Points to [[sales.specialoffer.SpecialofferRow.enddate]] */
@@ -67,10 +67,10 @@ object SoViewRow {
           SoViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
-            description = json.\("description").toOption.map(_.as[String]),
+            description = json.\("description").toOption.map(_.as[/* max 255 chars */ String]),
             discountpct = json.\("discountpct").toOption.map(_.as[BigDecimal]),
-            `type` = json.\("type").toOption.map(_.as[String]),
-            category = json.\("category").toOption.map(_.as[String]),
+            `type` = json.\("type").toOption.map(_.as[/* max 50 chars */ String]),
+            category = json.\("category").toOption.map(_.as[/* max 50 chars */ String]),
             startdate = json.\("startdate").toOption.map(_.as[LocalDateTime]),
             enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
             minqty = json.\("minqty").toOption.map(_.as[Int]),

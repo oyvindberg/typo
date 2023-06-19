@@ -52,7 +52,7 @@ object VViewRepoImpl extends VViewRepo {
         (Get[Int], Nullability.Nullable),
         (Get[Flag], Nullability.NoNulls),
         (Get[Flag], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 1024 chars */ String], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
@@ -63,7 +63,7 @@ object VViewRepoImpl extends VViewRepo {
         creditrating = Get[Int].unsafeGetNullable(rs, i + 4),
         preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 5),
         activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
-        purchasingwebserviceurl = Get[String].unsafeGetNullable(rs, i + 7),
+        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 7),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
       )
     )

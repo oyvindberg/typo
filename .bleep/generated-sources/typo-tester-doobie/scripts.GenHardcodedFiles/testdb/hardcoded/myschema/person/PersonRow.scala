@@ -20,15 +20,15 @@ case class PersonRow(
   id: PersonId,
   /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
-  name: String,
-  nickName: Option[String],
-  blogUrl: Option[String],
-  email: String,
-  phone: String,
+  name: /* max 100 chars */ String,
+  nickName: Option[/* max 30 chars */ String],
+  blogUrl: Option[/* max 100 chars */ String],
+  email: /* max 254 chars */ String,
+  phone: /* max 8 chars */ String,
   likesPizza: Boolean,
   /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
-  workEmail: Option[String],
+  workEmail: Option[/* max 254 chars */ String],
   sector: Sector
 )
 
@@ -38,14 +38,14 @@ object PersonRow {
       for {
         id <- c.downField("id").as[PersonId]
         favouriteFootballClubId <- c.downField("favourite_football_club_id").as[FootballClubId]
-        name <- c.downField("name").as[String]
-        nickName <- c.downField("nick_name").as[Option[String]]
-        blogUrl <- c.downField("blog_url").as[Option[String]]
-        email <- c.downField("email").as[String]
-        phone <- c.downField("phone").as[String]
+        name <- c.downField("name").as[/* max 100 chars */ String]
+        nickName <- c.downField("nick_name").as[Option[/* max 30 chars */ String]]
+        blogUrl <- c.downField("blog_url").as[Option[/* max 100 chars */ String]]
+        email <- c.downField("email").as[/* max 254 chars */ String]
+        phone <- c.downField("phone").as[/* max 8 chars */ String]
         likesPizza <- c.downField("likes_pizza").as[Boolean]
         maritalStatusId <- c.downField("marital_status_id").as[MaritalStatusId]
-        workEmail <- c.downField("work_email").as[Option[String]]
+        workEmail <- c.downField("work_email").as[Option[/* max 254 chars */ String]]
         sector <- c.downField("sector").as[Sector]
       } yield PersonRow(id, favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, maritalStatusId, workEmail, sector)
   implicit val encoder: Encoder[PersonRow] = {

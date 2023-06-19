@@ -22,7 +22,7 @@ case class EmailaddressRowUnsaved(
       Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** E-mail address for the person. */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Default: nextval('person.emailaddress_emailaddressid_seq'::regclass)
       Primary key. ID of this email address. */
   emailaddressid: Defaulted[Int] = Defaulted.UseDefault,
@@ -54,7 +54,7 @@ object EmailaddressRowUnsaved {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
         emailaddressid <- c.downField("emailaddressid").as[Defaulted[Int]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]

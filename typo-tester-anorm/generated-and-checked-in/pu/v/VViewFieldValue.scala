@@ -24,6 +24,6 @@ object VViewFieldValue {
   case class creditrating(override val value: Option[Int]) extends VViewFieldValue("creditrating", value)
   case class preferredvendorstatus(override val value: Flag) extends VViewFieldValue("preferredvendorstatus", value)
   case class activeflag(override val value: Flag) extends VViewFieldValue("activeflag", value)
-  case class purchasingwebserviceurl(override val value: Option[String]) extends VViewFieldValue("purchasingwebserviceurl", value)
+  case class purchasingwebserviceurl(override val value: Option[/* max 1024 chars */ String]) extends VViewFieldValue("purchasingwebserviceurl", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends VViewFieldValue("modifieddate", value)
 }

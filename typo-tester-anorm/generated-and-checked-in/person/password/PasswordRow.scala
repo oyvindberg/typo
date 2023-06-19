@@ -21,9 +21,9 @@ case class PasswordRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Password for the e-mail account. */
-  passwordhash: String,
+  passwordhash: /* max 128 chars */ String,
   /** Random value concatenated with the password string before the password is hashed. */
-  passwordsalt: String,
+  passwordsalt: /* max 10 chars */ String,
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -44,8 +44,8 @@ object PasswordRow {
         Try(
           PasswordRow(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            passwordhash = json.\("passwordhash").as[String],
-            passwordsalt = json.\("passwordsalt").as[String],
+            passwordhash = json.\("passwordhash").as[/* max 128 chars */ String],
+            passwordsalt = json.\("passwordsalt").as[/* max 10 chars */ String],
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

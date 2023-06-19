@@ -15,5 +15,5 @@ sealed abstract class FootballClubFieldValue[T](name: String, value: T) extends 
 
 object FootballClubFieldValue {
   case class id(override val value: FootballClubId) extends FootballClubFieldOrIdValue("id", value)
-  case class name(override val value: String) extends FootballClubFieldValue("name", value)
+  case class name(override val value: /* max 100 chars */ String) extends FootballClubFieldValue("name", value)
 }

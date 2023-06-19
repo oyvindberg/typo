@@ -169,7 +169,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       gets = List(
         (Get[SalesorderheaderId], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 25 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.NoNulls),
         (Get[ProductId], Nullability.NoNulls),
         (Get[SpecialofferId], Nullability.NoNulls),
@@ -181,7 +181,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       unsafeGet = (rs: ResultSet, i: Int) => SalesorderdetailRow(
         salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
         salesorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        carriertrackingnumber = Get[String].unsafeGetNullable(rs, i + 2),
+        carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 2),
         orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
         productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
         specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 5),

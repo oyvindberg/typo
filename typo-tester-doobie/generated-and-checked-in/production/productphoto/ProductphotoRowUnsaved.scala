@@ -19,11 +19,11 @@ case class ProductphotoRowUnsaved(
   /** Small image of the product. */
   thumbnailphoto: Option[Array[Byte]],
   /** Small image file name. */
-  thumbnailphotofilename: Option[String],
+  thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
-  largephotofilename: Option[String],
+  largephotofilename: Option[/* max 50 chars */ String],
   /** Default: nextval('production.productphoto_productphotoid_seq'::regclass)
       Primary key for ProductPhoto records. */
   productphotoid: Defaulted[ProductphotoId] = Defaulted.UseDefault,
@@ -51,9 +51,9 @@ object ProductphotoRowUnsaved {
     (c: HCursor) =>
       for {
         thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Array[Byte]]]
-        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[String]]
+        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[/* max 50 chars */ String]]
         largephoto <- c.downField("largephoto").as[Option[Array[Byte]]]
-        largephotofilename <- c.downField("largephotofilename").as[Option[String]]
+        largephotofilename <- c.downField("largephotofilename").as[Option[/* max 50 chars */ String]]
         productphotoid <- c.downField("productphotoid").as[Defaulted[ProductphotoId]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
       } yield ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)

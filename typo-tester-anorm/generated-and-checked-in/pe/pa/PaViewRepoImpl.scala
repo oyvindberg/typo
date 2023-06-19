@@ -54,8 +54,8 @@ object PaViewRepoImpl extends PaViewRepo {
         PaViewRow(
           id = row[Option[Int]]("id"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          passwordhash = row[Option[String]]("passwordhash"),
-          passwordsalt = row[Option[String]]("passwordsalt"),
+          passwordhash = row[Option[/* max 128 chars */ String]]("passwordhash"),
+          passwordsalt = row[Option[/* max 10 chars */ String]]("passwordsalt"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

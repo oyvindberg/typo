@@ -20,14 +20,14 @@ import java.util.UUID
 /** This class corresponds to a row in table `production.document` which has not been persisted yet */
 case class DocumentRowUnsaved(
   /** Title of the document. */
-  title: String,
+  title: /* max 50 chars */ String,
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId,
   /** File name of the document */
-  filename: String,
+  filename: /* max 400 chars */ String,
   /** File extension indicating the document type. For example, .doc or .txt. */
-  fileextension: Option[String],
+  fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
   revision: /* bpchar */ String,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
@@ -87,10 +87,10 @@ object DocumentRowUnsaved {
   implicit val decoder: Decoder[DocumentRowUnsaved] =
     (c: HCursor) =>
       for {
-        title <- c.downField("title").as[String]
+        title <- c.downField("title").as[/* max 50 chars */ String]
         owner <- c.downField("owner").as[BusinessentityId]
-        filename <- c.downField("filename").as[String]
-        fileextension <- c.downField("fileextension").as[Option[String]]
+        filename <- c.downField("filename").as[/* max 400 chars */ String]
+        fileextension <- c.downField("fileextension").as[Option[/* max 8 chars */ String]]
         revision <- c.downField("revision").as[/* bpchar */ String]
         status <- c.downField("status").as[Int]
         documentsummary <- c.downField("documentsummary").as[Option[String]]

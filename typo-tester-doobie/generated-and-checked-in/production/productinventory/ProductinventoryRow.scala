@@ -24,7 +24,7 @@ case class ProductinventoryRow(
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
   /** Storage compartment within an inventory location. */
-  shelf: String,
+  shelf: /* max 10 chars */ String,
   /** Storage container on a shelf in an inventory location. */
   bin: Int,
   /** Quantity of products in the inventory location. */
@@ -41,7 +41,7 @@ object ProductinventoryRow {
       for {
         productid <- c.downField("productid").as[ProductId]
         locationid <- c.downField("locationid").as[LocationId]
-        shelf <- c.downField("shelf").as[String]
+        shelf <- c.downField("shelf").as[/* max 10 chars */ String]
         bin <- c.downField("bin").as[Int]
         quantity <- c.downField("quantity").as[Int]
         rowguid <- c.downField("rowguid").as[UUID]

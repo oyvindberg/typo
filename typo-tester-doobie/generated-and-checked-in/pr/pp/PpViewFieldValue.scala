@@ -17,8 +17,8 @@ object PpViewFieldValue {
   case class id(override val value: Option[Int]) extends PpViewFieldValue("id", value)
   case class productphotoid(override val value: Option[ProductphotoId]) extends PpViewFieldValue("productphotoid", value)
   case class thumbnailphoto(override val value: Option[Byte]) extends PpViewFieldValue("thumbnailphoto", value)
-  case class thumbnailphotofilename(override val value: Option[String]) extends PpViewFieldValue("thumbnailphotofilename", value)
+  case class thumbnailphotofilename(override val value: Option[/* max 50 chars */ String]) extends PpViewFieldValue("thumbnailphotofilename", value)
   case class largephoto(override val value: Option[Byte]) extends PpViewFieldValue("largephoto", value)
-  case class largephotofilename(override val value: Option[String]) extends PpViewFieldValue("largephotofilename", value)
+  case class largephotofilename(override val value: Option[/* max 50 chars */ String]) extends PpViewFieldValue("largephotofilename", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PpViewFieldValue("modifieddate", value)
 }

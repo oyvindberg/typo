@@ -20,13 +20,13 @@ case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
   specialofferid: Option[SpecialofferId],
   /** Points to [[sales.specialoffer.SpecialofferRow.description]] */
-  description: Option[String],
+  description: Option[/* max 255 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.discountpct]] */
   discountpct: Option[BigDecimal],
   /** Points to [[sales.specialoffer.SpecialofferRow.type]] */
-  `type`: Option[String],
+  `type`: Option[/* max 50 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.category]] */
-  category: Option[String],
+  category: Option[/* max 50 chars */ String],
   /** Points to [[sales.specialoffer.SpecialofferRow.startdate]] */
   startdate: Option[LocalDateTime],
   /** Points to [[sales.specialoffer.SpecialofferRow.enddate]] */
@@ -47,10 +47,10 @@ object SoViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         specialofferid <- c.downField("specialofferid").as[Option[SpecialofferId]]
-        description <- c.downField("description").as[Option[String]]
+        description <- c.downField("description").as[Option[/* max 255 chars */ String]]
         discountpct <- c.downField("discountpct").as[Option[BigDecimal]]
-        `type` <- c.downField("type").as[Option[String]]
-        category <- c.downField("category").as[Option[String]]
+        `type` <- c.downField("type").as[Option[/* max 50 chars */ String]]
+        category <- c.downField("category").as[Option[/* max 50 chars */ String]]
         startdate <- c.downField("startdate").as[Option[LocalDateTime]]
         enddate <- c.downField("enddate").as[Option[LocalDateTime]]
         minqty <- c.downField("minqty").as[Option[Int]]

@@ -16,11 +16,11 @@ sealed abstract class VemployeedepartmenthistoryViewFieldValue[T](name: String, 
 
 object VemployeedepartmenthistoryViewFieldValue {
   case class businessentityid(override val value: Option[BusinessentityId]) extends VemployeedepartmenthistoryViewFieldValue("businessentityid", value)
-  case class title(override val value: Option[String]) extends VemployeedepartmenthistoryViewFieldValue("title", value)
+  case class title(override val value: Option[/* max 8 chars */ String]) extends VemployeedepartmenthistoryViewFieldValue("title", value)
   case class firstname(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("firstname", value)
   case class middlename(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("middlename", value)
   case class lastname(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("lastname", value)
-  case class suffix(override val value: Option[String]) extends VemployeedepartmenthistoryViewFieldValue("suffix", value)
+  case class suffix(override val value: Option[/* max 10 chars */ String]) extends VemployeedepartmenthistoryViewFieldValue("suffix", value)
   case class shift(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("shift", value)
   case class department(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("department", value)
   case class groupname(override val value: Option[Name]) extends VemployeedepartmenthistoryViewFieldValue("groupname", value)

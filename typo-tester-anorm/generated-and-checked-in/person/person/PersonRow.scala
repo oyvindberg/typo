@@ -29,7 +29,7 @@ case class PersonRow(
   /** 0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: NameStyle,
   /** A courtesy title. For example, Mr. or Ms. */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** First name of the person. */
   firstname: Name,
   /** Middle name or middle initial of the person. */
@@ -37,7 +37,7 @@ case class PersonRow(
   /** Last name of the person. */
   lastname: Name,
   /** Surname suffix. For example, Sr. or Jr. */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** 0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners. */
   emailpromotion: Int,
   /** Additional contact information about the person stored in xml format. */
@@ -74,11 +74,11 @@ object PersonRow {
             businessentityid = json.\("businessentityid").as[BusinessentityId],
             persontype = json.\("persontype").as[/* bpchar */ String],
             namestyle = json.\("namestyle").as[NameStyle],
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
             firstname = json.\("firstname").as[Name],
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").as[Name],
-            suffix = json.\("suffix").toOption.map(_.as[String]),
+            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
             emailpromotion = json.\("emailpromotion").as[Int],
             additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
             demographics = json.\("demographics").toOption.map(_.as[TypoXml]),

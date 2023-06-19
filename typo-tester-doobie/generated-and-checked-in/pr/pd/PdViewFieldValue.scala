@@ -17,7 +17,7 @@ sealed abstract class PdViewFieldValue[T](name: String, value: T) extends PdView
 object PdViewFieldValue {
   case class id(override val value: Option[Int]) extends PdViewFieldValue("id", value)
   case class productdescriptionid(override val value: Option[ProductdescriptionId]) extends PdViewFieldValue("productdescriptionid", value)
-  case class description(override val value: Option[String]) extends PdViewFieldValue("description", value)
+  case class description(override val value: Option[/* max 400 chars */ String]) extends PdViewFieldValue("description", value)
   case class rowguid(override val value: Option[UUID]) extends PdViewFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PdViewFieldValue("modifieddate", value)
 }

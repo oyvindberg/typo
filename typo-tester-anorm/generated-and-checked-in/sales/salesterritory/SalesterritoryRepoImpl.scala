@@ -218,7 +218,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           territoryid = row[SalesterritoryId]("territoryid"),
           name = row[Name]("name"),
           countryregioncode = row[CountryregionId]("countryregioncode"),
-          group = row[String]("group"),
+          group = row[/* max 50 chars */ String]("group"),
           salesytd = row[BigDecimal]("salesytd"),
           saleslastyear = row[BigDecimal]("saleslastyear"),
           costytd = row[BigDecimal]("costytd"),

@@ -17,10 +17,10 @@ sealed abstract class SoViewFieldValue[T](name: String, value: T) extends SoView
 object SoViewFieldValue {
   case class id(override val value: Option[Int]) extends SoViewFieldValue("id", value)
   case class specialofferid(override val value: Option[SpecialofferId]) extends SoViewFieldValue("specialofferid", value)
-  case class description(override val value: Option[String]) extends SoViewFieldValue("description", value)
+  case class description(override val value: Option[/* max 255 chars */ String]) extends SoViewFieldValue("description", value)
   case class discountpct(override val value: Option[BigDecimal]) extends SoViewFieldValue("discountpct", value)
-  case class `type`(override val value: Option[String]) extends SoViewFieldValue("type", value)
-  case class category(override val value: Option[String]) extends SoViewFieldValue("category", value)
+  case class `type`(override val value: Option[/* max 50 chars */ String]) extends SoViewFieldValue("type", value)
+  case class category(override val value: Option[/* max 50 chars */ String]) extends SoViewFieldValue("category", value)
   case class startdate(override val value: Option[LocalDateTime]) extends SoViewFieldValue("startdate", value)
   case class enddate(override val value: Option[LocalDateTime]) extends SoViewFieldValue("enddate", value)
   case class minqty(override val value: Option[Int]) extends SoViewFieldValue("minqty", value)

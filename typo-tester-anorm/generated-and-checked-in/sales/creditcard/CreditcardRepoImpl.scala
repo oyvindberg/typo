@@ -174,8 +174,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
       Success(
         CreditcardRow(
           creditcardid = row[CreditcardId]("creditcardid"),
-          cardtype = row[String]("cardtype"),
-          cardnumber = row[String]("cardnumber"),
+          cardtype = row[/* max 50 chars */ String]("cardtype"),
+          cardnumber = row[/* max 25 chars */ String]("cardnumber"),
           expmonth = row[Int]("expmonth"),
           expyear = row[Int]("expyear"),
           modifieddate = row[LocalDateTime]("modifieddate")

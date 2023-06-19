@@ -19,16 +19,16 @@ case class AddressRow(
   /** Primary key for Address records. */
   addressid: AddressId,
   /** First street address line. */
-  addressline1: String,
+  addressline1: /* max 60 chars */ String,
   /** Second street address line. */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Name of the city. */
-  city: String,
+  city: /* max 30 chars */ String,
   /** Unique identification number for the state or province. Foreign key to StateProvince table.
       Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** Postal code for the street address. */
-  postalcode: String,
+  postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
   rowguid: UUID,
@@ -40,11 +40,11 @@ object AddressRow {
     (c: HCursor) =>
       for {
         addressid <- c.downField("addressid").as[AddressId]
-        addressline1 <- c.downField("addressline1").as[String]
-        addressline2 <- c.downField("addressline2").as[Option[String]]
-        city <- c.downField("city").as[String]
+        addressline1 <- c.downField("addressline1").as[/* max 60 chars */ String]
+        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
+        city <- c.downField("city").as[/* max 30 chars */ String]
         stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        postalcode <- c.downField("postalcode").as[String]
+        postalcode <- c.downField("postalcode").as[/* max 15 chars */ String]
         spatiallocation <- c.downField("spatiallocation").as[Option[Array[Byte]]]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]

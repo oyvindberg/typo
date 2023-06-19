@@ -27,13 +27,13 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.name]] */
   name: Option[Name],
   /** Points to [[production.product.ProductRow.productnumber]] */
-  productnumber: Option[String],
+  productnumber: Option[/* max 25 chars */ String],
   /** Points to [[production.product.ProductRow.makeflag]] */
   makeflag: Flag,
   /** Points to [[production.product.ProductRow.finishedgoodsflag]] */
   finishedgoodsflag: Flag,
   /** Points to [[production.product.ProductRow.color]] */
-  color: Option[String],
+  color: Option[/* max 15 chars */ String],
   /** Points to [[production.product.ProductRow.safetystocklevel]] */
   safetystocklevel: Option[Int],
   /** Points to [[production.product.ProductRow.reorderpoint]] */
@@ -43,7 +43,7 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.listprice]] */
   listprice: Option[BigDecimal],
   /** Points to [[production.product.ProductRow.size]] */
-  size: Option[String],
+  size: Option[/* max 5 chars */ String],
   /** Points to [[production.product.ProductRow.sizeunitmeasurecode]] */
   sizeunitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.product.ProductRow.weightunitmeasurecode]] */
@@ -81,15 +81,15 @@ object PViewRow {
         id <- c.downField("id").as[Option[Int]]
         productid <- c.downField("productid").as[Option[ProductId]]
         name <- c.downField("name").as[Option[Name]]
-        productnumber <- c.downField("productnumber").as[Option[String]]
+        productnumber <- c.downField("productnumber").as[Option[/* max 25 chars */ String]]
         makeflag <- c.downField("makeflag").as[Flag]
         finishedgoodsflag <- c.downField("finishedgoodsflag").as[Flag]
-        color <- c.downField("color").as[Option[String]]
+        color <- c.downField("color").as[Option[/* max 15 chars */ String]]
         safetystocklevel <- c.downField("safetystocklevel").as[Option[Int]]
         reorderpoint <- c.downField("reorderpoint").as[Option[Int]]
         standardcost <- c.downField("standardcost").as[Option[BigDecimal]]
         listprice <- c.downField("listprice").as[Option[BigDecimal]]
-        size <- c.downField("size").as[Option[String]]
+        size <- c.downField("size").as[Option[/* max 5 chars */ String]]
         sizeunitmeasurecode <- c.downField("sizeunitmeasurecode").as[Option[UnitmeasureId]]
         weightunitmeasurecode <- c.downField("weightunitmeasurecode").as[Option[UnitmeasureId]]
         weight <- c.downField("weight").as[Option[BigDecimal]]

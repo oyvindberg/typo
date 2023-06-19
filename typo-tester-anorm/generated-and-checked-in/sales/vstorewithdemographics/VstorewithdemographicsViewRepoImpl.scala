@@ -62,13 +62,13 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
           name = row[Option[Name]]("name"),
           AnnualSales = row[Option[TypoMoney]]("AnnualSales"),
           AnnualRevenue = row[Option[TypoMoney]]("AnnualRevenue"),
-          BankName = row[Option[String]]("BankName"),
-          BusinessType = row[Option[String]]("BusinessType"),
+          BankName = row[Option[/* max 50 chars */ String]]("BankName"),
+          BusinessType = row[Option[/* max 5 chars */ String]]("BusinessType"),
           YearOpened = row[Option[Int]]("YearOpened"),
-          Specialty = row[Option[String]]("Specialty"),
+          Specialty = row[Option[/* max 50 chars */ String]]("Specialty"),
           SquareFeet = row[Option[Int]]("SquareFeet"),
-          Brands = row[Option[String]]("Brands"),
-          Internet = row[Option[String]]("Internet"),
+          Brands = row[Option[/* max 30 chars */ String]]("Brands"),
+          Internet = row[Option[/* max 30 chars */ String]]("Internet"),
           NumberEmployees = row[Option[Int]]("NumberEmployees")
         )
       )

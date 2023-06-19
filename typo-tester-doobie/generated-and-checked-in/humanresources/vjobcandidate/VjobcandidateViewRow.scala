@@ -20,17 +20,17 @@ case class VjobcandidateViewRow(
   jobcandidateid: Option[JobcandidateId],
   /** Points to [[jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  `Name.Prefix`: Option[String],
-  `Name.First`: Option[String],
-  `Name.Middle`: Option[String],
-  `Name.Last`: Option[String],
-  `Name.Suffix`: Option[String],
+  `Name.Prefix`: Option[/* max 30 chars */ String],
+  `Name.First`: Option[/* max 30 chars */ String],
+  `Name.Middle`: Option[/* max 30 chars */ String],
+  `Name.Last`: Option[/* max 30 chars */ String],
+  `Name.Suffix`: Option[/* max 30 chars */ String],
   Skills: Option[String],
-  `Addr.Type`: Option[String],
-  `Addr.Loc.CountryRegion`: Option[String],
-  `Addr.Loc.State`: Option[String],
-  `Addr.Loc.City`: Option[String],
-  `Addr.PostalCode`: Option[String],
+  `Addr.Type`: Option[/* max 30 chars */ String],
+  `Addr.Loc.CountryRegion`: Option[/* max 100 chars */ String],
+  `Addr.Loc.State`: Option[/* max 100 chars */ String],
+  `Addr.Loc.City`: Option[/* max 100 chars */ String],
+  `Addr.PostalCode`: Option[/* max 20 chars */ String],
   EMail: Option[String],
   WebSite: Option[String],
   /** Points to [[jobcandidate.JobcandidateRow.modifieddate]] */
@@ -43,17 +43,17 @@ object VjobcandidateViewRow {
       for {
         jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        `Name.Prefix` <- c.downField("Name.Prefix").as[Option[String]]
-        `Name.First` <- c.downField("Name.First").as[Option[String]]
-        `Name.Middle` <- c.downField("Name.Middle").as[Option[String]]
-        `Name.Last` <- c.downField("Name.Last").as[Option[String]]
-        `Name.Suffix` <- c.downField("Name.Suffix").as[Option[String]]
+        `Name.Prefix` <- c.downField("Name.Prefix").as[Option[/* max 30 chars */ String]]
+        `Name.First` <- c.downField("Name.First").as[Option[/* max 30 chars */ String]]
+        `Name.Middle` <- c.downField("Name.Middle").as[Option[/* max 30 chars */ String]]
+        `Name.Last` <- c.downField("Name.Last").as[Option[/* max 30 chars */ String]]
+        `Name.Suffix` <- c.downField("Name.Suffix").as[Option[/* max 30 chars */ String]]
         Skills <- c.downField("Skills").as[Option[String]]
-        `Addr.Type` <- c.downField("Addr.Type").as[Option[String]]
-        `Addr.Loc.CountryRegion` <- c.downField("Addr.Loc.CountryRegion").as[Option[String]]
-        `Addr.Loc.State` <- c.downField("Addr.Loc.State").as[Option[String]]
-        `Addr.Loc.City` <- c.downField("Addr.Loc.City").as[Option[String]]
-        `Addr.PostalCode` <- c.downField("Addr.PostalCode").as[Option[String]]
+        `Addr.Type` <- c.downField("Addr.Type").as[Option[/* max 30 chars */ String]]
+        `Addr.Loc.CountryRegion` <- c.downField("Addr.Loc.CountryRegion").as[Option[/* max 100 chars */ String]]
+        `Addr.Loc.State` <- c.downField("Addr.Loc.State").as[Option[/* max 100 chars */ String]]
+        `Addr.Loc.City` <- c.downField("Addr.Loc.City").as[Option[/* max 100 chars */ String]]
+        `Addr.PostalCode` <- c.downField("Addr.PostalCode").as[Option[/* max 20 chars */ String]]
         EMail <- c.downField("EMail").as[Option[String]]
         WebSite <- c.downField("WebSite").as[Option[String]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]

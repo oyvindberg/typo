@@ -180,10 +180,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     new Read[SpecialofferRow](
       gets = List(
         (Get[SpecialofferId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 255 chars */ String], Nullability.NoNulls),
         (Get[BigDecimal], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
@@ -193,10 +193,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       ),
       unsafeGet = (rs: ResultSet, i: Int) => SpecialofferRow(
         specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
-        description = Get[String].unsafeGetNonNullable(rs, i + 1),
+        description = Get[/* max 255 chars */ String].unsafeGetNonNullable(rs, i + 1),
         discountpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        `type` = Get[String].unsafeGetNonNullable(rs, i + 3),
-        category = Get[String].unsafeGetNonNullable(rs, i + 4),
+        `type` = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        category = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
         startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5),
         enddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
         minqty = Get[Int].unsafeGetNonNullable(rs, i + 7),

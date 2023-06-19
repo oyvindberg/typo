@@ -24,7 +24,7 @@ case class EViewRow(
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
   emailaddressid: Option[Int],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.emailaddress.EmailaddressRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.emailaddress.EmailaddressRow.modifieddate]] */
@@ -50,7 +50,7 @@ object EViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             emailaddressid = json.\("emailaddressid").toOption.map(_.as[Int]),
-            emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

@@ -22,7 +22,7 @@ case class EmailaddressRow(
   /** Primary key. ID of this email address. */
   emailaddressid: Int,
   /** E-mail address for the person. */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   rowguid: UUID,
   modifieddate: LocalDateTime
 ){
@@ -35,7 +35,7 @@ object EmailaddressRow {
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
         emailaddressid <- c.downField("emailaddressid").as[Int]
-        emailaddress <- c.downField("emailaddress").as[Option[String]]
+        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield EmailaddressRow(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)

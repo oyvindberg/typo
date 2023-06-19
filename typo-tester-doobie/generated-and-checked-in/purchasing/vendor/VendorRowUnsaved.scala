@@ -30,7 +30,7 @@ case class VendorRowUnsaved(
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
   creditrating: Int,
   /** Vendor URL. */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Default: true
       0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
   preferredvendorstatus: Defaulted[Flag] = Defaulted.UseDefault,
@@ -69,7 +69,7 @@ object VendorRowUnsaved {
         accountnumber <- c.downField("accountnumber").as[AccountNumber]
         name <- c.downField("name").as[Name]
         creditrating <- c.downField("creditrating").as[Int]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[String]]
+        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
         preferredvendorstatus <- c.downField("preferredvendorstatus").as[Defaulted[Flag]]
         activeflag <- c.downField("activeflag").as[Defaulted[Flag]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]

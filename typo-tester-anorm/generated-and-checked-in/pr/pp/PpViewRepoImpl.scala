@@ -55,9 +55,9 @@ object PpViewRepoImpl extends PpViewRepo {
           id = row[Option[Int]]("id"),
           productphotoid = row[Option[ProductphotoId]]("productphotoid"),
           thumbnailphoto = row[Option[Byte]]("thumbnailphoto"),
-          thumbnailphotofilename = row[Option[String]]("thumbnailphotofilename"),
+          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
           largephoto = row[Option[Byte]]("largephoto"),
-          largephotofilename = row[Option[String]]("largephotofilename"),
+          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

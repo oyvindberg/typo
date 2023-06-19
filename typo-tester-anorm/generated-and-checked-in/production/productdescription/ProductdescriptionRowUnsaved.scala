@@ -20,7 +20,7 @@ import scala.util.Try
 /** This class corresponds to a row in table `production.productdescription` which has not been persisted yet */
 case class ProductdescriptionRowUnsaved(
   /** Description of the product. */
-  description: String,
+  description: /* max 400 chars */ String,
   /** Default: nextval('production.productdescription_productdescriptionid_seq'::regclass)
       Primary key for ProductDescription records. */
   productdescriptionid: Defaulted[ProductdescriptionId] = Defaulted.UseDefault,
@@ -60,7 +60,7 @@ object ProductdescriptionRowUnsaved {
       JsResult.fromTry(
         Try(
           ProductdescriptionRowUnsaved(
-            description = json.\("description").as[String],
+            description = json.\("description").as[/* max 400 chars */ String],
             productdescriptionid = json.\("productdescriptionid").as[Defaulted[ProductdescriptionId]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

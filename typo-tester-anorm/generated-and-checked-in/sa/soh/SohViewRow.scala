@@ -62,7 +62,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardapprovalcode]] */
-  creditcardapprovalcode: Option[String],
+  creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.subtotal]] */
@@ -74,7 +74,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.totaldue]] */
   totaldue: Option[BigDecimal],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]] */
-  comment: Option[String],
+  comment: Option[/* max 128 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
@@ -134,13 +134,13 @@ object SohViewRow {
             shiptoaddressid = json.\("shiptoaddressid").toOption.map(_.as[AddressId]),
             shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
             creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[String]),
+            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
             currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
             subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
             taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
             freight = json.\("freight").toOption.map(_.as[BigDecimal]),
             totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-            comment = json.\("comment").toOption.map(_.as[String]),
+            comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

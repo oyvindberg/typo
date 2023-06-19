@@ -23,15 +23,15 @@ case class AViewRow(
   /** Points to [[person.address.AddressRow.addressid]] */
   addressid: Option[AddressId],
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[String],
+  addressline1: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[String],
+  city: Option[/* max 30 chars */ String],
   /** Points to [[person.address.AddressRow.stateprovinceid]] */
   stateprovinceid: Option[StateprovinceId],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[String],
+  postalcode: Option[/* max 15 chars */ String],
   /** Points to [[person.address.AddressRow.spatiallocation]] */
   spatiallocation: Option[Byte],
   /** Points to [[person.address.AddressRow.rowguid]] */
@@ -62,11 +62,11 @@ object AViewRow {
           AViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             addressid = json.\("addressid").toOption.map(_.as[AddressId]),
-            addressline1 = json.\("addressline1").toOption.map(_.as[String]),
-            addressline2 = json.\("addressline2").toOption.map(_.as[String]),
-            city = json.\("city").toOption.map(_.as[String]),
+            addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
+            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+            city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
             stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-            postalcode = json.\("postalcode").toOption.map(_.as[String]),
+            postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
             spatiallocation = json.\("spatiallocation").toOption.map(_.as[Byte]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])

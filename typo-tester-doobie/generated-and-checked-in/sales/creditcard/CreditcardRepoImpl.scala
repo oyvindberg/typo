@@ -140,16 +140,16 @@ object CreditcardRepoImpl extends CreditcardRepo {
     new Read[CreditcardRow](
       gets = List(
         (Get[CreditcardId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[/* max 25 chars */ String], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
         creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
-        cardtype = Get[String].unsafeGetNonNullable(rs, i + 1),
-        cardnumber = Get[String].unsafeGetNonNullable(rs, i + 2),
+        cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
         expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
         expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)

@@ -119,7 +119,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
       Success(
         FootballClubRow(
           id = row[FootballClubId]("id"),
-          name = row[String]("name")
+          name = row[/* max 100 chars */ String]("name")
         )
       )
     }

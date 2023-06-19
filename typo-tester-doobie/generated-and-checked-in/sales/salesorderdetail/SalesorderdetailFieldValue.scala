@@ -19,7 +19,7 @@ sealed abstract class SalesorderdetailFieldValue[T](name: String, value: T) exte
 object SalesorderdetailFieldValue {
   case class salesorderid(override val value: SalesorderheaderId) extends SalesorderdetailFieldOrIdValue("salesorderid", value)
   case class salesorderdetailid(override val value: Int) extends SalesorderdetailFieldOrIdValue("salesorderdetailid", value)
-  case class carriertrackingnumber(override val value: Option[String]) extends SalesorderdetailFieldValue("carriertrackingnumber", value)
+  case class carriertrackingnumber(override val value: Option[/* max 25 chars */ String]) extends SalesorderdetailFieldValue("carriertrackingnumber", value)
   case class orderqty(override val value: Int) extends SalesorderdetailFieldValue("orderqty", value)
   case class productid(override val value: ProductId) extends SalesorderdetailFieldValue("productid", value)
   case class specialofferid(override val value: SpecialofferId) extends SalesorderdetailFieldValue("specialofferid", value)

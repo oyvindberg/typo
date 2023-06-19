@@ -19,9 +19,9 @@ case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
-  cardtype: Option[String],
+  cardtype: Option[/* max 50 chars */ String],
   /** Points to [[sales.creditcard.CreditcardRow.cardnumber]] */
-  cardnumber: Option[String],
+  cardnumber: Option[/* max 25 chars */ String],
   /** Points to [[sales.creditcard.CreditcardRow.expmonth]] */
   expmonth: Option[Int],
   /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
@@ -36,8 +36,8 @@ object CcViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        cardtype <- c.downField("cardtype").as[Option[String]]
-        cardnumber <- c.downField("cardnumber").as[Option[String]]
+        cardtype <- c.downField("cardtype").as[Option[/* max 50 chars */ String]]
+        cardnumber <- c.downField("cardnumber").as[Option[/* max 25 chars */ String]]
         expmonth <- c.downField("expmonth").as[Option[Int]]
         expyear <- c.downField("expyear").as[Option[Int]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]

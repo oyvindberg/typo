@@ -65,7 +65,7 @@ case class SalesorderheaderRow(
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Approval code provided by the credit card company. */
-  creditcardapprovalcode: Option[String],
+  creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
       Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
@@ -78,7 +78,7 @@ case class SalesorderheaderRow(
   /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
-  comment: Option[String],
+  comment: Option[/* max 128 chars */ String],
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -103,13 +103,13 @@ object SalesorderheaderRow {
         shiptoaddressid <- c.downField("shiptoaddressid").as[AddressId]
         shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
         creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[String]]
+        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[/* max 15 chars */ String]]
         currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
         subtotal <- c.downField("subtotal").as[BigDecimal]
         taxamt <- c.downField("taxamt").as[BigDecimal]
         freight <- c.downField("freight").as[BigDecimal]
         totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
-        comment <- c.downField("comment").as[Option[String]]
+        comment <- c.downField("comment").as[Option[/* max 128 chars */ String]]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield SalesorderheaderRow(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate)

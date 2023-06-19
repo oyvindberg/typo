@@ -19,9 +19,9 @@ sealed abstract class EViewFieldValue[T](name: String, value: T) extends EViewFi
 object EViewFieldValue {
   case class id(override val value: Option[Int]) extends EViewFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends EViewFieldValue("businessentityid", value)
-  case class nationalidnumber(override val value: Option[String]) extends EViewFieldValue("nationalidnumber", value)
-  case class loginid(override val value: Option[String]) extends EViewFieldValue("loginid", value)
-  case class jobtitle(override val value: Option[String]) extends EViewFieldValue("jobtitle", value)
+  case class nationalidnumber(override val value: Option[/* max 15 chars */ String]) extends EViewFieldValue("nationalidnumber", value)
+  case class loginid(override val value: Option[/* max 256 chars */ String]) extends EViewFieldValue("loginid", value)
+  case class jobtitle(override val value: Option[/* max 50 chars */ String]) extends EViewFieldValue("jobtitle", value)
   case class birthdate(override val value: Option[LocalDate]) extends EViewFieldValue("birthdate", value)
   case class maritalstatus(override val value: Option[/* bpchar */ String]) extends EViewFieldValue("maritalstatus", value)
   case class gender(override val value: Option[/* bpchar */ String]) extends EViewFieldValue("gender", value)

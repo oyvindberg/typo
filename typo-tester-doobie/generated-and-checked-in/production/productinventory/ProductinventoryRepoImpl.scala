@@ -147,7 +147,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       gets = List(
         (Get[ProductId], Nullability.NoNulls),
         (Get[LocationId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 10 chars */ String], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[UUID], Nullability.NoNulls),
@@ -156,7 +156,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       unsafeGet = (rs: ResultSet, i: Int) => ProductinventoryRow(
         productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
         locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 1),
-        shelf = Get[String].unsafeGetNonNullable(rs, i + 2),
+        shelf = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
         bin = Get[Int].unsafeGetNonNullable(rs, i + 3),
         quantity = Get[Int].unsafeGetNonNullable(rs, i + 4),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),

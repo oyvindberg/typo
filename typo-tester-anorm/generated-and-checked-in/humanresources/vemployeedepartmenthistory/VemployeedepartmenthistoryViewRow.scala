@@ -21,7 +21,7 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Option[Name],
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -29,7 +29,7 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Option[Name],
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   shift: Option[Name],
   department: Option[Name],
   /** Points to [[department.DepartmentRow.groupname]] */
@@ -62,11 +62,11 @@ object VemployeedepartmenthistoryViewRow {
         Try(
           VemployeedepartmenthistoryViewRow(
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
             firstname = json.\("firstname").toOption.map(_.as[Name]),
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").toOption.map(_.as[Name]),
-            suffix = json.\("suffix").toOption.map(_.as[String]),
+            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
             shift = json.\("shift").toOption.map(_.as[Name]),
             department = json.\("department").toOption.map(_.as[Name]),
             groupname = json.\("groupname").toOption.map(_.as[Name]),

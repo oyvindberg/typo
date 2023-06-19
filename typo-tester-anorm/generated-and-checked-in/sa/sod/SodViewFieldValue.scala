@@ -20,7 +20,7 @@ object SodViewFieldValue {
   case class id(override val value: Option[Int]) extends SodViewFieldValue("id", value)
   case class salesorderid(override val value: Option[SalesorderheaderId]) extends SodViewFieldValue("salesorderid", value)
   case class salesorderdetailid(override val value: Option[Int]) extends SodViewFieldValue("salesorderdetailid", value)
-  case class carriertrackingnumber(override val value: Option[String]) extends SodViewFieldValue("carriertrackingnumber", value)
+  case class carriertrackingnumber(override val value: Option[/* max 25 chars */ String]) extends SodViewFieldValue("carriertrackingnumber", value)
   case class orderqty(override val value: Option[Int]) extends SodViewFieldValue("orderqty", value)
   case class productid(override val value: Option[ProductId]) extends SodViewFieldValue("productid", value)
   case class specialofferid(override val value: Option[SpecialofferId]) extends SodViewFieldValue("specialofferid", value)

@@ -19,7 +19,7 @@ case class VsalespersonsalesbyfiscalyearsdataViewRow(
   salespersonid: Option[BusinessentityId],
   fullname: Option[String],
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[String],
+  jobtitle: Option[/* max 50 chars */ String],
   salesterritory: Option[Name],
   salestotal: Option[BigDecimal],
   fiscalyear: Option[BigDecimal]
@@ -31,7 +31,7 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
       for {
         salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
         fullname <- c.downField("fullname").as[Option[String]]
-        jobtitle <- c.downField("jobtitle").as[Option[String]]
+        jobtitle <- c.downField("jobtitle").as[Option[/* max 50 chars */ String]]
         salesterritory <- c.downField("salesterritory").as[Option[Name]]
         salestotal <- c.downField("salestotal").as[Option[BigDecimal]]
         fiscalyear <- c.downField("fiscalyear").as[Option[BigDecimal]]

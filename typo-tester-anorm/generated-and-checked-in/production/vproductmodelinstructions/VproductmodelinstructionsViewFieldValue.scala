@@ -25,7 +25,7 @@ object VproductmodelinstructionsViewFieldValue {
   case class MachineHours(override val value: Option[BigDecimal]) extends VproductmodelinstructionsViewFieldValue("MachineHours", value)
   case class LaborHours(override val value: Option[BigDecimal]) extends VproductmodelinstructionsViewFieldValue("LaborHours", value)
   case class LotSize(override val value: Option[Int]) extends VproductmodelinstructionsViewFieldValue("LotSize", value)
-  case class Step(override val value: Option[String]) extends VproductmodelinstructionsViewFieldValue("Step", value)
+  case class Step(override val value: Option[/* max 1024 chars */ String]) extends VproductmodelinstructionsViewFieldValue("Step", value)
   case class rowguid(override val value: Option[UUID]) extends VproductmodelinstructionsViewFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends VproductmodelinstructionsViewFieldValue("modifieddate", value)
 }

@@ -59,11 +59,11 @@ object AViewRepoImpl extends AViewRepo {
         AViewRow(
           id = row[Option[Int]]("id"),
           addressid = row[Option[AddressId]]("addressid"),
-          addressline1 = row[Option[String]]("addressline1"),
-          addressline2 = row[Option[String]]("addressline2"),
-          city = row[Option[String]]("city"),
+          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
+          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
+          city = row[Option[/* max 30 chars */ String]]("city"),
           stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          postalcode = row[Option[String]]("postalcode"),
+          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
           spatiallocation = row[Option[Byte]]("spatiallocation"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")

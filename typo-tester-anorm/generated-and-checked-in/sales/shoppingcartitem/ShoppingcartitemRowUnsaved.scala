@@ -20,7 +20,7 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.shoppingcartitem` which has not been persisted yet */
 case class ShoppingcartitemRowUnsaved(
   /** Shopping cart identification number. */
-  shoppingcartid: String,
+  shoppingcartid: /* max 50 chars */ String,
   /** Product ordered. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
@@ -74,7 +74,7 @@ object ShoppingcartitemRowUnsaved {
       JsResult.fromTry(
         Try(
           ShoppingcartitemRowUnsaved(
-            shoppingcartid = json.\("shoppingcartid").as[String],
+            shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
             productid = json.\("productid").as[ProductId],
             shoppingcartitemid = json.\("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]],
             quantity = json.\("quantity").as[Defaulted[Int]],

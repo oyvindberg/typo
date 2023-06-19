@@ -63,13 +63,13 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
           totalpurchaseytd = row[Option[TypoMoney]]("totalpurchaseytd"),
           datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
           birthdate = row[Option[LocalDate]]("birthdate"),
-          maritalstatus = row[Option[String]]("maritalstatus"),
-          yearlyincome = row[Option[String]]("yearlyincome"),
-          gender = row[Option[String]]("gender"),
+          maritalstatus = row[Option[/* max 1 chars */ String]]("maritalstatus"),
+          yearlyincome = row[Option[/* max 30 chars */ String]]("yearlyincome"),
+          gender = row[Option[/* max 1 chars */ String]]("gender"),
           totalchildren = row[Option[Int]]("totalchildren"),
           numberchildrenathome = row[Option[Int]]("numberchildrenathome"),
-          education = row[Option[String]]("education"),
-          occupation = row[Option[String]]("occupation"),
+          education = row[Option[/* max 30 chars */ String]]("education"),
+          occupation = row[Option[/* max 30 chars */ String]]("occupation"),
           homeownerflag = row[Option[Boolean]]("homeownerflag"),
           numbercarsowned = row[Option[Int]]("numbercarsowned")
         )

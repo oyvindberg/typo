@@ -55,7 +55,7 @@ object SciViewRepoImpl extends SciViewRepo {
         SciViewRow(
           id = row[Option[Int]]("id"),
           shoppingcartitemid = row[Option[ShoppingcartitemId]]("shoppingcartitemid"),
-          shoppingcartid = row[Option[String]]("shoppingcartid"),
+          shoppingcartid = row[Option[/* max 50 chars */ String]]("shoppingcartid"),
           quantity = row[Option[Int]]("quantity"),
           productid = row[Option[ProductId]]("productid"),
           datecreated = row[Option[LocalDateTime]]("datecreated"),

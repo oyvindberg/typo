@@ -19,7 +19,7 @@ object PiViewFieldValue {
   case class id(override val value: Option[Int]) extends PiViewFieldValue("id", value)
   case class productid(override val value: Option[ProductId]) extends PiViewFieldValue("productid", value)
   case class locationid(override val value: Option[LocationId]) extends PiViewFieldValue("locationid", value)
-  case class shelf(override val value: Option[String]) extends PiViewFieldValue("shelf", value)
+  case class shelf(override val value: Option[/* max 10 chars */ String]) extends PiViewFieldValue("shelf", value)
   case class bin(override val value: Option[Int]) extends PiViewFieldValue("bin", value)
   case class quantity(override val value: Option[Int]) extends PiViewFieldValue("quantity", value)
   case class rowguid(override val value: Option[UUID]) extends PiViewFieldValue("rowguid", value)

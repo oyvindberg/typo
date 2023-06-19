@@ -18,7 +18,7 @@ case class ProductdescriptionRow(
   /** Primary key for ProductDescription records. */
   productdescriptionid: ProductdescriptionId,
   /** Description of the product. */
-  description: String,
+  description: /* max 400 chars */ String,
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -28,7 +28,7 @@ object ProductdescriptionRow {
     (c: HCursor) =>
       for {
         productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
-        description <- c.downField("description").as[String]
+        description <- c.downField("description").as[/* max 400 chars */ String]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield ProductdescriptionRow(productdescriptionid, description, rowguid, modifieddate)

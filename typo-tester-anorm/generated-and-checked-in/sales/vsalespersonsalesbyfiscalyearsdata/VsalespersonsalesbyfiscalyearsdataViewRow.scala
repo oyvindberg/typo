@@ -21,7 +21,7 @@ case class VsalespersonsalesbyfiscalyearsdataViewRow(
   salespersonid: Option[BusinessentityId],
   fullname: Option[String],
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[String],
+  jobtitle: Option[/* max 50 chars */ String],
   salesterritory: Option[Name],
   salestotal: Option[BigDecimal],
   fiscalyear: Option[BigDecimal]
@@ -45,7 +45,7 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
           VsalespersonsalesbyfiscalyearsdataViewRow(
             salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
             fullname = json.\("fullname").toOption.map(_.as[String]),
-            jobtitle = json.\("jobtitle").toOption.map(_.as[String]),
+            jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
             salesterritory = json.\("salesterritory").toOption.map(_.as[Name]),
             salestotal = json.\("salestotal").toOption.map(_.as[BigDecimal]),
             fiscalyear = json.\("fiscalyear").toOption.map(_.as[BigDecimal])

@@ -27,7 +27,7 @@ case class SalesterritoryRowUnsaved(
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
-  group: String,
+  group: /* max 50 chars */ String,
   /** Default: nextval('sales.salesterritory_territoryid_seq'::regclass)
       Primary key for SalesTerritory records. */
   territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
@@ -105,7 +105,7 @@ object SalesterritoryRowUnsaved {
           SalesterritoryRowUnsaved(
             name = json.\("name").as[Name],
             countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            group = json.\("group").as[String],
+            group = json.\("group").as[/* max 50 chars */ String],
             territoryid = json.\("territoryid").as[Defaulted[SalesterritoryId]],
             salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
             saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],

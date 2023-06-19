@@ -16,7 +16,7 @@ sealed abstract class VsalespersonsalesbyfiscalyearsdataViewFieldValue[T](name: 
 object VsalespersonsalesbyfiscalyearsdataViewFieldValue {
   case class salespersonid(override val value: Option[BusinessentityId]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("salespersonid", value)
   case class fullname(override val value: Option[String]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("fullname", value)
-  case class jobtitle(override val value: Option[String]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("jobtitle", value)
+  case class jobtitle(override val value: Option[/* max 50 chars */ String]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("jobtitle", value)
   case class salesterritory(override val value: Option[Name]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("salesterritory", value)
   case class salestotal(override val value: Option[BigDecimal]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("salestotal", value)
   case class fiscalyear(override val value: Option[BigDecimal]) extends VsalespersonsalesbyfiscalyearsdataViewFieldValue("fiscalyear", value)

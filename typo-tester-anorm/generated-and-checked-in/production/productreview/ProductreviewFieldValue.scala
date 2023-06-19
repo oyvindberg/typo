@@ -19,8 +19,8 @@ object ProductreviewFieldValue {
   case class productid(override val value: ProductId) extends ProductreviewFieldValue("productid", value)
   case class reviewername(override val value: Name) extends ProductreviewFieldValue("reviewername", value)
   case class reviewdate(override val value: LocalDateTime) extends ProductreviewFieldValue("reviewdate", value)
-  case class emailaddress(override val value: String) extends ProductreviewFieldValue("emailaddress", value)
+  case class emailaddress(override val value: /* max 50 chars */ String) extends ProductreviewFieldValue("emailaddress", value)
   case class rating(override val value: Int) extends ProductreviewFieldValue("rating", value)
-  case class comments(override val value: Option[String]) extends ProductreviewFieldValue("comments", value)
+  case class comments(override val value: Option[/* max 3850 chars */ String]) extends ProductreviewFieldValue("comments", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductreviewFieldValue("modifieddate", value)
 }

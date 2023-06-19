@@ -32,7 +32,7 @@ case class VendorRowUnsaved(
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
   creditrating: Int,
   /** Vendor URL. */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Default: true
       0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
   preferredvendorstatus: Defaulted[Flag] = Defaulted.UseDefault,
@@ -85,7 +85,7 @@ object VendorRowUnsaved {
             accountnumber = json.\("accountnumber").as[AccountNumber],
             name = json.\("name").as[Name],
             creditrating = json.\("creditrating").as[Int],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
+            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
             preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
             activeflag = json.\("activeflag").as[Defaulted[Flag]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

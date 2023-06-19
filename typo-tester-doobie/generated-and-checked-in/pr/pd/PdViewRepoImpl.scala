@@ -41,14 +41,14 @@ object PdViewRepoImpl extends PdViewRepo {
       gets = List(
         (Get[Int], Nullability.Nullable),
         (Get[ProductdescriptionId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 400 chars */ String], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-        description = Get[String].unsafeGetNullable(rs, i + 2),
+        description = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 2),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
       )

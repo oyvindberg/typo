@@ -17,7 +17,7 @@ sealed abstract class SciViewFieldValue[T](name: String, value: T) extends SciVi
 object SciViewFieldValue {
   case class id(override val value: Option[Int]) extends SciViewFieldValue("id", value)
   case class shoppingcartitemid(override val value: Option[ShoppingcartitemId]) extends SciViewFieldValue("shoppingcartitemid", value)
-  case class shoppingcartid(override val value: Option[String]) extends SciViewFieldValue("shoppingcartid", value)
+  case class shoppingcartid(override val value: Option[/* max 50 chars */ String]) extends SciViewFieldValue("shoppingcartid", value)
   case class quantity(override val value: Option[Int]) extends SciViewFieldValue("quantity", value)
   case class productid(override val value: Option[ProductId]) extends SciViewFieldValue("productid", value)
   case class datecreated(override val value: Option[LocalDateTime]) extends SciViewFieldValue("datecreated", value)

@@ -23,7 +23,7 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.locationid]] */
   locationid: Option[LocationId],
   /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
-  shelf: Option[String],
+  shelf: Option[/* max 10 chars */ String],
   /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
   bin: Option[Int],
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
@@ -41,7 +41,7 @@ object PiViewRow {
         id <- c.downField("id").as[Option[Int]]
         productid <- c.downField("productid").as[Option[ProductId]]
         locationid <- c.downField("locationid").as[Option[LocationId]]
-        shelf <- c.downField("shelf").as[Option[String]]
+        shelf <- c.downField("shelf").as[Option[/* max 10 chars */ String]]
         bin <- c.downField("bin").as[Option[Int]]
         quantity <- c.downField("quantity").as[Option[Int]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]

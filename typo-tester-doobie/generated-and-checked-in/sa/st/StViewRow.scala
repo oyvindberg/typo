@@ -26,7 +26,7 @@ case class StViewRow(
   /** Points to [[sales.salesterritory.SalesterritoryRow.countryregioncode]] */
   countryregioncode: Option[CountryregionId],
   /** Points to [[sales.salesterritory.SalesterritoryRow.group]] */
-  group: Option[String],
+  group: Option[/* max 50 chars */ String],
   /** Points to [[sales.salesterritory.SalesterritoryRow.salesytd]] */
   salesytd: Option[BigDecimal],
   /** Points to [[sales.salesterritory.SalesterritoryRow.saleslastyear]] */
@@ -49,7 +49,7 @@ object StViewRow {
         territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
         name <- c.downField("name").as[Option[Name]]
         countryregioncode <- c.downField("countryregioncode").as[Option[CountryregionId]]
-        group <- c.downField("group").as[Option[String]]
+        group <- c.downField("group").as[Option[/* max 50 chars */ String]]
         salesytd <- c.downField("salesytd").as[Option[BigDecimal]]
         saleslastyear <- c.downField("saleslastyear").as[Option[BigDecimal]]
         costytd <- c.downField("costytd").as[Option[BigDecimal]]

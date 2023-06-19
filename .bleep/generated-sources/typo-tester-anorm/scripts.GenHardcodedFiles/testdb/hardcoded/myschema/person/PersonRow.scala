@@ -22,15 +22,15 @@ case class PersonRow(
   id: PersonId,
   /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
-  name: String,
-  nickName: Option[String],
-  blogUrl: Option[String],
-  email: String,
-  phone: String,
+  name: /* max 100 chars */ String,
+  nickName: Option[/* max 30 chars */ String],
+  blogUrl: Option[/* max 100 chars */ String],
+  email: /* max 254 chars */ String,
+  phone: /* max 8 chars */ String,
   likesPizza: Boolean,
   /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
-  workEmail: Option[String],
+  workEmail: Option[/* max 254 chars */ String],
   sector: Sector
 )
 
@@ -57,14 +57,14 @@ object PersonRow {
           PersonRow(
             id = json.\("id").as[PersonId],
             favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
-            name = json.\("name").as[String],
-            nickName = json.\("nick_name").toOption.map(_.as[String]),
-            blogUrl = json.\("blog_url").toOption.map(_.as[String]),
-            email = json.\("email").as[String],
-            phone = json.\("phone").as[String],
+            name = json.\("name").as[/* max 100 chars */ String],
+            nickName = json.\("nick_name").toOption.map(_.as[/* max 30 chars */ String]),
+            blogUrl = json.\("blog_url").toOption.map(_.as[/* max 100 chars */ String]),
+            email = json.\("email").as[/* max 254 chars */ String],
+            phone = json.\("phone").as[/* max 8 chars */ String],
             likesPizza = json.\("likes_pizza").as[Boolean],
             maritalStatusId = json.\("marital_status_id").as[MaritalStatusId],
-            workEmail = json.\("work_email").toOption.map(_.as[String]),
+            workEmail = json.\("work_email").toOption.map(_.as[/* max 254 chars */ String]),
             sector = json.\("sector").as[Sector]
           )
         )

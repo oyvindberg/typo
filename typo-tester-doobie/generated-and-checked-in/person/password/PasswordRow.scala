@@ -19,9 +19,9 @@ case class PasswordRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Password for the e-mail account. */
-  passwordhash: String,
+  passwordhash: /* max 128 chars */ String,
   /** Random value concatenated with the password string before the password is hashed. */
-  passwordsalt: String,
+  passwordsalt: /* max 10 chars */ String,
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -31,8 +31,8 @@ object PasswordRow {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        passwordhash <- c.downField("passwordhash").as[String]
-        passwordsalt <- c.downField("passwordsalt").as[String]
+        passwordhash <- c.downField("passwordhash").as[/* max 128 chars */ String]
+        passwordsalt <- c.downField("passwordsalt").as[/* max 10 chars */ String]
         rowguid <- c.downField("rowguid").as[UUID]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield PasswordRow(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

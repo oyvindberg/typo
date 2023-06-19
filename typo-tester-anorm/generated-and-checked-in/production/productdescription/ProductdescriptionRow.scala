@@ -20,7 +20,7 @@ case class ProductdescriptionRow(
   /** Primary key for ProductDescription records. */
   productdescriptionid: ProductdescriptionId,
   /** Description of the product. */
-  description: String,
+  description: /* max 400 chars */ String,
   rowguid: UUID,
   modifieddate: LocalDateTime
 )
@@ -40,7 +40,7 @@ object ProductdescriptionRow {
         Try(
           ProductdescriptionRow(
             productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-            description = json.\("description").as[String],
+            description = json.\("description").as[/* max 400 chars */ String],
             rowguid = json.\("rowguid").as[UUID],
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )

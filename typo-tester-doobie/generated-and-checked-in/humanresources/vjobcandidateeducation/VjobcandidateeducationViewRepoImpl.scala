@@ -47,33 +47,33 @@ object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo
     new Read[VjobcandidateeducationViewRow](
       gets = List(
         (Get[JobcandidateId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[LocalDate], Nullability.Nullable),
         (Get[LocalDate], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[/* max 5 chars */ String], Nullability.Nullable),
+        (Get[/* max 5 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateeducationViewRow(
         jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
-        `Edu.Level` = Get[String].unsafeGetNullable(rs, i + 1),
+        `Edu.Level` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 1),
         `Edu.StartDate` = Get[LocalDate].unsafeGetNullable(rs, i + 2),
         `Edu.EndDate` = Get[LocalDate].unsafeGetNullable(rs, i + 3),
-        `Edu.Degree` = Get[String].unsafeGetNullable(rs, i + 4),
-        `Edu.Major` = Get[String].unsafeGetNullable(rs, i + 5),
-        `Edu.Minor` = Get[String].unsafeGetNullable(rs, i + 6),
-        `Edu.GPA` = Get[String].unsafeGetNullable(rs, i + 7),
-        `Edu.GPAScale` = Get[String].unsafeGetNullable(rs, i + 8),
-        `Edu.School` = Get[String].unsafeGetNullable(rs, i + 9),
-        `Edu.Loc.CountryRegion` = Get[String].unsafeGetNullable(rs, i + 10),
-        `Edu.Loc.State` = Get[String].unsafeGetNullable(rs, i + 11),
-        `Edu.Loc.City` = Get[String].unsafeGetNullable(rs, i + 12)
+        `Edu.Degree` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
+        `Edu.Major` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
+        `Edu.Minor` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
+        `Edu.GPA` = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 7),
+        `Edu.GPAScale` = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 8),
+        `Edu.School` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 9),
+        `Edu.Loc.CountryRegion` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 10),
+        `Edu.Loc.State` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 11),
+        `Edu.Loc.City` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 12)
       )
     )
   

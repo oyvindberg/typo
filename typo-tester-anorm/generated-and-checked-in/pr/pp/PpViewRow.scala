@@ -23,11 +23,11 @@ case class PpViewRow(
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphoto]] */
   thumbnailphoto: Option[Byte],
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphotofilename]] */
-  thumbnailphotofilename: Option[String],
+  thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.largephoto]] */
   largephoto: Option[Byte],
   /** Points to [[production.productphoto.ProductphotoRow.largephotofilename]] */
-  largephotofilename: Option[String],
+  largephotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -52,9 +52,9 @@ object PpViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
             thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Byte]),
-            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[String]),
+            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
             largephoto = json.\("largephoto").toOption.map(_.as[Byte]),
-            largephotofilename = json.\("largephotofilename").toOption.map(_.as[String]),
+            largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

@@ -27,7 +27,7 @@ case class PersonRow(
   /** 0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: NameStyle,
   /** A courtesy title. For example, Mr. or Ms. */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** First name of the person. */
   firstname: Name,
   /** Middle name or middle initial of the person. */
@@ -35,7 +35,7 @@ case class PersonRow(
   /** Last name of the person. */
   lastname: Name,
   /** Surname suffix. For example, Sr. or Jr. */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** 0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners. */
   emailpromotion: Int,
   /** Additional contact information about the person stored in xml format. */
@@ -53,11 +53,11 @@ object PersonRow {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
         persontype <- c.downField("persontype").as[/* bpchar */ String]
         namestyle <- c.downField("namestyle").as[NameStyle]
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
         firstname <- c.downField("firstname").as[Name]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Name]
-        suffix <- c.downField("suffix").as[Option[String]]
+        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
         emailpromotion <- c.downField("emailpromotion").as[Int]
         additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
         demographics <- c.downField("demographics").as[Option[TypoXml]]

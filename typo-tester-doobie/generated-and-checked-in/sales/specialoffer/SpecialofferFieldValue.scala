@@ -15,10 +15,10 @@ sealed abstract class SpecialofferFieldValue[T](name: String, value: T) extends 
 
 object SpecialofferFieldValue {
   case class specialofferid(override val value: SpecialofferId) extends SpecialofferFieldOrIdValue("specialofferid", value)
-  case class description(override val value: String) extends SpecialofferFieldValue("description", value)
+  case class description(override val value: /* max 255 chars */ String) extends SpecialofferFieldValue("description", value)
   case class discountpct(override val value: BigDecimal) extends SpecialofferFieldValue("discountpct", value)
-  case class `type`(override val value: String) extends SpecialofferFieldValue("type", value)
-  case class category(override val value: String) extends SpecialofferFieldValue("category", value)
+  case class `type`(override val value: /* max 50 chars */ String) extends SpecialofferFieldValue("type", value)
+  case class category(override val value: /* max 50 chars */ String) extends SpecialofferFieldValue("category", value)
   case class startdate(override val value: LocalDateTime) extends SpecialofferFieldValue("startdate", value)
   case class enddate(override val value: LocalDateTime) extends SpecialofferFieldValue("enddate", value)
   case class minqty(override val value: Int) extends SpecialofferFieldValue("minqty", value)

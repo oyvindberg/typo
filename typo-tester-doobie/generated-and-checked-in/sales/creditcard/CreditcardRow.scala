@@ -17,9 +17,9 @@ case class CreditcardRow(
   /** Primary key for CreditCard records. */
   creditcardid: CreditcardId,
   /** Credit card name. */
-  cardtype: String,
+  cardtype: /* max 50 chars */ String,
   /** Credit card number. */
-  cardnumber: String,
+  cardnumber: /* max 25 chars */ String,
   /** Credit card expiration month. */
   expmonth: Int,
   /** Credit card expiration year. */
@@ -32,8 +32,8 @@ object CreditcardRow {
     (c: HCursor) =>
       for {
         creditcardid <- c.downField("creditcardid").as[CreditcardId]
-        cardtype <- c.downField("cardtype").as[String]
-        cardnumber <- c.downField("cardnumber").as[String]
+        cardtype <- c.downField("cardtype").as[/* max 50 chars */ String]
+        cardnumber <- c.downField("cardnumber").as[/* max 25 chars */ String]
         expmonth <- c.downField("expmonth").as[Int]
         expyear <- c.downField("expyear").as[Int]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]

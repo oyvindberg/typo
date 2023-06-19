@@ -20,7 +20,7 @@ case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records. */
   shoppingcartitemid: ShoppingcartitemId,
   /** Shopping cart identification number. */
-  shoppingcartid: String,
+  shoppingcartid: /* max 50 chars */ String,
   /** Product quantity ordered. */
   quantity: Int,
   /** Product ordered. Foreign key to Product.ProductID.
@@ -48,7 +48,7 @@ object ShoppingcartitemRow {
         Try(
           ShoppingcartitemRow(
             shoppingcartitemid = json.\("shoppingcartitemid").as[ShoppingcartitemId],
-            shoppingcartid = json.\("shoppingcartid").as[String],
+            shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
             quantity = json.\("quantity").as[Int],
             productid = json.\("productid").as[ProductId],
             datecreated = json.\("datecreated").as[LocalDateTime],

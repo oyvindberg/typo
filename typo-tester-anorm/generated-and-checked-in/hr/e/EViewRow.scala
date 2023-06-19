@@ -24,11 +24,11 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.employee.EmployeeRow.nationalidnumber]] */
-  nationalidnumber: Option[String],
+  nationalidnumber: Option[/* max 15 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.loginid]] */
-  loginid: Option[String],
+  loginid: Option[/* max 256 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[String],
+  jobtitle: Option[/* max 50 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.birthdate]] */
   birthdate: Option[LocalDate],
   /** Points to [[humanresources.employee.EmployeeRow.maritalstatus]] */
@@ -81,9 +81,9 @@ object EViewRow {
           EViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            nationalidnumber = json.\("nationalidnumber").toOption.map(_.as[String]),
-            loginid = json.\("loginid").toOption.map(_.as[String]),
-            jobtitle = json.\("jobtitle").toOption.map(_.as[String]),
+            nationalidnumber = json.\("nationalidnumber").toOption.map(_.as[/* max 15 chars */ String]),
+            loginid = json.\("loginid").toOption.map(_.as[/* max 256 chars */ String]),
+            jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
             birthdate = json.\("birthdate").toOption.map(_.as[LocalDate]),
             maritalstatus = json.\("maritalstatus").toOption.map(_.as[/* bpchar */ String]),
             gender = json.\("gender").toOption.map(_.as[/* bpchar */ String]),

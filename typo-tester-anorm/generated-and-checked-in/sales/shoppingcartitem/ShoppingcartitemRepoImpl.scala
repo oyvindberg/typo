@@ -181,7 +181,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       Success(
         ShoppingcartitemRow(
           shoppingcartitemid = row[ShoppingcartitemId]("shoppingcartitemid"),
-          shoppingcartid = row[String]("shoppingcartid"),
+          shoppingcartid = row[/* max 50 chars */ String]("shoppingcartid"),
           quantity = row[Int]("quantity"),
           productid = row[ProductId]("productid"),
           datecreated = row[LocalDateTime]("datecreated"),

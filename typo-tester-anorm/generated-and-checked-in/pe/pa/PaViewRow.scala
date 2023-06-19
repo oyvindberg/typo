@@ -22,9 +22,9 @@ case class PaViewRow(
   /** Points to [[person.password.PasswordRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.password.PasswordRow.passwordhash]] */
-  passwordhash: Option[String],
+  passwordhash: Option[/* max 128 chars */ String],
   /** Points to [[person.password.PasswordRow.passwordsalt]] */
-  passwordsalt: Option[String],
+  passwordsalt: Option[/* max 10 chars */ String],
   /** Points to [[person.password.PasswordRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.password.PasswordRow.modifieddate]] */
@@ -49,8 +49,8 @@ object PaViewRow {
           PaViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            passwordhash = json.\("passwordhash").toOption.map(_.as[String]),
-            passwordsalt = json.\("passwordsalt").toOption.map(_.as[String]),
+            passwordhash = json.\("passwordhash").toOption.map(_.as[/* max 128 chars */ String]),
+            passwordsalt = json.\("passwordsalt").toOption.map(_.as[/* max 10 chars */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

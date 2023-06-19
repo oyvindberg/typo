@@ -34,7 +34,7 @@ case class VendorRow(
   /** 0 = Vendor no longer used. 1 = Vendor is actively used. */
   activeflag: Flag,
   /** Vendor URL. */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   modifieddate: LocalDateTime
 )
 
@@ -62,7 +62,7 @@ object VendorRow {
             creditrating = json.\("creditrating").as[Int],
             preferredvendorstatus = json.\("preferredvendorstatus").as[Flag],
             activeflag = json.\("activeflag").as[Flag],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
+            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

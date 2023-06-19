@@ -29,11 +29,11 @@ case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.reviewdate]] */
   reviewdate: Option[LocalDateTime],
   /** Points to [[production.productreview.ProductreviewRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.rating]] */
   rating: Option[Int],
   /** Points to [[production.productreview.ProductreviewRow.comments]] */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -62,9 +62,9 @@ object PrViewRow {
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             reviewername = json.\("reviewername").toOption.map(_.as[Name]),
             reviewdate = json.\("reviewdate").toOption.map(_.as[LocalDateTime]),
-            emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
             rating = json.\("rating").toOption.map(_.as[Int]),
-            comments = json.\("comments").toOption.map(_.as[String]),
+            comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

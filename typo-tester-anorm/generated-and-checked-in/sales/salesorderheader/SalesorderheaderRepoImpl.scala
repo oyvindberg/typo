@@ -338,13 +338,13 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           shiptoaddressid = row[AddressId]("shiptoaddressid"),
           shipmethodid = row[ShipmethodId]("shipmethodid"),
           creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          creditcardapprovalcode = row[Option[String]]("creditcardapprovalcode"),
+          creditcardapprovalcode = row[Option[/* max 15 chars */ String]]("creditcardapprovalcode"),
           currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
           subtotal = row[BigDecimal]("subtotal"),
           taxamt = row[BigDecimal]("taxamt"),
           freight = row[BigDecimal]("freight"),
           totaldue = row[Option[BigDecimal]]("totaldue"),
-          comment = row[Option[String]]("comment"),
+          comment = row[Option[/* max 128 chars */ String]]("comment"),
           rowguid = row[UUID]("rowguid"),
           modifieddate = row[LocalDateTime]("modifieddate")
         )

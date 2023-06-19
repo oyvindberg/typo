@@ -164,7 +164,7 @@ object VendorRepoImpl extends VendorRepo {
         (Get[Int], Nullability.NoNulls),
         (Get[Flag], Nullability.NoNulls),
         (Get[Flag], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 1024 chars */ String], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
@@ -174,7 +174,7 @@ object VendorRepoImpl extends VendorRepo {
         creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
         preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
         activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        purchasingwebserviceurl = Get[String].unsafeGetNullable(rs, i + 6),
+        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
       )
     )

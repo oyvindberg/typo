@@ -24,7 +24,7 @@ case class SalesorderdetailRowUnsaved(
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */
   salesorderid: SalesorderheaderId,
   /** Shipment tracking number supplied by the shipper. */
-  carriertrackingnumber: Option[String],
+  carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
   orderqty: Int,
   /** Product sold to customer. Foreign key to Product.ProductID.
@@ -77,7 +77,7 @@ object SalesorderdetailRowUnsaved {
     (c: HCursor) =>
       for {
         salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
-        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[String]]
+        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[/* max 25 chars */ String]]
         orderqty <- c.downField("orderqty").as[Int]
         productid <- c.downField("productid").as[ProductId]
         specialofferid <- c.downField("specialofferid").as[SpecialofferId]

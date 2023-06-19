@@ -21,15 +21,15 @@ case class AViewRow(
   /** Points to [[person.address.AddressRow.addressid]] */
   addressid: Option[AddressId],
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[String],
+  addressline1: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[String],
+  city: Option[/* max 30 chars */ String],
   /** Points to [[person.address.AddressRow.stateprovinceid]] */
   stateprovinceid: Option[StateprovinceId],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[String],
+  postalcode: Option[/* max 15 chars */ String],
   /** Points to [[person.address.AddressRow.spatiallocation]] */
   spatiallocation: Option[Byte],
   /** Points to [[person.address.AddressRow.rowguid]] */
@@ -44,11 +44,11 @@ object AViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         addressid <- c.downField("addressid").as[Option[AddressId]]
-        addressline1 <- c.downField("addressline1").as[Option[String]]
-        addressline2 <- c.downField("addressline2").as[Option[String]]
-        city <- c.downField("city").as[Option[String]]
+        addressline1 <- c.downField("addressline1").as[Option[/* max 60 chars */ String]]
+        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
+        city <- c.downField("city").as[Option[/* max 30 chars */ String]]
         stateprovinceid <- c.downField("stateprovinceid").as[Option[StateprovinceId]]
-        postalcode <- c.downField("postalcode").as[Option[String]]
+        postalcode <- c.downField("postalcode").as[Option[/* max 15 chars */ String]]
         spatiallocation <- c.downField("spatiallocation").as[Option[Byte]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]

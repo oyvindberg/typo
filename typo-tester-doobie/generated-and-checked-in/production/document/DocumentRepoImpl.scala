@@ -196,11 +196,11 @@ object DocumentRepoImpl extends DocumentRepo {
   implicit val read: Read[DocumentRow] =
     new Read[DocumentRow](
       gets = List(
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
         (Get[BusinessentityId], Nullability.NoNulls),
         (Get[Flag], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 400 chars */ String], Nullability.NoNulls),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
         (Get[/* bpchar */ String], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
         (Get[Int], Nullability.NoNulls),
@@ -211,11 +211,11 @@ object DocumentRepoImpl extends DocumentRepo {
         (Get[DocumentId], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
-        title = Get[String].unsafeGetNonNullable(rs, i + 0),
+        title = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 0),
         owner = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
         folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        filename = Get[String].unsafeGetNonNullable(rs, i + 3),
-        fileextension = Get[String].unsafeGetNullable(rs, i + 4),
+        filename = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
         revision = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
         changenumber = Get[Int].unsafeGetNonNullable(rs, i + 6),
         status = Get[Int].unsafeGetNonNullable(rs, i + 7),

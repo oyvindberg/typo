@@ -19,11 +19,11 @@ case class ProductphotoRow(
   /** Small image of the product. */
   thumbnailphoto: Option[Array[Byte]],
   /** Small image file name. */
-  thumbnailphotofilename: Option[String],
+  thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
-  largephotofilename: Option[String],
+  largephotofilename: Option[/* max 50 chars */ String],
   modifieddate: LocalDateTime
 )
 
@@ -33,9 +33,9 @@ object ProductphotoRow {
       for {
         productphotoid <- c.downField("productphotoid").as[ProductphotoId]
         thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Array[Byte]]]
-        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[String]]
+        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[/* max 50 chars */ String]]
         largephoto <- c.downField("largephoto").as[Option[Array[Byte]]]
-        largephotofilename <- c.downField("largephotofilename").as[Option[String]]
+        largephotofilename <- c.downField("largephotofilename").as[Option[/* max 50 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[LocalDateTime]
       } yield ProductphotoRow(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
   implicit val encoder: Encoder[ProductphotoRow] = {

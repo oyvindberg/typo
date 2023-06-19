@@ -19,18 +19,18 @@ import scala.util.Try
 case class VjobcandidateeducationViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId],
-  `Edu.Level`: Option[String],
+  `Edu.Level`: Option[/* max 50 chars */ String],
   `Edu.StartDate`: Option[LocalDate],
   `Edu.EndDate`: Option[LocalDate],
-  `Edu.Degree`: Option[String],
-  `Edu.Major`: Option[String],
-  `Edu.Minor`: Option[String],
-  `Edu.GPA`: Option[String],
-  `Edu.GPAScale`: Option[String],
-  `Edu.School`: Option[String],
-  `Edu.Loc.CountryRegion`: Option[String],
-  `Edu.Loc.State`: Option[String],
-  `Edu.Loc.City`: Option[String]
+  `Edu.Degree`: Option[/* max 50 chars */ String],
+  `Edu.Major`: Option[/* max 50 chars */ String],
+  `Edu.Minor`: Option[/* max 50 chars */ String],
+  `Edu.GPA`: Option[/* max 5 chars */ String],
+  `Edu.GPAScale`: Option[/* max 5 chars */ String],
+  `Edu.School`: Option[/* max 100 chars */ String],
+  `Edu.Loc.CountryRegion`: Option[/* max 100 chars */ String],
+  `Edu.Loc.State`: Option[/* max 100 chars */ String],
+  `Edu.Loc.City`: Option[/* max 100 chars */ String]
 )
 
 object VjobcandidateeducationViewRow {
@@ -57,18 +57,18 @@ object VjobcandidateeducationViewRow {
         Try(
           VjobcandidateeducationViewRow(
             jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-            `Edu.Level` = json.\("Edu.Level").toOption.map(_.as[String]),
+            `Edu.Level` = json.\("Edu.Level").toOption.map(_.as[/* max 50 chars */ String]),
             `Edu.StartDate` = json.\("Edu.StartDate").toOption.map(_.as[LocalDate]),
             `Edu.EndDate` = json.\("Edu.EndDate").toOption.map(_.as[LocalDate]),
-            `Edu.Degree` = json.\("Edu.Degree").toOption.map(_.as[String]),
-            `Edu.Major` = json.\("Edu.Major").toOption.map(_.as[String]),
-            `Edu.Minor` = json.\("Edu.Minor").toOption.map(_.as[String]),
-            `Edu.GPA` = json.\("Edu.GPA").toOption.map(_.as[String]),
-            `Edu.GPAScale` = json.\("Edu.GPAScale").toOption.map(_.as[String]),
-            `Edu.School` = json.\("Edu.School").toOption.map(_.as[String]),
-            `Edu.Loc.CountryRegion` = json.\("Edu.Loc.CountryRegion").toOption.map(_.as[String]),
-            `Edu.Loc.State` = json.\("Edu.Loc.State").toOption.map(_.as[String]),
-            `Edu.Loc.City` = json.\("Edu.Loc.City").toOption.map(_.as[String])
+            `Edu.Degree` = json.\("Edu.Degree").toOption.map(_.as[/* max 50 chars */ String]),
+            `Edu.Major` = json.\("Edu.Major").toOption.map(_.as[/* max 50 chars */ String]),
+            `Edu.Minor` = json.\("Edu.Minor").toOption.map(_.as[/* max 50 chars */ String]),
+            `Edu.GPA` = json.\("Edu.GPA").toOption.map(_.as[/* max 5 chars */ String]),
+            `Edu.GPAScale` = json.\("Edu.GPAScale").toOption.map(_.as[/* max 5 chars */ String]),
+            `Edu.School` = json.\("Edu.School").toOption.map(_.as[/* max 100 chars */ String]),
+            `Edu.Loc.CountryRegion` = json.\("Edu.Loc.CountryRegion").toOption.map(_.as[/* max 100 chars */ String]),
+            `Edu.Loc.State` = json.\("Edu.Loc.State").toOption.map(_.as[/* max 100 chars */ String]),
+            `Edu.Loc.City` = json.\("Edu.Loc.City").toOption.map(_.as[/* max 100 chars */ String])
           )
         )
       )

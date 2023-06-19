@@ -57,11 +57,11 @@ object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
           name = row[Option[Name]]("name"),
           addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[String]]("addressline1"),
-          addressline2 = row[Option[String]]("addressline2"),
-          city = row[Option[String]]("city"),
+          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
+          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
+          city = row[Option[/* max 30 chars */ String]]("city"),
           stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[String]]("postalcode"),
+          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
           countryregionname = row[Option[Name]]("countryregionname")
         )
       )

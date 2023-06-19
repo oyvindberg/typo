@@ -66,9 +66,9 @@ object EViewRepoImpl extends EViewRepo {
         EViewRow(
           id = row[Option[Int]]("id"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          nationalidnumber = row[Option[String]]("nationalidnumber"),
-          loginid = row[Option[String]]("loginid"),
-          jobtitle = row[Option[String]]("jobtitle"),
+          nationalidnumber = row[Option[/* max 15 chars */ String]]("nationalidnumber"),
+          loginid = row[Option[/* max 256 chars */ String]]("loginid"),
+          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
           birthdate = row[Option[LocalDate]]("birthdate"),
           maritalstatus = row[Option[/* bpchar */ String]]("maritalstatus"),
           gender = row[Option[/* bpchar */ String]]("gender"),

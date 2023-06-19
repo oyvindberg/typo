@@ -132,13 +132,13 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     new Read[ProductdescriptionRow](
       gets = List(
         (Get[ProductdescriptionId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
+        (Get[/* max 400 chars */ String], Nullability.NoNulls),
         (Get[UUID], Nullability.NoNulls),
         (Get[LocalDateTime], Nullability.NoNulls)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => ProductdescriptionRow(
         productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 0),
-        description = Get[String].unsafeGetNonNullable(rs, i + 1),
+        description = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 1),
         rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
         modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
       )

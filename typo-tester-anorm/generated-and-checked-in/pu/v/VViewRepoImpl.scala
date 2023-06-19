@@ -64,7 +64,7 @@ object VViewRepoImpl extends VViewRepo {
           creditrating = row[Option[Int]]("creditrating"),
           preferredvendorstatus = row[Flag]("preferredvendorstatus"),
           activeflag = row[Flag]("activeflag"),
-          purchasingwebserviceurl = row[Option[String]]("purchasingwebserviceurl"),
+          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]]("purchasingwebserviceurl"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

@@ -17,8 +17,8 @@ sealed abstract class PaViewFieldValue[T](name: String, value: T) extends PaView
 object PaViewFieldValue {
   case class id(override val value: Option[Int]) extends PaViewFieldValue("id", value)
   case class businessentityid(override val value: Option[BusinessentityId]) extends PaViewFieldValue("businessentityid", value)
-  case class passwordhash(override val value: Option[String]) extends PaViewFieldValue("passwordhash", value)
-  case class passwordsalt(override val value: Option[String]) extends PaViewFieldValue("passwordsalt", value)
+  case class passwordhash(override val value: Option[/* max 128 chars */ String]) extends PaViewFieldValue("passwordhash", value)
+  case class passwordsalt(override val value: Option[/* max 10 chars */ String]) extends PaViewFieldValue("passwordsalt", value)
   case class rowguid(override val value: Option[UUID]) extends PaViewFieldValue("rowguid", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends PaViewFieldValue("modifieddate", value)
 }

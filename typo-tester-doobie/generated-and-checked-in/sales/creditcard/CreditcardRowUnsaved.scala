@@ -17,9 +17,9 @@ import java.time.LocalDateTime
 /** This class corresponds to a row in table `sales.creditcard` which has not been persisted yet */
 case class CreditcardRowUnsaved(
   /** Credit card name. */
-  cardtype: String,
+  cardtype: /* max 50 chars */ String,
   /** Credit card number. */
-  cardnumber: String,
+  cardnumber: /* max 25 chars */ String,
   /** Credit card expiration month. */
   expmonth: Int,
   /** Credit card expiration year. */
@@ -50,8 +50,8 @@ object CreditcardRowUnsaved {
   implicit val decoder: Decoder[CreditcardRowUnsaved] =
     (c: HCursor) =>
       for {
-        cardtype <- c.downField("cardtype").as[String]
-        cardnumber <- c.downField("cardnumber").as[String]
+        cardtype <- c.downField("cardtype").as[/* max 50 chars */ String]
+        cardnumber <- c.downField("cardnumber").as[/* max 25 chars */ String]
         expmonth <- c.downField("expmonth").as[Int]
         expyear <- c.downField("expyear").as[Int]
         creditcardid <- c.downField("creditcardid").as[Defaulted[CreditcardId]]

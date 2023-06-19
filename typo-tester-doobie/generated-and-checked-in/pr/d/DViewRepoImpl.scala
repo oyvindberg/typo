@@ -49,11 +49,11 @@ object DViewRepoImpl extends DViewRepo {
   implicit val read: Read[DViewRow] =
     new Read[DViewRow](
       gets = List(
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[BusinessentityId], Nullability.Nullable),
         (Get[Flag], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 400 chars */ String], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
         (Get[/* bpchar */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
@@ -64,11 +64,11 @@ object DViewRepoImpl extends DViewRepo {
         (Get[DocumentId], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-        title = Get[String].unsafeGetNullable(rs, i + 0),
+        title = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 0),
         owner = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
         folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        filename = Get[String].unsafeGetNullable(rs, i + 3),
-        fileextension = Get[String].unsafeGetNullable(rs, i + 4),
+        filename = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 3),
+        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
         revision = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 5),
         changenumber = Get[Int].unsafeGetNullable(rs, i + 6),
         status = Get[Int].unsafeGetNullable(rs, i + 7),

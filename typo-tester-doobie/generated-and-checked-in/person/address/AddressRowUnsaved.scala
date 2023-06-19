@@ -19,16 +19,16 @@ import java.util.UUID
 /** This class corresponds to a row in table `person.address` which has not been persisted yet */
 case class AddressRowUnsaved(
   /** First street address line. */
-  addressline1: String,
+  addressline1: /* max 60 chars */ String,
   /** Second street address line. */
-  addressline2: Option[String],
+  addressline2: Option[/* max 60 chars */ String],
   /** Name of the city. */
-  city: String,
+  city: /* max 30 chars */ String,
   /** Unique identification number for the state or province. Foreign key to StateProvince table.
       Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** Postal code for the street address. */
-  postalcode: String,
+  postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
   /** Default: nextval('person.address_addressid_seq'::regclass)
@@ -65,11 +65,11 @@ object AddressRowUnsaved {
   implicit val decoder: Decoder[AddressRowUnsaved] =
     (c: HCursor) =>
       for {
-        addressline1 <- c.downField("addressline1").as[String]
-        addressline2 <- c.downField("addressline2").as[Option[String]]
-        city <- c.downField("city").as[String]
+        addressline1 <- c.downField("addressline1").as[/* max 60 chars */ String]
+        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
+        city <- c.downField("city").as[/* max 30 chars */ String]
         stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        postalcode <- c.downField("postalcode").as[String]
+        postalcode <- c.downField("postalcode").as[/* max 15 chars */ String]
         spatiallocation <- c.downField("spatiallocation").as[Option[Array[Byte]]]
         addressid <- c.downField("addressid").as[Defaulted[AddressId]]
         rowguid <- c.downField("rowguid").as[Defaulted[UUID]]

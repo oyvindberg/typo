@@ -171,7 +171,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         ProductinventoryRow(
           productid = row[ProductId]("productid"),
           locationid = row[LocationId]("locationid"),
-          shelf = row[String]("shelf"),
+          shelf = row[/* max 10 chars */ String]("shelf"),
           bin = row[Int]("bin"),
           quantity = row[Int]("quantity"),
           rowguid = row[UUID]("rowguid"),

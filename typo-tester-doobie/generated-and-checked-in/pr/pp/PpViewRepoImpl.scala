@@ -43,18 +43,18 @@ object PpViewRepoImpl extends PpViewRepo {
         (Get[Int], Nullability.Nullable),
         (Get[ProductphotoId], Nullability.Nullable),
         (Get[Byte], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[Byte], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         productphotoid = Get[ProductphotoId].unsafeGetNullable(rs, i + 1),
         thumbnailphoto = Get[Byte].unsafeGetNullable(rs, i + 2),
-        thumbnailphotofilename = Get[String].unsafeGetNullable(rs, i + 3),
+        thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
         largephoto = Get[Byte].unsafeGetNullable(rs, i + 4),
-        largephotofilename = Get[String].unsafeGetNullable(rs, i + 5),
+        largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
       )
     )

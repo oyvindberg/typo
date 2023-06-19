@@ -28,7 +28,7 @@ case class ProductinventoryRowUnsaved(
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
   /** Storage compartment within an inventory location. */
-  shelf: String,
+  shelf: /* max 10 chars */ String,
   /** Storage container on a shelf in an inventory location. */
   bin: Int,
   /** Default: 0
@@ -78,7 +78,7 @@ object ProductinventoryRowUnsaved {
           ProductinventoryRowUnsaved(
             productid = json.\("productid").as[ProductId],
             locationid = json.\("locationid").as[LocationId],
-            shelf = json.\("shelf").as[String],
+            shelf = json.\("shelf").as[/* max 10 chars */ String],
             bin = json.\("bin").as[Int],
             quantity = json.\("quantity").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],

@@ -55,7 +55,7 @@ object EViewRepoImpl extends EViewRepo {
           id = row[Option[Int]]("id"),
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
           emailaddressid = row[Option[Int]]("emailaddressid"),
-          emailaddress = row[Option[String]]("emailaddress"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

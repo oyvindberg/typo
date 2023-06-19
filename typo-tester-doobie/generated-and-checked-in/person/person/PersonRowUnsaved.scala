@@ -27,7 +27,7 @@ case class PersonRowUnsaved(
   /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact */
   persontype: /* bpchar */ String,
   /** A courtesy title. For example, Mr. or Ms. */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** First name of the person. */
   firstname: Name,
   /** Middle name or middle initial of the person. */
@@ -35,7 +35,7 @@ case class PersonRowUnsaved(
   /** Last name of the person. */
   lastname: Name,
   /** Surname suffix. For example, Sr. or Jr. */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** Additional contact information about the person stored in xml format. */
   additionalcontactinfo: Option[TypoXml],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
@@ -86,11 +86,11 @@ object PersonRowUnsaved {
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
         persontype <- c.downField("persontype").as[/* bpchar */ String]
-        title <- c.downField("title").as[Option[String]]
+        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
         firstname <- c.downField("firstname").as[Name]
         middlename <- c.downField("middlename").as[Option[Name]]
         lastname <- c.downField("lastname").as[Name]
-        suffix <- c.downField("suffix").as[Option[String]]
+        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
         additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
         demographics <- c.downField("demographics").as[Option[TypoXml]]
         namestyle <- c.downField("namestyle").as[Defaulted[NameStyle]]

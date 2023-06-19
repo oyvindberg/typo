@@ -55,7 +55,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
         (Get[BigDecimal], Nullability.Nullable),
         (Get[BigDecimal], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 1024 chars */ String], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
@@ -68,7 +68,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
         MachineHours = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
         LaborHours = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
         LotSize = Get[Int].unsafeGetNullable(rs, i + 7),
-        Step = Get[String].unsafeGetNullable(rs, i + 8),
+        Step = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 8),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
       )

@@ -19,7 +19,7 @@ case class PersonDetailSqlRow(
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Name,
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -27,13 +27,13 @@ case class PersonDetailSqlRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Name,
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: String,
+  jobtitle: /* max 50 chars */ String,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: String,
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: String,
+  city: /* max 30 chars */ String,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: String
+  postalcode: /* max 15 chars */ String
 )
 
 object PersonDetailSqlRow {
@@ -56,14 +56,14 @@ object PersonDetailSqlRow {
         Try(
           PersonDetailSqlRow(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
             firstname = json.\("firstname").as[Name],
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").as[Name],
-            jobtitle = json.\("jobtitle").as[String],
-            addressline1 = json.\("addressline1").as[String],
-            city = json.\("city").as[String],
-            postalcode = json.\("postalcode").as[String]
+            jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
+            addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
+            city = json.\("city").as[/* max 30 chars */ String],
+            postalcode = json.\("postalcode").as[/* max 15 chars */ String]
           )
         )
       )

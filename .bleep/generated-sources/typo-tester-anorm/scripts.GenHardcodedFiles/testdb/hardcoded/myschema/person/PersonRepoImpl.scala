@@ -211,14 +211,14 @@ object PersonRepoImpl extends PersonRepo {
         PersonRow(
           id = row[PersonId]("id"),
           favouriteFootballClubId = row[FootballClubId]("favourite_football_club_id"),
-          name = row[String]("name"),
-          nickName = row[Option[String]]("nick_name"),
-          blogUrl = row[Option[String]]("blog_url"),
-          email = row[String]("email"),
-          phone = row[String]("phone"),
+          name = row[/* max 100 chars */ String]("name"),
+          nickName = row[Option[/* max 30 chars */ String]]("nick_name"),
+          blogUrl = row[Option[/* max 100 chars */ String]]("blog_url"),
+          email = row[/* max 254 chars */ String]("email"),
+          phone = row[/* max 8 chars */ String]("phone"),
           likesPizza = row[Boolean]("likes_pizza"),
           maritalStatusId = row[MaritalStatusId]("marital_status_id"),
-          workEmail = row[Option[String]]("work_email"),
+          workEmail = row[Option[/* max 254 chars */ String]]("work_email"),
           sector = row[Sector]("sector")
         )
       )

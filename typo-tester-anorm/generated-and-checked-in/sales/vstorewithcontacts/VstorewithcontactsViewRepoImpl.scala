@@ -61,14 +61,14 @@ object VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
           businessentityid = row[Option[BusinessentityId]]("businessentityid"),
           name = row[Option[Name]]("name"),
           contacttype = row[Option[Name]]("contacttype"),
-          title = row[Option[String]]("title"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
           firstname = row[Option[Name]]("firstname"),
           middlename = row[Option[Name]]("middlename"),
           lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[String]]("suffix"),
+          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
           phonenumber = row[Option[Phone]]("phonenumber"),
           phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[String]]("emailaddress"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
           emailpromotion = row[Option[Int]]("emailpromotion")
         )
       )

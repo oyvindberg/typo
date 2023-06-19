@@ -24,7 +24,7 @@ case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   salesorderdetailid: Option[Int],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]] */
-  carriertrackingnumber: Option[String],
+  carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]] */
   orderqty: Option[Int],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]] */
@@ -48,7 +48,7 @@ object SodViewRow {
         id <- c.downField("id").as[Option[Int]]
         salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
         salesorderdetailid <- c.downField("salesorderdetailid").as[Option[Int]]
-        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[String]]
+        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[/* max 25 chars */ String]]
         orderqty <- c.downField("orderqty").as[Option[Int]]
         productid <- c.downField("productid").as[Option[ProductId]]
         specialofferid <- c.downField("specialofferid").as[Option[SpecialofferId]]

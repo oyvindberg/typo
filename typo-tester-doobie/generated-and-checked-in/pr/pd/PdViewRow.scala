@@ -20,7 +20,7 @@ case class PdViewRow(
   /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
   productdescriptionid: Option[ProductdescriptionId],
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
-  description: Option[String],
+  description: Option[/* max 400 chars */ String],
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
@@ -33,7 +33,7 @@ object PdViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         productdescriptionid <- c.downField("productdescriptionid").as[Option[ProductdescriptionId]]
-        description <- c.downField("description").as[Option[String]]
+        description <- c.downField("description").as[Option[/* max 400 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PdViewRow(id, productdescriptionid, description, rowguid, modifieddate)

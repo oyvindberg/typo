@@ -61,9 +61,9 @@ object PrViewRepoImpl extends PrViewRepo {
           productid = row[Option[ProductId]]("productid"),
           reviewername = row[Option[Name]]("reviewername"),
           reviewdate = row[Option[LocalDateTime]]("reviewdate"),
-          emailaddress = row[Option[String]]("emailaddress"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
           rating = row[Option[Int]]("rating"),
-          comments = row[Option[String]]("comments"),
+          comments = row[Option[/* max 3850 chars */ String]]("comments"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )
       )

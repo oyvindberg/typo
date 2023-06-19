@@ -15,8 +15,8 @@ sealed abstract class ProductphotoFieldValue[T](name: String, value: T) extends 
 object ProductphotoFieldValue {
   case class productphotoid(override val value: ProductphotoId) extends ProductphotoFieldOrIdValue("productphotoid", value)
   case class thumbnailphoto(override val value: Option[Array[Byte]]) extends ProductphotoFieldValue("thumbnailphoto", value)
-  case class thumbnailphotofilename(override val value: Option[String]) extends ProductphotoFieldValue("thumbnailphotofilename", value)
+  case class thumbnailphotofilename(override val value: Option[/* max 50 chars */ String]) extends ProductphotoFieldValue("thumbnailphotofilename", value)
   case class largephoto(override val value: Option[Array[Byte]]) extends ProductphotoFieldValue("largephoto", value)
-  case class largephotofilename(override val value: Option[String]) extends ProductphotoFieldValue("largephotofilename", value)
+  case class largephotofilename(override val value: Option[/* max 50 chars */ String]) extends ProductphotoFieldValue("largephotofilename", value)
   case class modifieddate(override val value: LocalDateTime) extends ProductphotoFieldValue("modifieddate", value)
 }

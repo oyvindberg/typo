@@ -22,7 +22,7 @@ case class PdViewRow(
   /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
   productdescriptionid: Option[ProductdescriptionId],
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
-  description: Option[String],
+  description: Option[/* max 400 chars */ String],
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
@@ -46,7 +46,7 @@ object PdViewRow {
           PdViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             productdescriptionid = json.\("productdescriptionid").toOption.map(_.as[ProductdescriptionId]),
-            description = json.\("description").toOption.map(_.as[String]),
+            description = json.\("description").toOption.map(_.as[/* max 400 chars */ String]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )

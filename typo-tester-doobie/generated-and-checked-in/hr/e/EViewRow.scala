@@ -22,11 +22,11 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.employee.EmployeeRow.nationalidnumber]] */
-  nationalidnumber: Option[String],
+  nationalidnumber: Option[/* max 15 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.loginid]] */
-  loginid: Option[String],
+  loginid: Option[/* max 256 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[String],
+  jobtitle: Option[/* max 50 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.birthdate]] */
   birthdate: Option[LocalDate],
   /** Points to [[humanresources.employee.EmployeeRow.maritalstatus]] */
@@ -57,9 +57,9 @@ object EViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        nationalidnumber <- c.downField("nationalidnumber").as[Option[String]]
-        loginid <- c.downField("loginid").as[Option[String]]
-        jobtitle <- c.downField("jobtitle").as[Option[String]]
+        nationalidnumber <- c.downField("nationalidnumber").as[Option[/* max 15 chars */ String]]
+        loginid <- c.downField("loginid").as[Option[/* max 256 chars */ String]]
+        jobtitle <- c.downField("jobtitle").as[Option[/* max 50 chars */ String]]
         birthdate <- c.downField("birthdate").as[Option[LocalDate]]
         maritalstatus <- c.downField("maritalstatus").as[Option[/* bpchar */ String]]
         gender <- c.downField("gender").as[Option[/* bpchar */ String]]

@@ -43,7 +43,7 @@ object SciViewRepoImpl extends SciViewRepo {
       gets = List(
         (Get[Int], Nullability.Nullable),
         (Get[ShoppingcartitemId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
         (Get[Int], Nullability.Nullable),
         (Get[ProductId], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable),
@@ -52,7 +52,7 @@ object SciViewRepoImpl extends SciViewRepo {
       unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNullable(rs, i + 1),
-        shoppingcartid = Get[String].unsafeGetNullable(rs, i + 2),
+        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
         quantity = Get[Int].unsafeGetNullable(rs, i + 3),
         productid = Get[ProductId].unsafeGetNullable(rs, i + 4),
         datecreated = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),

@@ -29,13 +29,13 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.name]] */
   name: Option[Name],
   /** Points to [[production.product.ProductRow.productnumber]] */
-  productnumber: Option[String],
+  productnumber: Option[/* max 25 chars */ String],
   /** Points to [[production.product.ProductRow.makeflag]] */
   makeflag: Flag,
   /** Points to [[production.product.ProductRow.finishedgoodsflag]] */
   finishedgoodsflag: Flag,
   /** Points to [[production.product.ProductRow.color]] */
-  color: Option[String],
+  color: Option[/* max 15 chars */ String],
   /** Points to [[production.product.ProductRow.safetystocklevel]] */
   safetystocklevel: Option[Int],
   /** Points to [[production.product.ProductRow.reorderpoint]] */
@@ -45,7 +45,7 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.listprice]] */
   listprice: Option[BigDecimal],
   /** Points to [[production.product.ProductRow.size]] */
-  size: Option[String],
+  size: Option[/* max 5 chars */ String],
   /** Points to [[production.product.ProductRow.sizeunitmeasurecode]] */
   sizeunitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.product.ProductRow.weightunitmeasurecode]] */
@@ -115,15 +115,15 @@ object PViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             name = json.\("name").toOption.map(_.as[Name]),
-            productnumber = json.\("productnumber").toOption.map(_.as[String]),
+            productnumber = json.\("productnumber").toOption.map(_.as[/* max 25 chars */ String]),
             makeflag = json.\("makeflag").as[Flag],
             finishedgoodsflag = json.\("finishedgoodsflag").as[Flag],
-            color = json.\("color").toOption.map(_.as[String]),
+            color = json.\("color").toOption.map(_.as[/* max 15 chars */ String]),
             safetystocklevel = json.\("safetystocklevel").toOption.map(_.as[Int]),
             reorderpoint = json.\("reorderpoint").toOption.map(_.as[Int]),
             standardcost = json.\("standardcost").toOption.map(_.as[BigDecimal]),
             listprice = json.\("listprice").toOption.map(_.as[BigDecimal]),
-            size = json.\("size").toOption.map(_.as[String]),
+            size = json.\("size").toOption.map(_.as[/* max 5 chars */ String]),
             sizeunitmeasurecode = json.\("sizeunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             weightunitmeasurecode = json.\("weightunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
             weight = json.\("weight").toOption.map(_.as[BigDecimal]),

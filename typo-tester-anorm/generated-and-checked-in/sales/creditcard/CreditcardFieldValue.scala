@@ -14,8 +14,8 @@ sealed abstract class CreditcardFieldValue[T](name: String, value: T) extends Cr
 
 object CreditcardFieldValue {
   case class creditcardid(override val value: CreditcardId) extends CreditcardFieldOrIdValue("creditcardid", value)
-  case class cardtype(override val value: String) extends CreditcardFieldValue("cardtype", value)
-  case class cardnumber(override val value: String) extends CreditcardFieldValue("cardnumber", value)
+  case class cardtype(override val value: /* max 50 chars */ String) extends CreditcardFieldValue("cardtype", value)
+  case class cardnumber(override val value: /* max 25 chars */ String) extends CreditcardFieldValue("cardnumber", value)
   case class expmonth(override val value: Int) extends CreditcardFieldValue("expmonth", value)
   case class expyear(override val value: Int) extends CreditcardFieldValue("expyear", value)
   case class modifieddate(override val value: LocalDateTime) extends CreditcardFieldValue("modifieddate", value)

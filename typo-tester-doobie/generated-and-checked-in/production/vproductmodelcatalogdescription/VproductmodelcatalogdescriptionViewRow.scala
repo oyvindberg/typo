@@ -23,25 +23,25 @@ case class VproductmodelcatalogdescriptionViewRow(
   name: Option[Name],
   Summary: Option[String],
   manufacturer: Option[String],
-  copyright: Option[String],
-  producturl: Option[String],
-  warrantyperiod: Option[String],
-  warrantydescription: Option[String],
-  noofyears: Option[String],
-  maintenancedescription: Option[String],
-  wheel: Option[String],
-  saddle: Option[String],
-  pedal: Option[String],
+  copyright: Option[/* max 30 chars */ String],
+  producturl: Option[/* max 256 chars */ String],
+  warrantyperiod: Option[/* max 256 chars */ String],
+  warrantydescription: Option[/* max 256 chars */ String],
+  noofyears: Option[/* max 256 chars */ String],
+  maintenancedescription: Option[/* max 256 chars */ String],
+  wheel: Option[/* max 256 chars */ String],
+  saddle: Option[/* max 256 chars */ String],
+  pedal: Option[/* max 256 chars */ String],
   bikeframe: Option[String],
-  crankset: Option[String],
-  pictureangle: Option[String],
-  picturesize: Option[String],
-  productphotoid: Option[String],
-  material: Option[String],
-  color: Option[String],
-  productline: Option[String],
-  style: Option[String],
-  riderexperience: Option[String],
+  crankset: Option[/* max 256 chars */ String],
+  pictureangle: Option[/* max 256 chars */ String],
+  picturesize: Option[/* max 256 chars */ String],
+  productphotoid: Option[/* max 256 chars */ String],
+  material: Option[/* max 256 chars */ String],
+  color: Option[/* max 256 chars */ String],
+  productline: Option[/* max 256 chars */ String],
+  style: Option[/* max 256 chars */ String],
+  riderexperience: Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
@@ -56,25 +56,25 @@ object VproductmodelcatalogdescriptionViewRow {
         name <- c.downField("name").as[Option[Name]]
         Summary <- c.downField("Summary").as[Option[String]]
         manufacturer <- c.downField("manufacturer").as[Option[String]]
-        copyright <- c.downField("copyright").as[Option[String]]
-        producturl <- c.downField("producturl").as[Option[String]]
-        warrantyperiod <- c.downField("warrantyperiod").as[Option[String]]
-        warrantydescription <- c.downField("warrantydescription").as[Option[String]]
-        noofyears <- c.downField("noofyears").as[Option[String]]
-        maintenancedescription <- c.downField("maintenancedescription").as[Option[String]]
-        wheel <- c.downField("wheel").as[Option[String]]
-        saddle <- c.downField("saddle").as[Option[String]]
-        pedal <- c.downField("pedal").as[Option[String]]
+        copyright <- c.downField("copyright").as[Option[/* max 30 chars */ String]]
+        producturl <- c.downField("producturl").as[Option[/* max 256 chars */ String]]
+        warrantyperiod <- c.downField("warrantyperiod").as[Option[/* max 256 chars */ String]]
+        warrantydescription <- c.downField("warrantydescription").as[Option[/* max 256 chars */ String]]
+        noofyears <- c.downField("noofyears").as[Option[/* max 256 chars */ String]]
+        maintenancedescription <- c.downField("maintenancedescription").as[Option[/* max 256 chars */ String]]
+        wheel <- c.downField("wheel").as[Option[/* max 256 chars */ String]]
+        saddle <- c.downField("saddle").as[Option[/* max 256 chars */ String]]
+        pedal <- c.downField("pedal").as[Option[/* max 256 chars */ String]]
         bikeframe <- c.downField("bikeframe").as[Option[String]]
-        crankset <- c.downField("crankset").as[Option[String]]
-        pictureangle <- c.downField("pictureangle").as[Option[String]]
-        picturesize <- c.downField("picturesize").as[Option[String]]
-        productphotoid <- c.downField("productphotoid").as[Option[String]]
-        material <- c.downField("material").as[Option[String]]
-        color <- c.downField("color").as[Option[String]]
-        productline <- c.downField("productline").as[Option[String]]
-        style <- c.downField("style").as[Option[String]]
-        riderexperience <- c.downField("riderexperience").as[Option[String]]
+        crankset <- c.downField("crankset").as[Option[/* max 256 chars */ String]]
+        pictureangle <- c.downField("pictureangle").as[Option[/* max 256 chars */ String]]
+        picturesize <- c.downField("picturesize").as[Option[/* max 256 chars */ String]]
+        productphotoid <- c.downField("productphotoid").as[Option[/* max 256 chars */ String]]
+        material <- c.downField("material").as[Option[/* max 256 chars */ String]]
+        color <- c.downField("color").as[Option[/* max 256 chars */ String]]
+        productline <- c.downField("productline").as[Option[/* max 256 chars */ String]]
+        style <- c.downField("style").as[Option[/* max 256 chars */ String]]
+        riderexperience <- c.downField("riderexperience").as[Option[/* max 1024 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield VproductmodelcatalogdescriptionViewRow(productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate)

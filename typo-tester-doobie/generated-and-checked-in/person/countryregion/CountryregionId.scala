@@ -12,13 +12,13 @@ import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `person.countryregion` */
-case class CountryregionId(value: String) extends AnyVal
+case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
   implicit val encoder: Encoder[CountryregionId] =
-    Encoder[String].contramap(_.value)
+    Encoder[/* max 3 chars */ String].contramap(_.value)
   implicit val decoder: Decoder[CountryregionId] =
-    Decoder[String].map(CountryregionId(_))
-  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
-  implicit val meta: Meta[CountryregionId] = Meta[String].imap(CountryregionId.apply)(_.value)
+    Decoder[/* max 3 chars */ String].map(CountryregionId(_))
+  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[/* max 3 chars */ String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
+  implicit val meta: Meta[CountryregionId] = Meta[/* max 3 chars */ String].imap(CountryregionId.apply)(_.value)
 }

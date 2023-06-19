@@ -28,11 +28,11 @@ case class ProductreviewRow(
   /** Date review was submitted. */
   reviewdate: LocalDateTime,
   /** Reviewer's e-mail address. */
-  emailaddress: String,
+  emailaddress: /* max 50 chars */ String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   modifieddate: LocalDateTime
 )
 
@@ -58,9 +58,9 @@ object ProductreviewRow {
             productid = json.\("productid").as[ProductId],
             reviewername = json.\("reviewername").as[Name],
             reviewdate = json.\("reviewdate").as[LocalDateTime],
-            emailaddress = json.\("emailaddress").as[String],
+            emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
             rating = json.\("rating").as[Int],
-            comments = json.\("comments").toOption.map(_.as[String]),
+            comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
             modifieddate = json.\("modifieddate").as[LocalDateTime]
           )
         )

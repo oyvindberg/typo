@@ -20,9 +20,9 @@ case class PaViewRow(
   /** Points to [[person.password.PasswordRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.password.PasswordRow.passwordhash]] */
-  passwordhash: Option[String],
+  passwordhash: Option[/* max 128 chars */ String],
   /** Points to [[person.password.PasswordRow.passwordsalt]] */
-  passwordsalt: Option[String],
+  passwordsalt: Option[/* max 10 chars */ String],
   /** Points to [[person.password.PasswordRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.password.PasswordRow.modifieddate]] */
@@ -35,8 +35,8 @@ object PaViewRow {
       for {
         id <- c.downField("id").as[Option[Int]]
         businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        passwordhash <- c.downField("passwordhash").as[Option[String]]
-        passwordsalt <- c.downField("passwordsalt").as[Option[String]]
+        passwordhash <- c.downField("passwordhash").as[Option[/* max 128 chars */ String]]
+        passwordsalt <- c.downField("passwordsalt").as[Option[/* max 10 chars */ String]]
         rowguid <- c.downField("rowguid").as[Option[UUID]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield PaViewRow(id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

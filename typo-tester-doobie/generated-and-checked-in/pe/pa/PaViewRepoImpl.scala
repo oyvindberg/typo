@@ -42,16 +42,16 @@ object PaViewRepoImpl extends PaViewRepo {
       gets = List(
         (Get[Int], Nullability.Nullable),
         (Get[BusinessentityId], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
+        (Get[/* max 128 chars */ String], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
         (Get[UUID], Nullability.Nullable),
         (Get[LocalDateTime], Nullability.Nullable)
       ),
       unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
         id = Get[Int].unsafeGetNullable(rs, i + 0),
         businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        passwordhash = Get[String].unsafeGetNullable(rs, i + 2),
-        passwordsalt = Get[String].unsafeGetNullable(rs, i + 3),
+        passwordhash = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 2),
+        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
         rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
         modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
       )

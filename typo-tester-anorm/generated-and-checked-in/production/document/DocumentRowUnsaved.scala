@@ -22,14 +22,14 @@ import scala.util.Try
 /** This class corresponds to a row in table `production.document` which has not been persisted yet */
 case class DocumentRowUnsaved(
   /** Title of the document. */
-  title: String,
+  title: /* max 50 chars */ String,
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId,
   /** File name of the document */
-  filename: String,
+  filename: /* max 400 chars */ String,
   /** File extension indicating the document type. For example, .doc or .txt. */
-  fileextension: Option[String],
+  fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
   revision: /* bpchar */ String,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
@@ -108,10 +108,10 @@ object DocumentRowUnsaved {
       JsResult.fromTry(
         Try(
           DocumentRowUnsaved(
-            title = json.\("title").as[String],
+            title = json.\("title").as[/* max 50 chars */ String],
             owner = json.\("owner").as[BusinessentityId],
-            filename = json.\("filename").as[String],
-            fileextension = json.\("fileextension").toOption.map(_.as[String]),
+            filename = json.\("filename").as[/* max 400 chars */ String],
+            fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
             revision = json.\("revision").as[/* bpchar */ String],
             status = json.\("status").as[Int],
             documentsummary = json.\("documentsummary").toOption.map(_.as[String]),

@@ -22,7 +22,7 @@ case class SciViewRow(
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
   shoppingcartitemid: Option[ShoppingcartitemId],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartid]] */
-  shoppingcartid: Option[String],
+  shoppingcartid: Option[/* max 50 chars */ String],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.quantity]] */
   quantity: Option[Int],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.productid]] */
@@ -52,7 +52,7 @@ object SciViewRow {
           SciViewRow(
             id = json.\("id").toOption.map(_.as[Int]),
             shoppingcartitemid = json.\("shoppingcartitemid").toOption.map(_.as[ShoppingcartitemId]),
-            shoppingcartid = json.\("shoppingcartid").toOption.map(_.as[String]),
+            shoppingcartid = json.\("shoppingcartid").toOption.map(_.as[/* max 50 chars */ String]),
             quantity = json.\("quantity").toOption.map(_.as[Int]),
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             datecreated = json.\("datecreated").toOption.map(_.as[LocalDateTime]),

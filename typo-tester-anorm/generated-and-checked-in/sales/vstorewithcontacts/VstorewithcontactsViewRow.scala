@@ -24,7 +24,7 @@ case class VstorewithcontactsViewRow(
   name: Option[Name],
   contacttype: Option[Name],
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[String],
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: Option[Name],
   /** Points to [[person.person.PersonRow.middlename]] */
@@ -32,12 +32,12 @@ case class VstorewithcontactsViewRow(
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Option[Name],
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[String],
+  suffix: Option[/* max 10 chars */ String],
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
   phonenumber: Option[Phone],
   phonenumbertype: Option[Name],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.person.PersonRow.emailpromotion]] */
   emailpromotion: Option[Int]
 )
@@ -67,14 +67,14 @@ object VstorewithcontactsViewRow {
             businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
             name = json.\("name").toOption.map(_.as[Name]),
             contacttype = json.\("contacttype").toOption.map(_.as[Name]),
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
             firstname = json.\("firstname").toOption.map(_.as[Name]),
             middlename = json.\("middlename").toOption.map(_.as[Name]),
             lastname = json.\("lastname").toOption.map(_.as[Name]),
-            suffix = json.\("suffix").toOption.map(_.as[String]),
+            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
             phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
             phonenumbertype = json.\("phonenumbertype").toOption.map(_.as[Name]),
-            emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
             emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int])
           )
         )

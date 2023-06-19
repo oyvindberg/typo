@@ -34,7 +34,7 @@ case class VViewRow(
   /** Points to [[purchasing.vendor.VendorRow.activeflag]] */
   activeflag: Flag,
   /** Points to [[purchasing.vendor.VendorRow.purchasingwebserviceurl]] */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Points to [[purchasing.vendor.VendorRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -65,7 +65,7 @@ object VViewRow {
             creditrating = json.\("creditrating").toOption.map(_.as[Int]),
             preferredvendorstatus = json.\("preferredvendorstatus").as[Flag],
             activeflag = json.\("activeflag").as[Flag],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[String]),
+            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
             modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
           )
         )

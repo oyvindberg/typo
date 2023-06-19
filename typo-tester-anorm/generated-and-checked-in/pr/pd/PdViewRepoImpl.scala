@@ -53,7 +53,7 @@ object PdViewRepoImpl extends PdViewRepo {
         PdViewRow(
           id = row[Option[Int]]("id"),
           productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
-          description = row[Option[String]]("description"),
+          description = row[Option[/* max 400 chars */ String]]("description"),
           rowguid = row[Option[UUID]]("rowguid"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")
         )

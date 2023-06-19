@@ -59,14 +59,14 @@ case class SalesorderheaderRowUnsaved(
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Approval code provided by the credit card company. */
-  creditcardapprovalcode: Option[String],
+  creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
       Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
-  comment: Option[String],
+  comment: Option[/* max 128 chars */ String],
   /** Default: nextval('sales.salesorderheader_salesorderid_seq'::regclass)
       Primary key. */
   salesorderid: Defaulted[SalesorderheaderId] = Defaulted.UseDefault,
@@ -201,10 +201,10 @@ object SalesorderheaderRowUnsaved {
             shiptoaddressid = json.\("shiptoaddressid").as[AddressId],
             shipmethodid = json.\("shipmethodid").as[ShipmethodId],
             creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[String]),
+            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
             currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
             totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-            comment = json.\("comment").toOption.map(_.as[String]),
+            comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
             salesorderid = json.\("salesorderid").as[Defaulted[SalesorderheaderId]],
             revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
             orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],

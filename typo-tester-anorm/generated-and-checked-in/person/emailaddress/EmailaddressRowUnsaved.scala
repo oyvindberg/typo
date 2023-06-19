@@ -24,7 +24,7 @@ case class EmailaddressRowUnsaved(
       Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** E-mail address for the person. */
-  emailaddress: Option[String],
+  emailaddress: Option[/* max 50 chars */ String],
   /** Default: nextval('person.emailaddress_emailaddressid_seq'::regclass)
       Primary key. ID of this email address. */
   emailaddressid: Defaulted[Int] = Defaulted.UseDefault,
@@ -67,7 +67,7 @@ object EmailaddressRowUnsaved {
         Try(
           EmailaddressRowUnsaved(
             businessentityid = json.\("businessentityid").as[BusinessentityId],
-            emailaddress = json.\("emailaddress").toOption.map(_.as[String]),
+            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
             emailaddressid = json.\("emailaddressid").as[Defaulted[Int]],
             rowguid = json.\("rowguid").as[Defaulted[UUID]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]

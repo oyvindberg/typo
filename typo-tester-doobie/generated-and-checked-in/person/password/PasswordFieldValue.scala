@@ -16,8 +16,8 @@ sealed abstract class PasswordFieldValue[T](name: String, value: T) extends Pass
 
 object PasswordFieldValue {
   case class businessentityid(override val value: BusinessentityId) extends PasswordFieldOrIdValue("businessentityid", value)
-  case class passwordhash(override val value: String) extends PasswordFieldValue("passwordhash", value)
-  case class passwordsalt(override val value: String) extends PasswordFieldValue("passwordsalt", value)
+  case class passwordhash(override val value: /* max 128 chars */ String) extends PasswordFieldValue("passwordhash", value)
+  case class passwordsalt(override val value: /* max 10 chars */ String) extends PasswordFieldValue("passwordsalt", value)
   case class rowguid(override val value: UUID) extends PasswordFieldValue("rowguid", value)
   case class modifieddate(override val value: LocalDateTime) extends PasswordFieldValue("modifieddate", value)
 }

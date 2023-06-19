@@ -114,7 +114,12 @@ case class TypeMapperScala(
       case db.Type.TimestampTz     => sc.Type.ZonedDateTime
       case db.Type.UUID            => sc.Type.UUID
       case db.Type.Xml             => customTypes.TypoXml.typoType
-      case db.Type.VarChar(_)      => sc.Type.String
+      case db.Type.VarChar(maybeN) =>
+        maybeN match {
+          case Some(n) if n != 2147483647 =>
+            sc.Type.String.withComment(s"max $n chars")
+          case _ => sc.Type.String
+        }
     }
   }
 

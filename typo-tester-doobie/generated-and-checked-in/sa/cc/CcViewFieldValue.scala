@@ -16,8 +16,8 @@ sealed abstract class CcViewFieldValue[T](name: String, value: T) extends CcView
 object CcViewFieldValue {
   case class id(override val value: Option[Int]) extends CcViewFieldValue("id", value)
   case class creditcardid(override val value: Option[CreditcardId]) extends CcViewFieldValue("creditcardid", value)
-  case class cardtype(override val value: Option[String]) extends CcViewFieldValue("cardtype", value)
-  case class cardnumber(override val value: Option[String]) extends CcViewFieldValue("cardnumber", value)
+  case class cardtype(override val value: Option[/* max 50 chars */ String]) extends CcViewFieldValue("cardtype", value)
+  case class cardnumber(override val value: Option[/* max 25 chars */ String]) extends CcViewFieldValue("cardnumber", value)
   case class expmonth(override val value: Option[Int]) extends CcViewFieldValue("expmonth", value)
   case class expyear(override val value: Option[Int]) extends CcViewFieldValue("expyear", value)
   case class modifieddate(override val value: Option[LocalDateTime]) extends CcViewFieldValue("modifieddate", value)

@@ -230,11 +230,11 @@ object DocumentRepoImpl extends DocumentRepo {
     RowParser[DocumentRow] { row =>
       Success(
         DocumentRow(
-          title = row[String]("title"),
+          title = row[/* max 50 chars */ String]("title"),
           owner = row[BusinessentityId]("owner"),
           folderflag = row[Flag]("folderflag"),
-          filename = row[String]("filename"),
-          fileextension = row[Option[String]]("fileextension"),
+          filename = row[/* max 400 chars */ String]("filename"),
+          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
           revision = row[/* bpchar */ String]("revision"),
           changenumber = row[Int]("changenumber"),
           status = row[Int]("status"),

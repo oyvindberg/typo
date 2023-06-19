@@ -21,11 +21,11 @@ case class ProductphotoRowUnsaved(
   /** Small image of the product. */
   thumbnailphoto: Option[Array[Byte]],
   /** Small image file name. */
-  thumbnailphotofilename: Option[String],
+  thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
-  largephotofilename: Option[String],
+  largephotofilename: Option[/* max 50 chars */ String],
   /** Default: nextval('production.productphoto_productphotoid_seq'::regclass)
       Primary key for ProductPhoto records. */
   productphotoid: Defaulted[ProductphotoId] = Defaulted.UseDefault,
@@ -65,9 +65,9 @@ object ProductphotoRowUnsaved {
         Try(
           ProductphotoRowUnsaved(
             thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
-            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[String]),
+            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
             largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
-            largephotofilename = json.\("largephotofilename").toOption.map(_.as[String]),
+            largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
             productphotoid = json.\("productphotoid").as[Defaulted[ProductphotoId]],
             modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
           )

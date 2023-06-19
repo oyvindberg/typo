@@ -21,13 +21,13 @@ case class VpersondemographicsViewRow(
   totalpurchaseytd: Option[TypoMoney],
   datefirstpurchase: Option[LocalDate],
   birthdate: Option[LocalDate],
-  maritalstatus: Option[String],
-  yearlyincome: Option[String],
-  gender: Option[String],
+  maritalstatus: Option[/* max 1 chars */ String],
+  yearlyincome: Option[/* max 30 chars */ String],
+  gender: Option[/* max 1 chars */ String],
   totalchildren: Option[Int],
   numberchildrenathome: Option[Int],
-  education: Option[String],
-  occupation: Option[String],
+  education: Option[/* max 30 chars */ String],
+  occupation: Option[/* max 30 chars */ String],
   homeownerflag: Option[Boolean],
   numbercarsowned: Option[Int]
 )
@@ -40,13 +40,13 @@ object VpersondemographicsViewRow {
         totalpurchaseytd <- c.downField("totalpurchaseytd").as[Option[TypoMoney]]
         datefirstpurchase <- c.downField("datefirstpurchase").as[Option[LocalDate]]
         birthdate <- c.downField("birthdate").as[Option[LocalDate]]
-        maritalstatus <- c.downField("maritalstatus").as[Option[String]]
-        yearlyincome <- c.downField("yearlyincome").as[Option[String]]
-        gender <- c.downField("gender").as[Option[String]]
+        maritalstatus <- c.downField("maritalstatus").as[Option[/* max 1 chars */ String]]
+        yearlyincome <- c.downField("yearlyincome").as[Option[/* max 30 chars */ String]]
+        gender <- c.downField("gender").as[Option[/* max 1 chars */ String]]
         totalchildren <- c.downField("totalchildren").as[Option[Int]]
         numberchildrenathome <- c.downField("numberchildrenathome").as[Option[Int]]
-        education <- c.downField("education").as[Option[String]]
-        occupation <- c.downField("occupation").as[Option[String]]
+        education <- c.downField("education").as[Option[/* max 30 chars */ String]]
+        occupation <- c.downField("occupation").as[Option[/* max 30 chars */ String]]
         homeownerflag <- c.downField("homeownerflag").as[Option[Boolean]]
         numbercarsowned <- c.downField("numbercarsowned").as[Option[Int]]
       } yield VpersondemographicsViewRow(businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned)

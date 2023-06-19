@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 /** This class corresponds to a row in table `sales.shoppingcartitem` which has not been persisted yet */
 case class ShoppingcartitemRowUnsaved(
   /** Shopping cart identification number. */
-  shoppingcartid: String,
+  shoppingcartid: /* max 50 chars */ String,
   /** Product ordered. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
@@ -60,7 +60,7 @@ object ShoppingcartitemRowUnsaved {
   implicit val decoder: Decoder[ShoppingcartitemRowUnsaved] =
     (c: HCursor) =>
       for {
-        shoppingcartid <- c.downField("shoppingcartid").as[String]
+        shoppingcartid <- c.downField("shoppingcartid").as[/* max 50 chars */ String]
         productid <- c.downField("productid").as[ProductId]
         shoppingcartitemid <- c.downField("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]]
         quantity <- c.downField("quantity").as[Defaulted[Int]]

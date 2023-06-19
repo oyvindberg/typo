@@ -18,7 +18,7 @@ case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records. */
   shoppingcartitemid: ShoppingcartitemId,
   /** Shopping cart identification number. */
-  shoppingcartid: String,
+  shoppingcartid: /* max 50 chars */ String,
   /** Product quantity ordered. */
   quantity: Int,
   /** Product ordered. Foreign key to Product.ProductID.
@@ -34,7 +34,7 @@ object ShoppingcartitemRow {
     (c: HCursor) =>
       for {
         shoppingcartitemid <- c.downField("shoppingcartitemid").as[ShoppingcartitemId]
-        shoppingcartid <- c.downField("shoppingcartid").as[String]
+        shoppingcartid <- c.downField("shoppingcartid").as[/* max 50 chars */ String]
         quantity <- c.downField("quantity").as[Int]
         productid <- c.downField("productid").as[ProductId]
         datecreated <- c.downField("datecreated").as[LocalDateTime]

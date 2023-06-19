@@ -24,11 +24,11 @@ case class ProductreviewRowUnsaved(
   /** Name of the reviewer. */
   reviewername: Name,
   /** Reviewer's e-mail address. */
-  emailaddress: String,
+  emailaddress: /* max 50 chars */ String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
-  comments: Option[String],
+  comments: Option[/* max 3850 chars */ String],
   /** Default: nextval('production.productreview_productreviewid_seq'::regclass)
       Primary key for ProductReview records. */
   productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
@@ -65,9 +65,9 @@ object ProductreviewRowUnsaved {
       for {
         productid <- c.downField("productid").as[ProductId]
         reviewername <- c.downField("reviewername").as[Name]
-        emailaddress <- c.downField("emailaddress").as[String]
+        emailaddress <- c.downField("emailaddress").as[/* max 50 chars */ String]
         rating <- c.downField("rating").as[Int]
-        comments <- c.downField("comments").as[Option[String]]
+        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
         productreviewid <- c.downField("productreviewid").as[Defaulted[ProductreviewId]]
         reviewdate <- c.downField("reviewdate").as[Defaulted[LocalDateTime]]
         modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]

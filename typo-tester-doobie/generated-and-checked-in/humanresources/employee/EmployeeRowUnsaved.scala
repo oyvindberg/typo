@@ -24,11 +24,11 @@ case class EmployeeRowUnsaved(
       Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Unique national identification number such as a social security number. */
-  nationalidnumber: String,
+  nationalidnumber: /* max 15 chars */ String,
   /** Network login. */
-  loginid: String,
+  loginid: /* max 256 chars */ String,
   /** Work title such as Buyer or Sales Representative. */
-  jobtitle: String,
+  jobtitle: /* max 50 chars */ String,
   /** Date of birth. */
   birthdate: LocalDate,
   /** M = Married, S = Single */
@@ -102,9 +102,9 @@ object EmployeeRowUnsaved {
     (c: HCursor) =>
       for {
         businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        nationalidnumber <- c.downField("nationalidnumber").as[String]
-        loginid <- c.downField("loginid").as[String]
-        jobtitle <- c.downField("jobtitle").as[String]
+        nationalidnumber <- c.downField("nationalidnumber").as[/* max 15 chars */ String]
+        loginid <- c.downField("loginid").as[/* max 256 chars */ String]
+        jobtitle <- c.downField("jobtitle").as[/* max 50 chars */ String]
         birthdate <- c.downField("birthdate").as[LocalDate]
         maritalstatus <- c.downField("maritalstatus").as[/* bpchar */ String]
         gender <- c.downField("gender").as[/* bpchar */ String]

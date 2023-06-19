@@ -21,15 +21,15 @@ import scala.util.Try
 
 case class DViewRow(
   /** Points to [[production.document.DocumentRow.title]] */
-  title: Option[String],
+  title: Option[/* max 50 chars */ String],
   /** Points to [[production.document.DocumentRow.owner]] */
   owner: Option[BusinessentityId],
   /** Points to [[production.document.DocumentRow.folderflag]] */
   folderflag: Flag,
   /** Points to [[production.document.DocumentRow.filename]] */
-  filename: Option[String],
+  filename: Option[/* max 400 chars */ String],
   /** Points to [[production.document.DocumentRow.fileextension]] */
-  fileextension: Option[String],
+  fileextension: Option[/* max 8 chars */ String],
   /** Points to [[production.document.DocumentRow.revision]] */
   revision: Option[/* bpchar */ String],
   /** Points to [[production.document.DocumentRow.changenumber]] */
@@ -71,11 +71,11 @@ object DViewRow {
       JsResult.fromTry(
         Try(
           DViewRow(
-            title = json.\("title").toOption.map(_.as[String]),
+            title = json.\("title").toOption.map(_.as[/* max 50 chars */ String]),
             owner = json.\("owner").toOption.map(_.as[BusinessentityId]),
             folderflag = json.\("folderflag").as[Flag],
-            filename = json.\("filename").toOption.map(_.as[String]),
-            fileextension = json.\("fileextension").toOption.map(_.as[String]),
+            filename = json.\("filename").toOption.map(_.as[/* max 400 chars */ String]),
+            fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
             revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),
             changenumber = json.\("changenumber").toOption.map(_.as[Int]),
             status = json.\("status").toOption.map(_.as[Int]),

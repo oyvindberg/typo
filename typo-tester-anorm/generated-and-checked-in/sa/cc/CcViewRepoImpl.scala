@@ -54,8 +54,8 @@ object CcViewRepoImpl extends CcViewRepo {
         CcViewRow(
           id = row[Option[Int]]("id"),
           creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          cardtype = row[Option[String]]("cardtype"),
-          cardnumber = row[Option[String]]("cardnumber"),
+          cardtype = row[Option[/* max 50 chars */ String]]("cardtype"),
+          cardnumber = row[Option[/* max 25 chars */ String]]("cardnumber"),
           expmonth = row[Option[Int]]("expmonth"),
           expyear = row[Option[Int]]("expyear"),
           modifieddate = row[Option[LocalDateTime]]("modifieddate")

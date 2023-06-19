@@ -20,13 +20,13 @@ case class SpecialofferRow(
   /** Primary key for SpecialOffer records. */
   specialofferid: SpecialofferId,
   /** Discount description. */
-  description: String,
+  description: /* max 255 chars */ String,
   /** Discount precentage. */
   discountpct: BigDecimal,
   /** Discount type category. */
-  `type`: String,
+  `type`: /* max 50 chars */ String,
   /** Group the discount applies to such as Reseller or Customer. */
-  category: String,
+  category: /* max 50 chars */ String,
   /** Discount start date. */
   startdate: LocalDateTime,
   /** Discount end date. */
@@ -61,10 +61,10 @@ object SpecialofferRow {
         Try(
           SpecialofferRow(
             specialofferid = json.\("specialofferid").as[SpecialofferId],
-            description = json.\("description").as[String],
+            description = json.\("description").as[/* max 255 chars */ String],
             discountpct = json.\("discountpct").as[BigDecimal],
-            `type` = json.\("type").as[String],
-            category = json.\("category").as[String],
+            `type` = json.\("type").as[/* max 50 chars */ String],
+            category = json.\("category").as[/* max 50 chars */ String],
             startdate = json.\("startdate").as[LocalDateTime],
             enddate = json.\("enddate").as[LocalDateTime],
             minqty = json.\("minqty").as[Int],

@@ -32,7 +32,7 @@ case class VViewRow(
   /** Points to [[purchasing.vendor.VendorRow.activeflag]] */
   activeflag: Flag,
   /** Points to [[purchasing.vendor.VendorRow.purchasingwebserviceurl]] */
-  purchasingwebserviceurl: Option[String],
+  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Points to [[purchasing.vendor.VendorRow.modifieddate]] */
   modifieddate: Option[LocalDateTime]
 )
@@ -48,7 +48,7 @@ object VViewRow {
         creditrating <- c.downField("creditrating").as[Option[Int]]
         preferredvendorstatus <- c.downField("preferredvendorstatus").as[Flag]
         activeflag <- c.downField("activeflag").as[Flag]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[String]]
+        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
         modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
       } yield VViewRow(id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
   implicit val encoder: Encoder[VViewRow] = {

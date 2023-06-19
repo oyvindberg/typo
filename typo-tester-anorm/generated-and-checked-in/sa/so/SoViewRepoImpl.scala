@@ -60,10 +60,10 @@ object SoViewRepoImpl extends SoViewRepo {
         SoViewRow(
           id = row[Option[Int]]("id"),
           specialofferid = row[Option[SpecialofferId]]("specialofferid"),
-          description = row[Option[String]]("description"),
+          description = row[Option[/* max 255 chars */ String]]("description"),
           discountpct = row[Option[BigDecimal]]("discountpct"),
-          `type` = row[Option[String]]("type"),
-          category = row[Option[String]]("category"),
+          `type` = row[Option[/* max 50 chars */ String]]("type"),
+          category = row[Option[/* max 50 chars */ String]]("category"),
           startdate = row[Option[LocalDateTime]]("startdate"),
           enddate = row[Option[LocalDateTime]]("enddate"),
           minqty = row[Option[Int]]("minqty"),

@@ -25,7 +25,7 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.locationid]] */
   locationid: Option[LocationId],
   /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
-  shelf: Option[String],
+  shelf: Option[/* max 10 chars */ String],
   /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
   bin: Option[Int],
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
@@ -57,7 +57,7 @@ object PiViewRow {
             id = json.\("id").toOption.map(_.as[Int]),
             productid = json.\("productid").toOption.map(_.as[ProductId]),
             locationid = json.\("locationid").toOption.map(_.as[LocationId]),
-            shelf = json.\("shelf").toOption.map(_.as[String]),
+            shelf = json.\("shelf").toOption.map(_.as[/* max 10 chars */ String]),
             bin = json.\("bin").toOption.map(_.as[Int]),
             quantity = json.\("quantity").toOption.map(_.as[Int]),
             rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
