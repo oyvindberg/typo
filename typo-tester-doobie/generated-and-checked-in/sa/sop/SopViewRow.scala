@@ -9,10 +9,14 @@ package sop
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -48,4 +52,23 @@ object SopViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SopViewRow] =
+    new Read[SopViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[SpecialofferId], Nullability.Nullable),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SopViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 1),
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
+      )
+    )
+  
+
 }

@@ -8,12 +8,9 @@ package person
 package address
 
 import adventureworks.Defaulted
-import adventureworks.person.stateprovince.StateprovinceId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +26,7 @@ object AddressRepoImpl extends AddressRepo {
           values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(AddressRow.rowParser.single)
   
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
@@ -58,7 +55,7 @@ object AddressRepoImpl extends AddressRepo {
       SQL"""insert into person.address default values
             returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(AddressRow.rowParser.single)
     } else {
       val q = s"""insert into person.address(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -68,14 +65,14 @@ object AddressRepoImpl extends AddressRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(AddressRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
-       """.as(rowParser.*)
+       """.as(AddressRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
     fieldValues match {
@@ -101,7 +98,7 @@ object AddressRepoImpl extends AddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(AddressRow.rowParser.*)
     }
   
   }
@@ -109,7 +106,7 @@ object AddressRepoImpl extends AddressRepo {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
           where addressid = $addressid
-       """.as(rowParser.singleOpt)
+       """.as(AddressRow.rowParser.singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     implicit val toStatement: ToStatement[Array[AddressId]] =
@@ -119,7 +116,7 @@ object AddressRepoImpl extends AddressRepo {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
           where addressid = ANY($addressids)
-       """.as(rowParser.*)
+       """.as(AddressRow.rowParser.*)
   
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
@@ -189,23 +186,7 @@ object AddressRepoImpl extends AddressRepo {
             modifieddate = EXCLUDED.modifieddate
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(AddressRow.rowParser.single)
   
   }
-  val rowParser: RowParser[AddressRow] =
-    RowParser[AddressRow] { row =>
-      Success(
-        AddressRow(
-          addressid = row[AddressId]("addressid"),
-          addressline1 = row[/* max 60 chars */ String]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[/* max 30 chars */ String]("city"),
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          postalcode = row[/* max 15 chars */ String]("postalcode"),
-          spatiallocation = row[Option[Array[Byte]]]("spatiallocation"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

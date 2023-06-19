@@ -8,18 +8,12 @@ package production
 package productreview
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
@@ -30,7 +24,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
-       """.query.unique
+       """.query[ProductreviewRow].unique
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
@@ -64,7 +58,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductreviewRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
@@ -151,31 +145,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             "comments" = EXCLUDED."comments",
             modifieddate = EXCLUDED.modifieddate
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
-       """.query.unique
+       """.query[ProductreviewRow].unique
   }
-  implicit val read: Read[ProductreviewRow] =
-    new Read[ProductreviewRow](
-      gets = List(
-        (Get[ProductreviewId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* max 3850 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductreviewRow(
-        productreviewid = Get[ProductreviewId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-        reviewername = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        reviewdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
-        rating = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
-    )
-  
-
 }

@@ -9,10 +9,14 @@ package vjobcandidate
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class VjobcandidateViewRow(
@@ -79,4 +83,45 @@ object VjobcandidateViewRow {
         "WebSite" := row.WebSite,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[VjobcandidateViewRow] =
+    new Read[VjobcandidateViewRow](
+      gets = List(
+        (Get[JobcandidateId], Nullability.Nullable),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 20 chars */ String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateViewRow(
+        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+        `Name.Prefix` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 2),
+        `Name.First` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
+        `Name.Middle` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 4),
+        `Name.Last` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 5),
+        `Name.Suffix` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 6),
+        Skills = Get[String].unsafeGetNullable(rs, i + 7),
+        `Addr.Type` = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 8),
+        `Addr.Loc.CountryRegion` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 9),
+        `Addr.Loc.State` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 10),
+        `Addr.Loc.City` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 11),
+        `Addr.PostalCode` = Get[/* max 20 chars */ String].unsafeGetNullable(rs, i + 12),
+        EMail = Get[String].unsafeGetNullable(rs, i + 13),
+        WebSite = Get[String].unsafeGetNullable(rs, i + 14),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 15)
+      )
+    )
+  
+
 }

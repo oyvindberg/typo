@@ -9,10 +9,14 @@ package customer
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -54,4 +58,25 @@ object CustomerRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CustomerRow] =
+    new Read[CustomerRow](
+      gets = List(
+        (Get[CustomerId], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[SalesterritoryId], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CustomerRow(
+        customerid = Get[CustomerId].unsafeGetNonNullable(rs, i + 0),
+        personid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+        storeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
+        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 3),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

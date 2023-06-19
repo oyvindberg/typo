@@ -8,19 +8,12 @@ package purchasing
 package productvendor
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
@@ -31,7 +24,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.averageleadtime}::int4, ${unsaved.standardprice}::numeric, ${unsaved.lastreceiptcost}::numeric, ${unsaved.lastreceiptdate}::timestamp, ${unsaved.minorderqty}::int4, ${unsaved.maxorderqty}::int4, ${unsaved.onorderqty}::int4, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
-       """.query.unique
+       """.query[ProductvendorRow].unique
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
@@ -62,7 +55,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
             returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductvendorRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
@@ -158,37 +151,6 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
             unitmeasurecode = EXCLUDED.unitmeasurecode,
             modifieddate = EXCLUDED.modifieddate
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
-       """.query.unique
+       """.query[ProductvendorRow].unique
   }
-  implicit val read: Read[ProductvendorRow] =
-    new Read[ProductvendorRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductvendorRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-        averageleadtime = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        standardprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        lastreceiptdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        minorderqty = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        maxorderqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        onorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 10)
-      )
-    )
-  
-
 }

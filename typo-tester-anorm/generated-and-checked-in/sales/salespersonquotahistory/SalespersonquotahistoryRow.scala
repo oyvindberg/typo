@@ -8,6 +8,8 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -32,6 +34,18 @@ case class SalespersonquotahistoryRow(
  }
 
 object SalespersonquotahistoryRow {
+  val rowParser: RowParser[SalespersonquotahistoryRow] =
+    RowParser[SalespersonquotahistoryRow] { row =>
+      Success(
+        SalespersonquotahistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          quotadate = row[LocalDateTime]("quotadate"),
+          salesquota = row[BigDecimal]("salesquota"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalespersonquotahistoryRow] = new OFormat[SalespersonquotahistoryRow]{
     override def writes(o: SalespersonquotahistoryRow): JsObject =
       Json.obj(

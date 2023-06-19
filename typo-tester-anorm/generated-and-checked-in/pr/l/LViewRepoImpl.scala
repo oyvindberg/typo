@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package l
 
-import adventureworks.production.location.LocationId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object LViewRepoImpl extends LViewRepo {
   override def selectAll(implicit c: Connection): List[LViewRow] = {
     SQL"""select "id", locationid, "name", costrate, availability, modifieddate
           from pr.l
-       """.as(rowParser.*)
+       """.as(LViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LViewFieldOrIdValue[_]])(implicit c: Connection): List[LViewRow] = {
     fieldValues match {
@@ -44,21 +39,8 @@ object LViewRepoImpl extends LViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(LViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[LViewRow] =
-    RowParser[LViewRow] { row =>
-      Success(
-        LViewRow(
-          id = row[Option[Int]]("id"),
-          locationid = row[Option[LocationId]]("locationid"),
-          name = row[Option[Name]]("name"),
-          costrate = row[Option[BigDecimal]]("costrate"),
-          availability = row[Option[BigDecimal]]("availability"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

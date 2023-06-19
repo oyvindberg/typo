@@ -9,10 +9,14 @@ package vsalespersonsalesbyfiscalyearsdata
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class VsalespersonsalesbyfiscalyearsdataViewRow(
   /** Points to [[salesorderheader.SalesorderheaderRow.salespersonid]] */
@@ -47,4 +51,25 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
         "salestotal" := row.salestotal,
         "fiscalyear" := row.fiscalyear
       )}
+  implicit val read: Read[VsalespersonsalesbyfiscalyearsdataViewRow] =
+    new Read[VsalespersonsalesbyfiscalyearsdataViewRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsdataViewRow(
+        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+        fullname = Get[String].unsafeGetNullable(rs, i + 1),
+        jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+        salesterritory = Get[Name].unsafeGetNullable(rs, i + 3),
+        salestotal = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+        fiscalyear = Get[BigDecimal].unsafeGetNullable(rs, i + 5)
+      )
+    )
+  
+
 }

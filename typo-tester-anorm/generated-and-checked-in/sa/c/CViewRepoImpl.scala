@@ -7,23 +7,16 @@ package adventureworks
 package sa
 package c
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object CViewRepoImpl extends CViewRepo {
   override def selectAll(implicit c: Connection): List[CViewRow] = {
     SQL"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate
           from sa."c"
-       """.as(rowParser.*)
+       """.as(CViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CViewFieldOrIdValue[_]])(implicit c: Connection): List[CViewRow] = {
     fieldValues match {
@@ -47,22 +40,8 @@ object CViewRepoImpl extends CViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[CViewRow] =
-    RowParser[CViewRow] { row =>
-      Success(
-        CViewRow(
-          id = row[Option[Int]]("id"),
-          customerid = row[Option[CustomerId]]("customerid"),
-          personid = row[Option[BusinessentityId]]("personid"),
-          storeid = row[Option[BusinessentityId]]("storeid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

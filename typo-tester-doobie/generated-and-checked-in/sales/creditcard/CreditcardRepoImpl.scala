@@ -8,16 +8,12 @@ package sales
 package creditcard
 
 import adventureworks.Defaulted
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CreditcardRepoImpl extends CreditcardRepo {
@@ -28,7 +24,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
           values (${unsaved.creditcardid}::int4, ${unsaved.cardtype}, ${unsaved.cardnumber}, ${unsaved.expmonth}::int2, ${unsaved.expyear}::int2, ${unsaved.modifieddate}::timestamp)
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
-       """.query.unique
+       """.query[CreditcardRow].unique
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
@@ -57,7 +53,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
             returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
          """
     }
-    q.query.unique
+    q.query[CreditcardRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
@@ -134,27 +130,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
             expyear = EXCLUDED.expyear,
             modifieddate = EXCLUDED.modifieddate
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
-       """.query.unique
+       """.query[CreditcardRow].unique
   }
-  implicit val read: Read[CreditcardRow] =
-    new Read[CreditcardRow](
-      gets = List(
-        (Get[CreditcardId], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[/* max 25 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
-        creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
-        cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

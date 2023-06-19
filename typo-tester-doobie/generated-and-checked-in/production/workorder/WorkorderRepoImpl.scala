@@ -8,18 +8,12 @@ package production
 package workorder
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.scrapreason.ScrapreasonId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
@@ -30,7 +24,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     sql"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
-       """.query.unique
+       """.query[WorkorderRow].unique
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
@@ -62,7 +56,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
          """
     }
-    q.query.unique
+    q.query[WorkorderRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
@@ -154,33 +148,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
             scrapreasonid = EXCLUDED.scrapreasonid,
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
-       """.query.unique
+       """.query[WorkorderRow].unique
   }
-  implicit val read: Read[WorkorderRow] =
-    new Read[WorkorderRow](
-      gets = List(
-        (Get[WorkorderId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[ScrapreasonId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => WorkorderRow(
-        workorderid = Get[WorkorderId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        scrappedqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
-        scrapreasonid = Get[ScrapreasonId].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

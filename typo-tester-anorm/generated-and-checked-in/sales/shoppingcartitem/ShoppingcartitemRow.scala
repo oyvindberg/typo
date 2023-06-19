@@ -8,6 +8,8 @@ package sales
 package shoppingcartitem
 
 import adventureworks.production.product.ProductId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,6 +34,19 @@ case class ShoppingcartitemRow(
 )
 
 object ShoppingcartitemRow {
+  val rowParser: RowParser[ShoppingcartitemRow] =
+    RowParser[ShoppingcartitemRow] { row =>
+      Success(
+        ShoppingcartitemRow(
+          shoppingcartitemid = row[ShoppingcartitemId]("shoppingcartitemid"),
+          shoppingcartid = row[/* max 50 chars */ String]("shoppingcartid"),
+          quantity = row[Int]("quantity"),
+          productid = row[ProductId]("productid"),
+          datecreated = row[LocalDateTime]("datecreated"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ShoppingcartitemRow] = new OFormat[ShoppingcartitemRow]{
     override def writes(o: ShoppingcartitemRow): JsObject =
       Json.obj(

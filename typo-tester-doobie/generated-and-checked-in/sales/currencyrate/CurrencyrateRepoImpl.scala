@@ -8,17 +8,12 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
-import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
@@ -29,7 +24,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
           values (${unsaved.currencyrateid}::int4, ${unsaved.currencyratedate}::timestamp, ${unsaved.fromcurrencycode}::bpchar, ${unsaved.tocurrencycode}::bpchar, ${unsaved.averagerate}::numeric, ${unsaved.endofdayrate}::numeric, ${unsaved.modifieddate}::timestamp)
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
-       """.query.unique
+       """.query[CurrencyrateRow].unique
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     val fs = List(
@@ -59,7 +54,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
          """
     }
-    q.query.unique
+    q.query[CurrencyrateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
@@ -141,29 +136,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             endofdayrate = EXCLUDED.endofdayrate,
             modifieddate = EXCLUDED.modifieddate
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
-       """.query.unique
+       """.query[CurrencyrateRow].unique
   }
-  implicit val read: Read[CurrencyrateRow] =
-    new Read[CurrencyrateRow](
-      gets = List(
-        (Get[CurrencyrateId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CurrencyrateRow(
-        currencyrateid = Get[CurrencyrateId].unsafeGetNonNullable(rs, i + 0),
-        currencyratedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        fromcurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 2),
-        tocurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 3),
-        averagerate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
-        endofdayrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
-    )
-  
-
 }

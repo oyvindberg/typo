@@ -7,16 +7,10 @@ package adventureworks
 package sa
 package cc
 
-import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object CcViewRepoImpl extends CcViewRepo {
   override def selectAll: Stream[ConnectionIO, CcViewRow] = {
@@ -37,27 +31,4 @@ object CcViewRepoImpl extends CcViewRepo {
     sql"select * from sa.cc $where".query[CcViewRow].stream
   
   }
-  implicit val read: Read[CcViewRow] =
-    new Read[CcViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 1),
-        cardtype = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        cardnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-        expmonth = Get[Int].unsafeGetNullable(rs, i + 4),
-        expyear = Get[Int].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

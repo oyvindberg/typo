@@ -8,17 +8,12 @@ package person
 package phonenumbertype
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
@@ -29,7 +24,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning phonenumbertypeid, "name", modifieddate
-       """.query.unique
+       """.query[PhonenumbertypeRow].unique
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
@@ -55,7 +50,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             returning phonenumbertypeid, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[PhonenumbertypeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
@@ -117,21 +112,6 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning phonenumbertypeid, "name", modifieddate
-       """.query.unique
+       """.query[PhonenumbertypeRow].unique
   }
-  implicit val read: Read[PhonenumbertypeRow] =
-    new Read[PhonenumbertypeRow](
-      gets = List(
-        (Get[PhonenumbertypeId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PhonenumbertypeRow(
-        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

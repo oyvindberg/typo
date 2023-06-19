@@ -8,6 +8,8 @@ package humanresources
 package shift
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.time.LocalTime
 import play.api.libs.json.JsObject
@@ -30,6 +32,18 @@ case class ShiftRow(
 )
 
 object ShiftRow {
+  val rowParser: RowParser[ShiftRow] =
+    RowParser[ShiftRow] { row =>
+      Success(
+        ShiftRow(
+          shiftid = row[ShiftId]("shiftid"),
+          name = row[Name]("name"),
+          starttime = row[LocalTime]("starttime"),
+          endtime = row[LocalTime]("endtime"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ShiftRow] = new OFormat[ShiftRow]{
     override def writes(o: ShiftRow): JsObject =
       Json.obj(

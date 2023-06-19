@@ -8,18 +8,13 @@ package production
 package document
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +26,7 @@ object DocumentRepoImpl extends DocumentRepo {
     sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
           values (${unsaved.title}, ${unsaved.owner}::int4, ${unsaved.folderflag}::"public"."Flag", ${unsaved.filename}, ${unsaved.fileextension}, ${unsaved.revision}::bpchar, ${unsaved.changenumber}::int4, ${unsaved.status}::int2, ${unsaved.documentsummary}, ${unsaved.document}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
-       """.query.unique
+       """.query[DocumentRow].unique
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
@@ -76,7 +71,7 @@ object DocumentRepoImpl extends DocumentRepo {
             returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
          """
     }
-    q.query.unique
+    q.query[DocumentRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
@@ -191,41 +186,6 @@ object DocumentRepoImpl extends DocumentRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
-       """.query.unique
+       """.query[DocumentRow].unique
   }
-  implicit val read: Read[DocumentRow] =
-    new Read[DocumentRow](
-      gets = List(
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 400 chars */ String], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[DocumentId], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
-        title = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 0),
-        owner = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-        folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        filename = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
-        revision = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-        changenumber = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        status = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
-        document = Get[Array[Byte]].unsafeGetNullable(rs, i + 9),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 11),
-        documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 12)
-      )
-    )
-  
-
 }

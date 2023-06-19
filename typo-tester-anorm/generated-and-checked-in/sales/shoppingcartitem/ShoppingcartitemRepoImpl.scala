@@ -8,12 +8,9 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           values (${unsaved.shoppingcartitemid}::int4, ${unsaved.shoppingcartid}, ${unsaved.quantity}::int4, ${unsaved.productid}::int4, ${unsaved.datecreated}::timestamp, ${unsaved.modifieddate}::timestamp)
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ShoppingcartitemRow.rowParser.single)
   
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
@@ -57,7 +54,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       SQL"""insert into sales.shoppingcartitem default values
             returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ShoppingcartitemRow.rowParser.single)
     } else {
       val q = s"""insert into sales.shoppingcartitem(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -67,14 +64,14 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ShoppingcartitemRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sales.shoppingcartitem
-       """.as(rowParser.*)
+       """.as(ShoppingcartitemRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow] = {
     fieldValues match {
@@ -97,7 +94,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ShoppingcartitemRow.rowParser.*)
     }
   
   }
@@ -105,7 +102,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sales.shoppingcartitem
           where shoppingcartitemid = $shoppingcartitemid
-       """.as(rowParser.singleOpt)
+       """.as(ShoppingcartitemRow.rowParser.singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     implicit val toStatement: ToStatement[Array[ShoppingcartitemId]] =
@@ -115,7 +112,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sales.shoppingcartitem
           where shoppingcartitemid = ANY($shoppingcartitemids)
-       """.as(rowParser.*)
+       """.as(ShoppingcartitemRow.rowParser.*)
   
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
@@ -173,20 +170,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             modifieddate = EXCLUDED.modifieddate
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ShoppingcartitemRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ShoppingcartitemRow] =
-    RowParser[ShoppingcartitemRow] { row =>
-      Success(
-        ShoppingcartitemRow(
-          shoppingcartitemid = row[ShoppingcartitemId]("shoppingcartitemid"),
-          shoppingcartid = row[/* max 50 chars */ String]("shoppingcartid"),
-          quantity = row[Int]("quantity"),
-          productid = row[ProductId]("productid"),
-          datecreated = row[LocalDateTime]("datecreated"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

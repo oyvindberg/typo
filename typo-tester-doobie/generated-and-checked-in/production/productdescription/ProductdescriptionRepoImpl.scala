@@ -8,16 +8,12 @@ package production
 package productdescription
 
 import adventureworks.Defaulted
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -29,7 +25,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
           values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productdescriptionid, description, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductdescriptionRow].unique
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow] = {
     val fs = List(
@@ -59,7 +55,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
             returning productdescriptionid, description, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductdescriptionRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductdescriptionRow] = {
@@ -126,23 +122,6 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productdescriptionid, description, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductdescriptionRow].unique
   }
-  implicit val read: Read[ProductdescriptionRow] =
-    new Read[ProductdescriptionRow](
-      gets = List(
-        (Get[ProductdescriptionId], Nullability.NoNulls),
-        (Get[/* max 400 chars */ String], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductdescriptionRow(
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 0),
-        description = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

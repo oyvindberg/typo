@@ -8,14 +8,9 @@ package person
 package businessentityaddress
 
 import adventureworks.Defaulted
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -29,7 +24,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.addressid}::int4, ${unsaved.addresstypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(BusinessentityaddressRow.rowParser.single)
   
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): BusinessentityaddressRow = {
@@ -51,7 +46,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
       SQL"""insert into person.businessentityaddress default values
             returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(BusinessentityaddressRow.rowParser.single)
     } else {
       val q = s"""insert into person.businessentityaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -61,14 +56,14 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(BusinessentityaddressRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from person.businessentityaddress
-       """.as(rowParser.*)
+       """.as(BusinessentityaddressRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentityaddressFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityaddressRow] = {
     fieldValues match {
@@ -90,7 +85,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(BusinessentityaddressRow.rowParser.*)
     }
   
   }
@@ -98,7 +93,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from person.businessentityaddress
           where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
-       """.as(rowParser.singleOpt)
+       """.as(BusinessentityaddressRow.rowParser.singleOpt)
   }
   override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -145,19 +140,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(BusinessentityaddressRow.rowParser.single)
   
   }
-  val rowParser: RowParser[BusinessentityaddressRow] =
-    RowParser[BusinessentityaddressRow] { row =>
-      Success(
-        BusinessentityaddressRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          addressid = row[AddressId]("addressid"),
-          addresstypeid = row[AddresstypeId]("addresstypeid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

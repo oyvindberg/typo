@@ -8,6 +8,8 @@ package person_detail
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -37,6 +39,22 @@ case class PersonDetailSqlRow(
 )
 
 object PersonDetailSqlRow {
+  val rowParser: RowParser[PersonDetailSqlRow] =
+    RowParser[PersonDetailSqlRow] { row =>
+      Success(
+        PersonDetailSqlRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
+          firstname = row[Name]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Name]("lastname"),
+          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
+          addressline1 = row[/* max 60 chars */ String]("addressline1"),
+          city = row[/* max 30 chars */ String]("city"),
+          postalcode = row[/* max 15 chars */ String]("postalcode")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PersonDetailSqlRow] = new OFormat[PersonDetailSqlRow]{
     override def writes(o: PersonDetailSqlRow): JsObject =
       Json.obj(

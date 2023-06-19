@@ -7,21 +7,16 @@ package adventureworks
 package pu
 package pod
 
-import adventureworks.production.product.ProductId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PodViewRepoImpl extends PodViewRepo {
   override def selectAll(implicit c: Connection): List[PodViewRow] = {
     SQL"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from pu.pod
-       """.as(rowParser.*)
+       """.as(PodViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PodViewFieldOrIdValue[_]])(implicit c: Connection): List[PodViewRow] = {
     fieldValues match {
@@ -48,25 +43,8 @@ object PodViewRepoImpl extends PodViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PodViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PodViewRow] =
-    RowParser[PodViewRow] { row =>
-      Success(
-        PodViewRow(
-          id = row[Option[Int]]("id"),
-          purchaseorderid = row[Option[PurchaseorderheaderId]]("purchaseorderid"),
-          purchaseorderdetailid = row[Option[Int]]("purchaseorderdetailid"),
-          duedate = row[Option[LocalDateTime]]("duedate"),
-          orderqty = row[Option[Int]]("orderqty"),
-          productid = row[Option[ProductId]]("productid"),
-          unitprice = row[Option[BigDecimal]]("unitprice"),
-          receivedqty = row[Option[BigDecimal]]("receivedqty"),
-          rejectedqty = row[Option[BigDecimal]]("rejectedqty"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

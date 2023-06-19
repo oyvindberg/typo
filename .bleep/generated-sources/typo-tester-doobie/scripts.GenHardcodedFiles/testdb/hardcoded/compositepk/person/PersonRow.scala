@@ -8,10 +8,14 @@ package hardcoded
 package compositepk
 package person
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class PersonRow(
   one: Long,
@@ -37,4 +41,19 @@ object PersonRow {
         "two" := row.two,
         "name" := row.name
       )}
+  implicit val read: Read[PersonRow] =
+    new Read[PersonRow](
+      gets = List(
+        (Get[Long], Nullability.NoNulls),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
+        one = Get[Long].unsafeGetNonNullable(rs, i + 0),
+        two = Get[String].unsafeGetNullable(rs, i + 1),
+        name = Get[String].unsafeGetNullable(rs, i + 2)
+      )
+    )
+  
+
 }

@@ -8,13 +8,9 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -30,7 +26,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductmodelRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
@@ -56,7 +52,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       SQL"""insert into production.productmodel default values
             returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductmodelRow.rowParser.single)
     } else {
       val q = s"""insert into production.productmodel(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -66,14 +62,14 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductmodelRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
-       """.as(rowParser.*)
+       """.as(ProductmodelRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelRow] = {
     fieldValues match {
@@ -96,7 +92,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductmodelRow.rowParser.*)
     }
   
   }
@@ -104,7 +100,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
           where productmodelid = $productmodelid
-       """.as(rowParser.singleOpt)
+       """.as(ProductmodelRow.rowParser.singleOpt)
   }
   override def selectByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): List[ProductmodelRow] = {
     implicit val toStatement: ToStatement[Array[ProductmodelId]] =
@@ -114,7 +110,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from production.productmodel
           where productmodelid = ANY($productmodelids)
-       """.as(rowParser.*)
+       """.as(ProductmodelRow.rowParser.*)
   
   }
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
@@ -172,20 +168,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductmodelRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductmodelRow] =
-    RowParser[ProductmodelRow] { row =>
-      Success(
-        ProductmodelRow(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          name = row[Name]("name"),
-          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

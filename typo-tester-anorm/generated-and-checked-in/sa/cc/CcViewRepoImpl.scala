@@ -7,20 +7,16 @@ package adventureworks
 package sa
 package cc
 
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CcViewRepoImpl extends CcViewRepo {
   override def selectAll(implicit c: Connection): List[CcViewRow] = {
     SQL"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
           from sa.cc
-       """.as(rowParser.*)
+       """.as(CcViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CcViewFieldOrIdValue[_]])(implicit c: Connection): List[CcViewRow] = {
     fieldValues match {
@@ -44,22 +40,8 @@ object CcViewRepoImpl extends CcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CcViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[CcViewRow] =
-    RowParser[CcViewRow] { row =>
-      Success(
-        CcViewRow(
-          id = row[Option[Int]]("id"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          cardtype = row[Option[/* max 50 chars */ String]]("cardtype"),
-          cardnumber = row[Option[/* max 25 chars */ String]]("cardnumber"),
-          expmonth = row[Option[Int]]("expmonth"),
-          expyear = row[Option[Int]]("expyear"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

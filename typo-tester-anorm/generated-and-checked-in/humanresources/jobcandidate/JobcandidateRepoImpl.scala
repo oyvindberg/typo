@@ -8,13 +8,9 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +25,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(JobcandidateRow.rowParser.single)
   
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
@@ -50,7 +46,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       SQL"""insert into humanresources.jobcandidate default values
             returning jobcandidateid, businessentityid, resume, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(JobcandidateRow.rowParser.single)
     } else {
       val q = s"""insert into humanresources.jobcandidate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -60,14 +56,14 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(JobcandidateRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
-       """.as(rowParser.*)
+       """.as(JobcandidateRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
     fieldValues match {
@@ -88,7 +84,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(JobcandidateRow.rowParser.*)
     }
   
   }
@@ -96,7 +92,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
           where jobcandidateid = $jobcandidateid
-       """.as(rowParser.singleOpt)
+       """.as(JobcandidateRow.rowParser.singleOpt)
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     implicit val toStatement: ToStatement[Array[JobcandidateId]] =
@@ -106,7 +102,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
           where jobcandidateid = ANY($jobcandidateids)
-       """.as(rowParser.*)
+       """.as(JobcandidateRow.rowParser.*)
   
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
@@ -156,18 +152,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning jobcandidateid, businessentityid, resume, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(JobcandidateRow.rowParser.single)
   
   }
-  val rowParser: RowParser[JobcandidateRow] =
-    RowParser[JobcandidateRow] { row =>
-      Success(
-        JobcandidateRow(
-          jobcandidateid = row[JobcandidateId]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[TypoXml]]("resume"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

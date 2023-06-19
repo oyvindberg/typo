@@ -7,19 +7,10 @@ package adventureworks
 package pu
 package v
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object VViewRepoImpl extends VViewRepo {
   override def selectAll: Stream[ConnectionIO, VViewRow] = {
@@ -42,31 +33,4 @@ object VViewRepoImpl extends VViewRepo {
     sql"select * from pu.v $where".query[VViewRow].stream
   
   }
-  implicit val read: Read[VViewRow] =
-    new Read[VViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[AccountNumber], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 2),
-        name = Get[Name].unsafeGetNullable(rs, i + 3),
-        creditrating = Get[Int].unsafeGetNullable(rs, i + 4),
-        preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
-        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
-      )
-    )
-  
-
 }

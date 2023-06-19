@@ -7,17 +7,10 @@ package adventureworks
 package sa
 package cu
 
-import adventureworks.public.Name
-import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object CuViewRepoImpl extends CuViewRepo {
   override def selectAll: Stream[ConnectionIO, CuViewRow] = {
@@ -35,21 +28,4 @@ object CuViewRepoImpl extends CuViewRepo {
     sql"select * from sa.cu $where".query[CuViewRow].stream
   
   }
-  implicit val read: Read[CuViewRow] =
-    new Read[CuViewRow](
-      gets = List(
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[CurrencyId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
-        id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
-        currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
-    )
-  
-
 }

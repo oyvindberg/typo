@@ -8,6 +8,8 @@ package production
 package illustration
 
 import adventureworks.TypoXml
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,6 +27,16 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
+  val rowParser: RowParser[IllustrationRow] =
+    RowParser[IllustrationRow] { row =>
+      Success(
+        IllustrationRow(
+          illustrationid = row[IllustrationId]("illustrationid"),
+          diagram = row[Option[TypoXml]]("diagram"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[IllustrationRow] = new OFormat[IllustrationRow]{
     override def writes(o: IllustrationRow): JsObject =
       Json.obj(

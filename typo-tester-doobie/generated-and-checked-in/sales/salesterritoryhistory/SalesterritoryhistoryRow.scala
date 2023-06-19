@@ -9,10 +9,14 @@ package salesterritoryhistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -55,4 +59,25 @@ object SalesterritoryhistoryRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalesterritoryhistoryRow] =
+    new Read[SalesterritoryhistoryRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[SalesterritoryId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesterritoryhistoryRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 1),
+        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

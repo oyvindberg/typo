@@ -9,6 +9,8 @@ package wr
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -46,6 +48,26 @@ case class WrViewRow(
 )
 
 object WrViewRow {
+  val rowParser: RowParser[WrViewRow] =
+    RowParser[WrViewRow] { row =>
+      Success(
+        WrViewRow(
+          id = row[Option[Int]]("id"),
+          workorderid = row[Option[WorkorderId]]("workorderid"),
+          productid = row[Option[Int]]("productid"),
+          operationsequence = row[Option[Int]]("operationsequence"),
+          locationid = row[Option[LocationId]]("locationid"),
+          scheduledstartdate = row[Option[LocalDateTime]]("scheduledstartdate"),
+          scheduledenddate = row[Option[LocalDateTime]]("scheduledenddate"),
+          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
+          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
+          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
+          plannedcost = row[Option[BigDecimal]]("plannedcost"),
+          actualcost = row[Option[BigDecimal]]("actualcost"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[WrViewRow] = new OFormat[WrViewRow]{
     override def writes(o: WrViewRow): JsObject =
       Json.obj(

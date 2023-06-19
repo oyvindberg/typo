@@ -7,25 +7,9 @@ package adventureworks
 package public
 package pgtestnull
 
-import adventureworks.TypoBox
-import adventureworks.TypoCircle
-import adventureworks.TypoHStore
-import adventureworks.TypoInet
-import adventureworks.TypoInterval
-import adventureworks.TypoJson
-import adventureworks.TypoJsonb
-import adventureworks.TypoLine
-import adventureworks.TypoLineSegment
-import adventureworks.TypoMoney
-import adventureworks.TypoPath
-import adventureworks.TypoPoint
-import adventureworks.TypoPolygon
-import adventureworks.TypoXml
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object PgtestnullRepoImpl extends PgtestnullRepo {
@@ -34,13 +18,13 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet)
           returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PgtestnullRow.rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgtestnullRow] = {
     SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtestnull
-       """.as(rowParser.*)
+       """.as(PgtestnullRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgtestnullFieldOrIdValue[_]])(implicit c: Connection): List[PgtestnullRow] = {
     fieldValues match {
@@ -85,43 +69,8 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PgtestnullRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PgtestnullRow] =
-    RowParser[PgtestnullRow] { row =>
-      Success(
-        PgtestnullRow(
-          box = row[Option[TypoBox]]("box"),
-          circle = row[Option[TypoCircle]]("circle"),
-          line = row[Option[TypoLine]]("line"),
-          lseg = row[Option[TypoLineSegment]]("lseg"),
-          path = row[Option[TypoPath]]("path"),
-          point = row[Option[TypoPoint]]("point"),
-          polygon = row[Option[TypoPolygon]]("polygon"),
-          interval = row[Option[TypoInterval]]("interval"),
-          money = row[Option[TypoMoney]]("money"),
-          xml = row[Option[TypoXml]]("xml"),
-          json = row[Option[TypoJson]]("json"),
-          jsonb = row[Option[TypoJsonb]]("jsonb"),
-          hstore = row[Option[TypoHStore]]("hstore"),
-          inet = row[Option[TypoInet]]("inet"),
-          boxes = row[Option[Array[TypoBox]]]("boxes"),
-          circlees = row[Option[Array[TypoCircle]]]("circlees"),
-          linees = row[Option[Array[TypoLine]]]("linees"),
-          lseges = row[Option[Array[TypoLineSegment]]]("lseges"),
-          pathes = row[Option[Array[TypoPath]]]("pathes"),
-          pointes = row[Option[Array[TypoPoint]]]("pointes"),
-          polygones = row[Option[Array[TypoPolygon]]]("polygones"),
-          intervales = row[Option[Array[TypoInterval]]]("intervales"),
-          moneyes = row[Option[Array[TypoMoney]]]("moneyes"),
-          xmles = row[Option[Array[TypoXml]]]("xmles"),
-          jsones = row[Option[Array[TypoJson]]]("jsones"),
-          jsonbes = row[Option[Array[TypoJsonb]]]("jsonbes"),
-          hstores = row[Option[Array[TypoHStore]]]("hstores"),
-          inets = row[Option[Array[TypoInet]]]("inets")
-        )
-      )
-    }
 }

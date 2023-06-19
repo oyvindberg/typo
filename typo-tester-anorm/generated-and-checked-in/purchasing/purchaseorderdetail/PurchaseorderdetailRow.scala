@@ -9,6 +9,8 @@ package purchaseorderdetail
 
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -42,6 +44,22 @@ case class PurchaseorderdetailRow(
  }
 
 object PurchaseorderdetailRow {
+  val rowParser: RowParser[PurchaseorderdetailRow] =
+    RowParser[PurchaseorderdetailRow] { row =>
+      Success(
+        PurchaseorderdetailRow(
+          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
+          purchaseorderdetailid = row[Int]("purchaseorderdetailid"),
+          duedate = row[LocalDateTime]("duedate"),
+          orderqty = row[Int]("orderqty"),
+          productid = row[ProductId]("productid"),
+          unitprice = row[BigDecimal]("unitprice"),
+          receivedqty = row[BigDecimal]("receivedqty"),
+          rejectedqty = row[BigDecimal]("rejectedqty"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PurchaseorderdetailRow] = new OFormat[PurchaseorderdetailRow]{
     override def writes(o: PurchaseorderdetailRow): JsObject =
       Json.obj(

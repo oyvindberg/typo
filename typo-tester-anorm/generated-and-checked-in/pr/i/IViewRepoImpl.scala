@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package i
 
-import adventureworks.TypoXml
-import adventureworks.production.illustration.IllustrationId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object IViewRepoImpl extends IViewRepo {
   override def selectAll(implicit c: Connection): List[IViewRow] = {
     SQL"""select "id", illustrationid, diagram, modifieddate
           from pr.i
-       """.as(rowParser.*)
+       """.as(IViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IViewFieldOrIdValue[_]])(implicit c: Connection): List[IViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object IViewRepoImpl extends IViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(IViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[IViewRow] =
-    RowParser[IViewRow] { row =>
-      Success(
-        IViewRow(
-          id = row[Option[Int]]("id"),
-          illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          diagram = row[Option[TypoXml]]("diagram"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

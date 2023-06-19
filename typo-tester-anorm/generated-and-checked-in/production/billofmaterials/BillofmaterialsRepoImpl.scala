@@ -8,13 +8,9 @@ package production
 package billofmaterials
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +25,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           values (${unsaved.billofmaterialsid}::int4, ${unsaved.productassemblyid}::int4, ${unsaved.componentid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.bomlevel}::int2, ${unsaved.perassemblyqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(BillofmaterialsRow.rowParser.single)
   
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
@@ -61,7 +57,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       SQL"""insert into production.billofmaterials default values
             returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(BillofmaterialsRow.rowParser.single)
     } else {
       val q = s"""insert into production.billofmaterials(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -71,14 +67,14 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(BillofmaterialsRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from production.billofmaterials
-       """.as(rowParser.*)
+       """.as(BillofmaterialsRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow] = {
     fieldValues match {
@@ -104,7 +100,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(BillofmaterialsRow.rowParser.*)
     }
   
   }
@@ -112,7 +108,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from production.billofmaterials
           where billofmaterialsid = $billofmaterialsid
-       """.as(rowParser.singleOpt)
+       """.as(BillofmaterialsRow.rowParser.singleOpt)
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow] = {
     implicit val toStatement: ToStatement[Array[BillofmaterialsId]] =
@@ -122,7 +118,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from production.billofmaterials
           where billofmaterialsid = ANY($billofmaterialsids)
-       """.as(rowParser.*)
+       """.as(BillofmaterialsRow.rowParser.*)
   
   }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
@@ -192,23 +188,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             modifieddate = EXCLUDED.modifieddate
           returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(BillofmaterialsRow.rowParser.single)
   
   }
-  val rowParser: RowParser[BillofmaterialsRow] =
-    RowParser[BillofmaterialsRow] { row =>
-      Success(
-        BillofmaterialsRow(
-          billofmaterialsid = row[BillofmaterialsId]("billofmaterialsid"),
-          productassemblyid = row[Option[ProductId]]("productassemblyid"),
-          componentid = row[ProductId]("componentid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
-          bomlevel = row[Int]("bomlevel"),
-          perassemblyqty = row[BigDecimal]("perassemblyqty"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

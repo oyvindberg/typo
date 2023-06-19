@@ -8,6 +8,8 @@ package production
 package culture
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,6 +27,16 @@ case class CultureRow(
 )
 
 object CultureRow {
+  val rowParser: RowParser[CultureRow] =
+    RowParser[CultureRow] { row =>
+      Success(
+        CultureRow(
+          cultureid = row[CultureId]("cultureid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CultureRow] = new OFormat[CultureRow]{
     override def writes(o: CultureRow): JsObject =
       Json.obj(

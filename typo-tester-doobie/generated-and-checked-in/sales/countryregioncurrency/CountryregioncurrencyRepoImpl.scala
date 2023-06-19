@@ -8,18 +8,12 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
@@ -30,7 +24,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.currencycode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, currencycode, modifieddate
-       """.query.unique
+       """.query[CountryregioncurrencyRow].unique
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
@@ -53,7 +47,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             returning countryregioncode, currencycode, modifieddate
          """
     }
-    q.query.unique
+    q.query[CountryregioncurrencyRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
@@ -109,21 +103,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, currencycode, modifieddate
-       """.query.unique
+       """.query[CountryregioncurrencyRow].unique
   }
-  implicit val read: Read[CountryregioncurrencyRow] =
-    new Read[CountryregioncurrencyRow](
-      gets = List(
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CountryregioncurrencyRow(
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
-        currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

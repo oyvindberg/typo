@@ -9,6 +9,8 @@ package a
 
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -41,6 +43,23 @@ case class AViewRow(
 )
 
 object AViewRow {
+  val rowParser: RowParser[AViewRow] =
+    RowParser[AViewRow] { row =>
+      Success(
+        AViewRow(
+          id = row[Option[Int]]("id"),
+          addressid = row[Option[AddressId]]("addressid"),
+          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
+          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
+          city = row[Option[/* max 30 chars */ String]]("city"),
+          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
+          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
+          spatiallocation = row[Option[Byte]]("spatiallocation"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[AViewRow] = new OFormat[AViewRow]{
     override def writes(o: AViewRow): JsObject =
       Json.obj(

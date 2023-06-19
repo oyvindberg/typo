@@ -7,21 +7,16 @@ package adventureworks
 package pe
 package cr
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CrViewRepoImpl extends CrViewRepo {
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
     SQL"""select countryregioncode, "name", modifieddate
           from pe.cr
-       """.as(rowParser.*)
+       """.as(CrViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CrViewFieldOrIdValue[_]])(implicit c: Connection): List[CrViewRow] = {
     fieldValues match {
@@ -41,18 +36,8 @@ object CrViewRepoImpl extends CrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CrViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[CrViewRow] =
-    RowParser[CrViewRow] { row =>
-      Success(
-        CrViewRow(
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

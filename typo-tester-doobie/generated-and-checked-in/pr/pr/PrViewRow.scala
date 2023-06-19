@@ -10,10 +10,14 @@ package pr
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PrViewRow(
@@ -64,4 +68,31 @@ object PrViewRow {
         "comments" := row.comments,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PrViewRow] =
+    new Read[PrViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[ProductreviewId], Nullability.Nullable),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[/* max 3850 chars */ String], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        productreviewid = Get[ProductreviewId].unsafeGetNullable(rs, i + 1),
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+        reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
+        reviewdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
+        rating = Get[Int].unsafeGetNullable(rs, i + 6),
+        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
+      )
+    )
+  
+
 }

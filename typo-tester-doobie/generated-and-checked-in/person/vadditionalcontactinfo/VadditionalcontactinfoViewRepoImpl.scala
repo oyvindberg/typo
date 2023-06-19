@@ -7,19 +7,10 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
@@ -50,47 +41,4 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
     sql"select * from person.vadditionalcontactinfo $where".query[VadditionalcontactinfoViewRow].stream
   
   }
-  implicit val read: Read[VadditionalcontactinfoViewRow] =
-    new Read[VadditionalcontactinfoViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VadditionalcontactinfoViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 1),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 2),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 3),
-        telephonenumber = Get[TypoXml].unsafeGetNullable(rs, i + 4),
-        telephonespecialinstructions = Get[String].unsafeGetNullable(rs, i + 5),
-        street = Get[TypoXml].unsafeGetNullable(rs, i + 6),
-        city = Get[TypoXml].unsafeGetNullable(rs, i + 7),
-        stateprovince = Get[TypoXml].unsafeGetNullable(rs, i + 8),
-        postalcode = Get[TypoXml].unsafeGetNullable(rs, i + 9),
-        countryregion = Get[TypoXml].unsafeGetNullable(rs, i + 10),
-        homeaddressspecialinstructions = Get[TypoXml].unsafeGetNullable(rs, i + 11),
-        emailaddress = Get[TypoXml].unsafeGetNullable(rs, i + 12),
-        emailspecialinstructions = Get[String].unsafeGetNullable(rs, i + 13),
-        emailtelephonenumber = Get[TypoXml].unsafeGetNullable(rs, i + 14),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 15),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 16)
-      )
-    )
-  
-
 }

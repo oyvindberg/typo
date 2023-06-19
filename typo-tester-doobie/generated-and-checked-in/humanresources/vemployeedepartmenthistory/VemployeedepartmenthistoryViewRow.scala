@@ -9,10 +9,14 @@ package vemployeedepartmenthistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDate
 
 case class VemployeedepartmenthistoryViewRow(
@@ -70,4 +74,35 @@ object VemployeedepartmenthistoryViewRow {
         "startdate" := row.startdate,
         "enddate" := row.enddate
       )}
+  implicit val read: Read[VemployeedepartmenthistoryViewRow] =
+    new Read[VemployeedepartmenthistoryViewRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[LocalDate], Nullability.Nullable),
+        (Get[LocalDate], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmenthistoryViewRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+        shift = Get[Name].unsafeGetNullable(rs, i + 6),
+        department = Get[Name].unsafeGetNullable(rs, i + 7),
+        groupname = Get[Name].unsafeGetNullable(rs, i + 8),
+        startdate = Get[LocalDate].unsafeGetNullable(rs, i + 9),
+        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 10)
+      )
+    )
+  
+
 }

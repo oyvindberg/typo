@@ -8,13 +8,9 @@ package production
 package productinventory
 
 import adventureworks.Defaulted
-import adventureworks.production.location.LocationId
-import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -28,7 +24,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductinventoryRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
@@ -55,7 +51,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       SQL"""insert into production.productinventory default values
             returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductinventoryRow.rowParser.single)
     } else {
       val q = s"""insert into production.productinventory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -65,14 +61,14 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductinventoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from production.productinventory
-       """.as(rowParser.*)
+       """.as(ProductinventoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductinventoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductinventoryRow] = {
     fieldValues match {
@@ -96,7 +92,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductinventoryRow.rowParser.*)
     }
   
   }
@@ -104,7 +100,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from production.productinventory
           where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
-       """.as(rowParser.singleOpt)
+       """.as(ProductinventoryRow.rowParser.singleOpt)
   }
   override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -162,21 +158,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductinventoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductinventoryRow] =
-    RowParser[ProductinventoryRow] { row =>
-      Success(
-        ProductinventoryRow(
-          productid = row[ProductId]("productid"),
-          locationid = row[LocationId]("locationid"),
-          shelf = row[/* max 10 chars */ String]("shelf"),
-          bin = row[Int]("bin"),
-          quantity = row[Int]("quantity"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

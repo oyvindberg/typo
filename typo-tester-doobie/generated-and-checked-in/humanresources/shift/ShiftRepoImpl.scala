@@ -8,19 +8,13 @@ package humanresources
 package shift
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
@@ -30,7 +24,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
           returning shiftid, "name", starttime, endtime, modifieddate
-       """.query.unique
+       """.query[ShiftRow].unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
@@ -58,7 +52,7 @@ object ShiftRepoImpl extends ShiftRepo {
             returning shiftid, "name", starttime, endtime, modifieddate
          """
     }
-    q.query.unique
+    q.query[ShiftRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
@@ -130,25 +124,6 @@ object ShiftRepoImpl extends ShiftRepo {
             endtime = EXCLUDED.endtime,
             modifieddate = EXCLUDED.modifieddate
           returning shiftid, "name", starttime, endtime, modifieddate
-       """.query.unique
+       """.query[ShiftRow].unique
   }
-  implicit val read: Read[ShiftRow] =
-    new Read[ShiftRow](
-      gets = List(
-        (Get[ShiftId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalTime], Nullability.NoNulls),
-        (Get[LocalTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ShiftRow(
-        shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        starttime = Get[LocalTime].unsafeGetNonNullable(rs, i + 2),
-        endtime = Get[LocalTime].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

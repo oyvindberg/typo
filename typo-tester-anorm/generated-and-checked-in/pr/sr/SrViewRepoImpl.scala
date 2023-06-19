@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package sr
 
-import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object SrViewRepoImpl extends SrViewRepo {
   override def selectAll(implicit c: Connection): List[SrViewRow] = {
     SQL"""select "id", scrapreasonid, "name", modifieddate
           from pr.sr
-       """.as(rowParser.*)
+       """.as(SrViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SrViewFieldOrIdValue[_]])(implicit c: Connection): List[SrViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object SrViewRepoImpl extends SrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SrViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SrViewRow] =
-    RowParser[SrViewRow] { row =>
-      Success(
-        SrViewRow(
-          id = row[Option[Int]]("id"),
-          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

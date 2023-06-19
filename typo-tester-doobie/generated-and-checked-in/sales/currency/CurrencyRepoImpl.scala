@@ -8,17 +8,12 @@ package sales
 package currency
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CurrencyRepoImpl extends CurrencyRepo {
@@ -29,7 +24,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning currencycode, "name", modifieddate
-       """.query.unique
+       """.query[CurrencyRow].unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
@@ -52,7 +47,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
             returning currencycode, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[CurrencyRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
@@ -114,21 +109,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning currencycode, "name", modifieddate
-       """.query.unique
+       """.query[CurrencyRow].unique
   }
-  implicit val read: Read[CurrencyRow] =
-    new Read[CurrencyRow](
-      gets = List(
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CurrencyRow(
-        currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

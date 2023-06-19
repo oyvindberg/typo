@@ -10,15 +10,12 @@ package person
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
-import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
@@ -30,7 +27,7 @@ object PersonRepoImpl extends PersonRepo {
           values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonRow.rowParser.single)
   
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -61,7 +58,7 @@ object PersonRepoImpl extends PersonRepo {
       SQL"""insert into myschema.person default values
             returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonRow.rowParser.single)
     } else {
       val q = s"""insert into myschema.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -71,14 +68,14 @@ object PersonRepoImpl extends PersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
-       """.as(rowParser.*)
+       """.as(PersonRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -106,7 +103,7 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PersonRow.rowParser.*)
     }
   
   }
@@ -114,7 +111,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
           where "id" = $id
-       """.as(rowParser.singleOpt)
+       """.as(PersonRow.rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
     implicit val toStatement: ToStatement[Array[PersonId]] =
@@ -124,7 +121,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
           where "id" = ANY($ids)
-       """.as(rowParser.*)
+       """.as(PersonRow.rowParser.*)
   
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
@@ -202,25 +199,7 @@ object PersonRepoImpl extends PersonRepo {
             sector = EXCLUDED.sector
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PersonRow] =
-    RowParser[PersonRow] { row =>
-      Success(
-        PersonRow(
-          id = row[PersonId]("id"),
-          favouriteFootballClubId = row[FootballClubId]("favourite_football_club_id"),
-          name = row[/* max 100 chars */ String]("name"),
-          nickName = row[Option[/* max 30 chars */ String]]("nick_name"),
-          blogUrl = row[Option[/* max 100 chars */ String]]("blog_url"),
-          email = row[/* max 254 chars */ String]("email"),
-          phone = row[/* max 8 chars */ String]("phone"),
-          likesPizza = row[Boolean]("likes_pizza"),
-          maritalStatusId = row[MaritalStatusId]("marital_status_id"),
-          workEmail = row[Option[/* max 254 chars */ String]]("work_email"),
-          sector = row[Sector]("sector")
-        )
-      )
-    }
 }

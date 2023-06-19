@@ -12,18 +12,14 @@ package referential_constraints
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
 
 object ReferentialConstraintsViewRepoImpl extends ReferentialConstraintsViewRepo {
   override def selectAll(implicit c: Connection): List[ReferentialConstraintsViewRow] = {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule
           from information_schema.referential_constraints
-       """.as(rowParser.*)
+       """.as(ReferentialConstraintsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ReferentialConstraintsViewFieldOrIdValue[_]])(implicit c: Connection): List[ReferentialConstraintsViewRow] = {
     fieldValues match {
@@ -49,24 +45,8 @@ object ReferentialConstraintsViewRepoImpl extends ReferentialConstraintsViewRepo
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ReferentialConstraintsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[ReferentialConstraintsViewRow] =
-    RowParser[ReferentialConstraintsViewRow] { row =>
-      Success(
-        ReferentialConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
-          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
-          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
-          uniqueConstraintCatalog = row[Option[SqlIdentifier]]("unique_constraint_catalog"),
-          uniqueConstraintSchema = row[Option[SqlIdentifier]]("unique_constraint_schema"),
-          uniqueConstraintName = row[Option[SqlIdentifier]]("unique_constraint_name"),
-          matchOption = row[Option[CharacterData]]("match_option"),
-          updateRule = row[Option[CharacterData]]("update_rule"),
-          deleteRule = row[Option[CharacterData]]("delete_rule")
-        )
-      )
-    }
 }

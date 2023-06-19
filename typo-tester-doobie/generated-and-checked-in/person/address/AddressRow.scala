@@ -8,10 +8,14 @@ package person
 package address
 
 import adventureworks.person.stateprovince.StateprovinceId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -63,4 +67,31 @@ object AddressRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[AddressRow] =
+    new Read[AddressRow](
+      gets = List(
+        (Get[AddressId], Nullability.NoNulls),
+        (Get[/* max 60 chars */ String], Nullability.NoNulls),
+        (Get[/* max 60 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.NoNulls),
+        (Get[StateprovinceId], Nullability.NoNulls),
+        (Get[/* max 15 chars */ String], Nullability.NoNulls),
+        (Get[Array[Byte]], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
+        addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
+        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
+        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
+        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
+        spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      )
+    )
+  
+
 }

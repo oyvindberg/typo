@@ -9,6 +9,8 @@ package salesterritoryhistory
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -36,6 +38,19 @@ case class SalesterritoryhistoryRow(
  }
 
 object SalesterritoryhistoryRow {
+  val rowParser: RowParser[SalesterritoryhistoryRow] =
+    RowParser[SalesterritoryhistoryRow] { row =>
+      Success(
+        SalesterritoryhistoryRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          territoryid = row[SalesterritoryId]("territoryid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalesterritoryhistoryRow] = new OFormat[SalesterritoryhistoryRow]{
     override def writes(o: SalesterritoryhistoryRow): JsObject =
       Json.obj(

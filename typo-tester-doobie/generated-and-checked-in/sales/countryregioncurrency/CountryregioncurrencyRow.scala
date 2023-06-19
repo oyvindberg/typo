@@ -9,10 +9,14 @@ package countryregioncurrency
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CountryregioncurrencyRow(
@@ -43,4 +47,19 @@ object CountryregioncurrencyRow {
         "currencycode" := row.currencycode,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CountryregioncurrencyRow] =
+    new Read[CountryregioncurrencyRow](
+      gets = List(
+        (Get[CountryregionId], Nullability.NoNulls),
+        (Get[CurrencyId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CountryregioncurrencyRow(
+        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
+        currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

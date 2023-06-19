@@ -8,18 +8,12 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesterritoryhistoryRow].unique
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
     val fs = List(
@@ -60,7 +54,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesterritoryhistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
@@ -128,27 +122,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesterritoryhistoryRow].unique
   }
-  implicit val read: Read[SalesterritoryhistoryRow] =
-    new Read[SalesterritoryhistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[SalesterritoryId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesterritoryhistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 1),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

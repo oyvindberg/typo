@@ -9,10 +9,14 @@ package productmodel
 
 import adventureworks.TypoXml
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -51,4 +55,25 @@ object ProductmodelRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductmodelRow] =
+    new Read[ProductmodelRow](
+      gets = List(
+        (Get[ProductmodelId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
+        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        catalogdescription = Get[TypoXml].unsafeGetNullable(rs, i + 2),
+        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 3),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

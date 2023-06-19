@@ -9,10 +9,14 @@ package billofmaterials
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class BillofmaterialsRow(
@@ -66,4 +70,31 @@ object BillofmaterialsRow {
         "perassemblyqty" := row.perassemblyqty,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[BillofmaterialsRow] =
+    new Read[BillofmaterialsRow](
+      gets = List(
+        (Get[BillofmaterialsId], Nullability.NoNulls),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[UnitmeasureId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => BillofmaterialsRow(
+        billofmaterialsid = Get[BillofmaterialsId].unsafeGetNonNullable(rs, i + 0),
+        productassemblyid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+        componentid = Get[ProductId].unsafeGetNonNullable(rs, i + 2),
+        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
+        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 5),
+        bomlevel = Get[Int].unsafeGetNonNullable(rs, i + 6),
+        perassemblyqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      )
+    )
+  
+
 }

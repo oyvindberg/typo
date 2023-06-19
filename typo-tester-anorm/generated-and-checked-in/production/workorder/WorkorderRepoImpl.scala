@@ -8,13 +8,9 @@ package production
 package workorder
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +25,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(WorkorderRow.rowParser.single)
   
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
@@ -55,7 +51,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
       SQL"""insert into production.workorder default values
             returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(WorkorderRow.rowParser.single)
     } else {
       val q = s"""insert into production.workorder(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -65,14 +61,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(WorkorderRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
-       """.as(rowParser.*)
+       """.as(WorkorderRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
     fieldValues match {
@@ -98,7 +94,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(WorkorderRow.rowParser.*)
     }
   
   }
@@ -106,7 +102,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
           where workorderid = $workorderid
-       """.as(rowParser.singleOpt)
+       """.as(WorkorderRow.rowParser.singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     implicit val toStatement: ToStatement[Array[WorkorderId]] =
@@ -116,7 +112,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
           where workorderid = ANY($workorderids)
-       """.as(rowParser.*)
+       """.as(WorkorderRow.rowParser.*)
   
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
@@ -186,23 +182,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(WorkorderRow.rowParser.single)
   
   }
-  val rowParser: RowParser[WorkorderRow] =
-    RowParser[WorkorderRow] { row =>
-      Success(
-        WorkorderRow(
-          workorderid = row[WorkorderId]("workorderid"),
-          productid = row[ProductId]("productid"),
-          orderqty = row[Int]("orderqty"),
-          scrappedqty = row[Int]("scrappedqty"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          duedate = row[LocalDateTime]("duedate"),
-          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

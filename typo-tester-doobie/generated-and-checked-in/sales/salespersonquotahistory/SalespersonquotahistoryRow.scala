@@ -8,10 +8,14 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -49,4 +53,23 @@ object SalespersonquotahistoryRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalespersonquotahistoryRow] =
+    new Read[SalespersonquotahistoryRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalespersonquotahistoryRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        quotadate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
+        salesquota = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

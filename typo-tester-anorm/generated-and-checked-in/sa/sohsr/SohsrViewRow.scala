@@ -9,6 +9,8 @@ package sohsr
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -27,6 +29,16 @@ case class SohsrViewRow(
 )
 
 object SohsrViewRow {
+  val rowParser: RowParser[SohsrViewRow] =
+    RowParser[SohsrViewRow] { row =>
+      Success(
+        SohsrViewRow(
+          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
+          salesreasonid = row[Option[SalesreasonId]]("salesreasonid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SohsrViewRow] = new OFormat[SohsrViewRow]{
     override def writes(o: SohsrViewRow): JsObject =
       Json.obj(

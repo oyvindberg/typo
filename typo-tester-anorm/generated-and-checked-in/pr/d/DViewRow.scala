@@ -10,6 +10,8 @@ package d
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -49,6 +51,26 @@ case class DViewRow(
 )
 
 object DViewRow {
+  val rowParser: RowParser[DViewRow] =
+    RowParser[DViewRow] { row =>
+      Success(
+        DViewRow(
+          title = row[Option[/* max 50 chars */ String]]("title"),
+          owner = row[Option[BusinessentityId]]("owner"),
+          folderflag = row[Flag]("folderflag"),
+          filename = row[Option[/* max 400 chars */ String]]("filename"),
+          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
+          revision = row[Option[/* bpchar */ String]]("revision"),
+          changenumber = row[Option[Int]]("changenumber"),
+          status = row[Option[Int]]("status"),
+          documentsummary = row[Option[String]]("documentsummary"),
+          document = row[Option[Byte]]("document"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          documentnode = row[Option[DocumentId]]("documentnode")
+        )
+      )
+    }
   implicit val oFormat: OFormat[DViewRow] = new OFormat[DViewRow]{
     override def writes(o: DViewRow): JsObject =
       Json.obj(

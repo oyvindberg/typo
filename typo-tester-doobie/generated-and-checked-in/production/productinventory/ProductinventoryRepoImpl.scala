@@ -8,18 +8,12 @@ package production
 package productinventory
 
 import adventureworks.Defaulted
-import adventureworks.production.location.LocationId
-import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductinventoryRow].unique
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
@@ -64,7 +58,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductinventoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
@@ -140,29 +134,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductinventoryRow].unique
   }
-  implicit val read: Read[ProductinventoryRow] =
-    new Read[ProductinventoryRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocationId], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductinventoryRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 1),
-        shelf = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        bin = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
-    )
-  
-
 }

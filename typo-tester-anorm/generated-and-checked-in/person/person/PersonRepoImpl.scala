@@ -8,15 +8,11 @@ package person
 package person
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -32,7 +28,7 @@ object PersonRepoImpl extends PersonRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.persontype}::bpchar, ${unsaved.namestyle}::"public".NameStyle, ${unsaved.title}, ${unsaved.firstname}::"public"."Name", ${unsaved.middlename}::"public"."Name", ${unsaved.lastname}::"public"."Name", ${unsaved.suffix}, ${unsaved.emailpromotion}::int4, ${unsaved.additionalcontactinfo}::xml, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonRow.rowParser.single)
   
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -68,7 +64,7 @@ object PersonRepoImpl extends PersonRepo {
       SQL"""insert into person.person default values
             returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonRow.rowParser.single)
     } else {
       val q = s"""insert into person.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -78,14 +74,14 @@ object PersonRepoImpl extends PersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from person.person
-       """.as(rowParser.*)
+       """.as(PersonRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -115,7 +111,7 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PersonRow.rowParser.*)
     }
   
   }
@@ -123,7 +119,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from person.person
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(PersonRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -133,7 +129,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from person.person
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(PersonRow.rowParser.*)
   
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
@@ -219,27 +215,7 @@ object PersonRepoImpl extends PersonRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PersonRow] =
-    RowParser[PersonRow] { row =>
-      Success(
-        PersonRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          persontype = row[/* bpchar */ String]("persontype"),
-          namestyle = row[NameStyle]("namestyle"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Name]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Name]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          emailpromotion = row[Int]("emailpromotion"),
-          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

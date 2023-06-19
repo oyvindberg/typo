@@ -9,6 +9,8 @@ package l
 
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,6 +34,19 @@ case class LViewRow(
 )
 
 object LViewRow {
+  val rowParser: RowParser[LViewRow] =
+    RowParser[LViewRow] { row =>
+      Success(
+        LViewRow(
+          id = row[Option[Int]]("id"),
+          locationid = row[Option[LocationId]]("locationid"),
+          name = row[Option[Name]]("name"),
+          costrate = row[Option[BigDecimal]]("costrate"),
+          availability = row[Option[BigDecimal]]("availability"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[LViewRow] = new OFormat[LViewRow]{
     override def writes(o: LViewRow): JsObject =
       Json.obj(

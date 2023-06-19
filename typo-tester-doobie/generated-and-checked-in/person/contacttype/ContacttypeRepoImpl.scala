@@ -8,17 +8,12 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
@@ -29,7 +24,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning contacttypeid, "name", modifieddate
-       """.query.unique
+       """.query[ContacttypeRow].unique
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
@@ -55,7 +50,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             returning contacttypeid, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[ContacttypeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
@@ -117,21 +112,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning contacttypeid, "name", modifieddate
-       """.query.unique
+       """.query[ContacttypeRow].unique
   }
-  implicit val read: Read[ContacttypeRow] =
-    new Read[ContacttypeRow](
-      gets = List(
-        (Get[ContacttypeId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ContacttypeRow(
-        contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

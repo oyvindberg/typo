@@ -8,18 +8,12 @@ package production
 package billofmaterials
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
@@ -30,7 +24,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
           values (${unsaved.billofmaterialsid}::int4, ${unsaved.productassemblyid}::int4, ${unsaved.componentid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.bomlevel}::int2, ${unsaved.perassemblyqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
-       """.query.unique
+       """.query[BillofmaterialsRow].unique
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
@@ -68,7 +62,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
          """
     }
-    q.query.unique
+    q.query[BillofmaterialsRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
@@ -160,33 +154,6 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             perassemblyqty = EXCLUDED.perassemblyqty,
             modifieddate = EXCLUDED.modifieddate
           returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
-       """.query.unique
+       """.query[BillofmaterialsRow].unique
   }
-  implicit val read: Read[BillofmaterialsRow] =
-    new Read[BillofmaterialsRow](
-      gets = List(
-        (Get[BillofmaterialsId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BillofmaterialsRow(
-        billofmaterialsid = Get[BillofmaterialsId].unsafeGetNonNullable(rs, i + 0),
-        productassemblyid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        componentid = Get[ProductId].unsafeGetNonNullable(rs, i + 2),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 5),
-        bomlevel = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        perassemblyqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

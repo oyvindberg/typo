@@ -21,10 +21,14 @@ import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class PgtestRow(
   box: TypoBox,
@@ -123,4 +127,69 @@ object PgtestRow {
         "hstores" := row.hstores,
         "inets" := row.inets
       )}
+  implicit val read: Read[PgtestRow] =
+    new Read[PgtestRow](
+      gets = List(
+        (Get[TypoBox], Nullability.NoNulls),
+        (Get[TypoCircle], Nullability.NoNulls),
+        (Get[TypoLine], Nullability.NoNulls),
+        (Get[TypoLineSegment], Nullability.NoNulls),
+        (Get[TypoPath], Nullability.NoNulls),
+        (Get[TypoPoint], Nullability.NoNulls),
+        (Get[TypoPolygon], Nullability.NoNulls),
+        (Get[TypoInterval], Nullability.NoNulls),
+        (Get[TypoMoney], Nullability.NoNulls),
+        (Get[TypoXml], Nullability.NoNulls),
+        (Get[TypoJson], Nullability.NoNulls),
+        (Get[TypoJsonb], Nullability.NoNulls),
+        (Get[TypoHStore], Nullability.NoNulls),
+        (Get[TypoInet], Nullability.NoNulls),
+        (Get[Array[TypoBox]], Nullability.NoNulls),
+        (Get[Array[TypoCircle]], Nullability.NoNulls),
+        (Get[Array[TypoLine]], Nullability.NoNulls),
+        (Get[Array[TypoLineSegment]], Nullability.NoNulls),
+        (Get[Array[TypoPath]], Nullability.NoNulls),
+        (Get[Array[TypoPoint]], Nullability.NoNulls),
+        (Get[Array[TypoPolygon]], Nullability.NoNulls),
+        (Get[Array[TypoInterval]], Nullability.NoNulls),
+        (Get[Array[TypoMoney]], Nullability.NoNulls),
+        (Get[Array[TypoXml]], Nullability.NoNulls),
+        (Get[Array[TypoJson]], Nullability.NoNulls),
+        (Get[Array[TypoJsonb]], Nullability.NoNulls),
+        (Get[Array[TypoHStore]], Nullability.NoNulls),
+        (Get[Array[TypoInet]], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PgtestRow(
+        box = Get[TypoBox].unsafeGetNonNullable(rs, i + 0),
+        circle = Get[TypoCircle].unsafeGetNonNullable(rs, i + 1),
+        line = Get[TypoLine].unsafeGetNonNullable(rs, i + 2),
+        lseg = Get[TypoLineSegment].unsafeGetNonNullable(rs, i + 3),
+        path = Get[TypoPath].unsafeGetNonNullable(rs, i + 4),
+        point = Get[TypoPoint].unsafeGetNonNullable(rs, i + 5),
+        polygon = Get[TypoPolygon].unsafeGetNonNullable(rs, i + 6),
+        interval = Get[TypoInterval].unsafeGetNonNullable(rs, i + 7),
+        money = Get[TypoMoney].unsafeGetNonNullable(rs, i + 8),
+        xml = Get[TypoXml].unsafeGetNonNullable(rs, i + 9),
+        json = Get[TypoJson].unsafeGetNonNullable(rs, i + 10),
+        jsonb = Get[TypoJsonb].unsafeGetNonNullable(rs, i + 11),
+        hstore = Get[TypoHStore].unsafeGetNonNullable(rs, i + 12),
+        inet = Get[TypoInet].unsafeGetNonNullable(rs, i + 13),
+        boxes = Get[Array[TypoBox]].unsafeGetNonNullable(rs, i + 14),
+        circlees = Get[Array[TypoCircle]].unsafeGetNonNullable(rs, i + 15),
+        linees = Get[Array[TypoLine]].unsafeGetNonNullable(rs, i + 16),
+        lseges = Get[Array[TypoLineSegment]].unsafeGetNonNullable(rs, i + 17),
+        pathes = Get[Array[TypoPath]].unsafeGetNonNullable(rs, i + 18),
+        pointes = Get[Array[TypoPoint]].unsafeGetNonNullable(rs, i + 19),
+        polygones = Get[Array[TypoPolygon]].unsafeGetNonNullable(rs, i + 20),
+        intervales = Get[Array[TypoInterval]].unsafeGetNonNullable(rs, i + 21),
+        moneyes = Get[Array[TypoMoney]].unsafeGetNonNullable(rs, i + 22),
+        xmles = Get[Array[TypoXml]].unsafeGetNonNullable(rs, i + 23),
+        jsones = Get[Array[TypoJson]].unsafeGetNonNullable(rs, i + 24),
+        jsonbes = Get[Array[TypoJsonb]].unsafeGetNonNullable(rs, i + 25),
+        hstores = Get[Array[TypoHStore]].unsafeGetNonNullable(rs, i + 26),
+        inets = Get[Array[TypoInet]].unsafeGetNonNullable(rs, i + 27)
+      )
+    )
+  
+
 }

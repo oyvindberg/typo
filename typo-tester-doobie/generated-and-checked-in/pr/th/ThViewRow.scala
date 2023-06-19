@@ -9,10 +9,14 @@ package th
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ThViewRow(
@@ -67,4 +71,33 @@ object ThViewRow {
         "actualcost" := row.actualcost,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ThViewRow] =
+    new Read[ThViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[TransactionhistoryId], Nullability.Nullable),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[/* bpchar */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ThViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        transactionid = Get[TransactionhistoryId].unsafeGetNullable(rs, i + 1),
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+        referenceorderid = Get[Int].unsafeGetNullable(rs, i + 3),
+        referenceorderlineid = Get[Int].unsafeGetNullable(rs, i + 4),
+        transactiondate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
+        transactiontype = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 6),
+        quantity = Get[Int].unsafeGetNullable(rs, i + 7),
+        actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
+      )
+    )
+  
+
 }

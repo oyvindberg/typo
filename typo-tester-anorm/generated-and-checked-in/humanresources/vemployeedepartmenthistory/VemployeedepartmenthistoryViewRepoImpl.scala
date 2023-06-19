@@ -7,21 +7,16 @@ package adventureworks
 package humanresources
 package vemployeedepartmenthistory
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
 
 object VemployeedepartmenthistoryViewRepoImpl extends VemployeedepartmenthistoryViewRepo {
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate
           from humanresources.vemployeedepartmenthistory
-       """.as(rowParser.*)
+       """.as(VemployeedepartmenthistoryViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryViewFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
     fieldValues match {
@@ -49,26 +44,8 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VemployeedepartmenthistoryViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VemployeedepartmenthistoryViewRow] =
-    RowParser[VemployeedepartmenthistoryViewRow] { row =>
-      Success(
-        VemployeedepartmenthistoryViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          shift = row[Option[Name]]("shift"),
-          department = row[Option[Name]]("department"),
-          groupname = row[Option[Name]]("groupname"),
-          startdate = row[Option[LocalDate]]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate")
-        )
-      )
-    }
 }

@@ -21,10 +21,14 @@ import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class PgtestnullRow(
   box: Option[TypoBox],
@@ -123,4 +127,69 @@ object PgtestnullRow {
         "hstores" := row.hstores,
         "inets" := row.inets
       )}
+  implicit val read: Read[PgtestnullRow] =
+    new Read[PgtestnullRow](
+      gets = List(
+        (Get[TypoBox], Nullability.Nullable),
+        (Get[TypoCircle], Nullability.Nullable),
+        (Get[TypoLine], Nullability.Nullable),
+        (Get[TypoLineSegment], Nullability.Nullable),
+        (Get[TypoPath], Nullability.Nullable),
+        (Get[TypoPoint], Nullability.Nullable),
+        (Get[TypoPolygon], Nullability.Nullable),
+        (Get[TypoInterval], Nullability.Nullable),
+        (Get[TypoMoney], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[TypoJson], Nullability.Nullable),
+        (Get[TypoJsonb], Nullability.Nullable),
+        (Get[TypoHStore], Nullability.Nullable),
+        (Get[TypoInet], Nullability.Nullable),
+        (Get[Array[TypoBox]], Nullability.Nullable),
+        (Get[Array[TypoCircle]], Nullability.Nullable),
+        (Get[Array[TypoLine]], Nullability.Nullable),
+        (Get[Array[TypoLineSegment]], Nullability.Nullable),
+        (Get[Array[TypoPath]], Nullability.Nullable),
+        (Get[Array[TypoPoint]], Nullability.Nullable),
+        (Get[Array[TypoPolygon]], Nullability.Nullable),
+        (Get[Array[TypoInterval]], Nullability.Nullable),
+        (Get[Array[TypoMoney]], Nullability.Nullable),
+        (Get[Array[TypoXml]], Nullability.Nullable),
+        (Get[Array[TypoJson]], Nullability.Nullable),
+        (Get[Array[TypoJsonb]], Nullability.Nullable),
+        (Get[Array[TypoHStore]], Nullability.Nullable),
+        (Get[Array[TypoInet]], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PgtestnullRow(
+        box = Get[TypoBox].unsafeGetNullable(rs, i + 0),
+        circle = Get[TypoCircle].unsafeGetNullable(rs, i + 1),
+        line = Get[TypoLine].unsafeGetNullable(rs, i + 2),
+        lseg = Get[TypoLineSegment].unsafeGetNullable(rs, i + 3),
+        path = Get[TypoPath].unsafeGetNullable(rs, i + 4),
+        point = Get[TypoPoint].unsafeGetNullable(rs, i + 5),
+        polygon = Get[TypoPolygon].unsafeGetNullable(rs, i + 6),
+        interval = Get[TypoInterval].unsafeGetNullable(rs, i + 7),
+        money = Get[TypoMoney].unsafeGetNullable(rs, i + 8),
+        xml = Get[TypoXml].unsafeGetNullable(rs, i + 9),
+        json = Get[TypoJson].unsafeGetNullable(rs, i + 10),
+        jsonb = Get[TypoJsonb].unsafeGetNullable(rs, i + 11),
+        hstore = Get[TypoHStore].unsafeGetNullable(rs, i + 12),
+        inet = Get[TypoInet].unsafeGetNullable(rs, i + 13),
+        boxes = Get[Array[TypoBox]].unsafeGetNullable(rs, i + 14),
+        circlees = Get[Array[TypoCircle]].unsafeGetNullable(rs, i + 15),
+        linees = Get[Array[TypoLine]].unsafeGetNullable(rs, i + 16),
+        lseges = Get[Array[TypoLineSegment]].unsafeGetNullable(rs, i + 17),
+        pathes = Get[Array[TypoPath]].unsafeGetNullable(rs, i + 18),
+        pointes = Get[Array[TypoPoint]].unsafeGetNullable(rs, i + 19),
+        polygones = Get[Array[TypoPolygon]].unsafeGetNullable(rs, i + 20),
+        intervales = Get[Array[TypoInterval]].unsafeGetNullable(rs, i + 21),
+        moneyes = Get[Array[TypoMoney]].unsafeGetNullable(rs, i + 22),
+        xmles = Get[Array[TypoXml]].unsafeGetNullable(rs, i + 23),
+        jsones = Get[Array[TypoJson]].unsafeGetNullable(rs, i + 24),
+        jsonbes = Get[Array[TypoJsonb]].unsafeGetNullable(rs, i + 25),
+        hstores = Get[Array[TypoHStore]].unsafeGetNullable(rs, i + 26),
+        inets = Get[Array[TypoInet]].unsafeGetNullable(rs, i + 27)
+      )
+    )
+  
+
 }

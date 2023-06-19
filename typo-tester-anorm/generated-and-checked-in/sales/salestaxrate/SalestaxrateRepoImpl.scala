@@ -8,13 +8,9 @@ package sales
 package salestaxrate
 
 import adventureworks.Defaulted
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -30,7 +26,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalestaxrateRow.rowParser.single)
   
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
@@ -60,7 +56,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       SQL"""insert into sales.salestaxrate default values
             returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalestaxrateRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salestaxrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -70,14 +66,14 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalestaxrateRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
-       """.as(rowParser.*)
+       """.as(SalestaxrateRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
     fieldValues match {
@@ -101,7 +97,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalestaxrateRow.rowParser.*)
     }
   
   }
@@ -109,7 +105,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = $salestaxrateid
-       """.as(rowParser.singleOpt)
+       """.as(SalestaxrateRow.rowParser.singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     implicit val toStatement: ToStatement[Array[SalestaxrateId]] =
@@ -119,7 +115,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
-       """.as(rowParser.*)
+       """.as(SalestaxrateRow.rowParser.*)
   
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
@@ -181,21 +177,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalestaxrateRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalestaxrateRow] =
-    RowParser[SalestaxrateRow] { row =>
-      Success(
-        SalestaxrateRow(
-          salestaxrateid = row[SalestaxrateId]("salestaxrateid"),
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          taxtype = row[Int]("taxtype"),
-          taxrate = row[BigDecimal]("taxrate"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

@@ -8,14 +8,10 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -28,7 +24,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
           returning productid, productphotoid, "primary", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductproductphotoRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow = {
@@ -49,7 +45,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       SQL"""insert into production.productproductphoto default values
             returning productid, productphotoid, "primary", modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductproductphotoRow.rowParser.single)
     } else {
       val q = s"""insert into production.productproductphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +55,14 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductproductphotoRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from production.productproductphoto
-       """.as(rowParser.*)
+       """.as(ProductproductphotoRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductproductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductproductphotoRow] = {
     fieldValues match {
@@ -87,7 +83,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductproductphotoRow.rowParser.*)
     }
   
   }
@@ -95,7 +91,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from production.productproductphoto
           where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
-       """.as(rowParser.singleOpt)
+       """.as(ProductproductphotoRow.rowParser.singleOpt)
   }
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -141,18 +137,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, productphotoid, "primary", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductproductphotoRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductproductphotoRow] =
-    RowParser[ProductproductphotoRow] { row =>
-      Success(
-        ProductproductphotoRow(
-          productid = row[ProductId]("productid"),
-          productphotoid = row[ProductphotoId]("productphotoid"),
-          primary = row[Flag]("primary"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

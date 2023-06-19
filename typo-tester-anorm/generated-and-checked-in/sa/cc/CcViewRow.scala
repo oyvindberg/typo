@@ -8,6 +8,8 @@ package sa
 package cc
 
 import adventureworks.sales.creditcard.CreditcardId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -33,6 +35,20 @@ case class CcViewRow(
 )
 
 object CcViewRow {
+  val rowParser: RowParser[CcViewRow] =
+    RowParser[CcViewRow] { row =>
+      Success(
+        CcViewRow(
+          id = row[Option[Int]]("id"),
+          creditcardid = row[Option[CreditcardId]]("creditcardid"),
+          cardtype = row[Option[/* max 50 chars */ String]]("cardtype"),
+          cardnumber = row[Option[/* max 25 chars */ String]]("cardnumber"),
+          expmonth = row[Option[Int]]("expmonth"),
+          expyear = row[Option[Int]]("expyear"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CcViewRow] = new OFormat[CcViewRow]{
     override def writes(o: CcViewRow): JsObject =
       Json.obj(

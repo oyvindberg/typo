@@ -9,6 +9,8 @@ package workorderrouting
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -48,6 +50,25 @@ case class WorkorderroutingRow(
  }
 
 object WorkorderroutingRow {
+  val rowParser: RowParser[WorkorderroutingRow] =
+    RowParser[WorkorderroutingRow] { row =>
+      Success(
+        WorkorderroutingRow(
+          workorderid = row[WorkorderId]("workorderid"),
+          productid = row[Int]("productid"),
+          operationsequence = row[Int]("operationsequence"),
+          locationid = row[LocationId]("locationid"),
+          scheduledstartdate = row[LocalDateTime]("scheduledstartdate"),
+          scheduledenddate = row[LocalDateTime]("scheduledenddate"),
+          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
+          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
+          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
+          plannedcost = row[BigDecimal]("plannedcost"),
+          actualcost = row[Option[BigDecimal]]("actualcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[WorkorderroutingRow] = new OFormat[WorkorderroutingRow]{
     override def writes(o: WorkorderroutingRow): JsObject =
       Json.obj(

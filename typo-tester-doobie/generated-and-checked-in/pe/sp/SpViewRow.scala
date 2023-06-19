@@ -12,10 +12,14 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -67,4 +71,31 @@ object SpViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SpViewRow] =
+    new Read[SpViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[StateprovinceId], Nullability.Nullable),
+        (Get[/* bpchar */ String], Nullability.Nullable),
+        (Get[CountryregionId], Nullability.Nullable),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[Name], Nullability.Nullable),
+        (Get[SalesterritoryId], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        stateprovinceid = Get[StateprovinceId].unsafeGetNullable(rs, i + 1),
+        stateprovincecode = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 2),
+        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
+        isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
+        name = Get[Name].unsafeGetNullable(rs, i + 5),
+        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 6),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
+      )
+    )
+  
+
 }

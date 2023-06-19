@@ -7,18 +7,10 @@ package adventureworks
 package production
 package vproductmodelcatalogdescription
 
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow] = {
@@ -57,63 +49,4 @@ object VproductmodelcatalogdescriptionViewRepoImpl extends Vproductmodelcatalogd
     sql"select * from production.vproductmodelcatalogdescription $where".query[VproductmodelcatalogdescriptionViewRow].stream
   
   }
-  implicit val read: Read[VproductmodelcatalogdescriptionViewRow] =
-    new Read[VproductmodelcatalogdescriptionViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        Summary = Get[String].unsafeGetNullable(rs, i + 2),
-        manufacturer = Get[String].unsafeGetNullable(rs, i + 3),
-        copyright = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 4),
-        producturl = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 5),
-        warrantyperiod = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 6),
-        warrantydescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 7),
-        noofyears = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 8),
-        maintenancedescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 9),
-        wheel = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 10),
-        saddle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 11),
-        pedal = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 12),
-        bikeframe = Get[String].unsafeGetNullable(rs, i + 13),
-        crankset = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 14),
-        pictureangle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 15),
-        picturesize = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 16),
-        productphotoid = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 17),
-        material = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 18),
-        color = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 19),
-        productline = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 20),
-        style = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 21),
-        riderexperience = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 22),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 23),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 24)
-      )
-    )
-  
-
 }

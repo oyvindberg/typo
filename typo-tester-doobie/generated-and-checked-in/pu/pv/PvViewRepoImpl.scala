@@ -7,18 +7,10 @@ package adventureworks
 package pu
 package pv
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PvViewRepoImpl extends PvViewRepo {
   override def selectAll: Stream[ConnectionIO, PvViewRow] = {
@@ -44,37 +36,4 @@ object PvViewRepoImpl extends PvViewRepo {
     sql"select * from pu.pv $where".query[PvViewRow].stream
   
   }
-  implicit val read: Read[PvViewRow] =
-    new Read[PvViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PvViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        averageleadtime = Get[Int].unsafeGetNullable(rs, i + 3),
-        standardprice = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        lastreceiptdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
-        minorderqty = Get[Int].unsafeGetNullable(rs, i + 7),
-        maxorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
-        onorderqty = Get[Int].unsafeGetNullable(rs, i + 9),
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 11)
-      )
-    )
-  
-
 }

@@ -10,6 +10,8 @@ package vadditionalcontactinfo
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -46,6 +48,30 @@ case class VadditionalcontactinfoViewRow(
 )
 
 object VadditionalcontactinfoViewRow {
+  val rowParser: RowParser[VadditionalcontactinfoViewRow] =
+    RowParser[VadditionalcontactinfoViewRow] { row =>
+      Success(
+        VadditionalcontactinfoViewRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          telephonenumber = row[Option[TypoXml]]("telephonenumber"),
+          telephonespecialinstructions = row[Option[String]]("telephonespecialinstructions"),
+          street = row[Option[TypoXml]]("street"),
+          city = row[Option[TypoXml]]("city"),
+          stateprovince = row[Option[TypoXml]]("stateprovince"),
+          postalcode = row[Option[TypoXml]]("postalcode"),
+          countryregion = row[Option[TypoXml]]("countryregion"),
+          homeaddressspecialinstructions = row[Option[TypoXml]]("homeaddressspecialinstructions"),
+          emailaddress = row[Option[TypoXml]]("emailaddress"),
+          emailspecialinstructions = row[Option[String]]("emailspecialinstructions"),
+          emailtelephonenumber = row[Option[TypoXml]]("emailtelephonenumber"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VadditionalcontactinfoViewRow] = new OFormat[VadditionalcontactinfoViewRow]{
     override def writes(o: VadditionalcontactinfoViewRow): JsObject =
       Json.obj(

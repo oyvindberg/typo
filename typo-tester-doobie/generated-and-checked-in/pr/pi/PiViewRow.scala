@@ -9,10 +9,14 @@ package pi
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -60,4 +64,29 @@ object PiViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PiViewRow] =
+    new Read[PiViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[LocationId], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+        locationid = Get[LocationId].unsafeGetNullable(rs, i + 2),
+        shelf = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
+        bin = Get[Int].unsafeGetNullable(rs, i + 4),
+        quantity = Get[Int].unsafeGetNullable(rs, i + 5),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 6),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7)
+      )
+    )
+  
+
 }

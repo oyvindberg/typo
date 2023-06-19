@@ -7,19 +7,10 @@ package adventureworks
 package pe
 package bea
 
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object BeaViewRepoImpl extends BeaViewRepo {
   override def selectAll: Stream[ConnectionIO, BeaViewRow] = {
@@ -39,25 +30,4 @@ object BeaViewRepoImpl extends BeaViewRepo {
     sql"select * from pe.bea $where".query[BeaViewRow].stream
   
   }
-  implicit val read: Read[BeaViewRow] =
-    new Read[BeaViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[AddressId], Nullability.Nullable),
-        (Get[AddresstypeId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        addressid = Get[AddressId].unsafeGetNullable(rs, i + 2),
-        addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
-    )
-  
-
 }

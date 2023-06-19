@@ -7,22 +7,16 @@ package adventureworks
 package pr
 package pmpdc
 
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
           from pr.pmpdc
-       """.as(rowParser.*)
+       """.as(PmpdcViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmpdcViewFieldOrIdValue[_]])(implicit c: Connection): List[PmpdcViewRow] = {
     fieldValues match {
@@ -43,19 +37,8 @@ object PmpdcViewRepoImpl extends PmpdcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PmpdcViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PmpdcViewRow] =
-    RowParser[PmpdcViewRow] { row =>
-      Success(
-        PmpdcViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
-          cultureid = row[Option[CultureId]]("cultureid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

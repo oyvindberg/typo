@@ -10,6 +10,8 @@ package jc
 import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -31,6 +33,18 @@ case class JcViewRow(
 )
 
 object JcViewRow {
+  val rowParser: RowParser[JcViewRow] =
+    RowParser[JcViewRow] { row =>
+      Success(
+        JcViewRow(
+          id = row[Option[Int]]("id"),
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          resume = row[Option[TypoXml]]("resume"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[JcViewRow] = new OFormat[JcViewRow]{
     override def writes(o: JcViewRow): JsObject =
       Json.obj(

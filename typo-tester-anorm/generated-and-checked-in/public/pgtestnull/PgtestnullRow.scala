@@ -21,6 +21,8 @@ import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -60,6 +62,41 @@ case class PgtestnullRow(
 )
 
 object PgtestnullRow {
+  val rowParser: RowParser[PgtestnullRow] =
+    RowParser[PgtestnullRow] { row =>
+      Success(
+        PgtestnullRow(
+          box = row[Option[TypoBox]]("box"),
+          circle = row[Option[TypoCircle]]("circle"),
+          line = row[Option[TypoLine]]("line"),
+          lseg = row[Option[TypoLineSegment]]("lseg"),
+          path = row[Option[TypoPath]]("path"),
+          point = row[Option[TypoPoint]]("point"),
+          polygon = row[Option[TypoPolygon]]("polygon"),
+          interval = row[Option[TypoInterval]]("interval"),
+          money = row[Option[TypoMoney]]("money"),
+          xml = row[Option[TypoXml]]("xml"),
+          json = row[Option[TypoJson]]("json"),
+          jsonb = row[Option[TypoJsonb]]("jsonb"),
+          hstore = row[Option[TypoHStore]]("hstore"),
+          inet = row[Option[TypoInet]]("inet"),
+          boxes = row[Option[Array[TypoBox]]]("boxes"),
+          circlees = row[Option[Array[TypoCircle]]]("circlees"),
+          linees = row[Option[Array[TypoLine]]]("linees"),
+          lseges = row[Option[Array[TypoLineSegment]]]("lseges"),
+          pathes = row[Option[Array[TypoPath]]]("pathes"),
+          pointes = row[Option[Array[TypoPoint]]]("pointes"),
+          polygones = row[Option[Array[TypoPolygon]]]("polygones"),
+          intervales = row[Option[Array[TypoInterval]]]("intervales"),
+          moneyes = row[Option[Array[TypoMoney]]]("moneyes"),
+          xmles = row[Option[Array[TypoXml]]]("xmles"),
+          jsones = row[Option[Array[TypoJson]]]("jsones"),
+          jsonbes = row[Option[Array[TypoJsonb]]]("jsonbes"),
+          hstores = row[Option[Array[TypoHStore]]]("hstores"),
+          inets = row[Option[Array[TypoInet]]]("inets")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PgtestnullRow] = new OFormat[PgtestnullRow]{
     override def writes(o: PgtestnullRow): JsObject =
       Json.obj(

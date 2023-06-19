@@ -9,10 +9,14 @@ package sth
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -56,4 +60,27 @@ object SthViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SthViewRow] =
+    new Read[SthViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[SalesterritoryId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
+        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
+      )
+    )
+  
+
 }

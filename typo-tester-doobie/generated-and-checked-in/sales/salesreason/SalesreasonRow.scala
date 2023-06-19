@@ -8,10 +8,14 @@ package sales
 package salesreason
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class SalesreasonRow(
@@ -42,4 +46,21 @@ object SalesreasonRow {
         "reasontype" := row.reasontype,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalesreasonRow] =
+    new Read[SalesreasonRow](
+      gets = List(
+        (Get[SalesreasonId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
+        salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        reasontype = Get[Name].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

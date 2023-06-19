@@ -7,19 +7,10 @@ package adventureworks
 package sa
 package sod
 
-import adventureworks.production.product.ProductId
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SodViewRepoImpl extends SodViewRepo {
   override def selectAll: Stream[ConnectionIO, SodViewRow] = {
@@ -44,35 +35,4 @@ object SodViewRepoImpl extends SodViewRepo {
     sql"select * from sa.sod $where".query[SodViewRow].stream
   
   }
-  implicit val read: Read[SodViewRow] =
-    new Read[SodViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesorderheaderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[SpecialofferId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SodViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
-        salesorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
-        carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-        orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
-        specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 6),
-        unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        unitpricediscount = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
-    )
-  
-
 }

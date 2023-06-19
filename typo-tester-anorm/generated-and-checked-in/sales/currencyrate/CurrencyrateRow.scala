@@ -8,6 +8,8 @@ package sales
 package currencyrate
 
 import adventureworks.sales.currency.CurrencyId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -35,6 +37,20 @@ case class CurrencyrateRow(
 )
 
 object CurrencyrateRow {
+  val rowParser: RowParser[CurrencyrateRow] =
+    RowParser[CurrencyrateRow] { row =>
+      Success(
+        CurrencyrateRow(
+          currencyrateid = row[CurrencyrateId]("currencyrateid"),
+          currencyratedate = row[LocalDateTime]("currencyratedate"),
+          fromcurrencycode = row[CurrencyId]("fromcurrencycode"),
+          tocurrencycode = row[CurrencyId]("tocurrencycode"),
+          averagerate = row[BigDecimal]("averagerate"),
+          endofdayrate = row[BigDecimal]("endofdayrate"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CurrencyrateRow] = new OFormat[CurrencyrateRow]{
     override def writes(o: CurrencyrateRow): JsObject =
       Json.obj(

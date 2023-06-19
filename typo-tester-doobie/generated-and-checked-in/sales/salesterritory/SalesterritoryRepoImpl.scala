@@ -8,18 +8,12 @@ package sales
 package salesterritory
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
           values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesterritoryRow].unique
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
@@ -79,7 +73,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesterritoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
@@ -176,35 +170,6 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesterritoryRow].unique
   }
-  implicit val read: Read[SalesterritoryRow] =
-    new Read[SalesterritoryRow](
-      gets = List(
-        (Get[SalesterritoryId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesterritoryRow(
-        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
-        group = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
-        saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        costytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        costlastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 9)
-      )
-    )
-  
-
 }

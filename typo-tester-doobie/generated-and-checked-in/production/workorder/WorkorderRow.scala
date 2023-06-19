@@ -9,10 +9,14 @@ package workorder
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class WorkorderRow(
@@ -65,4 +69,31 @@ object WorkorderRow {
         "scrapreasonid" := row.scrapreasonid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[WorkorderRow] =
+    new Read[WorkorderRow](
+      gets = List(
+        (Get[WorkorderId], Nullability.NoNulls),
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[ScrapreasonId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => WorkorderRow(
+        workorderid = Get[WorkorderId].unsafeGetNonNullable(rs, i + 0),
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
+        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 2),
+        scrappedqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
+        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
+        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
+        scrapreasonid = Get[ScrapreasonId].unsafeGetNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      )
+    )
+  
+
 }

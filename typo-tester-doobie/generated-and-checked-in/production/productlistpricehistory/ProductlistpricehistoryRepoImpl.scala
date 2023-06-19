@@ -8,17 +8,12 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
@@ -29,7 +24,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     sql"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.listprice}::numeric, ${unsaved.modifieddate}::timestamp)
           returning productid, startdate, enddate, listprice, modifieddate
-       """.query.unique
+       """.query[ProductlistpricehistoryRow].unique
   }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow] = {
     val fs = List(
@@ -54,7 +49,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             returning productid, startdate, enddate, listprice, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductlistpricehistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow] = {
@@ -120,25 +115,6 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             listprice = EXCLUDED.listprice,
             modifieddate = EXCLUDED.modifieddate
           returning productid, startdate, enddate, listprice, modifieddate
-       """.query.unique
+       """.query[ProductlistpricehistoryRow].unique
   }
-  implicit val read: Read[ProductlistpricehistoryRow] =
-    new Read[ProductlistpricehistoryRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductlistpricehistoryRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

@@ -8,10 +8,14 @@ package sales
 package currency
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CurrencyRow(
@@ -38,4 +42,19 @@ object CurrencyRow {
         "name" := row.name,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CurrencyRow] =
+    new Read[CurrencyRow](
+      gets = List(
+        (Get[CurrencyId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CurrencyRow(
+        currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

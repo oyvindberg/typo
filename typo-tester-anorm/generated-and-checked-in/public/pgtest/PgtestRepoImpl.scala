@@ -7,25 +7,9 @@ package adventureworks
 package public
 package pgtest
 
-import adventureworks.TypoBox
-import adventureworks.TypoCircle
-import adventureworks.TypoHStore
-import adventureworks.TypoInet
-import adventureworks.TypoInterval
-import adventureworks.TypoJson
-import adventureworks.TypoJsonb
-import adventureworks.TypoLine
-import adventureworks.TypoLineSegment
-import adventureworks.TypoMoney
-import adventureworks.TypoPath
-import adventureworks.TypoPoint
-import adventureworks.TypoPolygon
-import adventureworks.TypoXml
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object PgtestRepoImpl extends PgtestRepo {
@@ -34,13 +18,13 @@ object PgtestRepoImpl extends PgtestRepo {
           values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::numeric, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::numeric[], ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet)
           returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PgtestRow.rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgtestRow] = {
     SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtest
-       """.as(rowParser.*)
+       """.as(PgtestRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgtestFieldOrIdValue[_]])(implicit c: Connection): List[PgtestRow] = {
     fieldValues match {
@@ -85,43 +69,8 @@ object PgtestRepoImpl extends PgtestRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PgtestRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PgtestRow] =
-    RowParser[PgtestRow] { row =>
-      Success(
-        PgtestRow(
-          box = row[TypoBox]("box"),
-          circle = row[TypoCircle]("circle"),
-          line = row[TypoLine]("line"),
-          lseg = row[TypoLineSegment]("lseg"),
-          path = row[TypoPath]("path"),
-          point = row[TypoPoint]("point"),
-          polygon = row[TypoPolygon]("polygon"),
-          interval = row[TypoInterval]("interval"),
-          money = row[TypoMoney]("money"),
-          xml = row[TypoXml]("xml"),
-          json = row[TypoJson]("json"),
-          jsonb = row[TypoJsonb]("jsonb"),
-          hstore = row[TypoHStore]("hstore"),
-          inet = row[TypoInet]("inet"),
-          boxes = row[Array[TypoBox]]("boxes"),
-          circlees = row[Array[TypoCircle]]("circlees"),
-          linees = row[Array[TypoLine]]("linees"),
-          lseges = row[Array[TypoLineSegment]]("lseges"),
-          pathes = row[Array[TypoPath]]("pathes"),
-          pointes = row[Array[TypoPoint]]("pointes"),
-          polygones = row[Array[TypoPolygon]]("polygones"),
-          intervales = row[Array[TypoInterval]]("intervales"),
-          moneyes = row[Array[TypoMoney]]("moneyes"),
-          xmles = row[Array[TypoXml]]("xmles"),
-          jsones = row[Array[TypoJson]]("jsones"),
-          jsonbes = row[Array[TypoJsonb]]("jsonbes"),
-          hstores = row[Array[TypoHStore]]("hstores"),
-          inets = row[Array[TypoInet]]("inets")
-        )
-      )
-    }
 }

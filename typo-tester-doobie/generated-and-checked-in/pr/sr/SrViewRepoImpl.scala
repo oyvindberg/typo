@@ -7,17 +7,10 @@ package adventureworks
 package pr
 package sr
 
-import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object SrViewRepoImpl extends SrViewRepo {
   override def selectAll: Stream[ConnectionIO, SrViewRow] = {
@@ -35,21 +28,4 @@ object SrViewRepoImpl extends SrViewRepo {
     sql"select * from pr.sr $where".query[SrViewRow].stream
   
   }
-  implicit val read: Read[SrViewRow] =
-    new Read[SrViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ScrapreasonId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SrViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        scrapreasonid = Get[ScrapreasonId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
-    )
-  
-
 }

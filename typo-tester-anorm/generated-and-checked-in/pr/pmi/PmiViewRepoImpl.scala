@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package pmi
 
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PmiViewRepoImpl extends PmiViewRepo {
   override def selectAll(implicit c: Connection): List[PmiViewRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate
           from pr.pmi
-       """.as(rowParser.*)
+       """.as(PmiViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmiViewFieldOrIdValue[_]])(implicit c: Connection): List[PmiViewRow] = {
     fieldValues match {
@@ -41,18 +36,8 @@ object PmiViewRepoImpl extends PmiViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PmiViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PmiViewRow] =
-    RowParser[PmiViewRow] { row =>
-      Success(
-        PmiViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

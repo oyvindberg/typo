@@ -9,10 +9,14 @@ package salesterritory
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -68,4 +72,33 @@ object SalesterritoryRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalesterritoryRow] =
+    new Read[SalesterritoryRow](
+      gets = List(
+        (Get[SalesterritoryId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[CountryregionId], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesterritoryRow(
+        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
+        group = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
+        saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+        costytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
+        costlastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 8),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 9)
+      )
+    )
+  
+
 }

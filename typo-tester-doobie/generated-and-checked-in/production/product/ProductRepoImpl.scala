@@ -8,21 +8,13 @@ package production
 package product
 
 import adventureworks.Defaulted
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -34,7 +26,7 @@ object ProductRepoImpl extends ProductRepo {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.productnumber}, ${unsaved.makeflag}::"public"."Flag", ${unsaved.finishedgoodsflag}::"public"."Flag", ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductRow].unique
   }
   override def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow] = {
     val fs = List(
@@ -91,7 +83,7 @@ object ProductRepoImpl extends ProductRepo {
             returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductRow] = {
@@ -263,65 +255,6 @@ object ProductRepoImpl extends ProductRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductRow].unique
   }
-  implicit val read: Read[ProductRow] =
-    new Read[ProductRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 25 chars */ String], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[ProductsubcategoryId], Nullability.Nullable),
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        productnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        makeflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
-        finishedgoodsflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        color = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 5),
-        safetystocklevel = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        reorderpoint = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        standardcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
-        listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
-        size = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 10),
-        sizeunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 11),
-        weightunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 12),
-        weight = Get[BigDecimal].unsafeGetNullable(rs, i + 13),
-        daystomanufacture = Get[Int].unsafeGetNonNullable(rs, i + 14),
-        productline = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 15),
-        `class` = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 16),
-        style = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 17),
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 18),
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 19),
-        sellstartdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 20),
-        sellenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 21),
-        discontinueddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 22),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 23),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 24)
-      )
-    )
-  
-
 }

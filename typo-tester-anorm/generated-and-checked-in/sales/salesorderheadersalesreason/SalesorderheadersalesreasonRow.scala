@@ -9,6 +9,8 @@ package salesorderheadersalesreason
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,16 @@ case class SalesorderheadersalesreasonRow(
  }
 
 object SalesorderheadersalesreasonRow {
+  val rowParser: RowParser[SalesorderheadersalesreasonRow] =
+    RowParser[SalesorderheadersalesreasonRow] { row =>
+      Success(
+        SalesorderheadersalesreasonRow(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          salesreasonid = row[SalesreasonId]("salesreasonid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalesorderheadersalesreasonRow] = new OFormat[SalesorderheadersalesreasonRow]{
     override def writes(o: SalesorderheadersalesreasonRow): JsObject =
       Json.obj(

@@ -7,17 +7,10 @@ package adventureworks
 package pr
 package th
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.transactionhistory.TransactionhistoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object ThViewRepoImpl extends ThViewRepo {
   override def selectAll: Stream[ConnectionIO, ThViewRow] = {
@@ -41,33 +34,4 @@ object ThViewRepoImpl extends ThViewRepo {
     sql"select * from pr.th $where".query[ThViewRow].stream
   
   }
-  implicit val read: Read[ThViewRow] =
-    new Read[ThViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[TransactionhistoryId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ThViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        transactionid = Get[TransactionhistoryId].unsafeGetNullable(rs, i + 1),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        referenceorderid = Get[Int].unsafeGetNullable(rs, i + 3),
-        referenceorderlineid = Get[Int].unsafeGetNullable(rs, i + 4),
-        transactiondate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        transactiontype = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 6),
-        quantity = Get[Int].unsafeGetNullable(rs, i + 7),
-        actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
-    )
-  
-
 }

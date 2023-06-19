@@ -10,9 +10,7 @@ package productphoto
 import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -27,7 +25,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductphotoRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
@@ -50,7 +48,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       SQL"""insert into production.productphoto default values
             returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductphotoRow.rowParser.single)
     } else {
       val q = s"""insert into production.productphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -60,14 +58,14 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductphotoRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
-       """.as(rowParser.*)
+       """.as(ProductphotoRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow] = {
     fieldValues match {
@@ -90,7 +88,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductphotoRow.rowParser.*)
     }
   
   }
@@ -98,7 +96,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
           where productphotoid = $productphotoid
-       """.as(rowParser.singleOpt)
+       """.as(ProductphotoRow.rowParser.singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     implicit val toStatement: ToStatement[Array[ProductphotoId]] =
@@ -108,7 +106,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
           where productphotoid = ANY($productphotoids)
-       """.as(rowParser.*)
+       """.as(ProductphotoRow.rowParser.*)
   
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
@@ -166,20 +164,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductphotoRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductphotoRow] =
-    RowParser[ProductphotoRow] { row =>
-      Success(
-        ProductphotoRow(
-          productphotoid = row[ProductphotoId]("productphotoid"),
-          thumbnailphoto = row[Option[Array[Byte]]]("thumbnailphoto"),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
-          largephoto = row[Option[Array[Byte]]]("largephoto"),
-          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

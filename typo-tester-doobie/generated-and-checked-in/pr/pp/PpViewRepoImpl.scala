@@ -7,16 +7,10 @@ package adventureworks
 package pr
 package pp
 
-import adventureworks.production.productphoto.ProductphotoId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PpViewRepoImpl extends PpViewRepo {
   override def selectAll: Stream[ConnectionIO, PpViewRow] = {
@@ -37,27 +31,4 @@ object PpViewRepoImpl extends PpViewRepo {
     sql"select * from pr.pp $where".query[PpViewRow].stream
   
   }
-  implicit val read: Read[PpViewRow] =
-    new Read[PpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductphotoId], Nullability.Nullable),
-        (Get[Byte], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Byte], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productphotoid = Get[ProductphotoId].unsafeGetNullable(rs, i + 1),
-        thumbnailphoto = Get[Byte].unsafeGetNullable(rs, i + 2),
-        thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
-        largephoto = Get[Byte].unsafeGetNullable(rs, i + 4),
-        largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

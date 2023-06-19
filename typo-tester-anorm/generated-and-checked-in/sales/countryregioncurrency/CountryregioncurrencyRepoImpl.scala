@@ -8,13 +8,9 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -27,7 +23,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           values (${unsaved.countryregioncode}, ${unsaved.currencycode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, currencycode, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CountryregioncurrencyRow.rowParser.single)
   
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
@@ -44,7 +40,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       SQL"""insert into sales.countryregioncurrency default values
             returning countryregioncode, currencycode, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(CountryregioncurrencyRow.rowParser.single)
     } else {
       val q = s"""insert into sales.countryregioncurrency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -54,14 +50,14 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(CountryregioncurrencyRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate
           from sales.countryregioncurrency
-       """.as(rowParser.*)
+       """.as(CountryregioncurrencyRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CountryregioncurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CountryregioncurrencyRow] = {
     fieldValues match {
@@ -81,7 +77,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CountryregioncurrencyRow.rowParser.*)
     }
   
   }
@@ -89,7 +85,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     SQL"""select countryregioncode, currencycode, modifieddate
           from sales.countryregioncurrency
           where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
-       """.as(rowParser.singleOpt)
+       """.as(CountryregioncurrencyRow.rowParser.singleOpt)
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -131,17 +127,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, currencycode, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CountryregioncurrencyRow.rowParser.single)
   
   }
-  val rowParser: RowParser[CountryregioncurrencyRow] =
-    RowParser[CountryregioncurrencyRow] { row =>
-      Success(
-        CountryregioncurrencyRow(
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          currencycode = row[CurrencyId]("currencycode"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

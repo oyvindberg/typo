@@ -8,16 +8,12 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
@@ -28,7 +24,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
-       """.query.unique
+       """.query[ProductphotoRow].unique
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
@@ -57,7 +53,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductphotoRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
@@ -134,27 +130,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             largephotofilename = EXCLUDED.largephotofilename,
             modifieddate = EXCLUDED.modifieddate
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
-       """.query.unique
+       """.query[ProductphotoRow].unique
   }
-  implicit val read: Read[ProductphotoRow] =
-    new Read[ProductphotoRow](
-      gets = List(
-        (Get[ProductphotoId], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
-        productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 0),
-        thumbnailphoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 1),
-        thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        largephoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 3),
-        largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

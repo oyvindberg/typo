@@ -8,16 +8,12 @@ package production
 package transactionhistoryarchive
 
 import adventureworks.Defaulted
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
@@ -28,7 +24,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     sql"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
           values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
-       """.query.unique
+       """.query[TransactionhistoryarchiveRow].unique
   }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ConnectionIO[TransactionhistoryarchiveRow] = {
     val fs = List(
@@ -63,7 +59,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
          """
     }
-    q.query.unique
+    q.query[TransactionhistoryarchiveRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
@@ -155,33 +151,6 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             actualcost = EXCLUDED.actualcost,
             modifieddate = EXCLUDED.modifieddate
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
-       """.query.unique
+       """.query[TransactionhistoryarchiveRow].unique
   }
-  implicit val read: Read[TransactionhistoryarchiveRow] =
-    new Read[TransactionhistoryarchiveRow](
-      gets = List(
-        (Get[TransactionhistoryarchiveId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => TransactionhistoryarchiveRow(
-        transactionid = Get[TransactionhistoryarchiveId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        referenceorderid = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        referenceorderlineid = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        transactiondate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        transactiontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        actualcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

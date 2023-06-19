@@ -8,18 +8,12 @@ package production
 package workorderrouting
 
 import adventureworks.Defaulted
-import adventureworks.production.location.LocationId
-import adventureworks.production.workorder.WorkorderId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
@@ -30,7 +24,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.operationsequence}::int2, ${unsaved.locationid}::int2, ${unsaved.scheduledstartdate}::timestamp, ${unsaved.scheduledenddate}::timestamp, ${unsaved.actualstartdate}::timestamp, ${unsaved.actualenddate}::timestamp, ${unsaved.actualresourcehrs}::numeric, ${unsaved.plannedcost}::numeric, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
-       """.query.unique
+       """.query[WorkorderroutingRow].unique
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     val fs = List(
@@ -62,7 +56,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
          """
     }
-    q.query.unique
+    q.query[WorkorderroutingRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
@@ -160,39 +154,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             actualcost = EXCLUDED.actualcost,
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
-       """.query.unique
+       """.query[WorkorderroutingRow].unique
   }
-  implicit val read: Read[WorkorderroutingRow] =
-    new Read[WorkorderroutingRow](
-      gets = List(
-        (Get[WorkorderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocationId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => WorkorderroutingRow(
-        workorderid = Get[WorkorderId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        operationsequence = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 3),
-        scheduledstartdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        scheduledenddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5),
-        actualstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
-        actualenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
-        actualresourcehrs = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        plannedcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
-        actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 11)
-      )
-    )
-  
-
 }

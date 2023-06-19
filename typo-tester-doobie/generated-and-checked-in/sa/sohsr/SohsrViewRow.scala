@@ -9,10 +9,14 @@ package sohsr
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class SohsrViewRow(
@@ -40,4 +44,19 @@ object SohsrViewRow {
         "salesreasonid" := row.salesreasonid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SohsrViewRow] =
+    new Read[SohsrViewRow](
+      gets = List(
+        (Get[SalesorderheaderId], Nullability.Nullable),
+        (Get[SalesreasonId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SohsrViewRow(
+        salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 0),
+        salesreasonid = Get[SalesreasonId].unsafeGetNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
+      )
+    )
+  
+
 }

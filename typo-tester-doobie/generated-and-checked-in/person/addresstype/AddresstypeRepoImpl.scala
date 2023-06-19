@@ -8,17 +8,12 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[AddresstypeRow].unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
@@ -60,7 +55,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             returning addresstypeid, "name", rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[AddresstypeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
@@ -127,23 +122,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning addresstypeid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[AddresstypeRow].unique
   }
-  implicit val read: Read[AddresstypeRow] =
-    new Read[AddresstypeRow](
-      gets = List(
-        (Get[AddresstypeId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AddresstypeRow(
-        addresstypeid = Get[AddresstypeId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

@@ -9,10 +9,14 @@ package wr
 
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class WrViewRow(
@@ -79,4 +83,39 @@ object WrViewRow {
         "actualcost" := row.actualcost,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[WrViewRow] =
+    new Read[WrViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[WorkorderId], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[LocationId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => WrViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        workorderid = Get[WorkorderId].unsafeGetNullable(rs, i + 1),
+        productid = Get[Int].unsafeGetNullable(rs, i + 2),
+        operationsequence = Get[Int].unsafeGetNullable(rs, i + 3),
+        locationid = Get[LocationId].unsafeGetNullable(rs, i + 4),
+        scheduledstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
+        scheduledenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
+        actualstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
+        actualenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8),
+        actualresourcehrs = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
+        plannedcost = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
+        actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 11),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 12)
+      )
+    )
+  
+
 }

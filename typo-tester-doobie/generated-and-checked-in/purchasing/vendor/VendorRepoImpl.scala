@@ -9,19 +9,13 @@ package vendor
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object VendorRepoImpl extends VendorRepo {
@@ -32,7 +26,7 @@ object VendorRepoImpl extends VendorRepo {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
-       """.query.unique
+       """.query[VendorRow].unique
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
     val fs = List(
@@ -66,7 +60,7 @@ object VendorRepoImpl extends VendorRepo {
             returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
          """
     }
-    q.query.unique
+    q.query[VendorRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
@@ -153,31 +147,6 @@ object VendorRepoImpl extends VendorRepo {
             purchasingwebserviceurl = EXCLUDED.purchasingwebserviceurl,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
-       """.query.unique
+       """.query[VendorRow].unique
   }
-  implicit val read: Read[VendorRow] =
-    new Read[VendorRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[AccountNumber], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        accountnumber = Get[AccountNumber].unsafeGetNonNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
-    )
-  
-
 }

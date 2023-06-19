@@ -8,17 +8,12 @@ package production
 package unitmeasure
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
@@ -29,7 +24,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning unitmeasurecode, "name", modifieddate
-       """.query.unique
+       """.query[UnitmeasureRow].unique
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
@@ -52,7 +47,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
             returning unitmeasurecode, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[UnitmeasureRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
@@ -114,21 +109,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning unitmeasurecode, "name", modifieddate
-       """.query.unique
+       """.query[UnitmeasureRow].unique
   }
-  implicit val read: Read[UnitmeasureRow] =
-    new Read[UnitmeasureRow](
-      gets = List(
-        (Get[UnitmeasureId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => UnitmeasureRow(
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

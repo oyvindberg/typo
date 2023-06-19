@@ -7,22 +7,16 @@ package adventureworks
 package pu
 package sm
 
-import adventureworks.public.Name
-import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SmViewRepoImpl extends SmViewRepo {
   override def selectAll(implicit c: Connection): List[SmViewRow] = {
     SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from pu.sm
-       """.as(rowParser.*)
+       """.as(SmViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SmViewFieldOrIdValue[_]])(implicit c: Connection): List[SmViewRow] = {
     fieldValues match {
@@ -46,22 +40,8 @@ object SmViewRepoImpl extends SmViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SmViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SmViewRow] =
-    RowParser[SmViewRow] { row =>
-      Success(
-        SmViewRow(
-          id = row[Option[Int]]("id"),
-          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
-          name = row[Option[Name]]("name"),
-          shipbase = row[Option[BigDecimal]]("shipbase"),
-          shiprate = row[Option[BigDecimal]]("shiprate"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

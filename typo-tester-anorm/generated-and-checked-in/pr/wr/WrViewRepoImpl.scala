@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package wr
 
-import adventureworks.production.location.LocationId
-import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object WrViewRepoImpl extends WrViewRepo {
   override def selectAll(implicit c: Connection): List[WrViewRow] = {
     SQL"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from pr.wr
-       """.as(rowParser.*)
+       """.as(WrViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WrViewFieldOrIdValue[_]])(implicit c: Connection): List[WrViewRow] = {
     fieldValues match {
@@ -51,28 +46,8 @@ object WrViewRepoImpl extends WrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(WrViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[WrViewRow] =
-    RowParser[WrViewRow] { row =>
-      Success(
-        WrViewRow(
-          id = row[Option[Int]]("id"),
-          workorderid = row[Option[WorkorderId]]("workorderid"),
-          productid = row[Option[Int]]("productid"),
-          operationsequence = row[Option[Int]]("operationsequence"),
-          locationid = row[Option[LocationId]]("locationid"),
-          scheduledstartdate = row[Option[LocalDateTime]]("scheduledstartdate"),
-          scheduledenddate = row[Option[LocalDateTime]]("scheduledenddate"),
-          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
-          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
-          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
-          plannedcost = row[Option[BigDecimal]]("plannedcost"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

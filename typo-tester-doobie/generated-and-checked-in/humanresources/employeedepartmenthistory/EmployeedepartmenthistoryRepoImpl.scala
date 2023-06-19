@@ -8,20 +8,12 @@ package humanresources
 package employeedepartmenthistory
 
 import adventureworks.Defaulted
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
@@ -32,7 +24,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.departmentid}::int2, ${unsaved.shiftid}::int2, ${unsaved.startdate}::date, ${unsaved.enddate}::date, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
-       """.query.unique
+       """.query[EmployeedepartmenthistoryRow].unique
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ConnectionIO[EmployeedepartmenthistoryRow] = {
     val fs = List(
@@ -58,7 +50,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
          """
     }
-    q.query.unique
+    q.query[EmployeedepartmenthistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
@@ -123,27 +115,6 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             enddate = EXCLUDED.enddate,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
-       """.query.unique
+       """.query[EmployeedepartmenthistoryRow].unique
   }
-  implicit val read: Read[EmployeedepartmenthistoryRow] =
-    new Read[EmployeedepartmenthistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[DepartmentId], Nullability.NoNulls),
-        (Get[ShiftId], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 1),
-        shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 2),
-        startdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 3),
-        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

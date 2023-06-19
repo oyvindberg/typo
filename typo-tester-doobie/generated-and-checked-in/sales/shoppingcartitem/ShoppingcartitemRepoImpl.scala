@@ -8,17 +8,12 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
@@ -29,7 +24,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
           values (${unsaved.shoppingcartitemid}::int4, ${unsaved.shoppingcartid}, ${unsaved.quantity}::int4, ${unsaved.productid}::int4, ${unsaved.datecreated}::timestamp, ${unsaved.modifieddate}::timestamp)
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
-       """.query.unique
+       """.query[ShoppingcartitemRow].unique
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
@@ -64,7 +59,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
          """
     }
-    q.query.unique
+    q.query[ShoppingcartitemRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
@@ -141,27 +136,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             datecreated = EXCLUDED.datecreated,
             modifieddate = EXCLUDED.modifieddate
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
-       """.query.unique
+       """.query[ShoppingcartitemRow].unique
   }
-  implicit val read: Read[ShoppingcartitemRow] =
-    new Read[ShoppingcartitemRow](
-      gets = List(
-        (Get[ShoppingcartitemId], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
-        shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
-        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
-        datecreated = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

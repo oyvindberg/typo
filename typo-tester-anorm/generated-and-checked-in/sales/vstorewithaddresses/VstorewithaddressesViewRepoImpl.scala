@@ -7,20 +7,16 @@ package adventureworks
 package sales
 package vstorewithaddresses
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
   override def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow] = {
     SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
           from sales.vstorewithaddresses
-       """.as(rowParser.*)
+       """.as(VstorewithaddressesViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithaddressesViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesViewRow] = {
     fieldValues match {
@@ -46,24 +42,8 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VstorewithaddressesViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VstorewithaddressesViewRow] =
-    RowParser[VstorewithaddressesViewRow] { row =>
-      Success(
-        VstorewithaddressesViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname")
-        )
-      )
-    }
 }

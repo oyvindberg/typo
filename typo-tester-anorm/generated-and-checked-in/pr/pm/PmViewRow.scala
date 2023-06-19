@@ -10,6 +10,8 @@ package pm
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -36,6 +38,20 @@ case class PmViewRow(
 )
 
 object PmViewRow {
+  val rowParser: RowParser[PmViewRow] =
+    RowParser[PmViewRow] { row =>
+      Success(
+        PmViewRow(
+          id = row[Option[Int]]("id"),
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          name = row[Option[Name]]("name"),
+          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
+          instructions = row[Option[TypoXml]]("instructions"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PmViewRow] = new OFormat[PmViewRow]{
     override def writes(o: PmViewRow): JsObject =
       Json.obj(

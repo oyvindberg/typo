@@ -10,6 +10,8 @@ package businessentityaddress
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -36,6 +38,18 @@ case class BusinessentityaddressRow(
  }
 
 object BusinessentityaddressRow {
+  val rowParser: RowParser[BusinessentityaddressRow] =
+    RowParser[BusinessentityaddressRow] { row =>
+      Success(
+        BusinessentityaddressRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          addressid = row[AddressId]("addressid"),
+          addresstypeid = row[AddresstypeId]("addresstypeid"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[BusinessentityaddressRow] = new OFormat[BusinessentityaddressRow]{
     override def writes(o: BusinessentityaddressRow): JsObject =
       Json.obj(

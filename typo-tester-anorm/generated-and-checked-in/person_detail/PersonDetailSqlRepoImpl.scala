@@ -6,11 +6,7 @@
 package adventureworks
 package person_detail
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
@@ -32,23 +28,7 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.address a ON a.addressid = bea.addressid
             where s.businessentityid = $businessentityid
          """
-    sql.as(rowParser.*)
+    sql.as(PersonDetailSqlRow.rowParser.*)
   
   }
-  val rowParser: RowParser[PersonDetailSqlRow] =
-    RowParser[PersonDetailSqlRow] { row =>
-      Success(
-        PersonDetailSqlRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Name]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Name]("lastname"),
-          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
-          addressline1 = row[/* max 60 chars */ String]("addressline1"),
-          city = row[/* max 30 chars */ String]("city"),
-          postalcode = row[/* max 15 chars */ String]("postalcode")
-        )
-      )
-    }
 }

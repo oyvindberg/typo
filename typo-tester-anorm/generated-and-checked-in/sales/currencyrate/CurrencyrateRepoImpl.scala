@@ -8,12 +8,9 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
-import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           values (${unsaved.currencyrateid}::int4, ${unsaved.currencyratedate}::timestamp, ${unsaved.fromcurrencycode}::bpchar, ${unsaved.tocurrencycode}::bpchar, ${unsaved.averagerate}::numeric, ${unsaved.endofdayrate}::numeric, ${unsaved.modifieddate}::timestamp)
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CurrencyrateRow.rowParser.single)
   
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
@@ -52,7 +49,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       SQL"""insert into sales.currencyrate default values
             returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(CurrencyrateRow.rowParser.single)
     } else {
       val q = s"""insert into sales.currencyrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -62,14 +59,14 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(CurrencyrateRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
-       """.as(rowParser.*)
+       """.as(CurrencyrateRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
     fieldValues match {
@@ -93,7 +90,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CurrencyrateRow.rowParser.*)
     }
   
   }
@@ -101,7 +98,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
           where currencyrateid = $currencyrateid
-       """.as(rowParser.singleOpt)
+       """.as(CurrencyrateRow.rowParser.singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
     implicit val toStatement: ToStatement[Array[CurrencyrateId]] =
@@ -111,7 +108,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
           where currencyrateid = ANY($currencyrateids)
-       """.as(rowParser.*)
+       """.as(CurrencyrateRow.rowParser.*)
   
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
@@ -173,21 +170,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CurrencyrateRow.rowParser.single)
   
   }
-  val rowParser: RowParser[CurrencyrateRow] =
-    RowParser[CurrencyrateRow] { row =>
-      Success(
-        CurrencyrateRow(
-          currencyrateid = row[CurrencyrateId]("currencyrateid"),
-          currencyratedate = row[LocalDateTime]("currencyratedate"),
-          fromcurrencycode = row[CurrencyId]("fromcurrencycode"),
-          tocurrencycode = row[CurrencyId]("tocurrencycode"),
-          averagerate = row[BigDecimal]("averagerate"),
-          endofdayrate = row[BigDecimal]("endofdayrate"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

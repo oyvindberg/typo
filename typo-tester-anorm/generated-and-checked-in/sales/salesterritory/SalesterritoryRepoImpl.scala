@@ -8,13 +8,9 @@ package sales
 package salesterritory
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -30,7 +26,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesterritoryRow.rowParser.single)
   
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
@@ -72,7 +68,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       SQL"""insert into sales.salesterritory default values
             returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesterritoryRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salesterritory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -82,14 +78,14 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesterritoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
-       """.as(rowParser.*)
+       """.as(SalesterritoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryRow] = {
     fieldValues match {
@@ -116,7 +112,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalesterritoryRow.rowParser.*)
     }
   
   }
@@ -124,7 +120,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = $territoryid
-       """.as(rowParser.singleOpt)
+       """.as(SalesterritoryRow.rowParser.singleOpt)
   }
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     implicit val toStatement: ToStatement[Array[SalesterritoryId]] =
@@ -134,7 +130,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = ANY($territoryids)
-       """.as(rowParser.*)
+       """.as(SalesterritoryRow.rowParser.*)
   
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
@@ -208,24 +204,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesterritoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalesterritoryRow] =
-    RowParser[SalesterritoryRow] { row =>
-      Success(
-        SalesterritoryRow(
-          territoryid = row[SalesterritoryId]("territoryid"),
-          name = row[Name]("name"),
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          group = row[/* max 50 chars */ String]("group"),
-          salesytd = row[BigDecimal]("salesytd"),
-          saleslastyear = row[BigDecimal]("saleslastyear"),
-          costytd = row[BigDecimal]("costytd"),
-          costlastyear = row[BigDecimal]("costlastyear"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

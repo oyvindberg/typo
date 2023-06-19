@@ -8,6 +8,8 @@ package humanresources
 package vjobcandidateeducation
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -34,6 +36,26 @@ case class VjobcandidateeducationViewRow(
 )
 
 object VjobcandidateeducationViewRow {
+  val rowParser: RowParser[VjobcandidateeducationViewRow] =
+    RowParser[VjobcandidateeducationViewRow] { row =>
+      Success(
+        VjobcandidateeducationViewRow(
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          `Edu.Level` = row[Option[/* max 50 chars */ String]]("Edu.Level"),
+          `Edu.StartDate` = row[Option[LocalDate]]("Edu.StartDate"),
+          `Edu.EndDate` = row[Option[LocalDate]]("Edu.EndDate"),
+          `Edu.Degree` = row[Option[/* max 50 chars */ String]]("Edu.Degree"),
+          `Edu.Major` = row[Option[/* max 50 chars */ String]]("Edu.Major"),
+          `Edu.Minor` = row[Option[/* max 50 chars */ String]]("Edu.Minor"),
+          `Edu.GPA` = row[Option[/* max 5 chars */ String]]("Edu.GPA"),
+          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]]("Edu.GPAScale"),
+          `Edu.School` = row[Option[/* max 100 chars */ String]]("Edu.School"),
+          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Edu.Loc.CountryRegion"),
+          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]]("Edu.Loc.State"),
+          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]]("Edu.Loc.City")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VjobcandidateeducationViewRow] = new OFormat[VjobcandidateeducationViewRow]{
     override def writes(o: VjobcandidateeducationViewRow): JsObject =
       Json.obj(

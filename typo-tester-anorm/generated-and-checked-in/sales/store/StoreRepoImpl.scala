@@ -8,14 +8,10 @@ package sales
 package store
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -31,7 +27,7 @@ object StoreRepoImpl extends StoreRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(StoreRow.rowParser.single)
   
   }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
@@ -54,7 +50,7 @@ object StoreRepoImpl extends StoreRepo {
       SQL"""insert into sales.store default values
             returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(StoreRow.rowParser.single)
     } else {
       val q = s"""insert into sales.store(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -64,14 +60,14 @@ object StoreRepoImpl extends StoreRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(StoreRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
-       """.as(rowParser.*)
+       """.as(StoreRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]])(implicit c: Connection): List[StoreRow] = {
     fieldValues match {
@@ -94,7 +90,7 @@ object StoreRepoImpl extends StoreRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(StoreRow.rowParser.*)
     }
   
   }
@@ -102,7 +98,7 @@ object StoreRepoImpl extends StoreRepo {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(StoreRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -112,7 +108,7 @@ object StoreRepoImpl extends StoreRepo {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(StoreRow.rowParser.*)
   
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
@@ -170,20 +166,7 @@ object StoreRepoImpl extends StoreRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(StoreRow.rowParser.single)
   
   }
-  val rowParser: RowParser[StoreRow] =
-    RowParser[StoreRow] { row =>
-      Success(
-        StoreRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          name = row[Name]("name"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

@@ -37,12 +37,15 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
 
       code"$comment${col.param.code}"
     }
+    val jsonInstances = options.jsonLibs.flatMap(_.instances(names.RowName, names.cols))
+    val dbInstances = options.dbLib.toList.flatMap(_.rowInstances(names.maybeId, names.RowName, names.cols))
+    val instances = (jsonInstances ++ dbInstances).sortBy(_.code)
     val str =
       code"""case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |${obj(names.RowName.name, options.jsonLibs.flatMap(_.instances(names.RowName, names.cols)))}
+            |${obj(names.RowName.name, instances)}
             |""".stripMargin
 
     sc.File(names.RowName, str, secondaryTypes = Nil)
@@ -81,12 +84,9 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
              |  ${dbLib.repoImpl(repoMethod)}
              |}""".stripMargin
     }
-    val allMethods = renderedMethods ++
-      dbLib.repoAdditionalMembers(names.maybeId, names.RowName, names.cols)
-
     val str =
       code"""|object ${names.RepoImplName.name} extends ${names.RepoName} {
-             |  ${allMethods.mkCode("\n")}
+             |  ${renderedMethods.mkCode("\n")}
              |}
              |""".stripMargin
 

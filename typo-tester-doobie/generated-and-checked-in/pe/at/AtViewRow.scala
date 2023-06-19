@@ -9,10 +9,14 @@ package at
 
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -48,4 +52,23 @@ object AtViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[AtViewRow] =
+    new Read[AtViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[AddresstypeId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => AtViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
+      )
+    )
+  
+
 }

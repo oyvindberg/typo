@@ -10,10 +10,14 @@ package productmodelproductdescriptionculture
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ProductmodelproductdescriptioncultureRow(
@@ -49,4 +53,21 @@ object ProductmodelproductdescriptioncultureRow {
         "cultureid" := row.cultureid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductmodelproductdescriptioncultureRow] =
+    new Read[ProductmodelproductdescriptioncultureRow](
+      gets = List(
+        (Get[ProductmodelId], Nullability.NoNulls),
+        (Get[ProductdescriptionId], Nullability.NoNulls),
+        (Get[CultureId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
+        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
+        productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 1),
+        cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

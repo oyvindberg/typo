@@ -11,6 +11,8 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -54,6 +56,31 @@ case class VindividualcustomerViewRow(
 )
 
 object VindividualcustomerViewRow {
+  val rowParser: RowParser[VindividualcustomerViewRow] =
+    RowParser[VindividualcustomerViewRow] { row =>
+      Success(
+        VindividualcustomerViewRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
+          phonenumber = row[Option[Phone]]("phonenumber"),
+          phonenumbertype = row[Option[Name]]("phonenumbertype"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
+          emailpromotion = row[Option[Int]]("emailpromotion"),
+          addresstype = row[Option[Name]]("addresstype"),
+          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
+          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
+          city = row[Option[/* max 30 chars */ String]]("city"),
+          stateprovincename = row[Option[Name]]("stateprovincename"),
+          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
+          countryregionname = row[Option[Name]]("countryregionname"),
+          demographics = row[Option[TypoXml]]("demographics")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VindividualcustomerViewRow] = new OFormat[VindividualcustomerViewRow]{
     override def writes(o: VindividualcustomerViewRow): JsObject =
       Json.obj(

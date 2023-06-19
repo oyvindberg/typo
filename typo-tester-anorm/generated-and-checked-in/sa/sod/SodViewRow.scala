@@ -10,6 +10,8 @@ package sod
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -44,6 +46,24 @@ case class SodViewRow(
 )
 
 object SodViewRow {
+  val rowParser: RowParser[SodViewRow] =
+    RowParser[SodViewRow] { row =>
+      Success(
+        SodViewRow(
+          id = row[Option[Int]]("id"),
+          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
+          salesorderdetailid = row[Option[Int]]("salesorderdetailid"),
+          carriertrackingnumber = row[Option[/* max 25 chars */ String]]("carriertrackingnumber"),
+          orderqty = row[Option[Int]]("orderqty"),
+          productid = row[Option[ProductId]]("productid"),
+          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
+          unitprice = row[Option[BigDecimal]]("unitprice"),
+          unitpricediscount = row[Option[BigDecimal]]("unitpricediscount"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SodViewRow] = new OFormat[SodViewRow]{
     override def writes(o: SodViewRow): JsObject =
       Json.obj(

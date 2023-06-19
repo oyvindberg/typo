@@ -7,18 +7,10 @@ package adventureworks
 package pr
 package w
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.production.workorder.WorkorderId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object WViewRepoImpl extends WViewRepo {
   override def selectAll: Stream[ConnectionIO, WViewRow] = {
@@ -42,33 +34,4 @@ object WViewRepoImpl extends WViewRepo {
     sql"select * from pr.w $where".query[WViewRow].stream
   
   }
-  implicit val read: Read[WViewRow] =
-    new Read[WViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[WorkorderId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[ScrapreasonId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => WViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        workorderid = Get[WorkorderId].unsafeGetNullable(rs, i + 1),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        orderqty = Get[Int].unsafeGetNullable(rs, i + 3),
-        scrappedqty = Get[Int].unsafeGetNullable(rs, i + 4),
-        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
-        duedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
-        scrapreasonid = Get[ScrapreasonId].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
-    )
-  
-
 }

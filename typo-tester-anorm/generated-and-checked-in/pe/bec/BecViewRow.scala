@@ -9,6 +9,8 @@ package bec
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -33,6 +35,19 @@ case class BecViewRow(
 )
 
 object BecViewRow {
+  val rowParser: RowParser[BecViewRow] =
+    RowParser[BecViewRow] { row =>
+      Success(
+        BecViewRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          personid = row[Option[BusinessentityId]]("personid"),
+          contacttypeid = row[Option[ContacttypeId]]("contacttypeid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[BecViewRow] = new OFormat[BecViewRow]{
     override def writes(o: BecViewRow): JsObject =
       Json.obj(

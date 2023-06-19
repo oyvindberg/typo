@@ -8,17 +8,12 @@ package person
 package address
 
 import adventureworks.Defaulted
-import adventureworks.person.stateprovince.StateprovinceId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object AddressRepoImpl extends AddressRepo {
     sql"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
           values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
-       """.query.unique
+       """.query[AddressRow].unique
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
@@ -65,7 +60,7 @@ object AddressRepoImpl extends AddressRepo {
             returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[AddressRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
@@ -157,33 +152,6 @@ object AddressRepoImpl extends AddressRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
-       """.query.unique
+       """.query[AddressRow].unique
   }
-  implicit val read: Read[AddressRow] =
-    new Read[AddressRow](
-      gets = List(
-        (Get[AddressId], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.NoNulls),
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
-        addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
-        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

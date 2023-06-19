@@ -7,23 +7,16 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
-import adventureworks.TypoXml
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
           from production.vproductmodelinstructions
-       """.as(rowParser.*)
+       """.as(VproductmodelinstructionsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelinstructionsViewFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     fieldValues match {
@@ -51,26 +44,8 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VproductmodelinstructionsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VproductmodelinstructionsViewRow] =
-    RowParser[VproductmodelinstructionsViewRow] { row =>
-      Success(
-        VproductmodelinstructionsViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          name = row[Option[Name]]("name"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          LocationID = row[Option[Int]]("LocationID"),
-          SetupHours = row[Option[BigDecimal]]("SetupHours"),
-          MachineHours = row[Option[BigDecimal]]("MachineHours"),
-          LaborHours = row[Option[BigDecimal]]("LaborHours"),
-          LotSize = row[Option[Int]]("LotSize"),
-          Step = row[Option[/* max 1024 chars */ String]]("Step"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

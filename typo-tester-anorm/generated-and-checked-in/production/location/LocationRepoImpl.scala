@@ -8,12 +8,9 @@ package production
 package location
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object LocationRepoImpl extends LocationRepo {
           values (${unsaved.locationid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.costrate}::numeric, ${unsaved.availability}::numeric, ${unsaved.modifieddate}::timestamp)
           returning locationid, "name", costrate, availability, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(LocationRow.rowParser.single)
   
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
@@ -56,7 +53,7 @@ object LocationRepoImpl extends LocationRepo {
       SQL"""insert into production."location" default values
             returning locationid, "name", costrate, availability, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(LocationRow.rowParser.single)
     } else {
       val q = s"""insert into production."location"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -66,14 +63,14 @@ object LocationRepoImpl extends LocationRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(LocationRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate
           from production."location"
-       """.as(rowParser.*)
+       """.as(LocationRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
     fieldValues match {
@@ -95,7 +92,7 @@ object LocationRepoImpl extends LocationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(LocationRow.rowParser.*)
     }
   
   }
@@ -103,7 +100,7 @@ object LocationRepoImpl extends LocationRepo {
     SQL"""select locationid, "name", costrate, availability, modifieddate
           from production."location"
           where locationid = $locationid
-       """.as(rowParser.singleOpt)
+       """.as(LocationRow.rowParser.singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     implicit val toStatement: ToStatement[Array[LocationId]] =
@@ -113,7 +110,7 @@ object LocationRepoImpl extends LocationRepo {
     SQL"""select locationid, "name", costrate, availability, modifieddate
           from production."location"
           where locationid = ANY($locationids)
-       """.as(rowParser.*)
+       """.as(LocationRow.rowParser.*)
   
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
@@ -167,19 +164,7 @@ object LocationRepoImpl extends LocationRepo {
             modifieddate = EXCLUDED.modifieddate
           returning locationid, "name", costrate, availability, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(LocationRow.rowParser.single)
   
   }
-  val rowParser: RowParser[LocationRow] =
-    RowParser[LocationRow] { row =>
-      Success(
-        LocationRow(
-          locationid = row[LocationId]("locationid"),
-          name = row[Name]("name"),
-          costrate = row[BigDecimal]("costrate"),
-          availability = row[BigDecimal]("availability"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

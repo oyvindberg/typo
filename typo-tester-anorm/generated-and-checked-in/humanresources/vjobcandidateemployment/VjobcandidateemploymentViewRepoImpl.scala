@@ -7,20 +7,16 @@ package adventureworks
 package humanresources
 package vjobcandidateemployment
 
-import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
 
 object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     SQL"""select jobcandidateid, "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City"
           from humanresources.vjobcandidateemployment
-       """.as(rowParser.*)
+       """.as(VjobcandidateemploymentViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateemploymentViewFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     fieldValues match {
@@ -48,26 +44,8 @@ object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRe
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VjobcandidateemploymentViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VjobcandidateemploymentViewRow] =
-    RowParser[VjobcandidateemploymentViewRow] { row =>
-      Success(
-        VjobcandidateemploymentViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          `Emp.StartDate` = row[Option[LocalDate]]("Emp.StartDate"),
-          `Emp.EndDate` = row[Option[LocalDate]]("Emp.EndDate"),
-          `Emp.OrgName` = row[Option[/* max 100 chars */ String]]("Emp.OrgName"),
-          `Emp.JobTitle` = row[Option[/* max 100 chars */ String]]("Emp.JobTitle"),
-          `Emp.Responsibility` = row[Option[String]]("Emp.Responsibility"),
-          `Emp.FunctionCategory` = row[Option[String]]("Emp.FunctionCategory"),
-          `Emp.IndustryCategory` = row[Option[String]]("Emp.IndustryCategory"),
-          `Emp.Loc.CountryRegion` = row[Option[String]]("Emp.Loc.CountryRegion"),
-          `Emp.Loc.State` = row[Option[String]]("Emp.Loc.State"),
-          `Emp.Loc.City` = row[Option[String]]("Emp.Loc.City")
-        )
-      )
-    }
 }

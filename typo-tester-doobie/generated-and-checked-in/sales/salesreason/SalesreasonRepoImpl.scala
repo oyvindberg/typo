@@ -8,17 +8,12 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
@@ -29,7 +24,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate
-       """.query.unique
+       """.query[SalesreasonRow].unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
@@ -56,7 +51,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             returning salesreasonid, "name", reasontype, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesreasonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
@@ -123,23 +118,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             reasontype = EXCLUDED.reasontype,
             modifieddate = EXCLUDED.modifieddate
           returning salesreasonid, "name", reasontype, modifieddate
-       """.query.unique
+       """.query[SalesreasonRow].unique
   }
-  implicit val read: Read[SalesreasonRow] =
-    new Read[SalesreasonRow](
-      gets = List(
-        (Get[SalesreasonId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
-        salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        reasontype = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

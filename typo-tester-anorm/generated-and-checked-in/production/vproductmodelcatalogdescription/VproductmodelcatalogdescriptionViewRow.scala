@@ -9,6 +9,8 @@ package vproductmodelcatalogdescription
 
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -51,6 +53,38 @@ case class VproductmodelcatalogdescriptionViewRow(
 )
 
 object VproductmodelcatalogdescriptionViewRow {
+  val rowParser: RowParser[VproductmodelcatalogdescriptionViewRow] =
+    RowParser[VproductmodelcatalogdescriptionViewRow] { row =>
+      Success(
+        VproductmodelcatalogdescriptionViewRow(
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          name = row[Option[Name]]("name"),
+          Summary = row[Option[String]]("Summary"),
+          manufacturer = row[Option[String]]("manufacturer"),
+          copyright = row[Option[/* max 30 chars */ String]]("copyright"),
+          producturl = row[Option[/* max 256 chars */ String]]("producturl"),
+          warrantyperiod = row[Option[/* max 256 chars */ String]]("warrantyperiod"),
+          warrantydescription = row[Option[/* max 256 chars */ String]]("warrantydescription"),
+          noofyears = row[Option[/* max 256 chars */ String]]("noofyears"),
+          maintenancedescription = row[Option[/* max 256 chars */ String]]("maintenancedescription"),
+          wheel = row[Option[/* max 256 chars */ String]]("wheel"),
+          saddle = row[Option[/* max 256 chars */ String]]("saddle"),
+          pedal = row[Option[/* max 256 chars */ String]]("pedal"),
+          bikeframe = row[Option[String]]("bikeframe"),
+          crankset = row[Option[/* max 256 chars */ String]]("crankset"),
+          pictureangle = row[Option[/* max 256 chars */ String]]("pictureangle"),
+          picturesize = row[Option[/* max 256 chars */ String]]("picturesize"),
+          productphotoid = row[Option[/* max 256 chars */ String]]("productphotoid"),
+          material = row[Option[/* max 256 chars */ String]]("material"),
+          color = row[Option[/* max 256 chars */ String]]("color"),
+          productline = row[Option[/* max 256 chars */ String]]("productline"),
+          style = row[Option[/* max 256 chars */ String]]("style"),
+          riderexperience = row[Option[/* max 1024 chars */ String]]("riderexperience"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VproductmodelcatalogdescriptionViewRow] = new OFormat[VproductmodelcatalogdescriptionViewRow]{
     override def writes(o: VproductmodelcatalogdescriptionViewRow): JsObject =
       Json.obj(

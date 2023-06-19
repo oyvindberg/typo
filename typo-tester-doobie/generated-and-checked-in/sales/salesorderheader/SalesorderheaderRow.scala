@@ -17,10 +17,14 @@ import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -143,4 +147,63 @@ object SalesorderheaderRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalesorderheaderRow] =
+    new Read[SalesorderheaderRow](
+      gets = List(
+        (Get[SalesorderheaderId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[OrderNumber], Nullability.Nullable),
+        (Get[AccountNumber], Nullability.Nullable),
+        (Get[CustomerId], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[SalesterritoryId], Nullability.Nullable),
+        (Get[AddressId], Nullability.NoNulls),
+        (Get[AddressId], Nullability.NoNulls),
+        (Get[ShipmethodId], Nullability.NoNulls),
+        (Get[CreditcardId], Nullability.Nullable),
+        (Get[/* max 15 chars */ String], Nullability.Nullable),
+        (Get[CurrencyrateId], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[/* max 128 chars */ String], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesorderheaderRow(
+        salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
+        revisionnumber = Get[Int].unsafeGetNonNullable(rs, i + 1),
+        orderdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
+        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
+        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
+        status = Get[Int].unsafeGetNonNullable(rs, i + 5),
+        onlineorderflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
+        purchaseordernumber = Get[OrderNumber].unsafeGetNullable(rs, i + 7),
+        accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 8),
+        customerid = Get[CustomerId].unsafeGetNonNullable(rs, i + 9),
+        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 10),
+        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 11),
+        billtoaddressid = Get[AddressId].unsafeGetNonNullable(rs, i + 12),
+        shiptoaddressid = Get[AddressId].unsafeGetNonNullable(rs, i + 13),
+        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 14),
+        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 15),
+        creditcardapprovalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 16),
+        currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 17),
+        subtotal = Get[BigDecimal].unsafeGetNonNullable(rs, i + 18),
+        taxamt = Get[BigDecimal].unsafeGetNonNullable(rs, i + 19),
+        freight = Get[BigDecimal].unsafeGetNonNullable(rs, i + 20),
+        totaldue = Get[BigDecimal].unsafeGetNullable(rs, i + 21),
+        comment = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 22),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 23),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 24)
+      )
+    )
+  
+
 }

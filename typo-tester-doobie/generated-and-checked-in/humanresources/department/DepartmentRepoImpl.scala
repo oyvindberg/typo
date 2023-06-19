@@ -8,17 +8,12 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object DepartmentRepoImpl extends DepartmentRepo {
@@ -29,7 +24,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning departmentid, "name", groupname, modifieddate
-       """.query.unique
+       """.query[DepartmentRow].unique
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
@@ -56,7 +51,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
             returning departmentid, "name", groupname, modifieddate
          """
     }
-    q.query.unique
+    q.query[DepartmentRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
@@ -123,23 +118,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
             groupname = EXCLUDED.groupname,
             modifieddate = EXCLUDED.modifieddate
           returning departmentid, "name", groupname, modifieddate
-       """.query.unique
+       """.query[DepartmentRow].unique
   }
-  implicit val read: Read[DepartmentRow] =
-    new Read[DepartmentRow](
-      gets = List(
-        (Get[DepartmentId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
-        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        groupname = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

@@ -9,10 +9,14 @@ package s
 
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -52,4 +56,25 @@ object SViewRow {
         "endtime" := row.endtime,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SViewRow] =
+    new Read[SViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[ShiftId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[LocalTime], Nullability.Nullable),
+        (Get[LocalTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNullable(rs, i + 2),
+        starttime = Get[LocalTime].unsafeGetNullable(rs, i + 3),
+        endtime = Get[LocalTime].unsafeGetNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
+      )
+    )
+  
+
 }

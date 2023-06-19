@@ -10,9 +10,7 @@ package productdescription
 import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +26,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productdescriptionid, description, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductdescriptionRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
@@ -52,7 +50,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       SQL"""insert into production.productdescription default values
             returning productdescriptionid, description, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductdescriptionRow.rowParser.single)
     } else {
       val q = s"""insert into production.productdescription(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -62,14 +60,14 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductdescriptionRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
-       """.as(rowParser.*)
+       """.as(ProductdescriptionRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[ProductdescriptionRow] = {
     fieldValues match {
@@ -90,7 +88,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductdescriptionRow.rowParser.*)
     }
   
   }
@@ -98,7 +96,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
           where productdescriptionid = $productdescriptionid
-       """.as(rowParser.singleOpt)
+       """.as(ProductdescriptionRow.rowParser.singleOpt)
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
     implicit val toStatement: ToStatement[Array[ProductdescriptionId]] =
@@ -108,7 +106,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
           where productdescriptionid = ANY($productdescriptionids)
-       """.as(rowParser.*)
+       """.as(ProductdescriptionRow.rowParser.*)
   
   }
   override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
@@ -158,18 +156,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productdescriptionid, description, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductdescriptionRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductdescriptionRow] =
-    RowParser[ProductdescriptionRow] { row =>
-      Success(
-        ProductdescriptionRow(
-          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
-          description = row[/* max 400 chars */ String]("description"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

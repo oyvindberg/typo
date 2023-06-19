@@ -8,19 +8,13 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
@@ -31,7 +25,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
           returning productid, productphotoid, "primary", modifieddate
-       """.query.unique
+       """.query[ProductproductphotoRow].unique
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
@@ -58,7 +52,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             returning productid, productphotoid, "primary", modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductproductphotoRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
@@ -119,23 +113,6 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             "primary" = EXCLUDED."primary",
             modifieddate = EXCLUDED.modifieddate
           returning productid, productphotoid, "primary", modifieddate
-       """.query.unique
+       """.query[ProductproductphotoRow].unique
   }
-  implicit val read: Read[ProductproductphotoRow] =
-    new Read[ProductproductphotoRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[ProductphotoId], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductproductphotoRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 1),
-        primary = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

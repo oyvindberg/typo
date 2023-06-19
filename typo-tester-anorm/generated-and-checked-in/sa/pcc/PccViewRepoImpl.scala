@@ -7,21 +7,16 @@ package adventureworks
 package sa
 package pcc
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PccViewRepoImpl extends PccViewRepo {
   override def selectAll(implicit c: Connection): List[PccViewRow] = {
     SQL"""select "id", businessentityid, creditcardid, modifieddate
           from sa.pcc
-       """.as(rowParser.*)
+       """.as(PccViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PccViewFieldOrIdValue[_]])(implicit c: Connection): List[PccViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object PccViewRepoImpl extends PccViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PccViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PccViewRow] =
-    RowParser[PccViewRow] { row =>
-      Success(
-        PccViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

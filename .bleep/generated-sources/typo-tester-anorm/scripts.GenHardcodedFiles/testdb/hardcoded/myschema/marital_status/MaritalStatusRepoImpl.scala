@@ -10,9 +10,7 @@ package marital_status
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -26,13 +24,13 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           values (${unsaved.id}::int8)
           returning "id"
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(MaritalStatusRow.rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
           from myschema.marital_status
-       """.as(rowParser.*)
+       """.as(MaritalStatusRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -50,7 +48,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(MaritalStatusRow.rowParser.*)
     }
   
   }
@@ -58,7 +56,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""select "id"
           from myschema.marital_status
           where "id" = $id
-       """.as(rowParser.singleOpt)
+       """.as(MaritalStatusRow.rowParser.singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     implicit val toStatement: ToStatement[Array[MaritalStatusId]] =
@@ -68,7 +66,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""select "id"
           from myschema.marital_status
           where "id" = ANY($ids)
-       """.as(rowParser.*)
+       """.as(MaritalStatusRow.rowParser.*)
   
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
@@ -81,15 +79,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
             
           returning "id"
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(MaritalStatusRow.rowParser.single)
   
   }
-  val rowParser: RowParser[MaritalStatusRow] =
-    RowParser[MaritalStatusRow] { row =>
-      Success(
-        MaritalStatusRow(
-          id = row[MaritalStatusId]("id")
-        )
-      )
-    }
 }

@@ -10,6 +10,8 @@ package generated
 package custom
 package comments
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -34,6 +36,17 @@ case class CommentsSqlRow(
 )
 
 object CommentsSqlRow {
+  val rowParser: RowParser[CommentsSqlRow] =
+    RowParser[CommentsSqlRow] { row =>
+      Success(
+        CommentsSqlRow(
+          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
+          tableName = row[Option[SqlIdentifier]]("table_name"),
+          columnName = row[Option[SqlIdentifier]]("column_name"),
+          description = row[String]("description")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CommentsSqlRow] = new OFormat[CommentsSqlRow]{
     override def writes(o: CommentsSqlRow): JsObject =
       Json.obj(

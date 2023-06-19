@@ -8,19 +8,14 @@ package hardcoded
 package myschema
 package person
 
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
-import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
@@ -31,7 +26,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
           values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
-       """.query.unique
+       """.query[PersonRow].unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -68,7 +63,7 @@ object PersonRepoImpl extends PersonRepo {
             returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
          """
     }
-    q.query.unique
+    q.query[PersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
@@ -170,37 +165,6 @@ object PersonRepoImpl extends PersonRepo {
             work_email = EXCLUDED.work_email,
             sector = EXCLUDED.sector
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
-       """.query.unique
+       """.query[PersonRow].unique
   }
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[PersonId], Nullability.NoNulls),
-        (Get[FootballClubId], Nullability.NoNulls),
-        (Get[/* max 100 chars */ String], Nullability.NoNulls),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 254 chars */ String], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[MaritalStatusId], Nullability.NoNulls),
-        (Get[/* max 254 chars */ String], Nullability.Nullable),
-        (Get[Sector], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        id = Get[PersonId].unsafeGetNonNullable(rs, i + 0),
-        favouriteFootballClubId = Get[FootballClubId].unsafeGetNonNullable(rs, i + 1),
-        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        nickName = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
-        blogUrl = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
-        email = Get[/* max 254 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        phone = Get[/* max 8 chars */ String].unsafeGetNonNullable(rs, i + 6),
-        likesPizza = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        maritalStatusId = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 8),
-        workEmail = Get[/* max 254 chars */ String].unsafeGetNullable(rs, i + 9),
-        sector = Get[Sector].unsafeGetNonNullable(rs, i + 10)
-      )
-    )
-  
-
 }

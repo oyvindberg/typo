@@ -8,20 +8,14 @@ package person
 package person
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -33,7 +27,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.persontype}::bpchar, ${unsaved.namestyle}::"public".NameStyle, ${unsaved.title}, ${unsaved.firstname}::"public"."Name", ${unsaved.middlename}::"public"."Name", ${unsaved.lastname}::"public"."Name", ${unsaved.suffix}, ${unsaved.emailpromotion}::int4, ${unsaved.additionalcontactinfo}::xml, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
-       """.query.unique
+       """.query[PersonRow].unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -75,7 +69,7 @@ object PersonRepoImpl extends PersonRepo {
             returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[PersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
@@ -187,41 +181,6 @@ object PersonRepoImpl extends PersonRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
-       """.query.unique
+       """.query[PersonRow].unique
   }
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[NameStyle], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        persontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
-        namestyle = Get[NameStyle].unsafeGetNonNullable(rs, i + 2),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
-        firstname = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 5),
-        lastname = Get[Name].unsafeGetNonNullable(rs, i + 6),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
-        emailpromotion = Get[Int].unsafeGetNonNullable(rs, i + 8),
-        additionalcontactinfo = Get[TypoXml].unsafeGetNullable(rs, i + 9),
-        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 10),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 11),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 12)
-      )
-    )
-  
-
 }

@@ -9,10 +9,14 @@ package cu
 
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CuViewRow(
@@ -43,4 +47,21 @@ object CuViewRow {
         "name" := row.name,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CuViewRow] =
+    new Read[CuViewRow](
+      gets = List(
+        (Get[/* bpchar */ String], Nullability.Nullable),
+        (Get[CurrencyId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
+        id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
+        currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
+      )
+    )
+  
+
 }

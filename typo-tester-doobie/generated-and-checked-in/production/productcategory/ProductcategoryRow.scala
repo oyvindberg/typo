@@ -8,10 +8,14 @@ package production
 package productcategory
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -42,4 +46,21 @@ object ProductcategoryRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductcategoryRow] =
+    new Read[ProductcategoryRow](
+      gets = List(
+        (Get[ProductcategoryId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
+        productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

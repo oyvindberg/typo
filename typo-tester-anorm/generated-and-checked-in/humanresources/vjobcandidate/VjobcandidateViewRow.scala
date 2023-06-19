@@ -9,6 +9,8 @@ package vjobcandidate
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,6 +42,29 @@ case class VjobcandidateViewRow(
 )
 
 object VjobcandidateViewRow {
+  val rowParser: RowParser[VjobcandidateViewRow] =
+    RowParser[VjobcandidateViewRow] { row =>
+      Success(
+        VjobcandidateViewRow(
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          `Name.Prefix` = row[Option[/* max 30 chars */ String]]("Name.Prefix"),
+          `Name.First` = row[Option[/* max 30 chars */ String]]("Name.First"),
+          `Name.Middle` = row[Option[/* max 30 chars */ String]]("Name.Middle"),
+          `Name.Last` = row[Option[/* max 30 chars */ String]]("Name.Last"),
+          `Name.Suffix` = row[Option[/* max 30 chars */ String]]("Name.Suffix"),
+          Skills = row[Option[String]]("Skills"),
+          `Addr.Type` = row[Option[/* max 30 chars */ String]]("Addr.Type"),
+          `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Addr.Loc.CountryRegion"),
+          `Addr.Loc.State` = row[Option[/* max 100 chars */ String]]("Addr.Loc.State"),
+          `Addr.Loc.City` = row[Option[/* max 100 chars */ String]]("Addr.Loc.City"),
+          `Addr.PostalCode` = row[Option[/* max 20 chars */ String]]("Addr.PostalCode"),
+          EMail = row[Option[String]]("EMail"),
+          WebSite = row[Option[String]]("WebSite"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VjobcandidateViewRow] = new OFormat[VjobcandidateViewRow]{
     override def writes(o: VjobcandidateViewRow): JsObject =
       Json.obj(

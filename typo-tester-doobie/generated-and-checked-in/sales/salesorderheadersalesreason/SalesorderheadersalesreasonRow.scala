@@ -9,10 +9,14 @@ package salesorderheadersalesreason
 
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class SalesorderheadersalesreasonRow(
@@ -43,4 +47,19 @@ object SalesorderheadersalesreasonRow {
         "salesreasonid" := row.salesreasonid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalesorderheadersalesreasonRow] =
+    new Read[SalesorderheadersalesreasonRow](
+      gets = List(
+        (Get[SalesorderheaderId], Nullability.NoNulls),
+        (Get[SalesreasonId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesorderheadersalesreasonRow(
+        salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
+        salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

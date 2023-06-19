@@ -10,6 +10,8 @@ package bea
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -34,6 +36,19 @@ case class BeaViewRow(
 )
 
 object BeaViewRow {
+  val rowParser: RowParser[BeaViewRow] =
+    RowParser[BeaViewRow] { row =>
+      Success(
+        BeaViewRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          addressid = row[Option[AddressId]]("addressid"),
+          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[BeaViewRow] = new OFormat[BeaViewRow]{
     override def writes(o: BeaViewRow): JsObject =
       Json.obj(

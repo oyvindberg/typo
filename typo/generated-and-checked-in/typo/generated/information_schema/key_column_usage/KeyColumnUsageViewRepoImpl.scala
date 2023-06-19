@@ -12,18 +12,14 @@ package key_column_usage
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.information_schema.CardinalNumber
-import typo.generated.information_schema.SqlIdentifier
 
 object KeyColumnUsageViewRepoImpl extends KeyColumnUsageViewRepo {
   override def selectAll(implicit c: Connection): List[KeyColumnUsageViewRow] = {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", "column_name", ordinal_position, position_in_unique_constraint
           from information_schema.key_column_usage
-       """.as(rowParser.*)
+       """.as(KeyColumnUsageViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[KeyColumnUsageViewFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageViewRow] = {
     fieldValues match {
@@ -49,24 +45,8 @@ object KeyColumnUsageViewRepoImpl extends KeyColumnUsageViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(KeyColumnUsageViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[KeyColumnUsageViewRow] =
-    RowParser[KeyColumnUsageViewRow] { row =>
-      Success(
-        KeyColumnUsageViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
-          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
-          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
-          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          columnName = row[Option[SqlIdentifier]]("column_name"),
-          ordinalPosition = row[Option[CardinalNumber]]("ordinal_position"),
-          positionInUniqueConstraint = row[Option[CardinalNumber]]("position_in_unique_constraint")
-        )
-      )
-    }
 }

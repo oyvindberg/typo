@@ -7,20 +7,16 @@ package adventureworks
 package pr
 package plph
 
-import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PlphViewRepoImpl extends PlphViewRepo {
   override def selectAll(implicit c: Connection): List[PlphViewRow] = {
     SQL"""select "id", productid, startdate, enddate, listprice, modifieddate
           from pr.plph
-       """.as(rowParser.*)
+       """.as(PlphViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PlphViewFieldOrIdValue[_]])(implicit c: Connection): List[PlphViewRow] = {
     fieldValues match {
@@ -43,21 +39,8 @@ object PlphViewRepoImpl extends PlphViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PlphViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PlphViewRow] =
-    RowParser[PlphViewRow] { row =>
-      Success(
-        PlphViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          listprice = row[Option[BigDecimal]]("listprice"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

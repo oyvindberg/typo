@@ -10,6 +10,8 @@ package store
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -35,6 +37,19 @@ case class StoreRow(
 )
 
 object StoreRow {
+  val rowParser: RowParser[StoreRow] =
+    RowParser[StoreRow] { row =>
+      Success(
+        StoreRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          name = row[Name]("name"),
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          demographics = row[Option[TypoXml]]("demographics"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[StoreRow] = new OFormat[StoreRow]{
     override def writes(o: StoreRow): JsObject =
       Json.obj(

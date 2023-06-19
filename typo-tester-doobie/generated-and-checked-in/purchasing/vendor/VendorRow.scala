@@ -11,10 +11,14 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class VendorRow(
@@ -62,4 +66,29 @@ object VendorRow {
         "purchasingwebserviceurl" := row.purchasingwebserviceurl,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[VendorRow] =
+    new Read[VendorRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[AccountNumber], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[/* max 1024 chars */ String], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        accountnumber = Get[AccountNumber].unsafeGetNonNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 2),
+        creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
+        preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
+        activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
+        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
+      )
+    )
+  
+
 }

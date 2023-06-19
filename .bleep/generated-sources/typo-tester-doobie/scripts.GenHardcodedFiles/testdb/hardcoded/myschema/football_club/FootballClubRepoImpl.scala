@@ -8,15 +8,11 @@ package hardcoded
 package myschema
 package football_club
 
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
@@ -26,7 +22,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""insert into myschema.football_club("id", "name")
           values (${unsaved.id}::int8, ${unsaved.name})
           returning "id", "name"
-       """.query.unique
+       """.query[FootballClubRow].unique
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query[FootballClubRow].stream
@@ -82,19 +78,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "id", "name"
-       """.query.unique
+       """.query[FootballClubRow].unique
   }
-  implicit val read: Read[FootballClubRow] =
-    new Read[FootballClubRow](
-      gets = List(
-        (Get[FootballClubId], Nullability.NoNulls),
-        (Get[/* max 100 chars */ String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
-        id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
-      )
-    )
-  
-
 }

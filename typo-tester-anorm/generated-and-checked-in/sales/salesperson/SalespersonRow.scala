@@ -9,6 +9,8 @@ package salesperson
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -40,6 +42,22 @@ case class SalespersonRow(
 )
 
 object SalespersonRow {
+  val rowParser: RowParser[SalespersonRow] =
+    RowParser[SalespersonRow] { row =>
+      Success(
+        SalespersonRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          salesquota = row[Option[BigDecimal]]("salesquota"),
+          bonus = row[BigDecimal]("bonus"),
+          commissionpct = row[BigDecimal]("commissionpct"),
+          salesytd = row[BigDecimal]("salesytd"),
+          saleslastyear = row[BigDecimal]("saleslastyear"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalespersonRow] = new OFormat[SalespersonRow]{
     override def writes(o: SalespersonRow): JsObject =
       Json.obj(

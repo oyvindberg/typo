@@ -8,10 +8,14 @@ package hardcoded
 package myschema
 package person
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -64,4 +68,35 @@ object PersonRow {
         "work_email" := row.workEmail,
         "sector" := row.sector
       )}
+  implicit val read: Read[PersonRow] =
+    new Read[PersonRow](
+      gets = List(
+        (Get[PersonId], Nullability.NoNulls),
+        (Get[FootballClubId], Nullability.NoNulls),
+        (Get[/* max 100 chars */ String], Nullability.NoNulls),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 254 chars */ String], Nullability.NoNulls),
+        (Get[/* max 8 chars */ String], Nullability.NoNulls),
+        (Get[Boolean], Nullability.NoNulls),
+        (Get[MaritalStatusId], Nullability.NoNulls),
+        (Get[/* max 254 chars */ String], Nullability.Nullable),
+        (Get[Sector], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
+        id = Get[PersonId].unsafeGetNonNullable(rs, i + 0),
+        favouriteFootballClubId = Get[FootballClubId].unsafeGetNonNullable(rs, i + 1),
+        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 2),
+        nickName = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
+        blogUrl = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
+        email = Get[/* max 254 chars */ String].unsafeGetNonNullable(rs, i + 5),
+        phone = Get[/* max 8 chars */ String].unsafeGetNonNullable(rs, i + 6),
+        likesPizza = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+        maritalStatusId = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 8),
+        workEmail = Get[/* max 254 chars */ String].unsafeGetNullable(rs, i + 9),
+        sector = Get[Sector].unsafeGetNonNullable(rs, i + 10)
+      )
+    )
+  
+
 }

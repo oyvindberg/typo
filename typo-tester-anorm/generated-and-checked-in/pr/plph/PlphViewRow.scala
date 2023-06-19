@@ -8,6 +8,8 @@ package pr
 package plph
 
 import adventureworks.production.product.ProductId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -31,6 +33,19 @@ case class PlphViewRow(
 )
 
 object PlphViewRow {
+  val rowParser: RowParser[PlphViewRow] =
+    RowParser[PlphViewRow] { row =>
+      Success(
+        PlphViewRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          startdate = row[Option[LocalDateTime]]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          listprice = row[Option[BigDecimal]]("listprice"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PlphViewRow] = new OFormat[PlphViewRow]{
     override def writes(o: PlphViewRow): JsObject =
       Json.obj(

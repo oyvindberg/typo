@@ -7,23 +7,16 @@ package adventureworks
 package sa
 package s
 
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SViewRepoImpl extends SViewRepo {
   override def selectAll(implicit c: Connection): List[SViewRow] = {
     SQL"""select "id", businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sa.s
-       """.as(rowParser.*)
+       """.as(SViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SViewFieldOrIdValue[_]])(implicit c: Connection): List[SViewRow] = {
     fieldValues match {
@@ -47,22 +40,8 @@ object SViewRepoImpl extends SViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SViewRow] =
-    RowParser[SViewRow] { row =>
-      Success(
-        SViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

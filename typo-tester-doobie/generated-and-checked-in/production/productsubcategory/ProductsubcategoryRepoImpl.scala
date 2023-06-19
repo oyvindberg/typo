@@ -8,18 +8,12 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
-import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[ProductsubcategoryRow].unique
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow] = {
     val fs = List(
@@ -62,7 +56,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductsubcategoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
@@ -134,25 +128,6 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[ProductsubcategoryRow].unique
   }
-  implicit val read: Read[ProductsubcategoryRow] =
-    new Read[ProductsubcategoryRow](
-      gets = List(
-        (Get[ProductsubcategoryId], Nullability.NoNulls),
-        (Get[ProductcategoryId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductsubcategoryRow(
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNonNullable(rs, i + 0),
-        productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

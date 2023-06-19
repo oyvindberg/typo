@@ -7,18 +7,10 @@ package adventureworks
 package hr
 package jc
 
-import adventureworks.TypoXml
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll: Stream[ConnectionIO, JcViewRow] = {
@@ -37,23 +29,4 @@ object JcViewRepoImpl extends JcViewRepo {
     sql"select * from hr.jc $where".query[JcViewRow].stream
   
   }
-  implicit val read: Read[JcViewRow] =
-    new Read[JcViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[JobcandidateId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 1),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        resume = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
-    )
-  
-
 }

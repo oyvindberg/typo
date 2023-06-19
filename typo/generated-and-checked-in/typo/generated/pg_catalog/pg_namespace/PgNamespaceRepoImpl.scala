@@ -12,13 +12,10 @@ package pg_namespace
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
-import typo.generated.TypoAclItem
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
@@ -29,13 +26,13 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           values (${unsaved.oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
           returning oid, nspname, nspowner, nspacl
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PgNamespaceRow.rowParser.single)
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
-       """.as(rowParser.*)
+       """.as(PgNamespaceRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
@@ -56,7 +53,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PgNamespaceRow.rowParser.*)
     }
   
   }
@@ -64,7 +61,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
           where oid = $oid
-       """.as(rowParser.singleOpt)
+       """.as(PgNamespaceRow.rowParser.singleOpt)
   }
   override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
     implicit val toStatement: ToStatement[Array[PgNamespaceId]] =
@@ -74,7 +71,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
           where oid = ANY($oids)
-       """.as(rowParser.*)
+       """.as(PgNamespaceRow.rowParser.*)
   
   }
   override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
@@ -127,18 +124,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
             nspacl = EXCLUDED.nspacl
           returning oid, nspname, nspowner, nspacl
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PgNamespaceRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PgNamespaceRow] =
-    RowParser[PgNamespaceRow] { row =>
-      Success(
-        PgNamespaceRow(
-          oid = row[PgNamespaceId]("oid"),
-          nspname = row[String]("nspname"),
-          nspowner = row[/* oid */ Long]("nspowner"),
-          nspacl = row[Option[Array[TypoAclItem]]]("nspacl")
-        )
-      )
-    }
 }

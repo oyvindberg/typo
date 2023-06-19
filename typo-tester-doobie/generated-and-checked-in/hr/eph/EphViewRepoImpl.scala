@@ -7,16 +7,10 @@ package adventureworks
 package hr
 package eph
 
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object EphViewRepoImpl extends EphViewRepo {
   override def selectAll: Stream[ConnectionIO, EphViewRow] = {
@@ -36,25 +30,4 @@ object EphViewRepoImpl extends EphViewRepo {
     sql"select * from hr.eph $where".query[EphViewRow].stream
   
   }
-  implicit val read: Read[EphViewRow] =
-    new Read[EphViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        ratechangedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        rate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        payfrequency = Get[Int].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
-    )
-  
-
 }

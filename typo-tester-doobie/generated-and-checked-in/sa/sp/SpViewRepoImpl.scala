@@ -7,18 +7,10 @@ package adventureworks
 package sa
 package sp
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SpViewRepoImpl extends SpViewRepo {
   override def selectAll: Stream[ConnectionIO, SpViewRow] = {
@@ -42,33 +34,4 @@ object SpViewRepoImpl extends SpViewRepo {
     sql"select * from sa.sp $where".query[SpViewRow].stream
   
   }
-  implicit val read: Read[SpViewRow] =
-    new Read[SpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        bonus = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        commissionpct = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
-    )
-  
-
 }

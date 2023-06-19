@@ -8,13 +8,9 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +25,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           values (${unsaved.purchaseorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.status}::int2, ${unsaved.employeeid}::int4, ${unsaved.vendorid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.orderdate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PurchaseorderheaderRow.rowParser.single)
   
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
@@ -76,7 +72,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       SQL"""insert into purchasing.purchaseorderheader default values
             returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PurchaseorderheaderRow.rowParser.single)
     } else {
       val q = s"""insert into purchasing.purchaseorderheader(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -86,14 +82,14 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PurchaseorderheaderRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from purchasing.purchaseorderheader
-       """.as(rowParser.*)
+       """.as(PurchaseorderheaderRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     fieldValues match {
@@ -122,7 +118,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PurchaseorderheaderRow.rowParser.*)
     }
   
   }
@@ -130,7 +126,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from purchasing.purchaseorderheader
           where purchaseorderid = $purchaseorderid
-       """.as(rowParser.singleOpt)
+       """.as(PurchaseorderheaderRow.rowParser.singleOpt)
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     implicit val toStatement: ToStatement[Array[PurchaseorderheaderId]] =
@@ -140,7 +136,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from purchasing.purchaseorderheader
           where purchaseorderid = ANY($purchaseorderids)
-       """.as(rowParser.*)
+       """.as(PurchaseorderheaderRow.rowParser.*)
   
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
@@ -222,26 +218,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PurchaseorderheaderRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PurchaseorderheaderRow] =
-    RowParser[PurchaseorderheaderRow] { row =>
-      Success(
-        PurchaseorderheaderRow(
-          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
-          revisionnumber = row[Int]("revisionnumber"),
-          status = row[Int]("status"),
-          employeeid = row[BusinessentityId]("employeeid"),
-          vendorid = row[BusinessentityId]("vendorid"),
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          orderdate = row[LocalDateTime]("orderdate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          subtotal = row[BigDecimal]("subtotal"),
-          taxamt = row[BigDecimal]("taxamt"),
-          freight = row[BigDecimal]("freight"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

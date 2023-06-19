@@ -7,20 +7,16 @@ package adventureworks
 package hr
 package eph
 
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object EphViewRepoImpl extends EphViewRepo {
   override def selectAll(implicit c: Connection): List[EphViewRow] = {
     SQL"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate
           from hr.eph
-       """.as(rowParser.*)
+       """.as(EphViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EphViewFieldOrIdValue[_]])(implicit c: Connection): List[EphViewRow] = {
     fieldValues match {
@@ -43,21 +39,8 @@ object EphViewRepoImpl extends EphViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EphViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[EphViewRow] =
-    RowParser[EphViewRow] { row =>
-      Success(
-        EphViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          ratechangedate = row[Option[LocalDateTime]]("ratechangedate"),
-          rate = row[Option[BigDecimal]]("rate"),
-          payfrequency = row[Option[Int]]("payfrequency"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

@@ -9,6 +9,8 @@ package productmodel
 
 import adventureworks.TypoXml
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -32,6 +34,19 @@ case class ProductmodelRow(
 )
 
 object ProductmodelRow {
+  val rowParser: RowParser[ProductmodelRow] =
+    RowParser[ProductmodelRow] { row =>
+      Success(
+        ProductmodelRow(
+          productmodelid = row[ProductmodelId]("productmodelid"),
+          name = row[Name]("name"),
+          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
+          instructions = row[Option[TypoXml]]("instructions"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductmodelRow] = new OFormat[ProductmodelRow]{
     override def writes(o: ProductmodelRow): JsObject =
       Json.obj(

@@ -8,10 +8,14 @@ package humanresources
 package department
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class DepartmentRow(
@@ -42,4 +46,21 @@ object DepartmentRow {
         "groupname" := row.groupname,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[DepartmentRow] =
+    new Read[DepartmentRow](
+      gets = List(
+        (Get[DepartmentId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
+        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        groupname = Get[Name].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

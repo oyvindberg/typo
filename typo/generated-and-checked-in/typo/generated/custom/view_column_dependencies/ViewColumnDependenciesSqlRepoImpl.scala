@@ -10,11 +10,8 @@ package generated
 package custom
 package view_column_dependencies
 
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.TypoRegnamespace
 
 object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
   override def apply(viewName: /* nullability unknown */ Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
@@ -35,19 +32,7 @@ object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
                 AND view_class.relname = coalesce($viewName, view_class.relname)
             
          """
-    sql.as(rowParser.*)
+    sql.as(ViewColumnDependenciesSqlRow.rowParser.*)
   
   }
-  val rowParser: RowParser[ViewColumnDependenciesSqlRow] =
-    RowParser[ViewColumnDependenciesSqlRow] { row =>
-      Success(
-        ViewColumnDependenciesSqlRow(
-          viewSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("view_schema"),
-          viewName = row[String]("view_name"),
-          tableSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("table_schema"),
-          tableName = row[String]("table_name"),
-          columnName = row[String]("column_name")
-        )
-      )
-    }
 }

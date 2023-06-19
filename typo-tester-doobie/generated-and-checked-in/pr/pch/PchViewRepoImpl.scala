@@ -7,16 +7,10 @@ package adventureworks
 package pr
 package pch
 
-import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PchViewRepoImpl extends PchViewRepo {
   override def selectAll: Stream[ConnectionIO, PchViewRow] = {
@@ -36,25 +30,4 @@ object PchViewRepoImpl extends PchViewRepo {
     sql"select * from pr.pch $where".query[PchViewRow].stream
   
   }
-  implicit val read: Read[PchViewRow] =
-    new Read[PchViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PchViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        standardcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
-    )
-  
-
 }

@@ -7,21 +7,16 @@ package adventureworks
 package humanresources
 package vjobcandidate
 
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateViewRow] = {
     SQL"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate
           from humanresources.vjobcandidate
-       """.as(rowParser.*)
+       """.as(VjobcandidateViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateViewFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateViewRow] = {
     fieldValues match {
@@ -54,31 +49,8 @@ object VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VjobcandidateViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VjobcandidateViewRow] =
-    RowParser[VjobcandidateViewRow] { row =>
-      Success(
-        VjobcandidateViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          `Name.Prefix` = row[Option[/* max 30 chars */ String]]("Name.Prefix"),
-          `Name.First` = row[Option[/* max 30 chars */ String]]("Name.First"),
-          `Name.Middle` = row[Option[/* max 30 chars */ String]]("Name.Middle"),
-          `Name.Last` = row[Option[/* max 30 chars */ String]]("Name.Last"),
-          `Name.Suffix` = row[Option[/* max 30 chars */ String]]("Name.Suffix"),
-          Skills = row[Option[String]]("Skills"),
-          `Addr.Type` = row[Option[/* max 30 chars */ String]]("Addr.Type"),
-          `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Addr.Loc.CountryRegion"),
-          `Addr.Loc.State` = row[Option[/* max 100 chars */ String]]("Addr.Loc.State"),
-          `Addr.Loc.City` = row[Option[/* max 100 chars */ String]]("Addr.Loc.City"),
-          `Addr.PostalCode` = row[Option[/* max 20 chars */ String]]("Addr.PostalCode"),
-          EMail = row[Option[String]]("EMail"),
-          WebSite = row[Option[String]]("WebSite"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

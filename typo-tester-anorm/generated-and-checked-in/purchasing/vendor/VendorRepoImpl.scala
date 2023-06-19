@@ -9,14 +9,10 @@ package vendor
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -31,7 +27,7 @@ object VendorRepoImpl extends VendorRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(VendorRow.rowParser.single)
   
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
@@ -59,7 +55,7 @@ object VendorRepoImpl extends VendorRepo {
       SQL"""insert into purchasing.vendor default values
             returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(VendorRow.rowParser.single)
     } else {
       val q = s"""insert into purchasing.vendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -69,14 +65,14 @@ object VendorRepoImpl extends VendorRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(VendorRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
-       """.as(rowParser.*)
+       """.as(VendorRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
     fieldValues match {
@@ -101,7 +97,7 @@ object VendorRepoImpl extends VendorRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VendorRow.rowParser.*)
     }
   
   }
@@ -109,7 +105,7 @@ object VendorRepoImpl extends VendorRepo {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(VendorRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -119,7 +115,7 @@ object VendorRepoImpl extends VendorRepo {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(VendorRow.rowParser.*)
   
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
@@ -185,22 +181,7 @@ object VendorRepoImpl extends VendorRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(VendorRow.rowParser.single)
   
   }
-  val rowParser: RowParser[VendorRow] =
-    RowParser[VendorRow] { row =>
-      Success(
-        VendorRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          accountnumber = row[AccountNumber]("accountnumber"),
-          name = row[Name]("name"),
-          creditrating = row[Int]("creditrating"),
-          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
-          activeflag = row[Flag]("activeflag"),
-          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]]("purchasingwebserviceurl"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

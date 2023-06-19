@@ -9,6 +9,8 @@ package pdoc
 
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -28,6 +30,17 @@ case class PdocViewRow(
 )
 
 object PdocViewRow {
+  val rowParser: RowParser[PdocViewRow] =
+    RowParser[PdocViewRow] { row =>
+      Success(
+        PdocViewRow(
+          id = row[Option[Int]]("id"),
+          productid = row[Option[ProductId]]("productid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          documentnode = row[Option[DocumentId]]("documentnode")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PdocViewRow] = new OFormat[PdocViewRow]{
     override def writes(o: PdocViewRow): JsObject =
       Json.obj(

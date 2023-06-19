@@ -8,17 +8,12 @@ package production
 package productcategory
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productcategoryid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[ProductcategoryRow].unique
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow] = {
     val fs = List(
@@ -60,7 +55,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
             returning productcategoryid, "name", rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductcategoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductcategoryRow] = {
@@ -127,23 +122,6 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productcategoryid, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[ProductcategoryRow].unique
   }
-  implicit val read: Read[ProductcategoryRow] =
-    new Read[ProductcategoryRow](
-      gets = List(
-        (Get[ProductcategoryId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
-        productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

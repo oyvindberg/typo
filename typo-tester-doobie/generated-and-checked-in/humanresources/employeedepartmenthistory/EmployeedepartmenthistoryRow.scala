@@ -10,10 +10,14 @@ package employeedepartmenthistory
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -58,4 +62,25 @@ object EmployeedepartmenthistoryRow {
         "enddate" := row.enddate,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[EmployeedepartmenthistoryRow] =
+    new Read[EmployeedepartmenthistoryRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[DepartmentId], Nullability.NoNulls),
+        (Get[ShiftId], Nullability.NoNulls),
+        (Get[LocalDate], Nullability.NoNulls),
+        (Get[LocalDate], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 1),
+        shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 2),
+        startdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 3),
+        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

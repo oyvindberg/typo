@@ -9,12 +9,9 @@ package salesperson
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -30,7 +27,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.salesquota}::numeric, ${unsaved.bonus}::numeric, ${unsaved.commissionpct}::numeric, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalespersonRow.rowParser.single)
   
   }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
@@ -68,7 +65,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
       SQL"""insert into sales.salesperson default values
             returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalespersonRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salesperson(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -78,14 +75,14 @@ object SalespersonRepoImpl extends SalespersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalespersonRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
-       """.as(rowParser.*)
+       """.as(SalespersonRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow] = {
     fieldValues match {
@@ -111,7 +108,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalespersonRow.rowParser.*)
     }
   
   }
@@ -119,7 +116,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(SalespersonRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -129,7 +126,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(SalespersonRow.rowParser.*)
   
   }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
@@ -199,23 +196,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalespersonRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalespersonRow] =
-    RowParser[SalespersonRow] { row =>
-      Success(
-        SalespersonRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          bonus = row[BigDecimal]("bonus"),
-          commissionpct = row[BigDecimal]("commissionpct"),
-          salesytd = row[BigDecimal]("salesytd"),
-          saleslastyear = row[BigDecimal]("saleslastyear"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

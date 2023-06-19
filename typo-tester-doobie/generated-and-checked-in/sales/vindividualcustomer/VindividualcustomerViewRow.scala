@@ -11,10 +11,14 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class VindividualcustomerViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -97,4 +101,49 @@ object VindividualcustomerViewRow {
         "countryregionname" := row.countryregionname,
         "demographics" := row.demographics
       )}
+  implicit val read: Read[VindividualcustomerViewRow] =
+    new Read[VindividualcustomerViewRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
+        (Get[Phone], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 60 chars */ String], Nullability.Nullable),
+        (Get[/* max 60 chars */ String], Nullability.Nullable),
+        (Get[/* max 30 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 15 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VindividualcustomerViewRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 6),
+        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 7),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 8),
+        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 9),
+        addresstype = Get[Name].unsafeGetNullable(rs, i + 10),
+        addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
+        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
+        city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
+        stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
+        postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
+        countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 17)
+      )
+    )
+  
+
 }

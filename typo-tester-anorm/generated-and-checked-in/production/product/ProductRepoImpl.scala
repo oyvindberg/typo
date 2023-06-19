@@ -8,16 +8,10 @@ package production
 package product
 
 import adventureworks.Defaulted
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -33,7 +27,7 @@ object ProductRepoImpl extends ProductRepo {
           values (${unsaved.productid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.productnumber}, ${unsaved.makeflag}::"public"."Flag", ${unsaved.finishedgoodsflag}::"public"."Flag", ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
@@ -84,7 +78,7 @@ object ProductRepoImpl extends ProductRepo {
       SQL"""insert into production.product default values
             returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductRow.rowParser.single)
     } else {
       val q = s"""insert into production.product(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -94,14 +88,14 @@ object ProductRepoImpl extends ProductRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
-       """.as(rowParser.*)
+       """.as(ProductRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductFieldOrIdValue[_]])(implicit c: Connection): List[ProductRow] = {
     fieldValues match {
@@ -143,7 +137,7 @@ object ProductRepoImpl extends ProductRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductRow.rowParser.*)
     }
   
   }
@@ -151,7 +145,7 @@ object ProductRepoImpl extends ProductRepo {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
           where productid = $productid
-       """.as(rowParser.singleOpt)
+       """.as(ProductRow.rowParser.singleOpt)
   }
   override def selectByIds(productids: Array[ProductId])(implicit c: Connection): List[ProductRow] = {
     implicit val toStatement: ToStatement[Array[ProductId]] =
@@ -161,7 +155,7 @@ object ProductRepoImpl extends ProductRepo {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
           where productid = ANY($productids)
-       """.as(rowParser.*)
+       """.as(ProductRow.rowParser.*)
   
   }
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
@@ -295,39 +289,7 @@ object ProductRepoImpl extends ProductRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductRow] =
-    RowParser[ProductRow] { row =>
-      Success(
-        ProductRow(
-          productid = row[ProductId]("productid"),
-          name = row[Name]("name"),
-          productnumber = row[/* max 25 chars */ String]("productnumber"),
-          makeflag = row[Flag]("makeflag"),
-          finishedgoodsflag = row[Flag]("finishedgoodsflag"),
-          color = row[Option[/* max 15 chars */ String]]("color"),
-          safetystocklevel = row[Int]("safetystocklevel"),
-          reorderpoint = row[Int]("reorderpoint"),
-          standardcost = row[BigDecimal]("standardcost"),
-          listprice = row[BigDecimal]("listprice"),
-          size = row[Option[/* max 5 chars */ String]]("size"),
-          sizeunitmeasurecode = row[Option[UnitmeasureId]]("sizeunitmeasurecode"),
-          weightunitmeasurecode = row[Option[UnitmeasureId]]("weightunitmeasurecode"),
-          weight = row[Option[BigDecimal]]("weight"),
-          daystomanufacture = row[Int]("daystomanufacture"),
-          productline = row[Option[/* bpchar */ String]]("productline"),
-          `class` = row[Option[/* bpchar */ String]]("class"),
-          style = row[Option[/* bpchar */ String]]("style"),
-          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          sellstartdate = row[LocalDateTime]("sellstartdate"),
-          sellenddate = row[Option[LocalDateTime]]("sellenddate"),
-          discontinueddate = row[Option[LocalDateTime]]("discontinueddate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

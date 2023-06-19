@@ -7,17 +7,10 @@ package adventureworks
 package sales
 package vsalesperson
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 
 object VsalespersonViewRepoImpl extends VsalespersonViewRepo {
   override def selectAll: Stream[ConnectionIO, VsalespersonViewRow] = {
@@ -53,57 +46,4 @@ object VsalespersonViewRepoImpl extends VsalespersonViewRepo {
     sql"select * from sales.vsalesperson $where".query[VsalespersonViewRow].stream
   
   }
-  implicit val read: Read[VsalespersonViewRow] =
-    new Read[VsalespersonViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Phone], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VsalespersonViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
-        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 7),
-        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 8),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 9),
-        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 10),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
-        city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
-        stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
-        countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
-        territoryname = Get[Name].unsafeGetNullable(rs, i + 17),
-        territorygroup = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 18),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 21)
-      )
-    )
-  
-
 }

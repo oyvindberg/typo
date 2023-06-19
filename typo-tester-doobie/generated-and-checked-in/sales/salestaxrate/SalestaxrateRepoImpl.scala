@@ -8,18 +8,12 @@ package sales
 package salestaxrate
 
 import adventureworks.Defaulted
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[SalestaxrateRow].unique
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
@@ -67,7 +61,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalestaxrateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
@@ -149,29 +143,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
-       """.query.unique
+       """.query[SalestaxrateRow].unique
   }
-  implicit val read: Read[SalestaxrateRow] =
-    new Read[SalestaxrateRow](
-      gets = List(
-        (Get[SalestaxrateId], Nullability.NoNulls),
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
-        salestaxrateid = Get[SalestaxrateId].unsafeGetNonNullable(rs, i + 0),
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 1),
-        taxtype = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        taxrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
-    )
-  
-
 }

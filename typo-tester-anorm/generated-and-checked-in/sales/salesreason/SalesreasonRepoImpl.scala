@@ -8,12 +8,9 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesreasonRow.rowParser.single)
   
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
@@ -49,7 +46,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       SQL"""insert into sales.salesreason default values
             returning salesreasonid, "name", reasontype, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesreasonRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +56,14 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesreasonRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
-       """.as(rowParser.*)
+       """.as(SalesreasonRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
     fieldValues match {
@@ -87,7 +84,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalesreasonRow.rowParser.*)
     }
   
   }
@@ -95,7 +92,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = $salesreasonid
-       """.as(rowParser.singleOpt)
+       """.as(SalesreasonRow.rowParser.singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     implicit val toStatement: ToStatement[Array[SalesreasonId]] =
@@ -105,7 +102,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = ANY($salesreasonids)
-       """.as(rowParser.*)
+       """.as(SalesreasonRow.rowParser.*)
   
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
@@ -155,18 +152,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salesreasonid, "name", reasontype, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesreasonRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalesreasonRow] =
-    RowParser[SalesreasonRow] { row =>
-      Success(
-        SalesreasonRow(
-          salesreasonid = row[SalesreasonId]("salesreasonid"),
-          name = row[Name]("name"),
-          reasontype = row[Name]("reasontype"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

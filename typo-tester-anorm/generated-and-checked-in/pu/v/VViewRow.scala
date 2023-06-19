@@ -11,6 +11,8 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,6 +42,22 @@ case class VViewRow(
 )
 
 object VViewRow {
+  val rowParser: RowParser[VViewRow] =
+    RowParser[VViewRow] { row =>
+      Success(
+        VViewRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          accountnumber = row[Option[AccountNumber]]("accountnumber"),
+          name = row[Option[Name]]("name"),
+          creditrating = row[Option[Int]]("creditrating"),
+          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
+          activeflag = row[Flag]("activeflag"),
+          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]]("purchasingwebserviceurl"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VViewRow] = new OFormat[VViewRow]{
     override def writes(o: VViewRow): JsObject =
       Json.obj(

@@ -9,10 +9,14 @@ package productdocument
 
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ProductdocumentRow(
@@ -43,4 +47,19 @@ object ProductdocumentRow {
         "modifieddate" := row.modifieddate,
         "documentnode" := row.documentnode
       )}
+  implicit val read: Read[ProductdocumentRow] =
+    new Read[ProductdocumentRow](
+      gets = List(
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[DocumentId], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductdocumentRow(
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
+        documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

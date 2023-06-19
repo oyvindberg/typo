@@ -12,6 +12,8 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -42,6 +44,22 @@ case class SpViewRow(
 )
 
 object SpViewRow {
+  val rowParser: RowParser[SpViewRow] =
+    RowParser[SpViewRow] { row =>
+      Success(
+        SpViewRow(
+          id = row[Option[Int]]("id"),
+          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
+          stateprovincecode = row[Option[/* bpchar */ String]]("stateprovincecode"),
+          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
+          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
+          name = row[Option[Name]]("name"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SpViewRow] = new OFormat[SpViewRow]{
     override def writes(o: SpViewRow): JsObject =
       Json.obj(

@@ -8,6 +8,8 @@ package hardcoded
 package myschema
 package marital_status
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -20,6 +22,14 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
+  val rowParser: RowParser[MaritalStatusRow] =
+    RowParser[MaritalStatusRow] { row =>
+      Success(
+        MaritalStatusRow(
+          id = row[MaritalStatusId]("id")
+        )
+      )
+    }
   implicit val oFormat: OFormat[MaritalStatusRow] = new OFormat[MaritalStatusRow]{
     override def writes(o: MaritalStatusRow): JsObject =
       Json.obj(

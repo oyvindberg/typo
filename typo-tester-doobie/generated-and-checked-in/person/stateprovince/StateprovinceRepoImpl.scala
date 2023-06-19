@@ -8,20 +8,13 @@ package person
 package stateprovince
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -33,7 +26,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
           values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::"public"."Flag", ${unsaved.name}::"public"."Name", ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
-       """.query.unique
+       """.query[StateprovinceRow].unique
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     val fs = List(
@@ -70,7 +63,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[StateprovinceRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
@@ -157,31 +150,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
-       """.query.unique
+       """.query[StateprovinceRow].unique
   }
-  implicit val read: Read[StateprovinceRow] =
-    new Read[StateprovinceRow](
-      gets = List(
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[SalesterritoryId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => StateprovinceRow(
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 0),
-        stateprovincecode = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
-        isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 5),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
-    )
-  
-
 }

@@ -12,13 +12,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +28,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmployeeRow.rowParser.single)
   
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
@@ -78,7 +75,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       SQL"""insert into humanresources.employee default values
             returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(EmployeeRow.rowParser.single)
     } else {
       val q = s"""insert into humanresources.employee(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -88,14 +85,14 @@ object EmployeeRepoImpl extends EmployeeRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(EmployeeRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from humanresources.employee
-       """.as(rowParser.*)
+       """.as(EmployeeRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]])(implicit c: Connection): List[EmployeeRow] = {
     fieldValues match {
@@ -127,7 +124,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EmployeeRow.rowParser.*)
     }
   
   }
@@ -135,7 +132,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from humanresources.employee
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(EmployeeRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -145,7 +142,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from humanresources.employee
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(EmployeeRow.rowParser.*)
   
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
@@ -239,29 +236,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
             organizationnode = EXCLUDED.organizationnode
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmployeeRow.rowParser.single)
   
   }
-  val rowParser: RowParser[EmployeeRow] =
-    RowParser[EmployeeRow] { row =>
-      Success(
-        EmployeeRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          nationalidnumber = row[/* max 15 chars */ String]("nationalidnumber"),
-          loginid = row[/* max 256 chars */ String]("loginid"),
-          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
-          birthdate = row[LocalDate]("birthdate"),
-          maritalstatus = row[/* bpchar */ String]("maritalstatus"),
-          gender = row[/* bpchar */ String]("gender"),
-          hiredate = row[LocalDate]("hiredate"),
-          salariedflag = row[Flag]("salariedflag"),
-          vacationhours = row[Int]("vacationhours"),
-          sickleavehours = row[Int]("sickleavehours"),
-          currentflag = row[Flag]("currentflag"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate"),
-          organizationnode = row[Option[String]]("organizationnode")
-        )
-      )
-    }
 }

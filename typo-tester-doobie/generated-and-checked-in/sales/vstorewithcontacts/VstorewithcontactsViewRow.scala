@@ -10,10 +10,14 @@ package vstorewithcontacts
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class VstorewithcontactsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -74,4 +78,37 @@ object VstorewithcontactsViewRow {
         "emailaddress" := row.emailaddress,
         "emailpromotion" := row.emailpromotion
       )}
+  implicit val read: Read[VstorewithcontactsViewRow] =
+    new Read[VstorewithcontactsViewRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 10 chars */ String], Nullability.Nullable),
+        (Get[Phone], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VstorewithcontactsViewRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNullable(rs, i + 1),
+        contacttype = Get[Name].unsafeGetNullable(rs, i + 2),
+        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
+        firstname = Get[Name].unsafeGetNullable(rs, i + 4),
+        middlename = Get[Name].unsafeGetNullable(rs, i + 5),
+        lastname = Get[Name].unsafeGetNullable(rs, i + 6),
+        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
+        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 8),
+        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 9),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 10),
+        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 11)
+      )
+    )
+  
+
 }

@@ -7,21 +7,16 @@ package adventureworks
 package sa
 package so
 
-import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SoViewRepoImpl extends SoViewRepo {
   override def selectAll(implicit c: Connection): List[SoViewRow] = {
     SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sa.so
-       """.as(rowParser.*)
+       """.as(SoViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SoViewFieldOrIdValue[_]])(implicit c: Connection): List[SoViewRow] = {
     fieldValues match {
@@ -50,27 +45,8 @@ object SoViewRepoImpl extends SoViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SoViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SoViewRow] =
-    RowParser[SoViewRow] { row =>
-      Success(
-        SoViewRow(
-          id = row[Option[Int]]("id"),
-          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
-          description = row[Option[/* max 255 chars */ String]]("description"),
-          discountpct = row[Option[BigDecimal]]("discountpct"),
-          `type` = row[Option[/* max 50 chars */ String]]("type"),
-          category = row[Option[/* max 50 chars */ String]]("category"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          minqty = row[Option[Int]]("minqty"),
-          maxqty = row[Option[Int]]("maxqty"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

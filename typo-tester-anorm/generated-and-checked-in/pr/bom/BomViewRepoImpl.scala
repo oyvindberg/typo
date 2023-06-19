@@ -7,22 +7,16 @@ package adventureworks
 package pr
 package bom
 
-import adventureworks.production.billofmaterials.BillofmaterialsId
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object BomViewRepoImpl extends BomViewRepo {
   override def selectAll(implicit c: Connection): List[BomViewRow] = {
     SQL"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from pr."bom"
-       """.as(rowParser.*)
+       """.as(BomViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]])(implicit c: Connection): List[BomViewRow] = {
     fieldValues match {
@@ -49,25 +43,8 @@ object BomViewRepoImpl extends BomViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(BomViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[BomViewRow] =
-    RowParser[BomViewRow] { row =>
-      Success(
-        BomViewRow(
-          id = row[Option[Int]]("id"),
-          billofmaterialsid = row[Option[BillofmaterialsId]]("billofmaterialsid"),
-          productassemblyid = row[Option[ProductId]]("productassemblyid"),
-          componentid = row[Option[ProductId]]("componentid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
-          bomlevel = row[Option[Int]]("bomlevel"),
-          perassemblyqty = row[Option[BigDecimal]]("perassemblyqty"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

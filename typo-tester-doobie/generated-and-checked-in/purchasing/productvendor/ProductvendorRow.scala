@@ -10,10 +10,14 @@ package productvendor
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ProductvendorRow(
@@ -77,4 +81,35 @@ object ProductvendorRow {
         "unitmeasurecode" := row.unitmeasurecode,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductvendorRow] =
+    new Read[ProductvendorRow](
+      gets = List(
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.Nullable),
+        (Get[UnitmeasureId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductvendorRow(
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
+        averageleadtime = Get[Int].unsafeGetNonNullable(rs, i + 2),
+        standardprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+        lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+        lastreceiptdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
+        minorderqty = Get[Int].unsafeGetNonNullable(rs, i + 6),
+        maxorderqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
+        onorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
+        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 9),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 10)
+      )
+    )
+  
+
 }

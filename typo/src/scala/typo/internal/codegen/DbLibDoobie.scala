@@ -207,7 +207,7 @@ object DbLibDoobie extends DbLib {
                |  .run
                |  .map(_ > 0)"""
 
-      case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, _) =>
+      case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val colCast = cast(col).render
           val set = frInterpolate(code"$${${unsavedParam.name}.${col.name}}$colCast")
@@ -244,9 +244,9 @@ object DbLibDoobie extends DbLib {
                |  import cats.syntax.foldable.toFoldableOps
                |  $sql
                |}
-               |q.query.unique
+               |q.query[$rowType].unique
                |"""
-      case RepoMethod.Upsert(relName, cols, id, unsavedParam, _) =>
+      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
@@ -267,9 +267,9 @@ object DbLibDoobie extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query.unique"
+        code"$sql.query[$rowType].unique"
 
-      case RepoMethod.Insert(relName, cols, unsavedParam, _) =>
+      case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
@@ -280,7 +280,7 @@ object DbLibDoobie extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query.unique"
+        code"$sql.query[$rowType].unique"
 
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
@@ -367,7 +367,7 @@ object DbLibDoobie extends DbLib {
            |""".stripMargin
   }
 
-  def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
+  def rowInstances(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
     val readInstance =
       code"""|implicit val read: ${Read.of(tpe)} =
              |  ${readInstanceFor(tpe, cols)}

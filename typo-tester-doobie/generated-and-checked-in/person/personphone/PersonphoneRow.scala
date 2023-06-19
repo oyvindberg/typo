@@ -10,10 +10,14 @@ package personphone
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PersonphoneRow(
@@ -48,4 +52,21 @@ object PersonphoneRow {
         "phonenumbertypeid" := row.phonenumbertypeid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PersonphoneRow] =
+    new Read[PersonphoneRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[Phone], Nullability.NoNulls),
+        (Get[PhonenumbertypeId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        phonenumber = Get[Phone].unsafeGetNonNullable(rs, i + 1),
+        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

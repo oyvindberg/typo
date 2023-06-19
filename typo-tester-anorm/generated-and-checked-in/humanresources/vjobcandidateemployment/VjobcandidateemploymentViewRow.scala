@@ -8,6 +8,8 @@ package humanresources
 package vjobcandidateemployment
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,6 +34,24 @@ case class VjobcandidateemploymentViewRow(
 )
 
 object VjobcandidateemploymentViewRow {
+  val rowParser: RowParser[VjobcandidateemploymentViewRow] =
+    RowParser[VjobcandidateemploymentViewRow] { row =>
+      Success(
+        VjobcandidateemploymentViewRow(
+          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
+          `Emp.StartDate` = row[Option[LocalDate]]("Emp.StartDate"),
+          `Emp.EndDate` = row[Option[LocalDate]]("Emp.EndDate"),
+          `Emp.OrgName` = row[Option[/* max 100 chars */ String]]("Emp.OrgName"),
+          `Emp.JobTitle` = row[Option[/* max 100 chars */ String]]("Emp.JobTitle"),
+          `Emp.Responsibility` = row[Option[String]]("Emp.Responsibility"),
+          `Emp.FunctionCategory` = row[Option[String]]("Emp.FunctionCategory"),
+          `Emp.IndustryCategory` = row[Option[String]]("Emp.IndustryCategory"),
+          `Emp.Loc.CountryRegion` = row[Option[String]]("Emp.Loc.CountryRegion"),
+          `Emp.Loc.State` = row[Option[String]]("Emp.Loc.State"),
+          `Emp.Loc.City` = row[Option[String]]("Emp.Loc.City")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VjobcandidateemploymentViewRow] = new OFormat[VjobcandidateemploymentViewRow]{
     override def writes(o: VjobcandidateemploymentViewRow): JsObject =
       Json.obj(

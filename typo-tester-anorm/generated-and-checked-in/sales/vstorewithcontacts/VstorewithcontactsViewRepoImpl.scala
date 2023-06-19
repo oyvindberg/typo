@@ -7,21 +7,16 @@ package adventureworks
 package sales
 package vstorewithcontacts
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
   override def selectAll(implicit c: Connection): List[VstorewithcontactsViewRow] = {
     SQL"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
           from sales.vstorewithcontacts
-       """.as(rowParser.*)
+       """.as(VstorewithcontactsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithcontactsViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithcontactsViewRow] = {
     fieldValues match {
@@ -50,27 +45,8 @@ object VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VstorewithcontactsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VstorewithcontactsViewRow] =
-    RowParser[VstorewithcontactsViewRow] { row =>
-      Success(
-        VstorewithcontactsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          contacttype = row[Option[Name]]("contacttype"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          emailpromotion = row[Option[Int]]("emailpromotion")
-        )
-      )
-    }
 }

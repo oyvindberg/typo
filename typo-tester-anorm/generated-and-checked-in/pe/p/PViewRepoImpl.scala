@@ -7,24 +7,16 @@ package adventureworks
 package pe
 package p
 
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll(implicit c: Connection): List[PViewRow] = {
     SQL"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from pe."p"
-       """.as(rowParser.*)
+       """.as(PViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]])(implicit c: Connection): List[PViewRow] = {
     fieldValues match {
@@ -55,29 +47,8 @@ object PViewRepoImpl extends PViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PViewRow] =
-    RowParser[PViewRow] { row =>
-      Success(
-        PViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          persontype = row[Option[/* bpchar */ String]]("persontype"),
-          namestyle = row[NameStyle]("namestyle"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          emailpromotion = row[Option[Int]]("emailpromotion"),
-          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

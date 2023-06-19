@@ -9,6 +9,8 @@ package at
 
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -31,6 +33,18 @@ case class AtViewRow(
 )
 
 object AtViewRow {
+  val rowParser: RowParser[AtViewRow] =
+    RowParser[AtViewRow] { row =>
+      Success(
+        AtViewRow(
+          id = row[Option[Int]]("id"),
+          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
+          name = row[Option[Name]]("name"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[AtViewRow] = new OFormat[AtViewRow]{
     override def writes(o: AtViewRow): JsObject =
       Json.obj(

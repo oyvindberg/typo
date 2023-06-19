@@ -8,12 +8,9 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning departmentid, "name", groupname, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(DepartmentRow.rowParser.single)
   
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
@@ -49,7 +46,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
       SQL"""insert into humanresources.department default values
             returning departmentid, "name", groupname, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(DepartmentRow.rowParser.single)
     } else {
       val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +56,14 @@ object DepartmentRepoImpl extends DepartmentRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(DepartmentRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
-       """.as(rowParser.*)
+       """.as(DepartmentRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow] = {
     fieldValues match {
@@ -87,7 +84,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(DepartmentRow.rowParser.*)
     }
   
   }
@@ -95,7 +92,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
           where departmentid = $departmentid
-       """.as(rowParser.singleOpt)
+       """.as(DepartmentRow.rowParser.singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     implicit val toStatement: ToStatement[Array[DepartmentId]] =
@@ -105,7 +102,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
           where departmentid = ANY($departmentids)
-       """.as(rowParser.*)
+       """.as(DepartmentRow.rowParser.*)
   
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
@@ -155,18 +152,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
             modifieddate = EXCLUDED.modifieddate
           returning departmentid, "name", groupname, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(DepartmentRow.rowParser.single)
   
   }
-  val rowParser: RowParser[DepartmentRow] =
-    RowParser[DepartmentRow] { row =>
-      Success(
-        DepartmentRow(
-          departmentid = row[DepartmentId]("departmentid"),
-          name = row[Name]("name"),
-          groupname = row[Name]("groupname"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

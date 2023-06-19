@@ -9,6 +9,8 @@ package jobcandidate
 
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -29,6 +31,17 @@ case class JobcandidateRow(
 )
 
 object JobcandidateRow {
+  val rowParser: RowParser[JobcandidateRow] =
+    RowParser[JobcandidateRow] { row =>
+      Success(
+        JobcandidateRow(
+          jobcandidateid = row[JobcandidateId]("jobcandidateid"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          resume = row[Option[TypoXml]]("resume"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[JobcandidateRow] = new OFormat[JobcandidateRow]{
     override def writes(o: JobcandidateRow): JsObject =
       Json.obj(

@@ -7,21 +7,16 @@ package adventureworks
 package sales
 package vpersondemographics
 
-import adventureworks.TypoMoney
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
 
 object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def selectAll(implicit c: Connection): List[VpersondemographicsViewRow] = {
     SQL"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
           from sales.vpersondemographics
-       """.as(rowParser.*)
+       """.as(VpersondemographicsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VpersondemographicsViewFieldOrIdValue[_]])(implicit c: Connection): List[VpersondemographicsViewRow] = {
     fieldValues match {
@@ -51,28 +46,8 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VpersondemographicsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VpersondemographicsViewRow] =
-    RowParser[VpersondemographicsViewRow] { row =>
-      Success(
-        VpersondemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          totalpurchaseytd = row[Option[TypoMoney]]("totalpurchaseytd"),
-          datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
-          birthdate = row[Option[LocalDate]]("birthdate"),
-          maritalstatus = row[Option[/* max 1 chars */ String]]("maritalstatus"),
-          yearlyincome = row[Option[/* max 30 chars */ String]]("yearlyincome"),
-          gender = row[Option[/* max 1 chars */ String]]("gender"),
-          totalchildren = row[Option[Int]]("totalchildren"),
-          numberchildrenathome = row[Option[Int]]("numberchildrenathome"),
-          education = row[Option[/* max 30 chars */ String]]("education"),
-          occupation = row[Option[/* max 30 chars */ String]]("occupation"),
-          homeownerflag = row[Option[Boolean]]("homeownerflag"),
-          numbercarsowned = row[Option[Int]]("numbercarsowned")
-        )
-      )
-    }
 }

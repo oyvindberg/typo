@@ -8,17 +8,12 @@ package production
 package illustration
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
@@ -29,7 +24,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"""insert into production.illustration(illustrationid, diagram, modifieddate)
           values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
           returning illustrationid, diagram, modifieddate
-       """.query.unique
+       """.query[IllustrationRow].unique
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
@@ -55,7 +50,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
             returning illustrationid, diagram, modifieddate
          """
     }
-    q.query.unique
+    q.query[IllustrationRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
@@ -117,21 +112,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
             diagram = EXCLUDED.diagram,
             modifieddate = EXCLUDED.modifieddate
           returning illustrationid, diagram, modifieddate
-       """.query.unique
+       """.query[IllustrationRow].unique
   }
-  implicit val read: Read[IllustrationRow] =
-    new Read[IllustrationRow](
-      gets = List(
-        (Get[IllustrationId], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
-        illustrationid = Get[IllustrationId].unsafeGetNonNullable(rs, i + 0),
-        diagram = Get[TypoXml].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

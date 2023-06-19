@@ -7,16 +7,10 @@ package adventureworks
 package humanresources
 package vjobcandidateeducation
 
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
 
 object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
   override def selectAll: Stream[ConnectionIO, VjobcandidateeducationViewRow] = {
@@ -43,39 +37,4 @@ object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo
     sql"select * from humanresources.vjobcandidateeducation $where".query[VjobcandidateeducationViewRow].stream
   
   }
-  implicit val read: Read[VjobcandidateeducationViewRow] =
-    new Read[VjobcandidateeducationViewRow](
-      gets = List(
-        (Get[JobcandidateId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateeducationViewRow(
-        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
-        `Edu.Level` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 1),
-        `Edu.StartDate` = Get[LocalDate].unsafeGetNullable(rs, i + 2),
-        `Edu.EndDate` = Get[LocalDate].unsafeGetNullable(rs, i + 3),
-        `Edu.Degree` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        `Edu.Major` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-        `Edu.Minor` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
-        `Edu.GPA` = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 7),
-        `Edu.GPAScale` = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 8),
-        `Edu.School` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 9),
-        `Edu.Loc.CountryRegion` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 10),
-        `Edu.Loc.State` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 11),
-        `Edu.Loc.City` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 12)
-      )
-    )
-  
-
 }

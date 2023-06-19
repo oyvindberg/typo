@@ -8,12 +8,9 @@ package sales
 package currency
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
           values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning currencycode, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CurrencyRow.rowParser.single)
   
   }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
@@ -45,7 +42,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
       SQL"""insert into sales.currency default values
             returning currencycode, "name", modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(CurrencyRow.rowParser.single)
     } else {
       val q = s"""insert into sales.currency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -55,14 +52,14 @@ object CurrencyRepoImpl extends CurrencyRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(CurrencyRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
     SQL"""select currencycode, "name", modifieddate
           from sales.currency
-       """.as(rowParser.*)
+       """.as(CurrencyRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow] = {
     fieldValues match {
@@ -82,7 +79,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CurrencyRow.rowParser.*)
     }
   
   }
@@ -90,7 +87,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     SQL"""select currencycode, "name", modifieddate
           from sales.currency
           where currencycode = $currencycode
-       """.as(rowParser.singleOpt)
+       """.as(CurrencyRow.rowParser.singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     implicit val toStatement: ToStatement[Array[CurrencyId]] =
@@ -100,7 +97,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     SQL"""select currencycode, "name", modifieddate
           from sales.currency
           where currencycode = ANY($currencycodes)
-       """.as(rowParser.*)
+       """.as(CurrencyRow.rowParser.*)
   
   }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
@@ -146,17 +143,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
             modifieddate = EXCLUDED.modifieddate
           returning currencycode, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CurrencyRow.rowParser.single)
   
   }
-  val rowParser: RowParser[CurrencyRow] =
-    RowParser[CurrencyRow] { row =>
-      Success(
-        CurrencyRow(
-          currencycode = row[CurrencyId]("currencycode"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

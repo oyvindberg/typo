@@ -10,17 +10,12 @@ package employee
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -32,7 +27,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
           values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
-       """.query.unique
+       """.query[EmployeeRow].unique
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
     val fs = List(
@@ -85,7 +80,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
             returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
          """
     }
-    q.query.unique
+    q.query[EmployeeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
@@ -207,45 +202,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
             modifieddate = EXCLUDED.modifieddate,
             organizationnode = EXCLUDED.organizationnode
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
-       """.query.unique
+       """.query[EmployeeRow].unique
   }
-  implicit val read: Read[EmployeeRow] =
-    new Read[EmployeeRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.NoNulls),
-        (Get[/* max 256 chars */ String], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmployeeRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        nationalidnumber = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        loginid = Get[/* max 256 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        birthdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 4),
-        maritalstatus = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-        gender = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 6),
-        hiredate = Get[LocalDate].unsafeGetNonNullable(rs, i + 7),
-        salariedflag = Get[Flag].unsafeGetNonNullable(rs, i + 8),
-        vacationhours = Get[Int].unsafeGetNonNullable(rs, i + 9),
-        sickleavehours = Get[Int].unsafeGetNonNullable(rs, i + 10),
-        currentflag = Get[Flag].unsafeGetNonNullable(rs, i + 11),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 12),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 13),
-        organizationnode = Get[String].unsafeGetNullable(rs, i + 14)
-      )
-    )
-  
-
 }

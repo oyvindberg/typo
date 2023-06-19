@@ -7,19 +7,10 @@ package adventureworks
 package sa
 package s
 
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SViewRepoImpl extends SViewRepo {
   override def selectAll: Stream[ConnectionIO, SViewRow] = {
@@ -40,27 +31,4 @@ object SViewRepoImpl extends SViewRepo {
     sql"select * from sa.s $where".query[SViewRow].stream
   
   }
-  implicit val read: Read[SViewRow] =
-    new Read[SViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 3),
-        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

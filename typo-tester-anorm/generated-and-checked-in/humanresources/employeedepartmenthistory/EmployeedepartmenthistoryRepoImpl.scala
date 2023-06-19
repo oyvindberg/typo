@@ -8,16 +8,10 @@ package humanresources
 package employeedepartmenthistory
 
 import adventureworks.Defaulted
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
@@ -29,7 +23,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.departmentid}::int2, ${unsaved.shiftid}::int2, ${unsaved.startdate}::date, ${unsaved.enddate}::date, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
   
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
@@ -49,7 +43,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       SQL"""insert into humanresources.employeedepartmenthistory default values
             returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
     } else {
       val q = s"""insert into humanresources.employeedepartmenthistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +53,14 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from humanresources.employeedepartmenthistory
-       """.as(rowParser.*)
+       """.as(EmployeedepartmenthistoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     fieldValues match {
@@ -89,7 +83,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EmployeedepartmenthistoryRow.rowParser.*)
     }
   
   }
@@ -97,7 +91,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from humanresources.employeedepartmenthistory
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
-       """.as(rowParser.singleOpt)
+       """.as(EmployeedepartmenthistoryRow.rowParser.singleOpt)
   }
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -145,20 +139,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[EmployeedepartmenthistoryRow] =
-    RowParser[EmployeedepartmenthistoryRow] { row =>
-      Success(
-        EmployeedepartmenthistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          departmentid = row[DepartmentId]("departmentid"),
-          shiftid = row[ShiftId]("shiftid"),
-          startdate = row[LocalDate]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

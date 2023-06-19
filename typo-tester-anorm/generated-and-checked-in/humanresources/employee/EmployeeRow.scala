@@ -9,6 +9,8 @@ package employee
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -52,6 +54,28 @@ case class EmployeeRow(
 )
 
 object EmployeeRow {
+  val rowParser: RowParser[EmployeeRow] =
+    RowParser[EmployeeRow] { row =>
+      Success(
+        EmployeeRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          nationalidnumber = row[/* max 15 chars */ String]("nationalidnumber"),
+          loginid = row[/* max 256 chars */ String]("loginid"),
+          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
+          birthdate = row[LocalDate]("birthdate"),
+          maritalstatus = row[/* bpchar */ String]("maritalstatus"),
+          gender = row[/* bpchar */ String]("gender"),
+          hiredate = row[LocalDate]("hiredate"),
+          salariedflag = row[Flag]("salariedflag"),
+          vacationhours = row[Int]("vacationhours"),
+          sickleavehours = row[Int]("sickleavehours"),
+          currentflag = row[Flag]("currentflag"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate"),
+          organizationnode = row[Option[String]]("organizationnode")
+        )
+      )
+    }
   implicit val oFormat: OFormat[EmployeeRow] = new OFormat[EmployeeRow]{
     override def writes(o: EmployeeRow): JsObject =
       Json.obj(

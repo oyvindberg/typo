@@ -9,6 +9,8 @@ package e
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -54,6 +56,29 @@ case class EViewRow(
 )
 
 object EViewRow {
+  val rowParser: RowParser[EViewRow] =
+    RowParser[EViewRow] { row =>
+      Success(
+        EViewRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          nationalidnumber = row[Option[/* max 15 chars */ String]]("nationalidnumber"),
+          loginid = row[Option[/* max 256 chars */ String]]("loginid"),
+          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
+          birthdate = row[Option[LocalDate]]("birthdate"),
+          maritalstatus = row[Option[/* bpchar */ String]]("maritalstatus"),
+          gender = row[Option[/* bpchar */ String]]("gender"),
+          hiredate = row[Option[LocalDate]]("hiredate"),
+          salariedflag = row[Flag]("salariedflag"),
+          vacationhours = row[Option[Int]]("vacationhours"),
+          sickleavehours = row[Option[Int]]("sickleavehours"),
+          currentflag = row[Flag]("currentflag"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
+          organizationnode = row[Option[String]]("organizationnode")
+        )
+      )
+    }
   implicit val oFormat: OFormat[EViewRow] = new OFormat[EViewRow]{
     override def writes(o: EViewRow): JsObject =
       Json.obj(

@@ -8,10 +8,14 @@ package sales
 package currencyrate
 
 import adventureworks.sales.currency.CurrencyId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CurrencyrateRow(
@@ -56,4 +60,27 @@ object CurrencyrateRow {
         "endofdayrate" := row.endofdayrate,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CurrencyrateRow] =
+    new Read[CurrencyrateRow](
+      gets = List(
+        (Get[CurrencyrateId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[CurrencyId], Nullability.NoNulls),
+        (Get[CurrencyId], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CurrencyrateRow(
+        currencyrateid = Get[CurrencyrateId].unsafeGetNonNullable(rs, i + 0),
+        currencyratedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
+        fromcurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 2),
+        tocurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 3),
+        averagerate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
+        endofdayrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
+      )
+    )
+  
+
 }

@@ -8,17 +8,12 @@ package production
 package culture
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CultureRepoImpl extends CultureRepo {
@@ -29,7 +24,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
           values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning cultureid, "name", modifieddate
-       """.query.unique
+       """.query[CultureRow].unique
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
@@ -52,7 +47,7 @@ object CultureRepoImpl extends CultureRepo {
             returning cultureid, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[CultureRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
@@ -114,21 +109,6 @@ object CultureRepoImpl extends CultureRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning cultureid, "name", modifieddate
-       """.query.unique
+       """.query[CultureRow].unique
   }
-  implicit val read: Read[CultureRow] =
-    new Read[CultureRow](
-      gets = List(
-        (Get[CultureId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CultureRow(
-        cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

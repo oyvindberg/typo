@@ -8,6 +8,8 @@ package humanresources
 package department
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -27,6 +29,17 @@ case class DepartmentRow(
 )
 
 object DepartmentRow {
+  val rowParser: RowParser[DepartmentRow] =
+    RowParser[DepartmentRow] { row =>
+      Success(
+        DepartmentRow(
+          departmentid = row[DepartmentId]("departmentid"),
+          name = row[Name]("name"),
+          groupname = row[Name]("groupname"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[DepartmentRow] = new OFormat[DepartmentRow]{
     override def writes(o: DepartmentRow): JsObject =
       Json.obj(

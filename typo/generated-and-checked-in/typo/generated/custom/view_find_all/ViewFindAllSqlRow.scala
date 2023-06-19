@@ -10,6 +10,8 @@ package generated
 package custom
 package view_find_all
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -34,6 +36,18 @@ case class ViewFindAllSqlRow(
 )
 
 object ViewFindAllSqlRow {
+  val rowParser: RowParser[ViewFindAllSqlRow] =
+    RowParser[ViewFindAllSqlRow] { row =>
+      Success(
+        ViewFindAllSqlRow(
+          tableOid = row[PgNamespaceId]("table_oid"),
+          tableSchema = row[/* nullability unknown */ Option[String]]("table_schema"),
+          tableName = row[/* nullability unknown */ Option[String]]("table_name"),
+          relkind = row[String]("relkind"),
+          viewDefinition = row[/* nullability unknown */ Option[String]]("view_definition")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ViewFindAllSqlRow] = new OFormat[ViewFindAllSqlRow]{
     override def writes(o: ViewFindAllSqlRow): JsObject =
       Json.obj(

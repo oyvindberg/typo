@@ -8,10 +8,14 @@ package hr
 package eph
 
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class EphViewRow(
@@ -50,4 +54,25 @@ object EphViewRow {
         "payfrequency" := row.payfrequency,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[EphViewRow] =
+    new Read[EphViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+        ratechangedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
+        rate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
+        payfrequency = Get[Int].unsafeGetNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
+      )
+    )
+  
+
 }

@@ -9,6 +9,8 @@ package i
 
 import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -28,6 +30,17 @@ case class IViewRow(
 )
 
 object IViewRow {
+  val rowParser: RowParser[IViewRow] =
+    RowParser[IViewRow] { row =>
+      Success(
+        IViewRow(
+          id = row[Option[Int]]("id"),
+          illustrationid = row[Option[IllustrationId]]("illustrationid"),
+          diagram = row[Option[TypoXml]]("diagram"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[IViewRow] = new OFormat[IViewRow]{
     override def writes(o: IViewRow): JsObject =
       Json.obj(

@@ -9,16 +9,12 @@ package password
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +26,7 @@ object PasswordRepoImpl extends PasswordRepo {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-       """.query.unique
+       """.query[PasswordRow].unique
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
@@ -58,7 +54,7 @@ object PasswordRepoImpl extends PasswordRepo {
             returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[PasswordRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
@@ -130,25 +126,6 @@ object PasswordRepoImpl extends PasswordRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-       """.query.unique
+       """.query[PasswordRow].unique
   }
-  implicit val read: Read[PasswordRow] =
-    new Read[PasswordRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* max 128 chars */ String], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PasswordRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        passwordhash = Get[/* max 128 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

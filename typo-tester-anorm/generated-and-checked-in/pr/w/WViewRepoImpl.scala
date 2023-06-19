@@ -7,22 +7,16 @@ package adventureworks
 package pr
 package w
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object WViewRepoImpl extends WViewRepo {
   override def selectAll(implicit c: Connection): List[WViewRow] = {
     SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from pr.w
-       """.as(rowParser.*)
+       """.as(WViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]])(implicit c: Connection): List[WViewRow] = {
     fieldValues match {
@@ -49,25 +43,8 @@ object WViewRepoImpl extends WViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(WViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[WViewRow] =
-    RowParser[WViewRow] { row =>
-      Success(
-        WViewRow(
-          id = row[Option[Int]]("id"),
-          workorderid = row[Option[WorkorderId]]("workorderid"),
-          productid = row[Option[ProductId]]("productid"),
-          orderqty = row[Option[Int]]("orderqty"),
-          scrappedqty = row[Option[Int]]("scrappedqty"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          duedate = row[Option[LocalDateTime]]("duedate"),
-          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

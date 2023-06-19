@@ -9,6 +9,8 @@ package th
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,6 +42,23 @@ case class ThViewRow(
 )
 
 object ThViewRow {
+  val rowParser: RowParser[ThViewRow] =
+    RowParser[ThViewRow] { row =>
+      Success(
+        ThViewRow(
+          id = row[Option[Int]]("id"),
+          transactionid = row[Option[TransactionhistoryId]]("transactionid"),
+          productid = row[Option[ProductId]]("productid"),
+          referenceorderid = row[Option[Int]]("referenceorderid"),
+          referenceorderlineid = row[Option[Int]]("referenceorderlineid"),
+          transactiondate = row[Option[LocalDateTime]]("transactiondate"),
+          transactiontype = row[Option[/* bpchar */ String]]("transactiontype"),
+          quantity = row[Option[Int]]("quantity"),
+          actualcost = row[Option[BigDecimal]]("actualcost"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ThViewRow] = new OFormat[ThViewRow]{
     override def writes(o: ThViewRow): JsObject =
       Json.obj(

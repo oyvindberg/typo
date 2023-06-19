@@ -8,17 +8,12 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
-       """.query.unique
+       """.query[EmailaddressRow].unique
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
@@ -61,7 +56,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[EmailaddressRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
@@ -127,25 +122,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
-       """.query.unique
+       """.query[EmailaddressRow].unique
   }
-  implicit val read: Read[EmailaddressRow] =
-    new Read[EmailaddressRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmailaddressRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        emailaddressid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

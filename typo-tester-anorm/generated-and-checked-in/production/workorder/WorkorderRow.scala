@@ -9,6 +9,8 @@ package workorder
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -40,6 +42,22 @@ case class WorkorderRow(
 )
 
 object WorkorderRow {
+  val rowParser: RowParser[WorkorderRow] =
+    RowParser[WorkorderRow] { row =>
+      Success(
+        WorkorderRow(
+          workorderid = row[WorkorderId]("workorderid"),
+          productid = row[ProductId]("productid"),
+          orderqty = row[Int]("orderqty"),
+          scrappedqty = row[Int]("scrappedqty"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          duedate = row[LocalDateTime]("duedate"),
+          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[WorkorderRow] = new OFormat[WorkorderRow]{
     override def writes(o: WorkorderRow): JsObject =
       Json.obj(

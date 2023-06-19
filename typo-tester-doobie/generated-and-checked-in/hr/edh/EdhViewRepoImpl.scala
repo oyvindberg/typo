@@ -7,19 +7,10 @@ package adventureworks
 package hr
 package edh
 
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 object EdhViewRepoImpl extends EdhViewRepo {
   override def selectAll: Stream[ConnectionIO, EdhViewRow] = {
@@ -40,27 +31,4 @@ object EdhViewRepoImpl extends EdhViewRepo {
     sql"select * from hr.edh $where".query[EdhViewRow].stream
   
   }
-  implicit val read: Read[EdhViewRow] =
-    new Read[EdhViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[DepartmentId], Nullability.Nullable),
-        (Get[ShiftId], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EdhViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        departmentid = Get[DepartmentId].unsafeGetNullable(rs, i + 2),
-        shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 3),
-        startdate = Get[LocalDate].unsafeGetNullable(rs, i + 4),
-        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

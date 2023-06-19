@@ -10,6 +10,8 @@ package vstorewithcontacts
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,6 +45,25 @@ case class VstorewithcontactsViewRow(
 )
 
 object VstorewithcontactsViewRow {
+  val rowParser: RowParser[VstorewithcontactsViewRow] =
+    RowParser[VstorewithcontactsViewRow] { row =>
+      Success(
+        VstorewithcontactsViewRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          contacttype = row[Option[Name]]("contacttype"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
+          firstname = row[Option[Name]]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Option[Name]]("lastname"),
+          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
+          phonenumber = row[Option[Phone]]("phonenumber"),
+          phonenumbertype = row[Option[Name]]("phonenumbertype"),
+          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
+          emailpromotion = row[Option[Int]]("emailpromotion")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VstorewithcontactsViewRow] = new OFormat[VstorewithcontactsViewRow]{
     override def writes(o: VstorewithcontactsViewRow): JsObject =
       Json.obj(

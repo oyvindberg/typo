@@ -9,10 +9,14 @@ package crc
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CrcViewRow(
@@ -40,4 +44,19 @@ object CrcViewRow {
         "currencycode" := row.currencycode,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CrcViewRow] =
+    new Read[CrcViewRow](
+      gets = List(
+        (Get[CountryregionId], Nullability.Nullable),
+        (Get[CurrencyId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
+        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
+        currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
+      )
+    )
+  
+
 }

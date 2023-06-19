@@ -10,10 +10,14 @@ package pmpdc
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PmpdcViewRow(
@@ -45,4 +49,21 @@ object PmpdcViewRow {
         "cultureid" := row.cultureid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PmpdcViewRow] =
+    new Read[PmpdcViewRow](
+      gets = List(
+        (Get[ProductmodelId], Nullability.Nullable),
+        (Get[ProductdescriptionId], Nullability.Nullable),
+        (Get[CultureId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
+        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
+        cultureid = Get[CultureId].unsafeGetNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
+      )
+    )
+  
+
 }

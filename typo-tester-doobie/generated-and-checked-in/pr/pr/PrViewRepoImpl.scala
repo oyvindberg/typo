@@ -7,18 +7,10 @@ package adventureworks
 package pr
 package pr
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.productreview.ProductreviewId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PrViewRepoImpl extends PrViewRepo {
   override def selectAll: Stream[ConnectionIO, PrViewRow] = {
@@ -41,31 +33,4 @@ object PrViewRepoImpl extends PrViewRepo {
     sql"select * from pr.pr $where".query[PrViewRow].stream
   
   }
-  implicit val read: Read[PrViewRow] =
-    new Read[PrViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductreviewId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 3850 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productreviewid = Get[ProductreviewId].unsafeGetNullable(rs, i + 1),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
-        reviewdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-        rating = Get[Int].unsafeGetNullable(rs, i + 6),
-        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
-      )
-    )
-  
-
 }

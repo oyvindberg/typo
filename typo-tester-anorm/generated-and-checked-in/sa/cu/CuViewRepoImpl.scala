@@ -7,21 +7,16 @@ package adventureworks
 package sa
 package cu
 
-import adventureworks.public.Name
-import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CuViewRepoImpl extends CuViewRepo {
   override def selectAll(implicit c: Connection): List[CuViewRow] = {
     SQL"""select "id", currencycode, "name", modifieddate
           from sa.cu
-       """.as(rowParser.*)
+       """.as(CuViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CuViewFieldOrIdValue[_]])(implicit c: Connection): List[CuViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object CuViewRepoImpl extends CuViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CuViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[CuViewRow] =
-    RowParser[CuViewRow] { row =>
-      Success(
-        CuViewRow(
-          id = row[Option[/* bpchar */ String]]("id"),
-          currencycode = row[Option[CurrencyId]]("currencycode"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

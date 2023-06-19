@@ -7,22 +7,16 @@ package adventureworks
 package hr
 package s
 
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 object SViewRepoImpl extends SViewRepo {
   override def selectAll(implicit c: Connection): List[SViewRow] = {
     SQL"""select "id", shiftid, "name", starttime, endtime, modifieddate
           from hr.s
-       """.as(rowParser.*)
+       """.as(SViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SViewFieldOrIdValue[_]])(implicit c: Connection): List[SViewRow] = {
     fieldValues match {
@@ -45,21 +39,8 @@ object SViewRepoImpl extends SViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SViewRow] =
-    RowParser[SViewRow] { row =>
-      Success(
-        SViewRow(
-          id = row[Option[Int]]("id"),
-          shiftid = row[Option[ShiftId]]("shiftid"),
-          name = row[Option[Name]]("name"),
-          starttime = row[Option[LocalTime]]("starttime"),
-          endtime = row[Option[LocalTime]]("endtime"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

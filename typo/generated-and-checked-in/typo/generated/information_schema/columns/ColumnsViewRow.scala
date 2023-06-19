@@ -10,6 +10,8 @@ package generated
 package information_schema
 package columns
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -113,6 +115,57 @@ case class ColumnsViewRow(
 )
 
 object ColumnsViewRow {
+  val rowParser: RowParser[ColumnsViewRow] =
+    RowParser[ColumnsViewRow] { row =>
+      Success(
+        ColumnsViewRow(
+          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
+          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
+          tableName = row[Option[SqlIdentifier]]("table_name"),
+          columnName = row[Option[SqlIdentifier]]("column_name"),
+          ordinalPosition = row[Option[CardinalNumber]]("ordinal_position"),
+          columnDefault = row[Option[CharacterData]]("column_default"),
+          isNullable = row[Option[YesOrNo]]("is_nullable"),
+          dataType = row[Option[CharacterData]]("data_type"),
+          characterMaximumLength = row[Option[CardinalNumber]]("character_maximum_length"),
+          characterOctetLength = row[Option[CardinalNumber]]("character_octet_length"),
+          numericPrecision = row[Option[CardinalNumber]]("numeric_precision"),
+          numericPrecisionRadix = row[Option[CardinalNumber]]("numeric_precision_radix"),
+          numericScale = row[Option[CardinalNumber]]("numeric_scale"),
+          datetimePrecision = row[Option[CardinalNumber]]("datetime_precision"),
+          intervalType = row[Option[CharacterData]]("interval_type"),
+          intervalPrecision = row[Option[CardinalNumber]]("interval_precision"),
+          characterSetCatalog = row[Option[SqlIdentifier]]("character_set_catalog"),
+          characterSetSchema = row[Option[SqlIdentifier]]("character_set_schema"),
+          characterSetName = row[Option[SqlIdentifier]]("character_set_name"),
+          collationCatalog = row[Option[SqlIdentifier]]("collation_catalog"),
+          collationSchema = row[Option[SqlIdentifier]]("collation_schema"),
+          collationName = row[Option[SqlIdentifier]]("collation_name"),
+          domainCatalog = row[Option[SqlIdentifier]]("domain_catalog"),
+          domainSchema = row[Option[SqlIdentifier]]("domain_schema"),
+          domainName = row[Option[SqlIdentifier]]("domain_name"),
+          udtCatalog = row[Option[SqlIdentifier]]("udt_catalog"),
+          udtSchema = row[Option[SqlIdentifier]]("udt_schema"),
+          udtName = row[Option[SqlIdentifier]]("udt_name"),
+          scopeCatalog = row[Option[SqlIdentifier]]("scope_catalog"),
+          scopeSchema = row[Option[SqlIdentifier]]("scope_schema"),
+          scopeName = row[Option[SqlIdentifier]]("scope_name"),
+          maximumCardinality = row[Option[CardinalNumber]]("maximum_cardinality"),
+          dtdIdentifier = row[Option[SqlIdentifier]]("dtd_identifier"),
+          isSelfReferencing = row[Option[YesOrNo]]("is_self_referencing"),
+          isIdentity = row[Option[YesOrNo]]("is_identity"),
+          identityGeneration = row[Option[CharacterData]]("identity_generation"),
+          identityStart = row[Option[CharacterData]]("identity_start"),
+          identityIncrement = row[Option[CharacterData]]("identity_increment"),
+          identityMaximum = row[Option[CharacterData]]("identity_maximum"),
+          identityMinimum = row[Option[CharacterData]]("identity_minimum"),
+          identityCycle = row[Option[YesOrNo]]("identity_cycle"),
+          isGenerated = row[Option[CharacterData]]("is_generated"),
+          generationExpression = row[Option[CharacterData]]("generation_expression"),
+          isUpdatable = row[Option[YesOrNo]]("is_updatable")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ColumnsViewRow] = new OFormat[ColumnsViewRow]{
     override def writes(o: ColumnsViewRow): JsObject =
       Json.obj(

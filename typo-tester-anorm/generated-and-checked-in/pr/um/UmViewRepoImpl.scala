@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package um
 
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object UmViewRepoImpl extends UmViewRepo {
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
     SQL"""select "id", unitmeasurecode, "name", modifieddate
           from pr.um
-       """.as(rowParser.*)
+       """.as(UmViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]])(implicit c: Connection): List[UmViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object UmViewRepoImpl extends UmViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(UmViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[UmViewRow] =
-    RowParser[UmViewRow] { row =>
-      Success(
-        UmViewRow(
-          id = row[Option[/* bpchar */ String]]("id"),
-          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

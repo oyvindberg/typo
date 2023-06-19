@@ -7,20 +7,16 @@ package adventureworks
 package purchasing
 package vvendorwithaddresses
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
   override def selectAll(implicit c: Connection): List[VvendorwithaddressesViewRow] = {
     SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
           from purchasing.vvendorwithaddresses
-       """.as(rowParser.*)
+       """.as(VvendorwithaddressesViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VvendorwithaddressesViewFieldOrIdValue[_]])(implicit c: Connection): List[VvendorwithaddressesViewRow] = {
     fieldValues match {
@@ -46,24 +42,8 @@ object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VvendorwithaddressesViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VvendorwithaddressesViewRow] =
-    RowParser[VvendorwithaddressesViewRow] { row =>
-      Success(
-        VvendorwithaddressesViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname")
-        )
-      )
-    }
 }

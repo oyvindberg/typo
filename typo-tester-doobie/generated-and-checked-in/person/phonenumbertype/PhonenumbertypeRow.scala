@@ -8,10 +8,14 @@ package person
 package phonenumbertype
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PhonenumbertypeRow(
@@ -38,4 +42,19 @@ object PhonenumbertypeRow {
         "name" := row.name,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PhonenumbertypeRow] =
+    new Read[PhonenumbertypeRow](
+      gets = List(
+        (Get[PhonenumbertypeId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PhonenumbertypeRow(
+        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

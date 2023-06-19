@@ -7,20 +7,16 @@ package adventureworks
 package pr
 package tha
 
-import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ThaViewRepoImpl extends ThaViewRepo {
   override def selectAll(implicit c: Connection): List[ThaViewRow] = {
     SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from pr.tha
-       """.as(rowParser.*)
+       """.as(ThaViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ThaViewFieldOrIdValue[_]])(implicit c: Connection): List[ThaViewRow] = {
     fieldValues match {
@@ -47,25 +43,8 @@ object ThaViewRepoImpl extends ThaViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ThaViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[ThaViewRow] =
-    RowParser[ThaViewRow] { row =>
-      Success(
-        ThaViewRow(
-          id = row[Option[Int]]("id"),
-          transactionid = row[Option[TransactionhistoryarchiveId]]("transactionid"),
-          productid = row[Option[Int]]("productid"),
-          referenceorderid = row[Option[Int]]("referenceorderid"),
-          referenceorderlineid = row[Option[Int]]("referenceorderlineid"),
-          transactiondate = row[Option[LocalDateTime]]("transactiondate"),
-          transactiontype = row[Option[/* bpchar */ String]]("transactiontype"),
-          quantity = row[Option[Int]]("quantity"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

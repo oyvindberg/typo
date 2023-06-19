@@ -8,18 +8,12 @@ package sales
 package customer
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate
-       """.query.unique
+       """.query[CustomerRow].unique
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
@@ -63,7 +57,7 @@ object CustomerRepoImpl extends CustomerRepo {
             returning customerid, personid, storeid, territoryid, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[CustomerRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
@@ -140,27 +134,6 @@ object CustomerRepoImpl extends CustomerRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate
-       """.query.unique
+       """.query[CustomerRow].unique
   }
-  implicit val read: Read[CustomerRow] =
-    new Read[CustomerRow](
-      gets = List(
-        (Get[CustomerId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CustomerRow(
-        customerid = Get[CustomerId].unsafeGetNonNullable(rs, i + 0),
-        personid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        storeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

@@ -10,6 +10,8 @@ package productproductphoto
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -33,6 +35,17 @@ case class ProductproductphotoRow(
  }
 
 object ProductproductphotoRow {
+  val rowParser: RowParser[ProductproductphotoRow] =
+    RowParser[ProductproductphotoRow] { row =>
+      Success(
+        ProductproductphotoRow(
+          productid = row[ProductId]("productid"),
+          productphotoid = row[ProductphotoId]("productphotoid"),
+          primary = row[Flag]("primary"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductproductphotoRow] = new OFormat[ProductproductphotoRow]{
     override def writes(o: ProductproductphotoRow): JsObject =
       Json.obj(

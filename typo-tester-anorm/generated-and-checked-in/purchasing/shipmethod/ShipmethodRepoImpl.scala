@@ -8,12 +8,9 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +26,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ShipmethodRow.rowParser.single)
   
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
@@ -61,7 +58,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       SQL"""insert into purchasing.shipmethod default values
             returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ShipmethodRow.rowParser.single)
     } else {
       val q = s"""insert into purchasing.shipmethod(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -71,14 +68,14 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ShipmethodRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
-       """.as(rowParser.*)
+       """.as(ShipmethodRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
     fieldValues match {
@@ -101,7 +98,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ShipmethodRow.rowParser.*)
     }
   
   }
@@ -109,7 +106,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = $shipmethodid
-       """.as(rowParser.singleOpt)
+       """.as(ShipmethodRow.rowParser.singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     implicit val toStatement: ToStatement[Array[ShipmethodId]] =
@@ -119,7 +116,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)
-       """.as(rowParser.*)
+       """.as(ShipmethodRow.rowParser.*)
   
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
@@ -177,20 +174,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             modifieddate = EXCLUDED.modifieddate
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ShipmethodRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ShipmethodRow] =
-    RowParser[ShipmethodRow] { row =>
-      Success(
-        ShipmethodRow(
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          name = row[Name]("name"),
-          shipbase = row[BigDecimal]("shipbase"),
-          shiprate = row[BigDecimal]("shiprate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

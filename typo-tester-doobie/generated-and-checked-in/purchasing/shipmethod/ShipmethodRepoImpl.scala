@@ -8,17 +8,12 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
-       """.query.unique
+       """.query[ShipmethodRow].unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
@@ -68,7 +63,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ShipmethodRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
@@ -145,27 +140,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
-       """.query.unique
+       """.query[ShipmethodRow].unique
   }
-  implicit val read: Read[ShipmethodRow] =
-    new Read[ShipmethodRow](
-      gets = List(
-        (Get[ShipmethodId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
-        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        shipbase = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        shiprate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

@@ -7,22 +7,16 @@ package adventureworks
 package sales
 package vindividualcustomer
 
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
   override def selectAll(implicit c: Connection): List[VindividualcustomerViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics
           from sales.vindividualcustomer
-       """.as(rowParser.*)
+       """.as(VindividualcustomerViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VindividualcustomerViewFieldOrIdValue[_]])(implicit c: Connection): List[VindividualcustomerViewRow] = {
     fieldValues match {
@@ -57,33 +51,8 @@ object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VindividualcustomerViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VindividualcustomerViewRow] =
-    RowParser[VindividualcustomerViewRow] { row =>
-      Success(
-        VindividualcustomerViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          emailpromotion = row[Option[Int]]("emailpromotion"),
-          addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname"),
-          demographics = row[Option[TypoXml]]("demographics")
-        )
-      )
-    }
 }

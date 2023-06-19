@@ -8,10 +8,14 @@ package person
 package emailaddress
 
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -49,4 +53,23 @@ object EmailaddressRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[EmailaddressRow] =
+    new Read[EmailaddressRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EmailaddressRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        emailaddressid = Get[Int].unsafeGetNonNullable(rs, i + 1),
+        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

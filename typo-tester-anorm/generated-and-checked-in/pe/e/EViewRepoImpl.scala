@@ -7,21 +7,16 @@ package adventureworks
 package pe
 package e
 
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll(implicit c: Connection): List[EViewRow] = {
     SQL"""select "id", businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from pe.e
-       """.as(rowParser.*)
+       """.as(EViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EViewFieldOrIdValue[_]])(implicit c: Connection): List[EViewRow] = {
     fieldValues match {
@@ -44,21 +39,8 @@ object EViewRepoImpl extends EViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[EViewRow] =
-    RowParser[EViewRow] { row =>
-      Success(
-        EViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          emailaddressid = row[Option[Int]]("emailaddressid"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

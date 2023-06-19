@@ -8,12 +8,9 @@ package production
 package culture
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object CultureRepoImpl extends CultureRepo {
           values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning cultureid, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CultureRow.rowParser.single)
   
   }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
@@ -45,7 +42,7 @@ object CultureRepoImpl extends CultureRepo {
       SQL"""insert into production.culture default values
             returning cultureid, "name", modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(CultureRow.rowParser.single)
     } else {
       val q = s"""insert into production.culture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -55,14 +52,14 @@ object CultureRepoImpl extends CultureRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(CultureRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     SQL"""select cultureid, "name", modifieddate
           from production.culture
-       """.as(rowParser.*)
+       """.as(CultureRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
     fieldValues match {
@@ -82,7 +79,7 @@ object CultureRepoImpl extends CultureRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CultureRow.rowParser.*)
     }
   
   }
@@ -90,7 +87,7 @@ object CultureRepoImpl extends CultureRepo {
     SQL"""select cultureid, "name", modifieddate
           from production.culture
           where cultureid = $cultureid
-       """.as(rowParser.singleOpt)
+       """.as(CultureRow.rowParser.singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     implicit val toStatement: ToStatement[Array[CultureId]] =
@@ -100,7 +97,7 @@ object CultureRepoImpl extends CultureRepo {
     SQL"""select cultureid, "name", modifieddate
           from production.culture
           where cultureid = ANY($cultureids)
-       """.as(rowParser.*)
+       """.as(CultureRow.rowParser.*)
   
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
@@ -146,17 +143,7 @@ object CultureRepoImpl extends CultureRepo {
             modifieddate = EXCLUDED.modifieddate
           returning cultureid, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(CultureRow.rowParser.single)
   
   }
-  val rowParser: RowParser[CultureRow] =
-    RowParser[CultureRow] { row =>
-      Success(
-        CultureRow(
-          cultureid = row[CultureId]("cultureid"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

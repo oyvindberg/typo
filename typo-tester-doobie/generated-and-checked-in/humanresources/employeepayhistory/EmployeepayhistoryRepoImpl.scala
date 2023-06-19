@@ -8,17 +8,12 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
@@ -29,7 +24,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
-       """.query.unique
+       """.query[EmployeepayhistoryRow].unique
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
@@ -54,7 +49,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
          """
     }
-    q.query.unique
+    q.query[EmployeepayhistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
@@ -120,25 +115,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             payfrequency = EXCLUDED.payfrequency,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
-       """.query.unique
+       """.query[EmployeepayhistoryRow].unique
   }
-  implicit val read: Read[EmployeepayhistoryRow] =
-    new Read[EmployeepayhistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmployeepayhistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        ratechangedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        rate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        payfrequency = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

@@ -7,14 +7,10 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 
 object VsalespersonsalesbyfiscalyearsViewRepoImpl extends VsalespersonsalesbyfiscalyearsViewRepo {
   override def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsViewRow] = {
@@ -35,27 +31,4 @@ object VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfis
     sql"select * from sales.vsalespersonsalesbyfiscalyears $where".query[VsalespersonsalesbyfiscalyearsViewRow].stream
   
   }
-  implicit val read: Read[VsalespersonsalesbyfiscalyearsViewRow] =
-    new Read[VsalespersonsalesbyfiscalyearsViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsViewRow(
-        SalesPersonID = Get[Int].unsafeGetNullable(rs, i + 0),
-        FullName = Get[String].unsafeGetNullable(rs, i + 1),
-        JobTitle = Get[String].unsafeGetNullable(rs, i + 2),
-        SalesTerritory = Get[String].unsafeGetNullable(rs, i + 3),
-        `2012` = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        `2013` = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        `2014` = Get[BigDecimal].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

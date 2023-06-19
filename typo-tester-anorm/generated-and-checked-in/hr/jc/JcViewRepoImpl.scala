@@ -7,22 +7,16 @@ package adventureworks
 package hr
 package jc
 
-import adventureworks.TypoXml
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll(implicit c: Connection): List[JcViewRow] = {
     SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate
           from hr.jc
-       """.as(rowParser.*)
+       """.as(JcViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[JcViewFieldOrIdValue[_]])(implicit c: Connection): List[JcViewRow] = {
     fieldValues match {
@@ -44,20 +38,8 @@ object JcViewRepoImpl extends JcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(JcViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[JcViewRow] =
-    RowParser[JcViewRow] { row =>
-      Success(
-        JcViewRow(
-          id = row[Option[Int]]("id"),
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[TypoXml]]("resume"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

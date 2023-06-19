@@ -8,12 +8,9 @@ package production
 package productcategory
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +26,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
           values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productcategoryid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductcategoryRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow = {
@@ -53,7 +50,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       SQL"""insert into production.productcategory default values
             returning productcategoryid, "name", rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductcategoryRow.rowParser.single)
     } else {
       val q = s"""insert into production.productcategory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -63,14 +60,14 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductcategoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
     SQL"""select productcategoryid, "name", rowguid, modifieddate
           from production.productcategory
-       """.as(rowParser.*)
+       """.as(ProductcategoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcategoryRow] = {
     fieldValues match {
@@ -91,7 +88,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductcategoryRow.rowParser.*)
     }
   
   }
@@ -99,7 +96,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     SQL"""select productcategoryid, "name", rowguid, modifieddate
           from production.productcategory
           where productcategoryid = $productcategoryid
-       """.as(rowParser.singleOpt)
+       """.as(ProductcategoryRow.rowParser.singleOpt)
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
     implicit val toStatement: ToStatement[Array[ProductcategoryId]] =
@@ -109,7 +106,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     SQL"""select productcategoryid, "name", rowguid, modifieddate
           from production.productcategory
           where productcategoryid = ANY($productcategoryids)
-       """.as(rowParser.*)
+       """.as(ProductcategoryRow.rowParser.*)
   
   }
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
@@ -159,18 +156,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productcategoryid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductcategoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductcategoryRow] =
-    RowParser[ProductcategoryRow] { row =>
-      Success(
-        ProductcategoryRow(
-          productcategoryid = row[ProductcategoryId]("productcategoryid"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

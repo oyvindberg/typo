@@ -8,10 +8,14 @@ package pr
 package pd
 
 import adventureworks.production.productdescription.ProductdescriptionId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -47,4 +51,23 @@ object PdViewRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PdViewRow] =
+    new Read[PdViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[ProductdescriptionId], Nullability.Nullable),
+        (Get[/* max 400 chars */ String], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
+        description = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
+      )
+    )
+  
+
 }

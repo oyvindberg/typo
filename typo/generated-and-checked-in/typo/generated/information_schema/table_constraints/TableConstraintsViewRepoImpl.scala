@@ -12,19 +12,14 @@ package table_constraints
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
-import typo.generated.information_schema.YesOrNo
 
 object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
   override def selectAll(implicit c: Connection): List[TableConstraintsViewRow] = {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
           from information_schema.table_constraints
-       """.as(rowParser.*)
+       """.as(TableConstraintsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TableConstraintsViewFieldOrIdValue[_]])(implicit c: Connection): List[TableConstraintsViewRow] = {
     fieldValues match {
@@ -51,25 +46,8 @@ object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(TableConstraintsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[TableConstraintsViewRow] =
-    RowParser[TableConstraintsViewRow] { row =>
-      Success(
-        TableConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
-          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
-          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
-          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          constraintType = row[Option[CharacterData]]("constraint_type"),
-          isDeferrable = row[Option[YesOrNo]]("is_deferrable"),
-          initiallyDeferred = row[Option[YesOrNo]]("initially_deferred"),
-          enforced = row[Option[YesOrNo]]("enforced")
-        )
-      )
-    }
 }

@@ -8,18 +8,12 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductmodelRow].unique
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
@@ -63,7 +57,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductmodelRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
@@ -140,27 +134,6 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
-       """.query.unique
+       """.query[ProductmodelRow].unique
   }
-  implicit val read: Read[ProductmodelRow] =
-    new Read[ProductmodelRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        catalogdescription = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

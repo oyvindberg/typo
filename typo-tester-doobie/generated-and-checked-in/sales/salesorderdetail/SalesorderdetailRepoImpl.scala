@@ -8,19 +8,12 @@ package sales
 package salesorderdetail
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -32,7 +25,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.salesorderdetailid}::int4, ${unsaved.carriertrackingnumber}, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.specialofferid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.unitpricediscount}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesorderdetailRow].unique
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
@@ -71,7 +64,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesorderdetailRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesorderdetailRow] = {
@@ -162,35 +155,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
-       """.query.unique
+       """.query[SalesorderdetailRow].unique
   }
-  implicit val read: Read[SalesorderdetailRow] =
-    new Read[SalesorderdetailRow](
-      gets = List(
-        (Get[SalesorderheaderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[SpecialofferId], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesorderdetailRow(
-        salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        salesorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 2),
-        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
-        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 5),
-        unitprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        unitpricediscount = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 9)
-      )
-    )
-  
-
 }

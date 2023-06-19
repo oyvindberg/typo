@@ -9,6 +9,8 @@ package vpersondemographics
 
 import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -35,6 +37,26 @@ case class VpersondemographicsViewRow(
 )
 
 object VpersondemographicsViewRow {
+  val rowParser: RowParser[VpersondemographicsViewRow] =
+    RowParser[VpersondemographicsViewRow] { row =>
+      Success(
+        VpersondemographicsViewRow(
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          totalpurchaseytd = row[Option[TypoMoney]]("totalpurchaseytd"),
+          datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
+          birthdate = row[Option[LocalDate]]("birthdate"),
+          maritalstatus = row[Option[/* max 1 chars */ String]]("maritalstatus"),
+          yearlyincome = row[Option[/* max 30 chars */ String]]("yearlyincome"),
+          gender = row[Option[/* max 1 chars */ String]]("gender"),
+          totalchildren = row[Option[Int]]("totalchildren"),
+          numberchildrenathome = row[Option[Int]]("numberchildrenathome"),
+          education = row[Option[/* max 30 chars */ String]]("education"),
+          occupation = row[Option[/* max 30 chars */ String]]("occupation"),
+          homeownerflag = row[Option[Boolean]]("homeownerflag"),
+          numbercarsowned = row[Option[Int]]("numbercarsowned")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VpersondemographicsViewRow] = new OFormat[VpersondemographicsViewRow]{
     override def writes(o: VpersondemographicsViewRow): JsObject =
       Json.obj(

@@ -9,10 +9,14 @@ package pnt
 
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PntViewRow(
@@ -43,4 +47,21 @@ object PntViewRow {
         "name" := row.name,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PntViewRow] =
+    new Read[PntViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[PhonenumbertypeId], Nullability.Nullable),
+        (Get[Name], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PntViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
+      )
+    )
+  
+
 }

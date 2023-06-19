@@ -8,13 +8,9 @@ package production
 package workorderrouting
 
 import adventureworks.Defaulted
-import adventureworks.production.location.LocationId
-import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -27,7 +23,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.operationsequence}::int2, ${unsaved.locationid}::int2, ${unsaved.scheduledstartdate}::timestamp, ${unsaved.scheduledenddate}::timestamp, ${unsaved.actualstartdate}::timestamp, ${unsaved.actualenddate}::timestamp, ${unsaved.actualresourcehrs}::numeric, ${unsaved.plannedcost}::numeric, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(WorkorderroutingRow.rowParser.single)
   
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
@@ -53,7 +49,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       SQL"""insert into production.workorderrouting default values
             returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(WorkorderroutingRow.rowParser.single)
     } else {
       val q = s"""insert into production.workorderrouting(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -63,14 +59,14 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(WorkorderroutingRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
-       """.as(rowParser.*)
+       """.as(WorkorderroutingRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
     fieldValues match {
@@ -99,7 +95,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(WorkorderroutingRow.rowParser.*)
     }
   
   }
@@ -107,7 +103,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
           where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
-       """.as(rowParser.singleOpt)
+       """.as(WorkorderroutingRow.rowParser.singleOpt)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -182,26 +178,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(WorkorderroutingRow.rowParser.single)
   
   }
-  val rowParser: RowParser[WorkorderroutingRow] =
-    RowParser[WorkorderroutingRow] { row =>
-      Success(
-        WorkorderroutingRow(
-          workorderid = row[WorkorderId]("workorderid"),
-          productid = row[Int]("productid"),
-          operationsequence = row[Int]("operationsequence"),
-          locationid = row[LocationId]("locationid"),
-          scheduledstartdate = row[LocalDateTime]("scheduledstartdate"),
-          scheduledenddate = row[LocalDateTime]("scheduledenddate"),
-          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
-          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
-          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
-          plannedcost = row[BigDecimal]("plannedcost"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

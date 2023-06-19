@@ -9,6 +9,8 @@ package billofmaterials
 
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -41,6 +43,22 @@ case class BillofmaterialsRow(
 )
 
 object BillofmaterialsRow {
+  val rowParser: RowParser[BillofmaterialsRow] =
+    RowParser[BillofmaterialsRow] { row =>
+      Success(
+        BillofmaterialsRow(
+          billofmaterialsid = row[BillofmaterialsId]("billofmaterialsid"),
+          productassemblyid = row[Option[ProductId]]("productassemblyid"),
+          componentid = row[ProductId]("componentid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
+          bomlevel = row[Int]("bomlevel"),
+          perassemblyqty = row[BigDecimal]("perassemblyqty"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[BillofmaterialsRow] = new OFormat[BillofmaterialsRow]{
     override def writes(o: BillofmaterialsRow): JsObject =
       Json.obj(

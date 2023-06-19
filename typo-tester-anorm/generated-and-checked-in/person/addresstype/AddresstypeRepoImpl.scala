@@ -8,12 +8,9 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +26,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(AddresstypeRow.rowParser.single)
   
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
@@ -53,7 +50,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       SQL"""insert into person.addresstype default values
             returning addresstypeid, "name", rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(AddresstypeRow.rowParser.single)
     } else {
       val q = s"""insert into person.addresstype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -63,14 +60,14 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(AddresstypeRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
-       """.as(rowParser.*)
+       """.as(AddresstypeRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
     fieldValues match {
@@ -91,7 +88,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(AddresstypeRow.rowParser.*)
     }
   
   }
@@ -99,7 +96,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = $addresstypeid
-       """.as(rowParser.singleOpt)
+       """.as(AddresstypeRow.rowParser.singleOpt)
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     implicit val toStatement: ToStatement[Array[AddresstypeId]] =
@@ -109,7 +106,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = ANY($addresstypeids)
-       """.as(rowParser.*)
+       """.as(AddresstypeRow.rowParser.*)
   
   }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
@@ -159,18 +156,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             modifieddate = EXCLUDED.modifieddate
           returning addresstypeid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(AddresstypeRow.rowParser.single)
   
   }
-  val rowParser: RowParser[AddresstypeRow] =
-    RowParser[AddresstypeRow] { row =>
-      Success(
-        AddresstypeRow(
-          addresstypeid = row[AddresstypeId]("addresstypeid"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

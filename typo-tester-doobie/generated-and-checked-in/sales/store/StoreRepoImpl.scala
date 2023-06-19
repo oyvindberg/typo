@@ -8,19 +8,13 @@ package sales
 package store
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -32,7 +26,7 @@ object StoreRepoImpl extends StoreRepo {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
-       """.query.unique
+       """.query[StoreRow].unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
@@ -61,7 +55,7 @@ object StoreRepoImpl extends StoreRepo {
             returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[StoreRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
@@ -138,27 +132,6 @@ object StoreRepoImpl extends StoreRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
-       """.query.unique
+       """.query[StoreRow].unique
   }
-  implicit val read: Read[StoreRow] =
-    new Read[StoreRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => StoreRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
-    )
-  
-
 }

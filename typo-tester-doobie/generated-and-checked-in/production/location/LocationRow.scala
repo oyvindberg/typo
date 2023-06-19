@@ -8,10 +8,14 @@ package production
 package location
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class LocationRow(
@@ -46,4 +50,23 @@ object LocationRow {
         "availability" := row.availability,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[LocationRow] =
+    new Read[LocationRow](
+      gets = List(
+        (Get[LocationId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => LocationRow(
+        locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        costrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+        availability = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

@@ -10,6 +10,8 @@ package s
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -36,6 +38,20 @@ case class SViewRow(
 )
 
 object SViewRow {
+  val rowParser: RowParser[SViewRow] =
+    RowParser[SViewRow] { row =>
+      Success(
+        SViewRow(
+          id = row[Option[Int]]("id"),
+          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
+          name = row[Option[Name]]("name"),
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          demographics = row[Option[TypoXml]]("demographics"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SViewRow] = new OFormat[SViewRow]{
     override def writes(o: SViewRow): JsObject =
       Json.obj(

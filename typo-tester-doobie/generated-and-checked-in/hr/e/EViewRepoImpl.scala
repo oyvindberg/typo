@@ -7,19 +7,10 @@ package adventureworks
 package hr
 package e
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.UUID
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
@@ -49,45 +40,4 @@ object EViewRepoImpl extends EViewRepo {
     sql"select * from hr.e $where".query[EViewRow].stream
   
   }
-  implicit val read: Read[EViewRow] =
-    new Read[EViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        nationalidnumber = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 2),
-        loginid = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 3),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        birthdate = Get[LocalDate].unsafeGetNullable(rs, i + 5),
-        maritalstatus = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 6),
-        gender = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 7),
-        hiredate = Get[LocalDate].unsafeGetNullable(rs, i + 8),
-        salariedflag = Get[Flag].unsafeGetNonNullable(rs, i + 9),
-        vacationhours = Get[Int].unsafeGetNullable(rs, i + 10),
-        sickleavehours = Get[Int].unsafeGetNullable(rs, i + 11),
-        currentflag = Get[Flag].unsafeGetNonNullable(rs, i + 12),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 13),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 14),
-        organizationnode = Get[String].unsafeGetNullable(rs, i + 15)
-      )
-    )
-  
-
 }

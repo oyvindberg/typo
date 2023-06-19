@@ -9,10 +9,14 @@ package specialofferproduct
 
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -47,4 +51,21 @@ object SpecialofferproductRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SpecialofferproductRow] =
+    new Read[SpecialofferproductRow](
+      gets = List(
+        (Get[SpecialofferId], Nullability.NoNulls),
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
+        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      )
+    )
+  
+
 }

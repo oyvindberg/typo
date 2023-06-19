@@ -8,19 +8,12 @@ package person
 package personphone
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
@@ -31,7 +24,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
-       """.query.unique
+       """.query[PersonphoneRow].unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
@@ -55,7 +48,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
             returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
          """
     }
-    q.query.unique
+    q.query[PersonphoneRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
@@ -113,23 +106,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
-       """.query.unique
+       """.query[PersonphoneRow].unique
   }
-  implicit val read: Read[PersonphoneRow] =
-    new Read[PersonphoneRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Phone], Nullability.NoNulls),
-        (Get[PhonenumbertypeId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        phonenumber = Get[Phone].unsafeGetNonNullable(rs, i + 1),
-        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

@@ -8,6 +8,8 @@ package production
 package productcosthistory
 
 import adventureworks.production.product.ProductId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -32,6 +34,18 @@ case class ProductcosthistoryRow(
  }
 
 object ProductcosthistoryRow {
+  val rowParser: RowParser[ProductcosthistoryRow] =
+    RowParser[ProductcosthistoryRow] { row =>
+      Success(
+        ProductcosthistoryRow(
+          productid = row[ProductId]("productid"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          standardcost = row[BigDecimal]("standardcost"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductcosthistoryRow] = new OFormat[ProductcosthistoryRow]{
     override def writes(o: ProductcosthistoryRow): JsObject =
       Json.obj(

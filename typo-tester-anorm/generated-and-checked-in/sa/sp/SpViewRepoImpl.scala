@@ -7,22 +7,16 @@ package adventureworks
 package sa
 package sp
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SpViewRepoImpl extends SpViewRepo {
   override def selectAll(implicit c: Connection): List[SpViewRow] = {
     SQL"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sa.sp
-       """.as(rowParser.*)
+       """.as(SpViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]])(implicit c: Connection): List[SpViewRow] = {
     fieldValues match {
@@ -49,25 +43,8 @@ object SpViewRepoImpl extends SpViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SpViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SpViewRow] =
-    RowParser[SpViewRow] { row =>
-      Success(
-        SpViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          bonus = row[Option[BigDecimal]]("bonus"),
-          commissionpct = row[Option[BigDecimal]]("commissionpct"),
-          salesytd = row[Option[BigDecimal]]("salesytd"),
-          saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

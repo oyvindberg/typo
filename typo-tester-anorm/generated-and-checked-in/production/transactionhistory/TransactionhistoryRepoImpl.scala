@@ -8,12 +8,9 @@ package production
 package transactionhistory
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(TransactionhistoryRow.rowParser.single)
   
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
@@ -60,7 +57,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       SQL"""insert into production.transactionhistory default values
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(TransactionhistoryRow.rowParser.single)
     } else {
       val q = s"""insert into production.transactionhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -70,14 +67,14 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(TransactionhistoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistory
-       """.as(rowParser.*)
+       """.as(TransactionhistoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
     fieldValues match {
@@ -103,7 +100,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(TransactionhistoryRow.rowParser.*)
     }
   
   }
@@ -111,7 +108,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistory
           where transactionid = $transactionid
-       """.as(rowParser.singleOpt)
+       """.as(TransactionhistoryRow.rowParser.singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
     implicit val toStatement: ToStatement[Array[TransactionhistoryId]] =
@@ -121,7 +118,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistory
           where transactionid = ANY($transactionids)
-       """.as(rowParser.*)
+       """.as(TransactionhistoryRow.rowParser.*)
   
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
@@ -191,23 +188,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(TransactionhistoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[TransactionhistoryRow] =
-    RowParser[TransactionhistoryRow] { row =>
-      Success(
-        TransactionhistoryRow(
-          transactionid = row[TransactionhistoryId]("transactionid"),
-          productid = row[ProductId]("productid"),
-          referenceorderid = row[Int]("referenceorderid"),
-          referenceorderlineid = row[Int]("referenceorderlineid"),
-          transactiondate = row[LocalDateTime]("transactiondate"),
-          transactiontype = row[/* bpchar */ String]("transactiontype"),
-          quantity = row[Int]("quantity"),
-          actualcost = row[BigDecimal]("actualcost"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

@@ -8,18 +8,12 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
           values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning specialofferid, productid, rowguid, modifieddate
-       """.query.unique
+       """.query[SpecialofferproductRow].unique
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
@@ -58,7 +52,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             returning specialofferid, productid, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SpecialofferproductRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
@@ -119,23 +113,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning specialofferid, productid, rowguid, modifieddate
-       """.query.unique
+       """.query[SpecialofferproductRow].unique
   }
-  implicit val read: Read[SpecialofferproductRow] =
-    new Read[SpecialofferproductRow](
-      gets = List(
-        (Get[SpecialofferId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
-        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

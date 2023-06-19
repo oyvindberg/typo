@@ -7,18 +7,10 @@ package adventureworks
 package pr
 package pmpdc
 
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def selectAll: Stream[ConnectionIO, PmpdcViewRow] = {
@@ -36,21 +28,4 @@ object PmpdcViewRepoImpl extends PmpdcViewRepo {
     sql"select * from pr.pmpdc $where".query[PmpdcViewRow].stream
   
   }
-  implicit val read: Read[PmpdcViewRow] =
-    new Read[PmpdcViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[ProductdescriptionId], Nullability.Nullable),
-        (Get[CultureId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-        cultureid = Get[CultureId].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
-    )
-  
-
 }

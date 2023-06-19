@@ -7,23 +7,16 @@ package adventureworks
 package pr
 package pm
 
-import adventureworks.TypoXml
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PmViewRepoImpl extends PmViewRepo {
   override def selectAll(implicit c: Connection): List[PmViewRow] = {
     SQL"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
           from pr.pm
-       """.as(rowParser.*)
+       """.as(PmViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PmViewFieldOrIdValue[_]])(implicit c: Connection): List[PmViewRow] = {
     fieldValues match {
@@ -47,22 +40,8 @@ object PmViewRepoImpl extends PmViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PmViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PmViewRow] =
-    RowParser[PmViewRow] { row =>
-      Success(
-        PmViewRow(
-          id = row[Option[Int]]("id"),
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          name = row[Option[Name]]("name"),
-          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

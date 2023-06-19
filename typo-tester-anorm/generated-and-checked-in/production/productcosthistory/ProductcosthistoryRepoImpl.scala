@@ -8,12 +8,9 @@ package production
 package productcosthistory
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -26,7 +23,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.standardcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning productid, startdate, enddate, standardcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductcosthistoryRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow = {
@@ -45,7 +42,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       SQL"""insert into production.productcosthistory default values
             returning productid, startdate, enddate, standardcost, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductcosthistoryRow.rowParser.single)
     } else {
       val q = s"""insert into production.productcosthistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -55,14 +52,14 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductcosthistoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
     SQL"""select productid, startdate, enddate, standardcost, modifieddate
           from production.productcosthistory
-       """.as(rowParser.*)
+       """.as(ProductcosthistoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow] = {
     fieldValues match {
@@ -84,7 +81,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductcosthistoryRow.rowParser.*)
     }
   
   }
@@ -92,7 +89,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     SQL"""select productid, startdate, enddate, standardcost, modifieddate
           from production.productcosthistory
           where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
-       """.as(rowParser.singleOpt)
+       """.as(ProductcosthistoryRow.rowParser.singleOpt)
   }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -142,19 +139,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, startdate, enddate, standardcost, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductcosthistoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductcosthistoryRow] =
-    RowParser[ProductcosthistoryRow] { row =>
-      Success(
-        ProductcosthistoryRow(
-          productid = row[ProductId]("productid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          standardcost = row[BigDecimal]("standardcost"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

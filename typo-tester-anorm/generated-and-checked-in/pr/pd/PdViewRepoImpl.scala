@@ -7,21 +7,16 @@ package adventureworks
 package pr
 package pd
 
-import adventureworks.production.productdescription.ProductdescriptionId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PdViewRepoImpl extends PdViewRepo {
   override def selectAll(implicit c: Connection): List[PdViewRow] = {
     SQL"""select "id", productdescriptionid, description, rowguid, modifieddate
           from pr.pd
-       """.as(rowParser.*)
+       """.as(PdViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PdViewFieldOrIdValue[_]])(implicit c: Connection): List[PdViewRow] = {
     fieldValues match {
@@ -43,20 +38,8 @@ object PdViewRepoImpl extends PdViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PdViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PdViewRow] =
-    RowParser[PdViewRow] { row =>
-      Success(
-        PdViewRow(
-          id = row[Option[Int]]("id"),
-          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
-          description = row[Option[/* max 400 chars */ String]]("description"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

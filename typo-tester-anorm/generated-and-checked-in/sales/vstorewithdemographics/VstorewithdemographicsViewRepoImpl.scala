@@ -7,21 +7,16 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
-import adventureworks.TypoMoney
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 
 object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
     SQL"""select businessentityid, "name", AnnualSales::numeric, AnnualRevenue::numeric, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
           from sales.vstorewithdemographics
-       """.as(rowParser.*)
+       """.as(VstorewithdemographicsViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithdemographicsViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
     fieldValues match {
@@ -50,27 +45,8 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VstorewithdemographicsViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VstorewithdemographicsViewRow] =
-    RowParser[VstorewithdemographicsViewRow] { row =>
-      Success(
-        VstorewithdemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          AnnualSales = row[Option[TypoMoney]]("AnnualSales"),
-          AnnualRevenue = row[Option[TypoMoney]]("AnnualRevenue"),
-          BankName = row[Option[/* max 50 chars */ String]]("BankName"),
-          BusinessType = row[Option[/* max 5 chars */ String]]("BusinessType"),
-          YearOpened = row[Option[Int]]("YearOpened"),
-          Specialty = row[Option[/* max 50 chars */ String]]("Specialty"),
-          SquareFeet = row[Option[Int]]("SquareFeet"),
-          Brands = row[Option[/* max 30 chars */ String]]("Brands"),
-          Internet = row[Option[/* max 30 chars */ String]]("Internet"),
-          NumberEmployees = row[Option[Int]]("NumberEmployees")
-        )
-      )
-    }
 }

@@ -9,6 +9,8 @@ package countryregioncurrency
 
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,16 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
+  val rowParser: RowParser[CountryregioncurrencyRow] =
+    RowParser[CountryregioncurrencyRow] { row =>
+      Success(
+        CountryregioncurrencyRow(
+          countryregioncode = row[CountryregionId]("countryregioncode"),
+          currencycode = row[CurrencyId]("currencycode"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CountryregioncurrencyRow] = new OFormat[CountryregioncurrencyRow]{
     override def writes(o: CountryregioncurrencyRow): JsObject =
       Json.obj(

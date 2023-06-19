@@ -8,10 +8,14 @@ package pr
 package plph
 
 import adventureworks.production.product.ProductId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PlphViewRow(
@@ -50,4 +54,25 @@ object PlphViewRow {
         "listprice" := row.listprice,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PlphViewRow] =
+    new Read[PlphViewRow](
+      gets = List(
+        (Get[Int], Nullability.Nullable),
+        (Get[ProductId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PlphViewRow(
+        id = Get[Int].unsafeGetNullable(rs, i + 0),
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
+        listprice = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
+      )
+    )
+  
+
 }

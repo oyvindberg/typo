@@ -10,6 +10,8 @@ package pmpdc
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,17 @@ case class PmpdcViewRow(
 )
 
 object PmpdcViewRow {
+  val rowParser: RowParser[PmpdcViewRow] =
+    RowParser[PmpdcViewRow] { row =>
+      Success(
+        PmpdcViewRow(
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
+          cultureid = row[Option[CultureId]]("cultureid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PmpdcViewRow] = new OFormat[PmpdcViewRow]{
     override def writes(o: PmpdcViewRow): JsObject =
       Json.obj(

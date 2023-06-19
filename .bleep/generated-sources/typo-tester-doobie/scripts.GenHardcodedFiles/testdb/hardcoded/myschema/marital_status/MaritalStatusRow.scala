@@ -8,10 +8,14 @@ package hardcoded
 package myschema
 package marital_status
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class MaritalStatusRow(
   id: MaritalStatusId
@@ -29,4 +33,15 @@ object MaritalStatusRow {
       Json.obj(
         "id" := row.id
       )}
+  implicit val read: Read[MaritalStatusRow] =
+    new Read[MaritalStatusRow](
+      gets = List(
+        (Get[MaritalStatusId], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => MaritalStatusRow(
+        id = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 0)
+      )
+    )
+  
+
 }

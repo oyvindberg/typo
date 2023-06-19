@@ -8,17 +8,12 @@ package person
 package countryregion
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
@@ -29,7 +24,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, "name", modifieddate
-       """.query.unique
+       """.query[CountryregionRow].unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
@@ -52,7 +47,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
             returning countryregioncode, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[CountryregionRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
@@ -114,21 +109,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, "name", modifieddate
-       """.query.unique
+       """.query[CountryregionRow].unique
   }
-  implicit val read: Read[CountryregionRow] =
-    new Read[CountryregionRow](
-      gets = List(
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CountryregionRow(
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

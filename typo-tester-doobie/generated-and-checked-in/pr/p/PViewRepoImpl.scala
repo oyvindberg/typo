@@ -7,22 +7,10 @@ package adventureworks
 package pr
 package p
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
@@ -62,65 +50,4 @@ object PViewRepoImpl extends PViewRepo {
     sql"""select * from pr."p" $where""".query[PViewRow].stream
   
   }
-  implicit val read: Read[PViewRow] =
-    new Read[PViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[ProductsubcategoryId], Nullability.Nullable),
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        productnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-        makeflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        finishedgoodsflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        color = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 6),
-        safetystocklevel = Get[Int].unsafeGetNullable(rs, i + 7),
-        reorderpoint = Get[Int].unsafeGetNullable(rs, i + 8),
-        standardcost = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
-        listprice = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
-        size = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 11),
-        sizeunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 12),
-        weightunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 13),
-        weight = Get[BigDecimal].unsafeGetNullable(rs, i + 14),
-        daystomanufacture = Get[Int].unsafeGetNullable(rs, i + 15),
-        productline = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 16),
-        `class` = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 17),
-        style = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 18),
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 19),
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 20),
-        sellstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 21),
-        sellenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 22),
-        discontinueddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 23),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 24),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 25)
-      )
-    )
-  
-
 }

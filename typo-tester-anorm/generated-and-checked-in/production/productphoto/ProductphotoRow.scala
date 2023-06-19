@@ -7,6 +7,8 @@ package adventureworks
 package production
 package productphoto
 
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,19 @@ case class ProductphotoRow(
 )
 
 object ProductphotoRow {
+  val rowParser: RowParser[ProductphotoRow] =
+    RowParser[ProductphotoRow] { row =>
+      Success(
+        ProductphotoRow(
+          productphotoid = row[ProductphotoId]("productphotoid"),
+          thumbnailphoto = row[Option[Array[Byte]]]("thumbnailphoto"),
+          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
+          largephoto = row[Option[Array[Byte]]]("largephoto"),
+          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductphotoRow] = new OFormat[ProductphotoRow]{
     override def writes(o: ProductphotoRow): JsObject =
       Json.obj(

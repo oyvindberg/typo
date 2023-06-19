@@ -8,10 +8,14 @@ package sales
 package shoppingcartitem
 
 import adventureworks.production.product.ProductId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ShoppingcartitemRow(
@@ -51,4 +55,25 @@ object ShoppingcartitemRow {
         "datecreated" := row.datecreated,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ShoppingcartitemRow] =
+    new Read[ShoppingcartitemRow](
+      gets = List(
+        (Get[ShoppingcartitemId], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
+        shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
+        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
+        datecreated = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

@@ -7,17 +7,10 @@ package adventureworks
 package pe
 package ct
 
-import adventureworks.person.contacttype.ContacttypeId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object CtViewRepoImpl extends CtViewRepo {
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
@@ -35,21 +28,4 @@ object CtViewRepoImpl extends CtViewRepo {
     sql"select * from pe.ct $where".query[CtViewRow].stream
   
   }
-  implicit val read: Read[CtViewRow] =
-    new Read[CtViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ContacttypeId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        contacttypeid = Get[ContacttypeId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
-    )
-  
-
 }

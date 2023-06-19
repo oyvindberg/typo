@@ -10,11 +10,8 @@ package generated
 package custom
 package view_find_all
 
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.pg_catalog.pg_namespace.PgNamespaceId
 
 object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
   override def apply()(implicit c: Connection): List[ViewFindAllSqlRow] = {
@@ -33,19 +30,7 @@ object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
               AND c.relkind in ('m'::"char", 'v'::char)
             order by 1, 2, 3
          """
-    sql.as(rowParser.*)
+    sql.as(ViewFindAllSqlRow.rowParser.*)
   
   }
-  val rowParser: RowParser[ViewFindAllSqlRow] =
-    RowParser[ViewFindAllSqlRow] { row =>
-      Success(
-        ViewFindAllSqlRow(
-          tableOid = row[PgNamespaceId]("table_oid"),
-          tableSchema = row[/* nullability unknown */ Option[String]]("table_schema"),
-          tableName = row[/* nullability unknown */ Option[String]]("table_name"),
-          relkind = row[String]("relkind"),
-          viewDefinition = row[/* nullability unknown */ Option[String]]("view_definition")
-        )
-      )
-    }
 }

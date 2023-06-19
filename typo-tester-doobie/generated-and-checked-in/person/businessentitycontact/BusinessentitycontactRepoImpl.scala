@@ -8,18 +8,12 @@ package person
 package businessentitycontact
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.contacttype.ContacttypeId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +25,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     sql"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.personid}::int4, ${unsaved.contacttypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, personid, contacttypeid, rowguid, modifieddate
-       """.query.unique
+       """.query[BusinessentitycontactRow].unique
   }
   override def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow] = {
     val fs = List(
@@ -59,7 +53,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             returning businessentityid, personid, contacttypeid, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[BusinessentitycontactRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
@@ -122,25 +116,6 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, personid, contacttypeid, rowguid, modifieddate
-       """.query.unique
+       """.query[BusinessentitycontactRow].unique
   }
-  implicit val read: Read[BusinessentitycontactRow] =
-    new Read[BusinessentitycontactRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[ContacttypeId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BusinessentitycontactRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        personid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-        contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

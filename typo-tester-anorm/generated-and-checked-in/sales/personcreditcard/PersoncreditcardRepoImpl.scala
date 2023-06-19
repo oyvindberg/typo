@@ -8,13 +8,9 @@ package sales
 package personcreditcard
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -27,7 +23,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, creditcardid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersoncreditcardRow.rowParser.single)
   
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
@@ -44,7 +40,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       SQL"""insert into sales.personcreditcard default values
             returning businessentityid, creditcardid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PersoncreditcardRow.rowParser.single)
     } else {
       val q = s"""insert into sales.personcreditcard(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -54,14 +50,14 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PersoncreditcardRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate
           from sales.personcreditcard
-       """.as(rowParser.*)
+       """.as(PersoncreditcardRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]])(implicit c: Connection): List[PersoncreditcardRow] = {
     fieldValues match {
@@ -81,7 +77,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PersoncreditcardRow.rowParser.*)
     }
   
   }
@@ -89,7 +85,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     SQL"""select businessentityid, creditcardid, modifieddate
           from sales.personcreditcard
           where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
-       """.as(rowParser.singleOpt)
+       """.as(PersoncreditcardRow.rowParser.singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -131,17 +127,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, creditcardid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersoncreditcardRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PersoncreditcardRow] =
-    RowParser[PersoncreditcardRow] { row =>
-      Success(
-        PersoncreditcardRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          creditcardid = row[CreditcardId]("creditcardid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

@@ -10,6 +10,8 @@ package bom
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -41,6 +43,23 @@ case class BomViewRow(
 )
 
 object BomViewRow {
+  val rowParser: RowParser[BomViewRow] =
+    RowParser[BomViewRow] { row =>
+      Success(
+        BomViewRow(
+          id = row[Option[Int]]("id"),
+          billofmaterialsid = row[Option[BillofmaterialsId]]("billofmaterialsid"),
+          productassemblyid = row[Option[ProductId]]("productassemblyid"),
+          componentid = row[Option[ProductId]]("componentid"),
+          startdate = row[Option[LocalDateTime]]("startdate"),
+          enddate = row[Option[LocalDateTime]]("enddate"),
+          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
+          bomlevel = row[Option[Int]]("bomlevel"),
+          perassemblyqty = row[Option[BigDecimal]]("perassemblyqty"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[BomViewRow] = new OFormat[BomViewRow]{
     override def writes(o: BomViewRow): JsObject =
       Json.obj(

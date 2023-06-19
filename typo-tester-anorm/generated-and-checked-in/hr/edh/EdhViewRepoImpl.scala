@@ -7,23 +7,16 @@ package adventureworks
 package hr
 package edh
 
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 object EdhViewRepoImpl extends EdhViewRepo {
   override def selectAll(implicit c: Connection): List[EdhViewRow] = {
     SQL"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from hr.edh
-       """.as(rowParser.*)
+       """.as(EdhViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EdhViewFieldOrIdValue[_]])(implicit c: Connection): List[EdhViewRow] = {
     fieldValues match {
@@ -47,22 +40,8 @@ object EdhViewRepoImpl extends EdhViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EdhViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[EdhViewRow] =
-    RowParser[EdhViewRow] { row =>
-      Success(
-        EdhViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          departmentid = row[Option[DepartmentId]]("departmentid"),
-          shiftid = row[Option[ShiftId]]("shiftid"),
-          startdate = row[Option[LocalDate]]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

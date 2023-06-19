@@ -9,10 +9,14 @@ package pmi
 
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PmiViewRow(
@@ -40,4 +44,19 @@ object PmiViewRow {
         "illustrationid" := row.illustrationid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PmiViewRow] =
+    new Read[PmiViewRow](
+      gets = List(
+        (Get[ProductmodelId], Nullability.Nullable),
+        (Get[IllustrationId], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
+        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+        illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
+      )
+    )
+  
+
 }

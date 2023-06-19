@@ -7,19 +7,10 @@ package adventureworks
 package sa
 package st
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object StViewRepoImpl extends StViewRepo {
   override def selectAll: Stream[ConnectionIO, StViewRow] = {
@@ -44,35 +35,4 @@ object StViewRepoImpl extends StViewRepo {
     sql"select * from sa.st $where".query[StViewRow].stream
   
   }
-  implicit val read: Read[StViewRow] =
-    new Read[StViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[CountryregionId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
-        group = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        costytd = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        costlastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
-    )
-  
-
 }

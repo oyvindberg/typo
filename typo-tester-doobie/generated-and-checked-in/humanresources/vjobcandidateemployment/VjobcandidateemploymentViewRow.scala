@@ -8,10 +8,14 @@ package humanresources
 package vjobcandidateemployment
 
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDate
 
 case class VjobcandidateemploymentViewRow(
@@ -61,4 +65,35 @@ object VjobcandidateemploymentViewRow {
         "Emp.Loc.State" := row.`Emp.Loc.State`,
         "Emp.Loc.City" := row.`Emp.Loc.City`
       )}
+  implicit val read: Read[VjobcandidateemploymentViewRow] =
+    new Read[VjobcandidateemploymentViewRow](
+      gets = List(
+        (Get[JobcandidateId], Nullability.Nullable),
+        (Get[LocalDate], Nullability.Nullable),
+        (Get[LocalDate], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[/* max 100 chars */ String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[String], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateemploymentViewRow(
+        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
+        `Emp.StartDate` = Get[LocalDate].unsafeGetNullable(rs, i + 1),
+        `Emp.EndDate` = Get[LocalDate].unsafeGetNullable(rs, i + 2),
+        `Emp.OrgName` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 3),
+        `Emp.JobTitle` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
+        `Emp.Responsibility` = Get[String].unsafeGetNullable(rs, i + 5),
+        `Emp.FunctionCategory` = Get[String].unsafeGetNullable(rs, i + 6),
+        `Emp.IndustryCategory` = Get[String].unsafeGetNullable(rs, i + 7),
+        `Emp.Loc.CountryRegion` = Get[String].unsafeGetNullable(rs, i + 8),
+        `Emp.Loc.State` = Get[String].unsafeGetNullable(rs, i + 9),
+        `Emp.Loc.City` = Get[String].unsafeGetNullable(rs, i + 10)
+      )
+    )
+  
+
 }

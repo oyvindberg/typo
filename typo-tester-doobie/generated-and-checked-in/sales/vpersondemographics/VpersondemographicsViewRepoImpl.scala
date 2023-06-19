@@ -7,17 +7,10 @@ package adventureworks
 package sales
 package vpersondemographics
 
-import adventureworks.TypoMoney
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDate
 
 object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VpersondemographicsViewRow] = {
@@ -44,39 +37,4 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
     sql"select * from sales.vpersondemographics $where".query[VpersondemographicsViewRow].stream
   
   }
-  implicit val read: Read[VpersondemographicsViewRow] =
-    new Read[VpersondemographicsViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[/* max 1 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 1 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VpersondemographicsViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        totalpurchaseytd = Get[TypoMoney].unsafeGetNullable(rs, i + 1),
-        datefirstpurchase = Get[LocalDate].unsafeGetNullable(rs, i + 2),
-        birthdate = Get[LocalDate].unsafeGetNullable(rs, i + 3),
-        maritalstatus = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 4),
-        yearlyincome = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 5),
-        gender = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 6),
-        totalchildren = Get[Int].unsafeGetNullable(rs, i + 7),
-        numberchildrenathome = Get[Int].unsafeGetNullable(rs, i + 8),
-        education = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
-        occupation = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
-        homeownerflag = Get[Boolean].unsafeGetNullable(rs, i + 11),
-        numbercarsowned = Get[Int].unsafeGetNullable(rs, i + 12)
-      )
-    )
-  
-
 }

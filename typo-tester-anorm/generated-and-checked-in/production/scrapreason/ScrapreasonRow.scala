@@ -8,6 +8,8 @@ package production
 package scrapreason
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,6 +27,16 @@ case class ScrapreasonRow(
 )
 
 object ScrapreasonRow {
+  val rowParser: RowParser[ScrapreasonRow] =
+    RowParser[ScrapreasonRow] { row =>
+      Success(
+        ScrapreasonRow(
+          scrapreasonid = row[ScrapreasonId]("scrapreasonid"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ScrapreasonRow] = new OFormat[ScrapreasonRow]{
     override def writes(o: ScrapreasonRow): JsObject =
       Json.obj(

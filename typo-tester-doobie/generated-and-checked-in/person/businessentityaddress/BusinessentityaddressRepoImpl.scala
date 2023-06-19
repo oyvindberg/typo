@@ -8,19 +8,12 @@ package person
 package businessentityaddress
 
 import adventureworks.Defaulted
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -32,7 +25,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.addressid}::int4, ${unsaved.addresstypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
-       """.query.unique
+       """.query[BusinessentityaddressRow].unique
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
     val fs = List(
@@ -60,7 +53,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[BusinessentityaddressRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityaddressRow] = {
@@ -123,25 +116,6 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
-       """.query.unique
+       """.query[BusinessentityaddressRow].unique
   }
-  implicit val read: Read[BusinessentityaddressRow] =
-    new Read[BusinessentityaddressRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[AddressId], Nullability.NoNulls),
-        (Get[AddresstypeId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BusinessentityaddressRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 1),
-        addresstypeid = Get[AddresstypeId].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

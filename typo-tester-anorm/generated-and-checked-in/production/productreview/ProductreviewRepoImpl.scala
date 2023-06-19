@@ -8,13 +8,9 @@ package production
 package productreview
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +25,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductreviewRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
@@ -57,7 +53,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       SQL"""insert into production.productreview default values
             returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductreviewRow.rowParser.single)
     } else {
       val q = s"""insert into production.productreview(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -67,14 +63,14 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductreviewRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
-       """.as(rowParser.*)
+       """.as(ProductreviewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow] = {
     fieldValues match {
@@ -99,7 +95,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductreviewRow.rowParser.*)
     }
   
   }
@@ -107,7 +103,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
           where productreviewid = $productreviewid
-       """.as(rowParser.singleOpt)
+       """.as(ProductreviewRow.rowParser.singleOpt)
   }
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
     implicit val toStatement: ToStatement[Array[ProductreviewId]] =
@@ -117,7 +113,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
           where productreviewid = ANY($productreviewids)
-       """.as(rowParser.*)
+       """.as(ProductreviewRow.rowParser.*)
   
   }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
@@ -183,22 +179,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductreviewRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductreviewRow] =
-    RowParser[ProductreviewRow] { row =>
-      Success(
-        ProductreviewRow(
-          productreviewid = row[ProductreviewId]("productreviewid"),
-          productid = row[ProductId]("productid"),
-          reviewername = row[Name]("reviewername"),
-          reviewdate = row[LocalDateTime]("reviewdate"),
-          emailaddress = row[/* max 50 chars */ String]("emailaddress"),
-          rating = row[Int]("rating"),
-          comments = row[Option[/* max 3850 chars */ String]]("comments"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

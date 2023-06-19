@@ -10,6 +10,8 @@ package generated
 package custom
 package domains
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -44,6 +46,21 @@ case class DomainsSqlRow(
 )
 
 object DomainsSqlRow {
+  val rowParser: RowParser[DomainsSqlRow] =
+    RowParser[DomainsSqlRow] { row =>
+      Success(
+        DomainsSqlRow(
+          schema = row[String]("schema"),
+          name = row[String]("name"),
+          `type` = row[String]("type"),
+          collation = row[Option[String]]("collation"),
+          isNotNull = row[Boolean]("isNotNull"),
+          default = row[Option[String]]("default"),
+          constraintName = row[Option[String]]("constraintName"),
+          constraintDefinition = row[/* nullability unknown */ Option[String]]("constraintDefinition")
+        )
+      )
+    }
   implicit val oFormat: OFormat[DomainsSqlRow] = new OFormat[DomainsSqlRow]{
     override def writes(o: DomainsSqlRow): JsObject =
       Json.obj(

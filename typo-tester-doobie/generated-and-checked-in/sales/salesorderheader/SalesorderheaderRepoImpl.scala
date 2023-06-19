@@ -8,26 +8,13 @@ package sales
 package salesorderheader
 
 import adventureworks.Defaulted
-import adventureworks.person.address.AddressId
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
-import adventureworks.public.OrderNumber
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,7 +26,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     sql"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.orderdate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.status}::int2, ${unsaved.onlineorderflag}::"public"."Flag", ${unsaved.purchaseordernumber}::"public".OrderNumber, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.customerid}::int4, ${unsaved.salespersonid}::int4, ${unsaved.territoryid}::int4, ${unsaved.billtoaddressid}::int4, ${unsaved.shiptoaddressid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.creditcardapprovalcode}, ${unsaved.currencyrateid}::int4, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.totaldue}::numeric, ${unsaved.comment}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
-       """.query.unique
+       """.query[SalesorderheaderRow].unique
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow] = {
     val fs = List(
@@ -111,7 +98,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesorderheaderRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
@@ -283,65 +270,6 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
-       """.query.unique
+       """.query[SalesorderheaderRow].unique
   }
-  implicit val read: Read[SalesorderheaderRow] =
-    new Read[SalesorderheaderRow](
-      gets = List(
-        (Get[SalesorderheaderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[OrderNumber], Nullability.Nullable),
-        (Get[AccountNumber], Nullability.Nullable),
-        (Get[CustomerId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[AddressId], Nullability.NoNulls),
-        (Get[AddressId], Nullability.NoNulls),
-        (Get[ShipmethodId], Nullability.NoNulls),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[CurrencyrateId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[/* max 128 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesorderheaderRow(
-        salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        revisionnumber = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        orderdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
-        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
-        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        status = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        onlineorderflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
-        purchaseordernumber = Get[OrderNumber].unsafeGetNullable(rs, i + 7),
-        accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 8),
-        customerid = Get[CustomerId].unsafeGetNonNullable(rs, i + 9),
-        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 10),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 11),
-        billtoaddressid = Get[AddressId].unsafeGetNonNullable(rs, i + 12),
-        shiptoaddressid = Get[AddressId].unsafeGetNonNullable(rs, i + 13),
-        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 14),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 15),
-        creditcardapprovalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 16),
-        currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 17),
-        subtotal = Get[BigDecimal].unsafeGetNonNullable(rs, i + 18),
-        taxamt = Get[BigDecimal].unsafeGetNonNullable(rs, i + 19),
-        freight = Get[BigDecimal].unsafeGetNonNullable(rs, i + 20),
-        totaldue = Get[BigDecimal].unsafeGetNullable(rs, i + 21),
-        comment = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 22),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 23),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 24)
-      )
-    )
-  
-
 }

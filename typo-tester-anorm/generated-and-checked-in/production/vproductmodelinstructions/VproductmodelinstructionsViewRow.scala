@@ -10,6 +10,8 @@ package vproductmodelinstructions
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -39,6 +41,24 @@ case class VproductmodelinstructionsViewRow(
 )
 
 object VproductmodelinstructionsViewRow {
+  val rowParser: RowParser[VproductmodelinstructionsViewRow] =
+    RowParser[VproductmodelinstructionsViewRow] { row =>
+      Success(
+        VproductmodelinstructionsViewRow(
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          name = row[Option[Name]]("name"),
+          instructions = row[Option[TypoXml]]("instructions"),
+          LocationID = row[Option[Int]]("LocationID"),
+          SetupHours = row[Option[BigDecimal]]("SetupHours"),
+          MachineHours = row[Option[BigDecimal]]("MachineHours"),
+          LaborHours = row[Option[BigDecimal]]("LaborHours"),
+          LotSize = row[Option[Int]]("LotSize"),
+          Step = row[Option[/* max 1024 chars */ String]]("Step"),
+          rowguid = row[Option[UUID]]("rowguid"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[VproductmodelinstructionsViewRow] = new OFormat[VproductmodelinstructionsViewRow]{
     override def writes(o: VproductmodelinstructionsViewRow): JsObject =
       Json.obj(

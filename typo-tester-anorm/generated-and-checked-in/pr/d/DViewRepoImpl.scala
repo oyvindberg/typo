@@ -7,23 +7,16 @@ package adventureworks
 package pr
 package d
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.document.DocumentId
-import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll(implicit c: Connection): List[DViewRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from pr.d
-       """.as(rowParser.*)
+       """.as(DViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[DViewFieldOrIdValue[_]])(implicit c: Connection): List[DViewRow] = {
     fieldValues match {
@@ -53,28 +46,8 @@ object DViewRepoImpl extends DViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(DViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[DViewRow] =
-    RowParser[DViewRow] { row =>
-      Success(
-        DViewRow(
-          title = row[Option[/* max 50 chars */ String]]("title"),
-          owner = row[Option[BusinessentityId]]("owner"),
-          folderflag = row[Flag]("folderflag"),
-          filename = row[Option[/* max 400 chars */ String]]("filename"),
-          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
-          revision = row[Option[/* bpchar */ String]]("revision"),
-          changenumber = row[Option[Int]]("changenumber"),
-          status = row[Option[Int]]("status"),
-          documentsummary = row[Option[String]]("documentsummary"),
-          document = row[Option[Byte]]("document"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
-          documentnode = row[Option[DocumentId]]("documentnode")
-        )
-      )
-    }
 }

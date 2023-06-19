@@ -8,16 +8,12 @@ package hardcoded
 package compositepk
 package person
 
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import testdb.hardcoded.Defaulted
 
 object PersonRepoImpl extends PersonRepo {
@@ -28,7 +24,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""insert into compositepk.person("one", two, "name")
           values (${unsaved.one}::int8, ${unsaved.two}, ${unsaved.name})
           returning "one", two, "name"
-       """.query.unique
+       """.query[PersonRow].unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -54,7 +50,7 @@ object PersonRepoImpl extends PersonRepo {
             returning "one", two, "name"
          """
     }
-    q.query.unique
+    q.query[PersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
@@ -110,21 +106,6 @@ object PersonRepoImpl extends PersonRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "one", two, "name"
-       """.query.unique
+       """.query[PersonRow].unique
   }
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[Long], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        one = Get[Long].unsafeGetNonNullable(rs, i + 0),
-        two = Get[String].unsafeGetNullable(rs, i + 1),
-        name = Get[String].unsafeGetNullable(rs, i + 2)
-      )
-    )
-  
-
 }

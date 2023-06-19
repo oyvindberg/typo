@@ -8,13 +8,9 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -28,7 +24,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesterritoryhistoryRow.rowParser.single)
   
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): SalesterritoryhistoryRow = {
@@ -51,7 +47,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       SQL"""insert into sales.salesterritoryhistory default values
             returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesterritoryhistoryRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salesterritoryhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -61,14 +57,14 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesterritoryhistoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
           from sales.salesterritoryhistory
-       """.as(rowParser.*)
+       """.as(SalesterritoryhistoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     fieldValues match {
@@ -91,7 +87,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalesterritoryhistoryRow.rowParser.*)
     }
   
   }
@@ -99,7 +95,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
           from sales.salesterritoryhistory
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
-       """.as(rowParser.singleOpt)
+       """.as(SalesterritoryhistoryRow.rowParser.singleOpt)
   }
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -150,20 +146,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesterritoryhistoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalesterritoryhistoryRow] =
-    RowParser[SalesterritoryhistoryRow] { row =>
-      Success(
-        SalesterritoryhistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          territoryid = row[SalesterritoryId]("territoryid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

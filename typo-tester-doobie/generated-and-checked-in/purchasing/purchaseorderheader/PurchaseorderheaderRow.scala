@@ -9,10 +9,14 @@ package purchaseorderheader
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PurchaseorderheaderRow(
@@ -78,4 +82,37 @@ object PurchaseorderheaderRow {
         "freight" := row.freight,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PurchaseorderheaderRow] =
+    new Read[PurchaseorderheaderRow](
+      gets = List(
+        (Get[PurchaseorderheaderId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[ShipmethodId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
+        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
+        revisionnumber = Get[Int].unsafeGetNonNullable(rs, i + 1),
+        status = Get[Int].unsafeGetNonNullable(rs, i + 2),
+        employeeid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 3),
+        vendorid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 4),
+        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 5),
+        orderdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
+        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
+        subtotal = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
+        taxamt = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
+        freight = Get[BigDecimal].unsafeGetNonNullable(rs, i + 10),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 11)
+      )
+    )
+  
+
 }

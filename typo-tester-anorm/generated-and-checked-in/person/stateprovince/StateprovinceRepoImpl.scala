@@ -8,15 +8,10 @@ package person
 package stateprovince
 
 import adventureworks.Defaulted
-import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -32,7 +27,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::"public"."Flag", ${unsaved.name}::"public"."Name", ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(StateprovinceRow.rowParser.single)
   
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
@@ -63,7 +58,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       SQL"""insert into person.stateprovince default values
             returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(StateprovinceRow.rowParser.single)
     } else {
       val q = s"""insert into person.stateprovince(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -73,14 +68,14 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(StateprovinceRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
-       """.as(rowParser.*)
+       """.as(StateprovinceRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
     fieldValues match {
@@ -105,7 +100,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(StateprovinceRow.rowParser.*)
     }
   
   }
@@ -113,7 +108,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
           where stateprovinceid = $stateprovinceid
-       """.as(rowParser.singleOpt)
+       """.as(StateprovinceRow.rowParser.singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     implicit val toStatement: ToStatement[Array[StateprovinceId]] =
@@ -123,7 +118,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
           where stateprovinceid = ANY($stateprovinceids)
-       """.as(rowParser.*)
+       """.as(StateprovinceRow.rowParser.*)
   
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
@@ -189,22 +184,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             modifieddate = EXCLUDED.modifieddate
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(StateprovinceRow.rowParser.single)
   
   }
-  val rowParser: RowParser[StateprovinceRow] =
-    RowParser[StateprovinceRow] { row =>
-      Success(
-        StateprovinceRow(
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          stateprovincecode = row[/* bpchar */ String]("stateprovincecode"),
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
-          name = row[Name]("name"),
-          territoryid = row[SalesterritoryId]("territoryid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

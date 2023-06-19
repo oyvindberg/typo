@@ -8,13 +8,9 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
-import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -30,7 +26,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductsubcategoryRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
@@ -55,7 +51,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       SQL"""insert into production.productsubcategory default values
             returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductsubcategoryRow.rowParser.single)
     } else {
       val q = s"""insert into production.productsubcategory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -65,14 +61,14 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductsubcategoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from production.productsubcategory
-       """.as(rowParser.*)
+       """.as(ProductsubcategoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductsubcategoryRow] = {
     fieldValues match {
@@ -94,7 +90,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductsubcategoryRow.rowParser.*)
     }
   
   }
@@ -102,7 +98,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from production.productsubcategory
           where productsubcategoryid = $productsubcategoryid
-       """.as(rowParser.singleOpt)
+       """.as(ProductsubcategoryRow.rowParser.singleOpt)
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
     implicit val toStatement: ToStatement[Array[ProductsubcategoryId]] =
@@ -112,7 +108,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from production.productsubcategory
           where productsubcategoryid = ANY($productsubcategoryids)
-       """.as(rowParser.*)
+       """.as(ProductsubcategoryRow.rowParser.*)
   
   }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
@@ -166,19 +162,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductsubcategoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductsubcategoryRow] =
-    RowParser[ProductsubcategoryRow] { row =>
-      Success(
-        ProductsubcategoryRow(
-          productsubcategoryid = row[ProductsubcategoryId]("productsubcategoryid"),
-          productcategoryid = row[ProductcategoryId]("productcategoryid"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

@@ -8,14 +8,9 @@ package production
 package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -28,7 +23,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           values (${unsaved.productmodelid}::int4, ${unsaved.productdescriptionid}::int4, ${unsaved.cultureid}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, productdescriptionid, cultureid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser.single)
   
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
@@ -46,7 +41,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
       SQL"""insert into production.productmodelproductdescriptionculture default values
             returning productmodelid, productdescriptionid, cultureid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser.single)
     } else {
       val q = s"""insert into production.productmodelproductdescriptionculture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +51,14 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
           from production.productmodelproductdescriptionculture
-       """.as(rowParser.*)
+       """.as(ProductmodelproductdescriptioncultureRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelproductdescriptioncultureFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     fieldValues match {
@@ -84,7 +79,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ProductmodelproductdescriptioncultureRow.rowParser.*)
     }
   
   }
@@ -92,7 +87,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
           from production.productmodelproductdescriptionculture
           where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
-       """.as(rowParser.singleOpt)
+       """.as(ProductmodelproductdescriptioncultureRow.rowParser.singleOpt)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -135,18 +130,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, productdescriptionid, cultureid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ProductmodelproductdescriptioncultureRow] =
-    RowParser[ProductmodelproductdescriptioncultureRow] { row =>
-      Success(
-        ProductmodelproductdescriptioncultureRow(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
-          cultureid = row[CultureId]("cultureid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

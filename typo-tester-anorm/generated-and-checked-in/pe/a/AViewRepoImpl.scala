@@ -7,22 +7,16 @@ package adventureworks
 package pe
 package a
 
-import adventureworks.person.address.AddressId
-import adventureworks.person.stateprovince.StateprovinceId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object AViewRepoImpl extends AViewRepo {
   override def selectAll(implicit c: Connection): List[AViewRow] = {
     SQL"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from pe."a"
-       """.as(rowParser.*)
+       """.as(AViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AViewFieldOrIdValue[_]])(implicit c: Connection): List[AViewRow] = {
     fieldValues match {
@@ -49,25 +43,8 @@ object AViewRepoImpl extends AViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(AViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[AViewRow] =
-    RowParser[AViewRow] { row =>
-      Success(
-        AViewRow(
-          id = row[Option[Int]]("id"),
-          addressid = row[Option[AddressId]]("addressid"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          spatiallocation = row[Option[Byte]]("spatiallocation"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

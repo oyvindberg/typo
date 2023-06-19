@@ -7,22 +7,16 @@ package adventureworks
 package pu
 package poh
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PohViewRepoImpl extends PohViewRepo {
   override def selectAll(implicit c: Connection): List[PohViewRow] = {
     SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from pu.poh
-       """.as(rowParser.*)
+       """.as(PohViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PohViewFieldOrIdValue[_]])(implicit c: Connection): List[PohViewRow] = {
     fieldValues match {
@@ -52,28 +46,8 @@ object PohViewRepoImpl extends PohViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PohViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PohViewRow] =
-    RowParser[PohViewRow] { row =>
-      Success(
-        PohViewRow(
-          id = row[Option[Int]]("id"),
-          purchaseorderid = row[Option[PurchaseorderheaderId]]("purchaseorderid"),
-          revisionnumber = row[Option[Int]]("revisionnumber"),
-          status = row[Option[Int]]("status"),
-          employeeid = row[Option[BusinessentityId]]("employeeid"),
-          vendorid = row[Option[BusinessentityId]]("vendorid"),
-          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
-          orderdate = row[Option[LocalDateTime]]("orderdate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          subtotal = row[Option[BigDecimal]]("subtotal"),
-          taxamt = row[Option[BigDecimal]]("taxamt"),
-          freight = row[Option[BigDecimal]]("freight"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

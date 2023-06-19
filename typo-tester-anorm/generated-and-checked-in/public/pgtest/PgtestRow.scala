@@ -21,6 +21,8 @@ import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -60,6 +62,41 @@ case class PgtestRow(
 )
 
 object PgtestRow {
+  val rowParser: RowParser[PgtestRow] =
+    RowParser[PgtestRow] { row =>
+      Success(
+        PgtestRow(
+          box = row[TypoBox]("box"),
+          circle = row[TypoCircle]("circle"),
+          line = row[TypoLine]("line"),
+          lseg = row[TypoLineSegment]("lseg"),
+          path = row[TypoPath]("path"),
+          point = row[TypoPoint]("point"),
+          polygon = row[TypoPolygon]("polygon"),
+          interval = row[TypoInterval]("interval"),
+          money = row[TypoMoney]("money"),
+          xml = row[TypoXml]("xml"),
+          json = row[TypoJson]("json"),
+          jsonb = row[TypoJsonb]("jsonb"),
+          hstore = row[TypoHStore]("hstore"),
+          inet = row[TypoInet]("inet"),
+          boxes = row[Array[TypoBox]]("boxes"),
+          circlees = row[Array[TypoCircle]]("circlees"),
+          linees = row[Array[TypoLine]]("linees"),
+          lseges = row[Array[TypoLineSegment]]("lseges"),
+          pathes = row[Array[TypoPath]]("pathes"),
+          pointes = row[Array[TypoPoint]]("pointes"),
+          polygones = row[Array[TypoPolygon]]("polygones"),
+          intervales = row[Array[TypoInterval]]("intervales"),
+          moneyes = row[Array[TypoMoney]]("moneyes"),
+          xmles = row[Array[TypoXml]]("xmles"),
+          jsones = row[Array[TypoJson]]("jsones"),
+          jsonbes = row[Array[TypoJsonb]]("jsonbes"),
+          hstores = row[Array[TypoHStore]]("hstores"),
+          inets = row[Array[TypoInet]]("inets")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PgtestRow] = new OFormat[PgtestRow]{
     override def writes(o: PgtestRow): JsObject =
       Json.obj(

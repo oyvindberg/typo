@@ -7,18 +7,10 @@ package adventureworks
 package pu
 package poh
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PohViewRepoImpl extends PohViewRepo {
   override def selectAll: Stream[ConnectionIO, PohViewRow] = {
@@ -45,39 +37,4 @@ object PohViewRepoImpl extends PohViewRepo {
     sql"select * from pu.poh $where".query[PohViewRow].stream
   
   }
-  implicit val read: Read[PohViewRow] =
-    new Read[PohViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[PurchaseorderheaderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[ShipmethodId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PohViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNullable(rs, i + 1),
-        revisionnumber = Get[Int].unsafeGetNullable(rs, i + 2),
-        status = Get[Int].unsafeGetNullable(rs, i + 3),
-        employeeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 4),
-        vendorid = Get[BusinessentityId].unsafeGetNullable(rs, i + 5),
-        shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 6),
-        orderdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
-        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8),
-        subtotal = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
-        taxamt = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
-        freight = Get[BigDecimal].unsafeGetNullable(rs, i + 11),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 12)
-      )
-    )
-  
-
 }

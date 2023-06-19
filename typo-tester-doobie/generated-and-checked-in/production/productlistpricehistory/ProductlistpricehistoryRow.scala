@@ -8,10 +8,14 @@ package production
 package productlistpricehistory
 
 import adventureworks.production.product.ProductId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ProductlistpricehistoryRow(
@@ -49,4 +53,23 @@ object ProductlistpricehistoryRow {
         "listprice" := row.listprice,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductlistpricehistoryRow] =
+    new Read[ProductlistpricehistoryRow](
+      gets = List(
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductlistpricehistoryRow(
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
+        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
+        listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

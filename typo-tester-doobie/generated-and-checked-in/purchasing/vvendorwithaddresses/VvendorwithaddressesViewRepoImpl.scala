@@ -7,16 +7,10 @@ package adventureworks
 package purchasing
 package vvendorwithaddresses
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 
 object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
   override def selectAll: Stream[ConnectionIO, VvendorwithaddressesViewRow] = {
@@ -39,31 +33,4 @@ object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
     sql"select * from purchasing.vvendorwithaddresses $where".query[VvendorwithaddressesViewRow].stream
   
   }
-  implicit val read: Read[VvendorwithaddressesViewRow] =
-    new Read[VvendorwithaddressesViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VvendorwithaddressesViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        addresstype = Get[Name].unsafeGetNullable(rs, i + 2),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 3),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 4),
-        city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 5),
-        stateprovincename = Get[Name].unsafeGetNullable(rs, i + 6),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 7),
-        countryregionname = Get[Name].unsafeGetNullable(rs, i + 8)
-      )
-    )
-  
-
 }

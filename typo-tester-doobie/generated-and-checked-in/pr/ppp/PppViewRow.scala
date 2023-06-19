@@ -10,10 +10,14 @@ package ppp
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PppViewRow(
@@ -45,4 +49,21 @@ object PppViewRow {
         "primary" := row.primary,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PppViewRow] =
+    new Read[PppViewRow](
+      gets = List(
+        (Get[ProductId], Nullability.Nullable),
+        (Get[ProductphotoId], Nullability.Nullable),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PppViewRow(
+        productid = Get[ProductId].unsafeGetNullable(rs, i + 0),
+        productphotoid = Get[ProductphotoId].unsafeGetNullable(rs, i + 1),
+        primary = Get[Flag].unsafeGetNonNullable(rs, i + 2),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
+      )
+    )
+  
+
 }

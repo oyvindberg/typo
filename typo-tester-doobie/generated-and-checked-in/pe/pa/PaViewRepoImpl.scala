@@ -7,17 +7,10 @@ package adventureworks
 package pe
 package pa
 
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PaViewRepoImpl extends PaViewRepo {
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
@@ -37,25 +30,4 @@ object PaViewRepoImpl extends PaViewRepo {
     sql"select * from pe.pa $where".query[PaViewRow].stream
   
   }
-  implicit val read: Read[PaViewRow] =
-    new Read[PaViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 128 chars */ String], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        passwordhash = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 2),
-        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
-    )
-  
-
 }

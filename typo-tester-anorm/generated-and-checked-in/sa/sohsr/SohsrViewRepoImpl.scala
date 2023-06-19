@@ -7,21 +7,16 @@ package adventureworks
 package sa
 package sohsr
 
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesreason.SalesreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object SohsrViewRepoImpl extends SohsrViewRepo {
   override def selectAll(implicit c: Connection): List[SohsrViewRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate
           from sa.sohsr
-       """.as(rowParser.*)
+       """.as(SohsrViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SohsrViewFieldOrIdValue[_]])(implicit c: Connection): List[SohsrViewRow] = {
     fieldValues match {
@@ -41,18 +36,8 @@ object SohsrViewRepoImpl extends SohsrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SohsrViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SohsrViewRow] =
-    RowParser[SohsrViewRow] { row =>
-      Success(
-        SohsrViewRow(
-          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
-          salesreasonid = row[Option[SalesreasonId]]("salesreasonid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

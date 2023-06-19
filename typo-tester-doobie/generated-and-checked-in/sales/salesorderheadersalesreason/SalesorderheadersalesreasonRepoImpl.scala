@@ -8,18 +8,12 @@ package sales
 package salesorderheadersalesreason
 
 import adventureworks.Defaulted
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesreason.SalesreasonId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
@@ -30,7 +24,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, salesreasonid, modifieddate
-       """.query.unique
+       """.query[SalesorderheadersalesreasonRow].unique
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -53,7 +47,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
             returning salesorderid, salesreasonid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalesorderheadersalesreasonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
@@ -109,21 +103,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, salesreasonid, modifieddate
-       """.query.unique
+       """.query[SalesorderheadersalesreasonRow].unique
   }
-  implicit val read: Read[SalesorderheadersalesreasonRow] =
-    new Read[SalesorderheadersalesreasonRow](
-      gets = List(
-        (Get[SalesorderheaderId], Nullability.NoNulls),
-        (Get[SalesreasonId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalesorderheadersalesreasonRow(
-        salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

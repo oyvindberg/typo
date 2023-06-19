@@ -7,22 +7,16 @@ package adventureworks
 package pr
 package ppp
 
-import adventureworks.production.product.ProductId
-import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PppViewRepoImpl extends PppViewRepo {
   override def selectAll(implicit c: Connection): List[PppViewRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from pr.ppp
-       """.as(rowParser.*)
+       """.as(PppViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PppViewFieldOrIdValue[_]])(implicit c: Connection): List[PppViewRow] = {
     fieldValues match {
@@ -43,19 +37,8 @@ object PppViewRepoImpl extends PppViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PppViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PppViewRow] =
-    RowParser[PppViewRow] { row =>
-      Success(
-        PppViewRow(
-          productid = row[Option[ProductId]]("productid"),
-          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
-          primary = row[Flag]("primary"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

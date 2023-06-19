@@ -8,10 +8,14 @@ package hardcoded
 package myschema
 package football_club
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 
 case class FootballClubRow(
   id: FootballClubId,
@@ -32,4 +36,17 @@ object FootballClubRow {
         "id" := row.id,
         "name" := row.name
       )}
+  implicit val read: Read[FootballClubRow] =
+    new Read[FootballClubRow](
+      gets = List(
+        (Get[FootballClubId], Nullability.NoNulls),
+        (Get[/* max 100 chars */ String], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
+        id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
+      )
+    )
+  
+
 }

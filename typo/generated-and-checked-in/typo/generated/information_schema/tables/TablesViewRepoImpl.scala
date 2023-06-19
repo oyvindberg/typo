@@ -12,19 +12,14 @@ package tables
 
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
-import typo.generated.information_schema.YesOrNo
 
 object TablesViewRepoImpl extends TablesViewRepo {
   override def selectAll(implicit c: Connection): List[TablesViewRow] = {
     SQL"""select table_catalog, table_schema, "table_name", table_type, self_referencing_column_name, reference_generation, "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", is_insertable_into, is_typed, commit_action
           from information_schema."tables"
-       """.as(rowParser.*)
+       """.as(TablesViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TablesViewFieldOrIdValue[_]])(implicit c: Connection): List[TablesViewRow] = {
     fieldValues match {
@@ -53,27 +48,8 @@ object TablesViewRepoImpl extends TablesViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(TablesViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[TablesViewRow] =
-    RowParser[TablesViewRow] { row =>
-      Success(
-        TablesViewRow(
-          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          tableType = row[Option[CharacterData]]("table_type"),
-          selfReferencingColumnName = row[Option[SqlIdentifier]]("self_referencing_column_name"),
-          referenceGeneration = row[Option[CharacterData]]("reference_generation"),
-          userDefinedTypeCatalog = row[Option[SqlIdentifier]]("user_defined_type_catalog"),
-          userDefinedTypeSchema = row[Option[SqlIdentifier]]("user_defined_type_schema"),
-          userDefinedTypeName = row[Option[SqlIdentifier]]("user_defined_type_name"),
-          isInsertableInto = row[Option[YesOrNo]]("is_insertable_into"),
-          isTyped = row[Option[YesOrNo]]("is_typed"),
-          commitAction = row[Option[CharacterData]]("commit_action")
-        )
-      )
-    }
 }

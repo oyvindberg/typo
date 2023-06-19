@@ -9,10 +9,14 @@ package productsubcategory
 
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -48,4 +52,23 @@ object ProductsubcategoryRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductsubcategoryRow] =
+    new Read[ProductsubcategoryRow](
+      gets = List(
+        (Get[ProductsubcategoryId], Nullability.NoNulls),
+        (Get[ProductcategoryId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductsubcategoryRow(
+        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNonNullable(rs, i + 0),
+        productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 1),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 2),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

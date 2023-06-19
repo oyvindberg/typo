@@ -9,10 +9,14 @@ package productmodelillustration
 
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class ProductmodelillustrationRow(
@@ -43,4 +47,19 @@ object ProductmodelillustrationRow {
         "illustrationid" := row.illustrationid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ProductmodelillustrationRow] =
+    new Read[ProductmodelillustrationRow](
+      gets = List(
+        (Get[ProductmodelId], Nullability.NoNulls),
+        (Get[IllustrationId], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelillustrationRow(
+        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
+        illustrationid = Get[IllustrationId].unsafeGetNonNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -29,7 +27,7 @@ object PasswordRepoImpl extends PasswordRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PasswordRow.rowParser.single)
   
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
@@ -51,7 +49,7 @@ object PasswordRepoImpl extends PasswordRepo {
       SQL"""insert into person."password" default values
             returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PasswordRow.rowParser.single)
     } else {
       val q = s"""insert into person."password"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -61,14 +59,14 @@ object PasswordRepoImpl extends PasswordRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PasswordRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from person."password"
-       """.as(rowParser.*)
+       """.as(PasswordRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
     fieldValues match {
@@ -90,7 +88,7 @@ object PasswordRepoImpl extends PasswordRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PasswordRow.rowParser.*)
     }
   
   }
@@ -98,7 +96,7 @@ object PasswordRepoImpl extends PasswordRepo {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from person."password"
           where businessentityid = $businessentityid
-       """.as(rowParser.singleOpt)
+       """.as(PasswordRow.rowParser.singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -108,7 +106,7 @@ object PasswordRepoImpl extends PasswordRepo {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from person."password"
           where businessentityid = ANY($businessentityids)
-       """.as(rowParser.*)
+       """.as(PasswordRow.rowParser.*)
   
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
@@ -162,19 +160,7 @@ object PasswordRepoImpl extends PasswordRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PasswordRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PasswordRow] =
-    RowParser[PasswordRow] { row =>
-      Success(
-        PasswordRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          passwordhash = row[/* max 128 chars */ String]("passwordhash"),
-          passwordsalt = row[/* max 10 chars */ String]("passwordsalt"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

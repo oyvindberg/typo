@@ -9,17 +9,12 @@ package salesperson
 
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +26,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     sql"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.salesquota}::numeric, ${unsaved.bonus}::numeric, ${unsaved.commissionpct}::numeric, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
-       """.query.unique
+       """.query[SalespersonRow].unique
   }
   override def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow] = {
     val fs = List(
@@ -75,7 +70,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
             returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalespersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
@@ -167,33 +162,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
-       """.query.unique
+       """.query[SalespersonRow].unique
   }
-  implicit val read: Read[SalespersonRow] =
-    new Read[SalespersonRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalespersonRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
-        bonus = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        commissionpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
-        salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

@@ -10,9 +10,7 @@ package specialoffer
 import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +26,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           values (${unsaved.specialofferid}::int4, ${unsaved.description}, ${unsaved.discountpct}::numeric, ${unsaved.`type`}, ${unsaved.category}, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.minqty}::int4, ${unsaved.maxqty}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SpecialofferRow.rowParser.single)
   
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
@@ -65,7 +63,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       SQL"""insert into sales.specialoffer default values
             returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SpecialofferRow.rowParser.single)
     } else {
       val q = s"""insert into sales.specialoffer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -75,14 +73,14 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SpecialofferRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sales.specialoffer
-       """.as(rowParser.*)
+       """.as(SpecialofferRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow] = {
     fieldValues match {
@@ -110,7 +108,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SpecialofferRow.rowParser.*)
     }
   
   }
@@ -118,7 +116,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sales.specialoffer
           where specialofferid = $specialofferid
-       """.as(rowParser.singleOpt)
+       """.as(SpecialofferRow.rowParser.singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     implicit val toStatement: ToStatement[Array[SpecialofferId]] =
@@ -128,7 +126,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sales.specialoffer
           where specialofferid = ANY($specialofferids)
-       """.as(rowParser.*)
+       """.as(SpecialofferRow.rowParser.*)
   
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
@@ -206,25 +204,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
             modifieddate = EXCLUDED.modifieddate
           returning specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SpecialofferRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SpecialofferRow] =
-    RowParser[SpecialofferRow] { row =>
-      Success(
-        SpecialofferRow(
-          specialofferid = row[SpecialofferId]("specialofferid"),
-          description = row[/* max 255 chars */ String]("description"),
-          discountpct = row[BigDecimal]("discountpct"),
-          `type` = row[/* max 50 chars */ String]("type"),
-          category = row[/* max 50 chars */ String]("category"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[LocalDateTime]("enddate"),
-          minqty = row[Int]("minqty"),
-          maxqty = row[Option[Int]]("maxqty"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

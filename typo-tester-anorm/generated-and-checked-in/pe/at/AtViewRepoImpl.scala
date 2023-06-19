@@ -7,22 +7,16 @@ package adventureworks
 package pe
 package at
 
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object AtViewRepoImpl extends AtViewRepo {
   override def selectAll(implicit c: Connection): List[AtViewRow] = {
     SQL"""select "id", addresstypeid, "name", rowguid, modifieddate
           from pe."at"
-       """.as(rowParser.*)
+       """.as(AtViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[AtViewFieldOrIdValue[_]])(implicit c: Connection): List[AtViewRow] = {
     fieldValues match {
@@ -44,20 +38,8 @@ object AtViewRepoImpl extends AtViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(AtViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[AtViewRow] =
-    RowParser[AtViewRow] { row =>
-      Success(
-        AtViewRow(
-          id = row[Option[Int]]("id"),
-          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

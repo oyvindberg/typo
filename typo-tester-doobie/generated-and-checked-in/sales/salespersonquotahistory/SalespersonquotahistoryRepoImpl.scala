@@ -8,17 +8,12 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,7 +25,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
-       """.query.unique
+       """.query[SalespersonquotahistoryRow].unique
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     val fs = List(
@@ -58,7 +53,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             returning businessentityid, quotadate, salesquota, rowguid, modifieddate
          """
     }
-    q.query.unique
+    q.query[SalespersonquotahistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
@@ -124,25 +119,6 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
-       """.query.unique
+       """.query[SalespersonquotahistoryRow].unique
   }
-  implicit val read: Read[SalespersonquotahistoryRow] =
-    new Read[SalespersonquotahistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalespersonquotahistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        quotadate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        salesquota = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
-    )
-  
-
 }

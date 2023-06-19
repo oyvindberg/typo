@@ -8,19 +8,12 @@ package production
 package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
@@ -31,7 +24,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     sql"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.productdescriptionid}::int4, ${unsaved.cultureid}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, productdescriptionid, cultureid, modifieddate
-       """.query.unique
+       """.query[ProductmodelproductdescriptioncultureRow].unique
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
@@ -55,7 +48,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
             returning productmodelid, productdescriptionid, cultureid, modifieddate
          """
     }
-    q.query.unique
+    q.query[ProductmodelproductdescriptioncultureRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
@@ -113,23 +106,6 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, productdescriptionid, cultureid, modifieddate
-       """.query.unique
+       """.query[ProductmodelproductdescriptioncultureRow].unique
   }
-  implicit val read: Read[ProductmodelproductdescriptioncultureRow] =
-    new Read[ProductmodelproductdescriptioncultureRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.NoNulls),
-        (Get[ProductdescriptionId], Nullability.NoNulls),
-        (Get[CultureId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 1),
-        cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

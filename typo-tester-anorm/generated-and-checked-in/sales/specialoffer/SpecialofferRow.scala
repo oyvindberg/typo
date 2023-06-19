@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package specialoffer
 
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -40,6 +42,24 @@ case class SpecialofferRow(
 )
 
 object SpecialofferRow {
+  val rowParser: RowParser[SpecialofferRow] =
+    RowParser[SpecialofferRow] { row =>
+      Success(
+        SpecialofferRow(
+          specialofferid = row[SpecialofferId]("specialofferid"),
+          description = row[/* max 255 chars */ String]("description"),
+          discountpct = row[BigDecimal]("discountpct"),
+          `type` = row[/* max 50 chars */ String]("type"),
+          category = row[/* max 50 chars */ String]("category"),
+          startdate = row[LocalDateTime]("startdate"),
+          enddate = row[LocalDateTime]("enddate"),
+          minqty = row[Int]("minqty"),
+          maxqty = row[Option[Int]]("maxqty"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SpecialofferRow] = new OFormat[SpecialofferRow]{
     override def writes(o: SpecialofferRow): JsObject =
       Json.obj(

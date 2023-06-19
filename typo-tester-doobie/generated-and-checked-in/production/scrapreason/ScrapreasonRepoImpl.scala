@@ -8,17 +8,12 @@ package production
 package scrapreason
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
@@ -29,7 +24,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning scrapreasonid, "name", modifieddate
-       """.query.unique
+       """.query[ScrapreasonRow].unique
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
@@ -55,7 +50,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
             returning scrapreasonid, "name", modifieddate
          """
     }
-    q.query.unique
+    q.query[ScrapreasonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
@@ -117,21 +112,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning scrapreasonid, "name", modifieddate
-       """.query.unique
+       """.query[ScrapreasonRow].unique
   }
-  implicit val read: Read[ScrapreasonRow] =
-    new Read[ScrapreasonRow](
-      gets = List(
-        (Get[ScrapreasonId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ScrapreasonRow(
-        scrapreasonid = Get[ScrapreasonId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

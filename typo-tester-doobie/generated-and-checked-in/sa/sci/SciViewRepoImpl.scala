@@ -7,17 +7,10 @@ package adventureworks
 package sa
 package sci
 
-import adventureworks.production.product.ProductId
-import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object SciViewRepoImpl extends SciViewRepo {
   override def selectAll: Stream[ConnectionIO, SciViewRow] = {
@@ -38,27 +31,4 @@ object SciViewRepoImpl extends SciViewRepo {
     sql"select * from sa.sci $where".query[SciViewRow].stream
   
   }
-  implicit val read: Read[SciViewRow] =
-    new Read[SciViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ShoppingcartitemId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNullable(rs, i + 1),
-        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        quantity = Get[Int].unsafeGetNullable(rs, i + 3),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 4),
-        datecreated = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

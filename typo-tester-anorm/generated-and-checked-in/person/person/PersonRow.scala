@@ -11,6 +11,8 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -49,6 +51,26 @@ case class PersonRow(
 )
 
 object PersonRow {
+  val rowParser: RowParser[PersonRow] =
+    RowParser[PersonRow] { row =>
+      Success(
+        PersonRow(
+          businessentityid = row[BusinessentityId]("businessentityid"),
+          persontype = row[/* bpchar */ String]("persontype"),
+          namestyle = row[NameStyle]("namestyle"),
+          title = row[Option[/* max 8 chars */ String]]("title"),
+          firstname = row[Name]("firstname"),
+          middlename = row[Option[Name]]("middlename"),
+          lastname = row[Name]("lastname"),
+          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
+          emailpromotion = row[Int]("emailpromotion"),
+          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
+          demographics = row[Option[TypoXml]]("demographics"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
     override def writes(o: PersonRow): JsObject =
       Json.obj(

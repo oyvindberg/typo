@@ -10,10 +10,14 @@ package d
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -82,4 +86,39 @@ object DViewRow {
         "modifieddate" := row.modifieddate,
         "documentnode" := row.documentnode
       )}
+  implicit val read: Read[DViewRow] =
+    new Read[DViewRow](
+      gets = List(
+        (Get[/* max 50 chars */ String], Nullability.Nullable),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[/* max 400 chars */ String], Nullability.Nullable),
+        (Get[/* max 8 chars */ String], Nullability.Nullable),
+        (Get[/* bpchar */ String], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[Int], Nullability.Nullable),
+        (Get[String], Nullability.Nullable),
+        (Get[Byte], Nullability.Nullable),
+        (Get[UUID], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.Nullable),
+        (Get[DocumentId], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
+        title = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 0),
+        owner = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+        folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
+        filename = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 3),
+        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
+        revision = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 5),
+        changenumber = Get[Int].unsafeGetNullable(rs, i + 6),
+        status = Get[Int].unsafeGetNullable(rs, i + 7),
+        documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
+        document = Get[Byte].unsafeGetNullable(rs, i + 9),
+        rowguid = Get[UUID].unsafeGetNullable(rs, i + 10),
+        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 11),
+        documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 12)
+      )
+    )
+  
+
 }

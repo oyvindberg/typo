@@ -7,10 +7,14 @@ package adventureworks
 package sales
 package creditcard
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class CreditcardRow(
@@ -49,4 +53,25 @@ object CreditcardRow {
         "expyear" := row.expyear,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[CreditcardRow] =
+    new Read[CreditcardRow](
+      gets = List(
+        (Get[CreditcardId], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[/* max 25 chars */ String], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
+        creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
+        cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
+        expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
+        expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

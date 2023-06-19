@@ -8,12 +8,9 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -27,7 +24,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalespersonquotahistoryRow.rowParser.single)
   
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
@@ -49,7 +46,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       SQL"""insert into sales.salespersonquotahistory default values
             returning businessentityid, quotadate, salesquota, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalespersonquotahistoryRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salespersonquotahistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +56,14 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalespersonquotahistoryRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sales.salespersonquotahistory
-       """.as(rowParser.*)
+       """.as(SalespersonquotahistoryRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     fieldValues match {
@@ -88,7 +85,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalespersonquotahistoryRow.rowParser.*)
     }
   
   }
@@ -96,7 +93,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sales.salespersonquotahistory
           where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
-       """.as(rowParser.singleOpt)
+       """.as(SalespersonquotahistoryRow.rowParser.singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -146,19 +143,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalespersonquotahistoryRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalespersonquotahistoryRow] =
-    RowParser[SalespersonquotahistoryRow] { row =>
-      Success(
-        SalespersonquotahistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          quotadate = row[LocalDateTime]("quotadate"),
-          salesquota = row[BigDecimal]("salesquota"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

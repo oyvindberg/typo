@@ -9,10 +9,14 @@ package salesperson
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -65,4 +69,31 @@ object SalespersonRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalespersonRow] =
+    new Read[SalespersonRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[SalesterritoryId], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.Nullable),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalespersonRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
+        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
+        bonus = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+        commissionpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
+        salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+        saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      )
+    )
+  
+
 }

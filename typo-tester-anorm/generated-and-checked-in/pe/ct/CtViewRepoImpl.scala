@@ -7,21 +7,16 @@ package adventureworks
 package pe
 package ct
 
-import adventureworks.person.contacttype.ContacttypeId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CtViewRepoImpl extends CtViewRepo {
   override def selectAll(implicit c: Connection): List[CtViewRow] = {
     SQL"""select "id", contacttypeid, "name", modifieddate
           from pe.ct
-       """.as(rowParser.*)
+       """.as(CtViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[CtViewFieldOrIdValue[_]])(implicit c: Connection): List[CtViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object CtViewRepoImpl extends CtViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(CtViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[CtViewRow] =
-    RowParser[CtViewRow] { row =>
-      Success(
-        CtViewRow(
-          id = row[Option[Int]]("id"),
-          contacttypeid = row[Option[ContacttypeId]]("contacttypeid"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

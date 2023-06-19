@@ -7,17 +7,10 @@ package adventureworks
 package hr
 package d
 
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll: Stream[ConnectionIO, DViewRow] = {
@@ -36,23 +29,4 @@ object DViewRepoImpl extends DViewRepo {
     sql"select * from hr.d $where".query[DViewRow].stream
   
   }
-  implicit val read: Read[DViewRow] =
-    new Read[DViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[DepartmentId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        departmentid = Get[DepartmentId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        groupname = Get[Name].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
-    )
-  
-
 }

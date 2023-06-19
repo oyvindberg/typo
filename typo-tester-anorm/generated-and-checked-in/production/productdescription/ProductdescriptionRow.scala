@@ -7,6 +7,8 @@ package adventureworks
 package production
 package productdescription
 
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -26,6 +28,17 @@ case class ProductdescriptionRow(
 )
 
 object ProductdescriptionRow {
+  val rowParser: RowParser[ProductdescriptionRow] =
+    RowParser[ProductdescriptionRow] { row =>
+      Success(
+        ProductdescriptionRow(
+          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
+          description = row[/* max 400 chars */ String]("description"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductdescriptionRow] = new OFormat[ProductdescriptionRow]{
     override def writes(o: ProductdescriptionRow): JsObject =
       Json.obj(

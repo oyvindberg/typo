@@ -7,23 +7,16 @@ package adventureworks
 package sa
 package st
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object StViewRepoImpl extends StViewRepo {
   override def selectAll(implicit c: Connection): List[StViewRow] = {
     SQL"""select "id", territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sa.st
-       """.as(rowParser.*)
+       """.as(StViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[StViewFieldOrIdValue[_]])(implicit c: Connection): List[StViewRow] = {
     fieldValues match {
@@ -51,26 +44,8 @@ object StViewRepoImpl extends StViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(StViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[StViewRow] =
-    RowParser[StViewRow] { row =>
-      Success(
-        StViewRow(
-          id = row[Option[Int]]("id"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          name = row[Option[Name]]("name"),
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          group = row[Option[/* max 50 chars */ String]]("group"),
-          salesytd = row[Option[BigDecimal]]("salesytd"),
-          saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
-          costytd = row[Option[BigDecimal]]("costytd"),
-          costlastyear = row[Option[BigDecimal]]("costlastyear"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

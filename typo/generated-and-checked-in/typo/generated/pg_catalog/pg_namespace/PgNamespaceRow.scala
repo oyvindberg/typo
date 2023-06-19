@@ -10,6 +10,8 @@ package generated
 package pg_catalog
 package pg_namespace
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,6 +32,17 @@ case class PgNamespaceRow(
 )
 
 object PgNamespaceRow {
+  val rowParser: RowParser[PgNamespaceRow] =
+    RowParser[PgNamespaceRow] { row =>
+      Success(
+        PgNamespaceRow(
+          oid = row[PgNamespaceId]("oid"),
+          nspname = row[String]("nspname"),
+          nspowner = row[/* oid */ Long]("nspowner"),
+          nspacl = row[Option[Array[TypoAclItem]]]("nspacl")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PgNamespaceRow] = new OFormat[PgNamespaceRow]{
     override def writes(o: PgNamespaceRow): JsObject =
       Json.obj(

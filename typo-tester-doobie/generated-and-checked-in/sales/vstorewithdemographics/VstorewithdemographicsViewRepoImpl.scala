@@ -7,17 +7,10 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
-import adventureworks.TypoMoney
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 
 object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
@@ -43,37 +36,4 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
     sql"select * from sales.vstorewithdemographics $where".query[VstorewithdemographicsViewRow].stream
   
   }
-  implicit val read: Read[VstorewithdemographicsViewRow] =
-    new Read[VstorewithdemographicsViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        AnnualSales = Get[TypoMoney].unsafeGetNullable(rs, i + 2),
-        AnnualRevenue = Get[TypoMoney].unsafeGetNullable(rs, i + 3),
-        BankName = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        BusinessType = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 5),
-        YearOpened = Get[Int].unsafeGetNullable(rs, i + 6),
-        Specialty = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 7),
-        SquareFeet = Get[Int].unsafeGetNullable(rs, i + 8),
-        Brands = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
-        Internet = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
-        NumberEmployees = Get[Int].unsafeGetNullable(rs, i + 11)
-      )
-    )
-  
-
 }

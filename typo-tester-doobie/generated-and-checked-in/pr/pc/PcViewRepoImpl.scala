@@ -7,18 +7,10 @@ package adventureworks
 package pr
 package pc
 
-import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PcViewRepoImpl extends PcViewRepo {
   override def selectAll: Stream[ConnectionIO, PcViewRow] = {
@@ -37,23 +29,4 @@ object PcViewRepoImpl extends PcViewRepo {
     sql"select * from pr.pc $where".query[PcViewRow].stream
   
   }
-  implicit val read: Read[PcViewRow] =
-    new Read[PcViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductcategoryId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PcViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productcategoryid = Get[ProductcategoryId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
-    )
-  
-
 }

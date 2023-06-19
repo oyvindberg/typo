@@ -8,10 +8,14 @@ package humanresources
 package shift
 
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -47,4 +51,23 @@ object ShiftRow {
         "endtime" := row.endtime,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[ShiftRow] =
+    new Read[ShiftRow](
+      gets = List(
+        (Get[ShiftId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[LocalTime], Nullability.NoNulls),
+        (Get[LocalTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ShiftRow(
+        shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        starttime = Get[LocalTime].unsafeGetNonNullable(rs, i + 2),
+        endtime = Get[LocalTime].unsafeGetNonNullable(rs, i + 3),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      )
+    )
+  
+
 }

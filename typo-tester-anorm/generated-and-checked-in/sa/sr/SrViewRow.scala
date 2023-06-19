@@ -9,6 +9,8 @@ package sr
 
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,18 @@ case class SrViewRow(
 )
 
 object SrViewRow {
+  val rowParser: RowParser[SrViewRow] =
+    RowParser[SrViewRow] { row =>
+      Success(
+        SrViewRow(
+          id = row[Option[Int]]("id"),
+          salesreasonid = row[Option[SalesreasonId]]("salesreasonid"),
+          name = row[Option[Name]]("name"),
+          reasontype = row[Option[Name]]("reasontype"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SrViewRow] = new OFormat[SrViewRow]{
     override def writes(o: SrViewRow): JsObject =
       Json.obj(

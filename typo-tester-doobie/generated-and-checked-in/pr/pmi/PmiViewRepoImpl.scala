@@ -7,17 +7,10 @@ package adventureworks
 package pr
 package pmi
 
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PmiViewRepoImpl extends PmiViewRepo {
   override def selectAll: Stream[ConnectionIO, PmiViewRow] = {
@@ -34,19 +27,4 @@ object PmiViewRepoImpl extends PmiViewRepo {
     sql"select * from pr.pmi $where".query[PmiViewRow].stream
   
   }
-  implicit val read: Read[PmiViewRow] =
-    new Read[PmiViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[IllustrationId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
-      )
-    )
-  
-
 }

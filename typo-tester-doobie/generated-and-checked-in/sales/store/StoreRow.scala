@@ -10,10 +10,14 @@ package store
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -54,4 +58,25 @@ object StoreRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[StoreRow] =
+    new Read[StoreRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[BusinessentityId], Nullability.Nullable),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => StoreRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
+        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 3),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      )
+    )
+  
+
 }

@@ -9,6 +9,8 @@ package d
 
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -30,6 +32,18 @@ case class DViewRow(
 )
 
 object DViewRow {
+  val rowParser: RowParser[DViewRow] =
+    RowParser[DViewRow] { row =>
+      Success(
+        DViewRow(
+          id = row[Option[Int]]("id"),
+          departmentid = row[Option[DepartmentId]]("departmentid"),
+          name = row[Option[Name]]("name"),
+          groupname = row[Option[Name]]("groupname"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[DViewRow] = new OFormat[DViewRow]{
     override def writes(o: DViewRow): JsObject =
       Json.obj(

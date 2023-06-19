@@ -7,25 +7,16 @@ package adventureworks
 package pe
 package sp
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object SpViewRepoImpl extends SpViewRepo {
   override def selectAll(implicit c: Connection): List[SpViewRow] = {
     SQL"""select "id", stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from pe.sp
-       """.as(rowParser.*)
+       """.as(SpViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]])(implicit c: Connection): List[SpViewRow] = {
     fieldValues match {
@@ -51,24 +42,8 @@ object SpViewRepoImpl extends SpViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SpViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[SpViewRow] =
-    RowParser[SpViewRow] { row =>
-      Success(
-        SpViewRow(
-          id = row[Option[Int]]("id"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          stateprovincecode = row[Option[/* bpchar */ String]]("stateprovincecode"),
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
-          name = row[Option[Name]]("name"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

@@ -8,10 +8,14 @@ package production
 package illustration
 
 import adventureworks.TypoXml
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class IllustrationRow(
@@ -38,4 +42,19 @@ object IllustrationRow {
         "diagram" := row.diagram,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[IllustrationRow] =
+    new Read[IllustrationRow](
+      gets = List(
+        (Get[IllustrationId], Nullability.NoNulls),
+        (Get[TypoXml], Nullability.Nullable),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
+        illustrationid = Get[IllustrationId].unsafeGetNonNullable(rs, i + 0),
+        diagram = Get[TypoXml].unsafeGetNullable(rs, i + 1),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      )
+    )
+  
+
 }

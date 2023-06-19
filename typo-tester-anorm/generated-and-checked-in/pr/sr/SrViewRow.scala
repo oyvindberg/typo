@@ -9,6 +9,8 @@ package sr
 
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -28,6 +30,17 @@ case class SrViewRow(
 )
 
 object SrViewRow {
+  val rowParser: RowParser[SrViewRow] =
+    RowParser[SrViewRow] { row =>
+      Success(
+        SrViewRow(
+          id = row[Option[Int]]("id"),
+          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
+          name = row[Option[Name]]("name"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SrViewRow] = new OFormat[SrViewRow]{
     override def writes(o: SrViewRow): JsObject =
       Json.obj(

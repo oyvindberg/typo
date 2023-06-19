@@ -8,12 +8,9 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning contacttypeid, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ContacttypeRow.rowParser.single)
   
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
@@ -48,7 +45,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       SQL"""insert into person.contacttype default values
             returning contacttypeid, "name", modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(ContacttypeRow.rowParser.single)
     } else {
       val q = s"""insert into person.contacttype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -58,14 +55,14 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(ContacttypeRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
-       """.as(rowParser.*)
+       """.as(ContacttypeRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
     fieldValues match {
@@ -85,7 +82,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(ContacttypeRow.rowParser.*)
     }
   
   }
@@ -93,7 +90,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = $contacttypeid
-       """.as(rowParser.singleOpt)
+       """.as(ContacttypeRow.rowParser.singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
     implicit val toStatement: ToStatement[Array[ContacttypeId]] =
@@ -103,7 +100,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = ANY($contacttypeids)
-       """.as(rowParser.*)
+       """.as(ContacttypeRow.rowParser.*)
   
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
@@ -149,17 +146,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             modifieddate = EXCLUDED.modifieddate
           returning contacttypeid, "name", modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(ContacttypeRow.rowParser.single)
   
   }
-  val rowParser: RowParser[ContacttypeRow] =
-    RowParser[ContacttypeRow] { row =>
-      Success(
-        ContacttypeRow(
-          contacttypeid = row[ContacttypeId]("contacttypeid"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

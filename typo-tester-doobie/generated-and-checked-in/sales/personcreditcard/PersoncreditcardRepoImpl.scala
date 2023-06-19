@@ -8,18 +8,12 @@ package sales
 package personcreditcard
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
@@ -30,7 +24,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, creditcardid, modifieddate
-       """.query.unique
+       """.query[PersoncreditcardRow].unique
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
@@ -53,7 +47,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
             returning businessentityid, creditcardid, modifieddate
          """
     }
-    q.query.unique
+    q.query[PersoncreditcardRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
@@ -109,21 +103,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, creditcardid, modifieddate
-       """.query.unique
+       """.query[PersoncreditcardRow].unique
   }
-  implicit val read: Read[PersoncreditcardRow] =
-    new Read[PersoncreditcardRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[CreditcardId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersoncreditcardRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

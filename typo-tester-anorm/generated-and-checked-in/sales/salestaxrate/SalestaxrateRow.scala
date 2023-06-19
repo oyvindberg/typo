@@ -9,6 +9,8 @@ package salestaxrate
 
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -35,6 +37,20 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
+  val rowParser: RowParser[SalestaxrateRow] =
+    RowParser[SalestaxrateRow] { row =>
+      Success(
+        SalestaxrateRow(
+          salestaxrateid = row[SalestaxrateId]("salestaxrateid"),
+          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
+          taxtype = row[Int]("taxtype"),
+          taxrate = row[BigDecimal]("taxrate"),
+          name = row[Name]("name"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalestaxrateRow] = new OFormat[SalestaxrateRow]{
     override def writes(o: SalestaxrateRow): JsObject =
       Json.obj(

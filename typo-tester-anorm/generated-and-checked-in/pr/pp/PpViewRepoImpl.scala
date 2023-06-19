@@ -7,20 +7,16 @@ package adventureworks
 package pr
 package pp
 
-import adventureworks.production.productphoto.ProductphotoId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PpViewRepoImpl extends PpViewRepo {
   override def selectAll(implicit c: Connection): List[PpViewRow] = {
     SQL"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from pr.pp
-       """.as(rowParser.*)
+       """.as(PpViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PpViewFieldOrIdValue[_]])(implicit c: Connection): List[PpViewRow] = {
     fieldValues match {
@@ -44,22 +40,8 @@ object PpViewRepoImpl extends PpViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PpViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PpViewRow] =
-    RowParser[PpViewRow] { row =>
-      Success(
-        PpViewRow(
-          id = row[Option[Int]]("id"),
-          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
-          thumbnailphoto = row[Option[Byte]]("thumbnailphoto"),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
-          largephoto = row[Option[Byte]]("largephoto"),
-          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

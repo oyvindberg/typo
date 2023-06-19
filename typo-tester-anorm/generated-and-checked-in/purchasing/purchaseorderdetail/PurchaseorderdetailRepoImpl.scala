@@ -8,13 +8,9 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -27,7 +23,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PurchaseorderdetailRow.rowParser.single)
   
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
@@ -53,7 +49,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       SQL"""insert into purchasing.purchaseorderdetail default values
             returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PurchaseorderdetailRow.rowParser.single)
     } else {
       val q = s"""insert into purchasing.purchaseorderdetail(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -63,14 +59,14 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PurchaseorderdetailRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from purchasing.purchaseorderdetail
-       """.as(rowParser.*)
+       """.as(PurchaseorderdetailRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderdetailRow] = {
     fieldValues match {
@@ -96,7 +92,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PurchaseorderdetailRow.rowParser.*)
     }
   
   }
@@ -104,7 +100,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from purchasing.purchaseorderdetail
           where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
-       """.as(rowParser.singleOpt)
+       """.as(PurchaseorderdetailRow.rowParser.singleOpt)
   }
   override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -170,23 +166,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PurchaseorderdetailRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PurchaseorderdetailRow] =
-    RowParser[PurchaseorderdetailRow] { row =>
-      Success(
-        PurchaseorderdetailRow(
-          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
-          purchaseorderdetailid = row[Int]("purchaseorderdetailid"),
-          duedate = row[LocalDateTime]("duedate"),
-          orderqty = row[Int]("orderqty"),
-          productid = row[ProductId]("productid"),
-          unitprice = row[BigDecimal]("unitprice"),
-          receivedqty = row[BigDecimal]("receivedqty"),
-          rejectedqty = row[BigDecimal]("rejectedqty"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

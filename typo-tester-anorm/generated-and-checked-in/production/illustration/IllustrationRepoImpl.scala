@@ -8,12 +8,9 @@ package production
 package illustration
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -28,7 +25,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
           returning illustrationid, diagram, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(IllustrationRow.rowParser.single)
   
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
@@ -48,7 +45,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
       SQL"""insert into production.illustration default values
             returning illustrationid, diagram, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(IllustrationRow.rowParser.single)
     } else {
       val q = s"""insert into production.illustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -58,14 +55,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(IllustrationRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate
           from production.illustration
-       """.as(rowParser.*)
+       """.as(IllustrationRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow] = {
     fieldValues match {
@@ -85,7 +82,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(IllustrationRow.rowParser.*)
     }
   
   }
@@ -93,7 +90,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     SQL"""select illustrationid, diagram, modifieddate
           from production.illustration
           where illustrationid = $illustrationid
-       """.as(rowParser.singleOpt)
+       """.as(IllustrationRow.rowParser.singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     implicit val toStatement: ToStatement[Array[IllustrationId]] =
@@ -103,7 +100,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     SQL"""select illustrationid, diagram, modifieddate
           from production.illustration
           where illustrationid = ANY($illustrationids)
-       """.as(rowParser.*)
+       """.as(IllustrationRow.rowParser.*)
   
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
@@ -149,17 +146,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
             modifieddate = EXCLUDED.modifieddate
           returning illustrationid, diagram, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(IllustrationRow.rowParser.single)
   
   }
-  val rowParser: RowParser[IllustrationRow] =
-    RowParser[IllustrationRow] { row =>
-      Success(
-        IllustrationRow(
-          illustrationid = row[IllustrationId]("illustrationid"),
-          diagram = row[Option[TypoXml]]("diagram"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

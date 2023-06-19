@@ -8,6 +8,8 @@ package pr
 package pp
 
 import adventureworks.production.productphoto.ProductphotoId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -33,6 +35,20 @@ case class PpViewRow(
 )
 
 object PpViewRow {
+  val rowParser: RowParser[PpViewRow] =
+    RowParser[PpViewRow] { row =>
+      Success(
+        PpViewRow(
+          id = row[Option[Int]]("id"),
+          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
+          thumbnailphoto = row[Option[Byte]]("thumbnailphoto"),
+          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
+          largephoto = row[Option[Byte]]("largephoto"),
+          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
+          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[PpViewRow] = new OFormat[PpViewRow]{
     override def writes(o: PpViewRow): JsObject =
       Json.obj(

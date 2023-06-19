@@ -8,18 +8,12 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
-import adventureworks.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
@@ -30,7 +24,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
           values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate
-       """.query.unique
+       """.query[JobcandidateRow].unique
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
@@ -57,7 +51,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             returning jobcandidateid, businessentityid, resume, modifieddate
          """
     }
-    q.query.unique
+    q.query[JobcandidateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
@@ -124,23 +118,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             resume = EXCLUDED.resume,
             modifieddate = EXCLUDED.modifieddate
           returning jobcandidateid, businessentityid, resume, modifieddate
-       """.query.unique
+       """.query[JobcandidateRow].unique
   }
-  implicit val read: Read[JobcandidateRow] =
-    new Read[JobcandidateRow](
-      gets = List(
-        (Get[JobcandidateId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => JobcandidateRow(
-        jobcandidateid = Get[JobcandidateId].unsafeGetNonNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        resume = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
-    )
-  
-
 }

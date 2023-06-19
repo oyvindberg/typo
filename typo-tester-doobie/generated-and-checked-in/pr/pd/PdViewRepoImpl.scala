@@ -7,17 +7,10 @@ package adventureworks
 package pr
 package pd
 
-import adventureworks.production.productdescription.ProductdescriptionId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PdViewRepoImpl extends PdViewRepo {
   override def selectAll: Stream[ConnectionIO, PdViewRow] = {
@@ -36,23 +29,4 @@ object PdViewRepoImpl extends PdViewRepo {
     sql"select * from pr.pd $where".query[PdViewRow].stream
   
   }
-  implicit val read: Read[PdViewRow] =
-    new Read[PdViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductdescriptionId], Nullability.Nullable),
-        (Get[/* max 400 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-        description = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
-    )
-  
-
 }

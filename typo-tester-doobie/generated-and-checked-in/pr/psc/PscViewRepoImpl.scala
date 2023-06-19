@@ -7,19 +7,10 @@ package adventureworks
 package pr
 package psc
 
-import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object PscViewRepoImpl extends PscViewRepo {
   override def selectAll: Stream[ConnectionIO, PscViewRow] = {
@@ -39,25 +30,4 @@ object PscViewRepoImpl extends PscViewRepo {
     sql"select * from pr.psc $where".query[PscViewRow].stream
   
   }
-  implicit val read: Read[PscViewRow] =
-    new Read[PscViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductsubcategoryId], Nullability.Nullable),
-        (Get[ProductcategoryId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 1),
-        productcategoryid = Get[ProductcategoryId].unsafeGetNullable(rs, i + 2),
-        name = Get[Name].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
-    )
-  
-
 }

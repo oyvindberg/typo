@@ -7,17 +7,10 @@ package adventureworks
 package sa
 package cr
 
-import adventureworks.sales.currency.CurrencyId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object CrViewRepoImpl extends CrViewRepo {
   override def selectAll: Stream[ConnectionIO, CrViewRow] = {
@@ -38,27 +31,4 @@ object CrViewRepoImpl extends CrViewRepo {
     sql"select * from sa.cr $where".query[CrViewRow].stream
   
   }
-  implicit val read: Read[CrViewRow] =
-    new Read[CrViewRow](
-      gets = List(
-        (Get[CurrencyrateId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[CurrencyId], Nullability.Nullable),
-        (Get[CurrencyId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CrViewRow(
-        currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 0),
-        currencyratedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 1),
-        fromcurrencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 2),
-        tocurrencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 3),
-        averagerate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        endofdayrate = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
-    )
-  
-
 }

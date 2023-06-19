@@ -8,14 +8,9 @@ package person
 package personphone
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 
@@ -28,7 +23,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonphoneRow.rowParser.single)
   
   }
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
@@ -46,7 +41,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       SQL"""insert into person.personphone default values
             returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonphoneRow.rowParser.single)
     } else {
       val q = s"""insert into person.personphone(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +51,14 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(PersonphoneRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from person.personphone
-       """.as(rowParser.*)
+       """.as(PersonphoneRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow] = {
     fieldValues match {
@@ -84,7 +79,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PersonphoneRow.rowParser.*)
     }
   
   }
@@ -92,7 +87,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from person.personphone
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
-       """.as(rowParser.singleOpt)
+       """.as(PersonphoneRow.rowParser.singleOpt)
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -135,18 +130,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(PersonphoneRow.rowParser.single)
   
   }
-  val rowParser: RowParser[PersonphoneRow] =
-    RowParser[PersonphoneRow] { row =>
-      Success(
-        PersonphoneRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          phonenumber = row[Phone]("phonenumber"),
-          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

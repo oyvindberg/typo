@@ -7,10 +7,14 @@ package adventureworks
 package sales
 package specialoffer
 
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -69,4 +73,35 @@ object SpecialofferRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SpecialofferRow] =
+    new Read[SpecialofferRow](
+      gets = List(
+        (Get[SpecialofferId], Nullability.NoNulls),
+        (Get[/* max 255 chars */ String], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.Nullable),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferRow(
+        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
+        description = Get[/* max 255 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        discountpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+        `type` = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        category = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
+        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5),
+        enddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
+        minqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
+        maxqty = Get[Int].unsafeGetNullable(rs, i + 8),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 9),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 10)
+      )
+    )
+  
+
 }

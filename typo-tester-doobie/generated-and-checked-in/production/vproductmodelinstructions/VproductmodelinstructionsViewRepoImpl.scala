@@ -7,19 +7,10 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
-import adventureworks.TypoXml
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.util.UUID
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
@@ -44,35 +35,4 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
     sql"select * from production.vproductmodelinstructions $where".query[VproductmodelinstructionsViewRow].stream
   
   }
-  implicit val read: Read[VproductmodelinstructionsViewRow] =
-    new Read[VproductmodelinstructionsViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        LocationID = Get[Int].unsafeGetNullable(rs, i + 3),
-        SetupHours = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        MachineHours = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        LaborHours = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        LotSize = Get[Int].unsafeGetNullable(rs, i + 7),
-        Step = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
-    )
-  
-
 }

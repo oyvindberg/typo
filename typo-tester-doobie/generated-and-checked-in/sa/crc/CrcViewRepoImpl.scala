@@ -7,17 +7,10 @@ package adventureworks
 package sa
 package crc
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object CrcViewRepoImpl extends CrcViewRepo {
   override def selectAll: Stream[ConnectionIO, CrcViewRow] = {
@@ -34,19 +27,4 @@ object CrcViewRepoImpl extends CrcViewRepo {
     sql"select * from sa.crc $where".query[CrcViewRow].stream
   
   }
-  implicit val read: Read[CrcViewRow] =
-    new Read[CrcViewRow](
-      gets = List(
-        (Get[CountryregionId], Nullability.Nullable),
-        (Get[CurrencyId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
-        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
-        currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
-      )
-    )
-  
-
 }

@@ -19,6 +19,8 @@ object DbLibAnorm extends DbLib {
   val TypeDoesNotMatch = sc.Type.Qualified("anorm.TypeDoesNotMatch")
 
   val rowParserIdent = sc.Ident("rowParser")
+  def rowParserFor(rowType: sc.Type) = code"$rowType.$rowParserIdent"
+
   def SQL(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
@@ -128,24 +130,24 @@ object DbLibAnorm extends DbLib {
 
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
-      case RepoMethod.SelectAll(relName, cols, _) =>
+      case RepoMethod.SelectAll(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |""".stripMargin
         }
-        code"""$sql.as($rowParserIdent.*)"""
+        code"""$sql.as(${rowParserFor(rowType)}.*)"""
 
-      case RepoMethod.SelectById(relName, cols, id, _) =>
+      case RepoMethod.SelectById(relName, cols, id, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
                  |where ${matchId(id)}
                  |""".stripMargin
         }
-        code"""$sql.as($rowParserIdent.singleOpt)"""
+        code"""$sql.as(${rowParserFor(rowType)}.singleOpt)"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, _) =>
+      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
@@ -167,7 +169,7 @@ object DbLibAnorm extends DbLib {
         }
 
         code"""|$maybeToStatement
-               |$sql.as($rowParserIdent.*)
+               |$sql.as(${rowParserFor(rowType)}.*)
                |""".stripMargin
 
       case RepoMethod.SelectByUnique(params, fieldValue, _) =>
@@ -176,7 +178,7 @@ object DbLibAnorm extends DbLib {
         }
         code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
 
-      case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, _) =>
+      case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
           cols.map { col =>
             code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
@@ -200,7 +202,7 @@ object DbLibAnorm extends DbLib {
               |    import anorm._
               |    SQL(q)
               |      .on(namedParams: _*)
-              |      .as($rowParserIdent.*)
+              |      .as(${rowParserFor(rowType)}.*)
               |}
               |""".stripMargin
 
@@ -255,7 +257,7 @@ object DbLibAnorm extends DbLib {
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
                |$sql.executeUpdate() > 0"""
 
-      case RepoMethod.Insert(relName, cols, unsavedParam, _) =>
+      case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
@@ -267,9 +269,9 @@ object DbLibAnorm extends DbLib {
         }
 
         code"""|$sql
-               |  .executeInsert($rowParserIdent.single)
+               |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
-      case RepoMethod.Upsert(relName, cols, id, unsavedParam, _) =>
+      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"$${${unsavedParam.name}.${c.name}}${cast(c)}"
         }
@@ -291,10 +293,10 @@ object DbLibAnorm extends DbLib {
         }
 
         code"""|$sql
-               |  .executeInsert($rowParserIdent.single)
+               |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
 
-      case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, _) =>
+      case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val colCast = sc.StrLit(cast(col).render)
           code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})), $colCast))"""
@@ -327,14 +329,14 @@ object DbLibAnorm extends DbLib {
                |val quote = '"'.toString
                |if (namedParameters.isEmpty) {
                |  $sqlEmpty
-               |    .executeInsert($rowParserIdent.single)
+               |    .executeInsert(${rowParserFor(rowType)}.single)
                |} else {
                |  val q = $sql
                |  // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
                |  import anorm._
                |  SQL(q)
                |    .on(namedParameters.map(_._1) :_*)
-               |    .executeInsert($rowParserIdent.single)
+               |    .executeInsert(${rowParserFor(rowType)}.single)
                |}
                |"""
 
@@ -350,7 +352,7 @@ object DbLibAnorm extends DbLib {
         }
         code"""|val sql =
                |  ${SQL(renderedScript)}
-               |sql.as($rowParserIdent.*)
+               |sql.as(${rowParserFor(sqlScript.RowName)}.*)
                |""".stripMargin
     }
 
@@ -402,7 +404,7 @@ object DbLibAnorm extends DbLib {
     arrayInstances ++ List(localTime)
   }
 
-  def repoAdditionalMembers(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
+  def rowInstances(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
     val rowParser = {
       val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbName.value)})" }
       code"""|val $rowParserIdent: ${RowParser.of(tpe)} =

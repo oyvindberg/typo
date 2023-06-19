@@ -9,10 +9,14 @@ package salestaxrate
 
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -56,4 +60,27 @@ object SalestaxrateRow {
         "rowguid" := row.rowguid,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[SalestaxrateRow] =
+    new Read[SalestaxrateRow](
+      gets = List(
+        (Get[SalestaxrateId], Nullability.NoNulls),
+        (Get[StateprovinceId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[Name], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
+        salestaxrateid = Get[SalestaxrateId].unsafeGetNonNullable(rs, i + 0),
+        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 1),
+        taxtype = Get[Int].unsafeGetNonNullable(rs, i + 2),
+        taxrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+        name = Get[Name].unsafeGetNonNullable(rs, i + 4),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
+      )
+    )
+  
+
 }

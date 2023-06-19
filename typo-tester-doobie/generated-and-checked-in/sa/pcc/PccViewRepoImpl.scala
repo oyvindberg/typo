@@ -7,17 +7,10 @@ package adventureworks
 package sa
 package pcc
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
-import java.time.LocalDateTime
 
 object PccViewRepoImpl extends PccViewRepo {
   override def selectAll: Stream[ConnectionIO, PccViewRow] = {
@@ -35,21 +28,4 @@ object PccViewRepoImpl extends PccViewRepo {
     sql"select * from sa.pcc $where".query[PccViewRow].stream
   
   }
-  implicit val read: Read[PccViewRow] =
-    new Read[PccViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
-    )
-  
-
 }

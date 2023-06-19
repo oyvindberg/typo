@@ -8,21 +8,10 @@ package sales
 package salesorderheader
 
 import adventureworks.Defaulted
-import adventureworks.person.address.AddressId
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
-import adventureworks.public.OrderNumber
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import anorm.ToStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -38,7 +27,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           values (${unsaved.salesorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.orderdate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.status}::int2, ${unsaved.onlineorderflag}::"public"."Flag", ${unsaved.purchaseordernumber}::"public".OrderNumber, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.customerid}::int4, ${unsaved.salespersonid}::int4, ${unsaved.territoryid}::int4, ${unsaved.billtoaddressid}::int4, ${unsaved.shiptoaddressid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.creditcardapprovalcode}, ${unsaved.currencyrateid}::int4, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.totaldue}::numeric, ${unsaved.comment}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesorderheaderRow.rowParser.single)
   
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
@@ -104,7 +93,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       SQL"""insert into sales.salesorderheader default values
             returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesorderheaderRow.rowParser.single)
     } else {
       val q = s"""insert into sales.salesorderheader(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -114,14 +103,14 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(SalesorderheaderRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
-       """.as(rowParser.*)
+       """.as(SalesorderheaderRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheaderRow] = {
     fieldValues match {
@@ -163,7 +152,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(SalesorderheaderRow.rowParser.*)
     }
   
   }
@@ -171,7 +160,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
           where salesorderid = $salesorderid
-       """.as(rowParser.singleOpt)
+       """.as(SalesorderheaderRow.rowParser.singleOpt)
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
     implicit val toStatement: ToStatement[Array[SalesorderheaderId]] =
@@ -181,7 +170,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
           where salesorderid = ANY($salesorderids)
-       """.as(rowParser.*)
+       """.as(SalesorderheaderRow.rowParser.*)
   
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
@@ -315,39 +304,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(SalesorderheaderRow.rowParser.single)
   
   }
-  val rowParser: RowParser[SalesorderheaderRow] =
-    RowParser[SalesorderheaderRow] { row =>
-      Success(
-        SalesorderheaderRow(
-          salesorderid = row[SalesorderheaderId]("salesorderid"),
-          revisionnumber = row[Int]("revisionnumber"),
-          orderdate = row[LocalDateTime]("orderdate"),
-          duedate = row[LocalDateTime]("duedate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          status = row[Int]("status"),
-          onlineorderflag = row[Flag]("onlineorderflag"),
-          purchaseordernumber = row[Option[OrderNumber]]("purchaseordernumber"),
-          accountnumber = row[Option[AccountNumber]]("accountnumber"),
-          customerid = row[CustomerId]("customerid"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          billtoaddressid = row[AddressId]("billtoaddressid"),
-          shiptoaddressid = row[AddressId]("shiptoaddressid"),
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          creditcardapprovalcode = row[Option[/* max 15 chars */ String]]("creditcardapprovalcode"),
-          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
-          subtotal = row[BigDecimal]("subtotal"),
-          taxamt = row[BigDecimal]("taxamt"),
-          freight = row[BigDecimal]("freight"),
-          totaldue = row[Option[BigDecimal]]("totaldue"),
-          comment = row[Option[/* max 128 chars */ String]]("comment"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

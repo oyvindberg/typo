@@ -7,23 +7,16 @@ package adventureworks
 package sa
 package tr
 
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Name
-import adventureworks.sales.salestaxrate.SalestaxrateId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.util.UUID
 
 object TrViewRepoImpl extends TrViewRepo {
   override def selectAll(implicit c: Connection): List[TrViewRow] = {
     SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sa.tr
-       """.as(rowParser.*)
+       """.as(TrViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[TrViewFieldOrIdValue[_]])(implicit c: Connection): List[TrViewRow] = {
     fieldValues match {
@@ -48,23 +41,8 @@ object TrViewRepoImpl extends TrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(TrViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[TrViewRow] =
-    RowParser[TrViewRow] { row =>
-      Success(
-        TrViewRow(
-          id = row[Option[Int]]("id"),
-          salestaxrateid = row[Option[SalestaxrateId]]("salestaxrateid"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          taxtype = row[Option[Int]]("taxtype"),
-          taxrate = row[Option[BigDecimal]]("taxrate"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

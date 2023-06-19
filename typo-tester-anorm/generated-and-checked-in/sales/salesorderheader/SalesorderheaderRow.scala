@@ -17,6 +17,8 @@ import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -86,6 +88,38 @@ case class SalesorderheaderRow(
 )
 
 object SalesorderheaderRow {
+  val rowParser: RowParser[SalesorderheaderRow] =
+    RowParser[SalesorderheaderRow] { row =>
+      Success(
+        SalesorderheaderRow(
+          salesorderid = row[SalesorderheaderId]("salesorderid"),
+          revisionnumber = row[Int]("revisionnumber"),
+          orderdate = row[LocalDateTime]("orderdate"),
+          duedate = row[LocalDateTime]("duedate"),
+          shipdate = row[Option[LocalDateTime]]("shipdate"),
+          status = row[Int]("status"),
+          onlineorderflag = row[Flag]("onlineorderflag"),
+          purchaseordernumber = row[Option[OrderNumber]]("purchaseordernumber"),
+          accountnumber = row[Option[AccountNumber]]("accountnumber"),
+          customerid = row[CustomerId]("customerid"),
+          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
+          territoryid = row[Option[SalesterritoryId]]("territoryid"),
+          billtoaddressid = row[AddressId]("billtoaddressid"),
+          shiptoaddressid = row[AddressId]("shiptoaddressid"),
+          shipmethodid = row[ShipmethodId]("shipmethodid"),
+          creditcardid = row[Option[CreditcardId]]("creditcardid"),
+          creditcardapprovalcode = row[Option[/* max 15 chars */ String]]("creditcardapprovalcode"),
+          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
+          subtotal = row[BigDecimal]("subtotal"),
+          taxamt = row[BigDecimal]("taxamt"),
+          freight = row[BigDecimal]("freight"),
+          totaldue = row[Option[BigDecimal]]("totaldue"),
+          comment = row[Option[/* max 128 chars */ String]]("comment"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[SalesorderheaderRow] = new OFormat[SalesorderheaderRow]{
     override def writes(o: SalesorderheaderRow): JsObject =
       Json.obj(

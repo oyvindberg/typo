@@ -8,6 +8,8 @@ package sales
 package currency
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,6 +27,16 @@ case class CurrencyRow(
 )
 
 object CurrencyRow {
+  val rowParser: RowParser[CurrencyRow] =
+    RowParser[CurrencyRow] { row =>
+      Success(
+        CurrencyRow(
+          currencycode = row[CurrencyId]("currencycode"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[CurrencyRow] = new OFormat[CurrencyRow]{
     override def writes(o: CurrencyRow): JsObject =
       Json.obj(

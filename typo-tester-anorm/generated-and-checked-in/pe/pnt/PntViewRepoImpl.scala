@@ -7,21 +7,16 @@ package adventureworks
 package pe
 package pnt
 
-import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PntViewRepoImpl extends PntViewRepo {
   override def selectAll(implicit c: Connection): List[PntViewRow] = {
     SQL"""select "id", phonenumbertypeid, "name", modifieddate
           from pe.pnt
-       """.as(rowParser.*)
+       """.as(PntViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PntViewFieldOrIdValue[_]])(implicit c: Connection): List[PntViewRow] = {
     fieldValues match {
@@ -42,19 +37,8 @@ object PntViewRepoImpl extends PntViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PntViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PntViewRow] =
-    RowParser[PntViewRow] { row =>
-      Success(
-        PntViewRow(
-          id = row[Option[Int]]("id"),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]]("phonenumbertypeid"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

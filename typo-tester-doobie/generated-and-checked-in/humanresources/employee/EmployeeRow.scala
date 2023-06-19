@@ -9,10 +9,14 @@ package employee
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -89,4 +93,43 @@ object EmployeeRow {
         "modifieddate" := row.modifieddate,
         "organizationnode" := row.organizationnode
       )}
+  implicit val read: Read[EmployeeRow] =
+    new Read[EmployeeRow](
+      gets = List(
+        (Get[BusinessentityId], Nullability.NoNulls),
+        (Get[/* max 15 chars */ String], Nullability.NoNulls),
+        (Get[/* max 256 chars */ String], Nullability.NoNulls),
+        (Get[/* max 50 chars */ String], Nullability.NoNulls),
+        (Get[LocalDate], Nullability.NoNulls),
+        (Get[/* bpchar */ String], Nullability.NoNulls),
+        (Get[/* bpchar */ String], Nullability.NoNulls),
+        (Get[LocalDate], Nullability.NoNulls),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[Flag], Nullability.NoNulls),
+        (Get[UUID], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[String], Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EmployeeRow(
+        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+        nationalidnumber = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 1),
+        loginid = Get[/* max 256 chars */ String].unsafeGetNonNullable(rs, i + 2),
+        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
+        birthdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 4),
+        maritalstatus = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
+        gender = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 6),
+        hiredate = Get[LocalDate].unsafeGetNonNullable(rs, i + 7),
+        salariedflag = Get[Flag].unsafeGetNonNullable(rs, i + 8),
+        vacationhours = Get[Int].unsafeGetNonNullable(rs, i + 9),
+        sickleavehours = Get[Int].unsafeGetNonNullable(rs, i + 10),
+        currentflag = Get[Flag].unsafeGetNonNullable(rs, i + 11),
+        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 12),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 13),
+        organizationnode = Get[String].unsafeGetNullable(rs, i + 14)
+      )
+    )
+  
+
 }

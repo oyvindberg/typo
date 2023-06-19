@@ -7,20 +7,16 @@ package adventureworks
 package humanresources
 package vjobcandidateeducation
 
-import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDate
 
 object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
   override def selectAll(implicit c: Connection): List[VjobcandidateeducationViewRow] = {
     SQL"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City"
           from humanresources.vjobcandidateeducation
-       """.as(rowParser.*)
+       """.as(VjobcandidateeducationViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateeducationViewFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateeducationViewRow] = {
     fieldValues match {
@@ -50,28 +46,8 @@ object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(VjobcandidateeducationViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[VjobcandidateeducationViewRow] =
-    RowParser[VjobcandidateeducationViewRow] { row =>
-      Success(
-        VjobcandidateeducationViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          `Edu.Level` = row[Option[/* max 50 chars */ String]]("Edu.Level"),
-          `Edu.StartDate` = row[Option[LocalDate]]("Edu.StartDate"),
-          `Edu.EndDate` = row[Option[LocalDate]]("Edu.EndDate"),
-          `Edu.Degree` = row[Option[/* max 50 chars */ String]]("Edu.Degree"),
-          `Edu.Major` = row[Option[/* max 50 chars */ String]]("Edu.Major"),
-          `Edu.Minor` = row[Option[/* max 50 chars */ String]]("Edu.Minor"),
-          `Edu.GPA` = row[Option[/* max 5 chars */ String]]("Edu.GPA"),
-          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]]("Edu.GPAScale"),
-          `Edu.School` = row[Option[/* max 100 chars */ String]]("Edu.School"),
-          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Edu.Loc.CountryRegion"),
-          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]]("Edu.Loc.State"),
-          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]]("Edu.Loc.City")
-        )
-      )
-    }
 }

@@ -8,6 +8,8 @@ package hardcoded
 package myschema
 package football_club
 
+import anorm.RowParser
+import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -21,6 +23,15 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
+  val rowParser: RowParser[FootballClubRow] =
+    RowParser[FootballClubRow] { row =>
+      Success(
+        FootballClubRow(
+          id = row[FootballClubId]("id"),
+          name = row[/* max 100 chars */ String]("name")
+        )
+      )
+    }
   implicit val oFormat: OFormat[FootballClubRow] = new OFormat[FootballClubRow]{
     override def writes(o: FootballClubRow): JsObject =
       Json.obj(

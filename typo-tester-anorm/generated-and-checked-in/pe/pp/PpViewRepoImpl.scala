@@ -7,22 +7,16 @@ package adventureworks
 package pe
 package pp
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.Phone
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PpViewRepoImpl extends PpViewRepo {
   override def selectAll(implicit c: Connection): List[PpViewRow] = {
     SQL"""select "id", businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from pe.pp
-       """.as(rowParser.*)
+       """.as(PpViewRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[PpViewFieldOrIdValue[_]])(implicit c: Connection): List[PpViewRow] = {
     fieldValues match {
@@ -44,20 +38,8 @@ object PpViewRepoImpl extends PpViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(PpViewRow.rowParser.*)
     }
   
   }
-  val rowParser: RowParser[PpViewRow] =
-    RowParser[PpViewRow] { row =>
-      Success(
-        PpViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]]("phonenumbertypeid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
-        )
-      )
-    }
 }

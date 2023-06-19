@@ -8,18 +8,12 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.Defaulted
-import adventureworks.production.product.ProductId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
@@ -30,7 +24,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
           values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
-       """.query.unique
+       """.query[PurchaseorderdetailRow].unique
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow] = {
     val fs = List(
@@ -62,7 +56,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
          """
     }
-    q.query.unique
+    q.query[PurchaseorderdetailRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
@@ -148,33 +142,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             rejectedqty = EXCLUDED.rejectedqty,
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
-       """.query.unique
+       """.query[PurchaseorderdetailRow].unique
   }
-  implicit val read: Read[PurchaseorderdetailRow] =
-    new Read[PurchaseorderdetailRow](
-      gets = List(
-        (Get[PurchaseorderheaderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderdetailRow(
-        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        purchaseorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
-        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
-        unitprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        receivedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        rejectedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

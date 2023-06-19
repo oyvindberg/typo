@@ -8,6 +8,8 @@ package production
 package unitmeasure
 
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -25,6 +27,16 @@ case class UnitmeasureRow(
 )
 
 object UnitmeasureRow {
+  val rowParser: RowParser[UnitmeasureRow] =
+    RowParser[UnitmeasureRow] { row =>
+      Success(
+        UnitmeasureRow(
+          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
+          name = row[Name]("name"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[UnitmeasureRow] = new OFormat[UnitmeasureRow]{
     override def writes(o: UnitmeasureRow): JsObject =
       Json.obj(

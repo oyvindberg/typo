@@ -6,15 +6,9 @@
 package adventureworks
 package person_detail
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
-import java.sql.ResultSet
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
   override def apply(businessentityid: /* nullability unknown */ Option[Int]): Stream[ConnectionIO, PersonDetailSqlRow] = {
@@ -38,31 +32,4 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
     sql.query[PersonDetailSqlRow].stream
   
   }
-  implicit val read: Read[PersonDetailSqlRow] =
-    new Read[PersonDetailSqlRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.NoNulls),
-        (Get[/* max 30 chars */ String], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 6),
-        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 7),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 8)
-      )
-    )
-  
-
 }

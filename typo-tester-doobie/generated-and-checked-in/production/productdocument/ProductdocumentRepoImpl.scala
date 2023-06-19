@@ -9,17 +9,12 @@ package productdocument
 
 import adventureworks.Defaulted
 import adventureworks.production.document.DocumentId
-import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
-import doobie.enumerated.Nullability
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import fs2.Stream
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
@@ -30,7 +25,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
           values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning productid, modifieddate, documentnode
-       """.query.unique
+       """.query[ProductdocumentRow].unique
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
@@ -56,7 +51,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
             returning productid, modifieddate, documentnode
          """
     }
-    q.query.unique
+    q.query[ProductdocumentRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
@@ -112,21 +107,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning productid, modifieddate, documentnode
-       """.query.unique
+       """.query[ProductdocumentRow].unique
   }
-  implicit val read: Read[ProductdocumentRow] =
-    new Read[ProductdocumentRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[DocumentId], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductdocumentRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 2)
-      )
-    )
-  
-
 }

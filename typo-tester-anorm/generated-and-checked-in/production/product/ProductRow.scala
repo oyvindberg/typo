@@ -12,6 +12,8 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import anorm.RowParser
+import anorm.Success
 import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
@@ -77,6 +79,38 @@ case class ProductRow(
 )
 
 object ProductRow {
+  val rowParser: RowParser[ProductRow] =
+    RowParser[ProductRow] { row =>
+      Success(
+        ProductRow(
+          productid = row[ProductId]("productid"),
+          name = row[Name]("name"),
+          productnumber = row[/* max 25 chars */ String]("productnumber"),
+          makeflag = row[Flag]("makeflag"),
+          finishedgoodsflag = row[Flag]("finishedgoodsflag"),
+          color = row[Option[/* max 15 chars */ String]]("color"),
+          safetystocklevel = row[Int]("safetystocklevel"),
+          reorderpoint = row[Int]("reorderpoint"),
+          standardcost = row[BigDecimal]("standardcost"),
+          listprice = row[BigDecimal]("listprice"),
+          size = row[Option[/* max 5 chars */ String]]("size"),
+          sizeunitmeasurecode = row[Option[UnitmeasureId]]("sizeunitmeasurecode"),
+          weightunitmeasurecode = row[Option[UnitmeasureId]]("weightunitmeasurecode"),
+          weight = row[Option[BigDecimal]]("weight"),
+          daystomanufacture = row[Int]("daystomanufacture"),
+          productline = row[Option[/* bpchar */ String]]("productline"),
+          `class` = row[Option[/* bpchar */ String]]("class"),
+          style = row[Option[/* bpchar */ String]]("style"),
+          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
+          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
+          sellstartdate = row[LocalDateTime]("sellstartdate"),
+          sellenddate = row[Option[LocalDateTime]]("sellenddate"),
+          discontinueddate = row[Option[LocalDateTime]]("discontinueddate"),
+          rowguid = row[UUID]("rowguid"),
+          modifieddate = row[LocalDateTime]("modifieddate")
+        )
+      )
+    }
   implicit val oFormat: OFormat[ProductRow] = new OFormat[ProductRow]{
     override def writes(o: ProductRow): JsObject =
       Json.obj(

@@ -8,12 +8,9 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
-import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
-import anorm.RowParser
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.util.UUID
@@ -27,7 +24,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmailaddressRow.rowParser.single)
   
   }
   override def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
@@ -52,7 +49,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       SQL"""insert into person.emailaddress default values
             returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
          """
-        .executeInsert(rowParser.single)
+        .executeInsert(EmailaddressRow.rowParser.single)
     } else {
       val q = s"""insert into person.emailaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -62,14 +59,14 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(rowParser.single)
+        .executeInsert(EmailaddressRow.rowParser.single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from person.emailaddress
-       """.as(rowParser.*)
+       """.as(EmailaddressRow.rowParser.*)
   }
   override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow] = {
     fieldValues match {
@@ -91,7 +88,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(rowParser.*)
+          .as(EmailaddressRow.rowParser.*)
     }
   
   }
@@ -99,7 +96,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from person.emailaddress
           where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
-       """.as(rowParser.singleOpt)
+       """.as(EmailaddressRow.rowParser.singleOpt)
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -149,19 +146,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
        """
-      .executeInsert(rowParser.single)
+      .executeInsert(EmailaddressRow.rowParser.single)
   
   }
-  val rowParser: RowParser[EmailaddressRow] =
-    RowParser[EmailaddressRow] { row =>
-      Success(
-        EmailaddressRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          emailaddressid = row[Int]("emailaddressid"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
-        )
-      )
-    }
 }

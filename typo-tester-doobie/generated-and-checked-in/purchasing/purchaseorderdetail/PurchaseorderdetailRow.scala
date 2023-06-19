@@ -9,10 +9,14 @@ package purchaseorderdetail
 
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import doobie.Get
+import doobie.Read
+import doobie.enumerated.Nullability
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
+import java.sql.ResultSet
 import java.time.LocalDateTime
 
 case class PurchaseorderdetailRow(
@@ -67,4 +71,31 @@ object PurchaseorderdetailRow {
         "rejectedqty" := row.rejectedqty,
         "modifieddate" := row.modifieddate
       )}
+  implicit val read: Read[PurchaseorderdetailRow] =
+    new Read[PurchaseorderdetailRow](
+      gets = List(
+        (Get[PurchaseorderheaderId], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls),
+        (Get[Int], Nullability.NoNulls),
+        (Get[ProductId], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[BigDecimal], Nullability.NoNulls),
+        (Get[LocalDateTime], Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderdetailRow(
+        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
+        purchaseorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
+        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
+        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
+        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
+        unitprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+        receivedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
+        rejectedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
+        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      )
+    )
+  
+
 }
