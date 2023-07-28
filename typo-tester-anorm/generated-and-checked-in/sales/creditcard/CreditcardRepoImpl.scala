@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CreditcardRepoImpl extends CreditcardRepo {
@@ -74,10 +72,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
        """.as(CreditcardRow.rowParser(1).singleOpt)
   }
   override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
-    implicit val toStatement: ToStatement[Array[CreditcardId]] =
-      (s: PreparedStatement, index: Int, v: Array[CreditcardId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
           from sales.creditcard
           where creditcardid = ANY($creditcardids)

@@ -9,9 +9,7 @@ package myschema
 package football_club
 
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
@@ -37,10 +35,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
        """.as(FootballClubRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    implicit val toStatement: ToStatement[Array[FootballClubId]] =
-      (s: PreparedStatement, index: Int, v: Array[FootballClubId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
-    
     SQL"""select "id", "name"
           from myschema.football_club
           where "id" = ANY($ids)

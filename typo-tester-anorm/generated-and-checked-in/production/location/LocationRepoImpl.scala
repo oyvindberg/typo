@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object LocationRepoImpl extends LocationRepo {
@@ -79,10 +77,6 @@ object LocationRepoImpl extends LocationRepo {
        """.as(LocationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
-    implicit val toStatement: ToStatement[Array[LocationId]] =
-      (s: PreparedStatement, index: Int, v: Array[LocationId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select locationid, "name", costrate, availability, modifieddate
           from production."location"
           where locationid = ANY($locationids)

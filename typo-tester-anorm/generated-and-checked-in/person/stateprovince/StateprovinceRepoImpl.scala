@@ -12,9 +12,7 @@ import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -84,10 +82,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
        """.as(StateprovinceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
-    implicit val toStatement: ToStatement[Array[StateprovinceId]] =
-      (s: PreparedStatement, index: Int, v: Array[StateprovinceId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
           where stateprovinceid = ANY($stateprovinceids)

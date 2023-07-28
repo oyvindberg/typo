@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -89,10 +87,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
        """.as(SpecialofferRow.rowParser(1).singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
-    implicit val toStatement: ToStatement[Array[SpecialofferId]] =
-      (s: PreparedStatement, index: Int, v: Array[SpecialofferId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sales.specialoffer
           where specialofferid = ANY($specialofferids)

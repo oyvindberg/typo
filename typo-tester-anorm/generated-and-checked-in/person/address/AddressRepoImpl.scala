@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -81,10 +79,6 @@ object AddressRepoImpl extends AddressRepo {
        """.as(AddressRow.rowParser(1).singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
-    implicit val toStatement: ToStatement[Array[AddressId]] =
-      (s: PreparedStatement, index: Int, v: Array[AddressId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
           where addressid = ANY($addressids)

@@ -19,6 +19,6 @@ object PhonenumbertypeId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[PhonenumbertypeId] =
     Decoder[Int].map(PhonenumbertypeId(_))
-  implicit val metaArray: Meta[Array[PhonenumbertypeId]] = Meta[Array[Int]].imap(_.map(PhonenumbertypeId.apply))(_.map(_.value))
   implicit val meta: Meta[PhonenumbertypeId] = Meta[Int].imap(PhonenumbertypeId.apply)(_.value)
+  implicit val metaArray: Meta[Array[PhonenumbertypeId]] = Meta[Array[Int]].imap(_.map(PhonenumbertypeId.apply))(_.map(_.value))
 }

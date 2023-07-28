@@ -19,6 +19,6 @@ object ContacttypeId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[ContacttypeId] =
     Decoder[Int].map(ContacttypeId(_))
-  implicit val metaArray: Meta[Array[ContacttypeId]] = Meta[Array[Int]].imap(_.map(ContacttypeId.apply))(_.map(_.value))
   implicit val meta: Meta[ContacttypeId] = Meta[Int].imap(ContacttypeId.apply)(_.value)
+  implicit val metaArray: Meta[Array[ContacttypeId]] = Meta[Array[Int]].imap(_.map(ContacttypeId.apply))(_.map(_.value))
 }

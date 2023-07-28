@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
@@ -98,10 +96,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
        """.as(PurchaseorderheaderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    implicit val toStatement: ToStatement[Array[PurchaseorderheaderId]] =
-      (s: PreparedStatement, index: Int, v: Array[PurchaseorderheaderId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from purchasing.purchaseorderheader
           where purchaseorderid = ANY($purchaseorderids)

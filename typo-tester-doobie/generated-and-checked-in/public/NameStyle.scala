@@ -20,6 +20,6 @@ object NameStyle {
     Encoder[Boolean].contramap(_.value)
   implicit val decoder: Decoder[NameStyle] =
     Decoder[Boolean].map(NameStyle(_))
-  implicit val metaArray: Meta[Array[NameStyle]] = Meta[Array[Boolean]].imap(_.map(NameStyle.apply))(_.map(_.value))
   implicit val meta: Meta[NameStyle] = Meta[Boolean].imap(NameStyle.apply)(_.value)
+  implicit val metaArray: Meta[Array[NameStyle]] = Meta[Array[Boolean]].imap(_.map(NameStyle.apply))(_.map(_.value))
 }

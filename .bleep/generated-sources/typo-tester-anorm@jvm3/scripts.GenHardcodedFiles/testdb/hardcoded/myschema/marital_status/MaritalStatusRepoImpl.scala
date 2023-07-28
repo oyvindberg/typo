@@ -9,9 +9,7 @@ package myschema
 package marital_status
 
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
@@ -37,10 +35,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
        """.as(MaritalStatusRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
-    implicit val toStatement: ToStatement[Array[MaritalStatusId]] =
-      (s: PreparedStatement, index: Int, v: Array[MaritalStatusId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int8", v.map(x => x.value: java.lang.Long)))
-    
     SQL"""select "id"
           from myschema.marital_status
           where "id" = ANY($ids)

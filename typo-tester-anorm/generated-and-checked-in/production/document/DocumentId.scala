@@ -18,6 +18,7 @@ object DocumentId {
   implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
   implicit val format: Format[DocumentId] = implicitly[Format[String]].bimap(DocumentId.apply, _.value)
   implicit val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[DocumentId]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val column: Column[DocumentId] = implicitly[Column[String]].map(DocumentId.apply)
   implicit val parameterMetadata: ParameterMetaData[DocumentId] = new ParameterMetaData[DocumentId] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType

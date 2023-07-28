@@ -36,35 +36,32 @@ object DbLibAnorm extends DbLib {
       }
       .mkCode(", ")
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
-    val column =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] =
+    List(
       code"""|implicit val column: ${Column.of(wrapperType)} =
              |  implicitly[${Column.of(underlying)}]
-             |    .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin
-    val toStatement =
+             |    .mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }""".stripMargin,
       code"""|implicit val toStatement: ${ToStatement.of(wrapperType)} =
-             |  implicitly[${ToStatement.of(underlying)}].contramap(_.value)""".stripMargin
-
-    val parameterMetadata =
+             |  implicitly[${ToStatement.of(underlying)}].contramap(_.value)""".stripMargin,
+      code"""|implicit val toStatementArray: ${ToStatement.of(sc.Type.Array.of(wrapperType))} =
+             |  implicitly[${ToStatement.of(sc.Type.Array.of(underlying))}].contramap(_.map(_.value))""".stripMargin,
       code"""|implicit val parameterMetadata: $ParameterMetaData[$wrapperType] = new $ParameterMetaData[$wrapperType] {
              |  override def sqlType: ${sc.Type.String} = implicitly[${ParameterMetaData.of(underlying)}].sqlType
              |  override def jdbcType: ${sc.Type.Int} = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}"""
-    List(column, toStatement, parameterMetadata)
-  }
+    )
 
-  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
-    val toStatement = code"""implicit val toStatement: ${ToStatement.of(wrapperType)} = implicitly[${ToStatement.of(underlying)}].contramap(_.value)"""
-    val column = code"""implicit val column: ${Column.of(wrapperType)} = implicitly[${Column.of(underlying)}].map($wrapperType.apply)"""
-    val parameterMetadata =
+  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] =
+    List(
+      code"""implicit val toStatement: ${ToStatement.of(wrapperType)} = implicitly[${ToStatement.of(underlying)}].contramap(_.value)""",
+      code"""implicit val toStatementArray: ${ToStatement.of(sc.Type.Array.of(wrapperType))} = implicitly[${ToStatement.of(sc.Type.Array.of(underlying))}].contramap(_.map(_.value))""",
+      code"""implicit val column: ${Column.of(wrapperType)} = implicitly[${Column.of(underlying)}].map($wrapperType.apply)""",
       code"""|implicit val parameterMetadata: ${ParameterMetaData.of(wrapperType)} = new ${ParameterMetaData.of(wrapperType)} {
              |  override def sqlType: String = implicitly[${ParameterMetaData.of(underlying)}].sqlType
              |  override def jdbcType: Int = implicitly[${ParameterMetaData.of(underlying)}].jdbcType
              |}
              |""".stripMargin
-
-    List(toStatement, column, parameterMetadata)
-  }
+    )
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectAll(_, _, rowType) =>
@@ -154,22 +151,8 @@ object DbLibAnorm extends DbLib {
                  |where ${matchAnyId(unaryId, idsParam)}
                  |""".stripMargin
         }
-        val maybeToStatement = unaryId match {
-          case IdComputed.UnaryUserSpecified(_, _) =>
-            sc.Code.Empty
-          case id =>
-            val boxedType = sc.Type.boxedType(id.col.tpe) match {
-              case Some(boxed) => code": $boxed"
-              case None        => sc.Code.Empty
-            }
-            code"""|implicit val toStatement: ${ToStatement.of(sc.Type.Array.of(id.tpe))} =
-                   |  (s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: ${sc.Type.Array.of(id.tpe)}) =>
-                   |    s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(id.col.dbCol.udtName.get)}, v.map(x => x.value$boxedType)))
-                   |""".stripMargin
-        }
 
-        code"""|$maybeToStatement
-               |$sql.as(${rowParserFor(rowType)}.*)
+        code"""|$sql.as(${rowParserFor(rowType)}.*)
                |""".stripMargin
 
       case RepoMethod.SelectByUnique(params, fieldValue, _) =>
@@ -394,14 +377,46 @@ object DbLibAnorm extends DbLib {
            |    s.setObject(index, new java.sql.Time(v.toNanoOfDay / 1000000))
            |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either =
            |    v1 match {
-           |      case v: ${sc.Type.JavaTime} => ${sc.Type.Right}(v.toLocalTime)
+           |      case v: ${sc.Type.JavaSqlTime} => ${sc.Type.Right}(v.toLocalTime)
            |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of java.sql.Time, got $${other.getClass.getName}"))
            |    }
            |}
            |""".stripMargin
     }
+    val offsetTime = {
+      val tpe = sc.Type.OffsetTime
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val offsetTimeDb: ${inout(tpe)} = new ${inout(tpe)} {
+           |  override def sqlType: ${sc.Type.String} = "timez"
+           |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.TIME_WITH_TIMEZONE
+           |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} =
+           |    s.setObject(index, v)
+           |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either =
+           |    v1 match {
+           |      case v: $tpe => ${sc.Type.Right}(v)
+           |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of $tpe, got $${other.getClass.getName}"))
+           |    }
+           |}
+           |""".stripMargin
+    }
+    val offsetDateTime = {
+      val tpe = sc.Type.OffsetDateTime
+      val either = sc.Type.Either.of(SqlRequestError, tpe)
+      code"""|implicit val offsetDateTimeDb: ${inout(tpe)} = new ${inout(tpe)} {
+           |  override def sqlType: ${sc.Type.String} = "timestamptz"
+           |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.TIMESTAMP_WITH_TIMEZONE
+           |  override def set(s: ${sc.Type.PreparedStatement}, index: ${sc.Type.Int}, v: $tpe): ${sc.Type.Unit} =
+           |    s.setObject(index, v)
+           |  override def apply(v1: ${sc.Type.Any}, v2: $MetaDataItem): $either =
+           |    v1 match {
+           |      case v: $tpe => ${sc.Type.Right}(v)
+           |      case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of $tpe, got $${other.getClass.getName}"))
+           |    }
+           |}
+           |""".stripMargin
+    }
 
-    arrayInstances ++ List(localTime)
+    arrayInstances ++ List(localTime, offsetTime, offsetDateTime)
   }
 
   def rowInstances(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {

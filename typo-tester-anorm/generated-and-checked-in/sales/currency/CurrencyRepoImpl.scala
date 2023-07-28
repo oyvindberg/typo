@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CurrencyRepoImpl extends CurrencyRepo {
@@ -68,10 +66,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
        """.as(CurrencyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
-    implicit val toStatement: ToStatement[Array[CurrencyId]] =
-      (s: PreparedStatement, index: Int, v: Array[CurrencyId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
-    
     SQL"""select currencycode, "name", modifieddate
           from sales.currency
           where currencycode = ANY($currencycodes)

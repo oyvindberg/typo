@@ -33,7 +33,7 @@ object GeneratedAdventureWorks {
           val typoSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
           typo
-            .fromMetaDb(options, metadb, typo.Selector.ExcludePostgresInternal)
+            .fromMetaDb(options, metadb, typo.Selector.All)
             .overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
 
           cli(

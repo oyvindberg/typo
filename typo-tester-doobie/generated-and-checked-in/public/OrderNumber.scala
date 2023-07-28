@@ -20,6 +20,6 @@ object OrderNumber {
     Encoder[String].contramap(_.value)
   implicit val decoder: Decoder[OrderNumber] =
     Decoder[String].map(OrderNumber(_))
-  implicit val metaArray: Meta[Array[OrderNumber]] = Meta[Array[String]].imap(_.map(OrderNumber.apply))(_.map(_.value))
   implicit val meta: Meta[OrderNumber] = Meta[String].imap(OrderNumber.apply)(_.value)
+  implicit val metaArray: Meta[Array[OrderNumber]] = Meta[Array[String]].imap(_.map(OrderNumber.apply))(_.map(_.value))
 }

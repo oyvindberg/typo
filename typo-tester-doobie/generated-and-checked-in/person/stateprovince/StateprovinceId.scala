@@ -19,6 +19,6 @@ object StateprovinceId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[StateprovinceId] =
     Decoder[Int].map(StateprovinceId(_))
-  implicit val metaArray: Meta[Array[StateprovinceId]] = Meta[Array[Int]].imap(_.map(StateprovinceId.apply))(_.map(_.value))
   implicit val meta: Meta[StateprovinceId] = Meta[Int].imap(StateprovinceId.apply)(_.value)
+  implicit val metaArray: Meta[Array[StateprovinceId]] = Meta[Array[Int]].imap(_.map(StateprovinceId.apply))(_.map(_.value))
 }

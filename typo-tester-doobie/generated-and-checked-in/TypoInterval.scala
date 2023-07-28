@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -38,20 +39,22 @@ object TypoInterval {
         "minutes" := row.minutes,
         "seconds" := row.seconds
       )}
-  implicit val TypoIntervalGet: Get[TypoInterval] =
+  implicit val get: Get[TypoInterval] =
     Get.Advanced.other[PGInterval](cats.data.NonEmptyList.one("interval"))
       .map(v => TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
   
-  implicit val TypoIntervalPut: Put[TypoInterval] =
+  implicit val put: Put[TypoInterval] =
     Put.Advanced.other[PGInterval](NonEmptyList.one("interval"))
       .contramap(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))
   
-  implicit val TypoIntervalGetArray: Get[Array[TypoInterval]] =
+  implicit val meta: Meta[TypoInterval] = new Meta(get, put)
+  val gets: Get[Array[TypoInterval]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_interval"))
       .map(_.map(v => TypoInterval(v.asInstanceOf[PGInterval].getYears, v.asInstanceOf[PGInterval].getMonths, v.asInstanceOf[PGInterval].getDays, v.asInstanceOf[PGInterval].getHours, v.asInstanceOf[PGInterval].getMinutes, v.asInstanceOf[PGInterval].getSeconds)))
   
-  implicit val TypoIntervalPutArray: Put[Array[TypoInterval]] =
+  val puts: Put[Array[TypoInterval]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_interval"), "interval")
       .contramap(_.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
-
+  
+  implicit val metas: Meta[Array[TypoInterval]] = new Meta(gets, puts)
 }

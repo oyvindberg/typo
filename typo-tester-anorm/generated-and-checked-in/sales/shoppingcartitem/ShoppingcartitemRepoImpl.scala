@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
@@ -80,10 +78,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """.as(ShoppingcartitemRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
-    implicit val toStatement: ToStatement[Array[ShoppingcartitemId]] =
-      (s: PreparedStatement, index: Int, v: Array[ShoppingcartitemId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sales.shoppingcartitem
           where shoppingcartitemid = ANY($shoppingcartitemids)

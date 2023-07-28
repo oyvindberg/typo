@@ -18,6 +18,7 @@ object ContacttypeId {
   implicit val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
   implicit val format: Format[ContacttypeId] = implicitly[Format[Int]].bimap(ContacttypeId.apply, _.value)
   implicit val toStatement: ToStatement[ContacttypeId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[ContacttypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ContacttypeId] = implicitly[Column[Int]].map(ContacttypeId.apply)
   implicit val parameterMetadata: ParameterMetaData[ContacttypeId] = new ParameterMetaData[ContacttypeId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

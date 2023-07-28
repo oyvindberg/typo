@@ -19,6 +19,7 @@ object PersonId {
   implicit val ordering: Ordering[PersonId] = Ordering.by(_.value)
   implicit val format: Format[PersonId] = implicitly[Format[Long]].bimap(PersonId.apply, _.value)
   implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[PersonId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
   implicit val column: Column[PersonId] = implicitly[Column[Long]].map(PersonId.apply)
   implicit val parameterMetadata: ParameterMetaData[PersonId] = new ParameterMetaData[PersonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType

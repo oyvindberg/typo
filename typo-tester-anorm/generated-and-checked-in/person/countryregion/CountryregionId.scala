@@ -18,6 +18,7 @@ object CountryregionId {
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
   implicit val format: Format[CountryregionId] = implicitly[Format[/* max 3 chars */ String]].bimap(CountryregionId.apply, _.value)
   implicit val toStatement: ToStatement[CountryregionId] = implicitly[ToStatement[/* max 3 chars */ String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[CountryregionId]] = implicitly[ToStatement[Array[/* max 3 chars */ String]]].contramap(_.map(_.value))
   implicit val column: Column[CountryregionId] = implicitly[Column[/* max 3 chars */ String]].map(CountryregionId.apply)
   implicit val parameterMetadata: ParameterMetaData[CountryregionId] = new ParameterMetaData[CountryregionId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* max 3 chars */ String]].sqlType

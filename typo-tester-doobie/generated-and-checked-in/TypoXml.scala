@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,19 +30,20 @@ object TypoXml {
       Json.obj(
         "value" := row.value
       )}
-  implicit val TypoXmlGet: Get[TypoXml] =
+  implicit val get: Get[TypoXml] =
     Get.Advanced.other[PgSQLXML](cats.data.NonEmptyList.one("xml"))
       .map(v => TypoXml(v.getString))
   
-  implicit val TypoXmlPut: Put[TypoXml] =
+  implicit val put: Put[TypoXml] =
     Put.Advanced.other[String](NonEmptyList.one("xml"))
       .contramap(v => v.value)
   
-  implicit val TypoXmlGetArray: Get[Array[TypoXml]] =
+  implicit val meta: Meta[TypoXml] = new Meta(get, put)
+  val gets: Get[Array[TypoXml]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_xml"))
       .map(_.map(v => TypoXml(v.asInstanceOf[PGobject].getValue)))
   
-  implicit val TypoXmlPutArray: Put[Array[TypoXml]] =
+  val puts: Put[Array[TypoXml]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_xml"), "xml")
       .contramap(_.map(v => {
                               val obj = new PGobject
@@ -49,5 +51,6 @@ object TypoXml {
                               obj.setValue(v.value)
                               obj
                             }))
-
+  
+  implicit val metas: Meta[Array[TypoXml]] = new Meta(gets, puts)
 }

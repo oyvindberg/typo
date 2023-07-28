@@ -18,6 +18,7 @@ object WorkorderId {
   implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
   implicit val format: Format[WorkorderId] = implicitly[Format[Int]].bimap(WorkorderId.apply, _.value)
   implicit val toStatement: ToStatement[WorkorderId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[WorkorderId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[WorkorderId] = implicitly[Column[Int]].map(WorkorderId.apply)
   implicit val parameterMetadata: ParameterMetaData[WorkorderId] = new ParameterMetaData[WorkorderId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

@@ -20,6 +20,6 @@ object Flag {
     Encoder[Boolean].contramap(_.value)
   implicit val decoder: Decoder[Flag] =
     Decoder[Boolean].map(Flag(_))
-  implicit val metaArray: Meta[Array[Flag]] = Meta[Array[Boolean]].imap(_.map(Flag.apply))(_.map(_.value))
   implicit val meta: Meta[Flag] = Meta[Boolean].imap(Flag.apply)(_.value)
+  implicit val metaArray: Meta[Array[Flag]] = Meta[Array[Boolean]].imap(_.map(Flag.apply))(_.map(_.value))
 }

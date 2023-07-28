@@ -42,7 +42,7 @@ projects:
     - io.circe::circe-core:0.15.0-M1
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.3.0-SNAP4
-    - org.tpolecat::doobie-postgres:1.0.0-RC2
+    - org.tpolecat::doobie-postgres:1.0.0-RC4
     extends: template-cross
     isTestProject: true
     sourcegen:

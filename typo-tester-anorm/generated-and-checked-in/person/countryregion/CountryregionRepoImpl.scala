@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
@@ -68,10 +66,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
        """.as(CountryregionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
-    implicit val toStatement: ToStatement[Array[CountryregionId]] =
-      (s: PreparedStatement, index: Int, v: Array[CountryregionId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
-    
     SQL"""select countryregioncode, "name", modifieddate
           from person.countryregion
           where countryregioncode = ANY($countryregioncodes)

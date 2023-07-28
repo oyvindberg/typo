@@ -95,6 +95,43 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
     sc.File(sc.Type.Qualified(rowJoined.name), str, secondaryTypes = Nil)
   }
 
+  def ordering(tpe: sc.Type, constituents: NonEmptyList[sc.Param]) = {
+    val ordering = sc.Type.Ordering.of(tpe)
+
+    val impl =
+      constituents match {
+        case NonEmptyList(col, Nil) =>
+          code"${sc.Type.Ordering}.by(_.${col.name.code})"
+        case more =>
+          code"${sc.Type.Ordering}.by(x => (${more.map(col => code"x.${col.name.code}").mkCode(", ")}))"
+      }
+
+    // don't demand that parts of the id are ordered, for instance if they are custom types or user-provided
+    val needsImplicits = constituents.toList.filterNot { x =>
+      val baseType = sc.Type.base(x.tpe)
+      val hasOrdering = sc.Type.HasOrdering(baseType)
+
+      def isInternal = baseType match {
+        case sc.Type.Qualified(qident)
+            if qident.idents.startsWith(options.pkg.idents)
+            // custom types do not have ordering
+              && table.scalaTypeMapper.customTypes.All.forall(_.typoType != baseType) =>
+          true
+        case _ => false
+      }
+
+      hasOrdering || isInternal
+    }
+
+    needsImplicits match {
+      case Nil =>
+        code"implicit val ordering: $ordering = $impl"
+      case nonEmpty =>
+        val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
+        code"implicit def ordering(implicit ${orderingParams.mkCode(", ")}): $ordering = $impl"
+    }
+  }
+
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
       case id: IdComputed.UnaryNormal =>
@@ -104,7 +141,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
           code"""$comments
                 |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
                 |object ${id.tpe.name} {
-                |  implicit val ordering: ${sc.Type.Ordering.of(id.tpe)} = ${sc.Type.Ordering}.by(_.value)
+                |  ${ordering(id.tpe, NonEmptyList(sc.Param(sc.Ident("value"), id.underlying, None)))}
                 |  ${options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
                 |  ${options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
                 |}
@@ -117,30 +154,13 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
       case _: IdComputed.UnaryInherited =>
         None
       case id @ IdComputed.Composite(cols, qident, _) =>
-        val ordering = sc.Type.Ordering.of(id.tpe)
-
-        // don't demand that user-specified types are ordered, but compositive key will be if they are
-        val orderingImplicits = cols.toList.filterNot { x =>
-          val baseType = sc.Type.base(x.tpe)
-          val hasOrdering = sc.Type.HasOrdering(baseType)
-          def isInternal = baseType match {
-            case sc.Type.Qualified(qident) if qident.idents.startsWith(options.pkg.idents) => true
-            case _                                                                         => false
-          }
-          hasOrdering || isInternal
-        } match {
-          case Nil => sc.Code.Empty
-          case nonEmpty =>
-            val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
-            code"(implicit ${orderingParams.mkCode(", ")})"
-        }
         val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
 
         val str =
           code"""$comments
                 |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                 |object ${qident.name} {
-                |  implicit def ordering$orderingImplicits: $ordering = ${sc.Type.Ordering}.by(x => (${cols.map(col => code"x.${col.name.code}").mkCode(", ")}))
+                |  ${ordering(id.tpe, cols.map(cc => sc.Param(cc.param.name, cc.tpe, None)))}
                 |  ${options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols)).mkCode("\n")}
                 |}
 """.stripMargin

@@ -19,6 +19,6 @@ object CurrencyrateId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[CurrencyrateId] =
     Decoder[Int].map(CurrencyrateId(_))
-  implicit val metaArray: Meta[Array[CurrencyrateId]] = Meta[Array[Int]].imap(_.map(CurrencyrateId.apply))(_.map(_.value))
   implicit val meta: Meta[CurrencyrateId] = Meta[Int].imap(CurrencyrateId.apply)(_.value)
+  implicit val metaArray: Meta[Array[CurrencyrateId]] = Meta[Array[Int]].imap(_.map(CurrencyrateId.apply))(_.map(_.value))
 }

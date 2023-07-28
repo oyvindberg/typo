@@ -19,6 +19,6 @@ object JobcandidateId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[JobcandidateId] =
     Decoder[Int].map(JobcandidateId(_))
-  implicit val metaArray: Meta[Array[JobcandidateId]] = Meta[Array[Int]].imap(_.map(JobcandidateId.apply))(_.map(_.value))
   implicit val meta: Meta[JobcandidateId] = Meta[Int].imap(JobcandidateId.apply)(_.value)
+  implicit val metaArray: Meta[Array[JobcandidateId]] = Meta[Array[Int]].imap(_.map(JobcandidateId.apply))(_.map(_.value))
 }

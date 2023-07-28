@@ -18,6 +18,7 @@ object JobcandidateId {
   implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
   implicit val format: Format[JobcandidateId] = implicitly[Format[Int]].bimap(JobcandidateId.apply, _.value)
   implicit val toStatement: ToStatement[JobcandidateId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[JobcandidateId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[JobcandidateId] = implicitly[Column[Int]].map(JobcandidateId.apply)
   implicit val parameterMetadata: ParameterMetaData[JobcandidateId] = new ParameterMetaData[JobcandidateId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

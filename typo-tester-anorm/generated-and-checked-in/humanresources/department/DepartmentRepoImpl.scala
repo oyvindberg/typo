@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object DepartmentRepoImpl extends DepartmentRepo {
@@ -72,10 +70,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
        """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
-    implicit val toStatement: ToStatement[Array[DepartmentId]] =
-      (s: PreparedStatement, index: Int, v: Array[DepartmentId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
           where departmentid = ANY($departmentids)

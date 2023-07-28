@@ -19,6 +19,7 @@ object Name {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[Name] = Ordering.by(_.value)
   implicit val format: Format[Name] = implicitly[Format[String]].bimap(Name.apply, _.value)
   implicit val toStatement: ToStatement[Name] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[Name]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val column: Column[Name] = implicitly[Column[String]].map(Name.apply)
   implicit val parameterMetadata: ParameterMetaData[Name] = new ParameterMetaData[Name] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType

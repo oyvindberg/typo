@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ShiftRepoImpl extends ShiftRepo {
@@ -73,10 +71,6 @@ object ShiftRepoImpl extends ShiftRepo {
        """.as(ShiftRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
-    implicit val toStatement: ToStatement[Array[ShiftId]] =
-      (s: PreparedStatement, index: Int, v: Array[ShiftId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
           where shiftid = ANY($shiftids)

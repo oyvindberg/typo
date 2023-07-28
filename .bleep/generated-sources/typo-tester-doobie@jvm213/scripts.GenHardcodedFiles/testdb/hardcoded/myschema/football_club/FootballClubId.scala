@@ -20,6 +20,6 @@ object FootballClubId {
     Encoder[Long].contramap(_.value)
   implicit val decoder: Decoder[FootballClubId] =
     Decoder[Long].map(FootballClubId(_))
-  implicit val metaArray: Meta[Array[FootballClubId]] = Meta[Array[Long]].imap(_.map(FootballClubId.apply))(_.map(_.value))
   implicit val meta: Meta[FootballClubId] = Meta[Long].imap(FootballClubId.apply)(_.value)
+  implicit val metaArray: Meta[Array[FootballClubId]] = Meta[Array[Long]].imap(_.map(FootballClubId.apply))(_.map(_.value))
 }

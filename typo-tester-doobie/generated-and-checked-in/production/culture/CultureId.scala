@@ -19,6 +19,6 @@ object CultureId {
     Encoder[/* bpchar */ String].contramap(_.value)
   implicit val decoder: Decoder[CultureId] =
     Decoder[/* bpchar */ String].map(CultureId(_))
-  implicit val metaArray: Meta[Array[CultureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(CultureId.apply))(_.map(_.value))
   implicit val meta: Meta[CultureId] = Meta[/* bpchar */ String].imap(CultureId.apply)(_.value)
+  implicit val metaArray: Meta[Array[CultureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(CultureId.apply))(_.map(_.value))
 }

@@ -19,6 +19,7 @@ object Flag {
   implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[Flag] = Ordering.by(_.value)
   implicit val format: Format[Flag] = implicitly[Format[Boolean]].bimap(Flag.apply, _.value)
   implicit val toStatement: ToStatement[Flag] = implicitly[ToStatement[Boolean]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[Flag]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
   implicit val column: Column[Flag] = implicitly[Column[Boolean]].map(Flag.apply)
   implicit val parameterMetadata: ParameterMetaData[Flag] = new ParameterMetaData[Flag] {
     override def sqlType: String = implicitly[ParameterMetaData[Boolean]].sqlType

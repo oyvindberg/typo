@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,20 +30,22 @@ object TypoPolygon {
       Json.obj(
         "points" := row.points
       )}
-  implicit val TypoPolygonGet: Get[TypoPolygon] =
+  implicit val get: Get[TypoPolygon] =
     Get.Advanced.other[PGpolygon](cats.data.NonEmptyList.one("polygon"))
       .map(v => TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
   
-  implicit val TypoPolygonPut: Put[TypoPolygon] =
+  implicit val put: Put[TypoPolygon] =
     Put.Advanced.other[PGpolygon](NonEmptyList.one("polygon"))
       .contramap(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray))
   
-  implicit val TypoPolygonGetArray: Get[Array[TypoPolygon]] =
+  implicit val meta: Meta[TypoPolygon] = new Meta(get, put)
+  val gets: Get[Array[TypoPolygon]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_polygon"))
       .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
   
-  implicit val TypoPolygonPutArray: Put[Array[TypoPolygon]] =
+  val puts: Put[Array[TypoPolygon]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
       .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
-
+  
+  implicit val metas: Meta[Array[TypoPolygon]] = new Meta(gets, puts)
 }

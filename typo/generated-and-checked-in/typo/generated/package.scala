@@ -82,5 +82,29 @@ package object generated {
         case other => scala.Left(anorm.TypeDoesNotMatch(s"Expected instance of java.sql.Time, got ${other.getClass.getName}"))
       }
   }
+  
+  implicit val offsetTimeDb: anorm.ToStatement[java.time.OffsetTime] with anorm.ParameterMetaData[java.time.OffsetTime] with anorm.Column[java.time.OffsetTime] = new anorm.ToStatement[java.time.OffsetTime] with anorm.ParameterMetaData[java.time.OffsetTime] with anorm.Column[java.time.OffsetTime] {
+    override def sqlType: java.lang.String = "timez"
+    override def jdbcType: scala.Int = java.sql.Types.TIME_WITH_TIMEZONE
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: java.time.OffsetTime): scala.Unit =
+      s.setObject(index, v)
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, java.time.OffsetTime] =
+      v1 match {
+        case v: java.time.OffsetTime => scala.Right(v)
+        case other => scala.Left(anorm.TypeDoesNotMatch(s"Expected instance of java.time.OffsetTime, got ${other.getClass.getName}"))
+      }
+  }
+  
+  implicit val offsetDateTimeDb: anorm.ToStatement[java.time.OffsetDateTime] with anorm.ParameterMetaData[java.time.OffsetDateTime] with anorm.Column[java.time.OffsetDateTime] = new anorm.ToStatement[java.time.OffsetDateTime] with anorm.ParameterMetaData[java.time.OffsetDateTime] with anorm.Column[java.time.OffsetDateTime] {
+    override def sqlType: java.lang.String = "timestamptz"
+    override def jdbcType: scala.Int = java.sql.Types.TIMESTAMP_WITH_TIMEZONE
+    override def set(s: java.sql.PreparedStatement, index: scala.Int, v: java.time.OffsetDateTime): scala.Unit =
+      s.setObject(index, v)
+    override def apply(v1: scala.Any, v2: anorm.MetaDataItem): scala.Either[anorm.SqlRequestError, java.time.OffsetDateTime] =
+      v1 match {
+        case v: java.time.OffsetDateTime => scala.Right(v)
+        case other => scala.Left(anorm.TypeDoesNotMatch(s"Expected instance of java.time.OffsetDateTime, got ${other.getClass.getName}"))
+      }
+  }
 
 }

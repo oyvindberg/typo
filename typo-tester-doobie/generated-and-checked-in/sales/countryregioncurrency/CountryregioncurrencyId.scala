@@ -17,7 +17,7 @@ import io.circe.Json
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
 case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
 object CountryregioncurrencyId {
-  implicit def ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))
+  implicit val ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))
   implicit val decoder: Decoder[CountryregioncurrencyId] =
     (c: HCursor) =>
       for {

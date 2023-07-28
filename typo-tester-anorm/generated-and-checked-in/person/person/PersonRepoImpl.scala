@@ -13,9 +13,7 @@ import adventureworks.public.NameStyle
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -90,10 +88,6 @@ object PersonRepoImpl extends PersonRepo {
        """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
-    implicit val toStatement: ToStatement[Array[BusinessentityId]] =
-      (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from person.person
           where businessentityid = ANY($businessentityids)

@@ -18,6 +18,7 @@ object UnitmeasureId {
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
   implicit val format: Format[UnitmeasureId] = implicitly[Format[/* bpchar */ String]].bimap(UnitmeasureId.apply, _.value)
   implicit val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[UnitmeasureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit val column: Column[UnitmeasureId] = implicitly[Column[/* bpchar */ String]].map(UnitmeasureId.apply)
   implicit val parameterMetadata: ParameterMetaData[UnitmeasureId] = new ParameterMetaData[UnitmeasureId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType

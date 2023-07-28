@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -82,10 +80,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
-    implicit val toStatement: ToStatement[Array[SalestaxrateId]] =
-      (s: PreparedStatement, index: Int, v: Array[SalestaxrateId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
