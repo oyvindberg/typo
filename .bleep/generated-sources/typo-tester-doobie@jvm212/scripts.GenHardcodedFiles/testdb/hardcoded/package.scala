@@ -38,7 +38,6 @@ package object hardcoded {
   implicit val optionBigDecimalMeta: doobie.Meta[Array[Option[BigDecimal]]] = doobie.postgres.implicits.optionBigDecimalMeta
   implicit val JavaTimeOffsetDateTimeMeta: doobie.Meta[java.time.OffsetDateTime] = doobie.postgres.implicits.JavaTimeOffsetDateTimeMeta
   implicit val JavaTimeInstantMeta: doobie.Meta[java.time.Instant] = doobie.postgres.implicits.JavaTimeInstantMeta
-  implicit val JavaTimeZonedDateTimeMeta: doobie.Meta[java.time.ZonedDateTime] = doobie.postgres.implicits.JavaTimeZonedDateTimeMeta
   implicit val JavaTimeLocalDateTimeMeta: doobie.Meta[java.time.LocalDateTime] = doobie.postgres.implicits.JavaTimeLocalDateTimeMeta
   implicit val JavaTimeLocalDateMeta: doobie.Meta[java.time.LocalDate] = doobie.postgres.implicits.JavaTimeLocalDateMeta
   implicit val JavaTimeLocalTimeMeta: doobie.Meta[java.time.LocalTime] = doobie.postgres.implicits.JavaTimeLocalTimeMeta

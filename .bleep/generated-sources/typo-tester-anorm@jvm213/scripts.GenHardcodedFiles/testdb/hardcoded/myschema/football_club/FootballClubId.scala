@@ -19,6 +19,7 @@ object FootballClubId {
   implicit val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
   implicit val format: Format[FootballClubId] = implicitly[Format[Long]].bimap(FootballClubId.apply, _.value)
   implicit val toStatement: ToStatement[FootballClubId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[FootballClubId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
   implicit val column: Column[FootballClubId] = implicitly[Column[Long]].map(FootballClubId.apply)
   implicit val parameterMetadata: ParameterMetaData[FootballClubId] = new ParameterMetaData[FootballClubId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType

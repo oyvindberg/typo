@@ -110,8 +110,9 @@ case class TypeMapperScala(
       case db.Type.EnumRef(name)   => sc.Type.Qualified(naming.enumName(name))
       case db.Type.Text            => sc.Type.String
       case db.Type.Time            => sc.Type.LocalTime
+      case db.Type.Timez           => sc.Type.OffsetTime
       case db.Type.Timestamp       => sc.Type.LocalDateTime
-      case db.Type.TimestampTz     => sc.Type.ZonedDateTime
+      case db.Type.TimestampTz     => sc.Type.OffsetDateTime
       case db.Type.UUID            => sc.Type.UUID
       case db.Type.Xml             => customTypes.TypoXml.typoType
       case db.Type.VarChar(maybeN) =>

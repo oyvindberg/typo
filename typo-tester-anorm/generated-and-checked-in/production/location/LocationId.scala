@@ -18,6 +18,7 @@ object LocationId {
   implicit val ordering: Ordering[LocationId] = Ordering.by(_.value)
   implicit val format: Format[LocationId] = implicitly[Format[Int]].bimap(LocationId.apply, _.value)
   implicit val toStatement: ToStatement[LocationId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[LocationId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[LocationId] = implicitly[Column[Int]].map(LocationId.apply)
   implicit val parameterMetadata: ParameterMetaData[LocationId] = new ParameterMetaData[LocationId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

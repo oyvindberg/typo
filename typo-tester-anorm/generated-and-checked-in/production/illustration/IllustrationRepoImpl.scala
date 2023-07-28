@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
@@ -71,10 +69,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
        """.as(IllustrationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
-    implicit val toStatement: ToStatement[Array[IllustrationId]] =
-      (s: PreparedStatement, index: Int, v: Array[IllustrationId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select illustrationid, diagram, modifieddate
           from production.illustration
           where illustrationid = ANY($illustrationids)

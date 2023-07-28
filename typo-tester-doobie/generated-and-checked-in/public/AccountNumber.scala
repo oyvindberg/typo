@@ -20,6 +20,6 @@ object AccountNumber {
     Encoder[String].contramap(_.value)
   implicit val decoder: Decoder[AccountNumber] =
     Decoder[String].map(AccountNumber(_))
-  implicit val metaArray: Meta[Array[AccountNumber]] = Meta[Array[String]].imap(_.map(AccountNumber.apply))(_.map(_.value))
   implicit val meta: Meta[AccountNumber] = Meta[String].imap(AccountNumber.apply)(_.value)
+  implicit val metaArray: Meta[Array[AccountNumber]] = Meta[Array[String]].imap(_.map(AccountNumber.apply))(_.map(_.value))
 }

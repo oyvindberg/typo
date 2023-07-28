@@ -20,6 +20,6 @@ object MaritalStatusId {
     Encoder[Long].contramap(_.value)
   implicit val decoder: Decoder[MaritalStatusId] =
     Decoder[Long].map(MaritalStatusId(_))
-  implicit val metaArray: Meta[Array[MaritalStatusId]] = Meta[Array[Long]].imap(_.map(MaritalStatusId.apply))(_.map(_.value))
   implicit val meta: Meta[MaritalStatusId] = Meta[Long].imap(MaritalStatusId.apply)(_.value)
+  implicit val metaArray: Meta[Array[MaritalStatusId]] = Meta[Array[Long]].imap(_.map(MaritalStatusId.apply))(_.map(_.value))
 }

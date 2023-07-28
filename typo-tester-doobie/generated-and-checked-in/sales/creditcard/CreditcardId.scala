@@ -19,6 +19,6 @@ object CreditcardId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[CreditcardId] =
     Decoder[Int].map(CreditcardId(_))
-  implicit val metaArray: Meta[Array[CreditcardId]] = Meta[Array[Int]].imap(_.map(CreditcardId.apply))(_.map(_.value))
   implicit val meta: Meta[CreditcardId] = Meta[Int].imap(CreditcardId.apply)(_.value)
+  implicit val metaArray: Meta[Array[CreditcardId]] = Meta[Array[Int]].imap(_.map(CreditcardId.apply))(_.map(_.value))
 }

@@ -37,6 +37,8 @@ object Sector {
       .mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
   implicit val toStatement: ToStatement[Sector] =
     implicitly[ToStatement[String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[Sector]] =
+    implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType

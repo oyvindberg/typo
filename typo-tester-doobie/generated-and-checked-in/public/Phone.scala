@@ -20,6 +20,6 @@ object Phone {
     Encoder[String].contramap(_.value)
   implicit val decoder: Decoder[Phone] =
     Decoder[String].map(Phone(_))
-  implicit val metaArray: Meta[Array[Phone]] = Meta[Array[String]].imap(_.map(Phone.apply))(_.map(_.value))
   implicit val meta: Meta[Phone] = Meta[String].imap(Phone.apply)(_.value)
+  implicit val metaArray: Meta[Array[Phone]] = Meta[Array[String]].imap(_.map(Phone.apply))(_.map(_.value))
 }

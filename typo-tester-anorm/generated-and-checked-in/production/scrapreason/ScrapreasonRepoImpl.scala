@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
@@ -71,10 +69,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.as(ScrapreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
-    implicit val toStatement: ToStatement[Array[ScrapreasonId]] =
-      (s: PreparedStatement, index: Int, v: Array[ScrapreasonId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select scrapreasonid, "name", modifieddate
           from production.scrapreason
           where scrapreasonid = ANY($scrapreasonids)

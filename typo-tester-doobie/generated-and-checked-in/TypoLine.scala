@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -32,20 +33,22 @@ object TypoLine {
         "b" := row.b,
         "c" := row.c
       )}
-  implicit val TypoLineGet: Get[TypoLine] =
+  implicit val get: Get[TypoLine] =
     Get.Advanced.other[PGline](cats.data.NonEmptyList.one("line"))
       .map(v => TypoLine(v.a, v.b, v.c))
   
-  implicit val TypoLinePut: Put[TypoLine] =
+  implicit val put: Put[TypoLine] =
     Put.Advanced.other[PGline](NonEmptyList.one("line"))
       .contramap(v => new PGline(v.a, v.b, v.c))
   
-  implicit val TypoLineGetArray: Get[Array[TypoLine]] =
+  implicit val meta: Meta[TypoLine] = new Meta(get, put)
+  val gets: Get[Array[TypoLine]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_line"))
       .map(_.map(v => TypoLine(v.asInstanceOf[PGline].a, v.asInstanceOf[PGline].b, v.asInstanceOf[PGline].c)))
   
-  implicit val TypoLinePutArray: Put[Array[TypoLine]] =
+  val puts: Put[Array[TypoLine]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_line"), "line")
       .contramap(_.map(v => new PGline(v.a, v.b, v.c)))
-
+  
+  implicit val metas: Meta[Array[TypoLine]] = new Meta(gets, puts)
 }

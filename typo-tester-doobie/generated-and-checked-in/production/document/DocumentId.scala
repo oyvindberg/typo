@@ -19,6 +19,6 @@ object DocumentId {
     Encoder[String].contramap(_.value)
   implicit val decoder: Decoder[DocumentId] =
     Decoder[String].map(DocumentId(_))
-  implicit val metaArray: Meta[Array[DocumentId]] = Meta[Array[String]].imap(_.map(DocumentId.apply))(_.map(_.value))
   implicit val meta: Meta[DocumentId] = Meta[String].imap(DocumentId.apply)(_.value)
+  implicit val metaArray: Meta[Array[DocumentId]] = Meta[Array[String]].imap(_.map(DocumentId.apply))(_.map(_.value))
 }

@@ -19,6 +19,6 @@ object TransactionhistoryarchiveId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[TransactionhistoryarchiveId] =
     Decoder[Int].map(TransactionhistoryarchiveId(_))
-  implicit val metaArray: Meta[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].imap(_.map(TransactionhistoryarchiveId.apply))(_.map(_.value))
   implicit val meta: Meta[TransactionhistoryarchiveId] = Meta[Int].imap(TransactionhistoryarchiveId.apply)(_.value)
+  implicit val metaArray: Meta[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].imap(_.map(TransactionhistoryarchiveId.apply))(_.map(_.value))
 }

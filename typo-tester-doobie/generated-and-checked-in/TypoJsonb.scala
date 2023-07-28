@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -28,11 +29,11 @@ object TypoJsonb {
       Json.obj(
         "value" := row.value
       )}
-  implicit val TypoJsonbGet: Get[TypoJsonb] =
+  implicit val get: Get[TypoJsonb] =
     Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("jsonb"))
       .map(v => TypoJsonb(v.getValue))
   
-  implicit val TypoJsonbPut: Put[TypoJsonb] =
+  implicit val put: Put[TypoJsonb] =
     Put.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
       .contramap(v => {
                         val obj = new PGobject
@@ -41,11 +42,12 @@ object TypoJsonb {
                         obj
                       })
   
-  implicit val TypoJsonbGetArray: Get[Array[TypoJsonb]] =
+  implicit val meta: Meta[TypoJsonb] = new Meta(get, put)
+  val gets: Get[Array[TypoJsonb]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
       .map(_.map(v => TypoJsonb(v.asInstanceOf[String])))
   
-  implicit val TypoJsonbPutArray: Put[Array[TypoJsonb]] =
+  val puts: Put[Array[TypoJsonb]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
       .contramap(_.map(v => {
                               val obj = new PGobject
@@ -53,5 +55,6 @@ object TypoJsonb {
                               obj.setValue(v.value)
                               obj
                             }))
-
+  
+  implicit val metas: Meta[Array[TypoJsonb]] = new Meta(gets, puts)
 }

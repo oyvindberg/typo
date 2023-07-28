@@ -19,6 +19,6 @@ object AddressId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[AddressId] =
     Decoder[Int].map(AddressId(_))
-  implicit val metaArray: Meta[Array[AddressId]] = Meta[Array[Int]].imap(_.map(AddressId.apply))(_.map(_.value))
   implicit val meta: Meta[AddressId] = Meta[Int].imap(AddressId.apply)(_.value)
+  implicit val metaArray: Meta[Array[AddressId]] = Meta[Array[Int]].imap(_.map(AddressId.apply))(_.map(_.value))
 }

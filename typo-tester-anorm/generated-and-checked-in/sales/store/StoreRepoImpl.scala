@@ -12,9 +12,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -76,10 +74,6 @@ object StoreRepoImpl extends StoreRepo {
        """.as(StoreRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
-    implicit val toStatement: ToStatement[Array[BusinessentityId]] =
-      (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = ANY($businessentityids)

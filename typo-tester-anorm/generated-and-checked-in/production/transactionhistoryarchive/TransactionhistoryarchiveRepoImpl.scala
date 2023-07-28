@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
@@ -80,10 +78,6 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
        """.as(TransactionhistoryarchiveRow.rowParser(1).singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
-    implicit val toStatement: ToStatement[Array[TransactionhistoryarchiveId]] =
-      (s: PreparedStatement, index: Int, v: Array[TransactionhistoryarchiveId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistoryarchive
           where transactionid = ANY($transactionids)

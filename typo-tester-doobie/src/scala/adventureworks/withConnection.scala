@@ -8,7 +8,8 @@ import doobie.syntax.all.*
 object withConnection {
   val xa = Transactor.fromDriverManager[IO](
     "org.postgresql.Driver",
-    "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
+    "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password",
+    logHandler = None
   )
   val testXa = Transactor.after.set(xa, HC.rollback)
 

@@ -18,7 +18,7 @@ import play.api.libs.json.Format
 /** Type for the primary key of table `pg_catalog.pg_namespace` */
 case class PgNamespaceId(value: /* oid */ Long) extends AnyVal
 object PgNamespaceId {
-  implicit val ordering: Ordering[PgNamespaceId] = Ordering.by(_.value)
+  implicit val ordering: Ordering[PgNamespaceId] = Ordering.by(x => (x.value))
   implicit val format: Format[PgNamespaceId] = implicitly[Format[/* oid */ Long]].bimap(PgNamespaceId.apply, _.value)
   implicit val toStatement: ToStatement[PgNamespaceId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
   implicit val column: Column[PgNamespaceId] = implicitly[Column[/* oid */ Long]].map(PgNamespaceId.apply)

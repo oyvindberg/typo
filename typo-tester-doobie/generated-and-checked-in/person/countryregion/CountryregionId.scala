@@ -19,6 +19,6 @@ object CountryregionId {
     Encoder[/* max 3 chars */ String].contramap(_.value)
   implicit val decoder: Decoder[CountryregionId] =
     Decoder[/* max 3 chars */ String].map(CountryregionId(_))
-  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[/* max 3 chars */ String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
   implicit val meta: Meta[CountryregionId] = Meta[/* max 3 chars */ String].imap(CountryregionId.apply)(_.value)
+  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[/* max 3 chars */ String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
 }

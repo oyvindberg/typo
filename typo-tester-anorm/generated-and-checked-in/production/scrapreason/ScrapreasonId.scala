@@ -18,6 +18,7 @@ object ScrapreasonId {
   implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
   implicit val format: Format[ScrapreasonId] = implicitly[Format[Int]].bimap(ScrapreasonId.apply, _.value)
   implicit val toStatement: ToStatement[ScrapreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[ScrapreasonId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ScrapreasonId] = implicitly[Column[Int]].map(ScrapreasonId.apply)
   implicit val parameterMetadata: ParameterMetaData[ScrapreasonId] = new ParameterMetaData[ScrapreasonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
@@ -77,10 +75,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
        """.as(WorkorderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
-    implicit val toStatement: ToStatement[Array[WorkorderId]] =
-      (s: PreparedStatement, index: Int, v: Array[WorkorderId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
           where workorderid = ANY($workorderids)

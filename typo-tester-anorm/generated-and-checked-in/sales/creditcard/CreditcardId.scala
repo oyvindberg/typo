@@ -18,6 +18,7 @@ object CreditcardId {
   implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
   implicit val format: Format[CreditcardId] = implicitly[Format[Int]].bimap(CreditcardId.apply, _.value)
   implicit val toStatement: ToStatement[CreditcardId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[CreditcardId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)
   implicit val parameterMetadata: ParameterMetaData[CreditcardId] = new ParameterMetaData[CreditcardId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

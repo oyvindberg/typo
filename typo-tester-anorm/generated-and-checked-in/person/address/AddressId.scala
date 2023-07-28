@@ -18,6 +18,7 @@ object AddressId {
   implicit val ordering: Ordering[AddressId] = Ordering.by(_.value)
   implicit val format: Format[AddressId] = implicitly[Format[Int]].bimap(AddressId.apply, _.value)
   implicit val toStatement: ToStatement[AddressId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[AddressId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[AddressId] = implicitly[Column[Int]].map(AddressId.apply)
   implicit val parameterMetadata: ParameterMetaData[AddressId] = new ParameterMetaData[AddressId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

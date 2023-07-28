@@ -39,37 +39,18 @@ object DbLibDoobie extends DbLib {
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
     List(
       code"""implicit val put: ${Put.of(wrapperType)} = ${Put.of(underlying)}.contramap(_.value)""",
-      code"""implicit val get: ${Get.of(wrapperType)} = ${Get.of(
-          underlying
-        )}.temap { str => ByName.get(str).toRight(s"$$str was not among $${ByName.keys}") }""",
+      code"""implicit val putArray: ${Put.of(sc.Type.Array.of(wrapperType))} = ${Put.of(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))""",
+      code"""implicit val get: ${Get.of(wrapperType)} = ${Get.of(underlying)}.temap { str => ByName.get(str).toRight(s"$$str was not among $${ByName.keys}") }""",
       code"""implicit val write: ${Write.of(wrapperType)} = ${Write.of(underlying)}.contramap(_.value)""",
-      code"""implicit val read: ${Read.of(wrapperType)} = ${Read.of(
-          underlying
-        )}.map(x => ByName.getOrElse(x, throw new IllegalArgumentException(s"$$x was not among $${ByName.keys}")))"""
+      code"""implicit val read: ${Read.of(wrapperType)} = ${Read.of(underlying)}.map(x => ByName.getOrElse(x, throw new IllegalArgumentException(s"$$x was not among $${ByName.keys}")))"""
     )
   }
 
-  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] = {
-    val maybeArrayMeta = sc.Type.base(underlying) match {
-      case sc.Type.Long       => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.Int        => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.Boolean    => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.Float      => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.Double     => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.BigDecimal => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.UUID       => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case sc.Type.String     => Some(Meta.of(sc.Type.Array.of(underlying)).code)
-      case _                  => None
-    }
-
-    val arrayInstances = maybeArrayMeta.map { arrayMeta =>
-      code"implicit val metaArray: ${Meta.of(sc.Type.Array.of(wrapperType))} = $arrayMeta.imap(_.map($wrapperType.apply))(_.map(_.value))"
-    }
-
-    arrayInstances.toList ++ List(
-      code"""implicit val meta: ${Meta.of(wrapperType)} = ${Meta.of(underlying)}.imap($wrapperType.apply)(_.value)"""
+  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] =
+    List(
+      code"implicit val meta: ${Meta.of(wrapperType)} = ${Meta.of(underlying)}.imap($wrapperType.apply)(_.value)",
+      code"implicit val metaArray: ${Meta.of(sc.Type.Array.of(wrapperType))} = ${Meta.of(sc.Type.Array.of(underlying))}.imap(_.map($wrapperType.apply))(_.map(_.value))"
     )
-  }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectAll(_, _, rowType) =>
@@ -163,10 +144,10 @@ object DbLibDoobie extends DbLib {
           }
 
         val sql = SQL(code"""select * from $relName $$where""")
-        code"""val where = $Fragments.whereAnd(
+        code"""val where = $Fragments.whereAndOpt(
               |  ${fieldValueOrIdsParam.name}.map {
               |    ${cases.mkCode("\n")}
-              |  } :_*
+              |  }
               |)
               |$sql.query[$rowType].stream
               |""".stripMargin
@@ -184,13 +165,13 @@ object DbLibDoobie extends DbLib {
                  |where ${matchId(id)}""".stripMargin
         }
 
-        code"""${varargs.name} match {
-              |  case Nil => $pureCIO(false)
-              |  case nonEmpty =>
+        code"""$NonEmptyList.fromList(${varargs.name}) match {
+              |  case None => $pureCIO(false)
+              |  case Some(nonEmpty) =>
               |    val updates = $Fragments.set(
               |      nonEmpty.map {
               |        ${cases.mkCode("\n")}
-              |      } :_*
+              |      }
               |    )
               |    $sql.update.run.map(_ > 0)
               |}""".stripMargin
@@ -332,7 +313,6 @@ object DbLibDoobie extends DbLib {
       // time
       code"implicit val JavaTimeOffsetDateTimeMeta: $Meta[java.time.OffsetDateTime] = doobie.postgres.implicits.JavaTimeOffsetDateTimeMeta",
       code"implicit val JavaTimeInstantMeta: $Meta[java.time.Instant] = doobie.postgres.implicits.JavaTimeInstantMeta",
-      code"implicit val JavaTimeZonedDateTimeMeta: $Meta[java.time.ZonedDateTime] = doobie.postgres.implicits.JavaTimeZonedDateTimeMeta",
       code"implicit val JavaTimeLocalDateTimeMeta: $Meta[java.time.LocalDateTime] = doobie.postgres.implicits.JavaTimeLocalDateTimeMeta",
       code"implicit val JavaTimeLocalDateMeta: $Meta[java.time.LocalDate] = doobie.postgres.implicits.JavaTimeLocalDateMeta",
       code"implicit val JavaTimeLocalTimeMeta: $Meta[java.time.LocalTime] = doobie.postgres.implicits.JavaTimeLocalTimeMeta"
@@ -461,29 +441,32 @@ object DbLibDoobie extends DbLib {
     val sqlTypeLit = sc.StrLit(ct.sqlType)
     val single = {
       List(
-        code"""|implicit val ${tpe.value.name}Get: ${Get.of(tpe)} =
+        code"""|implicit val get: ${Get.of(tpe)} =
                |  $Get.Advanced.other[${ct.toTypo.jdbcType}](cats.data.NonEmptyList.one($sqlTypeLit))
                |    .map($v => ${ct.toTypo0(v)})
                |""".stripMargin,
-        code"""|implicit val ${tpe.value.name}Put: ${Put.of(tpe)} =
+        code"""|implicit val put: ${Put.of(tpe)} =
                |  $Put.Advanced.other[${ct.fromTypo.jdbcType}]($NonEmptyList.one($sqlTypeLit))
                |    .contramap($v => ${ct.fromTypo0(v)})
-               |""".stripMargin
+               |""".stripMargin,
+        code"implicit val meta: ${Meta.of(tpe)} = new $Meta(get, put)"
       )
     }
     val array = {
       val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
       val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
       val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
+      val arrayType = sc.Type.Array.of(tpe)
       List(
-        code"""|implicit val ${tpe.value.name}GetArray: ${Get.of(sc.Type.Array.of(tpe))} =
+        code"""|val gets: ${Get.of(arrayType)} =
                |  $Get.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
                |    .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
                |""".stripMargin,
-        code"""|implicit val ${tpe.value.name}PutArray: ${Put.of(sc.Type.Array.of(tpe))} =
+        code"""|val puts: ${Put.of(arrayType)} =
                |  $Put.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
                |    .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))
-               |""".stripMargin
+               |""".stripMargin,
+        code"implicit val metas: ${Meta.of(arrayType)} = new $Meta(gets, puts)"
       )
     }
 

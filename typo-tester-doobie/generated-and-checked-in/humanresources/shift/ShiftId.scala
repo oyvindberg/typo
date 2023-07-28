@@ -19,6 +19,6 @@ object ShiftId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[ShiftId] =
     Decoder[Int].map(ShiftId(_))
-  implicit val metaArray: Meta[Array[ShiftId]] = Meta[Array[Int]].imap(_.map(ShiftId.apply))(_.map(_.value))
   implicit val meta: Meta[ShiftId] = Meta[Int].imap(ShiftId.apply)(_.value)
+  implicit val metaArray: Meta[Array[ShiftId]] = Meta[Array[Int]].imap(_.map(ShiftId.apply))(_.map(_.value))
 }

@@ -13,9 +13,7 @@ import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object VendorRepoImpl extends VendorRepo {
@@ -81,10 +79,6 @@ object VendorRepoImpl extends VendorRepo {
        """.as(VendorRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
-    implicit val toStatement: ToStatement[Array[BusinessentityId]] =
-      (s: PreparedStatement, index: Int, v: Array[BusinessentityId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = ANY($businessentityids)

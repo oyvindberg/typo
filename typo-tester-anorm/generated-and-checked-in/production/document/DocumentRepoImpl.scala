@@ -12,9 +12,7 @@ import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -92,10 +90,6 @@ object DocumentRepoImpl extends DocumentRepo {
        """.as(DocumentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
-    implicit val toStatement: ToStatement[Array[DocumentId]] =
-      (s: PreparedStatement, index: Int, v: Array[DocumentId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("varchar", v.map(x => x.value)))
-    
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from production."document"
           where documentnode = ANY($documentnodes)

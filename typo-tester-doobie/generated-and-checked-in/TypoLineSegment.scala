@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -31,20 +32,22 @@ object TypoLineSegment {
         "p1" := row.p1,
         "p2" := row.p2
       )}
-  implicit val TypoLineSegmentGet: Get[TypoLineSegment] =
+  implicit val get: Get[TypoLineSegment] =
     Get.Advanced.other[PGlseg](cats.data.NonEmptyList.one("lseg"))
       .map(v => TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
   
-  implicit val TypoLineSegmentPut: Put[TypoLineSegment] =
+  implicit val put: Put[TypoLineSegment] =
     Put.Advanced.other[PGlseg](NonEmptyList.one("lseg"))
       .contramap(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
   
-  implicit val TypoLineSegmentGetArray: Get[Array[TypoLineSegment]] =
+  implicit val meta: Meta[TypoLineSegment] = new Meta(get, put)
+  val gets: Get[Array[TypoLineSegment]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_lseg"))
       .map(_.map(v => TypoLineSegment(TypoPoint(v.asInstanceOf[PGlseg].point(0).x, v.asInstanceOf[PGlseg].point(0).y), TypoPoint(v.asInstanceOf[PGlseg].point(1).x, v.asInstanceOf[PGlseg].point(1).y))))
   
-  implicit val TypoLineSegmentPutArray: Put[Array[TypoLineSegment]] =
+  val puts: Put[Array[TypoLineSegment]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_lseg"), "lseg")
       .contramap(_.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
-
+  
+  implicit val metas: Meta[Array[TypoLineSegment]] = new Meta(gets, puts)
 }

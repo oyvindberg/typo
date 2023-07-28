@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,20 +31,22 @@ object TypoPoint {
         "x" := row.x,
         "y" := row.y
       )}
-  implicit val TypoPointGet: Get[TypoPoint] =
+  implicit val get: Get[TypoPoint] =
     Get.Advanced.other[PGpoint](cats.data.NonEmptyList.one("point"))
       .map(v => TypoPoint(v.x, v.y))
   
-  implicit val TypoPointPut: Put[TypoPoint] =
+  implicit val put: Put[TypoPoint] =
     Put.Advanced.other[PGpoint](NonEmptyList.one("point"))
       .contramap(v => new PGpoint(v.x, v.y))
   
-  implicit val TypoPointGetArray: Get[Array[TypoPoint]] =
+  implicit val meta: Meta[TypoPoint] = new Meta(get, put)
+  val gets: Get[Array[TypoPoint]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_point"))
       .map(_.map(v => TypoPoint(v.asInstanceOf[PGpoint].x, v.asInstanceOf[PGpoint].y)))
   
-  implicit val TypoPointPutArray: Put[Array[TypoPoint]] =
+  val puts: Put[Array[TypoPoint]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_point"), "point")
       .contramap(_.map(v => new PGpoint(v.x, v.y)))
-
+  
+  implicit val metas: Meta[Array[TypoPoint]] = new Meta(gets, puts)
 }

@@ -18,6 +18,7 @@ object CultureId {
   implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)
   implicit val format: Format[CultureId] = implicitly[Format[/* bpchar */ String]].bimap(CultureId.apply, _.value)
   implicit val toStatement: ToStatement[CultureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[CultureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit val column: Column[CultureId] = implicitly[Column[/* bpchar */ String]].map(CultureId.apply)
   implicit val parameterMetadata: ParameterMetaData[CultureId] = new ParameterMetaData[CultureId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType

@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -31,20 +32,22 @@ object TypoPath {
         "open" := row.open,
         "points" := row.points
       )}
-  implicit val TypoPathGet: Get[TypoPath] =
+  implicit val get: Get[TypoPath] =
     Get.Advanced.other[PGpath](cats.data.NonEmptyList.one("path"))
       .map(v => TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
   
-  implicit val TypoPathPut: Put[TypoPath] =
+  implicit val put: Put[TypoPath] =
     Put.Advanced.other[PGpath](NonEmptyList.one("path"))
       .contramap(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open))
   
-  implicit val TypoPathGetArray: Get[Array[TypoPath]] =
+  implicit val meta: Meta[TypoPath] = new Meta(get, put)
+  val gets: Get[Array[TypoPath]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_path"))
       .map(_.map(v => TypoPath(v.asInstanceOf[PGpath].isOpen, v.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)))
   
-  implicit val TypoPathPutArray: Put[Array[TypoPath]] =
+  val puts: Put[Array[TypoPath]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_path"), "path")
       .contramap(_.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
-
+  
+  implicit val metas: Meta[Array[TypoPath]] = new Meta(gets, puts)
 }

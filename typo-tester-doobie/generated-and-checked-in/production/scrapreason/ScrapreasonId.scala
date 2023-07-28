@@ -19,6 +19,6 @@ object ScrapreasonId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[ScrapreasonId] =
     Decoder[Int].map(ScrapreasonId(_))
-  implicit val metaArray: Meta[Array[ScrapreasonId]] = Meta[Array[Int]].imap(_.map(ScrapreasonId.apply))(_.map(_.value))
   implicit val meta: Meta[ScrapreasonId] = Meta[Int].imap(ScrapreasonId.apply)(_.value)
+  implicit val metaArray: Meta[Array[ScrapreasonId]] = Meta[Array[Int]].imap(_.map(ScrapreasonId.apply))(_.map(_.value))
 }

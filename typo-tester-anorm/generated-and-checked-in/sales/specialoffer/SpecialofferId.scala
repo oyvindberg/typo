@@ -18,6 +18,7 @@ object SpecialofferId {
   implicit val ordering: Ordering[SpecialofferId] = Ordering.by(_.value)
   implicit val format: Format[SpecialofferId] = implicitly[Format[Int]].bimap(SpecialofferId.apply, _.value)
   implicit val toStatement: ToStatement[SpecialofferId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[SpecialofferId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[SpecialofferId] = implicitly[Column[Int]].map(SpecialofferId.apply)
   implicit val parameterMetadata: ParameterMetaData[SpecialofferId] = new ParameterMetaData[SpecialofferId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

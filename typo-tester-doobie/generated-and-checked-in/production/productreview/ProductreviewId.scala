@@ -19,6 +19,6 @@ object ProductreviewId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[ProductreviewId] =
     Decoder[Int].map(ProductreviewId(_))
-  implicit val metaArray: Meta[Array[ProductreviewId]] = Meta[Array[Int]].imap(_.map(ProductreviewId.apply))(_.map(_.value))
   implicit val meta: Meta[ProductreviewId] = Meta[Int].imap(ProductreviewId.apply)(_.value)
+  implicit val metaArray: Meta[Array[ProductreviewId]] = Meta[Array[Int]].imap(_.map(ProductreviewId.apply))(_.map(_.value))
 }

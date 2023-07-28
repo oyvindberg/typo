@@ -19,6 +19,6 @@ object LocationId {
     Encoder[Int].contramap(_.value)
   implicit val decoder: Decoder[LocationId] =
     Decoder[Int].map(LocationId(_))
-  implicit val metaArray: Meta[Array[LocationId]] = Meta[Array[Int]].imap(_.map(LocationId.apply))(_.map(_.value))
   implicit val meta: Meta[LocationId] = Meta[Int].imap(LocationId.apply)(_.value)
+  implicit val metaArray: Meta[Array[LocationId]] = Meta[Array[Int]].imap(_.map(LocationId.apply))(_.map(_.value))
 }

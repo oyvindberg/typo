@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -84,10 +82,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
        """.as(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
-    implicit val toStatement: ToStatement[Array[ShipmethodId]] =
-      (s: PreparedStatement, index: Int, v: Array[ShipmethodId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)

@@ -18,6 +18,7 @@ object CurrencyId {
   implicit val ordering: Ordering[CurrencyId] = Ordering.by(_.value)
   implicit val format: Format[CurrencyId] = implicitly[Format[/* bpchar */ String]].bimap(CurrencyId.apply, _.value)
   implicit val toStatement: ToStatement[CurrencyId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[CurrencyId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit val column: Column[CurrencyId] = implicitly[Column[/* bpchar */ String]].map(CurrencyId.apply)
   implicit val parameterMetadata: ParameterMetaData[CurrencyId] = new ParameterMetaData[CurrencyId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType

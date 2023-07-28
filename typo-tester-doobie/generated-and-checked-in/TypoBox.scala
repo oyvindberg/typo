@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -34,20 +35,22 @@ object TypoBox {
         "x2" := row.x2,
         "y2" := row.y2
       )}
-  implicit val TypoBoxGet: Get[TypoBox] =
+  implicit val get: Get[TypoBox] =
     Get.Advanced.other[PGbox](cats.data.NonEmptyList.one("box"))
       .map(v => TypoBox(v.point(0).x, v.point(0).y, v.point(1).x, v.point(1).y))
   
-  implicit val TypoBoxPut: Put[TypoBox] =
+  implicit val put: Put[TypoBox] =
     Put.Advanced.other[PGbox](NonEmptyList.one("box"))
       .contramap(v => new PGbox(v.x1, v.y1, v.x2, v.y2))
   
-  implicit val TypoBoxGetArray: Get[Array[TypoBox]] =
+  implicit val meta: Meta[TypoBox] = new Meta(get, put)
+  val gets: Get[Array[TypoBox]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_box"))
       .map(_.map(v => TypoBox(v.asInstanceOf[PGbox].point(0).x, v.asInstanceOf[PGbox].point(0).y, v.asInstanceOf[PGbox].point(1).x, v.asInstanceOf[PGbox].point(1).y)))
   
-  implicit val TypoBoxPutArray: Put[Array[TypoBox]] =
+  val puts: Put[Array[TypoBox]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_box"), "box")
       .contramap(_.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))
-
+  
+  implicit val metas: Meta[Array[TypoBox]] = new Meta(gets, puts)
 }

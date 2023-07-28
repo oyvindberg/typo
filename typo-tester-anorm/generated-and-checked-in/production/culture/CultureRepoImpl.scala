@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object CultureRepoImpl extends CultureRepo {
@@ -68,10 +66,6 @@ object CultureRepoImpl extends CultureRepo {
        """.as(CultureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
-    implicit val toStatement: ToStatement[Array[CultureId]] =
-      (s: PreparedStatement, index: Int, v: Array[CultureId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
-    
     SQL"""select cultureid, "name", modifieddate
           from production.culture
           where cultureid = ANY($cultureids)

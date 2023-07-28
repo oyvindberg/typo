@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,20 +31,22 @@ object TypoCircle {
         "center" := row.center,
         "radius" := row.radius
       )}
-  implicit val TypoCircleGet: Get[TypoCircle] =
+  implicit val get: Get[TypoCircle] =
     Get.Advanced.other[PGcircle](cats.data.NonEmptyList.one("circle"))
       .map(v => TypoCircle(TypoPoint(v.center.x, v.center.y), v.radius))
   
-  implicit val TypoCirclePut: Put[TypoCircle] =
+  implicit val put: Put[TypoCircle] =
     Put.Advanced.other[PGcircle](NonEmptyList.one("circle"))
       .contramap(v => new PGcircle(v.center.x, v.center.y, v.radius))
   
-  implicit val TypoCircleGetArray: Get[Array[TypoCircle]] =
+  implicit val meta: Meta[TypoCircle] = new Meta(get, put)
+  val gets: Get[Array[TypoCircle]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_circle"))
       .map(_.map(v => TypoCircle(TypoPoint(v.asInstanceOf[PGcircle].center.x, v.asInstanceOf[PGcircle].center.y), v.asInstanceOf[PGcircle].radius)))
   
-  implicit val TypoCirclePutArray: Put[Array[TypoCircle]] =
+  val puts: Put[Array[TypoCircle]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_circle"), "circle")
       .contramap(_.map(v => new PGcircle(v.center.x, v.center.y, v.radius)))
-
+  
+  implicit val metas: Meta[Array[TypoCircle]] = new Meta(gets, puts)
 }

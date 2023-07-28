@@ -30,6 +30,7 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
 
   implicit val put: Put[Sector] = Put[String].contramap(_.value)
+  implicit val putArray: Put[Array[Sector]] = Put[Array[String]].contramap(_.map(_.value))
   implicit val get: Get[Sector] = Get[String].temap { str => ByName.get(str).toRight(s"$str was not among ${ByName.keys}") }
   implicit val write: Write[Sector] = Write[String].contramap(_.value)
   implicit val read: Read[Sector] = Read[String].map(x => ByName.getOrElse(x, throw new IllegalArgumentException(s"$x was not among ${ByName.keys}")))

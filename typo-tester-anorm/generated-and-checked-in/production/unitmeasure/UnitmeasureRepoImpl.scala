@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
@@ -68,10 +66,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
        """.as(UnitmeasureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
-    implicit val toStatement: ToStatement[Array[UnitmeasureId]] =
-      (s: PreparedStatement, index: Int, v: Array[UnitmeasureId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("bpchar", v.map(x => x.value)))
-    
     SQL"""select unitmeasurecode, "name", modifieddate
           from production.unitmeasure
           where unitmeasurecode = ANY($unitmeasurecodes)

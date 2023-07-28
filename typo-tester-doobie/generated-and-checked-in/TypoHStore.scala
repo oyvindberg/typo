@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -28,7 +29,7 @@ object TypoHStore {
       Json.obj(
         "value" := row.value
       )}
-  implicit val TypoHStoreGet: Get[TypoHStore] =
+  implicit val get: Get[TypoHStore] =
     Get.Advanced.other[java.util.Map[_, _]](cats.data.NonEmptyList.one("hstore"))
       .map(v => {
                   val b = Map.newBuilder[String, String]
@@ -36,7 +37,7 @@ object TypoHStore {
                   TypoHStore(b.result())
                 })
   
-  implicit val TypoHStorePut: Put[TypoHStore] =
+  implicit val put: Put[TypoHStore] =
     Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore"))
       .contramap(v => {
                         val b = new HashMap[String, String]
@@ -44,7 +45,8 @@ object TypoHStore {
                         b
                       })
   
-  implicit val TypoHStoreGetArray: Get[Array[TypoHStore]] =
+  implicit val meta: Meta[TypoHStore] = new Meta(get, put)
+  val gets: Get[Array[TypoHStore]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
       .map(_.map(v => {
                         val b = Map.newBuilder[String, String]
@@ -52,12 +54,13 @@ object TypoHStore {
                         TypoHStore(b.result())
                       }))
   
-  implicit val TypoHStorePutArray: Put[Array[TypoHStore]] =
+  val puts: Put[Array[TypoHStore]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
       .contramap(_.map(v => {
                               val b = new HashMap[String, String]
                               v.value.foreach { case (k, v) => b.put(k, v)}
                               b
                             }))
-
+  
+  implicit val metas: Meta[Array[TypoHStore]] = new Meta(gets, puts)
 }

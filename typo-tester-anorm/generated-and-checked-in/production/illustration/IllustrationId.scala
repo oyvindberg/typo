@@ -18,6 +18,7 @@ object IllustrationId {
   implicit val ordering: Ordering[IllustrationId] = Ordering.by(_.value)
   implicit val format: Format[IllustrationId] = implicitly[Format[Int]].bimap(IllustrationId.apply, _.value)
   implicit val toStatement: ToStatement[IllustrationId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[IllustrationId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[IllustrationId] = implicitly[Column[Int]].map(IllustrationId.apply)
   implicit val parameterMetadata: ParameterMetaData[IllustrationId] = new ParameterMetaData[IllustrationId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

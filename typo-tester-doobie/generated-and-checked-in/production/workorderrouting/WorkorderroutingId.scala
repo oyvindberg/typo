@@ -16,7 +16,7 @@ import io.circe.Json
 /** Type for the composite primary key of table `production.workorderrouting` */
 case class WorkorderroutingId(workorderid: WorkorderId, productid: Int, operationsequence: Int)
 object WorkorderroutingId {
-  implicit def ordering: Ordering[WorkorderroutingId] = Ordering.by(x => (x.workorderid, x.productid, x.operationsequence))
+  implicit val ordering: Ordering[WorkorderroutingId] = Ordering.by(x => (x.workorderid, x.productid, x.operationsequence))
   implicit val decoder: Decoder[WorkorderroutingId] =
     (c: HCursor) =>
       for {

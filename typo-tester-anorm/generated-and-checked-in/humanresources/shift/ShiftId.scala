@@ -18,6 +18,7 @@ object ShiftId {
   implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit val format: Format[ShiftId] = implicitly[Format[Int]].bimap(ShiftId.apply, _.value)
   implicit val toStatement: ToStatement[ShiftId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[ShiftId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ShiftId] = implicitly[Column[Int]].map(ShiftId.apply)
   implicit val parameterMetadata: ParameterMetaData[ShiftId] = new ParameterMetaData[ShiftId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType

@@ -11,9 +11,7 @@ import adventureworks.Defaulted
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.time.LocalDateTime
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
@@ -74,10 +72,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
        """.as(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
-    implicit val toStatement: ToStatement[Array[ProductphotoId]] =
-      (s: PreparedStatement, index: Int, v: Array[ProductphotoId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("int4", v.map(x => x.value: Integer)))
-    
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
           where productphotoid = ANY($productphotoids)

@@ -7,6 +7,7 @@ package adventureworks
 
 import cats.data.NonEmptyList
 import doobie.Get
+import doobie.Meta
 import doobie.Put
 import io.circe.Decoder
 import io.circe.Encoder
@@ -28,11 +29,11 @@ object TypoInet {
       Json.obj(
         "value" := row.value
       )}
-  implicit val TypoInetGet: Get[TypoInet] =
+  implicit val get: Get[TypoInet] =
     Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("inet"))
       .map(v => TypoInet(v.getValue))
   
-  implicit val TypoInetPut: Put[TypoInet] =
+  implicit val put: Put[TypoInet] =
     Put.Advanced.other[PGobject](NonEmptyList.one("inet"))
       .contramap(v => {
                         val obj = new PGobject
@@ -41,11 +42,12 @@ object TypoInet {
                         obj
                       })
   
-  implicit val TypoInetGetArray: Get[Array[TypoInet]] =
+  implicit val meta: Meta[TypoInet] = new Meta(get, put)
+  val gets: Get[Array[TypoInet]] =
     Get.Advanced.array[AnyRef](NonEmptyList.one("_inet"))
       .map(_.map(v => TypoInet(v.asInstanceOf[PGobject].getValue)))
   
-  implicit val TypoInetPutArray: Put[Array[TypoInet]] =
+  val puts: Put[Array[TypoInet]] =
     Put.Advanced.array[AnyRef](NonEmptyList.one("_inet"), "inet")
       .contramap(_.map(v => {
                               val obj = new PGobject
@@ -53,5 +55,6 @@ object TypoInet {
                               obj.setValue(v.value)
                               obj
                             }))
-
+  
+  implicit val metas: Meta[Array[TypoInet]] = new Meta(gets, puts)
 }

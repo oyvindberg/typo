@@ -19,6 +19,7 @@ object AccountNumber {
   implicit def ordering(implicit ev: Ordering[String]): Ordering[AccountNumber] = Ordering.by(_.value)
   implicit val format: Format[AccountNumber] = implicitly[Format[String]].bimap(AccountNumber.apply, _.value)
   implicit val toStatement: ToStatement[AccountNumber] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val toStatementArray: ToStatement[Array[AccountNumber]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val column: Column[AccountNumber] = implicitly[Column[String]].map(AccountNumber.apply)
   implicit val parameterMetadata: ParameterMetaData[AccountNumber] = new ParameterMetaData[AccountNumber] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType

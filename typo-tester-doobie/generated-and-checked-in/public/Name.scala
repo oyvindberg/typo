@@ -20,6 +20,6 @@ object Name {
     Encoder[String].contramap(_.value)
   implicit val decoder: Decoder[Name] =
     Decoder[String].map(Name(_))
-  implicit val metaArray: Meta[Array[Name]] = Meta[Array[String]].imap(_.map(Name.apply))(_.map(_.value))
   implicit val meta: Meta[Name] = Meta[String].imap(Name.apply)(_.value)
+  implicit val metaArray: Meta[Array[Name]] = Meta[Array[String]].imap(_.map(Name.apply))(_.map(_.value))
 }
